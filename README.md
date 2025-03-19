@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> This project is currently only developer stable
+>
+
 <div style="text-align:center">
     <h1>Ultimate WebAssembly Virtual Machine</h1>
     <a href="LICENSE.md">
@@ -7,10 +11,6 @@
         <img src="https://img.shields.io/badge/language-c++26-blue.svg" ,alt="cppreference" />
     </a>
 </div>
-
-> [!IMPORTANT]
-> This project is currently only developer stable
->
 
 ## Introduce
 Ultimate WebAssembly Virtual Machine (Version 2).
