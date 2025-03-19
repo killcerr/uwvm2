@@ -7,7 +7,7 @@
 * NetBSD: unknown(50+)-netbsd
 * OpenBSD: unknown-openbsd
 * DragonflyBSD: (x86\_64, i386, aarch64, arm, powerpc64, etc.)-dragonfly
-* WASI (bootstrap): (wasm32, wasm64)-(wasip1, wasip2)-(threads)
+* WASI (bootstrap): (wasm32, wasm64)-(wasip1, wasip2)-(none, threads, neoh)
 * SerenityOS: (x86\_64, i686)-serenity
 * SunOS: (sparc, x86)-(sunos, solaris)-gnu
 
@@ -21,17 +21,18 @@
 * MinGW: i686-windows-gnu (aka. i686-w64-mingw32)
 
 ## DOS
-* MS-DOS DJGPP: i386-msdosdjgpp
+* MS-DOS, FreeDOS (DJGPP): i386-msdosdjgpp
 
 ## Host C Library Environment
 * newlib: unknown-elf; (x86\_64, i386, etc.)-(cygwin, msys2)
 * avr: avr-elf
 
-## Kernel
-* Windows NT kernel Driver
-* Linux kernel Module
+# Compiler Support
+- GCC >= 15
+- Clang >= 21
+- MSVC >= 14.30
 
-## Other System
-* Managarm
-* Vinix
-* etc.
+# C++ standard library support (Version is the same as the version released with the corresponding supported compiler)
+- GCC libstdc++
+- LLVM libc++
+- MSVC STL
