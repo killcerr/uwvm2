@@ -8,5 +8,10 @@
     </a>
 </div>
 
+> [!IMPORTANT]
+> This project is currently only developer stable
+>
+
 ## Introduce
-Ultimate WebAssembly Virtual Machine (Version 2)
+Ultimate WebAssembly Virtual Machine (Version 2).
+Supports over 100 triplet platforms, including DOS series, POSIX series, Windows 9x series, Windows NT series, and the Minimal C Library Series. Supports interpretation execution (INT), just-in-time compilation (JIT), and tiered compilation (TC). 
