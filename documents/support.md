@@ -27,12 +27,15 @@
 * newlib: unknown-elf; (x86\_64, i386, etc.)-(cygwin, msys2)
 * avr: avr-elf
 
+# C++ version support
+- Full ISO C++26
+
 # Compiler Support
 - GCC >= 15
 - Clang >= 21
 - MSVC >= 14.30
 
 # C++ standard library support (Version is the same as the version released with the corresponding supported compiler)
-- GCC libstdc++
+- GNU libstdc++
 - LLVM libc++
 - MSVC STL
