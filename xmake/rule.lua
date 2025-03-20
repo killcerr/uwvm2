@@ -50,3 +50,8 @@ end)
 ---rule tables
 ---@type string[]
 support_rules_table = { "debug", "release", "minsizerel", "releasedbg" }
+
+---set rules
+add_rules(support_rules_table)
+set_defaultmode("releasedbg")
+set_allowedmodes(support_rules_table)

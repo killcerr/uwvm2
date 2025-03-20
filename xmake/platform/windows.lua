@@ -9,6 +9,10 @@ function windows_target()
         set_extension(".exe")
     end
 
+    if is_mode("debug") then
+        add_cxflags("/guard:cf") -- enable Control Flow Guard
+    end
+
     add_cxflags("-GR-") -- disable rtti
 
     local static_link = get_config("static")

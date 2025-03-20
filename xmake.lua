@@ -40,6 +40,10 @@ function def_build()
 
     if is_plat("windows") then
         windows_target()
+    elseif is_plat("mingw") then
+        mingw_target()
+    else
+        error("Unknown Target!")
     end
 end
 

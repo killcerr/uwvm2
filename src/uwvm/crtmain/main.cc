@@ -20,7 +20,7 @@
 import uwvm;
 
 /**
- * @brief main func
+ * @brief (crt) main func. The main function is a special function, but there are still meaningless gnu::used and extern "C" properties.
  * @param argc Argument Count
  * @param argv Argument Vector
  * @return exit(3)
