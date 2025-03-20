@@ -22,3 +22,4 @@ Most wasm standards are supported. See [feature.md](documents/features.md)
 ### Supports multiple platforms
 Supports over 100 triplet platforms, including DOS series, POSIX series, Windows 9x series, Windows NT series, and the Host C Library Series. Supports interpretation execution (INT), just-in-time compilation (JIT), and tiered compilation (TC). See [support.md](documents/support.md) for details.
 
+## How to build

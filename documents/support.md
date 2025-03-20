@@ -17,7 +17,7 @@
 * MinGW: (x86\_64, i686, aarch64, arm)-windows-gnu (aka. unknown-w64-mingw32)
 
 ## Windows 9x
-* Supported system versions: Windows 95, Windows ME, Windows 98
+* Supported system versions: Windows 95, Windows 98, Windows ME
 * MinGW: i686-windows-gnu (aka. i686-w64-mingw32)
 
 ## DOS
