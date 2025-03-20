@@ -112,14 +112,24 @@ option("winmin", function()
     (
         "Minimum system required Minimum value for _WIN32_WINNT, _WIN32_WINDOWS and WINVER.",
         [[    default: Use the default compiler macro definition. In general, MinGW is 0x0A00, MSVC is not defined.]],
-        [[    WIN10: Windows 10 (11), -D_WIN32_WINNT=0x0A00]],
+        [[    WS25: Windows Server 2025, -D_WIN32_WINNT=0x0A00]],
+        [[    WIN11: Windows 11, -D_WIN32_WINNT=0x0A00]],
+        [[    WS22: Windows Server 2022, -D_WIN32_WINNT=0x0A00]],    
+        [[    WS19: Windows Server 2019, -D_WIN32_WINNT=0x0A00]],    
+        [[    WS16: Windows Server 2016, -D_WIN32_WINNT=0x0A00]],    
+        [[    WIN10: Windows 10, -D_WIN32_WINNT=0x0A00]],
+        [[    WS12R2: Windows Server 2012 R2, -D_WIN32_WINNT=0x0603]],    
         [[    WINBLUE: Windows 8.1, -D_WIN32_WINNT=0x0603]],
+        [[    WS12: Windows Server 2012, -D_WIN32_WINNT=0x0602]],    
         [[    WIN8: Windows 8, -D_WIN32_WINNT=0x0602]],
+        [[    WS08R2: Windows Server 2008 R2, -D_WIN32_WINNT=0x0601]],
         [[    WIN7: Windows 7, -D_WIN32_WINNT=0x0601]],
         [[    WS08: Windows Server 2008, -D_WIN32_WINNT=0x0600]],
         [[    VISTA: Windows Vista, -D_WIN32_WINNT=0x0600]],
-        [[    WS03: Windows Server 2003, -D_WIN32_WINNT=0x0502]],
+        [[    WS03R2: Windows Server 2003 R2, -D_WIN32_WINNT=0x0502]],
+        [[    WS03: Windows Server 2003, -D_WIN32_WINNT=0x0501]],
         [[    WINXP: Windows XP, -D_WIN32_WINNT=0x0501]],
+        [[    WS2K: Windows Server 2000, -D_WIN32_WINNT=0x0500]],
         [[    WIN2K: Windows 2000, -D_WIN32_WINNT=0x0500]],
         [[    WINME: Windows ME, -D_WIN32_WINDOWS=0x0490]],
         [[    WIN98: Windows 98, -D_WIN32_WINDOWS=0x0410]],
@@ -127,5 +137,30 @@ option("winmin", function()
         [[Errors may be reported as "version not recognized: Windows Version not recognized".]]
     )
     set_default("default")
-    set_values("WIN10", "WINBLUE", "WIN8", "WIN7", "WS08", "VISTA", "WS03", "WINXP", "WIN2K", "WINME", "WIN98", "WIN95")
+    set_values
+    (
+        "default",
+        "WS25", 
+        "WIN11", 
+        "WS22", 
+        "WS19", 
+        "WS16", 
+        "WIN10",
+        "WS12R2", 
+        "WINBLUE",
+        "WS12",
+        "WIN8", 
+        "WS08R2", 
+        "WIN7",         
+        "WS08", 
+        "VISTA", 
+        "WS03R2", 
+        "WS03", 
+        "WINXP", 
+        "WS2K", 
+        "WIN2K",        
+        "WINME", 
+        "WIN98", 
+        "WIN95", 
+    )
 end)

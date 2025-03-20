@@ -12,7 +12,7 @@
 * SunOS: (sparc, x86)-(sunos, solaris)-gnu
 
 ## Windows NT
-* Supported system versions: Windows 2000, Windows XP, Windows Vista, Windows 7, Windows 8, Windows Blue, Windows 10, Windows 11
+* Supported system versions: Windows 2000 (Windows Server 2000), Windows XP (Windows Server 2003), Windows Server 2003 R2, Windows Vista (Windows Server 2008), Windows 7 (Windows Server 2008 R2), Windows 8 (Windows Server 2012), Windows Blue (Windows Server 2012 R2), Windows 10 (Windows Server 2016, Windows Server 2019, Windows Server 2022), Windows 11 (Windows Server 2025)
 * MSVC: (x86\_64, i686, aarch64, arm)-windows-msvc
 * MinGW: (x86\_64, i686, aarch64, arm)-windows-gnu (aka. unknown-w64-mingw32)
 
