@@ -113,6 +113,25 @@ option("use-llvm", function()
     )
     set_default(false)
 end)
+
+option("disable-int", function()
+    set_description
+    (
+        "uwvm interpreter is not included",
+        "default = false"
+    )
+    set_default(false)
+end)
+
+option("disable-jit", function()
+    set_description
+    (
+        "uwvm jit is not included",
+        "default = false"
+    )
+    set_default(false)
+end)
+
 -- WINDOWS
 
 option("winmin", function()
@@ -177,6 +196,29 @@ option("winmin", function()
         "NT400",
         "NT351",
         "NT350",
-        "NT310",
+        "NT310"
     )
+end)
+
+-- uwvm Debug Option
+
+option("debug-timer", function()
+    set_description
+    (
+        "Add timer functionality to each module.",
+        "default = false"
+    )
+    set_default(false)
+end)
+
+-- uwvm special build options
+
+option("fno-exceptions", function()
+    set_description
+    (
+        "The uwvm's wasi relies on the cpp exception. Turn off the cpp exception with this parameter so that it can be used in an environment where exceptions are forbidden. " ..
+        "(This option causes the program to crash if some system calls fail, and it will be removed after herbception (P0709) enters the ios c++ standard)",
+        "default = false"
+    )
+    set_default(false)
 end)

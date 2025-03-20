@@ -1,17 +1,21 @@
 function windows_target()
+    local use_llvm_toolchain = get_config("use-llvm")
     if use_llvm_toolchain then	
         set_toolchains("clang-cl")
-        add_cxflags("-std:c++latest")
+        --add_cxflags("-std:c++latest")
     end
+
     if is_kind("binary") then
         set_extension(".exe")
     end
 
     add_cxflags("-GR-") -- disable rtti
 
+    local static_link = get_config("static")
+
     if is_mode("debug") then
-        add_cxflags("-GS")
-        local static_link = get_config("static")
+        add_cxflags("-GS") -- enable buffer overflow check
+
         if static_link then	
             set_runtimes("MTd")
         else
@@ -22,9 +26,8 @@ function windows_target()
 
         add_cxflags("-GS-") -- disable buffer overflow check
         add_cxflags("-GL") -- Whole Program Optimization
-        add_ldflags("-LTCG") -- Link Time Code Generation
+        --add_ldflags("-LTCG") -- Link Time Code Generation
 
-        local static_link = get_config("static")
         if static_link then	
             set_runtimes("MT")
         else
@@ -82,31 +85,36 @@ function windows_target()
     -- Windows 9x (with win32 api)
 
     elseif opt_name == "WINME" then
-        add_cxflags("-U_WIN32_WINNT")
+        add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0490")
     elseif opt_name == "WIN98" then
-        add_cxflags("-U_WIN32_WINNT")
+        add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0410")
     elseif opt_name == "WIN95" then
-        add_cxflags("-U_WIN32_WINNT")
+        add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0400")
 
     -- Windows NT (without win32 api)
 
     elseif opt_name == "NT400" then
-        add_cxflags("-U_WIN32_WINNT")
+        add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0400")
     elseif opt_name == "NT351" then
-        add_cxflags("-U_WIN32_WINNT")
+        add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0351")
     elseif opt_name == "NT350" then
-        add_cxflags("-U_WIN32_WINNT")
+        add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0350")    
     elseif opt_name == "NT310" then
-        add_cxflags("-U_WIN32_WINNT")
+        add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0310")
     else
         error("invalid value")
     end
 
+    local march = get_config("march")
+    if march == "no" or march == "default" then
+    else
+        error("windows (unknown-windows-msvc) does not support custom march!")
+    end
 end
