@@ -59,10 +59,10 @@ option("unwindlib", function()
         "The option is automatically added if using our toolchain option.",
         [[    default: Don't set the "unwindlib" option, use the default unwindlib of clang.]],
         [[    libgcc/libunwind/platform: Set the option "unwindlib" if rtlib is "compiler-rt".]],
-        [[    force_libgcc/force_libunwind/force_platform: Always set the "unwindlib" option.]]
+        [[    force-libgcc/force-libunwind/force-platform: Always set the "unwindlib" option.]]
         )
     set_default("default")
-    set_values("default", "libgcc", "libunwind", "platform", "force_libgcc", "force_libunwind", "force_platform")
+    set_values("default", "libgcc", "libunwind", "platform", "force-libgcc", "force-libunwind", "force-platform")
     add_deps("rtlib")
     after_check(function(option)
         import("utility.utility")
@@ -96,6 +96,15 @@ option("enable-lto", function()
     set_default(true)
 end)
 
+option("static", function()
+    set_description
+    (
+        "The static flag is used to enable static linking of libraries instead of dynamic linking.",
+        "static linking is disable by default"
+    )
+    set_default(false)
+end)
+
 -- WINDOWS
 
 option("winmin", function()
@@ -117,5 +126,6 @@ option("winmin", function()
         [[    WIN95: Windows 95, -D_WIN32_WINDOWS=0x0400]],
         [[Errors may be reported as "version not recognized: Windows Version not recognized".]]
     )
-    set_default(true)
+    set_default("default")
+    set_values("WIN10", "WINBLUE", "WIN8", "WIN7", "WS08", "VISTA", "WS03", "WINXP", "WIN2K", "WINME", "WIN98", "WIN95")
 end)
