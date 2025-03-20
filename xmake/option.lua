@@ -105,12 +105,20 @@ option("static", function()
     set_default(false)
 end)
 
+option("use-llvm", function()
+    set_description
+    (
+        "Use Clang-CL under windows and clang on the rest of the platforms.",
+        "default = false"
+    )
+    set_default(false)
+end)
 -- WINDOWS
 
 option("winmin", function()
     set_description
     (
-        "Minimum system required Minimum value for _WIN32_WINNT, _WIN32_WINDOWS and WINVER.",
+        "Minimum (x86_64, i686, aarch64, arm) windows system required. Minimum value for _WIN32_WINNT, _WIN32_WINDOWS and WINVER.",
         [[    default: Use the default compiler macro definition. In general, MinGW is 0x0A00, MSVC is not defined.]],
         [[    WS25: Windows Server 2025, -D_WIN32_WINNT=0x0A00]],
         [[    WIN11: Windows 11, -D_WIN32_WINNT=0x0A00]],
@@ -134,6 +142,10 @@ option("winmin", function()
         [[    WINME: Windows ME, -D_WIN32_WINDOWS=0x0490]],
         [[    WIN98: Windows 98, -D_WIN32_WINDOWS=0x0410]],
         [[    WIN95: Windows 95, -D_WIN32_WINDOWS=0x0400]],
+        [[    NT400: Windows NT 4.0, -D_WINNT=0x0400]],
+        [[    NT351: Windows NT 3.51, -D_WINNT=0x0351]],
+        [[    NT350: Windows NT 3.5, -D_WINNT=0x0350]],
+        [[    NT310: Windows NT 3.1, -D_WINNT=0x0310]],
         [[Errors may be reported as "version not recognized: Windows Version not recognized".]]
     )
     set_default("default")
@@ -157,10 +169,14 @@ option("winmin", function()
         "WS03R2", 
         "WS03", 
         "WINXP", 
-        "WS2K", 
-        "WIN2K",        
+        "WS2K",
+        "WIN2K",
         "WINME", 
         "WIN98", 
         "WIN95", 
+        "NT400",
+        "NT351",
+        "NT350",
+        "NT310",
     )
 end)
