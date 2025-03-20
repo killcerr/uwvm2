@@ -2,12 +2,12 @@
 
 ## POSIX Environment
 * Linux: (x86\_64, i386, aarch64, arm, loongarch64, powerpc64, riscv, mips, etc.)-linux-(gnu, musl, llvm, mlibc, uclibc, etc.)
-* Darwin (macosx, iphoneos, watchos): (x86\_64, i386, aarch64, arm, powerpc64)-apple-darwin
+* Darwin: (macosx, iphoneos, watchos): (x86\_64, i386, aarch64, arm, powerpc64)-apple-darwin
 * FreeBSD: (x86\_64, i386, aarch64, arm, powerpc64, etc.)-freebsd(Version)
 * NetBSD: unknown(50+)-netbsd
 * OpenBSD: unknown-openbsd
 * DragonflyBSD: (x86\_64, i386, aarch64, arm, powerpc64, etc.)-dragonfly
-* WASI (bootstrap): (wasm32, wasm64)-(wasip1, wasip2)-(none, threads, neoh)
+* WASM-WASI (bootstrap): (wasm32, wasm64)-(wasip1, wasip2)-(none, threads, neoh)
 * SerenityOS: (x86\_64, i686)-serenity
 * SunOS: (sparc, x86)-(sunos, solaris)-gnu
 
@@ -26,6 +26,9 @@
 ## Host C Library Environment
 * newlib: unknown-elf; (x86\_64, i386, etc.)-(cygwin, msys2)
 * avr: avr-elf
+
+## Freestanding
+* ISO C++26 Freestanding Support
 
 # C++ version support
 - Full ISO C++26
