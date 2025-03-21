@@ -53,65 +53,80 @@ function windows_target()
         opt_name == "WIN10"
             then
         add_defines("_WIN32_WINNT=0x0A00")
+        add_defines("WINVER=0x0A00")
     elseif 
         opt_name == "WS12R2" or
         opt_name == "WINBLUE"
             then
         add_defines("_WIN32_WINNT=0x0603")
+        add_defines("WINVER=0x0603")
     elseif 
         opt_name == "WS12" or 
         opt_name == "WIN8" 
             then
         add_defines("_WIN32_WINNT=0x0602")
+        add_defines("WINVER=0x0602")
     elseif 
         opt_name == "WS08R2" or
         opt_name == "WIN7"
             then
         add_defines("_WIN32_WINNT=0x0601")
+        add_defines("WINVER=0x0601")
     elseif 
         opt_name == "WS08" or
         opt_name == "VISTA" 
             then
         add_defines("_WIN32_WINNT=0x0600")
+        add_defines("WINVER=0x0600")
     elseif opt_name == "WS03R2" then
         add_defines("_WIN32_WINNT=0x0502")
+        add_defines("WINVER=0x0502")
     elseif 
         opt_name == "WS03" or
         opt_name == "WINXP"
     then
         add_defines("_WIN32_WINNT=0x0501")
+        add_defines("WINVER=0x0501")
     elseif 
         opt_name == "WS2K" or
         opt_name == "WIN2K"
     then
         add_defines("_WIN32_WINNT=0x0500")
+        add_defines("WINVER=0x0500")
 
     -- Windows 9x (with win32 api)
 
     elseif opt_name == "WINME" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0490")
+        add_defines("WINVER=0x0490")
     elseif opt_name == "WIN98" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0410")
+        add_defines("WINVER=0x0410")
     elseif opt_name == "WIN95" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0400")
+        add_defines("WINVER=0x0400")
 
     -- Windows NT (without win32 api)
 
     elseif opt_name == "NT400" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0400")
+        add_defines("WINVER=0x0400")
     elseif opt_name == "NT351" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0351")
+        add_defines("WINVER=0x0351")
     elseif opt_name == "NT350" then
         add_undefines("_WIN32_WINNT")
-        add_defines("_WINNT=0x0350")    
+        add_defines("_WINNT=0x0350")
+        add_defines("WINVER=0x0350")
     elseif opt_name == "NT310" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0310")
+        add_defines("WINVER=0x0310")
     else
         error("invalid value")
     end
