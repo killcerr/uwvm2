@@ -52,7 +52,7 @@ function mingw_target()
             then
         add_defines("_WIN32_WINNT=0x0A00")
         add_defines("WINVER=0x0A00")
-        add_ldflags("-Wl,--major-subsystem-version=10", "-Wl,--minor-subsystem-version=0", {force = true})
+        --add_ldflags("-Wl,--major-subsystem-version=10", "-Wl,--minor-subsystem-version=0", {force = true}) -- During startup program exited with code 0xc000007b (invalid parameters).
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS12R2" or
@@ -132,7 +132,7 @@ function mingw_target()
         add_syslinks("msvcrt")
         add_ldflags("-static", {force = true}) -- Forced static linking on win9x
 
-    -- Windows NT (without win32 api)
+    -- Windows NT (without win32 api)，unverified.
 
     elseif opt_name == "NT400" then
         add_undefines("_WIN32_WINNT")

@@ -41,6 +41,7 @@ function windows_target()
 
     local opt_name = get_config("winmin")
     if opt_name == "default" then	
+        -- do nothing
 
     -- Windows NT (with win32 api)
 
@@ -54,45 +55,61 @@ function windows_target()
             then
         add_defines("_WIN32_WINNT=0x0A00")
         add_defines("WINVER=0x0A00")
+        add_ldflags("-SUBSYSTEM:CONSOLE")
+        add_syslinks("ntdll")
     elseif 
         opt_name == "WS12R2" or
         opt_name == "WINBLUE"
             then
         add_defines("_WIN32_WINNT=0x0603")
         add_defines("WINVER=0x0603")
+        add_ldflags("-SUBSYSTEM:CONSOLE,6.03")
+        add_syslinks("ntdll")
     elseif 
         opt_name == "WS12" or 
         opt_name == "WIN8" 
             then
         add_defines("_WIN32_WINNT=0x0602")
         add_defines("WINVER=0x0602")
+        add_ldflags("-SUBSYSTEM:CONSOLE,6.02")
+        add_syslinks("ntdll")
     elseif 
         opt_name == "WS08R2" or
         opt_name == "WIN7"
             then
         add_defines("_WIN32_WINNT=0x0601")
         add_defines("WINVER=0x0601")
+        add_ldflags("-SUBSYSTEM:CONSOLE,6.01")
+        add_syslinks("ntdll")
     elseif 
         opt_name == "WS08" or
         opt_name == "VISTA" 
             then
         add_defines("_WIN32_WINNT=0x0600")
         add_defines("WINVER=0x0600")
+        add_ldflags("-SUBSYSTEM:CONSOLE,6.00")
+        add_syslinks("ntdll")
     elseif opt_name == "WS03R2" then
         add_defines("_WIN32_WINNT=0x0502")
         add_defines("WINVER=0x0502")
+        add_ldflags("-SUBSYSTEM:CONSOLE,5.02")
+        add_syslinks("ntdll")
     elseif 
         opt_name == "WS03" or
         opt_name == "WINXP"
     then
         add_defines("_WIN32_WINNT=0x0501")
         add_defines("WINVER=0x0501")
+        add_ldflags("-SUBSYSTEM:CONSOLE,5.01")
+        add_syslinks("ntdll")
     elseif 
         opt_name == "WS2K" or
         opt_name == "WIN2K"
     then
         add_defines("_WIN32_WINNT=0x0500")
         add_defines("WINVER=0x0500")
+        add_ldflags("-SUBSYSTEM:CONSOLE,5.00")
+        add_syslinks("ntdll")
 
     -- Windows 9x (with win32 api)
 
@@ -100,33 +117,47 @@ function windows_target()
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0490")
         add_defines("WINVER=0x0490")
+        add_ldflags("-SUBSYSTEM:CONSOLE,4.90")
+        add_syslinks("mscvrt")
     elseif opt_name == "WIN98" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0410")
         add_defines("WINVER=0x0410")
+        add_ldflags("-SUBSYSTEM:CONSOLE,4.10")
+        add_syslinks("mscvrt")
     elseif opt_name == "WIN95" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0400")
         add_defines("WINVER=0x0400")
+        add_ldflags("-SUBSYSTEM:CONSOLE,4.00")
+        add_syslinks("mscvrt")
 
-    -- Windows NT (without win32 api)
+    -- Windows NT (without win32 api)，unverified.
 
     elseif opt_name == "NT400" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0400")
         add_defines("WINVER=0x0400")
+        add_ldflags("-SUBSYSTEM:CONSOLE,4.00")
+        add_syslinks("ntdll")
     elseif opt_name == "NT351" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0351")
         add_defines("WINVER=0x0351")
+        add_ldflags("-SUBSYSTEM:CONSOLE,3.51")
+        add_syslinks("ntdll")
     elseif opt_name == "NT350" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0350")
         add_defines("WINVER=0x0350")
+        add_ldflags("-SUBSYSTEM:CONSOLE,3.50")
+        add_syslinks("ntdll")
     elseif opt_name == "NT310" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0310")
         add_defines("WINVER=0x0310")
+        add_ldflags("-SUBSYSTEM:CONSOLE,3.10")
+        add_syslinks("ntdll")
     else
         error("invalid value")
     end

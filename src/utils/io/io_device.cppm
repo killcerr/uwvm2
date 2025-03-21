@@ -8,6 +8,7 @@
  * @file io_device.cppm
  * @brief Set up the lowest-level implementation of uwvm.
  * Use the C API in the minimal C host environment and the user-space lowest-level API in other environments.
+ * Automatically add file-form buffers to out and in.
  * @author MacroModel
  * @version 2.0.0
  * @date 2025-03-21
@@ -23,6 +24,8 @@
  *                                      *
  ****************************************/
 
+module;
+
 /// @brief utils.io module declaration
 export module utils.io;
 
@@ -32,6 +35,13 @@ import fast_io;
 export namespace uwvm
 {
 #ifndef __AVR__
+    /*
+        native stdout:
+        on non-windows systems (fd): (int)[0, 1, 2]
+        on win9x-win32 (handle): GetStdHandle([STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE])
+        on nt (handle): RtlGetCurrentPeb()->ProcessParameters->Standard[input, Output, Error]
+     */
+
     inline ::fast_io::u8native_io_observer u8in{::fast_io::u8in()};
     inline ::fast_io::basic_ibuf<::fast_io::u8native_io_observer> u8in_buf{u8in};
     inline ::fast_io::u8native_io_observer u8out{::fast_io::u8out()};

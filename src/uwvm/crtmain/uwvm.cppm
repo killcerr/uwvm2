@@ -22,6 +22,8 @@
  *                                      *
  ****************************************/
 
+module;
+
 /// @brief uwvm.crtmain module declaration
 export module uwvm.crtmain;
 
