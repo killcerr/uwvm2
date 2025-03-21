@@ -9,6 +9,8 @@ add_defines("UWVM_VERSION_Y=0")
 add_defines("UWVM_VERSION_Z=0")
 add_defines("UWVM_VERSION_S=0")
 
+set_allowedplats("windows", "mingw", "linux", "msdosdjgpp", "unix", "bsd", "freebsd", "dragonflybsd", "netbsd", "openbsd", "macosx", "iphoneos", "watchos", "wasm-wasi", "serenity", "sun", "cross")
+
 includes("xmake/impl.lua")
 includes("xmake/platform/impl.lua")
 
@@ -42,8 +44,6 @@ function def_build()
         windows_target()
     elseif is_plat("mingw") then
         mingw_target()
-    else
-        error("Unknown Target!")
     end
 end
 
@@ -51,6 +51,12 @@ target("uwvm")
 	set_kind("binary")
 	def_build()
 
+	-- libfast_io
+	add_includedirs("third-parties/fast_io/include")
+	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm")
+
+	-- uwvm
 	add_files("src/uwvm/crtmain/main.cc")
     add_files("src/uwvm/crtmain/uwvm.cppm")
+
 target_end()

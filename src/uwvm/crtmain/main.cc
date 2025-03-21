@@ -23,10 +23,8 @@
  *                                      *
  ****************************************/
 
-/**
- * @brief import uwvm module
- */
-import uwvm;
+/// @brief import uwvm.crtmain module
+import uwvm.crtmain;
 
 /**
  * @brief (crt) main func. The main function is a special function, but there are still meaningless gnu::used and extern "C" properties.

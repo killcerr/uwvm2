@@ -22,14 +22,13 @@
  *                                      *
  ****************************************/
 
-/**
- * @brief export uwvm module
- */
-export module uwvm;
+/// @brief uwvm.crtmain module declaration
+export module uwvm.crtmain;
 
-/**
- * @brief export uwvm namespace
- */
+/// @brief import fast_io module
+import fast_io;
+
+/// @brief export uwvm namespace
 export namespace uwvm
 {
     /**
@@ -39,5 +38,9 @@ export namespace uwvm
      * @return exit value
      * @see main()
      */
-    inline int uwvm_main(int argc, char const* const* argv) noexcept { return 0; }
+    inline int uwvm_main(int argc, char const* const* argv) noexcept
+    {
+        ::fast_io::io::perrln(::fast_io::u8out(), u8"test");
+        return 0;
+    }
 }  // namespace uwvm

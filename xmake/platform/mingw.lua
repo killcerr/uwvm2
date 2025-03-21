@@ -38,6 +38,7 @@ function mingw_target()
 
     local opt_name = get_config("winmin")
     if opt_name == "default" then	
+        add_syslinks("ntdll") -- link ntdll for default
 
     -- Windows NT (with win32 api)
 
@@ -51,7 +52,7 @@ function mingw_target()
             then
         add_defines("_WIN32_WINNT=0x0A00")
         add_defines("WINVER=0x0A00")
-        add_ldflags("--major-subsystem-version=10", "--minor-subsystem-version=0", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=10", "-Wl,--minor-subsystem-version=0", {force = true})
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS12R2" or
@@ -59,7 +60,7 @@ function mingw_target()
             then
         add_defines("_WIN32_WINNT=0x0603")
         add_defines("WINVER=0x0603")
-        add_ldflags("--major-subsystem-version=6", "--minor-subsystem-version=3", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=3", {force = true})
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS12" or 
@@ -67,7 +68,7 @@ function mingw_target()
             then
         add_defines("_WIN32_WINNT=0x0602")
         add_defines("WINVER=0x0602")
-        add_ldflags("--major-subsystem-version=6", "--minor-subsystem-version=2", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=2", {force = true})
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS08R2" or
@@ -75,7 +76,7 @@ function mingw_target()
             then
         add_defines("_WIN32_WINNT=0x0601")
         add_defines("WINVER=0x0601")
-        add_ldflags("--major-subsystem-version=6", "--minor-subsystem-version=1", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=1", {force = true})
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS08" or
@@ -83,12 +84,12 @@ function mingw_target()
             then
         add_defines("_WIN32_WINNT=0x0600")
         add_defines("WINVER=0x0600")
-        add_ldflags("--major-subsystem-version=6", "--minor-subsystem-version=0", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=0", {force = true})
         add_syslinks("ntdll")
     elseif opt_name == "WS03R2" then
         add_defines("_WIN32_WINNT=0x0502")
         add_defines("WINVER=0x0502")
-        add_ldflags("--major-subsystem-version=5", "--minor-subsystem-version=2", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=5", "-Wl,--minor-subsystem-version=2", {force = true})
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS03" or
@@ -96,7 +97,7 @@ function mingw_target()
     then
         add_defines("_WIN32_WINNT=0x0501")
         add_defines("WINVER=0x0501")
-        add_ldflags("--major-subsystem-version=5", "--minor-subsystem-version=1", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=5", "-Wl,--minor-subsystem-version=1", {force = true})
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS2K" or
@@ -104,7 +105,7 @@ function mingw_target()
     then
         add_defines("_WIN32_WINNT=0x0500")
         add_defines("WINVER=0x0500")
-        add_ldflags("--major-subsystem-version=5", "--minor-subsystem-version=0", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=5", "-Wl,--minor-subsystem-version=0", {force = true})
         add_syslinks("ntdll")
 
     -- Windows 9x (with win32 api)
@@ -113,21 +114,21 @@ function mingw_target()
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0490")
         add_defines("WINVER=0x0490")
-        add_ldflags("--major-subsystem-version=4", "--minor-subsystem-version=90", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=4", "-Wl,--minor-subsystem-version=90", {force = true})
         add_syslinks("msvcrt")
         add_ldflags("-static", {force = true}) -- Forced static linking on win9x
     elseif opt_name == "WIN98" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0410")
         add_defines("WINVER=0x0410")
-        add_ldflags("--major-subsystem-version=4", "--minor-subsystem-version=10", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=4", "-Wl,--minor-subsystem-version=10", {force = true})
         add_syslinks("msvcrt")
         add_ldflags("-static", {force = true}) -- Forced static linking on win9x
     elseif opt_name == "WIN95" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0400")
         add_defines("WINVER=0x0400")
-        add_ldflags("--major-subsystem-version=4", "--minor-subsystem-version=0", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=4", "-Wl,--minor-subsystem-version=0", {force = true})
         add_syslinks("msvcrt")
         add_ldflags("-static", {force = true}) -- Forced static linking on win9x
 
@@ -137,28 +138,28 @@ function mingw_target()
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0400")
         add_defines("WINVER=0x0400")
-        add_ldflags("--major-subsystem-version=4", "--minor-subsystem-version=0", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=4", "-Wl,--minor-subsystem-version=0", {force = true})
         add_syslinks("ntdll")
         add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
     elseif opt_name == "NT351" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0351")
         add_defines("WINVER=0x0351")
-        add_ldflags("--major-subsystem-version=3", "--minor-subsystem-version=51", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=3", "-Wl,--minor-subsystem-version=51", {force = true})
         add_syslinks("ntdll")
         add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
     elseif opt_name == "NT350" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0350")
         add_defines("WINVER=0x0350")
-        add_ldflags("--major-subsystem-version=3", "--minor-subsystem-version=50", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=3", "-Wl,--minor-subsystem-version=50", {force = true})
         add_syslinks("ntdll")
         add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
     elseif opt_name == "NT310" then
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0310")
         add_defines("WINVER=0x0310")
-        add_ldflags("--major-subsystem-version=3", "--minor-subsystem-version=10", {force = true})
+        add_ldflags("-Wl,--major-subsystem-version=3", "-Wl,--minor-subsystem-version=10", {force = true})
         add_syslinks("ntdll")
         add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
 
