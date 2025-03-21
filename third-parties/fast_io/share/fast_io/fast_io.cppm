@@ -25,6 +25,7 @@ export module fast_io;
 #include "fast_io_inc/legacy/c.inc"
 #include "fast_io_inc/legacy/filebuf.inc"
 #include "fast_io_inc/device.inc"
+#include "fast_io_inc/io_buffer.inc"
 #endif
 
 /*

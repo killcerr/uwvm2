@@ -7,8 +7,17 @@ using ::fast_io::nt_family;
 
 using ::fast_io::basic_nt_family_io_observer;
 using ::fast_io::basic_nt_family_file;
+
 using ::fast_io::nt_io_observer;
 using ::fast_io::nt_file;
+using ::fast_io::wnt_io_observer;
+using ::fast_io::wnt_file;
+using ::fast_io::u8nt_io_observer;
+using ::fast_io::u8nt_file;
+using ::fast_io::u16nt_io_observer;
+using ::fast_io::u16nt_file;
+using ::fast_io::u32nt_io_observer;
+using ::fast_io::u32nt_file;
 
 using ::fast_io::nt_stdin;
 using ::fast_io::nt_stdout;
@@ -16,8 +25,17 @@ using ::fast_io::nt_stderr;
 
 using ::fast_io::basic_win32_family_io_observer;
 using ::fast_io::basic_win32_family_file;
+
 using ::fast_io::win32_io_observer;
 using ::fast_io::win32_file;
+using ::fast_io::wwin32_io_observer;
+using ::fast_io::wwin32_file;
+using ::fast_io::u8win32_io_observer;
+using ::fast_io::u8win32_file;
+using ::fast_io::u16win32_io_observer;
+using ::fast_io::u16win32_file;
+using ::fast_io::u32win32_io_observer;
+using ::fast_io::u32win32_file;
 
 using ::fast_io::win32_stdin;
 using ::fast_io::win32_stdout;
@@ -27,10 +45,28 @@ using ::fast_io::win32_stderr;
 
 using ::fast_io::basic_posix_family_io_observer;
 using ::fast_io::basic_posix_family_file;
+
 using ::fast_io::posix_io_observer;
 using ::fast_io::posix_file;
+using ::fast_io::wposix_io_observer;
+using ::fast_io::wposix_file;
+using ::fast_io::u8posix_io_observer;
+using ::fast_io::u8posix_file;
+using ::fast_io::u16posix_io_observer;
+using ::fast_io::u16posix_file;
+using ::fast_io::u32posix_io_observer;
+using ::fast_io::u32posix_file;
+
 using ::fast_io::native_file;
 using ::fast_io::native_io_observer;
+using ::fast_io::wnative_file;
+using ::fast_io::wnative_io_observer;
+using ::fast_io::u8native_file;
+using ::fast_io::u8native_io_observer;
+using ::fast_io::u16native_file;
+using ::fast_io::u16native_io_observer;
+using ::fast_io::u32native_file;
+using ::fast_io::u32native_io_observer;
 
 using ::fast_io::at;
 using ::fast_io::drt;

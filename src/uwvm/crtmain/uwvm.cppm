@@ -28,6 +28,9 @@ export module uwvm.crtmain;
 /// @brief import fast_io module
 import fast_io;
 
+/// @brief import utils.io module
+import utils.io;
+
 /// @brief export uwvm namespace
 export namespace uwvm
 {
@@ -40,7 +43,7 @@ export namespace uwvm
      */
     inline int uwvm_main(int argc, char const* const* argv) noexcept
     {
-        ::fast_io::io::perrln(::fast_io::u8out(), u8"test");
+        ::fast_io::io::perr(::uwvm::u8err, u8"test\n");
         return 0;
     }
 }  // namespace uwvm

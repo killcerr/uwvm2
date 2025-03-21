@@ -51,9 +51,12 @@ target("uwvm")
 	set_kind("binary")
 	def_build()
 
-	-- libfast_io
+	-- third-parties/fast_io
 	add_includedirs("third-parties/fast_io/include")
 	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm")
+
+	-- utils
+	add_files("src/utils/**.cppm")
 
 	-- uwvm
 	add_files("src/uwvm/crtmain/main.cc")

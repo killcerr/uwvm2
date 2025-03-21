@@ -1,0 +1,48 @@
+﻿/********************************************************
+ * Ultimate WebAssembly Virtual Machine (Version 2)     *
+ * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Licensed under the APL-2 License (see LICENSE file). *
+ ********************************************************/
+
+/**
+ * @file io_device.cppm
+ * @brief Set up the lowest-level implementation of uwvm.
+ * Use the C API in the minimal C host environment and the user-space lowest-level API in other environments.
+ * @author MacroModel
+ * @version 2.0.0
+ * @date 2025-03-21
+ * @copyright APL-2 License
+ */
+
+/****************************************
+ *  _   _ __        ____     __ __  __  *
+ * | | | |\ \      / /\ \   / /|  \/  | *
+ * | | | | \ \ /\ / /  \ \ / / | |\/| | *
+ * | |_| |  \ V  V /    \ V /  | |  | | *
+ *  \___/    \_/\_/      \_/   |_|  |_| *
+ *                                      *
+ ****************************************/
+
+/// @brief utils.io module declaration
+export module utils.io;
+
+/// @brief import fast_io module
+import fast_io;
+
+export namespace uwvm
+{
+#ifndef __AVR__
+    inline ::fast_io::u8native_io_observer u8in{::fast_io::u8in()};
+    inline ::fast_io::basic_ibuf<::fast_io::u8native_io_observer> u8in_buf{u8in};
+    inline ::fast_io::u8native_io_observer u8out{::fast_io::u8out()};
+    inline ::fast_io::basic_obuf<::fast_io::u8native_io_observer> u8out_buf{u8out};
+    inline ::fast_io::u8native_io_observer u8err{::fast_io::u8err()};
+#else
+    // The C API of avrlibc does not have any buffers.
+    inline ::fast_io::u8c_io_observer u8in{::fast_io::u8c_stdin()};
+    inline ::fast_io::basic_ibuf<::fast_io::u8c_io_observer> u8in_buf{u8in};
+    inline ::fast_io::u8c_io_observer u8out{::fast_io::u8c_stdout()};
+    inline ::fast_io::basic_obuf<::fast_io::u8c_io_observer> u8ou_buf{u8out};
+    inline ::fast_io::u8c_io_observer u8err{::fast_io::u8c_stderr()};
+#endif
+}  // namespace uwvm
