@@ -1,8 +1,11 @@
+
+-- There is no need to set up an allowed arch that comes with the msvc
+
 function windows_target()
+
     local use_llvm_toolchain = get_config("use-llvm")
     if use_llvm_toolchain then	
         set_toolchains("clang-cl")
-        --add_cxflags("-std:c++latest")
     end
 
     if is_kind("binary") then
@@ -41,7 +44,7 @@ function windows_target()
 
     local opt_name = get_config("winmin")
     if opt_name == "default" then	
-        -- do nothing
+        -- Already linking the ntdll via the "pragma" macro, nothing is done here to prevent problems
 
     -- Windows NT (with win32 api)
 
@@ -56,6 +59,8 @@ function windows_target()
         add_defines("_WIN32_WINNT=0x0A00")
         add_defines("WINVER=0x0A00")
         add_ldflags("-SUBSYSTEM:CONSOLE")
+        -- Do not set console version=10.00.
+        -- This option may be changed in a future update of the NT kernel major version.
         add_syslinks("ntdll")
     elseif 
         opt_name == "WS12R2" or
@@ -111,21 +116,21 @@ function windows_target()
         add_ldflags("-SUBSYSTEM:CONSOLE,5.00")
         add_syslinks("ntdll")
 
-    -- Windows 9x (with win32 api)
+    -- Windows 9x (with win32 api)，unverified.
 
-    elseif opt_name == "WINME" then
+    elseif opt_name == "WINME" then -- unverified
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0490")
         add_defines("WINVER=0x0490")
         add_ldflags("-SUBSYSTEM:CONSOLE,4.90")
         add_syslinks("mscvrt")
-    elseif opt_name == "WIN98" then
+    elseif opt_name == "WIN98" then -- unverified
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0410")
         add_defines("WINVER=0x0410")
         add_ldflags("-SUBSYSTEM:CONSOLE,4.10")
         add_syslinks("mscvrt")
-    elseif opt_name == "WIN95" then
+    elseif opt_name == "WIN95" then -- unverified
         add_undefines("_WIN32_WINNT")
         add_defines("_WIN32_WINDOWS=0x0400")
         add_defines("WINVER=0x0400")
@@ -134,25 +139,25 @@ function windows_target()
 
     -- Windows NT (without win32 api)，unverified.
 
-    elseif opt_name == "NT400" then
+    elseif opt_name == "NT400" then -- unverified
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0400")
         add_defines("WINVER=0x0400")
         add_ldflags("-SUBSYSTEM:CONSOLE,4.00")
         add_syslinks("ntdll")
-    elseif opt_name == "NT351" then
+    elseif opt_name == "NT351" then -- unverified
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0351")
         add_defines("WINVER=0x0351")
         add_ldflags("-SUBSYSTEM:CONSOLE,3.51")
         add_syslinks("ntdll")
-    elseif opt_name == "NT350" then
+    elseif opt_name == "NT350" then -- unverified
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0350")
         add_defines("WINVER=0x0350")
         add_ldflags("-SUBSYSTEM:CONSOLE,3.50")
         add_syslinks("ntdll")
-    elseif opt_name == "NT310" then
+    elseif opt_name == "NT310" then -- unverified
         add_undefines("_WIN32_WINNT")
         add_defines("_WINNT=0x0310")
         add_defines("WINVER=0x0310")

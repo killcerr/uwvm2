@@ -22,6 +22,7 @@
  *                                      *
  ****************************************/
 
+/// @brief This is a cpp module
 module;
 
 /// @brief uwvm.crtmain module declaration

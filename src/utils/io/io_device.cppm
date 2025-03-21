@@ -24,6 +24,7 @@
  *                                      *
  ****************************************/
 
+/// @brief This is a cpp module
 module;
 
 /// @brief utils.io module declaration
@@ -49,6 +50,7 @@ export namespace uwvm
     inline ::fast_io::u8native_io_observer u8err{::fast_io::u8err()};
 #else
     // The C API of avrlibc does not have any buffers.
+    
     inline ::fast_io::u8c_io_observer u8in{::fast_io::u8c_stdin()};
     inline ::fast_io::basic_ibuf<::fast_io::u8c_io_observer> u8in_buf{u8in};
     inline ::fast_io::u8c_io_observer u8out{::fast_io::u8c_stdout()};
