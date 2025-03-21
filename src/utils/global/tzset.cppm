@@ -26,7 +26,7 @@ export module utils.global:tzset;
 /// @brief import fast_io module
 import fast_io;
 
-export namespace uwvm
+export namespace uwvm::global
 {
     /// @brief Declare this via a global variable to get the correct timezone data when the program is run.
     struct tz_set_s

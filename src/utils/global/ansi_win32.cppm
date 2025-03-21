@@ -29,7 +29,7 @@ export module utils.global:ansi_win32;
 /// @brief import fast_io module
 import fast_io;
 
-export namespace uwvm
+export namespace uwvm::global
 {
     /// @brief cmd on windows nt does not enable ansi escaping by default.
     /// Declare this via a global variable to set up ansi escaping at program runtime.

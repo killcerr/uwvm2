@@ -29,7 +29,7 @@ export module utils.global:consolecp_win32;
 /// @brief import fast_io module
 import fast_io;
 
-export namespace uwvm
+export namespace uwvm::global
 {
     /// @brief The ConsoleCP of Windows is affected by system environment variables.
     /// By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8.

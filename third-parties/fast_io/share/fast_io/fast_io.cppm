@@ -22,6 +22,9 @@ export module fast_io;
 
 #ifndef FAST_IO_FREESTANDING
 #include "fast_io_inc/hosted.inc"
+#include "fast_io_inc/host/posix.inc"
+#include "fast_io_inc/host/nt.inc"
+#include "fast_io_inc/host/win32.inc"
 #include "fast_io_inc/legacy/c.inc"
 #include "fast_io_inc/legacy/filebuf.inc"
 #include "fast_io_inc/device.inc"

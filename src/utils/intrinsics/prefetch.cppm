@@ -22,8 +22,6 @@
  *                                      *
  ****************************************/
 
-module;
-
 /// @brief Including intrin.h in the absence of __builtin_prefetch
 #if !__has_builtin(__builtin_prefetch)
     #include <intrin.h>;
