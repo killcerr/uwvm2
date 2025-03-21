@@ -23,16 +23,17 @@
  *                                      *
  ****************************************/
 
-/// @brief import uwvm.crtmain module
-import uwvm.crtmain;
+/// @brief import global
+import uwvm:crtmain:global;
 
-/**
- * @brief (crt) main func. The main function is a special function, but there are still meaningless gnu::used and extern "C" properties.
- * @param argc Argument Count
- * @param argv Argument Vector
- * @return exit(3)
- * @see ::uwvm::uwvm_main()
- */
+/// @brief import uwvm.crtmain.uwvm modules
+import uwvm:crtmain:uwvm;
+
+/// @brief (crt) main func. The main function is a special function, but there are still meaningless gnu::used and extern "C" properties.
+/// @param argc Argument Count
+/// @param argv Argument Vector
+/// @return exit(3)
+/// @see ::uwvm::uwvm_main()
 extern "C"
 #if __has_cpp_attribute(__gnu__::__used__)
     [[__gnu__::__used__]]

@@ -168,8 +168,7 @@ function windows_target()
     end
 
     local march = get_config("march")
-    if march == "no" or march == "default" then
-    else
+    if not (march == "no" or march == "default") then
         error("windows (unknown-windows-msvc) does not support custom march!")
     end
 end

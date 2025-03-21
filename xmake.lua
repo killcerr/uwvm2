@@ -58,8 +58,10 @@ target("uwvm")
 	-- utils
 	add_files("src/utils/**.cppm")
 
-	-- uwvm
+	-- uwvm/crtmain
+	add_files("src/uwvm/crtmain/**.cppm")
+
+	-- uwvm main
 	add_files("src/uwvm/crtmain/main.cc")
-    add_files("src/uwvm/crtmain/uwvm.cppm")
 
 target_end()

@@ -39,3 +39,8 @@ containers
 #include "fast_io_inc/dsal/array.inc"
 #include "fast_io_inc/dsal/vector.inc"
 #include "fast_io_inc/dsal/string.inc"
+
+/*
+details
+*/
+#include "fast_io_inc/detail.inc"

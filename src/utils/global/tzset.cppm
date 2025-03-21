@@ -5,11 +5,9 @@
  ********************************************************/
 
 /**
- * @file uwvm.cppm
- * @brief uwvm cpp main function
  * @author MacroModel
  * @version 2.0.0
- * @date 2025-03-20
+ * @date 2025-03-21
  * @copyright APL-2 License
  */
 
@@ -25,26 +23,25 @@
 /// @brief This is a cpp module
 module;
 
-/// @brief uwvm:crtmain:uwvm module declaration
-export module uwvm:crtmain:uwvm;
+/// @brief utils:global:tzset module declaration
+export module utils:global:tzset;
 
 /// @brief import fast_io module
 import fast_io;
 
-/// @brief import utils:io:io_device module
-import utils:io:io_device;
-
-/// @brief export uwvm namespace
 export namespace uwvm
 {
-    /// @brief uwvm c++ main function
-    /// @param argc Argument Count
-    /// @param argv Argument Vector
-    /// @return exit value
-    /// @see main()
-    inline int uwvm_main(int argc, char const* const* argv) noexcept
+    /// @brief Declare this via a global variable to get the correct timezone data when the program is run.
+    struct tz_set_s
     {
-        ::fast_io::io::perr(::uwvm::u8err, 5, u8"test\n");
-        return 0;
-    }
+        /// @brief The tzset() function initializes the tzname variable from the TZ environment variable.
+        /// @see tzset(3)
+#if __has_cpp_attribute(__gnu__::__cold__)
+        [[__gnu__::__cold__]]
+#endif
+        tz_set_s() noexcept
+        {
+            ::fast_io::posix_tzset();
+        }
+    };
 }  // namespace uwvm
