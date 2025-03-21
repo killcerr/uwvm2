@@ -20,11 +20,8 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
-module;
-
-/// @brief utils:global:tzset module declaration
-export module utils:global:tzset;
+/// @brief utils.global:tzset module declaration
+export module utils.global:tzset;
 
 /// @brief import fast_io module
 import fast_io;

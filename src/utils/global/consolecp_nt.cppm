@@ -20,8 +20,5 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
-module;
-
-/// @brief utils:global:consolecp_nt module declaration
-export module utils:global:consolecp_nt;
+/// @brief utils.global:consolecp_nt module declaration
+export module utils.global:consolecp_nt;

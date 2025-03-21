@@ -20,20 +20,20 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
 module;
+#include <cstdint>
 
-/// @brief utils:global:consolecp_win32 module declaration
-export module utils:global:consolecp_win32;
+/// @brief utils.global:consolecp_win32 module declaration
+export module utils.global:consolecp_win32;
 
 /// @brief import fast_io module
 import fast_io;
 
 export namespace uwvm
 {
-    /// @brief The ConsoleCP of Windows is affected by system environment variables. 
-    /// By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8. 
-    /// Additionally, RAII is used for management, ensuring that the settings are applied at the beginning of the program 
+    /// @brief The ConsoleCP of Windows is affected by system environment variables.
+    /// By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8.
+    /// Additionally, RAII is used for management, ensuring that the settings are applied at the beginning of the program
     /// and restored upon termination to prevent permanent modifications to the console encoding, which could affect subsequent programs.
     /// @see https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
     struct set_win32_console_io_cp_to_utf8
