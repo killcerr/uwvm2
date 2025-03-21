@@ -22,6 +22,13 @@
  *                                      *
  ****************************************/
 
+module;
+
+/// @brief include source_location for debug mode
+#if defined(_DEBUG)
+#    include <source_location>
+#endif
+
 /// @brief uwvm.crtmain:uwvm module declaration
 export module uwvm.crtmain:uwvm;
 
@@ -41,7 +48,10 @@ export namespace uwvm
     /// @see main()
     inline int uwvm_main(int argc, char const* const* argv) noexcept
     {
-        ::fast_io::io::perr(::uwvm::u8err, 5, u8"test\n");
+#if defined(_DEBUG)
+        ::fast_io::io::perr(::uwvm::u8err, u8"[debug] uwvm_main start.\n");
+#endif
+
         return 0;
     }
 }  // namespace uwvm

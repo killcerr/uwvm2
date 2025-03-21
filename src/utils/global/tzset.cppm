@@ -36,9 +36,9 @@ export namespace uwvm::global
 #if __has_cpp_attribute(__gnu__::__cold__)
         [[__gnu__::__cold__]]
 #endif
-        tz_set_s() noexcept
+        inline tz_set_s() noexcept
         {
             ::fast_io::posix_tzset();
         }
     };
-}  // namespace uwvm
+}  // namespace uwvm::global

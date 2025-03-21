@@ -22,20 +22,27 @@
  *                                      *
  ****************************************/
 
+module;
+
 /// @brief Including intrin.h in the absence of __builtin_prefetch
 #if !__has_builtin(__builtin_prefetch)
     #include <intrin.h>;
 #endif
 
 /// @brief utils.instrinsics:prefetch module declaration
-export module uwvm.intrinsics:prefetch;
+export module utils.intrinsics:prefetch;
 
 export namespace uwvm
 {
-    /// @brief Direct conversion to cpu prefetch instructions
-    /// @param address address to be prefetched
-    /// @see __builtin_prefetch and _mm_prefetch
+    /// @brief      Direct conversion to cpu prefetch instructions
+    /// @details    level == 0 -> nta : Non-chronological storage
+    ///             level == 1 -> L3
+    ///             level == 2 -> L2, L3
+    ///             level == 3 -> L1, L2, L3
+    /// @param      address address to be prefetched
+    /// @see        __builtin_prefetch and _mm_prefetch
     template <bool write = false, int level = 3>
+        requires (0 <= level && level <= 3)
 #if __has_cpp_attribute(__gnu__::__artificial__)
     [[__gnu__::__artificial__]]
 #endif

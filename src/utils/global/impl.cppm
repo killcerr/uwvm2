@@ -21,8 +21,10 @@
  ****************************************/
 
 export module utils.global;
+export import :tzset;
+#if defined(_WIN32) && !defined(__CYGWIN__)
 export import :ansi_nt;
 export import :ansi_win32;
 export import :consolecp_nt;
 export import :consolecp_win32;
-export import :tzset;
+#endif

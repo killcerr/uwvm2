@@ -46,7 +46,7 @@ export namespace uwvm::global
 #if __has_cpp_attribute(__gnu__::__cold__)
         [[__gnu__::__cold__]]
 #endif
-        set_win32_console_io_cp_to_utf8() noexcept
+        inline set_win32_console_io_cp_to_utf8() noexcept
         {
             output = ::fast_io::win32::GetConsoleOutputCP();
             input = ::fast_io::win32::GetConsoleCP();
@@ -57,11 +57,11 @@ export namespace uwvm::global
 #if __has_cpp_attribute(__gnu__::__cold__)
         [[__gnu__::__cold__]]
 #endif
-        ~set_win32_console_io_cp_to_utf8()
+        inline ~set_win32_console_io_cp_to_utf8()
         {
             if(output != utf8_coding) { ::fast_io::win32::SetConsoleOutputCP(output); }
             if(input != utf8_coding) { ::fast_io::win32::SetConsoleCP(input); }
         }
     };
 
-}  // namespace uwvm
+}  // namespace uwvm::global
