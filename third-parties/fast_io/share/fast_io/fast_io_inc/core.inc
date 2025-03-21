@@ -169,7 +169,7 @@ using ::fast_io::intrinsics::operator>=;
 using ::fast_io::intrinsics::operator==;
 using ::fast_io::intrinsics::operator!=;
 using ::fast_io::intrinsics::wrap_add;
-using ::fast_io::intrinsics::wrap_minus;
+using ::fast_io::intrinsics::wrap_sub;
 
 } // namespace intrinsics
 
