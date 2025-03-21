@@ -15,6 +15,11 @@ using ::fast_io::scan_context_eof_define;
 
 namespace manipulators
 {
+    
+using ::fast_io::manipulators::print_alias_define;
+using ::fast_io::manipulators::print_reserve_size;
+using ::fast_io::manipulators::print_reserve_define;
+
 using ::fast_io::manipulators::scalar_placement;
 using ::fast_io::manipulators::floating_format;
 using ::fast_io::manipulators::lc_time_flag;

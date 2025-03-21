@@ -76,11 +76,4 @@ using ::fast_io::u32c_stdin;
 using ::fast_io::u32c_stdout;
 using ::fast_io::u32c_stderr;
 
-namespace freestanding
-{
-
-using ::fast_io::freestanding::is_trivially_copyable_or_relocatable;
-using ::fast_io::freestanding::is_zero_default_constructible;
-
-} // namespace freestanding
 } // namespace fast_io
