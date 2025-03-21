@@ -30,7 +30,7 @@ module;
 #endif
 
 /// @brief utils.instrinsics:prefetch module declaration
-export module uwvm.instrinsics:prefetch;
+export module uwvm.intrinsics:prefetch;
 
 export namespace uwvm
 {
