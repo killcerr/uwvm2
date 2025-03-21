@@ -44,7 +44,12 @@ function windows_target()
 
     local opt_name = get_config("winmin")
     if opt_name == "default" then	
-        -- Already linking the ntdll via the "pragma" macro, nothing is done here to prevent problems
+        -- same as WIN10
+        add_defines("_WIN32_WINNT=0x0A00")
+        add_defines("WINVER=0x0A00")
+        add_ldflags("-SUBSYSTEM:CONSOLE")
+        -- Do not set console version=10.00.
+        -- This option may be changed in a future update of the NT kernel major version.
 
     -- Windows NT (with win32 api)
 

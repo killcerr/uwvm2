@@ -43,7 +43,12 @@ function mingw_target()
 
     local opt_name = get_config("winmin")
     if opt_name == "default" then	
-        add_syslinks("ntdll") -- link ntdll for default, Because of the new version of gcc, clang defaults _WIN32_WINNT=0xa00
+        -- same as WIN10
+        add_defines("_WIN32_WINNT=0x0A00")
+        add_defines("WINVER=0x0A00")
+        -- Do not set --major-subsystem-version=10. During startup program exited with code 0xc000007b (invalid parameters).
+        -- This option may be changed in a future update of the NT kernel major version.
+        add_syslinks("ntdll")
         local march = get_config("march")
         if march == "default" then
             -- use all native instruction

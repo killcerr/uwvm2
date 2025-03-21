@@ -14,7 +14,12 @@ set_allowedplats("windows", "mingw", "linux", "msdosdjgpp", "unix", "bsd", "free
 includes("xmake/impl.lua")
 includes("xmake/platform/impl.lua")
 
+set_defaultmode("releasedbg")
+set_allowedmodes(support_rules_table)
+
 function def_build()
+
+	add_rules(support_rules_table)
 
     set_languages("c23", "cxx26")
 
