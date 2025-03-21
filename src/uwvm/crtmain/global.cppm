@@ -20,14 +20,11 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
-module;
+/// @brief uwvm.crtmain:global module declaration
+export module uwvm.crtmain:global;
 
-/// @brief uwvm:crtmain:global module declaration
-export module uwvm:crtmain:global;
-
-/// @brief import from global 
-import utils:global;
+/// @brief import utils.global
+import utils.global;
 
 export namespace uwvm::global
 {

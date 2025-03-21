@@ -19,6 +19,7 @@ function def_build()
     set_languages("c23", "cxx26")
 
 	set_policy("build.c++.modules", true)
+	set_policy("build.c++.modules.std", true)
 
 	local disable_cpp_exceptions = get_config("fno-exceptions")
 	if disable_cpp_exceptions then
@@ -62,6 +63,6 @@ target("uwvm")
 	add_files("src/uwvm/crtmain/**.cppm")
 
 	-- uwvm main
-	add_files("src/uwvm/crtmain/main.cc")
+	add_files("src/uwvm/main.cc")
 
 target_end()

@@ -20,8 +20,5 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
-module;
-
-/// @brief utils:global:ansi_nt module declaration
-export module utils:global:ansi_nt;
+/// @brief utils.global:ansi_nt module declaration
+export module utils.global:ansi_nt;

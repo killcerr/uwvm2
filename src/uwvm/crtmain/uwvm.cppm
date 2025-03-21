@@ -22,17 +22,14 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
-module;
-
-/// @brief uwvm:crtmain:uwvm module declaration
-export module uwvm:crtmain:uwvm;
+/// @brief uwvm.crtmain:uwvm module declaration
+export module uwvm.crtmain:uwvm;
 
 /// @brief import fast_io module
 import fast_io;
 
-/// @brief import utils:io:io_device module
-import utils:io:io_device;
+/// @brief import utils.io module
+import utils.io;
 
 /// @brief export uwvm namespace
 export namespace uwvm

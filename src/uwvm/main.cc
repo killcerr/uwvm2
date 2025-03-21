@@ -23,11 +23,8 @@
  *                                      *
  ****************************************/
 
-/// @brief import global
-import uwvm:crtmain:global;
-
-/// @brief import uwvm.crtmain.uwvm modules
-import uwvm:crtmain:uwvm;
+/// @brief import uwvm.crtmain
+import uwvm.crtmain;
 
 /// @brief (crt) main func. The main function is a special function, but there are still meaningless gnu::used and extern "C" properties.
 /// @param argc Argument Count
@@ -43,4 +40,3 @@ extern "C"
 {
     return ::uwvm::uwvm_main(argc, argv);
 }
-

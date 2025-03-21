@@ -24,11 +24,8 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
-module;
-
-/// @brief utils:io:io_device module declaration
-export module utils:io:io_device;
+/// @brief utils.io.io_device module declaration
+export module utils.io:io_device;
 
 /// @brief import fast_io module
 import fast_io;

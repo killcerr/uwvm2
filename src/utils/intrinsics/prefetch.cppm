@@ -22,7 +22,6 @@
  *                                      *
  ****************************************/
 
-/// @brief This is a cpp module
 module;
 
 /// @brief Including intrin.h in the absence of __builtin_prefetch
@@ -30,8 +29,8 @@ module;
     #include <intrin.h>;
 #endif
 
-/// @brief utils:instrinsics:prefetch module declaration
-export module uwvm:instrinsics:prefetch;
+/// @brief utils.instrinsics:prefetch module declaration
+export module uwvm.instrinsics:prefetch;
 
 export namespace uwvm
 {

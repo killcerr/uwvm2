@@ -5,7 +5,7 @@
  ********************************************************/
 
 /**
- * @author MacroModel
+ * @author 24bit-xjkp
  * @version 2.0.0
  * @date 2025-03-21
  * @copyright APL-2 License
@@ -16,9 +16,9 @@
  * | | | |\ \      / /\ \   / /|  \/  | *
  * | | | | \ \ /\ / /  \ \ / / | |\/| | *
  * | |_| |  \ V  V /    \ V /  | |  | | *
- *  \___/    \_/\_/      \_/   |_|  |_| *
+ *  \___/    \_/\_/      \_/  s |_|  |_| *
  *                                      *
  ****************************************/
 
-/// @brief utils.global:consolecp_nt module declaration
-export module utils.global:consolecp_nt;
+export module utils.intrinstics;
+export import :tzset;
