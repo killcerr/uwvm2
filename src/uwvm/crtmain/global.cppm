@@ -35,7 +35,9 @@ import utils.global;
 
 export namespace uwvm::global
 {
-    // This declares the rtti global variable, set __init_priority__ to 400
+    /// @brief      Control program initialization and termination functions through RTTI.
+    ///             Set __init_priority__ to 400
+    ///             Ensure initialization occurs only after the lowest-level module has been initialized.
 
     /// @brief Automatically setup windows consolecp with ansi
 #if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
