@@ -20,5 +20,7 @@
  *                                      *
  ****************************************/
 
+module;
+
 export module utils.intrinsics;
 export import :prefetch;

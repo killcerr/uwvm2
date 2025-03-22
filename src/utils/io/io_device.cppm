@@ -24,6 +24,8 @@
  *                                      *
  ****************************************/
 
+module;
+
 /// @brief utils.io:io_device module declaration
 export module utils.io:io_device;
 

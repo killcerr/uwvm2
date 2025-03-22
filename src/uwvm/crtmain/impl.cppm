@@ -20,6 +20,8 @@
  *                                      *
  ****************************************/
 
+module;
+
 export module uwvm.crtmain;
 export import :global;
 export import :uwvm;

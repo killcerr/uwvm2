@@ -24,11 +24,6 @@
 
 module;
 
-/// @brief include source_location for debug mode
-#if defined(_DEBUG)
-#    include <source_location>
-#endif
-
 /// @brief uwvm.crtmain:uwvm module declaration
 export module uwvm.crtmain:uwvm;
 

@@ -20,6 +20,8 @@
  *                                      *
  ****************************************/
 
+module;
+
 /// @brief utils.global:tzset module declaration
 export module utils.global:tzset;
 

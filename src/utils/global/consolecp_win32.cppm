@@ -21,6 +21,7 @@
  ****************************************/
 
 module;
+
 #include <cstdint>
 
 /// @brief utils.global:consolecp_win32 module declaration

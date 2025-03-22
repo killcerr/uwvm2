@@ -20,5 +20,7 @@
  *                                      *
  ****************************************/
 
+module;
+
 export module utils.io;
 export import :io_device;
