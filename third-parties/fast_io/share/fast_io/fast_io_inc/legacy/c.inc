@@ -63,17 +63,8 @@ using ::fast_io::obuffer_is_line_buffering_define;
 using ::fast_io::c_stdin;
 using ::fast_io::c_stdout;
 using ::fast_io::c_stderr;
-using ::fast_io::wc_stdin;
-using ::fast_io::wc_stdout;
-using ::fast_io::wc_stderr;
 using ::fast_io::u8c_stdin;
 using ::fast_io::u8c_stdout;
 using ::fast_io::u8c_stderr;
-using ::fast_io::u16c_stdin;
-using ::fast_io::u16c_stdout;
-using ::fast_io::u16c_stderr;
-using ::fast_io::u32c_stdin;
-using ::fast_io::u32c_stdout;
-using ::fast_io::u32c_stderr;
 
 } // namespace fast_io

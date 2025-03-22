@@ -27,6 +27,9 @@ module;
 /// @brief utils.global:consolecp_win32 module declaration
 export module utils.global:consolecp_win32;
 
+/// @brief only support on winnt (with win32 api)
+#if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
+
 /// @brief import fast_io module
 import fast_io;
 
@@ -66,3 +69,4 @@ export namespace uwvm::global
     };
 
 }  // namespace uwvm::global
+#endif

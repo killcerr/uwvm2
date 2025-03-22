@@ -47,8 +47,8 @@ function linux_target()
 
     -- dynamic libary loader
     add_syslinks("dl")
-    if use_llvm_toolchain then	
-        add_syslinks("c++abi")
-    end
+    --if use_llvm_toolchain then	
+    --    add_syslinks("c++abi")
+    --end
 
 end

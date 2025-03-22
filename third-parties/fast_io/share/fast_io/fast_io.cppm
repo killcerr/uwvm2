@@ -25,12 +25,12 @@ export module fast_io;
 #ifndef FAST_IO_FREESTANDING
 #include "fast_io_inc/hosted.inc"
 
-#if defined(_WIN32) || defined(__CYGWIN__)
 #include "fast_io_inc/host/posix.inc"
-#include "fast_io_inc/host/nt.inc"
-#endif
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include "fast_io_inc/host/nt.inc"
 #include "fast_io_inc/host/win32.inc"
+#endif
 
 #include "fast_io_inc/legacy/c.inc"
 #include "fast_io_inc/legacy/filebuf.inc"
