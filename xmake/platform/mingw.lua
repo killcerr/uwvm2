@@ -32,6 +32,10 @@ function mingw_target()
         add_cxflags("-fno-ident") -- also strip ident data
     end
 
+    add_cxflags("-fno-rtti") -- disable rtti
+    add_cxflags("-fno-unwind-tables") -- disable unwind tables
+    --add_cxflags("-fno-asynchronous-unwind-tables") -- disable asynchronous unwind tables
+
     if is_kind("binary") then
         set_extension(".exe")
     end

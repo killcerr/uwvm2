@@ -29,8 +29,6 @@ function windows_target()
             set_runtimes("MDd")
         end
     else
-        set_fpmodels("fast")
-
         add_cxflags("-GS-") -- disable buffer overflow check
         add_cxflags("-GL") -- Whole Program Optimization
         --add_ldflags("-LTCG") -- Link Time Code Generation

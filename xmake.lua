@@ -19,7 +19,15 @@ set_allowedmodes(support_rules_table)
 
 function def_build()
 
-	add_rules(support_rules_table)
+	if is_mode("debug") then
+		add_rules("debug")
+	elseif is_mode("release") then
+		add_rules("release")
+	elseif is_mode("minsizerel") then
+		add_rules("minsizerel")
+	elseif is_mode("releasedbg") then
+		add_rules("releasedbg")
+	end
 
     set_languages("c23", "cxx26")
 
@@ -50,6 +58,10 @@ function def_build()
         windows_target()
     elseif is_plat("mingw") then
         mingw_target()
+	elseif is_plat("linux") then
+        linux_target()
+	elseif is_plat("macosx", "iphoneos", "watchos") then
+        darwin_target()
     end
 end
 
