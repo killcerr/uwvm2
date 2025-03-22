@@ -9,7 +9,7 @@ add_defines("UWVM_VERSION_Y=0")
 add_defines("UWVM_VERSION_Z=0")
 add_defines("UWVM_VERSION_S=0")
 
-set_allowedplats("windows", "mingw", "linux", "msdosdjgpp", "unix", "bsd", "freebsd", "dragonflybsd", "netbsd", "openbsd", "macosx", "iphoneos", "watchos", "wasm-wasi", "serenity", "sun", "cross")
+set_allowedplats("windows", "mingw", "linux", "djgpp", "unix", "bsd", "freebsd", "dragonflybsd", "netbsd", "openbsd", "macosx", "iphoneos", "watchos", "wasm-wasi", "serenity", "sun", "cross")
 
 includes("xmake/impl.lua")
 includes("xmake/platform/impl.lua")
@@ -62,6 +62,10 @@ function def_build()
         linux_target()
 	elseif is_plat("macosx", "iphoneos", "watchos") then
         darwin_target()
+	elseif is_plat("djgpp") then
+        djgpp_target()
+	elseif is_plat("unix", "bsd", "freebsd", "dragonflybsd", "netbsd", "openbsd") then
+        bsd_target()
     end
 end
 
