@@ -126,22 +126,28 @@ option("use-llvm", function()
     set_default(false)
 end)
 
-option("disable-int", function()
+option("enable-int", function()
     set_description
     (
-        "uwvm interpreter is not included",
-        "default = false"
+        "enable interpreter",
+        [[    no: disable interpreter.]],
+        [[    defualt: use default interpreter.]],
+        [[    uwvm-int: use uwvm interpreter.]]
     )
-    set_default(false)
+    set_default("default")
+    set_values("no", "default", "uwvm-int")
 end)
 
-option("disable-jit", function()
+option("enable-jit", function()
     set_description
     (
-        "uwvm jit is not included",
-        "default = false"
+        "enable just-in-time compilation",
+        [[    no: disable jit.]],
+        [[    defualt: use default jit engine.]],
+        [[    llvm: use llvm jit engine.]]
     )
-    set_default(false)
+    set_default("default")
+    set_values("no", "default", "llvm")
 end)
 
 -- WINDOWS

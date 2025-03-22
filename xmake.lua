@@ -44,14 +44,22 @@ function def_build()
 		add_defines("UWVM_TIMER")
 	end
 
-    local disable_int = get_config("disable-int")
-	if disable_int then
+    local enable_int = get_config("enable-int")
+	if enable_int == "no" then
 		add_defines("UWVM_DISABLE_INT")
+	elseif enable_int == "default" then
+		add_defines("UWVM_USE_DEFAULT_INT")
+	elseif enable_int == "uwvm-int" then
+		add_defines("UWVM_USE_UWVM_INT")
 	end
 
-    local disable_jit = get_config("disable-jit")
-	if disable_jit then
+    local enable_jit = get_config("enable-jit")
+	if enable_jit == "no" then
 		add_defines("UWVM_DISABLE_JIT")
+	elseif enable_jit == "default" then
+		add_defines("UWVM_USE_DEFAULT_JIT")
+	elseif enable_jit == "llvm" then
+		add_defines("UWVM_USE_LLVM_JIT")
 	end
 
     if is_plat("windows") then
