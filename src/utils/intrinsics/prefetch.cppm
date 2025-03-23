@@ -56,4 +56,3 @@ export namespace uwvm
 
 }  // namespace uwvm
 
-#include <utils/macro/pop_macros.h>

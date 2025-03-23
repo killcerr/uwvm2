@@ -70,4 +70,3 @@ export namespace uwvm::global
 }  // namespace uwvm::global
 #endif
 
-#include <utils/macro/pop_macros.h>
