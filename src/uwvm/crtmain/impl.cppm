@@ -5,10 +5,10 @@
  ********************************************************/
 
 /**
- * @author 24bit-xjkp
- * @version 2.0.0
- * @date 2025-03-21
- * @copyright APL-2 License
+ * @author      24bit-xjkp
+ * @version     2.0.0
+ * @date        2025-03-21
+ * @copyright   APL-2 License
  */
 
 /****************************************

@@ -5,13 +5,13 @@
  ********************************************************/
 
 /**
- * @file main.cc
- * @brief main function for crt startup
- * @details This function does nothing but call the cpp boot method of the other module
- * @author MacroModel
- * @version 2.0.0
- * @date 2025-03-20
- * @copyright APL-2 License
+ * @file        main.cc
+ * @brief       main function for crt startup
+ * @details     This function does nothing but call the cpp boot method of the other module
+ * @author      MacroModel
+ * @version     2.0.0
+ * @date        2025-03-20
+ * @copyright   APL-2 License
  */
 
 /****************************************

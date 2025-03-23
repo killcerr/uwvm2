@@ -5,10 +5,10 @@
  ********************************************************/
 
 /**
- * @author MacroModel
- * @version 2.0.0
- * @date 2025-03-21
- * @copyright APL-2 License
+ * @author      MacroModel
+ * @version     2.0.0
+ * @date        2025-03-21
+ * @copyright   APL-2 License
  */
 
 /****************************************
@@ -27,13 +27,13 @@ module;
 
 #include <utils/macro/push_macros.h>
 
-/// @brief utils.global:ansi_win32 module declaration
+/// @brief      utils.global:ansi_win32 module declaration
 export module utils.global:ansi_win32;
 
-/// @brief only support on winnt (with win32 api)
+/// @brief      only support on winnt (with win32 api)
 #if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
 
-/// @brief import fast_io module
+/// @brief      import fast_io module
 import fast_io;
 
 export namespace uwvm::global

@@ -5,12 +5,12 @@
  ********************************************************/
 
 /**
- * @file prefetch.cppm
- * @brief cpu prefetch instruction
- * @author MacroModel
- * @version 2.0.0
- * @date 2025-03-21
- * @copyright APL-2 License
+ * @file        prefetch.cppm
+ * @brief       cpu prefetch instruction
+ * @author      MacroModel
+ * @version     2.0.0
+ * @date        2025-03-21
+ * @copyright   APL-2 License
  */
 
 /****************************************
@@ -26,12 +26,12 @@ module;
 
 #include <utils/macro/push_macros.h>
 
-/// @brief Including intrin.h in the absence of __builtin_prefetch
+/// @brief      Including intrin.h in the absence of __builtin_prefetch
 #if !__has_builtin(__builtin_prefetch)
 # include <intrin.h>;
 #endif
 
-/// @brief utils.instrinsics:prefetch module declaration
+/// @brief      utils.instrinsics:prefetch module declaration
 export module utils.intrinsics:prefetch;
 
 export namespace uwvm

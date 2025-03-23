@@ -5,10 +5,10 @@
  ********************************************************/
 
 /**
- * @author MacroModel
- * @version 2.0.0
- * @date 2025-03-23
- * @copyright APL-2 License
+ * @author      MacroModel
+ * @version     2.0.0
+ * @date        2025-03-23
+ * @copyright   APL-2 License
  */
 
 /****************************************
@@ -20,12 +20,12 @@
  *                                      *
  ****************************************/
 
-/// @brief The following are the macros used by uwvm. 
-/// @details Use `push_macro` to avoid side effects on existing macros. Please use `pop_macro` in conjunction.
+/// @brief      The following are the macros used by uwvm. 
+/// @details    Use `push_macro` to avoid side effects on existing macros. Please use `pop_macro` in conjunction.
 
 // #pragma once /// pragma once is not necessary
 
-/// @brief uwvm's macros
+/// @brief      uwvm's macros
 #pragma pop_macro("UWVM_GNU_HOT")
 #pragma pop_macro("UWVM_GNU_COLD")
 #pragma pop_macro("UWVM_THROWS")
@@ -48,7 +48,7 @@
 #pragma pop_macro("UWVM_DLL_DLLIMPORT")
 #pragma pop_macro("UWVM_DLLIMPORT")
 
-/// @brief std and windows.h macros
+/// @brief      std and windows.h macros
 #pragma pop_macro("refresh")
 #pragma pop_macro("new")
 #pragma pop_macro("move")
