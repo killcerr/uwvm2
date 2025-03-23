@@ -269,7 +269,9 @@
 # define UWVM_GNU_RETURNS_NONNULL
 #endif
 
-/// @brief        assert
+/// @brief        Avoid using C++26 contracts. Different modules including different handle_contract_violation 
+///               implementations may result in multiple handling approaches. If a module without handle_contract_violation 
+///               is included, std::terminate or std::abort will be used instead of the direct trap behavior we desire.
 /// @details      on gcc, clang: __builtin_trap()
 ///               on msvc: abort()
 #pragma push_macro("UWVM_ASSERT")
