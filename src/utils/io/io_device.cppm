@@ -42,9 +42,9 @@ export namespace uwvm
 #ifndef __AVR__
 
     /// @brief      native stdout
-    /// @details    on non-windows systems (fd): (int)[0, 1, 2]
-    ///             on win9x-win32 (handle): GetStdHandle([STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE])
-    ///             on nt (handle): RtlGetCurrentPeb()->ProcessParameters->Standard[input, Output, Error]
+    /// @details    on non-windows (POSIX) systems (fd): (int)[0, 1, 2]
+    ///             on win9x-win32 (handle): (void*) GetStdHandle([STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE])
+    ///             on nt (handle): (void*) RtlGetCurrentPeb()->ProcessParameters->Standard[Input, Output, Error]
     ///             set in out err __init_priority__ to 250, set xxx_buf __init_priority__ to 260
 
 # if __has_cpp_attribute(__gnu__::__init_priority__)
