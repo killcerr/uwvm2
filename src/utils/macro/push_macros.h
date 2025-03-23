@@ -73,7 +73,8 @@
 # define UWVM_DLL_DLLIMPORT
 #endif
 
-/// @brief        On x86-32 targets, the stdcall attribute causes the compiler to assume 
+/// @brief        stdcall
+/// @details      On x86-32 targets, the stdcall attribute causes the compiler to assume 
 ///               that the called function pops off the stack space used to pass arguments, 
 ///               unless it takes a variable number of arguments.
 /// @details      on msvc: __stdcall
@@ -122,7 +123,8 @@
 # define UWVM_WINSTDCALL_RENAME(name, count)
 #endif
 
-/// @brief        On the x86-32 targets, the cdecl attribute causes the compiler to assume that the calling function pops
+/// @brief        cdecl
+/// @details      On the x86-32 targets, the cdecl attribute causes the compiler to assume that the calling function pops
 ///               off the stack space used to pass arguments. This is useful to override the effects of the -mrtd switch.
 /// @details      on msvc: __cdecl
 ///               on gcc, clang: __attribute__((__cdecl__))
@@ -158,7 +160,8 @@
 # define UWVM_WINCDECL_RENAME(name, count)
 #endif
 
-/// @brief        On x86-32 targets, the fastcall attribute causes the compiler to pass the first argument
+/// @brief        fastcall
+/// @details      On x86-32 targets, the fastcall attribute causes the compiler to pass the first argument
 ///               (if of integral type) in the register ECX and the second argument (if of integral type)
 ///               in the register EDX. Subsequent and other typed arguments are passed on the stack.
 ///               The called function pops the arguments off the stack. If the number of arguments is variable
@@ -207,7 +210,8 @@
 # define UWVM_GNU_CONST
 #endif
 
-/// @brief        After C++17, the `inline` keyword no longer indicates forced inlining; 
+/// @brief        forceinline 
+/// @details      After C++17, the `inline` keyword no longer indicates forced inlining; 
 ///               instead, it serves to prevent ODR violations. Forced inlining should be achieved using the forceinline attribute.
 /// @details      on gcc, clang: [[__gnu__::__always_inline__]]
 ///               on msvc: [[msvc::forceinline]]
@@ -269,7 +273,8 @@
 # define UWVM_GNU_RETURNS_NONNULL
 #endif
 
-/// @brief        Avoid using C++26 contracts. Different modules including different handle_contract_violation 
+/// @brief        assert
+/// @details      Avoid using C++26 contracts. Different modules including different handle_contract_violation 
 ///               implementations may result in multiple handling approaches. If a module without handle_contract_violation 
 ///               is included, std::terminate or std::abort will be used instead of the direct trap behavior we desire.
 /// @details      on gcc, clang: __builtin_trap()
