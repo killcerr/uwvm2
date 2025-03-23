@@ -44,7 +44,7 @@ export namespace uwvm::global
     /// @see        https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
     struct set_win32_console_io_cp_to_utf8
     {
-        inline static constexpr ::std::uint_least32_t utf8_coding{65001u};  // utf8
+        inline static constexpr ::std::uint_least32_t utf8_coding{65001u /*Unicode (UTF-8)*/};
 
         ::std::uint_least32_t output{};
         ::std::uint_least32_t input{};

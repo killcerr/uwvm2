@@ -43,7 +43,7 @@ export namespace uwvm::global
     ///             Because of the internal CsrClientCallServer behavior, it must be restored at the end of the program.
     struct enable_win32_ansi
     {
-        inline static constexpr ::std::uint_least32_t enable_virtual_terminal_processing{0x0004u};
+        inline static constexpr ::std::uint_least32_t enable_virtual_terminal_processing{0x0004u /*ENABLE_VIRTUAL_TERMINAL_PROCESSING*/};
 
         ::std::uint_least32_t out_omode{};
         ::std::uint_least32_t err_omode{};

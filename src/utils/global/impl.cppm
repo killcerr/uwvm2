@@ -24,6 +24,7 @@ module;
 
 export module utils.global;
 export import :tzset;
+/// @brief only support on winnt (with win32 api)
 #if defined(_WIN32) && !defined(__CYGWIN__)
 export import :ansi_win32;
 export import :consolecp_win32;
