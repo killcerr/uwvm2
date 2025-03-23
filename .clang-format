@@ -12,6 +12,7 @@ IndentAccessModifiers: false
 IndentCaseLabels: true
 IndentExternBlock: Indent
 IndentGotoLabels: true
+PPIndentWidth: 1
 IndentPPDirectives: AfterHash
 IndentRequiresClause: true
 IndentWrappedFunctionNames: true

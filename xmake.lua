@@ -85,6 +85,9 @@ target("uwvm")
 	add_includedirs("third-parties/fast_io/include")
 	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm")
 
+	-- src
+	add_includedirs("src/")
+
 	-- utils
 	add_files("src/utils/**.cppm")
 
