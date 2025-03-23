@@ -41,11 +41,13 @@ export namespace uwvm::global
 
     /// @brief Automatically setup windows consolecp with ansi
 #if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
+    /// @brief set win32 console output and windows cp to  utf8
 # if __has_cpp_attribute(__gnu__::__init_priority__)
     [[__gnu__::__init_priority__(400)]]
 # endif
     inline ::uwvm::global::set_win32_console_io_cp_to_utf8 set_native_console_io_cp_to_utf8_ele{};
 
+    /// @brief set win32 console ansi escape
 # if __has_cpp_attribute(__gnu__::__init_priority__)
     [[__gnu__::__init_priority__(400)]]
 # endif

@@ -24,6 +24,8 @@ module;
 
 #include <cstdint>
 
+#include <utils/macro/push_macros.h>
+
 /// @brief utils.global:consolecp_win32 module declaration
 export module utils.global:consolecp_win32;
 
@@ -47,10 +49,7 @@ export namespace uwvm::global
         ::std::uint_least32_t output{};
         ::std::uint_least32_t input{};
 
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
-#endif
-        inline set_win32_console_io_cp_to_utf8() noexcept
+        UWVM_GNU_COLD inline set_win32_console_io_cp_to_utf8() noexcept
         {
             output = ::fast_io::win32::GetConsoleOutputCP();
             input = ::fast_io::win32::GetConsoleCP();
@@ -58,10 +57,7 @@ export namespace uwvm::global
             if(input != utf8_coding) { ::fast_io::win32::SetConsoleCP(utf8_coding); }
         }
 
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
-#endif
-        inline ~set_win32_console_io_cp_to_utf8()
+        UWVM_GNU_COLD inline ~set_win32_console_io_cp_to_utf8()
         {
             if(output != utf8_coding) { ::fast_io::win32::SetConsoleOutputCP(output); }
             if(input != utf8_coding) { ::fast_io::win32::SetConsoleCP(input); }
@@ -70,3 +66,5 @@ export namespace uwvm::global
 
 }  // namespace uwvm::global
 #endif
+
+#include <utils/macro/pop_macros.h>

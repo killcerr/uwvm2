@@ -25,6 +25,8 @@ module;
 #include <cstdint>
 #include <memory>
 
+#include <utils/macro/push_macros.h>
+
 /// @brief utils.global:ansi_win32 module declaration
 export module utils.global:ansi_win32;
 
@@ -49,10 +51,7 @@ export namespace uwvm::global
         void* out_handle{};
         void* err_handle{};
 
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
-#endif
-        inline enable_win32_ansi() noexcept
+        UWVM_GNU_COLD inline enable_win32_ansi() noexcept
         {
             out_handle = ::fast_io::win32::GetStdHandle(::fast_io::win32_stdout_number);
             err_handle = ::fast_io::win32::GetStdHandle(::fast_io::win32_stderr_number);
@@ -62,10 +61,7 @@ export namespace uwvm::global
             ::fast_io::win32::SetConsoleMode(err_handle, err_omode | enable_virtual_terminal_processing);
         }
 
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
-#endif
-        inline ~enable_win32_ansi() noexcept
+        UWVM_GNU_COLD inline ~enable_win32_ansi() noexcept
         {
             ::fast_io::win32::SetConsoleMode(out_handle, out_omode);
             ::fast_io::win32::SetConsoleMode(err_handle, err_omode);
@@ -73,3 +69,5 @@ export namespace uwvm::global
     };
 }  // namespace uwvm::global
 #endif
+
+#include <utils/macro/pop_macros.h>

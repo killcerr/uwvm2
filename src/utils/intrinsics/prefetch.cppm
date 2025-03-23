@@ -24,6 +24,8 @@
 
 module;
 
+#include <utils/macro/push_macros.h>
+
 /// @brief Including intrin.h in the absence of __builtin_prefetch
 #if !__has_builtin(__builtin_prefetch)
 # include <intrin.h>;
@@ -43,16 +45,7 @@ export namespace uwvm
     /// @see        __builtin_prefetch and _mm_prefetch
     template <bool write = false, int level = 3>
         requires (0 <= level && level <= 3)
-#if __has_cpp_attribute(__gnu__::__artificial__)
-    [[__gnu__::__artificial__]]
-#endif
-#if __has_cpp_attribute(__gnu__::__always_inline__)
-    [[__gnu__::__always_inline__]]
-#elif __has_cpp_attribute(msvc::forceinline)
-    [[msvc::forceinline]]
-#endif
-    inline void
-        prefetch(void const* address) noexcept
+    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline void prefetch(void const* address) noexcept
     {
 #if __has_builtin(__builtin_prefetch)
         __builtin_prefetch(address, static_cast<int>(write), level);
@@ -62,3 +55,5 @@ export namespace uwvm
     }
 
 }  // namespace uwvm
+
+#include <utils/macro/pop_macros.h>

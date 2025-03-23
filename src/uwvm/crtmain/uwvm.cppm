@@ -43,9 +43,6 @@ export namespace uwvm
     /// @see main()
     inline int uwvm_main(int argc, char const* const* argv) noexcept
     {
-#if defined(_DEBUG)
-        ::fast_io::io::perr(::uwvm::u8err, u8"[debug] uwvm_main start.\n");
-#endif
 
         return 0;
     }
