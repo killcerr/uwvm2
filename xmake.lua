@@ -31,6 +31,9 @@ function def_build()
 
     set_languages("c23", "cxx26")
 
+	set_encodings("utf-8")
+	set_warnings("all")
+	
 	set_policy("build.c++.modules", true)
 	set_policy("build.c++.modules.std", true)
 

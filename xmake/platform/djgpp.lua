@@ -1,7 +1,9 @@
 
 if is_plat("djgpp") then
-    set_allowedarchs("i386")
+    set_allowedarchs("i586")
 end
+
+set_defaultarchs("djgpp|i586")
 
 function djgpp_target()
 
