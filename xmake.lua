@@ -86,16 +86,16 @@ target("uwvm")
 
 	-- third-parties/fast_io
 	add_includedirs("third-parties/fast_io/include")
-	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm")
+	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_mode("debug")})
 
 	-- src
 	add_includedirs("src/")
 
 	-- utils
-	add_files("src/utils/**.cppm")
+	add_files("src/utils/**.cppm", {public = is_mode("debug")})
 
 	-- uwvm
-	add_files("src/uwvm/**.cppm")
+	add_files("src/uwvm/**.cppm", {public = is_mode("debug")})
 
 	-- uwvm main
 	add_files("src/uwvm/main.cc")

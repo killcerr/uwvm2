@@ -24,6 +24,7 @@ module;
 
 #include <cstdint>
 #include <cstddef>
+#include <concepts>
 
 export module utils.ansies:rgb;
 
@@ -75,7 +76,7 @@ export namespace utils::ansies
         requires (sizeof(char_type) == sizeof(char8_t))
     inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, rgb>, char_type* iter, rgb color) noexcept
     {
-        return details::rgb_print_reserve_impl(iter, color.r, color.g, rcolorgb.b);
+        return details::rgb_print_reserve_impl(iter, color.r, color.g, color.b);
     }
 
 }  // namespace utils::ansies

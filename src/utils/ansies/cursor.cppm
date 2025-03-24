@@ -24,6 +24,7 @@ module;
 
 #include <cstdint>
 #include <cstddef>
+#include <concepts>
 
 export module utils.ansies:cursor;
 
