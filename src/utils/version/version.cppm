@@ -79,11 +79,11 @@ export namespace utils
         {
             constexpr auto point{::fast_io::char_literal_v<u8'.', char_type>};
             char_type* curr_pos{::fast_io::pr_rsv_to_iterator_unchecked(iter, x)};
-            *(curr_pos) = point;
+            *curr_pos = point;
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, y);
-            *(curr_pos) = point;
+            *curr_pos = point;
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, z);
-            *(curr_pos) = point;
+            *curr_pos = point;
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, state);
             return curr_pos;
         }
