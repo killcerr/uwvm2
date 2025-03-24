@@ -33,7 +33,7 @@ function def_build()
 
 	set_encodings("utf-8")
 	set_warnings("all")
-	
+
 	set_policy("build.c++.modules", true)
 	set_policy("build.c++.modules.std", true)
 
@@ -94,8 +94,8 @@ target("uwvm")
 	-- utils
 	add_files("src/utils/**.cppm")
 
-	-- uwvm/crtmain
-	add_files("src/uwvm/crtmain/**.cppm")
+	-- uwvm
+	add_files("src/uwvm/**.cppm")
 
 	-- uwvm main
 	add_files("src/uwvm/main.cc")

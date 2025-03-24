@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-23
+ * @date        2025-03-24
  * @copyright   APL-2 License
  */
 
@@ -20,25 +20,22 @@
  *                                      *
  ****************************************/
 
-// #pragma once /// pragma once is not necessary
+module;
 
-#if defined(_MSC_VER) && !defined(__clang__)
-# pragma warning(push)
-# pragma warning(disable : 4061)
-# pragma warning(disable : 4324)
-# pragma warning(disable : 4365)
-# pragma warning(disable : 4464)
-# pragma warning(disable : 4514)
-# pragma warning(disable : 4623)
-# pragma warning(disable : 4626)
-# pragma warning(disable : 4668)
-# pragma warning(disable : 4702)
-# pragma warning(disable : 4710)
-# pragma warning(disable : 4711)
-# pragma warning(disable : 4800)
-# pragma warning(disable : 4820)
-# pragma warning(disable : 5027)
-# pragma warning(disable : 5031)
-# pragma warning(disable : 5045)
-# pragma warning(disable : 6308)
+#include <cstdint>
+#include <cstddef>
+
+export module uwvm.custom:version;
+
+import fast_io;
+
+import utils.version;
+
+export namespace uwvm
+{
+#if defined(UWVM_VERSION_X) && defined(UWVM_VERSION_Y) && defined(UWVM_VERSION_Z) && defined(UWVM_VERSION_S)
+    inline constexpr ::utils::version uwvm_version{UWVM_VERSION_X, UWVM_VERSION_Y, UWVM_VERSION_Z, UWVM_VERSION_S};
+#else
+    inline constexpr ::utils::version uwvm_version{0, 0, 0, 0};
 #endif
+}  // namespace uwvm

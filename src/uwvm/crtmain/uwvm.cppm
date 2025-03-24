@@ -27,11 +27,11 @@ module;
 /// @brief uwvm.crtmain:uwvm module declaration
 export module uwvm.crtmain:uwvm;
 
-/// @brief import fast_io module
 import fast_io;
 
-/// @brief import utils.io module
 import utils.io;
+
+import uwvm.custom;
 
 /// @brief export uwvm namespace
 export namespace uwvm
@@ -43,7 +43,7 @@ export namespace uwvm
     /// @see        main()
     inline int uwvm_main(int argc, char const* const* argv) noexcept
     {
-
+        ::fast_io::io::perrln(::uwvm::u8err, u8"[uwvm] version ", ::uwvm::uwvm_version);
         return 0;
     }
 }  // namespace uwvm

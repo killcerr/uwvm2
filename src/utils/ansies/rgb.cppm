@@ -29,7 +29,9 @@ export module utils.ansies:rgb;
 
 import fast_io;
 
-/// @brief not support on win9x and msdos
+/// @brief      not support on win9x and msdos
+/// @details    These functions are not provided on these platforms to avoid unwanted behaviors
+
 #if !((defined(_WIN32) && defined(_WIN32_WINDOWS)) || defined(__MSDOS__) || defined(__DJGPP__))
 
 export namespace utils::ansies

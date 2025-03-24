@@ -74,8 +74,8 @@
 #endif
 
 /// @brief        stdcall
-/// @details      On x86-32 targets, the stdcall attribute causes the compiler to assume 
-///               that the called function pops off the stack space used to pass arguments, 
+/// @details      On x86-32 targets, the stdcall attribute causes the compiler to assume
+///               that the called function pops off the stack space used to pass arguments,
 ///               unless it takes a variable number of arguments.
 /// @details      on msvc: __stdcall
 ///               on gcc, clang: __attribute__((__stdcall__))
@@ -210,8 +210,8 @@
 # define UWVM_GNU_CONST
 #endif
 
-/// @brief        forceinline 
-/// @details      After C++17, the `inline` keyword no longer indicates forced inlining; 
+/// @brief        forceinline
+/// @details      After C++17, the `inline` keyword no longer indicates forced inlining;
 ///               instead, it serves to prevent ODR violations. Forced inlining should be achieved using the forceinline attribute.
 /// @details      on gcc, clang: [[__gnu__::__always_inline__]]
 ///               on msvc: [[msvc::forceinline]]
@@ -225,7 +225,7 @@
 # define UWVM_ALWAYS_INLINE
 #endif
 
-/// @brief        Marking a function with [[gnu::artificial]] hints to debuggers that it is not 
+/// @brief        Marking a function with [[gnu::artificial]] hints to debuggers that it is not
 ///               a user-defined function, reducing unnecessary debug info.
 /// @details      on gcc, clang: [[__gnu__::__artificial__]]
 #pragma push_macro("UWVM_GNU_ARTIFICIAL")
@@ -274,8 +274,8 @@
 #endif
 
 /// @brief        assert
-/// @details      Avoid using C++26 contracts. Different modules including different handle_contract_violation 
-///               implementations may result in multiple handling approaches. If a module without handle_contract_violation 
+/// @details      Avoid using C++26 contracts. Different modules including different handle_contract_violation
+///               implementations may result in multiple handling approaches. If a module without handle_contract_violation
 ///               is included, std::terminate or std::abort will be used instead of the direct trap behavior we desire.
 /// @details      on gcc, clang: __builtin_trap()
 ///               on msvc: abort()

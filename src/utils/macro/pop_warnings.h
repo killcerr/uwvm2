@@ -23,5 +23,5 @@
 // #pragma once /// pragma once is not necessary
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#pragma warning(pop)
+# pragma warning(pop)
 #endif
