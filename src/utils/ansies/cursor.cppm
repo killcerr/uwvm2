@@ -23,6 +23,7 @@
 module;
 
 #include <cstdint>
+#include <cstddef>
 
 export module utils.ansies:cursor;
 
