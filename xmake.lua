@@ -84,18 +84,20 @@ target("uwvm")
 	set_kind("binary")
 	def_build()
 
+	local is_debug_mode = is_mode("debug") -- public all modules in debug mode
+
 	-- third-parties/fast_io
 	add_includedirs("third-parties/fast_io/include")
-	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_mode("debug")})
+	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_debug_mode})
 
 	-- src
 	add_includedirs("src/")
 
 	-- utils
-	add_files("src/utils/**.cppm", {public = is_mode("debug")})
+	add_files("src/utils/**.cppm", {public = is_debug_mode})
 
 	-- uwvm
-	add_files("src/uwvm/**.cppm", {public = is_mode("debug")})
+	add_files("src/uwvm/**.cppm", {public = is_debug_mode})
 
 	-- uwvm main
 	add_files("src/uwvm/main.cc")

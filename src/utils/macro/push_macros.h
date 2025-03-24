@@ -333,3 +333,14 @@
 #else
 # define UWVM_GNU_HOT
 #endif
+
+/// @brief        MSVC may not support if consteval, so macros are used to select the appropriate version.
+/// @details      on gcc, clang: consteval
+///               on msvc: (__builtin_is_constant_evaluated())
+#pragma push_macro("UWVM_IF_CONSTEVAL")
+#undef UWVM_IF_CONSTEVAL
+#if __cpp_if_consteval >= 202106L
+#define UWVM_IF_CONSTEVAL consteval
+#else
+#define UWVM_IF_CONSTEVAL (__builtin_is_constant_evaluated())
+#endif

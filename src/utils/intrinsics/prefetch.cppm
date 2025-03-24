@@ -34,10 +34,11 @@ module;
 /// @brief      utils.instrinsics:prefetch module declaration
 export module utils.intrinsics:prefetch;
 
-export namespace uwvm
+export namespace uwvm::intrinsics
 {
     /// @brief      Direct conversion to cpu prefetch instructions
-    /// @details    level == 0 -> nta : Non-chronological storage
+    /// @details    write: write or read sensitive
+    ///             level == 0 -> nta (Non-chronological storage)
     ///             level == 1 -> L3
     ///             level == 2 -> L2, L3
     ///             level == 3 -> L1, L2, L3
