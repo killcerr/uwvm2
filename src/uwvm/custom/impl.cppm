@@ -20,8 +20,7 @@
  *                                      *
  ****************************************/
 
- module;
+module;
 
- export module uwvm.custom;
- export import :version;
- 
+export module uwvm.custom;
+export import :version;

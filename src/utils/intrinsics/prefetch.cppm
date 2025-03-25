@@ -55,5 +55,5 @@ export namespace uwvm::intrinsics
 #endif
     }
 
-}  // namespace uwvm
+}  // namespace uwvm::intrinsics
 
