@@ -129,6 +129,7 @@ export namespace utils::cmdline
                                                        parameter_parsing_results* para_end) noexcept;
 
     /// @brief User-defined parameters and handlers
+    /// @brief Command line arguments will be encoded in ascii and will not be specialized for encodings such as ebcdic.
     struct parameter
     {
         ::fast_io::u8string_view const name{};      // parameter name
@@ -162,7 +163,7 @@ export namespace utils::cmdline
     /// @details    Calculate the total number of aliases in the sorting parameter results obtained by parameter_sort
     ///             This function only allows consteval to implement.
     template <::std::size_t N>
-    inline consteval ::std::size_t calculate_all_parameters_size(::fast_io::array<parameter const*, N> const& punsort) noexcept
+    inline consteval ::std::size_t calculate_alias_parameters_size(::fast_io::array<parameter const*, N> const& punsort) noexcept
     {
         ::std::size_t res{};
         for(::std::size_t i{}; i < N; ++i)
@@ -171,6 +172,284 @@ export namespace utils::cmdline
             res += punsort.index_unchecked(i)->alias.len;  // alias name size == alias.len
         }
         return res;
+    }
+
+    /// @brief judge whether parameter has invalid char
+    inline constexpr bool is_invalid_paramater_char(char8_t c) noexcept
+    {
+        if(c >= 0x21 && c <= 0x7E)
+        {
+            switch(c)
+            {
+                case u8'/': [[fallthrough]];
+                case u8'\\': [[fallthrough]];
+                case u8':': [[fallthrough]];
+                case u8'*': [[fallthrough]];
+                case u8'?': [[fallthrough]];
+                case u8'\"': [[fallthrough]];
+                case u8'<': [[fallthrough]];
+                case u8'>': [[fallthrough]];
+                case u8'|': return true;
+                default: return false;
+            }
+        }
+        else { return true; }
+    }
+
+    /// @brief this function expand all parameter raw name and it alias name and check whether they are valid
+    /// @details AllParaSize is the value calculate_alias_parameters_size return
+    template <::std::size_t AllParaSize, ::std::size_t N>
+    inline consteval auto expand_alias_parameters_and_check(::fast_io::array<parameter const*, N> const& punsort) noexcept
+    {
+        ::fast_io::array<alias_parameter, AllParaSize> res{};
+        ::std::size_t res_pos{};
+
+        // expand all alias patameters
+        for(::std::size_t i{}; i < N; ++i)
+        {
+            res.index_unchecked(res_pos) = {punsort.index_unchecked(i)->name, punsort.index_unchecked(i)};
+            ++res_pos;
+            for(::std::size_t j{}; j < punsort.index_unchecked(i)->alias.len; ++j)
+            {
+                res.index_unchecked(res_pos) = {punsort.index_unchecked(i)->alias.base[j], punsort.index_unchecked(i)};
+                ++res_pos;
+            }
+        }
+
+        // sort
+        ::std::ranges::sort(res, [](alias_parameter const& a, alias_parameter const& b) noexcept -> bool { return a.str < b.str; });
+
+        // check is invalid
+        ::fast_io::u8string_view check{};  // Empty strings will be sorted and placed first.
+        for(auto const& i: res)
+        {
+            if(i.str == check || i.str.front_unchecked() != u8'-')
+            {
+                // Duplicate parameters are not allowed
+                // The first character of the parameter must be '-'
+                ::fast_io::fast_terminate();
+            }
+            else
+            {
+                if(i.str.size() == 1)
+                {
+                    // "-" is invalid
+                    ::fast_io::fast_terminate();
+                }
+                else
+                {
+                    for(auto c: i.str)
+                    {
+                        if(is_invalid_paramater_char(c))
+                        {
+                            // invalid parameter character
+                            ::fast_io::fast_terminate();
+                        }
+                    }
+                }
+                check = i.str;  // check duplicate
+            }
+        }
+        return res;
+    }
+
+    /// @brief      Calculate max parameter size
+    /// @details    Maximum long distance used to provide to the shortest path
+    template <::std::size_t N>
+    inline consteval ::std::size_t calculate_max_para_size(::fast_io::array<alias_parameter, N> const& punsort) noexcept
+    {
+        ::std::size_t max_size{};
+        for(::std::size_t i{}; i < N; ++i) { max_size = ::std::max(max_size, punsort.index_unchecked(i).str.size()); }
+        return max_size;
+    }
+
+    /// @brief      Minimum hash table size to start generating
+    /// @details    2 ^ hash_size_base
+    inline constexpr ::std::size_t hash_size_base{4u};
+
+    /// @brief      Maximum conflict size above which the hashtable will be expanded.
+    inline constexpr ::std::size_t max_conflict_size{8u};
+
+    struct calculate_hash_table_size_res
+    {
+        ::std::size_t hash_table_size{};
+        ::std::size_t extra_size{};
+    };
+
+    /// @brief      Calculate the size of the hash_table with the maximum conflict size
+    template <::std::size_t N>
+    inline consteval calculate_hash_table_size_res calculate_hash_table_size(::fast_io::array<alias_parameter, N> const& ord) noexcept
+    {
+        constexpr auto sizet_d10{static_cast<::std::size_t>(::std::numeric_limits<::std::size_t>::digits10)};
+
+        ::fast_io::crc32c_context crc32c{};
+        for(auto i{hash_size_base}; i < sizet_d10; ++i)
+        {
+            ::std::size_t const hash_size{static_cast<::std::size_t>(1u) << i};
+            bool c{};
+            ::std::size_t extra_size{};
+            ::std::size_t* const hash_size_array{::new ::std::size_t[hash_size]{}};
+            for(auto const& j: ord)
+            {
+                ::std::size_t const j_str_size{j.str.size()};
+                ::std::byte* const ptr{::new ::std::byte[j_str_size]{}};
+                for(::std::size_t k{}; k < j_str_size; ++k) { ptr[k] = static_cast<::std::byte>(j.str.index_unchecked(k)); }
+                crc32c.reset();
+                crc32c.update(ptr, ptr + j_str_size);
+                ::delete[] ptr;
+                auto const val{crc32c.digest_value() % hash_size};
+                ++hash_size_array[val];
+                if(hash_size_array[val] == 2) { ++extra_size; }
+                if(hash_size_array[val] > max_conflict_size) { c = true; }
+            }
+
+            ::delete[] hash_size_array;
+            if(!c) { return {hash_size, extra_size}; }
+        }
+        ::fast_io::fast_terminate();  // error
+        return {};
+    }
+
+    struct ht_para_cpos
+    {
+        ::fast_io::u8string_view str{};
+        parameter const* para{};
+    };
+
+
+    using ct_para_str = alias_parameter;
+
+    struct conflict_table
+    {
+        ::fast_io::array<ct_para_str, max_conflict_size> ctmem{};
+    };
+
+    template <::std::size_t hash_table_size, ::std::size_t conflict_size>
+    struct parameters_hash_table
+    {
+        static_assert(hash_table_size > 1);
+
+        ::fast_io::array<ht_para_cpos, hash_table_size> ht{};
+        ::std::conditional_t<static_cast<bool>(conflict_size), ::fast_io::array<conflict_table, conflict_size>, ::std::in_place_t> ct{};
+    };
+
+    /// @brief generate hash table
+    template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t N>
+    inline consteval auto generate_hash_table(::fast_io::array<alias_parameter, N> const& ord) noexcept
+    {
+        parameters_hash_table<hash_table_size, conflict_size> res{};
+
+        ::fast_io::crc32c_context crc32c{};
+        ::std::size_t conflictplace{1u};
+
+        for(auto const& j: ord)
+        {
+            ::std::size_t const j_str_size{j.str.size()};
+            ::std::byte* const ptr{::new ::std::byte[j_str_size]{}};
+            for(::std::size_t k{}; k < j_str_size; ++k) { ptr[k] = static_cast<::std::byte>(j.str.index_unchecked(k)); }
+            crc32c.reset();
+            crc32c.update(ptr, ptr + j_str_size);
+            ::delete[] ptr;
+            auto const val{crc32c.digest_value() % hash_table_size};
+            if constexpr(conflict_size)
+            {
+                if(res.ht.index_unchecked(val).para == nullptr)
+                {
+                    if(!res.ht.index_unchecked(val).str.empty())
+                    {
+                        // Write a conflict table backward.
+                        for(auto& i: res.ct.index_unchecked(res.ht.index_unchecked(val).str.size() - 1).ctmem)
+                        {
+                            // Find an opening.
+                            if(i.para == nullptr)
+                            {
+                                i.para = j.para;
+                                i.str = j.str;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Without any conflict, this is the first
+                        res.ht.index_unchecked(val).para = j.para;
+                        res.ht.index_unchecked(val).str = j.str;
+                    }
+                }
+                else
+                {
+                    // Move the data to the conflict table with the number of conflicts +1
+                    res.ct.index_unchecked(conflictplace - 1).ctmem.front_unchecked().para = res.ht.index_unchecked(val).para;
+                    res.ct.index_unchecked(conflictplace - 1).ctmem.front_unchecked().str = res.ht.index_unchecked(val).str;
+                    res.ht.index_unchecked(val).para = nullptr;
+                    res.ht.index_unchecked(val).str.ptr = nullptr;
+                    res.ht.index_unchecked(val).str.n = conflictplace;
+                    res.ct.index_unchecked(conflictplace - 1).ctmem.index_unchecked(1).para = j.para;
+                    res.ct.index_unchecked(conflictplace - 1).ctmem.index_unchecked(1).str = j.str;
+                    ++conflictplace;
+                }
+            }
+            else
+            {
+                // No conflicts of any kind
+                res.ht.index_unchecked(val).para = j.para;
+                res.ht.index_unchecked(val).str = j.str;
+            }
+        }
+        return res;
+    }
+
+    template <::std::size_t hash_table_size, ::std::size_t conflict_size>
+    inline constexpr parameter const* find_from_hash_table(parameters_hash_table<hash_table_size, conflict_size> const& ht, ::fast_io::u8string_view str) noexcept
+    {
+        ::fast_io::crc32c_context crc32c{};
+
+        if UWVM_IF_CONSTEVAL
+        {
+            auto const str_size{str.size()};
+            ::std::byte* const ptr{::new ::std::byte[str_size]{}};
+            for(::std::size_t k{}; k < str_size; ++k) { ptr[k] = static_cast<::std::byte>(str.index_unchecked(k)); }
+            crc32c.update(ptr, ptr + str_size);
+            ::delete[] ptr;
+        }
+        else
+        {
+            auto const i{reinterpret_cast<::std::byte const*>(str.data())};
+            crc32c.update(i, i + str.size());
+        }
+        auto const val{crc32c.digest_value() % hash_table_size};
+        auto const htval{ht.ht.index_unchecked(val)};
+        if constexpr(conflict_size)
+        {
+            if(htval.para == nullptr)
+            {
+                if(!htval.str.empty())
+                {
+                    auto const& ct{ht.ct.index_unchecked(htval.str.size() - 1).ctmem};
+                    for(::std::size_t i{}; i < max_conflict_size; ++i)
+                    {
+                        if(ct.index_unchecked(i).str == str) { return ct.index_unchecked(i).para; }
+                        else if(ct.index_unchecked(i).para == nullptr) [[unlikely]] { return nullptr; }
+                    }
+                    return nullptr;
+                }
+                else [[unlikely]] { return nullptr; }
+            }
+            else
+            {
+                if(str == htval.str) { return htval.para; }
+                else [[unlikely]] { return nullptr; }
+            }
+        }
+        else
+        {
+            if(htval.para != nullptr)
+            {
+                if(str == htval.str) { return htval.para; }
+                else [[unlikely]] { return nullptr; }
+            }
+            else [[unlikely]] { return nullptr; }
+        }
     }
 
 }  // namespace utils::cmdline

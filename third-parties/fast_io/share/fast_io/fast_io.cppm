@@ -3,6 +3,7 @@ module;
 #include <fast_io.h>
 #include <fast_io_legacy.h>
 #include <fast_io_device.h>
+#include <fast_io_crypto.h>
 #include <fast_io_dsal/array.h>
 #include <fast_io_dsal/vector.h>
 #include <fast_io_dsal/string_view.h>
@@ -20,6 +21,8 @@ export module fast_io;
 #include "fast_io_inc/core.inc"
 #include "fast_io_inc/core/allocation.inc"
 #include "fast_io_inc/freestanding.inc"
+
+#include "fast_io_inc/crypto.inc"
 
 #ifndef FAST_IO_FREESTANDING
 # include "fast_io_inc/hosted.inc"
