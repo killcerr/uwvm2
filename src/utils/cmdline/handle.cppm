@@ -306,8 +306,8 @@ export namespace utils::cmdline
             ::delete[] hash_size_array;
             if(!c) { return {hash_size, extra_size}; }
         }
-        ::fast_io::fast_terminate();  // error
-        return {};
+        // The conflict size has not been able to stay within the maximum conflict size, try changing the initial seed.
+        ::fast_io::fast_terminate(); 
     }
 
     struct ht_para_cpos
@@ -429,7 +429,7 @@ export namespace utils::cmdline
         {
             if(htval.para == nullptr)
             {
-                if(!htval.str.empty()) [[likely]] 
+                if(!htval.str.empty()) [[likely]]
                 {
                     // Get Conflict Table
                     auto const& ct{ght.ct.index_unchecked(htval.str.size() - 1).ctmem};
@@ -446,13 +446,13 @@ export namespace utils::cmdline
             }
             else
             {
-                if(str == htval.str) [[likely]]  { return htval.para; }
+                if(str == htval.str) [[likely]] { return htval.para; }
                 else [[unlikely]] { return nullptr; }
             }
         }
         else
         {
-            if(str == htval.str) [[likely]]  { return htval.para; }
+            if(str == htval.str) [[likely]] { return htval.para; }
             else [[unlikely]] { return nullptr; }
         }
     }
