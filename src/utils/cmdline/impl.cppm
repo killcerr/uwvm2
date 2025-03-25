@@ -24,3 +24,4 @@ module;
 
 export module utils.cmdline;
 export import :shortest_path;
+export import :handle;

@@ -24,6 +24,11 @@
 
 module;
 
+#include <cstdint>
+#include <cstddef>
+
+#include <utils/macro/push_macros.h>
+
 /// @brief uwvm.crtmain:uwvm module declaration
 export module uwvm.crtmain:uwvm;
 
@@ -43,7 +48,10 @@ export namespace uwvm
     /// @see        main()
     inline int uwvm_main(int argc, char const* const* argv) noexcept
     {
-        ::fast_io::io::perrln(::uwvm::u8err, u8"[uwvm] version ", ::uwvm::uwvm_version);
+        auto const argc_uz{static_cast<::std::size_t>(argc)};
+        using char8_t_const_ptr_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const* const*;
+        auto const argv_u8{reinterpret_cast<char8_t_const_ptr_const_may_alias_ptr>(argv)};
+
         return 0;
     }
 }  // namespace uwvm

@@ -26,6 +26,7 @@
 // #pragma once /// pragma once is not necessary
 
 /// @brief      uwvm's macros
+#pragma pop_macro("UWVM_GNU_MAY_ALIAS")
 #pragma pop_macro("UWVM_IF_CONSTEVAL")
 #pragma pop_macro("UWVM_GNU_HOT")
 #pragma pop_macro("UWVM_GNU_COLD")

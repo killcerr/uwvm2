@@ -85,11 +85,7 @@ export namespace utils::cmdline
         if constexpr(!Stack_Len)
         {
             if UWVM_IF_CONSTEVAL { ::delete[] d; }
-            else
-            {
-                if constexpr(::fast_io::details::has_deallocate_n_impl<Alloc>) { Alloc::deallocate_n(d, y_length + 1); }
-                else { Alloc::deallocate(d); }
-            }
+            else { Alloc::deallocate_n(d, y_length + 1); }
         }
 
         return ret;

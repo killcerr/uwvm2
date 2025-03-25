@@ -1,5 +1,6 @@
 export namespace fast_io
 {
+using ::fast_io::basic_io_scatter_t;
 using ::fast_io::char_literal_v;
 using ::fast_io::pr_rsv_size;
 using ::fast_io::pr_rsv_to_iterator_unchecked;

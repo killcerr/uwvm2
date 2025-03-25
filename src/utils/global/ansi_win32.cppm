@@ -40,7 +40,7 @@ export namespace uwvm::global
 {
     /// @brief      cmd on windows nt does not enable ansi escaping by default.
     /// @details    Declare this via a global variable to set up ansi escaping at program runtime.
-    ///             Because of the internal CsrClientCallServer behavior, it must be restored at the end of the program.
+    ///             Because of the internal NtDeviceControlFile behavior, it must be restored at the end of the program.
     struct enable_win32_ansi
     {
         inline static constexpr ::std::uint_least32_t enable_virtual_terminal_processing{0x0004u /*ENABLE_VIRTUAL_TERMINAL_PROCESSING*/};
