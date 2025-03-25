@@ -5,10 +5,10 @@
  ********************************************************/
 
 /**
- * @author MacroModel
- * @version 2.0.0
- * @date 2025-03-21
- * @copyright APL-2 License
+ * @author      MacroModel
+ * @version     2.0.0
+ * @date        2025-03-21
+ * @copyright   APL-2 License
  */
 
 /****************************************
@@ -25,13 +25,15 @@ module;
 #include <cstdint>
 #include <memory>
 
-/// @brief utils.global:ansi_win32 module declaration
+#include <utils/macro/push_macros.h>
+
+/// @brief      utils.global:ansi_win32 module declaration
 export module utils.global:ansi_win32;
 
-/// @brief only support on winnt (with win32 api)
+/// @brief      only support on winnt (with win32 api)
 #if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
 
-/// @brief import fast_io module
+/// @brief      import fast_io module
 import fast_io;
 
 export namespace uwvm::global
@@ -41,7 +43,7 @@ export namespace uwvm::global
     ///             Because of the internal CsrClientCallServer behavior, it must be restored at the end of the program.
     struct enable_win32_ansi
     {
-        inline static constexpr ::std::uint_least32_t enable_virtual_terminal_processing{0x0004u};
+        inline static constexpr ::std::uint_least32_t enable_virtual_terminal_processing{0x0004u /*ENABLE_VIRTUAL_TERMINAL_PROCESSING*/};
 
         ::std::uint_least32_t out_omode{};
         ::std::uint_least32_t err_omode{};
@@ -49,10 +51,7 @@ export namespace uwvm::global
         void* out_handle{};
         void* err_handle{};
 
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
-#endif
-        inline enable_win32_ansi() noexcept
+        UWVM_GNU_COLD inline enable_win32_ansi() noexcept
         {
             out_handle = ::fast_io::win32::GetStdHandle(::fast_io::win32_stdout_number);
             err_handle = ::fast_io::win32::GetStdHandle(::fast_io::win32_stderr_number);
@@ -62,10 +61,7 @@ export namespace uwvm::global
             ::fast_io::win32::SetConsoleMode(err_handle, err_omode | enable_virtual_terminal_processing);
         }
 
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
-#endif
-        inline ~enable_win32_ansi() noexcept
+        UWVM_GNU_COLD inline ~enable_win32_ansi() noexcept
         {
             ::fast_io::win32::SetConsoleMode(out_handle, out_omode);
             ::fast_io::win32::SetConsoleMode(err_handle, err_omode);
@@ -73,3 +69,4 @@ export namespace uwvm::global
     };
 }  // namespace uwvm::global
 #endif
+

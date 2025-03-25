@@ -5,9 +5,9 @@
  ********************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-03-24
  * @copyright   APL-2 License
  */
 
@@ -22,10 +22,20 @@
 
 module;
 
-export module utils.global;
-export import :tzset;
-/// @brief only support on winnt (with win32 api)
-#if defined(_WIN32) && !defined(__CYGWIN__)
-export import :ansi_win32;
-export import :consolecp_win32;
+#include <cstdint>
+#include <cstddef>
+
+export module uwvm.custom:version;
+
+import fast_io;
+
+import utils.version;
+
+export namespace uwvm
+{
+#if defined(UWVM_VERSION_X) && defined(UWVM_VERSION_Y) && defined(UWVM_VERSION_Z) && defined(UWVM_VERSION_S)
+    inline constexpr ::utils::version uwvm_version{UWVM_VERSION_X, UWVM_VERSION_Y, UWVM_VERSION_Z, UWVM_VERSION_S};
+#else
+    inline constexpr ::utils::version uwvm_version{0, 0, 0, 0};
 #endif
+}  // namespace uwvm

@@ -661,7 +661,7 @@ inline void nt_family_alpc_ipc_server_disconnect_impl(void *__restrict client_pi
 template <nt_family family>
 inline ::fast_io::win32::nt::alpc_message_attributes *nt_family_create_alpc_ipc_client_message_attribute_view_impl()
 {
-	constexpr bool zw{family == nt_family::zw};
+	// constexpr bool zw{family == nt_family::zw};
 
 	constexpr ::std::uint_least32_t message_attribute{
 		0x80000000 /*ALPC_MESSAGE_SECURITY_ATTRIBUTE*/ |

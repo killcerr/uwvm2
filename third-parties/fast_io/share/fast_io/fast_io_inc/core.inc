@@ -1,5 +1,8 @@
 export namespace fast_io
 {
+using ::fast_io::char_literal_v;
+using ::fast_io::pr_rsv_size;
+using ::fast_io::pr_rsv_to_iterator_unchecked;
 
 using ::fast_io::io_reserve_type_t;
 using ::fast_io::io_reserve_type;

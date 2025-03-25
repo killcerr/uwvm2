@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-03-23
  * @copyright   APL-2 License
  */
 
@@ -20,27 +20,25 @@
  *                                      *
  ****************************************/
 
-module;
+// #pragma once /// pragma once is not necessary
 
-/// @brief      utils.global:tzset module declaration
-export module utils.global:tzset;
-
-/// @brief      import fast_io module
-import fast_io;
-
-export namespace uwvm::global
-{
-    /// @brief      Declare this via a global variable to get the correct timezone data when the program is run.
-    struct tz_set_s
-    {
-        /// @brief      The tzset() function initializes the tzname variable from the TZ environment variable.
-        /// @see        tzset(3)
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
+#if defined(_MSC_VER) && !defined(__clang__)
+# pragma warning(push)
+# pragma warning(disable : 4061)
+# pragma warning(disable : 4324)
+# pragma warning(disable : 4365)
+# pragma warning(disable : 4464)
+# pragma warning(disable : 4514)
+# pragma warning(disable : 4623)
+# pragma warning(disable : 4626)
+# pragma warning(disable : 4668)
+# pragma warning(disable : 4702)
+# pragma warning(disable : 4710)
+# pragma warning(disable : 4711)
+# pragma warning(disable : 4800)
+# pragma warning(disable : 4820)
+# pragma warning(disable : 5027)
+# pragma warning(disable : 5031)
+# pragma warning(disable : 5045)
+# pragma warning(disable : 6308)
 #endif
-        inline tz_set_s() noexcept
-        {
-            ::fast_io::posix_tzset();
-        }
-    };
-}  // namespace uwvm::global

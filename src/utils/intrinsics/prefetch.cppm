@@ -5,12 +5,12 @@
  ********************************************************/
 
 /**
- * @file prefetch.cppm
- * @brief cpu prefetch instruction
- * @author MacroModel
- * @version 2.0.0
- * @date 2025-03-21
- * @copyright APL-2 License
+ * @file        prefetch.cppm
+ * @brief       cpu prefetch instruction
+ * @author      MacroModel
+ * @version     2.0.0
+ * @date        2025-03-21
+ * @copyright   APL-2 License
  */
 
 /****************************************
@@ -24,18 +24,21 @@
 
 module;
 
-/// @brief Including intrin.h in the absence of __builtin_prefetch
+#include <utils/macro/push_macros.h>
+
+/// @brief      Including intrin.h in the absence of __builtin_prefetch
 #if !__has_builtin(__builtin_prefetch)
-    #include <intrin.h>;
+# include <intrin.h>;
 #endif
 
-/// @brief utils.instrinsics:prefetch module declaration
+/// @brief      utils.instrinsics:prefetch module declaration
 export module utils.intrinsics:prefetch;
 
-export namespace uwvm
+export namespace uwvm::intrinsics
 {
     /// @brief      Direct conversion to cpu prefetch instructions
-    /// @details    level == 0 -> nta : Non-chronological storage
+    /// @details    write: write or read sensitive
+    ///             level == 0 -> nta (Non-chronological storage)
     ///             level == 1 -> L3
     ///             level == 2 -> L2, L3
     ///             level == 3 -> L1, L2, L3
@@ -43,16 +46,7 @@ export namespace uwvm
     /// @see        __builtin_prefetch and _mm_prefetch
     template <bool write = false, int level = 3>
         requires (0 <= level && level <= 3)
-#if __has_cpp_attribute(__gnu__::__artificial__)
-    [[__gnu__::__artificial__]]
-#endif
-#if __has_cpp_attribute(__gnu__::__always_inline__)
-    [[__gnu__::__always_inline__]]
-#elif __has_cpp_attribute(msvc::forceinline)
-    [[msvc::forceinline]]
-#endif
-    inline void
-        prefetch(void const* address) noexcept
+    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline void prefetch(void const* address) noexcept
     {
 #if __has_builtin(__builtin_prefetch)
         __builtin_prefetch(address, static_cast<int>(write), level);
@@ -61,4 +55,5 @@ export namespace uwvm
 #endif
     }
 
-}  // namespace uwvm
+}  // namespace uwvm::intrinsics
+

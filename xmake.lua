@@ -31,6 +31,9 @@ function def_build()
 
     set_languages("c23", "cxx26")
 
+	set_encodings("utf-8")
+	set_warnings("all")
+
 	set_policy("build.c++.modules", true)
 	set_policy("build.c++.modules.std", true)
 
@@ -44,14 +47,22 @@ function def_build()
 		add_defines("UWVM_TIMER")
 	end
 
-    local disable_int = get_config("disable-int")
-	if disable_int then
+    local enable_int = get_config("enable-int")
+	if enable_int == "no" then
 		add_defines("UWVM_DISABLE_INT")
+	elseif enable_int == "default" then
+		add_defines("UWVM_USE_DEFAULT_INT")
+	elseif enable_int == "uwvm-int" then
+		add_defines("UWVM_USE_UWVM_INT")
 	end
 
-    local disable_jit = get_config("disable-jit")
-	if disable_jit then
+    local enable_jit = get_config("enable-jit")
+	if enable_jit == "no" then
 		add_defines("UWVM_DISABLE_JIT")
+	elseif enable_jit == "default" then
+		add_defines("UWVM_USE_DEFAULT_JIT")
+	elseif enable_jit == "llvm" then
+		add_defines("UWVM_USE_LLVM_JIT")
 	end
 
     if is_plat("windows") then
@@ -73,15 +84,20 @@ target("uwvm")
 	set_kind("binary")
 	def_build()
 
+	local is_debug_mode = is_mode("debug") -- public all modules in debug mode
+
 	-- third-parties/fast_io
 	add_includedirs("third-parties/fast_io/include")
-	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm")
+	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_debug_mode})
+
+	-- src
+	add_includedirs("src/")
 
 	-- utils
-	add_files("src/utils/**.cppm")
+	add_files("src/utils/**.cppm", {public = is_debug_mode})
 
-	-- uwvm/crtmain
-	add_files("src/uwvm/crtmain/**.cppm")
+	-- uwvm
+	add_files("src/uwvm/**.cppm", {public = is_debug_mode})
 
 	-- uwvm main
 	add_files("src/uwvm/main.cc")
