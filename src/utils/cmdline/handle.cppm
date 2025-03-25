@@ -429,7 +429,7 @@ export namespace utils::cmdline
         {
             if(htval.para == nullptr)
             {
-                if(!htval.str.empty())
+                if(!htval.str.empty()) [[likely]] 
                 {
                     // Get Conflict Table
                     auto const& ct{ght.ct.index_unchecked(htval.str.size() - 1).ctmem};
@@ -446,17 +446,13 @@ export namespace utils::cmdline
             }
             else
             {
-                if(str == htval.str) { return htval.para; }
+                if(str == htval.str) [[likely]]  { return htval.para; }
                 else [[unlikely]] { return nullptr; }
             }
         }
         else
         {
-            if(htval.para != nullptr)
-            {
-                if(str == htval.str) { return htval.para; }
-                else [[unlikely]] { return nullptr; }
-            }
+            if(str == htval.str) [[likely]]  { return htval.para; }
             else [[unlikely]] { return nullptr; }
         }
     }
