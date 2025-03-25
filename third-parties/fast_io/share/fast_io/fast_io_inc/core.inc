@@ -17,6 +17,8 @@ using ::fast_io::scan_context_type;
 using ::fast_io::scan_context_define;
 using ::fast_io::scan_context_eof_define;
 
+using ::fast_io::unreachable;
+
 namespace manipulators
 {
     

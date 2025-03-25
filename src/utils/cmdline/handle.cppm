@@ -316,20 +316,21 @@ export namespace utils::cmdline
         parameter const* para{};
     };
 
-
     using ct_para_str = alias_parameter;
 
     struct conflict_table
     {
-        ::fast_io::array<ct_para_str, max_conflict_size> ctmem{};
+        // Add one, store the last nullptr, to reduce the number of judgments when looking up
+        ::fast_io::array<ct_para_str, max_conflict_size + 1> ctmem{};
     };
 
     template <::std::size_t hash_table_size, ::std::size_t conflict_size>
     struct parameters_hash_table
     {
         static_assert(hash_table_size > 1);
-
+        // Hash Table
         ::fast_io::array<ht_para_cpos, hash_table_size> ht{};
+        // Conflict Table
         ::std::conditional_t<static_cast<bool>(conflict_size), ::fast_io::array<conflict_table, conflict_size>, ::std::in_place_t> ct{};
     };
 
@@ -378,12 +379,12 @@ export namespace utils::cmdline
                 }
                 else
                 {
-                    // Move the data to the conflict table with the number of conflicts +1
+                    // Move the data to the conflict table
                     res.ct.index_unchecked(conflictplace - 1).ctmem.front_unchecked().para = res.ht.index_unchecked(val).para;
                     res.ct.index_unchecked(conflictplace - 1).ctmem.front_unchecked().str = res.ht.index_unchecked(val).str;
-                    res.ht.index_unchecked(val).para = nullptr;
-                    res.ht.index_unchecked(val).str.ptr = nullptr;
-                    res.ht.index_unchecked(val).str.n = conflictplace;
+                    res.ht.index_unchecked(val).para = nullptr;         // Mark this as no available
+                    res.ht.index_unchecked(val).str.ptr = nullptr;      // Mark this as no available
+                    res.ht.index_unchecked(val).str.n = conflictplace;  // Conflict Table Location
                     res.ct.index_unchecked(conflictplace - 1).ctmem.index_unchecked(1).para = j.para;
                     res.ct.index_unchecked(conflictplace - 1).ctmem.index_unchecked(1).str = j.str;
                     ++conflictplace;
@@ -400,10 +401,12 @@ export namespace utils::cmdline
     }
 
     template <::std::size_t hash_table_size, ::std::size_t conflict_size>
-    inline constexpr parameter const* find_from_hash_table(parameters_hash_table<hash_table_size, conflict_size> const& ht, ::fast_io::u8string_view str) noexcept
+    inline constexpr parameter const* find_from_hash_table(parameters_hash_table<hash_table_size, conflict_size> const& ght,
+                                                           ::fast_io::u8string_view str) noexcept
     {
         ::fast_io::crc32c_context crc32c{};
 
+        // calculate crc32c
         if UWVM_IF_CONSTEVAL
         {
             auto const str_size{str.size()};
@@ -417,21 +420,27 @@ export namespace utils::cmdline
             auto const i{reinterpret_cast<::std::byte const*>(str.data())};
             crc32c.update(i, i + str.size());
         }
+
+        // get hash table
         auto const val{crc32c.digest_value() % hash_table_size};
-        auto const htval{ht.ht.index_unchecked(val)};
+        auto const htval{ght.ht.index_unchecked(val)};
+
         if constexpr(conflict_size)
         {
             if(htval.para == nullptr)
             {
                 if(!htval.str.empty())
                 {
-                    auto const& ct{ht.ct.index_unchecked(htval.str.size() - 1).ctmem};
-                    for(::std::size_t i{}; i < max_conflict_size; ++i)
+                    // Get Conflict Table
+                    auto const& ct{ght.ct.index_unchecked(htval.str.size() - 1).ctmem};
+                    // Conflict table is always the last one is nullptr, here no longer judge cend, improve speed
+                    for(auto curr_conflict{ct.cbegin()};; ++curr_conflict)
                     {
-                        if(ct.index_unchecked(i).str == str) { return ct.index_unchecked(i).para; }
-                        else if(ct.index_unchecked(i).para == nullptr) [[unlikely]] { return nullptr; }
+                        if(curr_conflict->str == str) { return curr_conflict->para; }
+                        else if(curr_conflict->para == nullptr) [[unlikely]] { return nullptr; }
                     }
-                    return nullptr;
+                    // If the above scenario is defined, there will never be a hit here.
+                    ::fast_io::unreachable();
                 }
                 else [[unlikely]] { return nullptr; }
             }
