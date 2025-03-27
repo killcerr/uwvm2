@@ -60,10 +60,10 @@ export namespace uwvm
     /// @param      argv Argument Vector
     /// @return     exit value
     /// @see        main()
-    inline int uwvm_main(int argc, char** argv) noexcept
+    inline int uwvm_main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) noexcept
     {
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
-        auto const argc_uz{static_cast<::std::size_t>(::uwvm::cmdline::u8_cmdline.argc)};
+        auto const argc_uz{::uwvm::cmdline::u8_cmdline.argc};
         auto const argv_u8{::uwvm::cmdline::u8_cmdline.argv.data()};
 #else
         auto const argc_uz{static_cast<::std::size_t>(argc)};
