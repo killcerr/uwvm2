@@ -161,6 +161,7 @@
 #pragma comment(linker,"/alternatename:__imp_?LookupPrivilegeValueA@win32@fast_io@@YAHPIBD0PA_J@Z=__imp_LookupPrivilegeValueA")
 #pragma comment(linker,"/alternatename:__imp_?LookupPrivilegeValueW@win32@fast_io@@YAHPIB_S0PA_J@Z=__imp_LookupPrivilegeValueW")
 #pragma comment(linker,"/alternatename:__imp_?CreateThread@win32@fast_io@@YAPAXPAUsecurity_attributes@12@IP6AIPAX@Z1IPAI@Z=__imp_CreateThread")
+#pragma comment(linker,"/alternatename:__imp_?CommandLineToArgvW@win32@fast_io@@YAPAPA_SPB_SPAH@Z=__imp_CommandLineToArgvW")
 // NT
 #pragma comment(linker,"/alternatename:__imp_?rtl_nt_status_to_dos_error@nt@win32@fast_io@@YAII@Z=__imp_RtlNtStatusToDosError")
 #pragma comment(linker,"/alternatename:__imp_?NtClose@nt@win32@fast_io@@YAIPAX@Z=__imp_NtClose")
