@@ -22,6 +22,8 @@
 
 module;
 
+#include <utils/macro/push_macros.h>
+
 /// @brief      utils.global:tzset module declaration
 export module utils.global:tzset;
 
@@ -35,10 +37,7 @@ export namespace utils::global
     {
         /// @brief      The tzset() function initializes the tzname variable from the TZ environment variable.
         /// @see        tzset(3)
-#if __has_cpp_attribute(__gnu__::__cold__)
-        [[__gnu__::__cold__]]
-#endif
-        inline tz_set_s() noexcept
+        UWVM_GNU_COLD inline tz_set_s() noexcept
         {
             ::fast_io::posix_tzset();
         }

@@ -39,31 +39,19 @@ export namespace utils::global
 {
     /// @brief      The ConsoleCP of Windows is affected by system environment variables.
     ///             By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8.
-    ///             Additionally, RAII is used for management, ensuring that the settings are applied at the beginning of the program
-    ///             and restored upon termination to prevent permanent modifications to the console encoding, which could affect subsequent programs.
+    ///             No need to restore, the console is automatically restored at the end of the program
     /// @see        https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
     struct set_win32_console_io_cp_to_utf8
     {
         inline static constexpr ::std::uint_least32_t utf8_coding{65001u /*Unicode (UTF-8)*/};
 
-        ::std::uint_least32_t output{};
-        ::std::uint_least32_t input{};
-
         UWVM_GNU_COLD inline set_win32_console_io_cp_to_utf8() noexcept
         {
-            output = ::fast_io::win32::GetConsoleOutputCP();
-            input = ::fast_io::win32::GetConsoleCP();
-            if(output != utf8_coding) { ::fast_io::win32::SetConsoleOutputCP(utf8_coding); }
-            if(input != utf8_coding) { ::fast_io::win32::SetConsoleCP(utf8_coding); }
-        }
-
-        UWVM_GNU_COLD inline ~set_win32_console_io_cp_to_utf8()
-        {
-            if(output != utf8_coding) { ::fast_io::win32::SetConsoleOutputCP(output); }
-            if(input != utf8_coding) { ::fast_io::win32::SetConsoleCP(input); }
+            ::fast_io::win32::SetConsoleOutputCP(utf8_coding);
+            ::fast_io::win32::SetConsoleCP(utf8_coding);
         }
     };
 
-}  // namespace uwvm::global
+}  // namespace utils::global
 #endif
 
