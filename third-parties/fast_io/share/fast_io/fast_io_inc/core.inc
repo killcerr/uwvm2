@@ -20,6 +20,8 @@ using ::fast_io::scan_context_eof_define;
 using ::fast_io::unreachable;
 using ::fast_io::noexcept_call;
 
+using ::fast_io::error;
+
 namespace manipulators
 {
     
