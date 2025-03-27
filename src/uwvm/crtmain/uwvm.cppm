@@ -54,9 +54,7 @@ export namespace uwvm
             default: ::fast_io::unreachable();
         }
 
-        ::uwvm::run::run();
-
-        return 0;
+        return ::uwvm::run::run();
     }
 
     /// @brief      uwvm c++ main function

@@ -22,9 +22,27 @@
 
 module;
 
+#include <utils/ansies/ansi_push_macro.h>
+
 export module uwvm.run:run;
+
+import fast_io;
+import utils.io;
+import uwvm.cmdline;
 
 export namespace uwvm::run
 {
-    inline void run() noexcept {}
+    inline int run() noexcept
+    {
+        if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
+        {
+            ::fast_io::io::perr(
+                ::utils::u8err,
+                UWVM_AES_U8_RST_ALL
+                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No input file.\n\n" UWVM_AES_U8_RST_ALL);
+            return -1;
+        }
+
+        return 0;
+    }
 }  // namespace uwvm::run
