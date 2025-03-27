@@ -25,6 +25,8 @@
 
 // #pragma once /// pragma once is not necessary
 
+#pragma pop_macro("UWVM_AES_U8_RGB")
+
 #pragma pop_macro("UWVM_AES_U8_CTRL_SCRS")
 #pragma pop_macro("UWVM_AES_U8_CTRL_HCRS")
 

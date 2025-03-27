@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-25
+ * @date        2025-03-27
  * @copyright   APL-2 License
  */
 
@@ -22,9 +22,6 @@
 
 module;
 
-export module uwvm.cmdline;
-export import :parser;
-export import :params;
-#if defined(_WIN32) && !defined(_WIN32_WINDOWS)
-export import :winnt_code_cvt;
-#endif
+export module uwvm.cmdline.params;
+export import :version;
+export import :run;

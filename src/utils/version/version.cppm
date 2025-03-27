@@ -33,6 +33,7 @@ import fast_io;
 
 export namespace utils
 {
+    // version does not add meaningless namespaces.
     struct version
     {
         ::std::uint_least32_t x{};

@@ -34,9 +34,8 @@ module;
 export module uwvm.crtmain:uwvm;
 
 import fast_io;
-import utils.io;
-import uwvm.custom;
 import uwvm.cmdline;
+import uwvm.run;
 
 /// @brief export uwvm namespace
 export namespace uwvm
@@ -47,11 +46,16 @@ export namespace uwvm
     /// @return     exit value
     inline int uwvm_uz_u8main(::std::size_t argc, char8_t const* const* argv) noexcept
     {
-        for(::std::size_t i{}; i != argc; ++i)
+        switch(::uwvm::cmdline::parsing(argc, argv))
         {
-            // test
-            ::fast_io::io::perrln(::utils::u8err, i, u8": ", ::fast_io::mnp::os_c_str(argv[i]));
+            case ::uwvm::cmdline::parsing_return_val::def: break;
+            case ::uwvm::cmdline::parsing_return_val::return0: return 0;
+            case ::uwvm::cmdline::parsing_return_val::returnm1: return -1;
+            default: ::fast_io::unreachable();
         }
+
+        ::uwvm::run::run();
+
         return 0;
     }
 

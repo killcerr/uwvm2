@@ -56,6 +56,8 @@ export namespace utils::cmdline
         parameter_parsing_results_type type{};  // Parameter type
     };
 
+    // Not recommended
+#if 0
     /// @brief Structure to storage parameter_parsing_results
     struct parameter_parsing_results_storage UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
@@ -95,6 +97,16 @@ export namespace utils::cmdline
 
         inline constexpr ~parameter_parsing_results_storage() { clear(); }
 
+        inline constexpr void alloc(::std::size_t argc) noexcept
+        {
+            if(!this->begin) [[likely]]
+            {
+                if UWVM_IF_CONSTEVAL { this->begin = ::new parameter_parsing_results[argc]; }
+                else { this->begin = Alloc::allocate(argc); }
+                this->end = this->begin + argc;
+            }
+        }
+
         inline constexpr void clear() noexcept
         {
             if(this->begin) [[likely]]
@@ -108,6 +120,7 @@ export namespace utils::cmdline
             }
         }
     };
+#endif
 
     /// @brief Used to indicate the return type of the parameter parser
     enum class parameter_return_type : unsigned
@@ -128,6 +141,11 @@ export namespace utils::cmdline
                                                        parameter_parsing_results* para_curr,
                                                        parameter_parsing_results* para_end) noexcept;
 
+    /// @brief type for pretreatment function
+    using parameter_func_type = void (*)(char8_t const* const*& argv_curr,
+                                         char8_t const* const* argv_end,
+                                         ::fast_io::vector<parameter_parsing_results>& pr) noexcept;
+
     /// @brief User-defined parameters and handlers
     /// @brief Command line arguments will be encoded in ascii and will not be specialized for encodings such as ebcdic.
     struct parameter
@@ -136,7 +154,7 @@ export namespace utils::cmdline
         ::fast_io::u8string_view const describe{};  // describtion shown in help
         kns_u8_str_scatter_t alias{};               // alias names
         handle_func_type handle{};                  // formal processing results
-        handle_func_type pretreatment{};            // pretreatment
+        parameter_func_type pretreatment{};       // pretreatment
         bool* is_exist{};                           // When it is not nullptr, repeated errors will be reported
     };
 
@@ -307,7 +325,7 @@ export namespace utils::cmdline
             if(!c) { return {hash_size, extra_size}; }
         }
         // The conflict size has not been able to stay within the maximum conflict size, try changing the initial seed.
-        ::fast_io::fast_terminate(); 
+        ::fast_io::fast_terminate();
     }
 
     struct ht_para_cpos
@@ -458,19 +476,3 @@ export namespace utils::cmdline
     }
 
 }  // namespace utils::cmdline
-
-/// @brief set fast_io::freestanding to match with fast_io
-namespace fast_io::freestanding
-{
-    template <>
-    struct is_trivially_copyable_or_relocatable<::utils::cmdline::parameter_parsing_results_storage>
-    {
-        inline static constexpr bool value = true;
-    };
-
-    template <>
-    struct is_zero_default_constructible<::utils::cmdline::parameter_parsing_results_storage>
-    {
-        inline static constexpr bool value = true;
-    };
-}  // namespace fast_io::freestanding

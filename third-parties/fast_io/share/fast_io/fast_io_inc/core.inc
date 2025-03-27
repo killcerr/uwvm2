@@ -21,6 +21,8 @@ using ::fast_io::unreachable;
 using ::fast_io::noexcept_call;
 
 using ::fast_io::error;
+using ::fast_io::cstr_len;
+using ::fast_io::cstr_nlen;
 
 namespace manipulators
 {

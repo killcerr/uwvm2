@@ -31,7 +31,7 @@ import fast_io;
 
 import utils.version;
 
-export namespace uwvm
+export namespace uwvm::custom
 {
 #if defined(UWVM_VERSION_X) && defined(UWVM_VERSION_Y) && defined(UWVM_VERSION_Z) && defined(UWVM_VERSION_S)
     inline constexpr ::utils::version uwvm_version{UWVM_VERSION_X, UWVM_VERSION_Y, UWVM_VERSION_Z, UWVM_VERSION_S};

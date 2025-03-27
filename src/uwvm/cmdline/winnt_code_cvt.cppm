@@ -11,7 +11,7 @@
 ///             such as GBK, the C runtime (crt) of the new process converts these UTF-16 arguments into the current ACP encoding when
 ///             initializing the char** argv array for the main function. This means that even if UTF-16 encoded arguments are passed
 ///             from the parent process, they are converted to the system's ACP (e.g., GBK) in the child process. To handle this,
-///             applications can retrieve the original UTF-16 command-line arguments using the __p___wargv() libc function and perform
+///             applications can retrieve the original UTF-16 command-line arguments using the CommandLineToArgvW function and perform
 ///             necessary conversions to UTF-8 or other desired encodings as needed.​
 ///
 ///             In contrast, Windows 9x systems do not exhibit this behavior. Internally, command-line arguments are stored as char* strings,
@@ -97,7 +97,9 @@ export namespace uwvm::cmdline
     inline nt_code_cvt_argv_storage nt_code_cvt_argv() noexcept
     {
         // get utf-16 cmdline from peb
+        // There is no need to check the nullptr in this step, it's never nullptr.
         auto const nt_proc_para{::fast_io::win32::nt::nt_get_current_peb()->ProcessParameters};
+        // There is no need to check the nullptr in this step, CommandLineToArgvW has special handling for nullptr.
         auto const nt_proc_cmdline{nt_proc_para->CommandLine};
 
         int u16_cmdline_argc;  // No initialization required
