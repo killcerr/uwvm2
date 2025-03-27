@@ -36,7 +36,7 @@ export module utils.global:ansi_win32;
 /// @brief      import fast_io module
 import fast_io;
 
-export namespace uwvm::global
+export namespace utils::global
 {
     /// @brief      cmd on windows nt does not enable ansi escaping by default.
     /// @details    Declare this via a global variable to set up ansi escaping at program runtime.

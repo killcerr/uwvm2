@@ -37,7 +37,7 @@ import fast_io;
 # pragma init_seg("lib")
 #endif
 
-export namespace uwvm
+export namespace utils
 {
 #ifndef __AVR__
 

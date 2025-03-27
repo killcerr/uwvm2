@@ -34,7 +34,7 @@ module;
 /// @brief      utils.instrinsics:prefetch module declaration
 export module utils.intrinsics:prefetch;
 
-export namespace uwvm::intrinsics
+export namespace utils::intrinsics
 {
     /// @brief      Direct conversion to cpu prefetch instructions
     /// @details    write: write or read sensitive
