@@ -48,7 +48,7 @@ export namespace uwvm::cmdline
 
     // globals
     inline ::fast_io::vector<::utils::cmdline::parameter_parsing_results> parsing_result{};
-    inline char8_t const* argv0{};
+    inline char8_t const* argv0_dir{};
     inline ::utils::cmdline::parameter_parsing_results* wasm_file_ppos{};
 
     /// @brief parsing cmdline
@@ -82,7 +82,7 @@ export namespace uwvm::cmdline
                                       nullptr,
                                       ::utils::cmdline::parameter_parsing_results_type::dir);
             // storage argv0
-            argv0 = *curr_argv;
+            argv0_dir = *curr_argv;
         }
 
         // preprocessing
@@ -91,19 +91,16 @@ export namespace uwvm::cmdline
         {
             if(*curr_argv == nullptr) [[unlikely]]
             {
-                // This doesn't usually happen, but just in case
+                // This doesn't happen, but just in case
                 continue;
             }
 
-            ::fast_io::u8cstring_view const argv_str{::fast_io::mnp::os_c_str(*curr_argv)};
-
-            if(argv_str.empty()) [[unlikely]]
+            if(::fast_io::u8cstring_view const argv_str{::fast_io::mnp::os_c_str(*curr_argv)}; argv_str.empty()) [[unlikely]]
             {
                 // No characters, may appear on windows, the first value of this parameter is u8'\0'
                 continue;
             }
-
-            if(argv_str.front_unchecked() == u8'-')
+            else if(argv_str.front_unchecked() == u8'-')
             {
                 // this is a parameter
                 // Special treatment for run
@@ -121,6 +118,8 @@ export namespace uwvm::cmdline
                 {
                     // All subsequent parameters are runtime parameters and need not be parsed further, jumping directly out of the
                     pr.emplace_back_unchecked(argv_str, run_para, ::utils::cmdline::parameter_parsing_results_type::parameter);  // -- run
+
+                    // grammatical error
                     if(++curr_argv == argv_end) [[unlikely]]
                     {
                         ::fast_io::io::perr(
@@ -146,7 +145,7 @@ export namespace uwvm::cmdline
                 }
                 else [[likely]]
                 {
-                    if(para->is_exist)
+                    if(para->is_exist)  // Check for null pointer
                     {
                         // not nullptr
                         if(auto& para_is_exist{*para->is_exist}; para_is_exist)
@@ -266,7 +265,7 @@ export namespace uwvm::cmdline
 
             for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
             {
-                if(curr_pr->para == nullptr) [[unlikely]]
+                if(curr_pr->para == nullptr)
                 {
                     // nonparametric
                     continue;
@@ -294,31 +293,29 @@ export namespace uwvm::cmdline
             if(needexit) [[unlikely]] { return parsing_return_val::returnm1; }
 
             // Check for unmarked arg
+
+            bool shouldreturn{};
+
+            for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
             {
-                bool shouldreturn{};
-
-                for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
+                if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
                 {
-                    if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
-                    {
-                        shouldreturn = true;
+                    shouldreturn = true;
 
-                        ::fast_io::io::perr(
-                            ::utils::u8err,
-                            UWVM_AES_U8_RST_ALL
-                                UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"invalid option: " UWVM_AES_U8_CYAN,
-                            curr_pr->str,
-                            UWVM_AES_U8_RST_ALL u8"\n");
-                    }
-                }
-
-                if(shouldreturn) [[unlikely]]
-                {
-                    ::fast_io::io::perrln(::utils::u8err);
-                    return parsing_return_val::returnm1;
+                    ::fast_io::io::perr(
+                        ::utils::u8err,
+                        UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"invalid option: " UWVM_AES_U8_CYAN,
+                        curr_pr->str,
+                        UWVM_AES_U8_RST_ALL u8"\n");
                 }
             }
-            return parsing_return_val::def;
+
+            if(shouldreturn) [[unlikely]]
+            {
+                ::fast_io::io::perrln(::utils::u8err);
+                return parsing_return_val::returnm1;
+            }
         }
+        return parsing_return_val::def;
     }
 }  // namespace uwvm::cmdline
