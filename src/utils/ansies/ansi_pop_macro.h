@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -24,6 +24,8 @@
 /// @details    Use `push_macro` to avoid side effects on existing macros. Please use `pop_macro` in conjunction.
 
 // #pragma once /// pragma once is not necessary
+
+#pragma pop_macro("UWVM_AES_U8_RGB")
 
 #pragma pop_macro("UWVM_AES_U8_CTRL_SCRS")
 #pragma pop_macro("UWVM_AES_U8_CTRL_HCRS")

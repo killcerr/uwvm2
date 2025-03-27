@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -85,11 +85,7 @@ export namespace utils::cmdline
         if constexpr(!Stack_Len)
         {
             if UWVM_IF_CONSTEVAL { ::delete[] d; }
-            else
-            {
-                if constexpr(::fast_io::details::has_deallocate_n_impl<Alloc>) { Alloc::deallocate_n(d, y_length + 1); }
-                else { Alloc::deallocate(d); }
-            }
+            else { Alloc::deallocate_n(d, y_length + 1); }
         }
 
         return ret;

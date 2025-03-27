@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -45,18 +45,18 @@ export namespace uwvm::global
 # if __has_cpp_attribute(__gnu__::__init_priority__)
     [[__gnu__::__init_priority__(400)]]
 # endif
-    inline ::uwvm::global::set_win32_console_io_cp_to_utf8 set_native_console_io_cp_to_utf8_ele{};
+    inline ::utils::global::set_win32_console_io_cp_to_utf8 set_native_console_io_cp_to_utf8_ele{};
 
     /// @brief      set win32 console ansi escape
 # if __has_cpp_attribute(__gnu__::__init_priority__)
     [[__gnu__::__init_priority__(400)]]
 # endif
-    inline ::uwvm::global::enable_win32_ansi enable_native_ansi_ele{};
+    inline ::utils::global::enable_win32_ansi enable_native_ansi_ele{};
 #endif
 
 /// @brief      Automatically get the correct timezone data
 #if __has_cpp_attribute(__gnu__::__init_priority__)
     [[__gnu__::__init_priority__(400)]]
 #endif
-    inline ::uwvm::global::tz_set_s tz_set_ele{};
+    inline ::utils::global::tz_set_s tz_set_ele{};
 }  // namespace uwvm::global

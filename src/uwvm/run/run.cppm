@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-03-27
  * @copyright   APL-2 License
  */
 
@@ -22,24 +22,27 @@
 
 module;
 
-#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
 
-/// @brief      utils.global:tzset module declaration
-export module utils.global:tzset;
+export module uwvm.run:run;
 
-/// @brief      import fast_io module
 import fast_io;
+import utils.io;
+import uwvm.cmdline;
 
-export namespace utils::global
+export namespace uwvm::run
 {
-    /// @brief      Declare this via a global variable to get the correct timezone data when the program is run.
-    struct tz_set_s
+    inline int run() noexcept
     {
-        /// @brief      The tzset() function initializes the tzname variable from the TZ environment variable.
-        /// @see        tzset(3)
-        UWVM_GNU_COLD inline tz_set_s() noexcept
+        if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
-            ::fast_io::posix_tzset();
+            ::fast_io::io::perr(
+                ::utils::u8err,
+                UWVM_AES_U8_RST_ALL
+                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No input file.\n\n" UWVM_AES_U8_RST_ALL);
+            return -1;
         }
-    };
-}  // namespace uwvm::global
+
+        return 0;
+    }
+}  // namespace uwvm::run

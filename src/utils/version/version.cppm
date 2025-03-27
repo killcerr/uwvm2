@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -33,6 +33,7 @@ import fast_io;
 
 export namespace utils
 {
+    // version does not add meaningless namespaces.
     struct version
     {
         ::std::uint_least32_t x{};

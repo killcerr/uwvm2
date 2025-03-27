@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -566,3 +566,11 @@
 # define UWVM_AES_U8_CTRL_SCRS u8"\033[?25h"
 #endif
 
+/// @brief RGB
+#pragma push_macro("UWVM_AES_U8_RGB")
+#undef UWVM_AES_U8_RGB
+#if (defined(_WIN32) && defined(_WIN32_WINDOWS)) || defined(__MSDOS__) || defined(__DJGPP__)
+# define UWVM_AES_U8_RGB(r, g, b)
+#else
+# define UWVM_AES_U8_RGB(r, g, b) u8"\033[38;2;" #r u8";" #g u8";" #b u8"m"
+#endif

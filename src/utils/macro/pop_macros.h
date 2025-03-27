@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -26,6 +26,7 @@
 // #pragma once /// pragma once is not necessary
 
 /// @brief      uwvm's macros
+#pragma pop_macro("UWVM_GNU_MAY_ALIAS")
 #pragma pop_macro("UWVM_IF_CONSTEVAL")
 #pragma pop_macro("UWVM_GNU_HOT")
 #pragma pop_macro("UWVM_GNU_COLD")

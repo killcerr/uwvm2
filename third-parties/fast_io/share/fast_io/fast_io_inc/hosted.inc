@@ -1,6 +1,8 @@
 export namespace fast_io
 {
 
+using ::fast_io::fast_terminate;
+
 #if defined(_WIN32) || defined(__CYGWIN__)
 using ::fast_io::win32_family;
 using ::fast_io::nt_family;

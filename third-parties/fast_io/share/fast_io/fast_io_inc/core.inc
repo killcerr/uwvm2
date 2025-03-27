@@ -1,5 +1,6 @@
 export namespace fast_io
 {
+using ::fast_io::basic_io_scatter_t;
 using ::fast_io::char_literal_v;
 using ::fast_io::pr_rsv_size;
 using ::fast_io::pr_rsv_to_iterator_unchecked;
@@ -15,6 +16,13 @@ using ::fast_io::scan_contiguous_define;
 using ::fast_io::scan_context_type;
 using ::fast_io::scan_context_define;
 using ::fast_io::scan_context_eof_define;
+
+using ::fast_io::unreachable;
+using ::fast_io::noexcept_call;
+
+using ::fast_io::error;
+using ::fast_io::cstr_len;
+using ::fast_io::cstr_nlen;
 
 namespace manipulators
 {
@@ -48,9 +56,18 @@ using ::fast_io::manipulators::whole_get_t;
 using ::fast_io::manipulators::pointervw;
 using ::fast_io::manipulators::handlevw;
 using ::fast_io::manipulators::methodvw;
-using ::fast_io::manipulators::os_c_str;
 using ::fast_io::manipulators::addrvw;
 using ::fast_io::manipulators::dfvw;
+
+using ::fast_io::manipulators::os_c_str;
+using ::fast_io::manipulators::os_c_str_carr;
+
+using ::fast_io::manipulators::code_cvt;
+using ::fast_io::manipulators::code_cvt_os_c_str;
+using ::fast_io::manipulators::os_c_str_null_terminated;
+using ::fast_io::manipulators::os_c_str_null_terminated_carr;
+using ::fast_io::manipulators::os_c_str_or_nullptr;
+using ::fast_io::manipulators::os_c_str_with_known_size;
 
 using ::fast_io::manipulators::base;
 using ::fast_io::manipulators::bin;

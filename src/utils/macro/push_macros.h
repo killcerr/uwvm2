@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -340,7 +340,16 @@
 #pragma push_macro("UWVM_IF_CONSTEVAL")
 #undef UWVM_IF_CONSTEVAL
 #if __cpp_if_consteval >= 202106L
-#define UWVM_IF_CONSTEVAL consteval
+# define UWVM_IF_CONSTEVAL consteval
 #else
-#define UWVM_IF_CONSTEVAL (__builtin_is_constant_evaluated())
+# define UWVM_IF_CONSTEVAL (__builtin_is_constant_evaluated())
+#endif
+
+/// @brief        You can specify the may_alias type attribute for a type so that lvalues of 
+///               the type can alias objects of any type, similar to a char type.
+/// @details      on gcc, clang: [[__gnu__::__may_alias__]]
+#pragma push_macro("UWVM_GNU_MAY_ALIAS")
+#undef UWVM_GNU_MAY_ALIAS
+#if __has_cpp_attribute(__gnu__::__may_alias__)
+# define UWVM_GNU_MAY_ALIAS [[__gnu__::__may_alias__]]
 #endif
