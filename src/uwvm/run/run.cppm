@@ -34,14 +34,34 @@ export namespace uwvm::run
 {
     inline int run() noexcept
     {
+
         if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
             ::fast_io::io::perr(
                 ::utils::u8err,
-                UWVM_AES_U8_RST_ALL
-                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No input file.\n\n" UWVM_AES_U8_RST_ALL);
+                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No input file.\n\n" UWVM_AES_U8_RST_ALL);
             return -1;
         }
+
+        auto module_name{::uwvm::cmdline::wasm_file_ppos->str};
+#ifdef __cpp_exceptions
+        try
+#endif
+        {
+            // TODO
+            ::fast_io::native_file_loader{module_name};
+        }
+#ifdef __cpp_exceptions
+        catch(::fast_io::error e)
+        {
+            ::fast_io::io::perr(::utils::u8err,
+                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Unable to open WASM file \"",
+                                module_name,
+                                u8"\": ",
+                                e,
+                                UWVM_AES_U8_RST_ALL u8"\n\n");
+        }
+#endif
 
         return 0;
     }
