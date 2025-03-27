@@ -45,8 +45,13 @@ export namespace uwvm
     /// @param      argc Argument Count
     /// @param      argv Argument Vector
     /// @return     exit value
-    inline int uwvm_uz_u8main(::std::size_t argc, char8_t const* const* argv) noexcept 
-    {             
+    inline int uwvm_uz_u8main(::std::size_t argc, char8_t const* const* argv) noexcept
+    {
+        for(::std::size_t i{}; i != argc; ++i)
+        {
+            // test
+            ::fast_io::io::perrln(::utils::u8err, i, u8": ", ::fast_io::mnp::os_c_str(argv[i]));
+        }
         return 0;
     }
 
@@ -58,14 +63,14 @@ export namespace uwvm
     inline int uwvm_main(int argc, char** argv) noexcept
     {
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
-        return uwvm_uz_u8main(::uwvm::cmdline::u16_cmdline.argc, ::uwvm::cmdline::u16_cmdline.argv.data());
+        auto const argc_uz{static_cast<::std::size_t>(::uwvm::cmdline::u8_cmdline.argc)};
+        auto const argv_u8{::uwvm::cmdline::u8_cmdline.argv.data()};
 #else
         auto const argc_uz{static_cast<::std::size_t>(argc)};
         using char8_t_const_ptr_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const* const*;
         auto const argv_u8{reinterpret_cast<char8_t_const_ptr_const_may_alias_ptr>(argv)};
-
-        return uwvm_uz_u8main(argc_uz, argv_u8);
 #endif
+        return uwvm_uz_u8main(argc_uz, argv_u8);
     }
 
 }  // namespace uwvm

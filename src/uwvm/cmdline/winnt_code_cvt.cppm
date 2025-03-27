@@ -140,7 +140,7 @@ export namespace uwvm::cmdline
 # if __has_cpp_attribute(__gnu__::__init_priority__)
     [[__gnu__::__init_priority__(300)]]
 # endif
-    inline nt_code_cvt_argv_storage const u16_cmdline{nt_code_cvt_argv()};
+    inline nt_code_cvt_argv_storage const u8_cmdline{nt_code_cvt_argv()};
 #endif
 }  // namespace uwvm::cmdline
 
