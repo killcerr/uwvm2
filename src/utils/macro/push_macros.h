@@ -353,3 +353,13 @@
 #if __has_cpp_attribute(__gnu__::__may_alias__)
 # define UWVM_GNU_MAY_ALIAS [[__gnu__::__may_alias__]]
 #endif
+
+/// @details      Allow or disallow loading dynamic libraries, 
+///               this macro is affected by the system environment, 
+///               some older systems do not support loading dynamic libraries
+#pragma push_macro("UWVM_CAN_LOAD_DL")
+#undef UWVM_CAN_LOAD_DL
+#if (defined(_WIN32) || defined(__CYGWIN__)) ||                                                                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__))))
+# define UWVM_CAN_LOAD_DL
+#endif
