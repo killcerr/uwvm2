@@ -60,6 +60,7 @@ export namespace uwvm::run
                                 u8"\": ",
                                 e,
                                 UWVM_AES_U8_RST_ALL u8"\n\n");
+            return -1;
         }
 #endif
 
