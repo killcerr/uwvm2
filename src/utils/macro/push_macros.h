@@ -389,3 +389,10 @@
 #elif defined(__APPLE__)
     #define UWVM_SUPPORT_INSTALL_PATH
 #endif
+
+/// @details      Some platforms do not support special characters
+#pragma push_macro("UWVM_NOT_SUPPORT_SPECIAL_CHAR")
+#undef UWVM_NOT_SUPPORT_SPECIAL_CHAR
+#if (defined(_WIN32) && defined(_WIN32_WINDOWS)) || defined(__MSDOS__) || defined(__DJGPP__)
+# define UWVM_NOT_SUPPORT_SPECIAL_CHAR
+#endif
