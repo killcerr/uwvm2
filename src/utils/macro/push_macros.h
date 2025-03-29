@@ -374,3 +374,18 @@
     ((!defined(_WIN32) || defined(__WINE__)) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__))))
 # define UWVM_CAN_LOAD_DL
 #endif
+
+/// @details      Determine whether the operating system supports getting the path to the program binary itself.
+#pragma push_macro("UWVM_SUPPORT_INSTALL_PATH")
+#undef UWVM_SUPPORT_INSTALL_PATH
+#if(defined(__linux) || defined(__linux__) || defined(__gnu_linux__)) || defined(__CYGWIN__) || defined(__sun)
+    #define UWVM_SUPPORT_INSTALL_PATH
+#elif defined(_WIN32)
+    #define UWVM_SUPPORT_INSTALL_PATH
+#elif defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(BSD) || defined(_SYSTYPE_BSD)
+    #define UWVM_SUPPORT_INSTALL_PATH
+#elif defined(__OpenBSD__)
+    #define UWVM_SUPPORT_INSTALL_PATH
+#elif defined(__APPLE__)
+    #define UWVM_SUPPORT_INSTALL_PATH
+#endif
