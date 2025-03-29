@@ -127,6 +127,11 @@ export namespace uwvm::cmdline::paras
 # endif
 #elif defined(__alpha__)
                                 u8"DEC Alpha"
+#elif defined(__arm64ec__) || defined(_M_ARM64EC)
+                                u8"ARM64EC"
+# if defined(__AARCH_BIG_ENDIAN)
+                                u8"_BE"
+# endif
 #elif defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)
                                 u8"AArch64"
 # if defined(__AARCH_BIG_ENDIAN)
