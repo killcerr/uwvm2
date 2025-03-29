@@ -28,7 +28,7 @@ module;
 
 export module uwvm.wasm.storage:import_dl;
 
-#if UWVM_CAN_LOAD_DL
+#ifdef UWVM_CAN_LOAD_DL
 
 import fast_io;
 
