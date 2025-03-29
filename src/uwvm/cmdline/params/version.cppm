@@ -49,11 +49,7 @@ export namespace uwvm::cmdline::paras
             ::fast_io::io::perr(::utils::u8err,
                                 // logo
                                 UWVM_AES_U8_RST_ALL u8"\n"
-#ifdef UWVM_NOT_SUPPORT_SPECIAL_CHAR
-                                UWVM_AES_U8_RGB(72, 61, 139) u8"-------------------------------------------\n"
-#else
-                                UWVM_AES_U8_RGB(72, 61, 139) u8"╭-----------------------------------------╮\n"
-#endif
+                                UWVM_AES_U8_RGB(72, 61, 139) u8" ----------------------------------------- \n"
                                 UWVM_AES_U8_RGB(72, 61, 139) u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8"  _   _  "  UWVM_AES_U8_RGB(152, 37, 206) u8"__        __ "    UWVM_AES_U8_RGB(113, 37, 206) u8"__     __  "  UWVM_AES_U8_RGB(70, 37, 206) u8"__  __  "   UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n" 
                                                              u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | | | | "  UWVM_AES_U8_RGB(152, 37, 206) u8"\\ \\      / / "  UWVM_AES_U8_RGB(113, 37, 206) u8"\\ \\   / / " UWVM_AES_U8_RGB(70, 37, 206) u8"|  \\/  | " UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
                                                              u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | | | | "  UWVM_AES_U8_RGB(152, 37, 206) u8" \\ \\ /\\ / /  " UWVM_AES_U8_RGB(113, 37, 206) u8" \\ \\ / /  " UWVM_AES_U8_RGB(70, 37, 206) u8"| |\\/| | " UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
@@ -61,11 +57,7 @@ export namespace uwvm::cmdline::paras
                                                              u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8"  \\___/ "  UWVM_AES_U8_RGB(152, 37, 206) u8"    \\_/\\_/    " UWVM_AES_U8_RGB(113, 37, 206) u8"   \\_/    "  UWVM_AES_U8_RGB(70, 37, 206) u8"|_|  |_| "  UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
                                                              u8"|                                         |\n"
                                                              u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" Ultimate " UWVM_AES_U8_RGB(152, 37, 206) u8"WebAssembly "     UWVM_AES_U8_RGB(113, 37, 206) u8" Virtual "    UWVM_AES_U8_RGB(70, 37, 206) u8"  Machine"  UWVM_AES_U8_RGB(72, 61, 139) u8" |" u8"\n"
-#ifdef UWVM_NOT_SUPPORT_SPECIAL_CHAR
-                                                             u8"-------------------------------------------\n\n"
-#else
-                                                             u8"╰-----------------------------------------╯\n\n"
-#endif
+                                                             u8" ----------------------------------------- \n\n"
                                 // uwvm
                                 UWVM_AES_U8_WHITE
                                 u8"Ultimate WebAssembly Virtual Machine\n"
