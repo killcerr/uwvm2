@@ -61,7 +61,7 @@ export namespace uwvm::cmdline::paras
                                 // uwvm
                                 UWVM_AES_U8_WHITE
                                 u8"Ultimate WebAssembly Virtual Machine\n"
-                                // Debug Mode
+            // Debug Mode
 #ifdef _DEBUG
                                 UWVM_AES_U8_GREEN
                                 u8"(Debug Mode)\n"
@@ -140,7 +140,13 @@ export namespace uwvm::cmdline::paras
 #elif defined(__x86_64__) || defined(_M_AMD64)
                                 u8"x86_64"
 #elif defined(__i386__) || defined(_M_IX86)
+# if defined(__MINGW32__) || defined(_MSC_VER)
+                                u8"i686"
+# elif defined(__DJGPP__)
+                                u8"i586"
+# else
                                 u8"i386"
+# endif
 #elif defined(__BFIN__)
                                 u8"Blackfin"
 #elif defined(__convex__)
