@@ -47,7 +47,8 @@ export namespace uwvm::cmdline
 
     inline constexpr auto hash_table_size{::utils::cmdline::calculate_hash_table_size(parameter_lookup_table)};
     inline constexpr auto hash_table{
-        ::utils::cmdline::generate_hash_table<hash_table_size.hash_table_size, hash_table_size.extra_size>(parameter_lookup_table)};
+        ::utils::cmdline::generate_hash_table<hash_table_size.hash_table_size, hash_table_size.extra_size, hash_table_size.real_max_conflict_size>(
+            parameter_lookup_table)};
 
     // inline constexpr auto sizeof_hash_table{sizeof(hash_table)};
 }  // namespace uwvm::cmdline
