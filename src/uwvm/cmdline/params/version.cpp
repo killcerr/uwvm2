@@ -469,13 +469,15 @@ namespace uwvm::cmdline::paras::details
                                 u8"    HWcrc32c: ",
                                 ::fast_io::mnp::boolalpha(::fast_io::details::support_hardware_crc32c),
                                 u8"\n"
-                                u8"    CMDHash: "
+                                u8"    CMDLHash: "
                                 u8"HT=",
                                 ::uwvm::cmdline::hash_table_size.hash_table_size,
                                 u8", EX=",
                                 ::uwvm::cmdline::hash_table_size.extra_size,
                                 u8", RC=",
                                 ::uwvm::cmdline::hash_table_size.real_max_conflict_size,
+                                u8", SZ=",
+                                ::uwvm::cmdline::hash_table_byte_sz,
                                 u8"\n"
                                 // End lf
                                 u8"\n"

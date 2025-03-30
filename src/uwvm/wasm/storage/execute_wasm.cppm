@@ -30,7 +30,7 @@ import fast_io;
 
 export namespace uwvm::wasm::storage
 {
-    inline ::fast_io::native_dll_file execute_wasm_file{};
+    inline ::fast_io::native_file_loader execute_wasm_file{};
 
     // TODO: execute_wasm_module // The result of parsing the exewasm is used to add the import module directly.
 }  // namespace uwvm::wasm::storage
