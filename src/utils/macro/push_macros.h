@@ -396,3 +396,10 @@
 #if (defined(_WIN32) && defined(_WIN32_WINDOWS)) || defined(__MSDOS__) || defined(__DJGPP__)
 # define UWVM_NOT_SUPPORT_SPECIAL_CHAR
 #endif
+
+/// @details      __gnu__::__used__
+#pragma push_macro("UWVM_GNU_USED")
+#undef UWVM_GNU_USED
+#if __has_cpp_attribute(__gnu__::__used__)
+# define UWVM_GNU_USED [[__gnu__::__used__]]
+#endif

@@ -99,6 +99,9 @@ target("uwvm")
 	-- uwvm
 	add_files("src/uwvm/**.cppm", {public = is_debug_mode})
 
+	-- uwvm cmd callback
+	add_files("src/uwvm/cmdline/params/**.cpp")
+
 	-- uwvm main
 	add_files("src/uwvm/main.cc")
 

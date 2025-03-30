@@ -26,6 +26,7 @@
 // #pragma once /// pragma once is not necessary
 
 /// @brief      uwvm's macros
+#pragma pop_macro("UWVM_GNU_USED")
 #pragma pop_macro("UWVM_NOT_SUPPORT_SPECIAL_CHAR")
 #pragma pop_macro("UWVM_SUPPORT_INSTALL_PATH")
 #pragma pop_macro("UWVM_CAN_LOAD_DL")
