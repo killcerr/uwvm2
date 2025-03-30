@@ -255,7 +255,7 @@ function mingw_target()
     end
 
     local march = get_config("march")
-    if not (march == "no" or march == "default") then
+    if not (not march or march == "default") then
         local march_target = "-march=" .. march
         add_cxflags(march_target)
     end

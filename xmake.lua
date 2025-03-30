@@ -48,7 +48,7 @@ function def_build()
 	end
 
     local enable_int = get_config("enable-int")
-	if enable_int == "no" then
+	if not enable_int then
 		add_defines("UWVM_DISABLE_INT")
 	elseif enable_int == "default" then
 		add_defines("UWVM_USE_DEFAULT_INT")
@@ -57,7 +57,7 @@ function def_build()
 	end
 
     local enable_jit = get_config("enable-jit")
-	if enable_jit == "no" then
+	if not enable_jit then
 		add_defines("UWVM_DISABLE_JIT")
 	elseif enable_jit == "default" then
 		add_defines("UWVM_USE_DEFAULT_JIT")

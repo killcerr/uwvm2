@@ -36,7 +36,7 @@ function bsd_target()
     --add_cxflags("-fno-asynchronous-unwind-tables") -- disable asynchronous unwind tables
 
     local march = get_config("march")
-    if march == "no" then
+    if not march then
     elseif march == "default" then
         add_cxflags("-march=native")
     else
