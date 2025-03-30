@@ -37,7 +37,6 @@ export namespace uwvm::cmdline::paras
     namespace details
     {
         inline constexpr ::fast_io::u8string_view run_alias{u8"-r"};
-
     }  // namespace details
 
     inline constexpr ::utils::cmdline::parameter run{.name{::fast_io::u8string_view{u8"--run"}},

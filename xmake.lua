@@ -103,6 +103,6 @@ target("uwvm")
 	add_files("src/uwvm/cmdline/params/**.cpp")
 
 	-- uwvm main
-	add_files("src/uwvm/main.cc")
+	add_files("src/uwvm/main.cpp")
 
 target_end()

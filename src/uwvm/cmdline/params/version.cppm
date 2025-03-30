@@ -27,15 +27,6 @@ module;
 #include <utils/macro/push_macros.h>
 #include <utils/ansies/ansi_push_macro.h>
 
-import utils.cmdline;
-
-namespace uwvm::cmdline::paras::details
-{
-    extern ::utils::cmdline::parameter_return_type version_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                    ::utils::cmdline::parameter_parsing_results*,
-                                                                    ::utils::cmdline::parameter_parsing_results*) noexcept;
-}
-
 export module uwvm.cmdline.params:version;
 
 import fast_io;
@@ -47,6 +38,10 @@ export namespace uwvm::cmdline::paras
     {
         inline bool version_is_exist{};
         inline constexpr ::fast_io::u8string_view version_alias{u8"-v"};
+        extern "C++" ::utils::cmdline::parameter_return_type version_callback(::utils::cmdline::parameter_parsing_results*,
+                                                                              ::utils::cmdline::parameter_parsing_results*,
+                                                                              ::utils::cmdline::parameter_parsing_results*) noexcept;
+
     }  // namespace details
 
     inline constexpr ::utils::cmdline::parameter version{.name{::fast_io::u8string_view{u8"--version"}},
