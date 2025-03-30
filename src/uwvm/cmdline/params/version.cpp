@@ -468,8 +468,17 @@ namespace uwvm::cmdline::paras::details
                                 u8"Feature:\n"
                                 u8"    Hardware CRC32C: ",
                                 ::fast_io::mnp::boolalpha(::fast_io::details::support_hardware_crc32c),
+                                u8"\n"
+                                u8"    CMDHash: "
+                                u8"HT=",
+                                ::uwvm::cmdline::hash_table_size.hash_table_size,
+                                u8", EX=",
+                                ::uwvm::cmdline::hash_table_size.extra_size,
+                                u8", RC=",
+                                ::uwvm::cmdline::hash_table_size.real_max_conflict_size,
+                                u8"\n"
                                 // End lf
-                                u8"\n\n"
+                                u8"\n"
             );
         return ::utils::cmdline::parameter_return_type::return_imme;
     }

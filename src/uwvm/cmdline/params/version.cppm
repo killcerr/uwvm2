@@ -27,13 +27,8 @@ module;
 #include <utils/macro/push_macros.h>
 #include <utils/ansies/ansi_push_macro.h>
 
-import fast_io;
-import utils.io;
 import utils.cmdline;
-import utils.install_path;
-import uwvm.custom;
 
-// extern
 namespace uwvm::cmdline::paras::details
 {
     extern ::utils::cmdline::parameter_return_type version_callback(::utils::cmdline::parameter_parsing_results*,
@@ -42,6 +37,9 @@ namespace uwvm::cmdline::paras::details
 }
 
 export module uwvm.cmdline.params:version;
+
+import fast_io;
+import utils.cmdline;
 
 export namespace uwvm::cmdline::paras
 {
