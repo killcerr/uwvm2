@@ -25,6 +25,7 @@ module;
 #include <memory>
 
 #include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
 
 export module uwvm.cmdline.params:run;
 
@@ -39,7 +40,8 @@ export namespace uwvm::cmdline::paras
         inline constexpr ::fast_io::u8string_view run_alias{u8"-r"};
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter run{.name{::fast_io::u8string_view{u8"--run"}},
-                                                     .describe{::fast_io::u8string_view{u8"Run WebAssembly. Usage: [--run|-r] <file> <argv1> <argv2> ..."}},
-                                                     .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
+    inline constexpr ::utils::cmdline::parameter run{
+        .name{u8"--run"},
+        .describe{UWVM_AES_U8_WHITE u8"Run WebAssembly. " UWVM_AES_U8_CYAN u8"Usage: [--run|-r] <file> <arg1> <arg2> ..."},
+        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
 }  // namespace uwvm::cmdline::paras

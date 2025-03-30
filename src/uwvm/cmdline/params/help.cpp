@@ -47,7 +47,7 @@ namespace uwvm::cmdline::paras::details
                 for(; i != p->alias.base + p->alias.len - 1; ++i) { ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_GREEN, *i, UWVM_AES_U8_WHITE u8", "); }
                 ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_GREEN, *i);
             }
-            ::fast_io::io::perrln(::utils::u8err, UWVM_AES_U8_GRAY u8" --- " UWVM_AES_U8_WHITE, p->describe);
+            ::fast_io::io::perrln(::utils::u8err, UWVM_AES_U8_GRAY u8" --- " UWVM_AES_U8_RST_ALL, p->describe, UWVM_AES_U8_RST_ALL);
         }
         ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
 

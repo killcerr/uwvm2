@@ -59,7 +59,11 @@ export namespace uwvm::run
                                 module_name,
                                 u8"\": ",
                                 e,
-                                UWVM_AES_U8_RST_ALL u8"\n\n");
+                                UWVM_AES_U8_RST_ALL u8"\n"
+# ifndef _WIN32 // Win32 automatically adds a newline
+                                u8"\n"
+# endif
+                            );
             return -1;
         }
 #endif

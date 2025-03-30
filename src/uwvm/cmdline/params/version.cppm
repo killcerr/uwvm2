@@ -44,9 +44,10 @@ export namespace uwvm::cmdline::paras
 
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter version{.name{::fast_io::u8string_view{u8"--version"}},
-                                                         .describe{::fast_io::u8string_view{u8"Output version information. Usage: [--version|-v]"}},
-                                                         .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::version_alias), 1}},
-                                                         .handle{::std::addressof(details::version_callback)},
-                                                         .is_exist{::std::addressof(details::version_is_exist)}};
+    inline constexpr ::utils::cmdline::parameter version{
+        .name{u8"--version"},
+        .describe{UWVM_AES_U8_WHITE u8"Output version information. " UWVM_AES_U8_CYAN u8"Usage: [--version|-v]"},
+        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::version_alias), 1}},
+        .handle{::std::addressof(details::version_callback)},
+        .is_exist{::std::addressof(details::version_is_exist)}};
 }  // namespace uwvm::cmdline::paras
