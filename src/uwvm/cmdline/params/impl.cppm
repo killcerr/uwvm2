@@ -25,3 +25,4 @@ module;
 export module uwvm.cmdline.params;
 export import :version;
 export import :run;
+export import :help;
