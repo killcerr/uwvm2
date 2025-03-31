@@ -5,9 +5,11 @@
  ********************************************************/
 
 /**
+ * @brief       The wasm file that will be run
+ * @details     "--run" or "-r"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-03-31
  * @copyright   APL-2 License
  */
 
@@ -21,5 +23,15 @@
  ****************************************/
 
 module;
-export module uwvm.run;
-export import :run;
+
+export module uwvm.wasm.base:mode;
+
+export namespace uwvm::wasm::base
+{
+    /// @brief wasm running mode
+    enum class mode : unsigned
+    {
+        objdump
+    };
+
+}  // namespace uwvm::wasm::base

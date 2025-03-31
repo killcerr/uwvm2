@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @run     2.0.0
- * @date        2025-03-27
+ * @date        2025-03-31
  * @copyright   APL-2 License
  */
 
@@ -27,7 +27,7 @@ module;
 #include <utils/macro/push_macros.h>
 #include <utils/ansies/ansi_push_macro.h>
 
-export module uwvm.cmdline.params:run;
+export module uwvm.cmdline.params:mode;
 
 import fast_io;
 import utils.io;
@@ -37,11 +37,18 @@ export namespace uwvm::cmdline::paras
 {
     namespace details
     {
-        inline constexpr ::fast_io::u8string_view run_alias{u8"-r"};
+        inline bool mode_is_exist{};
+        inline constexpr ::fast_io::u8string_view mode_alias{u8"-m"};
+        extern "C++" ::utils::cmdline::parameter_return_type mode_callback(::utils::cmdline::parameter_parsing_results*,
+                                                                           ::utils::cmdline::parameter_parsing_results*,
+                                                                           ::utils::cmdline::parameter_parsing_results*) noexcept;
+
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter run{
-        .name{u8"--run"},
-        .describe{UWVM_AES_U8_WHITE u8"Run WebAssembly. " UWVM_AES_U8_CYAN u8"Usage: [--run|-r] <file> <arg1> <arg2> ..."},
-        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
+    inline constexpr ::utils::cmdline::parameter mode{
+        .name{u8"--mode"},
+        .describe{UWVM_AES_U8_WHITE u8"Select operation mode. " UWVM_AES_U8_CYAN u8"Usage: [--mode|-m] [objdump (default)]"},
+        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::mode_alias), 1}},
+        .handle{::std::addressof(details::mode_callback)},
+        .is_exist{::std::addressof(details::mode_is_exist)}};
 }  // namespace uwvm::cmdline::paras

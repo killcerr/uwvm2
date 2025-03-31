@@ -48,7 +48,7 @@ function def_build()
 	end
 
     local enable_int = get_config("enable-int")
-	if enable_int == "no" then
+	if not enable_int then
 		add_defines("UWVM_DISABLE_INT")
 	elseif enable_int == "default" then
 		add_defines("UWVM_USE_DEFAULT_INT")
@@ -57,7 +57,7 @@ function def_build()
 	end
 
     local enable_jit = get_config("enable-jit")
-	if enable_jit == "no" then
+	if not enable_jit then
 		add_defines("UWVM_DISABLE_JIT")
 	elseif enable_jit == "default" then
 		add_defines("UWVM_USE_DEFAULT_JIT")
@@ -99,7 +99,10 @@ target("uwvm")
 	-- uwvm
 	add_files("src/uwvm/**.cppm", {public = is_debug_mode})
 
+	-- uwvm cmd callback
+	add_files("src/uwvm/cmdline/params/**.cpp")
+
 	-- uwvm main
-	add_files("src/uwvm/main.cc")
+	add_files("src/uwvm/main.cpp")
 
 target_end()

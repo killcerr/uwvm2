@@ -6,8 +6,8 @@
 
 /**
  * @author      MacroModel
- * @run     2.0.0
- * @date        2025-03-27
+ * @version     2.0.0
+ * @date        2025-03-29
  * @copyright   APL-2 License
  */
 
@@ -22,26 +22,35 @@
 
 module;
 
-#include <memory>
-
 #include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
 
-export module uwvm.cmdline.params:run;
+#ifdef UWVM_SUPPORT_INSTALL_PATH
+# include <fast_io.h>
+# include <fast_io_driver/install_path.h>
+#endif
 
-import fast_io;
-import utils.io;
-import utils.cmdline;
+export module utils.install_path:install_path;
 
-export namespace uwvm::cmdline::paras
+#ifdef UWVM_SUPPORT_INSTALL_PATH
+export namespace utils::install_path
 {
-    namespace details
+    inline ::fast_io::install_path get_module_install_path_noexcept() noexcept
     {
-        inline constexpr ::fast_io::u8string_view run_alias{u8"-r"};
-    }  // namespace details
+        ::fast_io::install_path ret{};
+# ifdef __cpp_exceptions
+        try
+# endif
+        {
+            ret = ::fast_io::get_module_install_path();
+        }
+# ifdef __cpp_exceptions
+        catch(::fast_io::error)
+        {
+            // If you can't get the install path, do nothing!
+        }
+# endif
+        return ret;
+    }
 
-    inline constexpr ::utils::cmdline::parameter run{
-        .name{u8"--run"},
-        .describe{UWVM_AES_U8_WHITE u8"Run WebAssembly. " UWVM_AES_U8_CYAN u8"Usage: [--run|-r] <file> <arg1> <arg2> ..."},
-        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
-}  // namespace uwvm::cmdline::paras
+}  // namespace utils::install_path
+#endif

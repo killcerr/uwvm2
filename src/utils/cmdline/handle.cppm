@@ -154,7 +154,7 @@ export namespace utils::cmdline
         ::fast_io::u8string_view const describe{};  // describtion shown in help
         kns_u8_str_scatter_t alias{};               // alias names
         handle_func_type handle{};                  // formal processing results
-        parameter_func_type pretreatment{};       // pretreatment
+        parameter_func_type pretreatment{};         // pretreatment
         bool* is_exist{};                           // When it is not nullptr, repeated errors will be reported
     };
 
@@ -203,7 +203,9 @@ export namespace utils::cmdline
                 case u8'\\': [[fallthrough]];
                 case u8':': [[fallthrough]];
                 case u8'*': [[fallthrough]];
+#if 0
                 case u8'?': [[fallthrough]];
+#endif
                 case u8'\"': [[fallthrough]];
                 case u8'<': [[fallthrough]];
                 case u8'>': [[fallthrough]];
@@ -292,6 +294,7 @@ export namespace utils::cmdline
     {
         ::std::size_t hash_table_size{};
         ::std::size_t extra_size{};
+        ::std::size_t real_max_conflict_size{};
     };
 
     /// @brief      Calculate the size of the hash_table with the maximum conflict size
@@ -306,6 +309,7 @@ export namespace utils::cmdline
             ::std::size_t const hash_size{static_cast<::std::size_t>(1u) << i};
             bool c{};
             ::std::size_t extra_size{};
+            ::std::size_t real_max_conflict_size{};
             ::std::size_t* const hash_size_array{::new ::std::size_t[hash_size]{}};
             for(auto const& j: ord)
             {
@@ -317,12 +321,13 @@ export namespace utils::cmdline
                 ::delete[] ptr;
                 auto const val{crc32c.digest_value() % hash_size};
                 ++hash_size_array[val];
-                if(hash_size_array[val] == 2) { ++extra_size; }
-                if(hash_size_array[val] > max_conflict_size) { c = true; }
+                if(hash_size_array[val] > real_max_conflict_size) { real_max_conflict_size = hash_size_array[val]; }  // Record maximum conflict size
+                if(hash_size_array[val] == 2) { ++extra_size; }                                                       // Initiate additional conflict tables
+                if(hash_size_array[val] > max_conflict_size) { c = true; }  // Maximum allowed conflict value exceeded, expanding hash_table
             }
 
             ::delete[] hash_size_array;
-            if(!c) { return {hash_size, extra_size}; }
+            if(!c) { return {hash_size, extra_size, real_max_conflict_size}; }
         }
         // The conflict size has not been able to stay within the maximum conflict size, try changing the initial seed.
         ::fast_io::fast_terminate();
@@ -336,27 +341,28 @@ export namespace utils::cmdline
 
     using ct_para_str = alias_parameter;
 
+    template <::std::size_t real_max_conflict_size>
     struct conflict_table
     {
         // Add one, store the last nullptr, to reduce the number of judgments when looking up
-        ::fast_io::array<ct_para_str, max_conflict_size + 1> ctmem{};
+        ::fast_io::array<ct_para_str, real_max_conflict_size + 1> ctmem{};
     };
 
-    template <::std::size_t hash_table_size, ::std::size_t conflict_size>
+    template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
     struct parameters_hash_table
     {
         static_assert(hash_table_size > 1);
         // Hash Table
         ::fast_io::array<ht_para_cpos, hash_table_size> ht{};
         // Conflict Table
-        ::std::conditional_t<static_cast<bool>(conflict_size), ::fast_io::array<conflict_table, conflict_size>, ::std::in_place_t> ct{};
+        ::std::conditional_t<static_cast<bool>(conflict_size), ::fast_io::array<conflict_table<real_max_conflict_size>, conflict_size>, ::std::in_place_t> ct{};
     };
 
     /// @brief generate hash table
-    template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t N>
+    template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size, ::std::size_t N>
     inline consteval auto generate_hash_table(::fast_io::array<alias_parameter, N> const& ord) noexcept
     {
-        parameters_hash_table<hash_table_size, conflict_size> res{};
+        parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> res{};
 
         ::fast_io::crc32c_context crc32c{};
         ::std::size_t conflictplace{1u};
@@ -418,8 +424,8 @@ export namespace utils::cmdline
         return res;
     }
 
-    template <::std::size_t hash_table_size, ::std::size_t conflict_size>
-    inline constexpr parameter const* find_from_hash_table(parameters_hash_table<hash_table_size, conflict_size> const& ght,
+    template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
+    inline constexpr parameter const* find_from_hash_table(parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> const& ght,
                                                            ::fast_io::u8string_view str) noexcept
     {
         ::fast_io::crc32c_context crc32c{};

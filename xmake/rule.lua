@@ -3,7 +3,7 @@ includes("option.lua")
 ---@type string | nil
 local debug_strip = get_config("debug-strip")
 
-if debug_strip == "no" then -- not strip
+if not debug_strip then -- not strip
     debug_strip = nil
 end
 
