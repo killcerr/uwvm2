@@ -318,30 +318,30 @@ namespace uwvm::cmdline::paras::details
 # if defined(_WIN32_WINDOWS)
                                 u8" - "
 #  if _WIN32_WINDOWS >= 0x0490
-                                u8"Windows ME"
+                                u8"Windows 9x 4.9 (WINME)"
 #  elif _WIN32_WINDOWS >= 0x0410
-                                u8"Windows 98"
+                                u8"Windows 9x 4.1 (WIN98)"
 #  elif _WIN32_WINDOWS >= 0x0400
-                                u8"Windows 95"
+                                u8"Windows 9x 4.0 (WIN95)"
 #  endif
 # elif defined(_WIN32_WINNT)
                                 u8" - "
 #  if _WIN32_WINNT >= 0x0A00
-                                u8"Windows 10 (WS25, WIN11, WS22, WS19, WS16, WIN10)"
+                                u8"Windows NT 10.0 (WS25, WIN11, WS22, WS19, WS16, WIN10)"
 #  elif _WIN32_WINNT >= 0x0603
-                                u8"Windows 8.1 (WS12R2, WINBLUE)"
+                                u8"Windows NT 6.3 (WS12R2, WINBLUE)"
 #  elif _WIN32_WINNT >= 0x0602
-                                u8"Windows 8 (WS12, WIN8)"
+                                u8"Windows NT 6.2 (WS12, WIN8)"
 #  elif _WIN32_WINNT >= 0x0601
-                                u8"Windows 7 (WS08R2, WIN7)"
+                                u8"Windows NT 6.1 (WS08R2, WIN7)"
 #  elif _WIN32_WINNT >= 0x0600
-                                u8"Windows Vista (WS08, VISTA)"
+                                u8"Windows NT 6.0 (WS08, VISTA)"
 #  elif _WIN32_WINNT >= 0x0502
-                                u8"Windows XP with SP2 (WS03SP1, WINXPSP2)"
+                                u8"Windows NT 5.2 (WS03SP1, WINXPSP2)"
 #  elif _WIN32_WINNT >= 0x0501
-                                u8"Windows XP (WS03, WINXP)"
+                                u8"Windows NT 5.1 (WS03, WINXP)"
 #  elif _WIN32_WINNT >= 0x0500
-                                u8"Windows 2000 (WS2K, WIN2K)"
+                                u8"Windows NT 5.0 (WS2K, WIN2K)"
 #  endif
 # endif
 #elif defined(__MSDOS__)
