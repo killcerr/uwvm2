@@ -28,9 +28,9 @@ export module uwvm.crtmain:global;
 /// @brief      import utils.global
 import utils.global;
 
-/// @brief      For msvc, set the initialization order of this global value to user
+/// @brief      For msvc, set the initialization order of this global value to library
 #if !__has_cpp_attribute(__gnu__::__init_priority__)
-# pragma init_seg("user")
+# pragma init_seg(library)
 #endif
 
 export namespace uwvm::global

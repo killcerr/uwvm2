@@ -51,7 +51,7 @@ import utils.io;
 
 /// @brief      For msvc, set the initialization order of this global value to user
 #if !__has_cpp_attribute(__gnu__::__init_priority__)
-# pragma init_seg("user")
+# pragma init_seg(user)
 #endif
 
 export namespace uwvm::cmdline
