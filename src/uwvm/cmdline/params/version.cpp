@@ -51,6 +51,7 @@ namespace uwvm::cmdline::paras::details
                                                              u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" Ultimate " UWVM_AES_U8_RGB(152, 37, 206) u8"WebAssembly "     UWVM_AES_U8_RGB(113, 37, 206) u8" Virtual "    UWVM_AES_U8_RGB(70, 37, 206) u8"  Machine"  UWVM_AES_U8_RGB(72, 61, 139) u8" |" u8"\n"
                                                              u8" ----------------------------------------- \n\n"
                                 // uwvm
+                                UWVM_AES_U8_RST_ALL
                                 UWVM_AES_U8_WHITE
                                 u8"Ultimate WebAssembly Virtual Machine\n"
         // Debug Mode

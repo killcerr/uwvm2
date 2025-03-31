@@ -203,9 +203,7 @@ export namespace utils::cmdline
                 case u8'\\': [[fallthrough]];
                 case u8':': [[fallthrough]];
                 case u8'*': [[fallthrough]];
-#if 0
                 case u8'?': [[fallthrough]];
-#endif
                 case u8'\"': [[fallthrough]];
                 case u8'<': [[fallthrough]];
                 case u8'>': [[fallthrough]];
