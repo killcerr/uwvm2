@@ -327,21 +327,21 @@ namespace uwvm::cmdline::paras::details
 # elif defined(_WIN32_WINNT)
                                 u8" - "
 #  if _WIN32_WINNT >= 0x0A00
-                                u8"Windows 10"
+                                u8"Windows 10 (WS25, WIN11, WS22, WS19, WS16, WIN10)"
 #  elif _WIN32_WINNT >= 0x0603
-                                u8"Windows 8.1"
+                                u8"Windows 8.1 (WS12R2, WINBLUE)"
 #  elif _WIN32_WINNT >= 0x0602
-                                u8"Windows 8"
+                                u8"Windows 8 (WS12, WIN8)"
 #  elif _WIN32_WINNT >= 0x0601
-                                u8"Windows 7"
+                                u8"Windows 7 (WS08R2, WIN7)"
 #  elif _WIN32_WINNT >= 0x0600
-                                u8"Windows Server 2008, Windows Vista"
+                                u8"Windows Vista (WS08, VISTA)"
 #  elif _WIN32_WINNT >= 0x0502
-                                u8"Windows Server 2003 with SP1, Windows XP with SP2"
+                                u8"Windows XP with SP2 (WS03SP1, WINXPSP2)"
 #  elif _WIN32_WINNT >= 0x0501
-                                u8"Windows Server 2003, Windows XP"
+                                u8"Windows XP (WS03, WINXP)"
 #  elif _WIN32_WINNT >= 0x0500
-                                u8"Windows 2000"
+                                u8"Windows 2000 (WS2K, WIN2K)"
 #  endif
 # endif
 #elif defined(__MSDOS__)
