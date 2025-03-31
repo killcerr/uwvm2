@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-23
+ * @date        2025-04-01
  * @copyright   APL-2 License
  */
 
@@ -22,6 +22,7 @@
 
 #pragma once
 
-#if defined(_MSC_VER) && !defined(__clang__)
-# pragma warning(pop)
-#endif
+#pragma pop_macro("UWVM_WASM_SUPPORT_F128")
+#pragma pop_macro("UWVM_WASM_SUPPORT_BF16")
+#pragma pop_macro("UWVM_WASM_SUPPORT_MVP")
+
