@@ -35,8 +35,8 @@ export namespace uwvm::wasm::base
         bare,
         emscripten,
         wasip1,
-        wasix,
-        wasip2
+        wasip2,
+        wasix
     };
 
 }  // namespace uwvm::wasm::base

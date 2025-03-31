@@ -32,7 +32,7 @@ import uwvm.wasm.base;
 export namespace uwvm::wasm::storage
 {
     inline ::fast_io::native_file_loader execute_wasm_file{};
-    inline ::uwvm::wasm::base::mode execute_wasm_mode{};
-    inline ::uwvm::wasm::base::abi execute_wasm_abi{};
+    inline ::uwvm::wasm::base::mode execute_wasm_mode{::uwvm::wasm::base::mode::objdump};
+    inline ::uwvm::wasm::base::abi execute_wasm_abi{::uwvm::wasm::base::abi::detect};
     // TODO: execute_wasm_module // The result of parsing the exewasm is used to add the import module directly.
 }  // namespace uwvm::wasm::storage

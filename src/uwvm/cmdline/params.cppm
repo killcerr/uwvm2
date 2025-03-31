@@ -37,6 +37,8 @@ export namespace uwvm::cmdline
             ::std::addressof(::uwvm::cmdline::paras::version),
             ::std::addressof(::uwvm::cmdline::paras::run),
             ::std::addressof(::uwvm::cmdline::paras::help),
+            ::std::addressof(::uwvm::cmdline::paras::mode),
+            ::std::addressof(::uwvm::cmdline::paras::wasm_abi),
         };
     }  // namespace details
 

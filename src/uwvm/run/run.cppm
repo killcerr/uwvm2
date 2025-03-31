@@ -55,12 +55,12 @@ export namespace uwvm::run
         catch(::fast_io::error e)
         {
             ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Unable to open WASM file \"",
+                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Unable to open WASM file \"" UWVM_AES_U8_YELLOW,
                                 module_name,
-                                u8"\": ",
+                                UWVM_AES_U8_WHITE u8"\": ",
                                 e,
                                 UWVM_AES_U8_RST_ALL u8"\n"
-# ifndef _WIN32 // Win32 automatically adds a newline
+# ifndef _WIN32  // Win32 automatically adds a newline
                                 u8"\n"
 # endif
                             );
