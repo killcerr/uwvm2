@@ -29,6 +29,7 @@ export module uwvm.run:run;
 import fast_io;
 import utils.io;
 import uwvm.cmdline;
+import uwvm.wasm.storage;
 
 export namespace uwvm::run
 {
@@ -48,8 +49,7 @@ export namespace uwvm::run
         try
 #endif
         {
-            // TODO
-            ::fast_io::native_file_loader{module_name};
+            ::uwvm::wasm::storage::execute_wasm_file = ::fast_io::native_file_loader{module_name};
         }
 #ifdef __cpp_exceptions
         catch(::fast_io::error e)
