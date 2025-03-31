@@ -313,7 +313,7 @@ namespace uwvm::cmdline::paras::details
 #if defined(__CYGWIN__)
                                 u8"Cygwin"
 #elif defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || defined(_WIN32_WINNT) ||                     \
-    defined(_WIN32_WINDOWS)
+    defined(_WIN32_WINDOWS) || defined(_WINNT) || defined(_WINDOWS)
                                 u8"Microsoft Windows"
 # if defined(_WIN32_WINDOWS)
                                 u8" - "
@@ -342,6 +342,24 @@ namespace uwvm::cmdline::paras::details
                                 u8"Windows NT 5.1 (WS03, WINXP)"
 #  elif _WIN32_WINNT >= 0x0500
                                 u8"Windows NT 5.0 (WS2K, WIN2K)"
+#  endif
+# elif defined(_WINNT)
+#  if _WINNT >= 0x0400
+                                u8"Windows NT 4.0"
+#  elif _WINNT >= 0x0351
+                                u8"Windows NT 3.51"
+#  elif _WINNT >= 0x0350
+                                u8"Windows NT 3.50"
+#  elif _WINNT >= 0x0310
+                                u8"Windows NT 3.10"
+#  endif
+# elif defined(_WINDOWS)
+#  if _WINDOWS >= 0x0300
+                                u8"Windows 3.0"
+#  elif _WINDOWS >= 0x0200
+                                u8"Windows 2.0"
+#  elif _WINDOWS >= 0x0310
+                                u8"Windows 1.0"
 #  endif
 # endif
 #elif defined(__MSDOS__)
