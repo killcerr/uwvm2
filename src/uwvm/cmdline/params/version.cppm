@@ -37,7 +37,7 @@ export namespace uwvm::cmdline::paras
     namespace details
     {
         inline bool version_is_exist{};
-        inline constexpr ::fast_io::u8string_view version_alias{u8"-v"};
+        inline constexpr ::fast_io::array<::fast_io::u8string_view, 2> version_alias{u8"-v", u8"-ver"};
         extern "C++" ::utils::cmdline::parameter_return_type version_callback(::utils::cmdline::parameter_parsing_results*,
                                                                               ::utils::cmdline::parameter_parsing_results*,
                                                                               ::utils::cmdline::parameter_parsing_results*) noexcept;
@@ -47,7 +47,7 @@ export namespace uwvm::cmdline::paras
     inline constexpr ::utils::cmdline::parameter version{
         .name{u8"--version"},
         .describe{UWVM_AES_U8_WHITE u8"Output version information. " UWVM_AES_U8_CYAN u8"Usage: [--version|-v]"},
-        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::version_alias), 1}},
+        .alias{::utils::cmdline::kns_u8_str_scatter_t{details::version_alias.data(), details::version_alias.size()}},
         .handle{::std::addressof(details::version_callback)},
         .is_exist{::std::addressof(details::version_is_exist)}};
 }  // namespace uwvm::cmdline::paras
