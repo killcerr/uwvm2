@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (help 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -44,10 +44,9 @@ export namespace uwvm::cmdline::paras
 
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter help{
-        .name{u8"--help"},
-        .describe{UWVM_AES_U8_WHITE u8"Get help information." UWVM_AES_U8_CYAN " Usage: [--help|-h|-?]"},
-        .alias{::utils::cmdline::kns_u8_str_scatter_t{details::help_alias.data(), details::help_alias.size()}},
-        .handle{::std::addressof(details::help_callback)},
-        .is_exist{::std::addressof(details::help_is_exist)}};
+    inline constexpr ::utils::cmdline::parameter help{.name{u8"--help"},
+                                                      .describe{UWVM_AES_U8_WHITE u8"Get help information." UWVM_AES_U8_CYAN " Usage: [--help|-h|-?]"},
+                                                      .alias{::utils::cmdline::kns_u8_str_scatter_t{details::help_alias.data(), details::help_alias.size()}},
+                                                      .handle{::std::addressof(details::help_callback)},
+                                                      .is_exist{::std::addressof(details::help_is_exist)}};
 }  // namespace uwvm::cmdline::paras

@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -40,15 +40,15 @@ export namespace uwvm::cmdline::paras
         inline bool mode_is_exist{};
         inline constexpr ::fast_io::u8string_view mode_alias{u8"-m"};
         extern "C++" ::utils::cmdline::parameter_return_type mode_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                              ::utils::cmdline::parameter_parsing_results*,
-                                                                              ::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                           ::utils::cmdline::parameter_parsing_results*,
+                                                                           ::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
     inline constexpr ::utils::cmdline::parameter mode{
         .name{u8"--mode"},
         .describe{UWVM_AES_U8_WHITE u8"Select operation mode. " UWVM_AES_U8_CYAN u8"Usage: [--mode|-m] [objdump (default)]"},
-        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof( details::mode_alias),1}},
+        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::mode_alias), 1}},
         .handle{::std::addressof(details::mode_callback)},
         .is_exist{::std::addressof(details::mode_is_exist)}};
 }  // namespace uwvm::cmdline::paras

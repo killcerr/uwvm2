@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -47,7 +47,8 @@ export namespace uwvm::cmdline::paras
 
     inline constexpr ::utils::cmdline::parameter wasm_abi{
         .name{u8"--wasm-abi"},
-        .describe{UWVM_AES_U8_WHITE u8"Specifies the ABI used by the WASM module (Default auto-detection). " UWVM_AES_U8_CYAN u8"Usage: [--wasm-abi|-Wa] [bare|emscripten|wasip1|wasip2|wasix]"},
+        .describe{
+            UWVM_AES_U8_WHITE u8"Specifies the ABI used by the WASM module (Default auto-detection). " UWVM_AES_U8_CYAN u8"Usage: [--wasm-abi|-Wa] [bare|emscripten|wasip1|wasip2|wasix]"},
         .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
         .handle{::std::addressof(details::wasm_abi_callback)},
         .is_exist{::std::addressof(details::wasm_abi_is_exist)}};
