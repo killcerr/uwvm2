@@ -44,6 +44,7 @@ namespace uwvm::cmdline::paras::details
         return res;
     }
 
+    // max parameter + left "  " + right " "
     inline constexpr auto parameter_max_name_size_u8nspace{u8nspace<::uwvm::cmdline::parameter_max_name_size + 3>()};
 
     inline void help_output_singal_cate(::utils::cmdline::categorization cate) noexcept
@@ -60,16 +61,11 @@ namespace uwvm::cmdline::paras::details
                                 p->name);
             for(auto curr_base{p->alias.base}; curr_base != p->alias.base + p->alias.len; ++curr_base)
             {
-                ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_WHITE u8", " UWVM_AES_U8_GREEN, *curr_base);
+                ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN, *curr_base);
             }
             ::fast_io::io::perrln(::utils::u8err, UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW, p->usage, UWVM_AES_U8_RST_ALL);
         }
     }
-
-    // Preventing underflow
-    static_assert(::uwvm::cmdline::parameter_max_name_size >= 6);
-    // For wasm output "<wasm>"
-    inline constexpr auto parameter_max_name_size_minus_wasm_u8nspace{u8nspace<::uwvm::cmdline::parameter_max_name_size - 6>()};
 
     UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type help_callback(::utils::cmdline::parameter_parsing_results* para_begin,
                                                                                ::utils::cmdline::parameter_parsing_results* para_curr,
@@ -86,7 +82,7 @@ namespace uwvm::cmdline::paras::details
             // display other parameter
             ::fast_io::io::perr(::utils::u8err, 
                 // wasm
-                UWVM_AES_U8_LT_CYAN u8"  " u8"<wasm>", parameter_max_name_size_minus_wasm_u8nspace.element, UWVM_AES_U8_YELLOW u8" -----  " UWVM_AES_U8_WHITE u8"Use \"" UWVM_AES_U8_YELLOW u8"--help wasm" UWVM_AES_U8_WHITE u8"\" to display the wasm command." 
+                UWVM_AES_U8_LT_CYAN u8"  " , ::fast_io::mnp::left(u8"<wasm>", ::uwvm::cmdline::parameter_max_name_size), UWVM_AES_U8_YELLOW u8" -----  " UWVM_AES_U8_WHITE u8"Use \"" UWVM_AES_U8_YELLOW u8"--help wasm" UWVM_AES_U8_WHITE u8"\" to display the wasm command." 
                 // endl
                 u8"\n\n");
 
@@ -112,9 +108,10 @@ namespace uwvm::cmdline::paras::details
             ::fast_io::io::perr(
                 ::utils::u8err,
                 UWVM_AES_U8_RST_ALL
-                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Invalid Extra Help Name \"" UWVM_AES_U8_YELLOW,
+                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Invalid Extra Help Name \"" UWVM_AES_U8_CYAN,
                 currp1_str,
-                UWVM_AES_U8_WHITE u8"\". Usage: " UWVM_AES_U8_CYAN u8"[--help|-h] " UWVM_AES_U8_GREEN u8"[<null>|global|wasm]" UWVM_AES_U8_RST_ALL u8"\n\n");
+                UWVM_AES_U8_WHITE u8"\". Usage: "  u8"[" UWVM_AES_U8_GREEN u8"--help" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-h" UWVM_AES_U8_WHITE u8"] "
+                UWVM_AES_U8_YELLOW u8"[<null>|global|wasm]" UWVM_AES_U8_RST_ALL u8"\n\n");
 
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }

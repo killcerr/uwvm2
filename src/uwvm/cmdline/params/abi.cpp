@@ -48,7 +48,7 @@ namespace uwvm::cmdline::paras::details
             ::fast_io::io::perr(
                 ::utils::u8err,
                 UWVM_AES_U8_RST_ALL
-                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Usage: " UWVM_AES_U8_CYAN u8"[--wasm-abi|-Wa] " UWVM_AES_U8_GREEN u8"[bare|emscripten|wasip1|wasip2|wasix]" UWVM_AES_U8_RST_ALL u8"\n\n");
+                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Usage: " u8"[" UWVM_AES_U8_GREEN u8"--wasm-abi" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN "-Wa" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[bare|emscripten|wasip1|wasip2|wasix]" UWVM_AES_U8_RST_ALL u8"\n\n");
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
@@ -64,9 +64,9 @@ namespace uwvm::cmdline::paras::details
         {
             ::fast_io::io::perr(
                 ::utils::u8err,
-                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Invalid abi \"" UWVM_AES_U8_YELLOW,
+                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Invalid abi \"" UWVM_AES_U8_CYAN,
                 currp1_str,
-                UWVM_AES_U8_WHITE u8"\". Usage: " UWVM_AES_U8_CYAN u8"[--wasm-abi|-Wa] " UWVM_AES_U8_GREEN u8"[bare|emscripten|wasip1|wasip2|wasix]" UWVM_AES_U8_RST_ALL u8"\n\n");
+                UWVM_AES_U8_WHITE u8"\". Usage: "  u8"[" UWVM_AES_U8_GREEN u8"--wasm-abi" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-Wa" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[bare|emscripten|wasip1|wasip2|wasix]" UWVM_AES_U8_RST_ALL u8"\n\n");
 
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
