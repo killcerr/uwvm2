@@ -270,6 +270,12 @@ namespace uwvm::cmdline::paras::details
 # if defined(__FMA__)
                                 u8"FMA "
 # endif
+# if defined(__BMI__)
+                                u8"BMI "
+# endif
+# if defined(__BMI2__)
+                                u8"BMI2 "
+# endif
 # if defined(__AVX__)
                                 u8"AVX "
 # endif
