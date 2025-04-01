@@ -280,6 +280,15 @@ export namespace utils::cmdline
         return res;
     }
 
+    /// @brief      Calculate max parameter principal name size
+    template <::std::size_t N>
+    inline consteval ::std::size_t calculate_max_principal_name_size(::fast_io::array<parameter const*, N> const& punsort) noexcept
+    {
+        ::std::size_t max_size{};
+        for(::std::size_t i{}; i < N; ++i) { max_size = ::std::max(max_size, punsort.index_unchecked(i)->name.size()); }
+        return max_size;
+    }
+
     /// @brief      Calculate max parameter size
     /// @details    Maximum long distance used to provide to the shortest path
     template <::std::size_t N>

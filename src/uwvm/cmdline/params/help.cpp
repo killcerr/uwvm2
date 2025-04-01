@@ -44,20 +44,19 @@ namespace uwvm::cmdline::paras::details
         return res;
     }
 
-    // max parameter + left "  " + right " "
-    inline constexpr auto parameter_max_name_size_u8nspace{u8nspace<::uwvm::cmdline::parameter_max_name_size + 3>()};
+    // max parameter + left "  " + right "  "
+    inline constexpr auto parameter_max_principal_name_size_u8nspace{u8nspace<::uwvm::cmdline::parameter_max_principal_name_size + 4>()};
 
     inline void help_output_singal_cate(::utils::cmdline::categorization cate) noexcept
     {
         for(auto const p: ::uwvm::cmdline::parameters)
         {
             if(p->cate != cate) { continue; }
-            ::fast_io::io::perr(::utils::u8err, u8"  " UWVM_AES_U8_GREEN, ::fast_io::mnp::left(p->name, ::uwvm::cmdline::parameter_max_name_size));
-            ::fast_io::io::perrln(::utils::u8err, UWVM_AES_U8_YELLOW u8" -----  " UWVM_AES_U8_WHITE, p->describe);
+            ::fast_io::io::perr(::utils::u8err, u8"  " UWVM_AES_U8_GREEN, ::fast_io::mnp::left(p->name, ::uwvm::cmdline::parameter_max_principal_name_size));
+            ::fast_io::io::perrln(::utils::u8err, UWVM_AES_U8_YELLOW u8"  -----  " UWVM_AES_U8_WHITE, p->describe);
             ::fast_io::io::perr(::utils::u8err,
-                                parameter_max_name_size_u8nspace.element,
-                                UWVM_AES_U8_LT_PURPLE u8"Usage: " UWVM_AES_U8_WHITE u8"[",
-                                UWVM_AES_U8_GREEN,
+                                parameter_max_principal_name_size_u8nspace.element,
+                                UWVM_AES_U8_LT_PURPLE u8"Usage: " UWVM_AES_U8_WHITE u8"[" UWVM_AES_U8_GREEN,
                                 p->name);
             for(auto curr_base{p->alias.base}; curr_base != p->alias.base + p->alias.len; ++curr_base)
             {
@@ -82,7 +81,7 @@ namespace uwvm::cmdline::paras::details
             // display other parameter
             ::fast_io::io::perr(::utils::u8err, 
                 // wasm
-                UWVM_AES_U8_LT_CYAN u8"  " , ::fast_io::mnp::left(u8"<wasm>", ::uwvm::cmdline::parameter_max_name_size), UWVM_AES_U8_YELLOW u8" -----  " UWVM_AES_U8_WHITE u8"Use \"" UWVM_AES_U8_YELLOW u8"--help wasm" UWVM_AES_U8_WHITE u8"\" to display the wasm command." 
+                UWVM_AES_U8_LT_CYAN u8"  " , ::fast_io::mnp::left(u8"<wasm>", ::uwvm::cmdline::parameter_max_principal_name_size), UWVM_AES_U8_YELLOW u8"  -----  " UWVM_AES_U8_WHITE u8"Use \"" UWVM_AES_U8_YELLOW u8"--help wasm" UWVM_AES_U8_WHITE u8"\" to display the wasm command." 
                 // endl
                 u8"\n\n");
 

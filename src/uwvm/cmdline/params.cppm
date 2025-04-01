@@ -47,6 +47,7 @@ export namespace uwvm::cmdline
     inline constexpr ::std::size_t parameter_lookup_table_size{::utils::cmdline::calculate_alias_parameters_size(parameters)};
     inline constexpr auto parameter_lookup_table{::utils::cmdline::expand_alias_parameters_and_check<parameter_lookup_table_size>(parameters)};
 
+    inline constexpr ::std::size_t parameter_max_principal_name_size{::utils::cmdline::calculate_max_principal_name_size(parameters)};
     inline constexpr ::std::size_t parameter_max_name_size{::utils::cmdline::calculate_max_para_size(parameter_lookup_table)};
 
     inline constexpr auto hash_table_size{::utils::cmdline::calculate_hash_table_size(parameter_lookup_table)};
