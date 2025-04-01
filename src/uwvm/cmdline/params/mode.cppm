@@ -47,7 +47,8 @@ export namespace uwvm::cmdline::paras
 
     inline constexpr ::utils::cmdline::parameter mode{
         .name{u8"--mode"},
-        .describe{UWVM_AES_U8_WHITE u8"Select operation mode. " UWVM_AES_U8_CYAN u8"Usage: [--mode|-m] [objdump (default)]"},
+        .describe{u8"Select operation mode."},
+        .usage{u8"[objdump (default)]"},
         .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::mode_alias), 1}},
         .handle{::std::addressof(details::mode_callback)},
         .is_exist{::std::addressof(details::mode_is_exist)}};

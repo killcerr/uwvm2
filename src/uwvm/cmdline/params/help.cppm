@@ -45,7 +45,8 @@ export namespace uwvm::cmdline::paras
     }  // namespace details
 
     inline constexpr ::utils::cmdline::parameter help{.name{u8"--help"},
-                                                      .describe{UWVM_AES_U8_WHITE u8"Get help information." UWVM_AES_U8_CYAN " Usage: [--help|-h]"},
+                                                      .describe{u8"Get help information."},
+                                                      .usage{u8"[<null>|global|wasm]"},
                                                       .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::help_alias), 1}},
                                                       .handle{::std::addressof(details::help_callback)},
                                                       .is_exist{::std::addressof(details::help_is_exist)}};

@@ -92,6 +92,12 @@ using ::fast_io::manipulators::comma_fixed;
 using ::fast_io::manipulators::comma_scientific;
 using ::fast_io::manipulators::comma_hexfloat;
 
+using ::fast_io::manipulators::width;
+using ::fast_io::manipulators::left;
+using ::fast_io::manipulators::middle;
+using ::fast_io::manipulators::right;
+using ::fast_io::manipulators::internal;
+
 using ::fast_io::manipulators::bitfieldvw;
 
 using ::fast_io::manipulators::ip_generic;

@@ -145,6 +145,13 @@ export namespace utils::cmdline
     using parameter_func_type = void (*)(char8_t const* const*& argv_curr,
                                          char8_t const* const* argv_end,
                                          ::fast_io::vector<parameter_parsing_results>& pr) noexcept;
+    
+    /// @brief Categorization of parameter types for help displays
+    enum class categorization : unsigned
+    {
+        global = 0u,
+        wasm,
+    };
 
     /// @brief User-defined parameters and handlers
     /// @brief Command line arguments will be encoded in ascii and will not be specialized for encodings such as ebcdic.
@@ -152,10 +159,12 @@ export namespace utils::cmdline
     {
         ::fast_io::u8string_view const name{};      // parameter name
         ::fast_io::u8string_view const describe{};  // describtion shown in help
+        ::fast_io::u8string_view const usage{};     // usage shown in help
         kns_u8_str_scatter_t alias{};               // alias names
         handle_func_type handle{};                  // formal processing results
         parameter_func_type pretreatment{};         // pretreatment
         bool* is_exist{};                           // When it is not nullptr, repeated errors will be reported
+        categorization cate{};                      // Categorization of parameter types for help displays
     };
 
     /// @brief      sort the parameter const* const [N]
