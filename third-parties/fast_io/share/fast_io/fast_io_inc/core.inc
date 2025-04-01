@@ -228,4 +228,27 @@ using ::fast_io::ipv4_scan_state_t;
 using ::fast_io::ipv6_scan_state_t;
 using ::fast_io::ip_port_scan_state_t;
 #endif
+
+using ::fast_io::unix_timestamp;
+
+using ::fast_io::operator==;
+using ::fast_io::operator!=;
+using ::fast_io::operator<=>;
+using ::fast_io::operator+;
+using ::fast_io::operator-;
+using ::fast_io::operator/;
+using ::fast_io::operator+=;
+using ::fast_io::operator-=;
+using ::fast_io::operator/=;
+using ::fast_io::operator*;
+using ::fast_io::operator~;
+using ::fast_io::operator&;
+using ::fast_io::operator|;
+using ::fast_io::operator^;
+using ::fast_io::operator&=;
+using ::fast_io::operator|=;
+using ::fast_io::operator^=;
+
+using ::fast_io::operator++;
+
 } // namespace fast_io

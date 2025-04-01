@@ -35,6 +35,9 @@ export module uwvm.cmdline:parser;
 import fast_io;
 import utils.io;
 import utils.cmdline;
+#ifdef UWVM_TIMER
+import utils.debug;
+#endif
 import :params;
 
 export namespace uwvm::cmdline
@@ -54,6 +57,10 @@ export namespace uwvm::cmdline
     /// @brief parsing cmdline
     inline constexpr parsing_return_val parsing(::std::size_t argc, char8_t const* const* argv) noexcept
     {
+#ifdef UWVM_TIMER
+        ::utils::debug::timer parsing_timer{u8"parsing"};
+#endif
+
         auto& pr{parsing_result};
         auto const& ht{::uwvm::cmdline::hash_table};
 

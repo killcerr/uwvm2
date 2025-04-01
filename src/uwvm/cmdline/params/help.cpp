@@ -99,7 +99,7 @@ namespace uwvm::cmdline::paras::details
             // display other parameter
             ::fast_io::io::perr(::utils::u8err, 
                 // wasm
-                UWVM_AES_U8_LT_CYAN u8"  " , ::fast_io::mnp::left(u8"<wasm>", ::uwvm::cmdline::parameter_max_principal_name_size), UWVM_AES_U8_YELLOW u8"  -----  " UWVM_AES_U8_WHITE u8"Use \"" UWVM_AES_U8_YELLOW u8"--help wasm" UWVM_AES_U8_WHITE u8"\" to display the wasm command." 
+                UWVM_AES_U8_LT_CYAN u8"  " , ::fast_io::mnp::left(u8"<wasm>", ::uwvm::cmdline::parameter_max_principal_name_size), UWVM_AES_U8_YELLOW u8"  -----  " UWVM_AES_U8_WHITE u8"Use \"" UWVM_AES_U8_YELLOW u8"--help wasm" UWVM_AES_U8_WHITE u8"\" to display the wasm arguments." 
                 // endl
                 u8"\n\n");
 
