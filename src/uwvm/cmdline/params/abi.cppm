@@ -46,7 +46,7 @@ export namespace uwvm::cmdline::paras
     }  // namespace details
 
     inline constexpr ::utils::cmdline::parameter wasm_abi{.name{u8"--wasm-abi"},
-                                                          .describe{u8"Specifies the ABI used by the WASM module (DEFAULT: auto-detection)."},
+                                                          .describe{u8"Specifies the ABI used by the WASM module, (DEFAULT: auto-detection)."},
                                                           .usage{u8"[bare|emscripten|wasip1|wasip2|wasix]"},
                                                           .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
                                                           .handle{::std::addressof(details::wasm_abi_callback)},

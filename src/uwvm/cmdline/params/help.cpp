@@ -66,6 +66,24 @@ namespace uwvm::cmdline::paras::details
         }
     }
 
+    inline void help_output_all() noexcept
+    {
+        for(auto const p: ::uwvm::cmdline::parameters)
+        {
+            ::fast_io::io::perr(::utils::u8err, u8"  " UWVM_AES_U8_GREEN, ::fast_io::mnp::left(p->name, ::uwvm::cmdline::parameter_max_principal_name_size));
+            ::fast_io::io::perrln(::utils::u8err, UWVM_AES_U8_YELLOW u8"  -----  " UWVM_AES_U8_WHITE, p->describe);
+            ::fast_io::io::perr(::utils::u8err,
+                                parameter_max_principal_name_size_u8nspace.element,
+                                UWVM_AES_U8_LT_PURPLE u8"Usage: " UWVM_AES_U8_WHITE u8"[" UWVM_AES_U8_GREEN,
+                                p->name);
+            for(auto curr_base{p->alias.base}; curr_base != p->alias.base + p->alias.len; ++curr_base)
+            {
+                ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN, *curr_base);
+            }
+            ::fast_io::io::perrln(::utils::u8err, UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW, p->usage, UWVM_AES_U8_RST_ALL);
+        }
+    }
+
     UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type help_callback(::utils::cmdline::parameter_parsing_results* para_begin,
                                                                                ::utils::cmdline::parameter_parsing_results* para_curr,
                                                                                ::utils::cmdline::parameter_parsing_results* para_end) noexcept
@@ -90,15 +108,21 @@ namespace uwvm::cmdline::paras::details
 
         currp1->type = ::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
-        if(auto currp1_str{currp1->str}; currp1_str == u8"global")
+        if(auto currp1_str{currp1->str}; currp1_str == u8"all")
         {
-            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  Global:\n");
+            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  [All]:\n");
+            help_output_all();
+            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
+        }
+        else if(currp1_str == u8"global")
+        {
+            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  [Global]:\n");
             help_output_singal_cate(::utils::cmdline::categorization::global);
             ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
         }
         else if(currp1_str == u8"wasm")
         {
-            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  Wasm:\n");
+            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  [Wasm]:\n");
             help_output_singal_cate(::utils::cmdline::categorization::wasm);
             ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
         }
@@ -110,7 +134,7 @@ namespace uwvm::cmdline::paras::details
                     UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Invalid Extra Help Name \"" UWVM_AES_U8_CYAN,
                 currp1_str,
                 UWVM_AES_U8_WHITE u8"\". Usage: "  u8"[" UWVM_AES_U8_GREEN u8"--help" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-h" UWVM_AES_U8_WHITE u8"] "
-                UWVM_AES_U8_YELLOW u8"[<null>|global|wasm]" UWVM_AES_U8_RST_ALL u8"\n\n");
+                UWVM_AES_U8_YELLOW u8"[<null>|all|global|wasm]" UWVM_AES_U8_RST_ALL u8"\n\n");
 
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
