@@ -21,7 +21,7 @@
 * MinGW: i686-windows-gnu (aka. i686-w64-mingw32)
 
 ## DOS
-* MS-DOS, FreeDOS (DJGPP): i386-msdosdjgpp
+* MS-DOS, FreeDOS (DJGPP): i586-msdosdjgpp
 
 ## Host C Library Environment
 * newlib: unknown-elf; (x86\_64, i386, etc.)-(cygwin, msys2)
