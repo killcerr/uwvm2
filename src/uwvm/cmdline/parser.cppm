@@ -58,7 +58,7 @@ export namespace uwvm::cmdline
     inline constexpr parsing_return_val parsing(::std::size_t argc, char8_t const* const* argv) noexcept
     {
 #ifdef UWVM_TIMER
-        ::utils::debug::timer parsing_timer{u8"parsing"};
+        ::utils::debug::timer parsing_timer{u8"parsing parameters"};
 #endif
 
         auto& pr{parsing_result};
