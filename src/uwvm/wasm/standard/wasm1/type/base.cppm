@@ -38,7 +38,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @brief      Bytes
     /// @details    Bytes encode themselves
     /// @details    New feature
-    /// @see        5.2.1
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.1
     using wasm_byte = ::std::uint_least8_t;
 
     /// @brief      Integers
@@ -48,7 +48,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     ///             Signed integers are encoded in signed LEB12831 format, which uses a two’s complement representation. As an
     ///             additional constraint, the total number of bytes encoding a value of type sN must not exceed ceil(N / 7) bytes.
     /// @details    New feature
-    /// @see        5.2.2
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.2
     using wasm_i8 = ::std::int_least8_t;
     using wasm_u8 = ::std::uint_least8_t;
 
@@ -64,7 +64,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @brief      Floating-Point
     /// @details    Floating-point values are encoded directly by their IEEE 75432 (Section 3.4) bit pattern in little endian33 byte order.
     /// @details    New feature
-    /// @see        5.2.3
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.3
 #ifdef __STDCPP_FLOAT32_T__
     using wasm_f32 = _Float32;  // IEEE 754-2008
 #else
@@ -88,7 +88,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
     /// @details    New feature
-    /// @see        2.3.4
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
     struct limits
     {
         wasm_u32 min{};
@@ -100,7 +100,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     namespace details
     {
         /// @brief      Type of varint converted to fixed-length int
-        /// @see        5.2.2
+        /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.2
         template <::std::size_t Varint, bool Unsigned>
             requires (0 < Varint && Varint <= 64)
         inline auto get_varint_type_from_type_bit_size_impl() noexcept

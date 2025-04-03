@@ -40,7 +40,7 @@ export namespace uwvm::wasm::standard::wasm2::type
     /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,
     ///             single instruction multiple data).
     ///             This is only used for storage and will be converted to the type used for computation during computation depending on platform support
-    /// @see        2.3.2
+    /// @see        WebAssembly Release 2.0 (Draft 2025-01-28) § 2.3.2
 #if __has_cpp_attribute(__gnu__::__vector_size__)
     using wasm_v128 [[__gnu__::__vector_size__(16)]] = char;
 #else
@@ -68,6 +68,8 @@ export namespace uwvm::wasm::standard::wasm2::type
         wasm_f64 f64x2[2];
     };
 #endif
+
+    // func
 
     /// @brief      v128 print_reserve
     /// @details    output: "[00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 0a, 0b, 0c, 0d, 0e, 0f]"

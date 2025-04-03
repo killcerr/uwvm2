@@ -39,7 +39,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @brief      Value Types
     /// @details    Value types are encoded by a single byte.
     /// @details    New feature
-    /// @see        5.3.1
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.1
     enum class value_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types
@@ -53,7 +53,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @details    The only result types occurring in the binary format are the types of blocks. These are encoded in special com
     ///             pressed form, by either the byte 0x40 indicating the empty type or as a single value type.
     /// @details    New feature
-    /// @see        5.3.2
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.2
     enum class result_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Result Types
@@ -63,7 +63,7 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @brief      Function Types
     /// @details    Function types are encoded by the byte 0x60 followed by the respective vectors of parameter and result types.
     /// @details    New feature
-    /// @see        5.3.3
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.3
     enum class function_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Function Types
