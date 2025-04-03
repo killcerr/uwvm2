@@ -5,9 +5,12 @@
  ********************************************************/
 
 /**
+ * @brief       WebAssembly 2.0 (Draft 2025-01-28)
+ * @details     uwvm2 will write all the standards directly into the parser, 
+ *              providing the most efficient parsing speed and providing the conceptual interface of the proposal for extensions.
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-01
+ * @date        2025-04-02
  * @copyright   APL-2 License
  */
 
@@ -20,9 +23,7 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
 
-#pragma pop_macro("UWVM_WASM_SUPPORT_F128")
-#pragma pop_macro("UWVM_WASM_SUPPORT_BF16")
-#pragma pop_macro("UWVM_WASM_SUPPORT_MVP")
-#pragma pop_macro("UWVM_WASM_SUPPORT_MVP")
+export module uwvm.wasm.standard;
+export import uwvm.wasm.standard.type;

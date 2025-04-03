@@ -22,6 +22,10 @@
 
 #pragma once
 
+#pragma push_macro("UWVM_WASM_SUPPORT_MVP")
+#undef UWVM_WASM_SUPPORT_MVP
+#define UWVM_WASM_SUPPORT_MVP
+
 #pragma push_macro("UWVM_WASM_SUPPORT_F16")
 #undef UWVM_WASM_SUPPORT_F16
 #if defined(__SIZEOF_FLOAT16__) || defined(__FLOAT16__)
