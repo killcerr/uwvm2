@@ -6,6 +6,7 @@
 
 /**
  * @brief       WebAssembly Proposal
+ * @details     WebAssembly Specification Release 3.0 (Draft 2024-09-21)
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-03

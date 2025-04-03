@@ -36,8 +36,9 @@ import :base;
 
 export namespace uwvm::wasm::standard::type
 {
-    /// @brief Number Types
-    /// @details 
+    /// @brief      Number Types
+    /// @details    Number types classify numeric values.
+    /// @see        2.3.1
     enum class number_type : ::uwvm::wasm::standard::type::wasm_byte
     {
         // Number types
@@ -47,12 +48,19 @@ export namespace uwvm::wasm::standard::type
         f64 = 0x7C
     };
 
+    /// @brief      Vector Types
+    /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,
+    ///             single instruction multiple data).
+    /// @see        2.3.2
     enum class vector_type : ::uwvm::wasm::standard::type::wasm_byte
     {
         // Vector types
         v128 = 0x7B
     };
 
+    /// @brief      Reference Types
+    /// @details    Reference types classify first-class references to objects in the runtime store.
+    /// @see        2.3.3
     enum class reference_type : ::uwvm::wasm::standard::type::wasm_byte
     {
         // Reference Types
@@ -60,6 +68,10 @@ export namespace uwvm::wasm::standard::type
         externref = 0x6F
     };
 
+    /// @brief      Value Types
+    /// @details    Value types classify the individual values that WebAssembly code can compute with and the values that a variable
+    ///             accepts. They are either number types, vector types, or reference types.
+    /// @see        2.3.4
     enum class value_type : ::uwvm::wasm::standard::type::wasm_byte
     {
         // Number types
@@ -76,18 +88,27 @@ export namespace uwvm::wasm::standard::type
         externref = 0x6F
     };
 
-    enum class function_type : ::uwvm::wasm::standard::type::wasm_byte
-    {
-        // Function Types
-        functype = 0x60,
-    };
-
+    /// @brief      Result Types
+    /// @details    Result types classify the result of executing instructions or functions, which is a sequence of values,
+    ///             written with brackets.
+    /// @see        2.3.5
     enum class result_type : ::uwvm::wasm::standard::type::wasm_byte
     {
         // Result Types
         resulttype = 0x40,
     };
 
+    /// @brief      Function Types
+    /// @details    Function types classify the signature of functions, mapping a vector of parameters to a vector of results. They are
+    ///             also used to classify the inputs and outputs of instructions.
+    /// @see        2.3.6
+    enum class function_type : ::uwvm::wasm::standard::type::wasm_byte
+    {
+        // Function Types
+        functype = 0x60,
+    };
+
+    // func
     inline constexpr bool is_valid_number_type(value_type type) noexcept
     {
         switch(type)

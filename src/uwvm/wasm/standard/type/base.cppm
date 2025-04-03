@@ -179,6 +179,16 @@ export namespace uwvm::wasm::standard::type
     /// @brief      wasm extended instructions, using u32, indicate the extended instruction section.
     using op_exten_type = wasm_u32;
 
+    /// @brief      Limits
+    /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
+    /// @see        2.3.7
+    struct limits
+    {
+        wasm_u32 min{};
+        wasm_u32 max{};
+        bool present_max{};
+    };
+
     /// @brief      v128 print_reserve
     /// @details    output: "[01, 02, 03, 04, 05, 06, 07, 08, 09, 0a, 0b, 0c, 0d, 0e, 0f]"
     template <::std::integral char_type>
