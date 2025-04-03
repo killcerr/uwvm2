@@ -190,7 +190,7 @@ export namespace uwvm::wasm::standard::type
     };
 
     /// @brief      v128 print_reserve
-    /// @details    output: "[01, 02, 03, 04, 05, 06, 07, 08, 09, 0a, 0b, 0c, 0d, 0e, 0f]"
+    /// @details    output: "[00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 0a, 0b, 0c, 0d, 0e, 0f]"
     template <::std::integral char_type>
     inline constexpr ::std::size_t print_reserve_size(::fast_io::io_reserve_type_t<char_type, wasm_v128>) noexcept
     {

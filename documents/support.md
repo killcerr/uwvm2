@@ -34,11 +34,11 @@
 - Full ISO C++26
 
 # Compiler Support
-- GCC >= 15
-- Clang >= 21
+- LLVM Clang >= 20 (recommended)
+- (Xmake does not support GCC module at this time)
 - (MSVC has bugs in module handling, not supported at this time)
 
 # C++ standard library support (Version is the same as the version released with the corresponding supported compiler)
-- GNU libstdc++
+- GNU libstdc++ (recommended)
 - LLVM libc++
 - MSVC STL
