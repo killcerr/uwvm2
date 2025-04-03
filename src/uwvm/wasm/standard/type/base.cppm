@@ -43,9 +43,9 @@ export namespace uwvm::wasm::standard::type
     /// @brief      Integers
     /// @details    All integers are encoded using the LEB12829 variable-length integer encoding, in either unsigned or signed variant.
     ///             Unsigned integers are encoded in unsigned LEB12830 format. As an additional constraint, the total number of
-    ///             bytes encoding a value of type uN must not exceed ceil(N7) bytes
+    ///             bytes encoding a value of type uN must not exceed ceil(N / 7) bytes
     ///             Signed integers are encoded in signed LEB12831 format, which uses a two’s complement representation. As an
-    ///             additional constraint, the total number of bytes encoding a value of type sN must not exceed ceil(N7) bytes.
+    ///             additional constraint, the total number of bytes encoding a value of type sN must not exceed ceil(N / 7) bytes.
     /// @see        5.2.2
     using wasm_i8 = ::std::int_least8_t;
     using wasm_u8 = ::std::uint_least8_t;
