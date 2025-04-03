@@ -5,7 +5,6 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Proposal
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-03
@@ -23,5 +22,6 @@
 
 module;
 
-export module uwvm.wasm.proposal;
-export import uwvm.wasm.proposal.fp_ext;
+export module uwvm.wasm.proposal.fp_ext.type;
+export import :base;
+

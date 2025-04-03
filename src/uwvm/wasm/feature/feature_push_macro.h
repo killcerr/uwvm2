@@ -47,7 +47,7 @@
 #endif
 
 #pragma push_macro("UWVM_WASM_SUPPORT_FP128")
-#undef UWVM_WASM_SUPPORT_F128
+#undef UWVM_WASM_SUPPORT_FP128
 #if defined(__SIZEOF_FLOAT128__) || defined(__FLOAT128__)
-# define UWVM_WASM_SUPPORT_F128
+# define UWVM_WASM_SUPPORT_FP128
 #endif

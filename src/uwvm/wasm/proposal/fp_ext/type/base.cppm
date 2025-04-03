@@ -22,6 +22,33 @@
 
 module;
 
-export module uwvm.wasm.proposal.type;
-export import :base;
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
 
+#include <uwvm/wasm/feature/feature_push_macro.h>
+
+export module uwvm.wasm.proposal.fp_ext.type:base;
+
+import fast_io;
+
+export namespace uwvm::wasm::proposal::fp_ext::type
+{
+    /// @brief      f16, bf16 and f128
+    /// @details    unknown
+    /// @details    new feature
+    /// @see        unknown
+#if defined(UWVM_WASM_SUPPORT_FP16)
+    using wasm_f16 = __float16;
+#endif
+
+#if defined(UWVM_WASM_SUPPORT_BF16)
+    using wasm_bf16 = decltype(0.0bf16);
+#endif
+
+#if defined(UWVM_WASM_SUPPORT_FP128)
+    using wasm_f128 = __float128;
+#endif
+
+}  // namespace uwvm::wasm::proposal::fp_ext::type
