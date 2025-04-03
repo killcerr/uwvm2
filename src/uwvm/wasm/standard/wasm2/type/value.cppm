@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -29,17 +29,18 @@ module;
 
 #include <uwvm/wasm/feature/feature_push_macro.h>
 
-export module uwvm.wasm.standard.type:value;
+export module uwvm.wasm.standard.wasm2.type:value;
 
 import fast_io;
 import :base;
 
-export namespace uwvm::wasm::standard::type
+export namespace uwvm::wasm::standard::wasm2::type
 {
     /// @brief      Number Types
     /// @details    Number types classify numeric values.
+    /// @details    New feature
     /// @see        2.3.1
-    enum class number_type : ::uwvm::wasm::standard::type::wasm_byte
+    enum class number_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types
         i32 = 0x7F,
@@ -51,8 +52,9 @@ export namespace uwvm::wasm::standard::type
     /// @brief      Vector Types
     /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,
     ///             single instruction multiple data).
+    /// @details    New feature
     /// @see        2.3.2
-    enum class vector_type : ::uwvm::wasm::standard::type::wasm_byte
+    enum class vector_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Vector types
         v128 = 0x7B
@@ -60,8 +62,9 @@ export namespace uwvm::wasm::standard::type
 
     /// @brief      Reference Types
     /// @details    Reference types classify first-class references to objects in the runtime store.
+    /// @details    New feature
     /// @see        2.3.3
-    enum class reference_type : ::uwvm::wasm::standard::type::wasm_byte
+    enum class reference_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Reference Types
         funcref = 0x70,
@@ -71,8 +74,9 @@ export namespace uwvm::wasm::standard::type
     /// @brief      Value Types
     /// @details    Value types classify the individual values that WebAssembly code can compute with and the values that a variable
     ///             accepts. They are either number types, vector types, or reference types.
+    /// @details    Extends wasm1's value_type
     /// @see        2.3.4
-    enum class value_type : ::uwvm::wasm::standard::type::wasm_byte
+    enum class value_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types
         i32 = 0x7F,
@@ -86,26 +90,6 @@ export namespace uwvm::wasm::standard::type
         // Reference Types
         funcref = 0x70,
         externref = 0x6F
-    };
-
-    /// @brief      Result Types
-    /// @details    Result types classify the result of executing instructions or functions, which is a sequence of values,
-    ///             written with brackets.
-    /// @see        2.3.5
-    enum class result_type : ::uwvm::wasm::standard::type::wasm_byte
-    {
-        // Result Types
-        resulttype = 0x40,
-    };
-
-    /// @brief      Function Types
-    /// @details    Function types classify the signature of functions, mapping a vector of parameters to a vector of results. They are
-    ///             also used to classify the inputs and outputs of instructions.
-    /// @see        2.3.6
-    enum class function_type : ::uwvm::wasm::standard::type::wasm_byte
-    {
-        // Function Types
-        functype = 0x60,
     };
 
     // func
@@ -319,5 +303,4 @@ export namespace uwvm::wasm::standard::type
     {
         return details::print_reserve_value_type_impl(iter, valtype);
     }
-
-}  // namespace uwvm::wasm::standard::type
+}  // namespace uwvm::wasm::standard::wasm2::type

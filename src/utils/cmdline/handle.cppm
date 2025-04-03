@@ -145,7 +145,7 @@ export namespace utils::cmdline
     using parameter_func_type = void (*)(char8_t const* const*& argv_curr,
                                          char8_t const* const* argv_end,
                                          ::fast_io::vector<parameter_parsing_results>& pr) noexcept;
-    
+
     /// @brief Categorization of parameter types for help displays
     enum class categorization : unsigned
     {

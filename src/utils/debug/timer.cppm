@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -62,7 +62,7 @@ export namespace utils::debug
         UWVM_GNU_COLD inline ~timer()
         {
             ::fast_io::unix_timestamp t1{};
-            
+
 #ifdef __cpp_exceptions
             try
 #endif

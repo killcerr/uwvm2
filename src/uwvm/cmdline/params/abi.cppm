@@ -51,6 +51,5 @@ export namespace uwvm::cmdline::paras
                                                           .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
                                                           .handle{::std::addressof(details::wasm_abi_callback)},
                                                           .is_exist{::std::addressof(details::wasm_abi_is_exist)},
-                                                          .cate{::utils::cmdline::categorization::wasm}
-                                                        };
+                                                          .cate{::utils::cmdline::categorization::wasm}};
 }  // namespace uwvm::cmdline::paras

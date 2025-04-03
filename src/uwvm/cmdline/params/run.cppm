@@ -40,9 +40,8 @@ export namespace uwvm::cmdline::paras
         inline constexpr ::fast_io::u8string_view run_alias{u8"-r"};
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter run{
-        .name{u8"--run"},
-        .describe{u8"Run WebAssembly."},
-        .usage{u8"<file> <arg1> <arg2> ..."},
-        .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
+    inline constexpr ::utils::cmdline::parameter run{.name{u8"--run"},
+                                                     .describe{u8"Run WebAssembly."},
+                                                     .usage{u8"<file> <arg1> <arg2> ..."},
+                                                     .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
 }  // namespace uwvm::cmdline::paras

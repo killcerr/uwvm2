@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -6,7 +6,7 @@
 
 /**
  * @brief       WebAssembly 2.0 (Draft 2025-01-28)
- * @details     uwvm2 will write all the standards directly into the parser, 
+ * @details     uwvm2 will write all the standards directly into the parser,
  *              providing the most efficient parsing speed and providing the conceptual interface of the proposal for extensions.
  * @author      MacroModel
  * @version     2.0.0
@@ -26,4 +26,6 @@
 module;
 
 export module uwvm.wasm.standard;
-export import uwvm.wasm.standard.type;
+export import uwvm.wasm.standard.wasm1;
+export import uwvm.wasm.standard.wasm2;
+export import uwvm.wasm.standard.wasm3;
