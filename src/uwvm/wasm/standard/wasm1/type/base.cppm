@@ -103,7 +103,7 @@ export namespace uwvm::wasm::standard::wasm1::type
         /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.2
         template <::std::size_t Varint, bool Unsigned>
             requires (0 < Varint && Varint <= 64)
-        inline auto get_varint_type_from_type_bit_size_impl() noexcept
+        inline consteval auto get_varint_type_from_type_bit_size_impl() noexcept
         {
             if constexpr(Varint <= 8)
             {
@@ -132,7 +132,7 @@ export namespace uwvm::wasm::standard::wasm1::type
         /// @see        5.2.2
         template <::std::size_t StorageSize, bool Unsigned>
             requires (0 < StorageSize && StorageSize <= 10)
-        inline auto get_varint_type_from_max_storage_size_impl() noexcept
+        inline consteval auto get_varint_type_from_max_storage_size_impl() noexcept
         {
             if constexpr(StorageSize <= 1)
             {
