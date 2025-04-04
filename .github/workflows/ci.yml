@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup
-        run: sudo apt install xmake
+        run: sudo apt install g++-14 xmake
       - name: Configure
         run: xmake config
       - name: Build
@@ -34,8 +34,8 @@ jobs:
           msystem: CLANG64
           update: true
           install: |
-            ${MINGW_PACKAGE_PREFIX}-cc
-            ${MINGW_PACKAGE_PREFIX}-xmake
+            mingw-w64-clang-x86_64-cc
+            mingw-w64-clang-x86_64-xmake
       - name: Configure
         run: xmake config -p mingw --use-llvm=y
       - name: Build
