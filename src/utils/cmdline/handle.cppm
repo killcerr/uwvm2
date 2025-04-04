@@ -32,6 +32,7 @@ module;
 export module utils.cmdline:handle;
 
 import fast_io;
+import fast_io_crypto;
 
 export namespace utils::cmdline
 {

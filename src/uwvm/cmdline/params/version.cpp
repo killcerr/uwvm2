@@ -26,6 +26,7 @@
 #include <utils/ansies/ansi_push_macro.h>
 
 import fast_io;
+import fast_io_crypto;
 import utils.io;
 import utils.cmdline;
 import utils.install_path;

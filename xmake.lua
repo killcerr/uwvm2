@@ -89,7 +89,7 @@ target("uwvm")
 	-- third-parties/fast_io
 	add_includedirs("third-parties/fast_io/include")
 	add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_debug_mode})
-
+	add_files("third-parties/fast_io/share/fast_io/fast_io_crypto.cppm", {public = is_debug_mode})
 	-- src
 	add_includedirs("src/")
 
