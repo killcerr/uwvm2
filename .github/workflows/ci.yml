@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup
-        run: sudo apt install g++-14 xmake
+        run: sudo apt install xmake
       - name: Configure
         run: xmake config
       - name: Build
