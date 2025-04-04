@@ -24,4 +24,3 @@ module;
 
 export module uwvm.wasm.standard.wasm3.type;
 export import :base;
-export import :value;

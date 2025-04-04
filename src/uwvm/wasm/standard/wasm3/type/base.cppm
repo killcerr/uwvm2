@@ -32,7 +32,6 @@ module;
 export module uwvm.wasm.standard.wasm3.type:base;
 
 import fast_io;
-import uwvm.wasm.standard.wasm1;
 import uwvm.wasm.standard.wasm2;
 
 export namespace uwvm::wasm::standard::wasm3::type
@@ -43,8 +42,8 @@ export namespace uwvm::wasm::standard::wasm3::type
     /// @see        WebAssembly Release 3.0 (Draft 2024-09-21) § 2.3.12
     struct limits
     {
-        ::uwvm::wasm::standard::wasm3::type::wasm_u64 min{};
-        ::uwvm::wasm::standard::wasm3::type::wasm_u64 max{};
+        ::uwvm::wasm::standard::wasm1::type::wasm_u64 min{};
+        ::uwvm::wasm::standard::wasm1::type::wasm_u64 max{};
         bool present_max{};
     };
 

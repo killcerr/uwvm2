@@ -5,8 +5,8 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Release 2.0 (Draft 2025-01-28)
- * @details     antecedent dependency: WebAssembly Release 1.0 (2019-07-20)
+ * @brief       WebAssembly Release 2.0 (Draft 2025-01-30)
+ * @details     antecedent dependency: WebAssembly Release 1.1 (Draft 2021-11-16)
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-02
@@ -25,4 +25,4 @@
 module;
 
 export module uwvm.wasm.standard.wasm2;
-export import uwvm.wasm.standard.wasm2.type;
+export import uwvm.wasm.standard.wasm1p1;

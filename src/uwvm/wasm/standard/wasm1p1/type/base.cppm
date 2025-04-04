@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-04
+ * @date        2025-03-31
  * @copyright   APL-2 License
  */
 
@@ -29,18 +29,18 @@ module;
 
 #include <uwvm/wasm/feature/feature_push_macro.h>
 
-export module uwvm.wasm.standard.wasm2.type:base;
+export module uwvm.wasm.standard.wasm1p1.type:base;
 
 import fast_io;
 import uwvm.wasm.standard.wasm1;
 
-export namespace uwvm::wasm::standard::wasm2::type
+export namespace uwvm::wasm::standard::wasm1p1::type
 {
     /// @brief      Vector Types
     /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,
     ///             single instruction multiple data).
     ///             This is only used for storage and will be converted to the type used for computation during computation depending on platform support
-    /// @see        WebAssembly Release 2.0 (Draft 2025-01-28) § 2.3.2
+    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 2.3.2
 #if __has_cpp_attribute(__gnu__::__vector_size__)
     using wasm_v128 [[__gnu__::__vector_size__(16)]] = char;
 #else
@@ -342,4 +342,4 @@ export namespace uwvm::wasm::standard::wasm2::type
     {
         return details::print_reserve_v128_i8x16_impl(iter, v128_val);
     }
-}  // namespace uwvm::wasm::standard::wasm2::type
+}  // namespace uwvm::wasm::standard::wasm1p1::type

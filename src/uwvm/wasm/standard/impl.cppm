@@ -25,6 +25,11 @@ module;
 
 export module uwvm.wasm.standard;
 export import uwvm.wasm.standard.wasm1;
+export import uwvm.wasm.standard.wasm1p1;
 export import uwvm.wasm.standard.wasm2;
+export import uwvm.wasm.standard.wasm2_MultiMemory;
+export import uwvm.wasm.standard.wasm2_TailCalls;
+export import uwvm.wasm.standard.wasm2_TailCalls_FunctionReference;
+export import uwvm.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
 export import uwvm.wasm.standard.wasm2_thread;
 export import uwvm.wasm.standard.wasm3;

@@ -5,9 +5,11 @@
  ********************************************************/
 
 /**
+ * @brief       WebAssembly Release 2.0 + tail calls (Draft 2023-03-01)
+ * @details     antecedent dependency: WebAssembly Release 2.0 (Draft 2025-01-30)
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-02
+ * @date        2025-04-04
  * @copyright   APL-2 License
  */
 
@@ -22,6 +24,5 @@
 
 module;
 
-export module uwvm.wasm.standard.wasm2.type;
-export import :base;
-export import :value;
+export module uwvm.wasm.standard.wasm2_TailCalls;
+export import uwvm.wasm.standard.wasm2;
