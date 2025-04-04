@@ -16,8 +16,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup
         run: sudo apt install xmake
+        run: sudo apt install clang
       - name: Configure
-        run: xmake config
+        run: xmake config --use-llvm=y
       - name: Build
         run: xmake build -v
   # ---------------------------------------------------------------------------

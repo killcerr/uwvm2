@@ -35,7 +35,7 @@
 
 # Compiler Support
 - LLVM Clang >= 20 (recommended)
-- (Xmake does not support GCC module at this time)
+- (The GCC module does not support non-exported functions adl matching, not supported at this time)
 - (MSVC has bugs in module handling, not supported at this time)
 
 # C++ standard library support (Version is the same as the version released with the corresponding supported compiler)
