@@ -47,11 +47,11 @@ export namespace uwvm::wasm::standard::wasm1::type
     ///             are unsigned or signed.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.2.2
-    using wasm_i8 = ::std::int_least8_t;
-    using wasm_u8 = ::std::uint_least8_t;
+    using wasm_i8 = ::std::int_least8_t;     // nonstandard
+    using wasm_u8 = ::std::uint_least8_t;    // nonstandard
 
-    using wasm_i16 = ::std::int_least16_t;
-    using wasm_u16 = ::std::uint_least16_t;
+    using wasm_i16 = ::std::int_least16_t;   // nonstandard
+    using wasm_u16 = ::std::uint_least16_t;  // nonstandard
 
     using wasm_i32 = ::std::int_least32_t;
     using wasm_u32 = ::std::uint_least32_t;
@@ -76,12 +76,25 @@ export namespace uwvm::wasm::standard::wasm1::type
     using wasm_f64 = double;
 #endif
 
+    /// @brief      Limits
+    /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
+    /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
+    struct limits
+    {
+        ::uwvm::wasm::standard::wasm1::type::wasm_u32 min{};
+        ::uwvm::wasm::standard::wasm1::type::wasm_u32 max{};
+        bool present_max{};
+    };
+
     /// @brief      wasm base instruction, using a byte composition, instruction or extension instruction.
     /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.4.5
     using op_basic_type = wasm_byte;
 
     /// @brief      wasm extended instructions, using u32, indicate the extended instruction section.
     /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.4.5
     using op_exten_type = wasm_u32;
 
     // func

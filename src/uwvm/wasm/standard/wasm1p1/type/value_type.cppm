@@ -29,7 +29,7 @@ module;
 
 #include <uwvm/wasm/feature/feature_push_macro.h>
 
-export module uwvm.wasm.standard.wasm1p1.type:base;
+export module uwvm.wasm.standard.wasm1p1.type:value_type;
 
 import fast_io;
 import uwvm.wasm.standard.wasm1;

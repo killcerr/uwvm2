@@ -29,18 +29,18 @@ module;
 
 #include <uwvm/wasm/feature/feature_push_macro.h>
 
-export module uwvm.wasm.standard.wasm1p1.type:value;
+export module uwvm.wasm.standard.wasm1p1.type:value_binfmt;
 
 import fast_io;
 import uwvm.wasm.standard.wasm1;
-import :base;
+import :value_type;
 
 export namespace uwvm::wasm::standard::wasm1p1::type
 {
     /// @brief      Number Types
-    /// @details    Number types classify numeric values.
+    /// @details    Number types are encoded by a single byte.
     /// @details    New feature
-    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 2.3.1
+    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.1
     enum class number_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types
@@ -51,10 +51,9 @@ export namespace uwvm::wasm::standard::wasm1p1::type
     };
 
     /// @brief      Vector Types
-    /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,
-    ///             single instruction multiple data).
+    /// @details    Vector types are also encoded by a single byte.
     /// @details    New feature
-    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 2.3.2
+    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.2
     enum class vector_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Vector types
@@ -62,9 +61,9 @@ export namespace uwvm::wasm::standard::wasm1p1::type
     };
 
     /// @brief      Reference Types
-    /// @details    Reference types classify first-class references to objects in the runtime store.
+    /// @details    Reference types are also encoded by a single byte.
     /// @details    New feature
-    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 2.3.3
+    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.3
     enum class reference_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Reference Types
@@ -73,10 +72,9 @@ export namespace uwvm::wasm::standard::wasm1p1::type
     };
 
     /// @brief      Value Types
-    /// @details    Value types classify the individual values that WebAssembly code can compute with and the values that a variable
-    ///             accepts. They are either number types, vector types, or reference types.
+    /// @details    Value types are encoded with their respective encoding as a number type or reference type.
     /// @details    Extends wasm1's value_type
-    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 2.3.4
+    /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.4
     enum class value_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types

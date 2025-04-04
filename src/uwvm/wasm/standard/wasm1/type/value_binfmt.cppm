@@ -56,18 +56,41 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.2
     enum class result_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
     {
-        // Result Types
-        resulttype = 0x40,
+        // Empty Types
+        empty = 0x40,
+        // t:valtype
+        i32 = 0x7F,
+        i64 = 0x7E,
+        f32 = 0x7D,
+        f64 = 0x7C,
+    };
+
+    /// @brief      Function Types Prefix
+    /// @details    Function types are encoded by the byte 0x60 followed by the respective vectors of parameter and result types.
+    /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.3
+    enum class function_type_prefix : ::uwvm::wasm::standard::wasm1::type::wasm_byte
+    {
+        // Function Types
+        functype = 0x60,
+    };
+
+    /// @brief      vec(valtype)
+    /// @details    the respective vectors of value type
+    struct vec_value_type
+    {
+        value_type const* begin{};
+        value_type const* end{};
     };
 
     /// @brief      Function Types
     /// @details    Function types are encoded by the byte 0x60 followed by the respective vectors of parameter and result types.
     /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.3
-    enum class function_type : ::uwvm::wasm::standard::wasm1::type::wasm_byte
+    /// @see        WebAssembly Release 1.0 (2019-07-20) §  5.3.3
+    struct function_type
     {
-        // Function Types
-        functype = 0x60,
+        vec_value_type parameter{};
+        vec_value_type result{};
     };
 
     // func
