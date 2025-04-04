@@ -19,7 +19,7 @@ jobs:
         run: sudo apt install clang clang-tools
       - name: Check Clang Version
         run: clang -v
-      - name: symlink
+      - name: symlink clang-scan-deps
         run: sudo ln -s /usr/lib/llvm-18/bin/clang-scan-deps /usr/bin/clang-scan-deps
       - name: Check Xmake Version
         run: xmake --version
