@@ -14,15 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: xmake-io/github-action-setup-xmake@v1
       - name: Setup
-        run: sudo apt install clang clang-tools xmake
-        run: ln -s /usr/lib/llvm-17/bin/clang-scan-deps /usr/local/bin/clang-scan-deps
+        run: sudo apt install clang clang-tools
+      - name: Check Clang Version
+        run: clang -v
+      - name: symlink
+        run: sudo ln -s /usr/lib/llvm-18/bin/clang-scan-deps /usr/bin/clang-scan-deps
       - name: Check Xmake Version
         run: xmake --version
       - name: Configure
-        run: xmake config --use-llvm=y
+        run: xmake f --use-llvm=y -m debug
       - name: Build
-        run: xmake build -v
+        run: xmake -v
       - name: Test
         run: xmake run uwvm --version
   # ---------------------------------------------------------------------------
@@ -44,8 +48,8 @@ jobs:
       - name: Check Xmake Version
         run: xmake --version
       - name: Configure
-        run: xmake config -p mingw --use-llvm=y
+        run: xmake f -p mingw --use-llvm=y
       - name: Build
-        run: xmake build -v
+        run: xmake -v
       - name: Test
         run: xmake run uwvm --version
