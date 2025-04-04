@@ -19,7 +19,7 @@ jobs:
       - name: Configure
         run: xmake config
       - name: Build
-        run: xmake build
+        run: xmake build -v
   # ---------------------------------------------------------------------------
   msys2-clang64:
     name: MSYS2 CLANG64
@@ -39,4 +39,4 @@ jobs:
       - name: Configure
         run: xmake config -p mingw --use-llvm=y
       - name: Build
-        run: xmake build
+        run: xmake build -v
