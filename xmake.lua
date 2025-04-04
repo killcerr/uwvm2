@@ -1,4 +1,4 @@
-set_xmakever("2.8.2")
+set_xmakever("2.9.0")
 
 set_project("uwvm")
 

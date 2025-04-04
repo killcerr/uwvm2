@@ -38,6 +38,7 @@ import utils.cmdline;
 #ifdef UWVM_TIMER
 import utils.debug;
 #endif
+import uwvm.cmdline.params; // ::uwvm::cmdline::paras::run
 import :params;
 
 export namespace uwvm::cmdline
