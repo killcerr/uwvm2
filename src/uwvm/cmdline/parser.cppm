@@ -35,10 +35,10 @@ export module uwvm.cmdline:parser;
 import fast_io;
 import utils.io;
 import utils.cmdline;
-import uwvm.cmdline.params;
 #ifdef UWVM_TIMER
 import utils.debug;
 #endif
+import uwvm.cmdline.params; // ::uwvm::cmdline::paras::run
 import :params;
 
 export namespace uwvm::cmdline
