@@ -35,6 +35,7 @@ export module uwvm.cmdline:parser;
 import fast_io;
 import utils.io;
 import utils.cmdline;
+import uwvm.cmdline.params;
 #ifdef UWVM_TIMER
 import utils.debug;
 #endif
