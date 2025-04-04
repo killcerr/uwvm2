@@ -3,7 +3,7 @@ option("march", function()
     (
         [[Set the "-march" option for gcc and clang.]],
         "The option is automatically added if using our toolchain option.",
-        [[    no: Don't set the "-march" option, use the default march of the toolchain.]],
+        [[    none: Don't set the "-march" option, use the default march of the toolchain.]],
         [[    default: Set the "-march" option as "-march=native" if possible, otherwise don't set the "-march" option and use the default march of the toolchain.]],
         [[    arch: Set the "-march" option as "-march=arch". Note that "arch" is any value other than "no" and "default".]]
     )
@@ -19,7 +19,7 @@ option("sysroot", function()
     (
         "Set the `--sysroot` option for gcc and clang.",
         "The option is automatically added if using our toolchain option.",
-        [[    no: Don't set the "--sysroot" option, use the default sysroot of the toolchain.]],
+        [[    none: Don't set the "--sysroot" option, use the default sysroot of the toolchain.]],
         [[    detect: Detect and set the sysroot for clang, use the default sysroot for gcc.]],
         [[    path: Set the "--sysroot" option as "--sysroot=path". Note that "path" is an absolute path or a relative path other than "no" and "detect".]]
     )
@@ -38,7 +38,7 @@ option("target", function()
     (
         "Set the `--target` option for gcc and clang.",
         "The option is automatically added if using our toolchain option.",
-        [[    no: Don't set the "--target" option, use the default target of the toolchain.]],
+        [[    none: Don't set the "--target" option, use the default target of the toolchain.]],
         [[    detect: Detect and set the target for clang, use the default target for gcc.]],
         [[    triplet: Set the "--target" option as "--target=triplet".]]
     )
@@ -89,12 +89,12 @@ option("debug-strip", function()
     set_description
     (
         "Whether to strip the symbols while building with debug information.",
-        [[    no: Don't strip the symbols if possible.]],
+        [[    none: Don't strip the symbols if possible.]],
         [[    debug: Strip the debug symbols to a independent symbol file while keeping other symbols in the target file.]],
         [[    all: Strip the debug symbols to a independent symbol file then strip all symbols from the target file.]]
     )
-    set_default("no")
-    set_values("no", "debug", "all")
+    set_default("none")
+    set_values("none", "debug", "all")
 end)
 
 option("enable-lto", function()
@@ -130,24 +130,24 @@ option("enable-int", function()
     set_description
     (
         "enable interpreter",
-        [[    no: disable interpreter.]],
+        [[    none: disable interpreter.]],
         [[    defualt: use default interpreter.]],
         [[    uwvm-int: use uwvm interpreter.]]
     )
     set_default("default")
-    set_values("no", "default", "uwvm-int")
+    set_values("none", "default", "uwvm-int")
 end)
 
 option("enable-jit", function()
     set_description
     (
         "enable just-in-time compilation",
-        [[    no: disable jit.]],
+        [[    none: disable jit.]],
         [[    defualt: use default jit engine.]],
         [[    llvm: use llvm jit engine.]]
     )
     set_default("default")
-    set_values("no", "default", "llvm")
+    set_values("none", "default", "llvm")
 end)
 
 -- WINDOWS

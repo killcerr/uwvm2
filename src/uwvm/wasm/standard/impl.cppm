@@ -5,9 +5,7 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly 2.0 (Draft 2025-01-28)
- * @details     uwvm2 will write all the standards directly into the parser,
- *              providing the most efficient parsing speed and providing the conceptual interface of the proposal for extensions.
+ * @brief       WebAssembly Standard
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-02
