@@ -29,10 +29,10 @@ module;
 
 #include <uwvm/wasm/feature/feature_push_macro.h>
 
-export module uwvm.wasm.standard.wasm1.type:value;
+export module uwvm.wasm.standard.wasm1.type:value_binfmt;
 
 import fast_io;
-import :base;
+import :value_type;
 
 export namespace uwvm::wasm::standard::wasm1::type
 {

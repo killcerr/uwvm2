@@ -23,5 +23,6 @@
 module;
 
 export module uwvm.wasm.standard.wasm1.type;
-export import :base;
-export import :value;
+export import :value_type;
+export import :limits;
+export import :value_binfmt;

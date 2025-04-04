@@ -29,26 +29,24 @@ module;
 
 #include <uwvm/wasm/feature/feature_push_macro.h>
 
-export module uwvm.wasm.standard.wasm1.type:base;
+export module uwvm.wasm.standard.wasm1.type:value_type;
 
 import fast_io;
 
 export namespace uwvm::wasm::standard::wasm1::type
 {
     /// @brief      Bytes
-    /// @details    Bytes encode themselves
+    /// @details    The simplest form of value are raw uninterpreted bytes. In the abstract syntax they are represented as hexadecimal
+    ///             literals.
     /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.1
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.2.1
     using wasm_byte = ::std::uint_least8_t;
 
     /// @brief      Integers
-    /// @details    All integers are encoded using the LEB12829 variable-length integer encoding, in either unsigned or signed variant.
-    ///             Unsigned integers are encoded in unsigned LEB12830 format. As an additional constraint, the total number of
-    ///             bytes encoding a value of type uN must not exceed ceil(N / 7) bytes
-    ///             Signed integers are encoded in signed LEB12831 format, which uses a two’s complement representation. As an
-    ///             additional constraint, the total number of bytes encoding a value of type sN must not exceed ceil(N / 7) bytes.
+    /// @details    Different classes of integers with different value ranges are distinguished by their bit width N and by whether they
+    ///             are unsigned or signed.
     /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.2
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.2.2
     using wasm_i8 = ::std::int_least8_t;
     using wasm_u8 = ::std::uint_least8_t;
 
@@ -62,9 +60,10 @@ export namespace uwvm::wasm::standard::wasm1::type
     using wasm_u64 = ::std::uint_least64_t;
 
     /// @brief      Floating-Point
-    /// @details    Floating-point values are encoded directly by their IEEE 75432 (Section 3.4) bit pattern in little endian33 byte order.
+    /// @details    Floating-point data represents 32 or 64 bit values that correspond to the respective binary formats of the IEEE
+    ///             754-20089 standard (Section 3.3).
     /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.3
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.2.3
 #ifdef __STDCPP_FLOAT32_T__
     using wasm_f32 = _Float32;  // IEEE 754-2008
 #else
@@ -84,17 +83,6 @@ export namespace uwvm::wasm::standard::wasm1::type
     /// @brief      wasm extended instructions, using u32, indicate the extended instruction section.
     /// @details    New feature
     using op_exten_type = wasm_u32;
-
-    /// @brief      Limits
-    /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
-    /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
-    struct limits
-    {
-        wasm_u32 min{};
-        wasm_u32 max{};
-        bool present_max{};
-    };
 
     // func
     namespace details
@@ -128,8 +116,12 @@ export namespace uwvm::wasm::standard::wasm1::type
         }
 
         /// @brief      Getting Variable Types from Maximum Storage Capacity
-        /// @details    the total number of bytes encoding a value of type uN must not exceed ceil(N7) bytes
-        /// @see        5.2.2
+        /// @details    All integers are encoded using the LEB12829 variable-length integer encoding, in either unsigned or signed variant.
+        ///             Unsigned integers are encoded in unsigned LEB12830 format. As an additional constraint, the total number of
+        ///             bytes encoding a value of type uN must not exceed ceil(N / 7) bytes
+        ///             Signed integers are encoded in signed LEB12831 format, which uses a two’s complement representation. As an
+        ///             additional constraint, the total number of bytes encoding a value of type sN must not exceed ceil(N / 7) bytes.
+        /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.2
         template <::std::size_t StorageSize, bool Unsigned>
             requires (0 < StorageSize && StorageSize <= 10)
         inline consteval auto get_varint_type_from_max_storage_size_impl() noexcept
