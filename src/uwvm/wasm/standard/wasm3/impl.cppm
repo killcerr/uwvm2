@@ -6,6 +6,7 @@
 
 /**
  * @brief       WebAssembly Release 3.0 (Draft 2024-09-21)
+ * @details     antecedent dependency: WebAssembly Release 2.0 (Draft 2025-01-28), WebAssembly Release 1.0 (2019-07-20)
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-02

@@ -5,7 +5,8 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Standard
+ * @brief       WebAssembly Release 2.0 + Threads (Draft 2023-10-10)
+ * @details     antecedent dependency: WebAssembly Release 2.0 (Draft 2025-01-28)
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-02
@@ -23,8 +24,5 @@
 
 module;
 
-export module uwvm.wasm.standard;
-export import uwvm.wasm.standard.wasm1;
-export import uwvm.wasm.standard.wasm2;
-export import uwvm.wasm.standard.wasm2_thread;
-export import uwvm.wasm.standard.wasm3;
+export module uwvm.wasm.standard.wasm2_thread;
+

@@ -5,7 +5,6 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Standard
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-02
@@ -23,8 +22,6 @@
 
 module;
 
-export module uwvm.wasm.standard;
-export import uwvm.wasm.standard.wasm1;
-export import uwvm.wasm.standard.wasm2;
-export import uwvm.wasm.standard.wasm2_thread;
-export import uwvm.wasm.standard.wasm3;
+export module uwvm.wasm.standard.wasm3.type;
+export import :base;
+export import :value;

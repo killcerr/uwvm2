@@ -5,10 +5,9 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Standard
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-02
+ * @date        2025-03-31
  * @copyright   APL-2 License
  */
 
@@ -23,8 +22,18 @@
 
 module;
 
-export module uwvm.wasm.standard;
-export import uwvm.wasm.standard.wasm1;
-export import uwvm.wasm.standard.wasm2;
-export import uwvm.wasm.standard.wasm2_thread;
-export import uwvm.wasm.standard.wasm3;
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
+
+#include <uwvm/wasm/feature/feature_push_macro.h>
+
+export module uwvm.wasm.standard.wasm3.type:value;
+
+import fast_io;
+import :base;
+
+export namespace uwvm::wasm::standard::wasm3::type
+{
+}  // namespace uwvm::wasm::standard::wasm3::type
