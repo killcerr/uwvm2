@@ -22,5 +22,17 @@
 
 module;
 
-export module uwvm.wasm;
-export import uwvm.wasm.storage;
+export module parser.wasm.standard.wasm1.section:funcbody;
+
+import fast_io;
+import parser.wasm.standard.wasm1.type;
+
+export namespace parser::wasm::standard::wasm1::section
+{
+    // function bodys
+    struct code_func_body
+    {
+        ::fast_io::vector<::parser::wasm::standard::wasm1::type::local_entry> locals{};
+        ::parser::wasm::standard::wasm1::type::vec_byte body{};
+    };
+}  // namespace parser::wasm::standard::wasm1::section

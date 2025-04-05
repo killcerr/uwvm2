@@ -22,5 +22,5 @@
 
 module;
 
-export module uwvm.wasm;
-export import uwvm.wasm.storage;
+export module parser.wasm.standard.wasm1.section;
+export import :funcbody;

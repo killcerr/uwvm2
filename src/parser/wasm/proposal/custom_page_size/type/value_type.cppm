@@ -38,4 +38,4 @@ import parser.wasm.standard.wasm3;
 export namespace parser::wasm::proposal::custom_page_size::value_type
 {
 
-}  // namespace parser::wasm::proposal::relaxed_simd::value_type
+}  // namespace parser::wasm::proposal::custom_page_size::value_type

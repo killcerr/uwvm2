@@ -29,7 +29,7 @@ module;
 
 #include <parser/wasm/feature/feature_push_macro.h>
 
-export module parser.wasm.standard.wasm3.type:limits;
+export module parser.wasm.standard.wasm3.type:section_type;
 
 import fast_io;
 import parser.wasm.standard.wasm2;

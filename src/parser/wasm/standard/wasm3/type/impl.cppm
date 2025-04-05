@@ -23,4 +23,4 @@
 module;
 
 export module parser.wasm.standard.wasm3.type;
-export import :limits;
+export import :section_type;

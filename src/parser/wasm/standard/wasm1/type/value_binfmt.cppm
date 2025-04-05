@@ -83,14 +83,22 @@ export namespace parser::wasm::standard::wasm1::type
         value_type const* end{};
     };
 
-    /// @brief      Function Types
-    /// @details    Function types are encoded by the byte 0x60 followed by the respective vectors of parameter and result types.
+    /// @brief      Limits preceding flag
+    /// @details    A prefix to limit to indicate whether to provide a maximum value.
     /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) §  5.3.3
-    struct function_type
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.4
+    enum class limits_preceding_flag : ::parser::wasm::standard::wasm1::type::wasm_byte
     {
-        vec_value_type parameter{};
-        vec_value_type result{};
+        non_max = 0x00,
+        have_max = 0x01,
+    };
+
+    /// @brief      vec(byte)
+    /// @details    the respective vectors of value byte
+    struct vec_byte
+    {
+        ::parser::wasm::standard::wasm1::type::wasm_byte const* byte_begin{};
+        ::parser::wasm::standard::wasm1::type::wasm_byte const* byte_end{};
     };
 
     // func

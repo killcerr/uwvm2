@@ -42,5 +42,4 @@ export namespace parser::wasm::proposal::half_precision::value_type
     using wasm_fp16 = __float16;
 #endif
 
-
 }  // namespace parser::wasm::proposal::half_precision::value_type

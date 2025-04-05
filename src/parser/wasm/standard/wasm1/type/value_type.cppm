@@ -76,17 +76,6 @@ export namespace parser::wasm::standard::wasm1::type
     using wasm_f64 = double;
 #endif
 
-    /// @brief      Limits
-    /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
-    /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
-    struct limits
-    {
-        ::parser::wasm::standard::wasm1::type::wasm_u32 min{};
-        ::parser::wasm::standard::wasm1::type::wasm_u32 max{};
-        bool present_max{};
-    };
-
     /// @brief      wasm base instruction, using a byte composition, instruction or extension instruction.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.4.5
