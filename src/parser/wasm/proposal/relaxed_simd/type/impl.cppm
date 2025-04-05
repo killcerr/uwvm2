@@ -5,7 +5,6 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Proposal
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-03
@@ -23,7 +22,6 @@
 
 module;
 
-export module parser.wasm.proposal;
-export import parser.wasm.proposal.relaxed_simd;
-export import parser.wasm.proposal.half_precision;
-export import parser.wasm.proposal.custom_page_size;
+export module parser.wasm.proposal.relaxed_simd.type;
+export import :value_type;
+

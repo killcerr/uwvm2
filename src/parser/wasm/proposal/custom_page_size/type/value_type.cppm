@@ -22,6 +22,20 @@
 
 module;
 
-export module parser.wasm.proposal.fp_ext.type;
-export import :base;
+#include <cstdint>
+#include <cstddef>
+#include <type_traits>
+#include <concepts>
+#include <bit>
 
+#include <parser/wasm/feature/feature_push_macro.h>
+
+export module parser.wasm.proposal.custom_page_size.type:value_type;
+
+import fast_io;
+import parser.wasm.standard.wasm3;
+
+export namespace parser::wasm::proposal::custom_page_size::value_type
+{
+
+}  // namespace parser::wasm::proposal::relaxed_simd::value_type

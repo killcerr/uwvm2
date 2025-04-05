@@ -5,7 +5,6 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Proposal
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-03
@@ -23,7 +22,25 @@
 
 module;
 
-export module parser.wasm.proposal;
-export import parser.wasm.proposal.relaxed_simd;
-export import parser.wasm.proposal.half_precision;
-export import parser.wasm.proposal.custom_page_size;
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
+
+#include <parser/wasm/feature/feature_push_macro.h>
+
+export module parser.wasm.proposal.half_precision.type:value_type;
+
+import fast_io;
+
+export namespace parser::wasm::proposal::half_precision::value_type
+{
+    /// @brief      fp16
+    /// @details    new feature
+    /// @see        https://github.com/WebAssembly/half-precision
+#if defined(UWVM_WASM_SUPPORT_FP16)
+    using wasm_fp16 = __float16;
+#endif
+
+
+}  // namespace parser::wasm::proposal::half_precision::value_type

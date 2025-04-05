@@ -5,10 +5,11 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Proposal
+ * @brief       Relaxed SIMD proposal for WebAssembly
+ * @details     antecedent dependency: WebAssembly Release 3.0 (Draft 2024-09-21)
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-03
+ * @date        2025-04-04
  * @copyright   APL-2 License
  */
 
@@ -23,7 +24,5 @@
 
 module;
 
-export module parser.wasm.proposal;
-export import parser.wasm.proposal.relaxed_simd;
-export import parser.wasm.proposal.half_precision;
-export import parser.wasm.proposal.custom_page_size;
+export module parser.wasm.proposal.relaxed_simd;
+export import parser.wasm.proposal.relaxed_simd.type;
