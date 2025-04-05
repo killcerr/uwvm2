@@ -47,8 +47,8 @@ export namespace parser::wasm::standard::wasm1::type
     ///             are unsigned or signed.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.2.2
-    using wasm_i8 = ::std::int_least8_t;     // nonstandard
-    using wasm_u8 = ::std::uint_least8_t;    // nonstandard
+    using wasm_i8 = ::std::int_least8_t;   // nonstandard
+    using wasm_u8 = ::std::uint_least8_t;  // nonstandard
 
     using wasm_i16 = ::std::int_least16_t;   // nonstandard
     using wasm_u16 = ::std::uint_least16_t;  // nonstandard
