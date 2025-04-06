@@ -3,6 +3,7 @@
 #include <fast_io.h>
 #include <fast_io_device.h>
 #include <fast_io_dsal/array.h>
+#include <fast_io_dsal/tuple.h>
 #include <fast_io_dsal/vector.h>
 #include <fast_io_dsal/string_view.h>
 #include <fast_io_dsal/string.h>
@@ -44,6 +45,7 @@ io functions
 containers
 */
 #include "fast_io_inc/dsal/array.inc"
+#include "fast_io_inc/dsal/tuple.inc"
 #include "fast_io_inc/dsal/vector.inc"
 #include "fast_io_inc/dsal/string_view.inc"
 #include "fast_io_inc/dsal/string.inc"
