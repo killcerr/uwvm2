@@ -261,3 +261,24 @@ export namespace parser::wasm::standard::wasm1::type
     }
 
 }  // namespace parser::wasm::standard::wasm1::type
+
+export namespace fast_io::freestanding
+{
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::function_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::table_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::memory_type>
+    {
+        inline static constexpr bool value = true;
+    };
+}  // namespace fast_io::freestanding

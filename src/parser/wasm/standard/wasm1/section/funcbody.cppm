@@ -29,10 +29,25 @@ import parser.wasm.standard.wasm1.type;
 
 export namespace parser::wasm::standard::wasm1::section
 {
-    // function bodys
+    /// @brief function bodys, use to storage
     struct code_func_body
     {
         ::fast_io::vector<::parser::wasm::standard::wasm1::type::local_entry> locals{};
         ::parser::wasm::standard::wasm1::type::vec_byte body{};
     };
 }  // namespace parser::wasm::standard::wasm1::section
+
+export namespace fast_io::freestanding
+{
+    template <>
+    struct is_trivially_copyable_or_relocatable<parser::wasm::standard::wasm1::section::code_func_body>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<parser::wasm::standard::wasm1::section::code_func_body>
+    {
+        inline static constexpr bool value = true;
+    };
+}  // namespace fast_io::freestanding

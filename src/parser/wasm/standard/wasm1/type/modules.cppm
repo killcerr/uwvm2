@@ -51,9 +51,9 @@ export namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.2
     struct local_function_type
     {
-        ::parser::wasm::standard::wasm1::type::function_type const* func_type{};
-        ::fast_io::string_view custom_name{};
+        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
 
+        ::parser::wasm::standard::wasm1::type::function_type const* func_type{};
         bool is_exported{};
     };
 
@@ -63,7 +63,8 @@ export namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.3
     struct local_entry
     {
-        ::fast_io::u8string_view custom_name{};
+        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
+
         indices count{};
         ::parser::wasm::standard::wasm1::type::value_type type{};
     };
@@ -78,6 +79,19 @@ export namespace parser::wasm::standard::wasm1::type
         ::fast_io::u8string_view export_name{};
         indices index{};
         ::parser::wasm::standard::wasm1::type::external_types kind{};
+    };
+
+    /// @brief      Imports
+    /// @details    The imports component of a module defines a set of imports that are required for instantiation
+    /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.11
+    struct import_type
+    {
+        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
+
+        ::fast_io::u8string_view module{};
+        ::fast_io::u8string_view name{};
+        ::parser::wasm::standard::wasm1::type::external_types importdesc{};
     };
 
     /// @brief      Expressions
@@ -104,7 +118,8 @@ export namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.6
     struct local_global_type
     {
-        ::fast_io::u8string_view custom_name;
+        ::fast_io::u8string_view custom_name;  // The name used for the data segment
+
         ::parser::wasm::standard::wasm1::type::global_type type{};
         initializer_exp init{};
     };
@@ -114,7 +129,7 @@ export namespace parser::wasm::standard::wasm1::type
     ///             that initialize a subrange of a table, at a given offset, from a static vector of elements.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.7
-    struct elem_segment_type
+    struct elem_segment_type 
     {
         indices table{};
         initializer_exp offset{};
@@ -134,3 +149,54 @@ export namespace parser::wasm::standard::wasm1::type
     };
 
 }  // namespace parser::wasm::standard::wasm1::type
+
+export namespace fast_io::freestanding
+{
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_function_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_entry>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::import_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_global_type>
+    {
+        inline static constexpr bool value = true;
+    };    
+    
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::export_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_trivially_copyable_or_relocatable<::parser::wasm::standard::wasm1::type::elem_segment_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::elem_segment_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::data_segment>
+    {
+        inline static constexpr bool value = true;
+    };
+}  // namespace fast_io::freestanding
