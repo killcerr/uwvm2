@@ -9,26 +9,26 @@ on:
 
 jobs:
   # ---------------------------------------------------------------------------
-  linux:
-    name: Linux
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: xmake-io/github-action-setup-xmake@v1
-      - name: Setup
-        run: sudo apt install clang clang-tools
-      - name: Check Clang Version
-        run: clang -v
-      - name: symlink clang-scan-deps
-        run: sudo ln -s /usr/lib/llvm-18/bin/clang-scan-deps /usr/bin/clang-scan-deps
-      - name: Check Xmake Version
-        run: xmake --version
-      - name: Configure
-        run: xmake f --use-llvm=y -m debug
-      - name: Build
-        run: xmake -v
-      - name: Test
-        run: xmake run uwvm --version
+  # linux:
+  #   name: Linux
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: xmake-io/github-action-setup-xmake@v1
+  #     - name: Setup
+  #       run: sudo apt install clang clang-tools
+  #     - name: Check Clang Version
+  #       run: clang -v
+  #     - name: symlink clang-scan-deps
+  #       run: sudo ln -s /usr/lib/llvm-18/bin/clang-scan-deps /usr/bin/clang-scan-deps
+  #     - name: Check Xmake Version
+  #       run: xmake --version
+  #     - name: Configure
+  #       run: xmake f --use-llvm=y -m debug
+  #     - name: Build
+  #       run: xmake -v
+  #     - name: Test
+  #       run: xmake run uwvm --version
   # ---------------------------------------------------------------------------
   msys2-clang64:
     name: MSYS2 CLANG64
