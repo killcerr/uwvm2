@@ -22,6 +22,8 @@
 
 module;
 
+#include <utils/macro/push_macros.h>
+
 export module parser.wasm.standard.wasm1.section:funcbody;
 
 import fast_io;
@@ -30,7 +32,7 @@ import parser.wasm.standard.wasm1.type;
 export namespace parser::wasm::standard::wasm1::section
 {
     /// @brief function bodys, use to storage
-    struct code_func_body
+    struct code_func_body UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         ::fast_io::vector<::parser::wasm::standard::wasm1::type::local_entry> locals{};
         ::parser::wasm::standard::wasm1::type::vec_byte body{};

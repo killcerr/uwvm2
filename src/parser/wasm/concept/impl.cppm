@@ -24,3 +24,4 @@ module;
 
 export module parser.wasm.concepts;
 export import :root;
+export import :operation;

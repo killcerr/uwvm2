@@ -124,8 +124,6 @@ export namespace parser::wasm::concepts
     /// @brief      Checks if a "define_wasm_binfmt_parsering_strategy" function is defined
     /// @details    Checks if a version handler function is defined. There can be only one version handler for the same binfmt version
     ///
-    ///             Whether the type is provided with a binfmt version or not, this is a mandatory option.
-    ///
     ///             example:
     ///
     ///             Conformity with the concept:
