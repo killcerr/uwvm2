@@ -30,6 +30,10 @@ module;
 #include <algorithm>
 #include <vector>
 
+#if !(__cpp_pack_indexing >= 202311L)
+# error "UWVM requires at least C++26 standard compiler."
+#endif
+
 export module parser.wasm.concepts:operation;
 
 import fast_io;
@@ -73,7 +77,7 @@ export namespace parser::wasm::concepts
             ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> binfmt_vers_uneliminated{};
 
             [&]<::std::size_t... I>(::std::index_sequence<I...>)
-            { ((binfmt_vers_uneliminated.push_back(get_binfmt_version<decltype(get<I>())>())), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+            { ((binfmt_vers_uneliminated.push_back(get_binfmt_version<Fs...[I]>())), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
 
             // Sorting for easy follow-up
             ::std::ranges::sort(binfmt_vers_uneliminated);
