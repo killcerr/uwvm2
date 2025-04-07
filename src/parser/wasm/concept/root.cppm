@@ -123,21 +123,37 @@ export namespace parser::wasm::concepts
 
     /// @brief      Checks if a "define_wasm_binfmt_parsering_strategy" function is defined
     /// @details    Checks if a version handler function is defined. There can be only one version handler for the same binfmt version
+    ///             Cannot define a parsing policy that differs from your wasm version.
     ///
     ///             example:
     ///
     ///             Conformity with the concept:
     ///             ```cpp
     ///             struct feature
-    ///             {};
+    ///             {
+    ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    ///             };
     ///
-    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>, binfmt_version_t<1>) {}
+    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
     ///
-    ///             static_assert(has_wasm_binfmt_parsering_strategy<feature, 1>); // OK
+    ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // OK. Provide a parsing strategy where binfmt version is 1
     ///             ```
-    template <typename FeatureType, ::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVersion>
+    ///
+    ///             Doesn't fit the concept:
+    ///             1. Version information must be provided
+    ///             ```cpp
+    ///             struct feature
+    ///             {
+    ///             };
+    ///
+    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
+    ///
+    ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // ERROR.
+    ///             ```
+    template <typename FeatureType>
     concept has_wasm_binfmt_parsering_strategy = requires {
-        { define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, binfmt_version<BinfmtVersion>) };
+        { define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>) };
+        requires has_wasm_binfmt_version<FeatureType>;
     };
 
     /// @todo Not Finished

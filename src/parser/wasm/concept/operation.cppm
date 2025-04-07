@@ -76,7 +76,8 @@ export namespace parser::wasm::concepts
             // Define the binfmt needed for the feature. Duplicates not eliminated.
             ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> binfmt_vers_uneliminated{};
 
-            [&]<::std::size_t... I>(::std::index_sequence<I...>)
+            // Get all required binfmt versions from the variant templates
+            [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             { ((binfmt_vers_uneliminated.push_back(get_binfmt_version<Fs...[I]>())), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
 
             // Sorting for easy follow-up
@@ -94,7 +95,30 @@ export namespace parser::wasm::concepts
             // Define the binfmt needed to process the feature.
             ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> binfmt_handlers{};
 
-            /// @todo Determine if there is a corresponding parsing scheme by the existing binfmt version.
+            // Cannot define a parsing policy that differs from your wasm version.
+            [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            {
+                ((
+                     [&]<::parser::wasm::concepts::wasm_feature FeatureType>() constexpr noexcept
+                     {
+                         if constexpr(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<FeatureType>)
+                         {
+                             constexpr auto binfmt_ver{get_binfmt_version<FeatureType>()};
+                             binfmt_handlers.push_back(binfmt_ver);
+                         }
+                     }.template operator()<Fs...[I]>()),
+                 ...);
+            }(::std::make_index_sequence<sizeof...(Fs)>{});
+
+            // Determine if there is a corresponding parsing scheme by the existing binfmt version.
+            ::std::ranges::sort(binfmt_handlers);
+
+            // Check for duplicates
+            for(::parser::wasm::standard::wasm1::type::wasm_u32 tmp{0u}; auto curr: binfmt_handlers)
+            {
+                if(curr == tmp) { ::fast_io::fast_terminate(); }
+                tmp = curr;
+            }
         }
 
         /// @brief      Checking for duplicate binfmt version handler functions from tuple
@@ -114,5 +138,7 @@ export namespace parser::wasm::concepts
         {
             check_has_duplicate_binfmt_handler<Fs...>();
         }
+
+        
     }  // namespace operation
 }  // namespace parser::wasm::concepts
