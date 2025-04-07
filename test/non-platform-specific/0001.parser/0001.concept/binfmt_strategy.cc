@@ -31,16 +31,25 @@ import parser.wasm.concepts;
 
 struct feature1
 {
+    inline static constexpr ::fast_io::u8string_view feature_name{u8"1"};
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-static_assert(::parser::wasm::concepts::has_wasm_binfmt_version<feature1>);
+inline void define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<feature1>) noexcept
+{
+
+}
 
 struct feature2
 {
-    ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::fast_io::u8string_view feature_name{u8"2"};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
 };
 
-static_assert(::parser::wasm::concepts::has_wasm_binfmt_version<feature2>); // Satisfy the concept, but subsequent operations will be wrong:
+static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<feature1>);
 
-int main() {}
+int main() 
+{
+    ::parser::wasm::concepts::operation::check_has_duplicate_binfmt_handler<feature1, feature2>();
+}

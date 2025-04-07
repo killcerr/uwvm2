@@ -119,6 +119,9 @@ export namespace parser::wasm::concepts
                 if(curr == tmp) { ::fast_io::fast_terminate(); }
                 tmp = curr;
             }
+
+            // Ensure that the version corresponds to the processing
+            if(binfmt_vers != binfmt_handlers) { ::fast_io::fast_terminate(); }
         }
 
         /// @brief      Checking for duplicate binfmt version handler functions from tuple

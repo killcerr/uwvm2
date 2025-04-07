@@ -26,6 +26,7 @@
 #include <concepts>
 
 import fast_io;
+import parser.wasm.standard.wasm1.type;
 import parser.wasm.concepts;
 
 struct feature1
@@ -40,6 +41,6 @@ struct feature2
     ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(!::parser::wasm::concepts::has_feature_name<feature2>);
+static_assert(::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
 
 int main() {}

@@ -79,7 +79,7 @@ export namespace parser::wasm::concepts
     ///             };
     ///             ```
     ///
-    ///             Doesn't fit the concept:
+    ///             Satisfy the concept, but subsequent operations will be wrong:
     ///             1. Must be a variable that statically stores duration
     ///             ```cpp
     ///             struct feature
@@ -107,7 +107,7 @@ export namespace parser::wasm::concepts
     ///             };
     ///             ```
     ///
-    ///             Doesn't fit the concept:
+    ///             Satisfy the concept, but subsequent operations will be wrong:
     ///             1. Must be a variable that statically stores duration
     ///             ```cpp
     ///             struct feature
