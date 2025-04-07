@@ -129,7 +129,7 @@ export namespace parser::wasm::concepts
     ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
     ///             };
     ///
-    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>, ::std::byte const*, ::std::byte const*) {}
+    ///             inline constexpr binfmt_handle_version_func_p_type define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // OK. Provide a parsing strategy where binfmt version is 1
     ///             ```
@@ -141,7 +141,7 @@ export namespace parser::wasm::concepts
     ///             {
     ///             };
     ///
-    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>, ::std::byte const*, ::std::byte const*) {}
+    ///             inline constexpr binfmt_handle_version_func_p_type define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // ERROR.
     ///             ```
