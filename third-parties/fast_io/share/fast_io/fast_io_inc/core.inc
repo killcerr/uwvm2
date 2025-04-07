@@ -139,6 +139,8 @@ using ::fast_io::manipulators::dfvw;
 using ::fast_io::manipulators::os_c_str;
 using ::fast_io::manipulators::os_c_str_carr;
 
+using ::fast_io::manipulators::rgvw;
+
 using ::fast_io::manipulators::code_cvt;
 using ::fast_io::manipulators::code_cvt_os_c_str;
 using ::fast_io::manipulators::os_c_str_null_terminated;
