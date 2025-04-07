@@ -110,19 +110,19 @@ namespace uwvm::cmdline::paras::details
 
         if(auto currp1_str{currp1->str}; currp1_str == u8"all")
         {
-            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  [All]:\n");
+            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n");
             help_output_all();
             ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
         }
         else if(currp1_str == u8"global")
         {
-            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  [Global]:\n");
+            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" UWVM_AES_U8_LT_CYAN u8"  <global>" UWVM_AES_U8_WHITE u8":\n");
             help_output_singal_cate(::utils::cmdline::categorization::global);
             ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
         }
         else if(currp1_str == u8"wasm")
         {
-            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" u8"  [Wasm]:\n");
+            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" UWVM_AES_U8_LT_CYAN u8"  <wasm>" UWVM_AES_U8_WHITE u8":\n");
             help_output_singal_cate(::utils::cmdline::categorization::wasm);
             ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
         }
