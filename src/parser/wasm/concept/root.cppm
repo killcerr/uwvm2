@@ -27,6 +27,8 @@ module;
 #include <type_traits>
 #include <concepts>
 
+#include <utils/macro/push_macros.h>
+
 export module parser.wasm.concepts:root;
 
 import fast_io;
@@ -34,16 +36,6 @@ import parser.wasm.standard.wasm1.type;
 
 export namespace parser::wasm::concepts
 {
-#if 0
-    /// @brief ROOT type
-    struct feature_root_t
-    {
-        explicit constexpr feature_root_t() noexcept = default;
-    };
-
-    inline constexpr feature_root_t feature_root{};
-#endif
-
     /// @brief Prevent inheritance effects when adl matching
     template <typename FeatureType>
     struct feature_reserve_type_t
@@ -65,6 +57,9 @@ export namespace parser::wasm::concepts
 
     template <::parser::wasm::standard::wasm1::type::wasm_u32 Version>
     inline constexpr binfmt_version_t<Version> binfmt_version{};
+
+    /// @brief      binfmt handle version func
+    using binfmt_handle_version_func_p_type = void (*)(::std::byte const*, ::std::byte const*) UWVM_THROWS;
 
     /// @brief      Determine if there is a feature name
     /// @details    Whether the type is provided with a feature name or not, this is a mandatory option.
@@ -134,7 +129,7 @@ export namespace parser::wasm::concepts
     ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
     ///             };
     ///
-    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
+    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>, ::std::byte const*, ::std::byte const*) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // OK. Provide a parsing strategy where binfmt version is 1
     ///             ```
@@ -146,13 +141,13 @@ export namespace parser::wasm::concepts
     ///             {
     ///             };
     ///
-    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
+    ///             inline void define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>, ::std::byte const*, ::std::byte const*) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // ERROR.
     ///             ```
     template <typename FeatureType>
     concept has_wasm_binfmt_parsering_strategy = requires {
-        { define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>) };
+        { define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>) } -> ::std::same_as<binfmt_handle_version_func_p_type>;
         requires has_wasm_binfmt_version<FeatureType>;
     };
 

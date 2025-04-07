@@ -51,5 +51,7 @@ jobs:
         run: xmake f -p mingw --use-llvm=y -m debug
       - name: Build
         run: xmake -v
-      - name: Test
+      - name: Test UWVM
         run: xmake run uwvm --version
+      - name: Test units
+        run: xmake test -vD
