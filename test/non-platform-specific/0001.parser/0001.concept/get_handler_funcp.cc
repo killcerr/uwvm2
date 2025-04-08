@@ -19,6 +19,10 @@
  *  \___/    \_/\_/      \_/   |_|  |_| *
  *                                      *
  ****************************************/
+ 
+#if !(__cpp_pack_indexing >= 202311L)
+# error "UWVM requires at least C++26 standard compiler."
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -44,7 +48,7 @@ inline constexpr void binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::by
 {
     // This defines the function that handles binary format 1.
     // Supported by <::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
-    [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+    []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
     { ((::fast_io::io::perrln(::utils::u8err, u8"binfmt1: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
 }
 
@@ -73,7 +77,7 @@ inline constexpr void binfmt_ver2_handle_func(::fast_io::tuple<Fs...>, ::std::by
 {
     // This defines the function that handles binary format 2.
     // Supported by <::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
-    [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+    []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
     { ((::fast_io::io::perrln(::utils::u8err, u8"binfmt2: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
 }
 
