@@ -147,7 +147,7 @@ export namespace parser::wasm::concepts
 
         namespace details
         {
-            // Provide temporary structure for get_binfmt_handler_func_p
+            /// @brief Provide temporary structure for get_binfmt_handler_func_p
             template <::parser::wasm::concepts::wasm_feature... Fs>
             struct binfmt_and_funcp_pair
             {
@@ -166,6 +166,77 @@ export namespace parser::wasm::concepts
             {
                 return a.binfmt_version <=> b.binfmt_version;
             }
+
+            /// @brief      Provide template meta to filter out different binfmt versions
+            /// @details                   
+            ///                            wasm
+            ///                     <B1F1, B1F2, B2F3, ...>
+            ///                      ______________________
+            ///                     /            |        |
+            ///                  binfmt1       binfmt2   ...
+            ///                <B1F1, B1F2>     <B2F3>   ...
+            ///
+            ///             ```cpp
+            ///             struct B1F1
+            ///             {
+            ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1};
+            ///             };
+            ///
+            ///             struct B1F2
+            ///             {
+            ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1};
+            ///             };
+            ///
+            ///             struct B2F3
+            ///             {
+            ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{2};
+            ///             };
+            ///
+            ///             using all_features = ::fast_io::tuple<B1F1, B1F2, B2F3>;
+            ///            
+            ///             using binfmt1_features = Fs_binfmt_controler_r<1, B1F1, B1F2, B2F3>; // same_as ::fast_io::tuple<B1F1, B1F2>
+            ///
+            ///             using binfmt2_features = Fs_binfmt_controler_r<2, B1F1, B1F2, B2F3>; // same_as ::fast_io::tuple<B2F3>
+            /// 
+            ///             ```
+            template <typename F1, typename F2>
+            struct tuple_type_merger;
+
+            template <typename... F1, typename... F2>
+            struct tuple_type_merger<::fast_io::tuple<F1...>, ::fast_io::tuple<F2...>>
+            {
+                using Result = ::fast_io::tuple<F1..., F2...>;
+            };
+
+            template <::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer, typename... Fs>
+            struct Fs_binfmt_controler;
+
+            template <::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer>
+            struct Fs_binfmt_controler<BinfmtVer>
+            {
+                using Result = ::fast_io::tuple<>;
+            };
+
+            template <::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer, typename F>
+            struct Fs_binfmt_controler<BinfmtVer, F>
+            {
+                inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver{get_binfmt_version<F>()};
+                using Result = ::std::conditional_t<(binfmt_ver == BinfmtVer), ::fast_io::tuple<F>, ::fast_io::tuple<>>;
+            };
+
+            template <::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer, typename F, typename... Fs>
+            struct Fs_binfmt_controler<BinfmtVer, F, Fs...>
+            {
+                inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver{get_binfmt_version<F>()};
+                using CurrentResult = ::std::conditional_t<(binfmt_ver == BinfmtVer), ::fast_io::tuple<F>, ::fast_io::tuple<>>;
+                using RestResult = Fs_binfmt_controler<BinfmtVer, Fs...>::Result;
+
+                using Result = tuple_type_merger<CurrentResult, RestResult>::Result;
+            };
+
+            template <::std::uint_least32_t Ver, typename... Fs>
+            using Fs_binfmt_controler_r = Fs_binfmt_controler<Ver, Fs...>::Result;
+
         }  // namespace details
 
         /// @brief      Get the handler function for the corresponding version of binfmt from a series of features
