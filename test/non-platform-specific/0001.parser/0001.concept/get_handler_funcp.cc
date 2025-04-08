@@ -63,6 +63,6 @@ static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<featu
 int main()
 {
     constexpr ::fast_io::tuple<feature1, feature2> features{};
-    constexpr auto funcp{::parser::wasm::concepts::operation::get_handler_func_p_from_tuple(1, features)};
+    constexpr auto funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple(1, features)};
     funcp(features, nullptr, nullptr);
 }
