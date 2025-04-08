@@ -77,6 +77,30 @@ export namespace parser::wasm::concepts
         template <::parser::wasm::concepts::wasm_feature... Fs>
         inline consteval void check_has_duplicate_binfmt_handler() noexcept
         {
+            // Check for duplicate Fs, wasm feature cannot be duplicated
+            []<::std::size_t... I1>(::std::index_sequence<I1...>) constexpr noexcept
+            {
+                ((
+                     []<::parser::wasm::concepts::wasm_feature F1>() constexpr noexcept
+                     {
+                         bool has{};
+                         [&has]<::std::size_t... I2>(::std::index_sequence<I2...>) constexpr noexcept
+                         {
+                             ((
+                                  [&has]<::parser::wasm::concepts::wasm_feature F2>() constexpr noexcept
+                                  {
+                                      if constexpr(::std::same_as<F1, F2>)
+                                      {
+                                          if(has) { ::fast_io::fast_terminate(); }
+                                          else { has = true; }
+                                      }
+                                  }.template operator()<Fs...[I2]>()),
+                              ...);
+                         }(::std::make_index_sequence<sizeof...(Fs)>{});
+                     }.template operator()<Fs...[I1]>()),
+                 ...);
+            }(::std::make_index_sequence<sizeof...(Fs)>{});
+
             // Define the binfmt needed for the feature. Duplicates not eliminated.
             ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> binfmt_vers_uneliminated{};
 
