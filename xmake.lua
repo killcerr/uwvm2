@@ -144,5 +144,7 @@ for _, file in ipairs(os.files("test/non-platform-specific/**.cc")) do
         add_files(file)
 
         add_tests("default")
+
+        set_warnings("all", "error")
 	target_end()
 end
