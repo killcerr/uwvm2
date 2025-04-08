@@ -147,27 +147,76 @@ export namespace parser::wasm::concepts
 
         namespace details
         {
+            // Provide temporary structure for get_handler_func_p
+            template <::parser::wasm::concepts::wasm_feature... Fs>
             struct binfmt_and_funcp_pair
             {
                 ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{};
-                ::parser::wasm::concepts::binfmt_handle_version_func_p_type func_p{};
+                ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...> func_p{};
             };
 
-            inline constexpr auto operator== (binfmt_and_funcp_pair a, binfmt_and_funcp_pair b) noexcept { return a.binfmt_version == b.binfmt_version; }
+            template <::parser::wasm::concepts::wasm_feature... Fs>
+            inline constexpr auto operator== (binfmt_and_funcp_pair<Fs...> a, binfmt_and_funcp_pair<Fs...> b) noexcept
+            {
+                return a.binfmt_version == b.binfmt_version;
+            }
 
-            inline constexpr auto operator<=> (binfmt_and_funcp_pair a, binfmt_and_funcp_pair b) noexcept { return a.binfmt_version <=> b.binfmt_version; }
+            template <::parser::wasm::concepts::wasm_feature... Fs>
+            inline constexpr auto operator<=> (binfmt_and_funcp_pair<Fs...> a, binfmt_and_funcp_pair<Fs...> b) noexcept
+            {
+                return a.binfmt_version <=> b.binfmt_version;
+            }
         }  // namespace details
 
         /// @brief      Get the handler function for the corresponding version of binfmt from a series of features
+        /// @details
+        ///             example:
+        ///
+        ///             ```cpp
+        ///
+        ///             struct feature1
+        ///             {
+        ///                 inline static constexpr ::fast_io::u8string_view feature_name{u8"feature1name"};
+        ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+        ///             };
+        ///
+        ///             template <::parser::wasm::concepts::wasm_feature... Fs>
+        ///             inline constexpr void binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+        ///             {
+        ///                 // This defines the function that handles binary format 1.
+        ///                 // Supported by <::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
+        ///             }
+        ///
+        ///             template <::parser::wasm::concepts::wasm_feature... Fs>
+        ///             inline constexpr ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...>
+        ///                 define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<feature1>, ::fast_io::tuple<Fs...>) noexcept
+        ///             {
+        ///                 // Since feature1 defines binfmt as 1 and also defines the handler function, this function is the parsing function for binfmt1
+        ///                 return ::std::addressof(binfmt_ver1_handle_func<Fs...>);
+        ///             }
+        ///
+        ///             struct feature2
+        ///             {
+        ///                 inline static constexpr ::fast_io::u8string_view feature_name{u8"feature2name"};
+        ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+        ///             };
+        ///
+        ///             int main()
+        ///             {
+        ///                 constexpr ::fast_io::tuple<feature1, feature2> features{};
+        ///                 constexpr auto funcp{::parser::wasm::concepts::operation::get_handler_func_p_from_tuple(1, features)};
+        ///                 funcp(features, nullptr, nullptr);
+        ///             }
+        ///             ```
         template <::parser::wasm::concepts::wasm_feature... Fs>
-        inline consteval ::parser::wasm::concepts::binfmt_handle_version_func_p_type
+        inline consteval ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...>
             get_handler_func_p(::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version) noexcept
         {
             // check
             check_has_duplicate_binfmt_handler<Fs...>();
 
             // create vector
-            ::std::vector<details::binfmt_and_funcp_pair> fmt_and_funcs{};
+            ::std::vector<details::binfmt_and_funcp_pair<Fs...>> fmt_and_funcs{};
 
             // emplace
             [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
@@ -178,8 +227,9 @@ export namespace parser::wasm::concepts
                          if constexpr(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<FeatureType>)
                          {
                              constexpr auto binfmt_ver{get_binfmt_version<FeatureType>()};
-                             constexpr auto handler{
-                                 define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<FeatureType>>)};
+                             constexpr ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...> handler{
+                                 define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<FeatureType>>,
+                                                                       ::fast_io::tuple<Fs...>{})};
                              fmt_and_funcs.emplace_back(binfmt_ver, handler);
                          }
                      }.template operator()<Fs...[I]>()),
@@ -200,7 +250,7 @@ export namespace parser::wasm::concepts
         /// @details    You can pass values directly when passing registers.
         template <::parser::wasm::concepts::wasm_feature... Fs>
             requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
-        inline consteval ::parser::wasm::concepts::binfmt_handle_version_func_p_type
+        inline consteval ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...>
             get_handler_func_p_from_tuple(::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::fast_io::tuple<Fs...>) noexcept
         {
             return get_handler_func_p<Fs...>(binfmt_version);
@@ -210,7 +260,7 @@ export namespace parser::wasm::concepts
         /// @details    You can't pass references on register passes.
         template <::parser::wasm::concepts::wasm_feature... Fs>
             requires (!::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
-        inline consteval ::parser::wasm::concepts::binfmt_handle_version_func_p_type
+        inline consteval ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...>
             get_handler_func_p_from_tuple(::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::fast_io::tuple<Fs...> const&) noexcept
         {
             return get_handler_func_p<Fs...>(binfmt_version);

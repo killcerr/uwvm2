@@ -58,9 +58,6 @@ export namespace parser::wasm::concepts
     template <::parser::wasm::standard::wasm1::type::wasm_u32 Version>
     inline constexpr binfmt_version_t<Version> binfmt_version{};
 
-    /// @brief      binfmt handle version func
-    using binfmt_handle_version_func_p_type = void (*)(::std::byte const*, ::std::byte const*) UWVM_THROWS;
-
     /// @brief      Determine if there is a feature name
     /// @details    Whether the type is provided with a feature name or not, this is a mandatory option.
     ///
@@ -85,6 +82,10 @@ export namespace parser::wasm::concepts
     template <typename FeatureType>
     concept has_feature_name =
         requires { requires ::std::same_as<::std::remove_cvref_t<decltype(::std::remove_cvref_t<FeatureType>::feature_name)>, ::fast_io::u8string_view>; };
+
+    /// @brief      binfmt handle version func
+    template <has_feature_name... Fs>
+    using binfmt_handle_version_func_p_type = void (*)(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS;
 
     /// @brief      Define the version number of the required wasm file binary format tagging
     /// @details    Changing the binfmt version requires a new binfmt version parsing policy, as the entire parsing behavior tree will be replaced with the
@@ -129,7 +130,9 @@ export namespace parser::wasm::concepts
     ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
     ///             };
     ///
-    ///             inline constexpr binfmt_handle_version_func_p_type define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
+    ///             template <wasm_feature ... Fs>
+    ///             inline constexpr binfmt_handle_version_func_p_type<Fs...> define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>,
+    ///             ::fast_io::tuple<Fs ...>) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // OK. Provide a parsing strategy where binfmt version is 1
     ///             ```
@@ -141,17 +144,21 @@ export namespace parser::wasm::concepts
     ///             {
     ///             };
     ///
-    ///             inline constexpr binfmt_handle_version_func_p_type define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>) {}
+    ///             template <wasm_feature ... Fs>
+    ///             inline constexpr binfmt_handle_version_func_p_type<Fs...> define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>,
+    ///             ::fast_io::tuple<Fs ...>) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // ERROR.
     ///             ```
     template <typename FeatureType>
     concept has_wasm_binfmt_parsering_strategy = requires {
-        { define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>) } -> ::std::same_as<binfmt_handle_version_func_p_type>;
+        {
+            define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, {/* ::fast_io::tuple<Fs ...> */})
+        } /* -> binfmt_handle_version_func_p_type<Fs...> */;
         requires has_wasm_binfmt_version<FeatureType>;
     };
 
     /// @todo Not Finished
     template <typename FeatureType>
-    concept wasm_feature = has_feature_name<FeatureType>;
+    concept wasm_feature = has_feature_name<FeatureType> && ::std::is_empty_v<FeatureType>;
 }  // namespace parser::wasm::concepts
