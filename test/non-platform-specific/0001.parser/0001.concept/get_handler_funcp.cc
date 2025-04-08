@@ -42,7 +42,7 @@ struct feature1
 template <::parser::wasm::concepts::wasm_feature... Fs>
 inline constexpr void binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
 {
-    ::fast_io::io::perr(::utils::u8err, u8"test\n");
+    ::fast_io::io::perr(::utils::u8err, u8"ver1\n");
 }
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
@@ -58,11 +58,32 @@ struct feature2
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<feature1>);
+struct feature3
+{
+    inline static constexpr ::fast_io::u8string_view feature_name{u8"3"};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{2u};
+};
+
+template <::parser::wasm::concepts::wasm_feature... Fs>
+inline constexpr void binfmt_ver2_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+{
+    ::fast_io::io::perr(::utils::u8err, u8"ver2\n");
+}
+
+template <::parser::wasm::concepts::wasm_feature... Fs>
+inline constexpr ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...>
+    define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<feature3>, ::fast_io::tuple<Fs...>) noexcept
+{
+    return ::std::addressof(binfmt_ver2_handle_func<Fs...>);
+}
 
 int main()
 {
-    constexpr ::fast_io::tuple<feature1, feature2> features{};
-    constexpr auto funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple(1, features)};
-    funcp(features, nullptr, nullptr);
+    constexpr ::fast_io::tuple<feature1, feature2, feature3> features{};
+
+    constexpr auto binfmt1_funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(features)};
+    binfmt1_funcp(::fast_io::tuple<feature1, feature2>{}, nullptr, nullptr);
+
+    constexpr auto binfmt2_funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<2>(features)};
+    binfmt2_funcp(::fast_io::tuple<feature3>{}, nullptr, nullptr);
 }
