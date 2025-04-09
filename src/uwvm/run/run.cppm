@@ -86,6 +86,7 @@ export namespace uwvm::run
                 binfmt_ver1_handler(binfmt_ver1_tuple_type{},
                                     reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                     reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
+                break;
             }
             default:
             {
