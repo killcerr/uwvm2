@@ -252,7 +252,8 @@ export namespace parser::wasm::concepts
             template <::std::uint_least32_t BinfmtVer, typename... Fs>
             using Fs_binfmt_controler_r = Fs_binfmt_controler<BinfmtVer, Fs...>::Result;
 
-            /// @brief function pointer return type getter
+            /// @brief      function pointer return type getter
+            /// @details    Getting the return type from a function pointer
             template <typename T>
             struct function_pointer_return_type_getter;
 
@@ -274,9 +275,18 @@ export namespace parser::wasm::concepts
 
             if constexpr(can_func_get_module_storage_type)
             {
-                return define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<F>>, all_feature_tuple);
+                // Get the type of function pointer returned from define_wasm_binfmt_parsering_strategy
+                using funcp_t = decltype(define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<F>>,
+                                                                               all_feature_tuple));
+                // Getting the return type from a function pointer
+                // This function only needs to return once, since a binfmt has only one processing option
+                return details::function_pointer_return_type_getter_t<funcp_t>{};
             }
-            else { return get_module_storage_type_from_singal_tuple<Fs1...>(all_feature_tuple); }
+            else 
+            { 
+                // Proceed to the next search
+                return get_module_storage_type_from_singal_tuple<Fs1...>(all_feature_tuple); 
+            }
         }
 
         template <::parser::wasm::concepts::wasm_feature... Fs>
@@ -303,8 +313,7 @@ export namespace parser::wasm::concepts
 
             // get required features for corresponding binfmt
             using current_binfmt_version_feature_tuple = details::Fs_binfmt_controler_r<BinfmtVer, Fs...>;
-            using current_binfmt_version_feature_module_storage_t =
-                details::function_pointer_return_type_getter_t<decltype(get_module_storage_type_from_tuple(current_binfmt_version_feature_tuple{}))>;
+            using current_binfmt_version_feature_module_storage_t = decltype(get_module_storage_type_from_tuple(current_binfmt_version_feature_tuple{}));
             using current_binfmt_handle_version_func_p =
                 decltype(details::get_binfmt_handle_version_func_p_type_from_tuple<current_binfmt_version_feature_module_storage_t>(
                     current_binfmt_version_feature_tuple{}));
@@ -319,9 +328,10 @@ export namespace parser::wasm::concepts
                      [&handle_func_p]<::parser::wasm::concepts::wasm_feature FeatureType>() constexpr noexcept
                      {
                          constexpr auto binfmt_ver{get_binfmt_version<FeatureType>()};
-
+                         // Determine if a requirement version is met
                          if constexpr(binfmt_ver == BinfmtVer)
                          {
+                             // Is the type defined to correspond to the binfmt handler?
                              if constexpr(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<FeatureType>)
                              {
                                  if(handle_func_p == nullptr)
@@ -368,7 +378,7 @@ export namespace parser::wasm::concepts
         /// @brief      Get binfmt version tuple type
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
-        inline consteval auto get_binfmt_handler_tuple_t() noexcept
+        inline consteval auto get_specified_binfmt_feature_tuple_from_all_freatures() noexcept
         {
             using current_binfmt_version_feature_tuple = details::Fs_binfmt_controler_r<binfmt_version, Fs...>;
             return current_binfmt_version_feature_tuple{};
@@ -378,18 +388,18 @@ export namespace parser::wasm::concepts
         /// @details    You can pass values directly when passing registers.
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
-        inline consteval auto get_binfmt_handler_tuple_t_from_tuple(::fast_io::tuple<Fs...>) noexcept
+        inline consteval auto get_specified_binfmt_feature_tuple_from_all_freatures_tuple(::fast_io::tuple<Fs...>) noexcept
         {
-            return get_binfmt_handler_tuple_t<binfmt_version, Fs...>();
+            return get_specified_binfmt_feature_tuple_from_all_freatures<binfmt_version, Fs...>();
         }
 
         /// @brief      Get binfmt version tuple type from tuple
         /// @details    You can't pass references on register passes.
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (!::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
-        inline consteval auto get_binfmt_handler_tuple_t_from_tuple(::fast_io::tuple<Fs...> const&) noexcept
+        inline consteval auto get_specified_binfmt_feature_tuple_from_all_freatures_tuple(::fast_io::tuple<Fs...> const&) noexcept
         {
-            return get_binfmt_handler_tuple_t<binfmt_version, Fs...>();
+            return get_specified_binfmt_feature_tuple_from_all_freatures<binfmt_version, Fs...>();
         }
     }  // namespace operation
 }  // namespace parser::wasm::concepts
