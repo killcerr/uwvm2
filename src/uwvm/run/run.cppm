@@ -79,6 +79,7 @@ export namespace uwvm::run
         {
             case 1:
             {
+                // parse wasm 1
                 constexpr auto binfmt_ver1_handler{
                     ::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(::uwvm::wasm::feature::features)};
                 using binfmt_ver1_tuple_type =
@@ -86,6 +87,10 @@ export namespace uwvm::run
                 binfmt_ver1_handler(binfmt_ver1_tuple_type{},
                                     reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                     reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
+
+                // run vm
+
+                // return 0
                 break;
             }
             default:
