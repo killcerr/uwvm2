@@ -332,5 +332,33 @@ export namespace parser::wasm::concepts
         {
             return get_binfmt_handler_func_p<binfmt_version, Fs...>();
         }
+
+        /// @brief      Checking for duplicate binfmt version tuple type from tuple
+        /// @details    You can pass values directly when passing registers.
+        template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
+            requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
+        inline consteval auto get_binfmt_handler_tuple_t() noexcept
+        {
+            using current_binfmt_version_feature_tuple = details::Fs_binfmt_controler_r<binfmt_version, Fs...>;
+            return current_binfmt_version_feature_tuple{};
+        }
+
+        /// @brief      Checking for duplicate binfmt version tuple type from tuple
+        /// @details    You can pass values directly when passing registers.
+        template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
+            requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
+        inline consteval auto get_binfmt_handler_tuple_t_from_tuple(::fast_io::tuple<Fs...>) noexcept
+        {
+            return get_binfmt_handler_tuple_t<binfmt_version, Fs...>();
+        }
+
+        /// @brief      Checking for duplicate binfmt version tuple type from tuple
+        /// @details    You can't pass references on register passes.
+        template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
+            requires (!::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
+        inline consteval auto get_binfmt_handler_tuple_t_from_tuple(::fast_io::tuple<Fs...> const&) noexcept
+        {
+            return get_binfmt_handler_tuple_t<binfmt_version, Fs...>();
+        }
     }  // namespace operation
 }  // namespace parser::wasm::concepts

@@ -5,8 +5,6 @@
  ********************************************************/
 
 /**
- * @brief       WebAssembly Release 1.0 (2019-07-20)
- * @details     antecedent dependency: null
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-04-09
@@ -24,26 +22,16 @@
 
 module;
 
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-
-#include <utils/macro/push_macros.h>
-
-export module parser.wasm.standard.wasm1.binfmt:binfmt1;
+export module uwvm.wasm.feature;
 
 import fast_io;
-import utils.io;
 import parser.wasm.concepts;
+import parser.wasm.standard;
 
-export namespace parser::wasm::standard::wasm1::binfmt
+export namespace uwvm::wasm::feature
 {
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
-    {
-        /// @todo TODO
-        ::fast_io::io::perr(::utils::u8err, ::fast_io::mnp::cur_src_loc(), u8": TODO!!!\n");
-    }
-}  // namespace parser::wasm::standard::wasm1::binfmt
+    inline constexpr ::fast_io::tuple features{
+        ::parser::wasm::standard::wasm1::features::wasm1{}
+        // Add here
+    };
+}
