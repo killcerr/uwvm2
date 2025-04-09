@@ -109,12 +109,18 @@ int main()
     constexpr ::fast_io::tuple<B1F1, B1F2, B2F3> features{};
 
     constexpr auto binfmt1_funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(features)};
-    // Passed tuple structures can only be passed structures with a binfmt of 1
-    [[maybe_unused]] auto storage1 = binfmt1_funcp(::fast_io::tuple<B1F1, B1F2>{}, nullptr, nullptr);
+    using wasm_binfmt1_features_t = decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(features));
+    static_assert(::std::same_as<wasm_binfmt1_features_t, ::fast_io::tuple<B1F1, B1F2>>, "wasm_binfmt1_features_t includes only features with a binfmt of 1");
+    using wasm_binfmt1_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features_t{}));
+    static_assert(::std::same_as<wasm_binfmt1_storage_t, binfmt_ver1_module_storage_t>, "wasm_binfmt1_storage_t is the type returned by binfmt_ver1_handle_func<B1F1, B1F2>");
+    [[maybe_unused]] wasm_binfmt1_storage_t storage1 = binfmt1_funcp(wasm_binfmt1_features_t{}, nullptr, nullptr);
 
     constexpr auto binfmt2_funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<2>(features)};
-    // Passed tuple structures can only be passed structures with a binfmt of 2
-    [[maybe_unused]] auto storage2 = binfmt2_funcp(::fast_io::tuple<B2F3>{}, nullptr, nullptr);
+    using wasm_binfmt2_features_t = decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<2>(features));
+    static_assert(::std::same_as<wasm_binfmt2_features_t, ::fast_io::tuple<B2F3>>, "wasm_binfmt2_features_t includes only features with a binfmt of 2");
+    using wasm_binfmt2_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt2_features_t{}));
+    static_assert(::std::same_as<wasm_binfmt2_storage_t, binfmt_ver2_module_storage_t<B2F3>>, "wasm_binfmt2_storage_t is the type of binfmt_ver2_handle_func<B2F3> return");
+    [[maybe_unused]] wasm_binfmt2_storage_t storage2 = binfmt2_funcp(wasm_binfmt2_features_t{}, nullptr, nullptr);
 }
 
 /*
