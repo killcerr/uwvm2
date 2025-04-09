@@ -40,7 +40,6 @@ import uwvm.wasm.storage;
 import parser.wasm.standard.wasm1.type;
 import parser.wasm.concepts;
 
-
 namespace uwvm::cmdline::paras::details
 {
     UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type test_callback([[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_begin,

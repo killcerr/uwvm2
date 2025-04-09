@@ -157,10 +157,9 @@ export namespace parser::wasm::concepts
         {
             define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, {/* ::fast_io::tuple<Fs ...> */})
         } /* -> binfmt_handle_version_func_p_type<Fs...> */;
-        requires has_wasm_binfmt_version<FeatureType>;
     };
 
     /// @todo Not Finished
     template <typename FeatureType>
-    concept wasm_feature = has_feature_name<FeatureType> && ::std::is_empty_v<FeatureType>;
+    concept wasm_feature = has_feature_name<FeatureType> && has_wasm_binfmt_version<FeatureType> && ::std::is_empty_v<FeatureType>;
 }  // namespace parser::wasm::concepts

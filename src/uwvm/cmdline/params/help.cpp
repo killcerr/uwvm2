@@ -116,13 +116,15 @@ namespace uwvm::cmdline::paras::details
         }
         else if(currp1_str == u8"global")
         {
-            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" UWVM_AES_U8_LT_CYAN u8"  <global>" UWVM_AES_U8_WHITE u8":\n");
+            ::fast_io::io::perr(::utils::u8err,
+                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" UWVM_AES_U8_LT_CYAN u8"  <global>" UWVM_AES_U8_WHITE u8":\n");
             help_output_singal_cate(::utils::cmdline::categorization::global);
             ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
         }
         else if(currp1_str == u8"wasm")
         {
-            ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" UWVM_AES_U8_LT_CYAN u8"  <wasm>" UWVM_AES_U8_WHITE u8":\n");
+            ::fast_io::io::perr(::utils::u8err,
+                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"Arguments:\n" UWVM_AES_U8_LT_CYAN u8"  <wasm>" UWVM_AES_U8_WHITE u8":\n");
             help_output_singal_cate(::utils::cmdline::categorization::wasm);
             ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
         }

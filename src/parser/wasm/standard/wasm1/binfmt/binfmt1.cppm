@@ -24,10 +24,26 @@
 
 module;
 
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+
+#include <utils/macro/push_macros.h>
+
 export module parser.wasm.standard.wasm1.binfmt:binfmt1;
+
+import fast_io;
+import utils.io;
+import parser.wasm.concepts;
 
 export namespace parser::wasm::standard::wasm1::binfmt
 {
 
-    
-}
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+    {
+        /// @todo TODO
+    }
+}  // namespace parser::wasm::standard::wasm1::binfmt

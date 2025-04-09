@@ -105,7 +105,7 @@ export namespace parser::wasm::concepts
             ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> binfmt_vers_uneliminated{};
 
             // Get all required binfmt versions from the variant templates
-            [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            [&binfmt_vers_uneliminated]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             { ((binfmt_vers_uneliminated.push_back(get_binfmt_version<Fs...[I]>())), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
 
             // Sorting for easy follow-up
@@ -124,10 +124,10 @@ export namespace parser::wasm::concepts
             ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> binfmt_handlers{};
 
             // Cannot define a parsing policy that differs from your wasm version.
-            [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            [&binfmt_handlers]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             {
                 ((
-                     [&]<::parser::wasm::concepts::wasm_feature FeatureType>() constexpr noexcept
+                     [&binfmt_handlers]<::parser::wasm::concepts::wasm_feature FeatureType>() constexpr noexcept
                      {
                          if constexpr(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<FeatureType>)
                          {
@@ -288,10 +288,10 @@ export namespace parser::wasm::concepts
             ::std::vector<current_binfmt_version_feature_binfmt_and_funcp_pair> fmt_and_funcs{};
 
             // emplace
-            [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            [&fmt_and_funcs]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             {
                 ((
-                     [&]<::parser::wasm::concepts::wasm_feature FeatureType>() constexpr noexcept
+                     [&fmt_and_funcs]<::parser::wasm::concepts::wasm_feature FeatureType>() constexpr noexcept
                      {
                          if constexpr(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<FeatureType>)
                          {

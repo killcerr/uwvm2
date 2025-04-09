@@ -175,8 +175,8 @@ export namespace fast_io::freestanding
     struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_global_type>
     {
         inline static constexpr bool value = true;
-    };    
-    
+    };
+
     template <>
     struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::export_type>
     {
