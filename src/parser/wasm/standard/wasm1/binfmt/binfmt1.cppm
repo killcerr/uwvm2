@@ -41,9 +41,16 @@ import parser.wasm.concepts;
 export namespace parser::wasm::standard::wasm1::binfmt
 {
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+    struct wasm_binfmt_ver1_storage_t
+    {
+    };
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr wasm_binfmt_ver1_storage_t<Fs...> wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
     {
         /// @todo TODO
         ::fast_io::io::perr(::utils::u8err, ::fast_io::mnp::cur_src_loc(), u8": TODO!!!\n");
+
+        return {};
     }
 }  // namespace parser::wasm::standard::wasm1::binfmt

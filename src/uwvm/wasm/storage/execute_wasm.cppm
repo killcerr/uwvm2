@@ -28,7 +28,9 @@ export module uwvm.wasm.storage:execute_wasm;
 
 import fast_io;
 import parser.wasm.base;
+import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
+import uwvm.wasm.feature;
 
 export namespace uwvm::wasm::storage
 {
@@ -36,5 +38,10 @@ export namespace uwvm::wasm::storage
     inline ::parser::wasm::base::mode execute_wasm_mode{::parser::wasm::base::mode::objdump};
     inline ::parser::wasm::base::abi execute_wasm_abi{::parser::wasm::base::abi::detect};
     inline ::parser::wasm::standard::wasm1::type::wasm_u32 execute_wasm_binfmt_ver{1u};
-    // TODO: execute_wasm_module // The result of parsing the exewasm is used to add the import module directly.
+
+    // WASM Module Binfmt 1
+    using wasm_binfmt1_features_t = decltype(::parser::wasm::concepts::operation::get_binfmt_handler_tuple_t_from_tuple<1>(::uwvm::wasm::feature::features));
+    inline constexpr wasm_binfmt1_features_t wasm_binfmt1_features{};
+    using wasm_binfmt1_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features));
+    inline wasm_binfmt1_storage_t execute_wasm_binfmt_ver1_storage{};
 }  // namespace uwvm::wasm::storage

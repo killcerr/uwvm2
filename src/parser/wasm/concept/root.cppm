@@ -85,8 +85,8 @@ export namespace parser::wasm::concepts
         requires { requires ::std::same_as<::std::remove_cvref_t<decltype(::std::remove_cvref_t<FeatureType>::feature_name)>, ::fast_io::u8string_view>; };
 
     /// @brief      binfmt handle version func
-    template <has_feature_name... Fs>
-    using binfmt_handle_version_func_p_type = void (*)(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS;
+    template <typename module_stroate_t, has_feature_name... Fs>
+    using binfmt_handle_version_func_p_type = module_stroate_t (*)(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS;
 
     /// @brief      Define the version number of the required wasm file binary format tagging
     /// @see        test\non-platform-specific\0001.parser\0001.concept\binfmt.cc
@@ -157,6 +157,13 @@ export namespace parser::wasm::concepts
         {
             define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, {/* ::fast_io::tuple<Fs ...> */})
         } /* -> binfmt_handle_version_func_p_type<Fs...> */;
+    };
+
+    /// @brief      Checks if a "module_storage_type" type is defined
+    /// @details    Must also satisfy has_wasm_binfmt_parsering_strategy
+    template <typename FeatureType>
+    concept has_func_get_module_storage_type = requires {
+        { define_wasm_binfmt_storage_type(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, {/* ::fast_io::tuple<Fs ...> */}) };
     };
 
     /// @todo Not Finished

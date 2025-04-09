@@ -55,12 +55,19 @@ export namespace parser::wasm::standard::wasm1::features
     static_assert(::parser::wasm::concepts::wasm_feature<wasm1>, "struct wasm1 not match wasm feature");
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr ::parser::wasm::concepts::binfmt_handle_version_func_p_type<Fs...>
-        define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<wasm1>, ::fast_io::tuple<Fs...>) noexcept
+    inline constexpr auto define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<wasm1>, ::fast_io::tuple<Fs...>) noexcept
     {
         return ::std::addressof(::parser::wasm::standard::wasm1::binfmt::wasm_binfmt_ver1_handle_func<Fs...>);
     }
 
     static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<wasm1>, "struct wasm1 did not has define_wasm_binfmt_parsering_strategy");
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr auto define_wasm_binfmt_storage_type(::parser::wasm::concepts::feature_reserve_type_t<wasm1>, ::fast_io::tuple<Fs...>) noexcept
+    {
+        return ::parser::wasm::standard::wasm1::binfmt::wasm_binfmt_ver1_storage_t<Fs...>{};
+    }
+
+    static_assert(::parser::wasm::concepts::has_func_get_module_storage_type<wasm1>, "struct wasm1 did not has define_wasm_binfmt_storage_type");
 
 }  // namespace parser::wasm::standard::wasm1::features
