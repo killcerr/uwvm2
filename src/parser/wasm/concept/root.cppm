@@ -159,13 +159,6 @@ export namespace parser::wasm::concepts
         } /* -> binfmt_handle_version_func_p_type<Fs...> */;
     };
 
-    /// @brief      Checks if a "module_storage_type" type is defined
-    /// @details    Must also satisfy has_wasm_binfmt_parsering_strategy
-    template <typename FeatureType>
-    concept has_func_get_module_storage_type = requires {
-        { define_wasm_binfmt_storage_type(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, {/* ::fast_io::tuple<Fs ...> */}) };
-    };
-
     /// @todo Not Finished
     template <typename FeatureType>
     concept wasm_feature = has_feature_name<FeatureType> && has_wasm_binfmt_version<FeatureType> && ::std::is_empty_v<FeatureType>;

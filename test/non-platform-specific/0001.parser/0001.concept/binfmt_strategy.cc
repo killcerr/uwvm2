@@ -45,6 +45,7 @@ struct binfmt_ver1_module_storage_t
 template <::parser::wasm::concepts::wasm_feature... Fs>
 inline constexpr binfmt_ver1_module_storage_t handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
 {
+    return {};
 }
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
@@ -52,13 +53,6 @@ inline constexpr auto
     define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<feature1>, ::fast_io::tuple<Fs...>) noexcept
 {
     return ::std::addressof(handle_func<Fs...>);
-}
-
-template <::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr binfmt_ver1_module_storage_t define_wasm_binfmt_storage_type(::parser::wasm::concepts::feature_reserve_type_t<feature1>,
-                                                                              ::fast_io::tuple<Fs...>) noexcept
-{
-    return binfmt_ver1_module_storage_t{};
 }
 
 struct feature2

@@ -82,7 +82,7 @@ export namespace uwvm::run
                 // parse wasm 1
                 constexpr auto binfmt_ver1_handler{
                     ::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(::uwvm::wasm::feature::features)};
-                
+
                 ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage =
                     binfmt_ver1_handler(::uwvm::wasm::storage::wasm_binfmt1_features_t{},
                                         reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
