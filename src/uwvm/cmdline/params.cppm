@@ -39,6 +39,7 @@ export namespace uwvm::cmdline
             ::std::addressof(::uwvm::cmdline::paras::help),
             ::std::addressof(::uwvm::cmdline::paras::mode),
             ::std::addressof(::uwvm::cmdline::paras::wasm_abi),
+            ::std::addressof(::uwvm::cmdline::paras::wasm_binfmt),
 
 #ifdef _DEBUG
             ::std::addressof(::uwvm::cmdline::paras::test),

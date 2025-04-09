@@ -1,13 +1,15 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
 /**
+ * @brief       WebAssembly Release 1.0 (2019-07-20)
+ * @details     antecedent dependency: null
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-04-09
  * @copyright   APL-2 License
  */
 
@@ -22,14 +24,5 @@
 
 module;
 
-export module uwvm.cmdline.params;
-export import :version;
-export import :run;
-export import :help;
-export import :mode;
-export import :wasm_abi;
-export import :wasm_binfmt;
-
-#ifdef _DEBUG
-export import :test;
-#endif
+export module parser.wasm.standard.wasm1.binfmt;
+export import :binfmt1;
