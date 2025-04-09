@@ -29,6 +29,7 @@ module;
 #include <concepts>
 #include <type_traits>
 #include <utility>
+#include <memory>
 
 #include <utils/macro/push_macros.h>
 

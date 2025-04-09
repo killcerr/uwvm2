@@ -315,7 +315,7 @@ export namespace parser::wasm::concepts
             ::fast_io::fast_terminate();
         }
 
-        /// @brief      Checking for duplicate binfmt version handler functions from tuple
+        /// @brief      Get binfmt version handler functions from tuple
         /// @details    You can pass values directly when passing registers.
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
@@ -324,7 +324,7 @@ export namespace parser::wasm::concepts
             return get_binfmt_handler_func_p<binfmt_version, Fs...>();
         }
 
-        /// @brief      Checking for duplicate binfmt version handler functions from tuple
+        /// @brief      Get binfmt version handler functions from tuple
         /// @details    You can't pass references on register passes.
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (!::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
@@ -333,8 +333,7 @@ export namespace parser::wasm::concepts
             return get_binfmt_handler_func_p<binfmt_version, Fs...>();
         }
 
-        /// @brief      Checking for duplicate binfmt version tuple type from tuple
-        /// @details    You can pass values directly when passing registers.
+        /// @brief      Get binfmt version tuple type
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
         inline consteval auto get_binfmt_handler_tuple_t() noexcept
@@ -343,7 +342,7 @@ export namespace parser::wasm::concepts
             return current_binfmt_version_feature_tuple{};
         }
 
-        /// @brief      Checking for duplicate binfmt version tuple type from tuple
+        /// @brief      Get binfmt version tuple type from tuple
         /// @details    You can pass values directly when passing registers.
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
@@ -352,7 +351,7 @@ export namespace parser::wasm::concepts
             return get_binfmt_handler_tuple_t<binfmt_version, Fs...>();
         }
 
-        /// @brief      Checking for duplicate binfmt version tuple type from tuple
+        /// @brief      Get binfmt version tuple type from tuple
         /// @details    You can't pass references on register passes.
         template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
             requires (!::parser::wasm::concepts::details::abi_transferable_value<::fast_io::tuple<Fs...>>)
