@@ -266,21 +266,21 @@ export namespace parser::wasm::concepts
                 using Result = tuple_type_merger<CurrentResult, RestResult>::Result;
             };
 
-            template <::std::uint_least32_t Ver, typename... Fs>
-            using Fs_binfmt_controler_r = Fs_binfmt_controler<Ver, Fs...>::Result;
+            template <::std::uint_least32_t BinfmtVer, typename... Fs>
+            using Fs_binfmt_controler_r = Fs_binfmt_controler<BinfmtVer, Fs...>::Result;
 
         }  // namespace details
 
         /// @brief      Get the handler function for the corresponding version of binfmt from a series of features
         /// @see        test\non-platform-specific\0001.parser\0001.concept\get_handler_funcp.cc
-        template <::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::parser::wasm::concepts::wasm_feature... Fs>
+        template <::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer, ::parser::wasm::concepts::wasm_feature... Fs>
         inline consteval auto get_binfmt_handler_func_p() noexcept
         {
             // check
             check_has_duplicate_binfmt_handler<Fs...>();
 
             // get required features for corresponding binfmt
-            using current_binfmt_version_feature_tuple = details::Fs_binfmt_controler_r<binfmt_version, Fs...>;
+            using current_binfmt_version_feature_tuple = details::Fs_binfmt_controler_r<BinfmtVer, Fs...>;
             using current_binfmt_version_feature_binfmt_and_funcp_pair =
                 decltype(details::get_binfmt_and_funcp_pair_type_from_tuple(current_binfmt_version_feature_tuple{}));
 
@@ -308,7 +308,7 @@ export namespace parser::wasm::concepts
             // try to find
             for(auto [bfv, fp]: fmt_and_funcs)
             {
-                if(binfmt_version == bfv) { return fp; }
+                if(bfv == BinfmtVer) { return fp; }
             }
 
             // not found
