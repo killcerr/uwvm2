@@ -37,6 +37,6 @@ export namespace utils::install_path
 {
     /// @brief Path to the program binary itself
     /// @details Only support to get by system parameter, not support to get by argv0, argv0 may be wrong
-    inline ::fast_io::install_path install_path{get_module_install_path_noexcept()};  // No sequential side effects
+    inline ::fast_io::install_path install_path{get_module_install_path_noexcept()};  // No global variable dependencies from other translation units
 }  // namespace utils::install_path
 #endif

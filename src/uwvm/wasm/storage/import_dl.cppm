@@ -34,7 +34,7 @@ import fast_io;
 
 export namespace uwvm::wasm::storage
 {
-    inline ::fast_io::vector<::fast_io::native_dll_file> import_dl_file{};  // No sequential side effects
+    inline ::fast_io::vector<::fast_io::native_dll_file> import_dl_file{};  // No global variable dependencies from other translation units
 
     // TODO: import_dl_func // The result of parsing the dl is used to add the import module directly.
 }  // namespace uwvm::wasm::storage

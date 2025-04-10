@@ -34,15 +34,15 @@ import uwvm.wasm.feature;
 
 export namespace uwvm::wasm::storage
 {
-    inline ::fast_io::native_file_loader execute_wasm_file{};                                  // No sequential side effects
-    inline ::parser::wasm::base::mode execute_wasm_mode{::parser::wasm::base::mode::objdump};  // No sequential side effects
-    inline ::parser::wasm::base::abi execute_wasm_abi{::parser::wasm::base::abi::detect};      // No sequential side effects
-    inline ::parser::wasm::standard::wasm1::type::wasm_u32 execute_wasm_binfmt_ver{1u};        // No sequential side effects
+    inline ::fast_io::native_file_loader execute_wasm_file{};                                  // No global variable dependencies from other translation units
+    inline ::parser::wasm::base::mode execute_wasm_mode{::parser::wasm::base::mode::objdump};  // No global variable dependencies from other translation units
+    inline ::parser::wasm::base::abi execute_wasm_abi{::parser::wasm::base::abi::detect};      // No global variable dependencies from other translation units
+    inline ::parser::wasm::standard::wasm1::type::wasm_u32 execute_wasm_binfmt_ver{1u};        // No global variable dependencies from other translation units
 
     // WASM Module Binfmt 1
     using wasm_binfmt1_features_t =
         decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(::uwvm::wasm::feature::features));
     inline constexpr wasm_binfmt1_features_t wasm_binfmt1_features{};
     using wasm_binfmt1_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features));
-    inline wasm_binfmt1_storage_t execute_wasm_binfmt_ver1_storage{};  // No sequential side effects
+    inline wasm_binfmt1_storage_t execute_wasm_binfmt_ver1_storage{};  // No global variable dependencies from other translation units
 }  // namespace uwvm::wasm::storage
