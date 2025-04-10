@@ -282,10 +282,10 @@ export namespace parser::wasm::concepts
                 // This function only needs to return once, since a binfmt has only one processing option
                 return details::function_pointer_return_type_getter_t<funcp_t>{};
             }
-            else 
-            { 
+            else
+            {
                 // Proceed to the next search
-                return get_module_storage_type_from_singal_tuple<Fs1...>(all_feature_tuple); 
+                return get_module_storage_type_from_singal_tuple<Fs1...>(all_feature_tuple);
             }
         }
 

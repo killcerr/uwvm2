@@ -40,7 +40,8 @@ export namespace uwvm::wasm::storage
     inline ::parser::wasm::standard::wasm1::type::wasm_u32 execute_wasm_binfmt_ver{1u};
 
     // WASM Module Binfmt 1
-    using wasm_binfmt1_features_t = decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(::uwvm::wasm::feature::features));
+    using wasm_binfmt1_features_t =
+        decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(::uwvm::wasm::feature::features));
     inline constexpr wasm_binfmt1_features_t wasm_binfmt1_features{};
     using wasm_binfmt1_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features));
     inline wasm_binfmt1_storage_t execute_wasm_binfmt_ver1_storage{};
