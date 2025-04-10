@@ -3,7 +3,7 @@ macosx, iphoneos, watchos, tvos
 
 ## Use GCC
 1. Install [[xmake]](https://github.com/xmake-io/xmake/)
-2. Install [[GCC]](https://sourceforge.net/projects/mingw-w64/)
+2. Install [[GCC]](git://gcc.gnu.org/git/gcc.git)
 3. Build
 ```ps
 > xmake f -m [debug|release|releasedbg|minsizerel]
