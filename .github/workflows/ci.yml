@@ -24,10 +24,8 @@ jobs:
           sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
           sudo apt-get install -t llvm-toolchain-noble-20 clang-20 clang-tools-20
           sudo apt-get install xmake
-      - name: Workaround for clang-scan-deps
-        run: sudo ln -s /usr/lib/llvm-20/bin/clang-scan-deps /usr/bin/clang-scan-deps
       - name: Configure
-        run: xmake f --use-llvm=y -m debug
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-20
       - name: Build
         run: xmake b -v
       - name: Test UWVM
