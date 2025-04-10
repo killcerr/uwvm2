@@ -1,17 +1,17 @@
 import("core.cache.detectcache")
 ---@alias map_t table<string, string>
 
----判断工具链是否是clang
----@return boolean --是否是clang工具链
+---Determine if a toolchain is clang
+---@return boolean --Is the clang toolchain
 function is_clang()
     return string.find(get_config("toolchain") or "", "clang", 1, true) ~= nil
 end
 
----本模块使用的缓存键
+---Cache keys used in this module
 local cache_key = "toolchain.utility"
 
----获取缓存信息
----@return table<string, any> --缓存信息表
+---Getting Cache Information
+---@return table<string, any> --Cache Information Table
 function get_cache()
     local cache_info = detectcache:get(cache_key)
     if not cache_info then
@@ -21,8 +21,8 @@ function get_cache()
     return cache_info
 end
 
----更新缓存信息
----@param cache_info table --要保存的缓存信息
+---Updating Cache Information
+---@param cache_info table --Cache information to be saved
 ---@return nil
 function update_cache(cache_info)
     detectcache:set(cache_key, cache_info)
