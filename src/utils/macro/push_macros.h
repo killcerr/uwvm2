@@ -305,6 +305,8 @@
 #endif
 
 /// @brief        Indicates that the function will throw a Herbception exception.
+/// @details      C++ exceptions are the worst historical feature of c++, this program uses only one exception
+///               type which is fast_io::error, and fully replaces herbception after it enters the proposal.
 /// @see          https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0709r4.pdf
 #pragma push_macro("UWVM_THROWS")
 #undef UWVM_THROWS

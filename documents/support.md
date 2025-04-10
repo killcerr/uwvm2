@@ -34,7 +34,7 @@
 - Full ISO C++26
 
 # Compiler Support
-- LLVM Clang >= 20 (recommended)
+- LLVM Clang >= 21 (recommended)
 - (The GCC module does not support non-exported functions adl matching, not supported at this time)
 - (MSVC has bugs in module handling, not supported at this time)
 

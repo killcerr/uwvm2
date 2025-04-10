@@ -22,6 +22,10 @@
 
 module;
 
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+
 #include <utils/ansies/ansi_push_macro.h>
 
 export module uwvm.run:run;
@@ -30,6 +34,9 @@ import fast_io;
 import utils.io;
 import uwvm.cmdline;
 import uwvm.wasm.storage;
+import uwvm.wasm.feature;
+import parser.wasm.concepts;
+import parser.wasm.standard;
 
 export namespace uwvm::run
 {
@@ -67,6 +74,31 @@ export namespace uwvm::run
             return -1;
         }
 #endif
+
+        switch(::uwvm::wasm::storage::execute_wasm_binfmt_ver)
+        {
+            case 1:
+            {
+                // parse wasm 1
+                constexpr auto binfmt_ver1_handler{
+                    ::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(::uwvm::wasm::feature::features)};
+
+                ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage =
+                    binfmt_ver1_handler(::uwvm::wasm::storage::wasm_binfmt1_features_t{},
+                                        reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
+                                        reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
+
+                /// @todo run vm
+
+                // return 0
+                break;
+            }
+            default:
+            {
+                // uwvm never match this control block
+                ::fast_io::unreachable();
+            }
+        }
 
         return 0;
     }

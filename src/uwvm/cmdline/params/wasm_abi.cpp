@@ -34,7 +34,7 @@ import uwvm.wasm.storage;
 
 namespace uwvm::cmdline::paras::details
 {
-    UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type wasm_abi_callback(::utils::cmdline::parameter_parsing_results* para_begin,
+    UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type wasm_abi_callback([[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_begin,
                                                                                    ::utils::cmdline::parameter_parsing_results* para_curr,
                                                                                    ::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {

@@ -26,3 +26,8 @@ Most wasm standards are supported. See [feature.md](documents/features.md)
 Supports over 100 triplet platforms, including DOS series, POSIX series, Windows 9x series, Windows NT series, and the Host C Library Series. Supports interpretation execution (INT), just-in-time compilation (JIT), and tiered compilation (TC). See [support.md](documents/support.md) for details.
 
 ## How to build
+* Windows (aka. unknown-windows-msvc). See [windows.md](documents/how-to-build/windows.md)
+* MinGW (aka. unknown-windows-gnu, unknown-w64-mingw32). See [mingw.md](documents/how-to-build/mingw.md)
+* linux (aka. unknown-linux-unknown). See [linux.md](documents/how-to-build/linux.md)
+* Darwin (aka. unknown-apple-darwin). See [darwin.md](documents/how-to-build/darwin.md)
+* FreeBSD (aka. unknown-freebsd(Version)). See [freebsd.md](documents/how-to-build/freebsd.md)

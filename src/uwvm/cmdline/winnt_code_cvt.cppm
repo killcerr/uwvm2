@@ -49,11 +49,6 @@ export module uwvm.cmdline:winnt_code_cvt;
 import fast_io;
 import utils.io;
 
-/// @brief      For msvc, set the initialization order of this global value to user
-#if !__has_cpp_attribute(__gnu__::__init_priority__)
-# pragma init_seg(user)
-#endif
-
 export namespace uwvm::cmdline
 {
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
@@ -138,12 +133,6 @@ export namespace uwvm::cmdline
         return res;
     }
 
-    /// @brief      Global variable storage argc, argv with string
-    /// @details    [priority] after set ansi
-# if __has_cpp_attribute(__gnu__::__init_priority__)
-    [[__gnu__::__init_priority__(500)]]
-# endif
-    inline nt_code_cvt_argv_storage const u8_cmdline{nt_code_cvt_argv()};
 #endif
 }  // namespace uwvm::cmdline
 

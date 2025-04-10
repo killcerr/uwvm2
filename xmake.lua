@@ -32,7 +32,7 @@ function def_build()
     set_languages("c23", "cxx26")
 
 	set_encodings("utf-8")
-	set_warnings("all")
+	set_warnings("all", "extra", "error")
 
 	set_policy("build.c++.modules", true)
 	set_policy("build.c++.modules.std", true)
@@ -144,5 +144,7 @@ for _, file in ipairs(os.files("test/non-platform-specific/**.cc")) do
         add_files(file)
 
         add_tests("default")
+
+		set_warnings("all", "extra", "error")
 	target_end()
 end
