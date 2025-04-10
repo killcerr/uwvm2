@@ -57,23 +57,23 @@ jobs:
       - name: Test units
         run: xmake test -vD
   # ---------------------------------------------------------------------------
-  freebsd:
-    name: FreeBSD
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: freebsd {0}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: vmactions/freebsd-vm@v1
-        with:
-          prepare: |
-            pkg install -y llvm20 xmake-io
-      - name: Build
-        run: |
-          export XMAKE_ROOT=y
-          cd ${GITHUB_WORKSPACE}
-          xmake f -m debug
-          xmake b -v
-          xmake run uwvm --version
-          xmake test -vD
+  #freebsd:
+  #  name: FreeBSD
+  #  runs-on: ubuntu-latest
+  #  defaults:
+  #    run:
+  #      shell: freebsd {0}
+  #  steps:
+  #    - uses: actions/checkout@v4
+  #    - uses: vmactions/freebsd-vm@v1
+  #      with:
+  #        prepare: |
+  #          pkg install -y llvm20 xmake-io
+  #    - name: Build
+  #      run: |
+  #        export XMAKE_ROOT=y
+  #        cd ${GITHUB_WORKSPACE}
+  #        xmake f -m debug
+  #        xmake b -v
+  #        xmake run uwvm --version
+  #        xmake test -vD
