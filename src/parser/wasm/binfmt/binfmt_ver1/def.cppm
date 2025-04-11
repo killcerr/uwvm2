@@ -32,7 +32,7 @@ module;
 
 #include <utils/macro/push_macros.h>
 
-export module parser.wasm.standard.wasm1.binfmt:binfmt1;
+export module parser.wasm.binfmt.binfmt_ver1:def;
 
 import fast_io;
 import utils.io;

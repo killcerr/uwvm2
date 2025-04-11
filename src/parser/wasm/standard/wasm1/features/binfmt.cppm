@@ -41,7 +41,7 @@ import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
 import parser.wasm.standard.wasm1.section;
 import parser.wasm.standard.wasm1.opcode;
-import parser.wasm.standard.wasm1.binfmt;
+import parser.wasm.binfmt;
 
 export namespace parser::wasm::standard::wasm1::features
 {

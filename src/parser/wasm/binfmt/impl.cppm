@@ -24,5 +24,5 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.binfmt;
-export import :binfmt1;
+export module parser.wasm.binfmt;
+export import parser.wasm.binfmt.binfmt_ver1;
