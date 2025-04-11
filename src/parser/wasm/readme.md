@@ -9,7 +9,7 @@ Provide a conceptualization of an extensible parser
 * `standard` Support for the wasm standard. Includes standardized structural equivalents, parsing programs, command code definition
 
 ```txt
-                                root (concept)
+concept:                         root (concept)
                                       |
                          ____________/ \______________
                         /                             \
