@@ -59,11 +59,15 @@ export namespace parser::wasm::binfmt::ver1
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...>
-        wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+        wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const* module_begin, ::std::byte const* module_end) UWVM_THROWS
     {
         /// @todo TODO
-        ::fast_io::io::perr(::utils::u8err, ::fast_io::mnp::cur_src_loc(), u8": TODO!!!\n");
+        wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
 
-        return {};
+        ret.module_span.module_begin = module_begin;
+        ret.module_span.module_end = module_end;
+
+        
+        return ret;
     }
 }  // namespace parser::wasm::binfmt::ver1
