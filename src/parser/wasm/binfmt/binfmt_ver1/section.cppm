@@ -61,7 +61,7 @@ export namespace parser::wasm::standard::wasm1::binfmt
                             else
                             {
                                 static_assert(!(requires {
-                                    typename FeatureCurr::binfmt_ver1_section_type;
+                                    typename FeatureCurr::template binfmt_ver1_section_type<Features...>;
                                 } && !has_binfmt_ver1_extensible_section_define<FeatureCurr, Features...>), "binfmt_ver1_section_type is not tuple");
                                 return ::parser::wasm::concepts::operation::tuple_megger<>{};
                             }
