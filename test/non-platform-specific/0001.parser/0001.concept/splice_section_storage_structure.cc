@@ -78,13 +78,13 @@ struct Feature3
 };
 
 /*
-root:                               wasm
-                                      |
-                         ____________/ \______________
-                        /                             \.  
-binfmt:           binfmt_ver1(binfmt1)                ...
-                 /           |            \.  
-featurs:       Feature1   Feature2    Feature3 
+root:                    wasm
+                          |
+                         / 
+                        /                          
+binfmt:           binfmt_ver1(binfmt1)               
+                 /           |        \.  
+featurs:       Feature1   Feature2  Feature3 
                  |          / \            
 sections:      Sec1      Sec2 Sec3
 */
