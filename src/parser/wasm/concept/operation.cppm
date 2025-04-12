@@ -477,13 +477,19 @@ export namespace parser::wasm::concepts
         template <typename... Fs>
         struct tuple_megger
         {
-            using Ty = ::fast_io::tuple<Fs...>;
+            using Type = ::fast_io::tuple<Fs...>;
         };
 
         template <typename... T1, typename... T2>
         inline consteval tuple_megger<T1..., T2...> operator, (tuple_megger<T1...>, tuple_megger<T2...>) noexcept
         {
             return tuple_megger<T1..., T2...>{};
+        }
+
+        template <typename... Fs>
+        inline consteval tuple_megger<Fs...> get_tuple_megger_from_tuple(::fast_io::tuple<Fs...>) noexcept
+        {
+            return tuple_megger<Fs...>{};
         }
     }  // namespace operation
 }  // namespace parser::wasm::concepts
