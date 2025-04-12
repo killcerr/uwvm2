@@ -213,6 +213,8 @@ export namespace parser::wasm::concepts
             ///             using binfmt2_features = Fs_binfmt_controler_r<2, B1F1, B1F2, B2F3>; // same_as ::fast_io::tuple<B2F3>
             ///
             ///             ```
+
+            /// @brief Tuple merger for template elements
             template <typename F1, typename F2>
             struct tuple_type_merger;
 
@@ -441,7 +443,7 @@ export namespace parser::wasm::concepts
             }
 
             template <typename T1, typename T2>
-            inline consteval void operator, (type_wrapper<T1> a, type_wrapper<T2>) noexcept = delete;
+            inline consteval void operator, (type_wrapper<T1>, type_wrapper<T2>) noexcept = delete;
 
             inline consteval type_wrapper<void> operator, (type_wrapper<void>, type_wrapper<void>) noexcept { return type_wrapper<void>{}; }
 
@@ -459,10 +461,10 @@ export namespace parser::wasm::concepts
                         ((
                              [&is_repeatable, &repeating]<typename ArgCurr>() constexpr noexcept
                              {
-                                 if constexpr (::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>)
+                                 if constexpr(::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>)
                                  {
-                                    // Replacement of the same type
-                                    ::fast_io::fast_terminate();
+                                     // Replacement of the same type
+                                     ::fast_io::fast_terminate();
                                  }
 
                                  if constexpr(::std::same_as<typename ArgCurr::superseded, Superseded>)
@@ -487,16 +489,16 @@ export namespace parser::wasm::concepts
                                      }
                                  }
                                  else { return type_wrapper<void>{}; }
-                             }.template operator()<Args...[I]>()),
+                             }.template operator()<Args...[I]>()), /* operator, () */
                          ...)
                     };
                     using rettype = decltype(ret);
                     if constexpr(::std::same_as<rettype, type_wrapper<void>>)
                     {
-                        // last
+                        // last one
                         return type_wrapper<Superseded>{};
                     }
-                    else { return rettype{}; }
+                    else { return ret; }
                 }(::std::make_index_sequence<sizeof...(Args)>{});
             }
         }  // namespace details
@@ -510,5 +512,19 @@ export namespace parser::wasm::concepts
 
         template <typename... Args>
         using replacement_structure_t = decltype(replacement_structure<Args...>())::Type;
+
+        /// @brief      Tuple merger for template expansion
+        /// @details    Merge tuples by overloading operator,() operator
+        template <typename... Fs>
+        struct tuple_megger
+        {
+            using Ty = ::fast_io::tuple<Fs...>;
+        };
+
+        template <typename... T1, typename... T2>
+        inline consteval tuple_megger<T1..., T2...> operator, (tuple_megger<T1...>, tuple_megger<T2...>) noexcept
+        {
+            return tuple_megger<T1..., T2...>{};
+        }
     }  // namespace operation
 }  // namespace parser::wasm::concepts
