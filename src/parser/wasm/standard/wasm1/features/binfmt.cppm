@@ -45,11 +45,12 @@ import parser.wasm.binfmt.binfmt_ver1;
 
 export namespace parser::wasm::standard::wasm1::features
 {
-    /// @brief
     struct wasm1
     {
         inline static constexpr ::fast_io::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
         inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+        /// @todo
     };
 
     static_assert(::parser::wasm::concepts::wasm_feature<wasm1>, "struct wasm1 not match wasm feature");

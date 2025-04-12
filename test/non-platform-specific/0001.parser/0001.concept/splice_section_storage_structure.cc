@@ -56,10 +56,9 @@ struct Sec2
     // Expand on Sec2 here
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec3
 {
-    // Expand on Sec3 here
+    // Unexpandable section
 };
 
 struct Feature2
@@ -68,7 +67,7 @@ struct Feature2
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    using binfmt_ver1_section_type = ::fast_io::tuple<Sec2<Fs...>, Sec3<Fs...>>;
+    using binfmt_ver1_section_type = ::fast_io::tuple<Sec2<Fs...>, Sec3>;
 };
 
 struct Feature3
@@ -83,15 +82,15 @@ root:                    wasm
                          / 
                         /                          
 binfmt:           binfmt_ver1(binfmt1)               
-                 /           |        \.  
-featurs:       Feature1   Feature2  Feature3 
-                 |          / \            
-sections:      Sec1      Sec2 Sec3
+                 /             |        \.  
+featurs:       Feature1     Feature2   Feature3 
+                 |          /      \            
+sections:      Sec1(ext) Sec2(ext) Sec3
 */
 
 int main()
 {
-    using T = decltype(::parser::wasm::standard::wasm1::binfmt::splice_section_storage_structure<Feature1, Feature2, Feature3>())::Type;
-    static_assert(::std::same_as<T, ::fast_io::tuple<Sec1<Feature1, Feature2, Feature3>, Sec2<Feature1, Feature2, Feature3>, Sec3<Feature1, Feature2, Feature3>>>);
+    using T = ::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Feature1, Feature2, Feature3>;
+    static_assert(::std::same_as<T, ::fast_io::tuple<Sec1<Feature1, Feature2, Feature3>, Sec2<Feature1, Feature2, Feature3>, Sec3>>);
 }
 

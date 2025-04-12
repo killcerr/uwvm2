@@ -366,7 +366,7 @@ export namespace parser::wasm::concepts
         /// @brief      Structure Replacement
         /// @details    Input unordered typename Replace fixed structure with typename, must replace starting from specified type,
         ///             only chains allowed, not directed graphs
-        ///             An unordered chain of substitutions: b -> c, root -> a, a -> b, x -> y <==> c
+        ///             An unordered chain of substitutions: b -> c, root -> a, a -> b, x -> y, x -> a ==> c
         ///             Automatic detection of duplicates, loops, different results with the same substitution
         template <typename A, typename B>
         struct type_replacer
@@ -448,7 +448,7 @@ export namespace parser::wasm::concepts
                                      }
                                  }
                                  else { return type_wrapper<void>{}; }
-                             }.template operator()<Args...[I]>()), /* operator, () */
+                             }.template operator()<Args...[I]>()),
                          ...)
                     };
                     using rettype = decltype(ret);
@@ -465,6 +465,7 @@ export namespace parser::wasm::concepts
         template <typename... Args>
         inline consteval auto replacement_structure() noexcept
         {
+            // repeating_table is used to detect loops, if the loop will hit an existing element, terminate it.
             ::fast_io::array<bool, sizeof...(Args)> repeating_table{};
             return details::replacement_structure_followup_impl<type_replacer, root_of_replacement, Args...>(repeating_table);
         }
@@ -483,6 +484,7 @@ export namespace parser::wasm::concepts
         template <typename... T1, typename... T2>
         inline constexpr tuple_megger<T1..., T2...> operator, (tuple_megger<T1...>, tuple_megger<T2...>) noexcept
         {
+            // constexpr provides functions for use at runtime
             return tuple_megger<T1..., T2...>{};
         }
 

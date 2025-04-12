@@ -45,6 +45,9 @@ export namespace parser::wasm::binfmt::ver1
     template <typename Feature, typename... Fs>
     concept has_binfmt_ver1_extensible_section_define = ::fast_io::is_tuple<typename Feature::template binfmt_ver1_section_type<Fs...>>;
 
+    template <typename Feature, typename... Fs>
+    concept has_binfmt_ver1_section_define = ::fast_io::is_tuple<typename Feature::binfmt_ver1_section_type>;
+
     template <::parser::wasm::concepts::wasm_feature... Features>
     inline consteval auto splice_section_storage_structure() noexcept
     {
@@ -61,11 +64,18 @@ export namespace parser::wasm::binfmt::ver1
                                     using extensible_section_t = typename FeatureCurr::template binfmt_ver1_section_type<Features...>;
                                     return ::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(extensible_section_t{});
                                 }
+                                else if constexpr(has_binfmt_ver1_section_define<FeatureCurr>) 
+                                {
+                                    using section_t = typename FeatureCurr::binfmt_ver1_section_type;
+                                    return ::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(section_t{});
+                                }
                                 else
                                 {
-                                    static_assert(!(requires {
-                                        typename FeatureCurr::template binfmt_ver1_section_type<Features...>;
-                                    } && !has_binfmt_ver1_extensible_section_define<FeatureCurr, Features...>), "binfmt_ver1_section_type is not tuple");
+                                    static_assert(!((
+                                                        requires { typename FeatureCurr::template binfmt_ver1_section_type<Features...>; } ||
+                                                        requires { typename FeatureCurr::binfmt_ver1_section_type; }) &&
+                                                    !has_binfmt_ver1_extensible_section_define<FeatureCurr, Features...>),
+                                                  "binfmt_ver1_section_type is not tuple");
                                     return ::parser::wasm::concepts::operation::tuple_megger<>{};
                                 }
                             }.template operator()<Features...[I]>()),
