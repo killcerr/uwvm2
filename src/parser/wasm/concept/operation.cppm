@@ -481,7 +481,7 @@ export namespace parser::wasm::concepts
         };
 
         template <typename... T1, typename... T2>
-        inline consteval tuple_megger<T1..., T2...> operator, (tuple_megger<T1...>, tuple_megger<T2...>) noexcept
+        inline constexpr tuple_megger<T1..., T2...> operator, (tuple_megger<T1...>, tuple_megger<T2...>) noexcept
         {
             return tuple_megger<T1..., T2...>{};
         }
