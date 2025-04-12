@@ -47,7 +47,9 @@ namespace uwvm::cmdline::paras::details
                                                                                [[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
 
-        return ::utils::cmdline::parameter_return_type::return_soon;
+        
+        
+        return ::utils::cmdline::parameter_return_type::return_imme;
     }
 
 }  // namespace uwvm::cmdline::paras::details

@@ -401,5 +401,114 @@ export namespace parser::wasm::concepts
         {
             return get_specified_binfmt_feature_tuple_from_all_freatures<binfmt_version, Fs...>();
         }
+
+        /// @brief      Structure Replacement
+        /// @details    Input unordered typename Replace fixed structure with typename, must replace starting from specified type,
+        ///             only chains allowed, not directed graphs
+        ///             An unordered chain of substitutions: b -> c, root -> a, a -> b, x -> y <==> c
+        ///             Automatic detection of duplicates, loops, different results with the same substitution
+        template <typename A, typename B>
+        struct type_replacer
+        {
+            // A -> B
+            using superseded = A;
+            using replacement = B;
+        };
+
+        struct root_of_replacement
+        {
+        };
+
+        namespace details
+        {
+            template <typename T>
+            struct type_wrapper
+            {
+                using Type = T;
+            };
+
+            // Overloading commas for subsequent type calculations
+            template <typename T>
+            inline consteval type_wrapper<T> operator, (type_wrapper<T>, type_wrapper<void>) noexcept
+            {
+                return type_wrapper<T>{};
+            }
+
+            template <typename T>
+            inline consteval type_wrapper<T> operator, (type_wrapper<void>, type_wrapper<T>) noexcept
+            {
+                return type_wrapper<T>{};
+            }
+
+            template <typename T1, typename T2>
+            inline consteval void operator, (type_wrapper<T1> a, type_wrapper<T2>) noexcept = delete;
+
+            inline consteval type_wrapper<void> operator, (type_wrapper<void>, type_wrapper<void>) noexcept { return type_wrapper<void>{}; }
+
+            // Type Calculation
+            template <template <typename, typename> typename T, typename Superseded, typename... Args>
+                requires (::std::same_as<T<typename Args::superseded, typename Args::replacement>,
+                                         type_replacer<typename Args::superseded, typename Args::replacement>> &&
+                          ...)
+            inline consteval auto replacement_structure_followup_impl(::fast_io::array<bool, sizeof...(Args)>& repeating) noexcept
+            {
+                bool is_repeatable{};
+                return [&is_repeatable, &repeating]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+                {
+                    auto ret {
+                        ((
+                             [&is_repeatable, &repeating]<typename ArgCurr>() constexpr noexcept
+                             {
+                                 if constexpr (::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>)
+                                 {
+                                    // Replacement of the same type
+                                    ::fast_io::fast_terminate();
+                                 }
+
+                                 if constexpr(::std::same_as<typename ArgCurr::superseded, Superseded>)
+                                 {
+                                     if(is_repeatable)
+                                     {
+                                         // Prohibition of duplicate substitutions
+                                         // a -> b, a -> c X
+                                         ::fast_io::fast_terminate();
+                                     }
+                                     else
+                                     {
+                                         if(repeating[I])
+                                         {
+                                             // Type Loop
+                                             ::fast_io::fast_terminate();
+                                         }
+                                         repeating[I] = true;
+                                         using replacement = typename ArgCurr::replacement;
+                                         is_repeatable = true;
+                                         return replacement_structure_followup_impl<T, replacement, Args...>(repeating);
+                                     }
+                                 }
+                                 else { return type_wrapper<void>{}; }
+                             }.template operator()<Args...[I]>()),
+                         ...)
+                    };
+                    using rettype = decltype(ret);
+                    if constexpr(::std::same_as<rettype, type_wrapper<void>>)
+                    {
+                        // last
+                        return type_wrapper<Superseded>{};
+                    }
+                    else { return rettype{}; }
+                }(::std::make_index_sequence<sizeof...(Args)>{});
+            }
+        }  // namespace details
+
+        template <typename... Args>
+        inline consteval auto replacement_structure() noexcept
+        {
+            ::fast_io::array<bool, sizeof...(Args)> repeating_table{};
+            return details::replacement_structure_followup_impl<type_replacer, root_of_replacement, Args...>(repeating_table);
+        }
+
+        template <typename... Args>
+        using replacement_structure_t = decltype(replacement_structure<Args...>())::Type;
     }  // namespace operation
 }  // namespace parser::wasm::concepts
