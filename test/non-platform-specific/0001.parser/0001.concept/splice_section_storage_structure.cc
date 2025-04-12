@@ -77,6 +77,18 @@ struct Feature3
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
+/*
+root:                               wasm
+                                      |
+                         ____________/ \______________
+                        /                             \.  
+binfmt:           binfmt_ver1(binfmt1)                ...
+                 /           |            \.  
+featurs:       Feature1   Feature2    Feature3 
+                 |          / \            
+sections:      Sec1      Sec2 Sec3
+*/
+
 int main()
 {
     using T = decltype(::parser::wasm::standard::wasm1::binfmt::splice_section_storage_structure<Feature1, Feature2, Feature3>())::Type;
