@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -159,7 +159,6 @@ export namespace parser::wasm::concepts
         } /* -> binfmt_handle_version_func_p_type<Fs...> */;
     };
 
-    /// @todo Not Finished
     template <typename FeatureType>
     concept wasm_feature = has_feature_name<FeatureType> && has_wasm_binfmt_version<FeatureType> && ::std::is_empty_v<FeatureType>;
 }  // namespace parser::wasm::concepts

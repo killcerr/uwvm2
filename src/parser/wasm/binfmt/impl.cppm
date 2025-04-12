@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -25,4 +25,5 @@
 module;
 
 export module parser.wasm.binfmt;
+export import parser.wasm.binfmt.base;
 export import parser.wasm.binfmt.binfmt_ver1;

@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -41,7 +41,7 @@ import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
 import parser.wasm.standard.wasm1.section;
 import parser.wasm.standard.wasm1.opcode;
-import parser.wasm.binfmt;
+import parser.wasm.binfmt.binfmt_ver1;
 
 export namespace parser::wasm::standard::wasm1::features
 {
@@ -57,7 +57,7 @@ export namespace parser::wasm::standard::wasm1::features
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr auto define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<wasm1>, ::fast_io::tuple<Fs...>) noexcept
     {
-        return ::std::addressof(::parser::wasm::standard::wasm1::binfmt::wasm_binfmt_ver1_handle_func<Fs...>);
+        return ::std::addressof(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>);
     }
 
     static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<wasm1>, "struct wasm1 did not has define_wasm_binfmt_parsering_strategy");

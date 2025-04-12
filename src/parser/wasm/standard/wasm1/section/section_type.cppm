@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -205,3 +205,12 @@ export namespace parser::wasm::standard::wasm1::section
         ::fast_io::vector<::parser::wasm::standard::wasm1::type::data_segment> datasec{};
     };
 }  // namespace parser::wasm::standard::wasm1::section
+
+export namespace fast_io::freestanding
+{
+    template <>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::section::custom_section>
+    {
+        inline static constexpr bool value = true;
+    };
+}  // namespace fast_io::freestanding

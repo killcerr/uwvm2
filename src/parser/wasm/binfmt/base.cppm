@@ -24,6 +24,17 @@
 
 module;
 
-export module parser.wasm.binfmt.binfmt_ver1;
-export import :section;
-export import :def;
+#include <cstddef>
+
+export module parser.wasm.binfmt.base;
+
+import fast_io;
+
+export namespace parser::wasm::binfmt
+{
+    struct module_span_t
+    {
+        ::std::byte const* module_begin{};
+        ::std::byte const* module_end{};
+    };
+}  // namespace parser::wasm::binfmt
