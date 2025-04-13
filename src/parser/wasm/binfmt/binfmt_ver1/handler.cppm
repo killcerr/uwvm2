@@ -29,6 +29,8 @@ module;
 #include <concepts>
 #include <type_traits>
 #include <utility>
+#include <vector>
+#include <algorithm>
 
 #include <utils/macro/push_macros.h>
 
@@ -64,6 +66,20 @@ export namespace parser::wasm::binfmt::ver1
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
         has_handle_binfmt_ver1_extensible_section_define<Ty, Fs...> && has_section_id_define<Ty>;
 
+    template <typename ...Ty>
+    inline consteval void check_extensible_section_is_series(::fast_io::tuple<Ty...>) noexcept
+    {
+        ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> vec{};
+        [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        { ((vec.push_back(Ty...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
+        ::std::ranges::sort(vec);
+        ::parser::wasm::standard::wasm1::type::wasm_u32 counter{1};
+        for(auto i: vec)
+        {
+            if(i != counter++) { ::fast_io::fast_terminate(); }
+        }
+    }
+
     /// @brief      handle all binfmt ver1 extensible section
     /// @throws     ::fast_io::error
     /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
@@ -75,6 +91,7 @@ export namespace parser::wasm::binfmt::ver1
                                                   ::std::byte const* section_end) UWVM_THROWS
     {
         auto [... secs]{module_storage.sections};
+        check_extensible_section_is_series(module_storage.sections);
         constexpr auto Secs_sz{sizeof...(secs)};
 
         bool finish{};
