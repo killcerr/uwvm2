@@ -92,4 +92,23 @@ export namespace parser::wasm::binfmt::ver1
     {
         return splice_section_storage_structure<Features...>();
     }
+
+    template <typename Ty>
+    concept has_handle_binfmt_ver1_extensible_section_define = requires(Ty& t) {
+        { handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<Ty>>, t) };
+    };
+
+    /// @brief      handle all binfmt ver1 extensible section
+    /// @throws     from handle_binfmt_ver1_extensible_section_define()
+    /// @see        test\non-platform-specific\0001.parser\0001.concept\splice_section_storage_structure.cc
+    template <has_handle_binfmt_ver1_extensible_section_define... Tys>
+    inline constexpr void handle_all_binfmt_ver1_extensible_section(::fast_io::tuple<Tys...>& all_section_storage) UWVM_THROWS
+    {
+        [&all_section_storage]<::std::size_t... I>(::std::index_sequence<I...>) constexpr UWVM_THROWS
+        {
+            ((handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<Tys...[I]>>,
+                                                           get<I>(all_section_storage))),
+             ...);
+        }(::std::make_index_sequence<sizeof...(Tys)>{});
+    }
 }  // namespace parser::wasm::binfmt::ver1
