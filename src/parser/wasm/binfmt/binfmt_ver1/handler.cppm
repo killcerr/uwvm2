@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -140,7 +140,7 @@ export namespace parser::wasm::binfmt::ver1
             ::fast_io::io::perr(::utils::u8err,
                                 UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
                                 ::fast_io::mnp::addrvw(section_begin - module_begin),
-                                u8") Unknown WebAssembly Section: \"",
+                                u8") Unknown WebAssembly Section ID: \"",
                                 UWVM_AES_U8_CYAN,
                                 section_id,
                                 UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");

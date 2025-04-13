@@ -37,12 +37,14 @@ import uwvm.wasm.storage;
 import uwvm.wasm.feature;
 import parser.wasm.concepts;
 import parser.wasm.standard;
+#ifdef UWVM_TIMER
+import utils.debug;
+#endif
 
 export namespace uwvm::run
 {
     inline int run() noexcept
     {
-
         if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
             ::fast_io::io::perr(
@@ -52,10 +54,14 @@ export namespace uwvm::run
         }
 
         auto module_name{::uwvm::cmdline::wasm_file_ppos->str};
+
 #ifdef __cpp_exceptions
         try
 #endif
         {
+#ifdef UWVM_TIMER
+            ::utils::debug::timer parsing_timer{u8"file loader"};
+#endif
             ::uwvm::wasm::storage::execute_wasm_file = ::fast_io::native_file_loader{module_name};
         }
 #ifdef __cpp_exceptions
@@ -67,7 +73,7 @@ export namespace uwvm::run
                                 UWVM_AES_U8_WHITE u8"\": ",
                                 e,
                                 UWVM_AES_U8_RST_ALL u8"\n"
-# ifndef _WIN32  // Win32 automatically adds a newline
+# ifndef _WIN32  // Win32 automatically adds a newline (winnt and win9x)
                                 u8"\n"
 # endif
                             );
@@ -84,6 +90,9 @@ export namespace uwvm::run
                 try
 #endif
                 {
+#ifdef UWVM_TIMER
+                    ::utils::debug::timer parsing_timer{u8"parse binfmt1"};
+#endif
                     ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage =
                         ::uwvm::wasm::feature::binfmt_ver1_handler(::uwvm::wasm::feature::wasm_binfmt1_features,
                                                                    reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
@@ -97,7 +106,7 @@ export namespace uwvm::run
 #endif
                 // set module name
                 ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.module_name = ::fast_io::u8string_view{module_name};
-                
+
                 /// @todo run vm
 
                 // return 0
