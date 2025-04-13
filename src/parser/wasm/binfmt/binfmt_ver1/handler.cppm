@@ -99,9 +99,89 @@ export namespace parser::wasm::binfmt::ver1
         }
     }
 
+#if 1
+    namespace details
+    {
+        template <::parser::wasm::concepts::wasm_feature... Fs>
+        inline constexpr void handle_all_binfmt_ver1_extensible_section_impl(bool&,
+                                                                             ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>&,
+                                                                             ::parser::wasm::standard::wasm1::type::wasm_u32,
+                                                                             ::std::byte const*,
+                                                                             ::std::byte const*) UWVM_THROWS
+        {
+            // do nothing
+        }
+
+        template <typename SecCurr, typename... Secs, ::parser::wasm::concepts::wasm_feature... Fs>
+        inline constexpr void
+            handle_all_binfmt_ver1_extensible_section_impl(bool& success,
+                                                           ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                                           ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
+                                                           ::std::byte const* section_begin,
+                                                           ::std::byte const* section_end) UWVM_THROWS
+        {
+            static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
+
+            if(section_id == SecCurr::section_id)
+            {
+                success = handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<SecCurr>>,
+                                                                      module_storage,
+                                                                      section_begin,
+                                                                      section_end);
+            }
+            else
+            {
+                if constexpr(sizeof...(Secs) != 0)
+                {
+                    handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success, module_storage, section_id, section_begin, section_end);
+                }
+            }
+        }
+
+    }  // namespace details
+
     /// @brief      handle all binfmt ver1 extensible section
     /// @throws     ::fast_io::error
     /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void
+        handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                                  [[maybe_unused]] ::std::byte const* module_begin,
+                                                  ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
+                                                  ::std::byte const* section_begin,
+                                                  ::std::byte const* section_end) UWVM_THROWS
+    {
+        auto [... secs]{module_storage.sections};
+        check_extensible_section_is_series(module_storage.sections);
+
+        bool success{};
+
+        details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success,
+                                                                                   module_storage,
+                                                                                   section_id,
+                                                                                   section_begin,
+                                                                                   section_end);
+
+        if(!success) [[unlikely]]
+        {
+# ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+            ::fast_io::io::perr(::utils::u8err,
+                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                ::fast_io::mnp::addrvw(section_begin - module_begin),
+                                u8") Unknown WebAssembly Section ID: \"",
+                                UWVM_AES_U8_CYAN,
+                                section_id,
+                                UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
+# endif
+            throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+    }
+
+#else
+    /// @brief          handle all binfmt ver1 extensible section
+    /// @deprecated     Twice lambda, compiler inconvenient optimization
+    /// @throws         ::fast_io::error
+    /// @see            test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void
         handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
@@ -136,7 +216,7 @@ export namespace parser::wasm::binfmt::ver1
 
         if(!finish) [[unlikely]]
         {
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+# ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
             ::fast_io::io::perr(::utils::u8err,
                                 UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
                                 ::fast_io::mnp::addrvw(section_begin - module_begin),
@@ -144,10 +224,11 @@ export namespace parser::wasm::binfmt::ver1
                                 UWVM_AES_U8_CYAN,
                                 section_id,
                                 UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
-#endif
+# endif
             throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
+#endif
 
     inline constexpr bool is_wasm_file_unchecked(::std::byte const* module_curr) noexcept
     {
