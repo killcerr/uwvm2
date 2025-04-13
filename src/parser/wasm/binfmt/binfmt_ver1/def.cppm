@@ -57,17 +57,4 @@ export namespace parser::wasm::binfmt::ver1
         ::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> sections{};
     };
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...>
-        wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const* module_begin, ::std::byte const* module_end) UWVM_THROWS
-    {
-        /// @todo TODO
-        wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
-
-        ret.module_span.module_begin = module_begin;
-        ret.module_span.module_end = module_end;
-
-        
-        return ret;
-    }
 }  // namespace parser::wasm::binfmt::ver1

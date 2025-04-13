@@ -39,8 +39,8 @@ export namespace uwvm::wasm::feature
 
     /// @brief wasm binfmt ver1 features
     using wasm_binfmt_ver1_features_t =
-        decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(::uwvm::wasm::feature::all_features));
-    inline constexpr ::uwvm::wasm::feature::wasm_binfmt_ver1_features_t wasm_binfmt1_features{};
+        decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(all_features));
+    inline constexpr wasm_binfmt_ver1_features_t wasm_binfmt1_features{};
     using wasm_binfmt_ver1_module_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features));
     inline constexpr auto binfmt_ver1_handler{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(wasm_binfmt1_features)};
 

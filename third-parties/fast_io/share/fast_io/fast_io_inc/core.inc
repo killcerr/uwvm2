@@ -5,6 +5,8 @@ using ::fast_io::char_literal_v;
 using ::fast_io::pr_rsv_size;
 using ::fast_io::pr_rsv_to_iterator_unchecked;
 
+using ::fast_io::io_alias_type_t;
+
 using ::fast_io::io_reserve_type_t;
 using ::fast_io::io_reserve_type;
 using ::fast_io::print_alias_define;
@@ -23,6 +25,13 @@ using ::fast_io::unreachable;
 using ::fast_io::noexcept_call;
 
 using ::fast_io::error;
+using ::fast_io::error_type_t;
+using ::fast_io::error_type;
+using ::fast_io::error_domain;
+using ::fast_io::is_domain;
+using ::fast_io::to_code;
+using ::fast_io::throw_parse_code;
+
 using ::fast_io::cstr_len;
 using ::fast_io::cstr_nlen;
 
