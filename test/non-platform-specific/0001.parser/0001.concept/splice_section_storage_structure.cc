@@ -38,14 +38,10 @@ import parser.wasm.binfmt.binfmt_ver1;
 template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
+    
     // Expand on Sec1 here
 };
-
-template <::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<Sec1<Fs...>>, Sec1<Fs...>&)
-{
-
-}
 
 struct Feature1
 {
@@ -59,24 +55,17 @@ struct Feature1
 template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec2
 {
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{2};
+
     // Expand on Sec2 here
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<Sec2<Fs...>>, Sec2<Fs...>&)
-{
-
-}
-
 struct Sec3
 {
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{3};
+
     // Unexpandable section
 };
-
-inline constexpr void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<Sec3>, Sec3&)
-{
-
-}
 
 struct Feature2
 {
@@ -109,7 +98,5 @@ int main()
 {
     using T = ::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Feature1, Feature2, Feature3>;
     static_assert(::std::same_as<T, ::fast_io::tuple<Sec1<Feature1, Feature2, Feature3>, Sec2<Feature1, Feature2, Feature3>, Sec3>>);
-    T t{};
-    parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(t);
 }
 
