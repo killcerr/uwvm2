@@ -154,21 +154,34 @@ int main()
     ::fast_io::io::perr(::utils::u8err, u8"sec1:\n");
     ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 1, nullptr, nullptr);
     ::fast_io::io::perr(::utils::u8err, u8"sec2:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 1, nullptr, nullptr);
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 2, nullptr, nullptr);
     ::fast_io::io::perr(::utils::u8err, u8"sec3:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 1, nullptr, nullptr);
-
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 3, nullptr, nullptr);
+    ::fast_io::io::perr(::utils::u8err, u8"sec4:\n");
+    try
+    {
+        ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 4, nullptr, nullptr);
+    }
+    catch(::fast_io::error e)
+    {
+        ::fast_io::perr(::utils::u8err, u8"test4, not found\n");
+    }
 }
 
 /* 
+
 (stderr)
 
 sec1:
 test1
 
 sec2:
-test1
+test2
 
 sec3:
-test1
+test3
+
+sec4:
+test4, not found
+
 */
