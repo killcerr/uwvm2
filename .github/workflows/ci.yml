@@ -30,6 +30,8 @@ jobs:
         run: xmake b -v
       - name: Test UWVM
         run: xmake run uwvm --version
+      - name: Test Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-20 --policies=build.sanitizer.address
       - name: Test units
         run: xmake test -vD
   # ---------------------------------------------------------------------------
@@ -54,6 +56,8 @@ jobs:
         run: xmake b -v
       - name: Test UWVM
         run: xmake run uwvm --version
+      - name: Test Configure
+        run: xmake f -p mingw --use-llvm=y -m debug --policies=build.sanitizer.address
       - name: Test units
         run: xmake test -vD
   # ---------------------------------------------------------------------------

@@ -115,8 +115,6 @@ target_end()
 for _, file in ipairs(os.files("test/non-platform-specific/**.cc")) do
     local name = path.basename(file)
     target(name)
-		add_rules("debug")
-		set_policy("build.sanitizer.address", true)
         set_kind("binary")
 		def_build()
         set_default(false)
