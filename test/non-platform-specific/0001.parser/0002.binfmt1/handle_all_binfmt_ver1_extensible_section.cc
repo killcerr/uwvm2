@@ -78,7 +78,7 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
-{    
+{
     ::fast_io::io::perrln(::utils::u8err, u8"test2\n");
 
     return true;
@@ -139,7 +139,7 @@ sections:      Sec1(ext) Sec2(ext) Sec3
 int main()
 {
     /// @brief All feature
-    constexpr ::fast_io::tuple<Feature1,Feature2,Feature3> all_features{};
+    constexpr ::fast_io::tuple<Feature1, Feature2, Feature3> all_features{};
     // [[maybe_unused]] using all_feature_t = decltype(all_features);
 
     /// @brief wasm binfmt ver1 features
@@ -152,15 +152,15 @@ int main()
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
     ::fast_io::io::perr(::utils::u8err, u8"sec1:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 1, nullptr, nullptr);
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 1, nullptr, nullptr);
     ::fast_io::io::perr(::utils::u8err, u8"sec2:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 2, nullptr, nullptr);
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 2, nullptr, nullptr);
     ::fast_io::io::perr(::utils::u8err, u8"sec3:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 3, nullptr, nullptr);
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 3, nullptr, nullptr);
     ::fast_io::io::perr(::utils::u8err, u8"sec4:\n");
     try
     {
-        ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 4, nullptr, nullptr);
+        ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 4, nullptr, nullptr);
     }
     catch(::fast_io::error e)
     {
@@ -168,7 +168,7 @@ int main()
     }
 }
 
-/* 
+/*
 
 (stderr)
 

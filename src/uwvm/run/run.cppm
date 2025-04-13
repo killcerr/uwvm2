@@ -80,11 +80,24 @@ export namespace uwvm::run
             case 1:
             {
                 // parse wasm 1
-                ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage =
-                    ::uwvm::wasm::feature::binfmt_ver1_handler(::uwvm::wasm::feature::wasm_binfmt1_features,
-                                                               reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
-                                                               reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
-
+#if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
+                try
+#endif
+                {
+                    ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage =
+                        ::uwvm::wasm::feature::binfmt_ver1_handler(::uwvm::wasm::feature::wasm_binfmt1_features,
+                                                                   reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
+                                                                   reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
+                }
+#if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
+                catch(::fast_io::error e)
+                {
+                    return -1;
+                }
+#endif
+                // set module name
+                ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.module_name = ::fast_io::u8string_view{module_name};
+                
                 /// @todo run vm
 
                 // return 0

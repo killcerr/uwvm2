@@ -24,6 +24,10 @@ using ::fast_io::scan_context_eof_define;
 using ::fast_io::unreachable;
 using ::fast_io::noexcept_call;
 
+using ::fast_io::little_endian;
+using ::fast_io::big_endian;
+using ::fast_io::byte_swap;
+
 using ::fast_io::error;
 using ::fast_io::error_type_t;
 using ::fast_io::error_type;
@@ -31,6 +35,7 @@ using ::fast_io::error_domain;
 using ::fast_io::is_domain;
 using ::fast_io::to_code;
 using ::fast_io::throw_parse_code;
+using ::fast_io::parse_domain_value;
 
 using ::fast_io::cstr_len;
 using ::fast_io::cstr_nlen;
@@ -139,6 +144,9 @@ using ::fast_io::manipulators::scalar_manip_t;
 
 using ::fast_io::manipulators::member_function_pointer_holder_t;
 using ::fast_io::manipulators::whole_get_t;
+
+using ::fast_io::manipulators::leb128_get;
+using ::fast_io::manipulators::leb128_put;
 
 using ::fast_io::manipulators::boolalpha;
 
