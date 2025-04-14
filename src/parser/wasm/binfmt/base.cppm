@@ -24,11 +24,15 @@
 
 module;
 
+#include <cstdint>
 #include <cstddef>
+#include <type_traits>
+#include <memory>
 
 export module parser.wasm.binfmt.base;
 
 import fast_io;
+import parser.wasm.standard.wasm1.type;
 
 export namespace parser::wasm::binfmt
 {
@@ -37,4 +41,39 @@ export namespace parser::wasm::binfmt
         ::std::byte const* module_begin{};
         ::std::byte const* module_end{};
     };
+
+    inline constexpr bool is_wasm_file_unchecked(::std::byte const* module_curr) noexcept
+    {
+        return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4u * sizeof(char8_t)) == 0;
+    }
+
+    inline constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
+    {
+        ::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
+        ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::parser::wasm::standard::wasm1::type::wasm_u32));
+        return ::fast_io::little_endian(temp);
+    }
+
+    /// @brief      detect wasm binfmt version
+    /// @return     0 : error, other : binfmt version
+    inline constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version(::std::byte const* const module_begin,
+                                                                                                ::std::byte const* const module_end) noexcept
+    {
+        ::std::byte const* module_curr{module_begin};
+
+        if(static_cast<::std::size_t>(module_end - module_curr) < 8U * sizeof(char8_t) || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr))
+            [[unlikely]]
+        {
+            return 0;
+        }
+
+        module_curr += 4U * sizeof(char8_t);
+
+        // 00 61 73 6D 01 00 00 00 ...
+        //             ^^ module_curr
+
+        auto binfmt_ver{detect_wasm_binfmt_version_unchecked(module_curr)};
+
+        return binfmt_ver;
+    }
 }  // namespace parser::wasm::binfmt

@@ -125,9 +125,9 @@ export namespace parser::wasm::binfmt::ver1
             if(section_id == SecCurr::section_id)
             {
                 success = handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<SecCurr>>,
-                                                                      module_storage,
-                                                                      section_begin,
-                                                                      section_end);
+                                                                       module_storage,
+                                                                       section_begin,
+                                                                       section_end);
             }
             else
             {
@@ -156,11 +156,7 @@ export namespace parser::wasm::binfmt::ver1
 
         bool success{};
 
-        details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success,
-                                                                                   module_storage,
-                                                                                   section_id,
-                                                                                   section_begin,
-                                                                                   section_end);
+        details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end);
 
         if(!success) [[unlikely]]
         {
@@ -230,18 +226,6 @@ export namespace parser::wasm::binfmt::ver1
     }
 #endif
 
-    inline constexpr bool is_wasm_file_unchecked(::std::byte const* module_curr) noexcept
-    {
-        return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4u * sizeof(char8_t)) == 0;
-    }
-
-    inline constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_version_unchecked(::std::byte const* module_curr) noexcept
-    {
-        ::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
-        ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::parser::wasm::standard::wasm1::type::wasm_u32));
-        return ::fast_io::little_endian(temp);
-    }
-
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...>
         wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const* const module_begin, ::std::byte const* const module_end) UWVM_THROWS
@@ -253,12 +237,13 @@ export namespace parser::wasm::binfmt::ver1
         ret.module_span.module_begin = module_begin;
         ret.module_span.module_end = module_end;
 
-        // 00 61 73 6D 01 00 00 00 ...
-        // ^^ module_curr
-
         ::std::byte const* module_curr{module_begin};
 
-        if(static_cast<::std::size_t>(module_end - module_curr) < 8U * sizeof(char8_t) || !is_wasm_file_unchecked(module_curr)) [[unlikely]]
+        // 00 61 73 6D 01 00 00 00 01 7D ...
+        // ^^ module_curr
+
+        if(static_cast<::std::size_t>(module_end - module_curr) < 8U * sizeof(char8_t) || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr))
+            [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
             ::fast_io::io::perr(::utils::u8err,
@@ -269,25 +254,9 @@ export namespace parser::wasm::binfmt::ver1
             throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        module_curr += 4U * sizeof(char8_t);
+        // uncheck binfmt version, user-selected, or auto-detect
 
-        // 00 61 73 6D 01 00 00 00 ...
-        //             ^^ module_curr
-
-        auto binfmt_ver{detect_wasm_version_unchecked(module_curr)};
-
-        if(binfmt_ver != 1U) [[unlikely]]
-        {
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
-                                ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                u8") The binary format version of WebAssembly is not 1." UWVM_AES_U8_RST_ALL u8"\n\n");
-#endif
-            throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
-
-        module_curr += 4U * sizeof(char8_t);
+        module_curr += 8U * sizeof(char8_t);
 
         // 00 61 73 6D 01 00 00 00 01 7D ...
         //                         ^^ module_curr

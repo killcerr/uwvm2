@@ -37,6 +37,8 @@ import uwvm.wasm.storage;
 import uwvm.wasm.feature;
 import parser.wasm.concepts;
 import parser.wasm.standard;
+import parser.wasm.binfmt.base;
+
 #ifdef UWVM_TIMER
 import utils.debug;
 #endif
@@ -81,10 +83,31 @@ export namespace uwvm::run
         }
 #endif
 
+        // If not specified by the user, detect it
+        if(::uwvm::wasm::storage::execute_wasm_binfmt_ver == 0)
+        {
+            ::uwvm::wasm::storage::execute_wasm_binfmt_ver =
+                ::parser::wasm::binfmt::detect_wasm_binfmt_version(reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
+                                                                   reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
+        }
+
         switch(::uwvm::wasm::storage::execute_wasm_binfmt_ver)
         {
+            case 0:
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::u8err,
+                                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                    ::fast_io::mnp::addrvw(nullptr),
+                                    u8") Illegal WebAssembly file format." UWVM_AES_U8_RST_ALL u8"\n\n");
+#endif
+                return -1;
+            }
             case 1:
             {
+                // set module name
+                ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.module_name = ::fast_io::u8string_view{module_name};
+
                 // parse wasm 1
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                 try
@@ -104,18 +127,22 @@ export namespace uwvm::run
                     return -1;
                 }
 #endif
-                // set module name
-                ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.module_name = ::fast_io::u8string_view{module_name};
 
                 /// @todo run vm
 
-                // return 0
                 break;
             }
             default:
             {
-                // uwvm never match this control block
-                ::fast_io::unreachable();
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::u8err,
+                                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                    ::fast_io::mnp::addrvw(4U * sizeof(char8_t)),
+                                    u8") Unknown Binary Format Version of WebAssembly: \"" UWVM_AES_U8_CYAN,
+                                    ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
+                                    UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
+#endif
+                return -1;
             }
         }
 
