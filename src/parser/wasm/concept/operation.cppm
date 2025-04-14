@@ -521,28 +521,28 @@ export namespace parser::wasm::concepts
         inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...>& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
-            return get<type_index>(tuple)
+            return get<type_index>(tuple);
         }
 
         template <typename TyGet, typename... Tys>
         inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...> const& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
-            return get<type_index>(tuple)
+            return get<type_index>(tuple);
         }
 
         template <typename TyGet, typename... Tys>
         inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...>&& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
-            return get<type_index>(tuple)
+            return get<type_index>(tuple);
         }
 
         template <typename TyGet, typename... Tys>
         inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...> const&& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
-            return get<type_index>(tuple)
+            return get<type_index>(tuple);
         }
     }  // namespace operation
 }  // namespace parser::wasm::concepts
