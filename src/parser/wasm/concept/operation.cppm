@@ -493,5 +493,56 @@ export namespace parser::wasm::concepts
         {
             return tuple_megger<Fs...>{};
         }
+
+        template <typename TyGet, typename... Tys>
+        inline consteval ::std::size_t get_first_type_index_in_tuple() noexcept
+        {
+            ::std::size_t ret{SIZE_MAX};
+            [&ret]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            {
+                ((
+                     [&ret]<typename TyCurr>() constexpr noexcept
+                     {
+                         if constexpr(::std::same_as<TyCurr, TyGet>)
+                         {
+                             if(ret == SIZE_MAX) { ret = I; }
+                         }
+                     }.template operator()<Tys...[I]>()),
+                 ...);
+            }(::std::make_index_sequence<sizeof...(Tys)>{});
+
+            if(ret == SIZE_MAX) { ::fast_io::fast_terminate(); }
+
+            return ret;
+        };
+
+        /// @brief get first type in tuple
+        template <typename TyGet, typename... Tys>
+        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...>& tuple) noexcept
+        {
+            constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
+            return get<type_index>(tuple)
+        }
+
+        template <typename TyGet, typename... Tys>
+        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...> const& tuple) noexcept
+        {
+            constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
+            return get<type_index>(tuple)
+        }
+
+        template <typename TyGet, typename... Tys>
+        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...>&& tuple) noexcept
+        {
+            constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
+            return get<type_index>(tuple)
+        }
+
+        template <typename TyGet, typename... Tys>
+        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...> const&& tuple) noexcept
+        {
+            constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
+            return get<type_index>(tuple)
+        }
     }  // namespace operation
 }  // namespace parser::wasm::concepts
