@@ -26,3 +26,4 @@ module;
 
 export module parser.wasm.standard.wasm1.features;
 export import :binfmt;
+export import :type_section;
