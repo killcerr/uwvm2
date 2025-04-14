@@ -50,7 +50,7 @@ import :def;
 
 export namespace parser::wasm::binfmt::ver1
 {
-    [[noreturn]] inline void throw_wasm_parse_code([[maybe_unused]] ::fast_io::parse_code code)
+    [[noreturn]] inline void throw_wasm_parse_code([[maybe_unused]] ::fast_io::parse_code code) UWVM_THROWS
     {
 #ifdef UWVM_TERMINATE_IMME_WHEN_PARSE
         ::fast_io::fast_terminate();
@@ -107,11 +107,12 @@ export namespace parser::wasm::binfmt::ver1
                                                                              ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>&,
                                                                              ::parser::wasm::standard::wasm1::type::wasm_u32,
                                                                              ::std::byte const*,
-                                                                             ::std::byte const*) UWVM_THROWS
+                                                                             ::std::byte const*) noexcept
         {
             // do nothing
         }
 
+        /// @throw ::fast_io::error
         template <typename SecCurr, typename... Secs, ::parser::wasm::concepts::wasm_feature... Fs>
         inline constexpr void
             handle_all_binfmt_ver1_extensible_section_impl(bool& success,
@@ -121,6 +122,9 @@ export namespace parser::wasm::binfmt::ver1
                                                            ::std::byte const* section_end) UWVM_THROWS
         {
             static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
+
+            /// @details    This can be optimized to jump tables, which is fine under llvm, not gcc or msvc.
+            /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section_test_jmp_table.cc
 
             if(section_id == SecCurr::section_id)
             {

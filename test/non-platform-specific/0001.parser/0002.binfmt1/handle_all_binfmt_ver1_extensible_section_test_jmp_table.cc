@@ -37,6 +37,12 @@ import parser.wasm.standard.wasm1.type;
 import parser.wasm.concepts;
 import parser.wasm.binfmt.binfmt_ver1;
 
+#pragma push_macro("GNU_NOINLINE")
+#undef GNU_NOINLINE
+#if __has_cpp_attribute(__gnu__::__noinline__)
+# define GNU_NOINLINE [[__gnu__::__noinline__]]
+#endif
+
 template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
@@ -46,7 +52,7 @@ struct Sec1
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec1<Fs...>>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -74,7 +80,7 @@ struct Sec2
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec2<Fs...>>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -93,7 +99,7 @@ struct Sec3
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec3>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -112,7 +118,7 @@ struct Sec4
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec4>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -131,7 +137,7 @@ struct Sec5
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec5>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -150,7 +156,7 @@ struct Sec6
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec6>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -169,7 +175,7 @@ struct Sec7
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec7>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -188,7 +194,7 @@ struct Sec8
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec8>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -207,7 +213,7 @@ struct Sec9
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec9>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -226,7 +232,7 @@ struct Sec10
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec10>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -245,7 +251,7 @@ struct Sec11
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec11>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -264,7 +270,7 @@ struct Sec12
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec12>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -283,7 +289,7 @@ struct Sec13
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec13>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -302,7 +308,7 @@ struct Sec14
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec14>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -321,7 +327,7 @@ struct Sec15
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec15>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -340,7 +346,7 @@ struct Sec16
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec16>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -359,7 +365,7 @@ struct Sec17
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec17>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -378,7 +384,7 @@ struct Sec18
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec18>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -397,7 +403,7 @@ struct Sec19
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec19>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -416,7 +422,7 @@ struct Sec20
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-[[__gnu__::__noinline__]] inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec20>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
