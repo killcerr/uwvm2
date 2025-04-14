@@ -51,7 +51,7 @@ export namespace uwvm
         {
             case ::uwvm::cmdline::parsing_return_val::def: break;
             case ::uwvm::cmdline::parsing_return_val::return0: return 0;
-            case ::uwvm::cmdline::parsing_return_val::returnm1: return -1;
+            case ::uwvm::cmdline::parsing_return_val::returnm1: return -1; // Invalid parameters
             default: ::fast_io::unreachable();
         }
 

@@ -52,7 +52,7 @@ export namespace uwvm::run
             ::fast_io::io::perr(
                 ::utils::u8err,
                 UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No input file.\n\n" UWVM_AES_U8_RST_ALL);
-            return -1;
+            return -2; // The specified file is not available or cannot be opened
         }
 
         auto module_name{::uwvm::cmdline::wasm_file_ppos->str};
@@ -79,7 +79,7 @@ export namespace uwvm::run
                                 u8"\n"
 # endif
                             );
-            return -1;
+            return -2; // The specified file is not available or cannot be opened
         }
 #endif
 
@@ -101,7 +101,7 @@ export namespace uwvm::run
                                     ::fast_io::mnp::addrvw(nullptr),
                                     u8") Illegal WebAssembly file format." UWVM_AES_U8_RST_ALL u8"\n\n");
 #endif
-                return -1;
+                return -3; // wasm parsing error
             }
             case 1:
             {
@@ -124,7 +124,7 @@ export namespace uwvm::run
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                 catch(::fast_io::error e)
                 {
-                    return -1;
+                    return -3; // wasm parsing error
                 }
 #endif
 
@@ -142,7 +142,7 @@ export namespace uwvm::run
                                     ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
                                     UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
 #endif
-                return -1;
+                return -3; // wasm parsing error
             }
         }
 
