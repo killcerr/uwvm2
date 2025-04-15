@@ -26,6 +26,7 @@ module;
 #include <cstdint>
 #include <cstddef>
 #include <memory>
+#include <new>
 #include <algorithm>
 // import
 #include <utils/macro/push_macros.h>
