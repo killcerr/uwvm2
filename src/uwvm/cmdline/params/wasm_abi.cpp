@@ -33,12 +33,12 @@ import parser.wasm.base;
 import uwvm.cmdline;
 import uwvm.wasm.storage;
 #else
-#include <fast_io.h>
-#include <utils/io/impl.h>
-#include <utils/cmdline/impl.h>
-#include <parser/wasm/base/impl.h>
-#include <uwvm/cmdline/impl.h>
-#include <uwvm/wasm/storage/impl.h>
+# include <fast_io.h>
+# include <utils/io/impl.h>
+# include <utils/cmdline/impl.h>
+# include <parser/wasm/base/impl.h>
+# include <uwvm/cmdline/impl.h>
+# include <uwvm/wasm/storage/impl.h>
 #endif
 
 namespace uwvm::cmdline::paras::details

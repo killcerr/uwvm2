@@ -31,11 +31,11 @@ import utils.io;
 import utils.cmdline;
 import uwvm.cmdline;
 #else
-#include <fast_io.h>
-#include <fast_io_dsal/array.h>
-#include <utils/io/impl.h>
-#include <utils/cmdline/impl.h>
-#include <uwvm/cmdline/impl.h>
+# include <fast_io.h>
+# include <fast_io_dsal/array.h>
+# include <utils/io/impl.h>
+# include <utils/cmdline/impl.h>
+# include <uwvm/cmdline/impl.h>
 #endif
 
 namespace uwvm::cmdline::paras::details

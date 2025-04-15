@@ -35,11 +35,11 @@
 import fast_io;
 import utils.io;
 import utils.cmdline;
-#else
-#include <fast_io.h>
-#include <utils/io/impl.h>
-#include <utils/cmdline/impl.h>
-#endif
+# else
+#  include <fast_io.h>
+#  include <utils/io/impl.h>
+#  include <utils/cmdline/impl.h>
+# endif
 
 namespace uwvm::cmdline::paras::details
 {
