@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.concepts;
-export import :root;
-export import :operation;
-#else
+#ifndef UWVM_MODULE
 #include "root.h"
 #include "operation.h"
 #endif

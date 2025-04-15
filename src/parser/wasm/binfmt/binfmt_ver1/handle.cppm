@@ -24,6 +24,22 @@
 
 module;
 
+// std
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <algorithm>
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+
+export module parser.wasm.binfmt.binfmt_ver1:handler;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "handler.h"

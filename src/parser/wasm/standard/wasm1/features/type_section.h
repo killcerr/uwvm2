@@ -24,20 +24,6 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
-
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
-
-#if UWVM_MODULE
-export module parser.wasm.standard.wasm1.features:type_section;
-#endif
-
 #if UWVM_MODULE
 import fast_io;
 import utils.io;
@@ -47,6 +33,17 @@ import parser.wasm.standard.wasm1.section;
 import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
 #else
+// std
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+// import
 #include <fast_io.h>
 #include <utils/io/impl.h>
 #include <parser/wasm/concepts/impl.h>
@@ -56,10 +53,11 @@ import parser.wasm.binfmt.binfmt_ver1;
 #include <parser/wasm/binfmt/binfmt_ver1/impl.h>
 #endif
 
-#if UWVM_MODULE
-export 
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace parser::wasm::standard::wasm1::features
+
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
     template <::parser::wasm::concepts::wasm_feature... Fs>
     struct type_section_storage_t

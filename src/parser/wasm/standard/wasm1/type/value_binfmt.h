@@ -22,30 +22,28 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
-
-#include <parser/wasm/feature/feature_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.type:value_binfmt;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import :value_type;
 #else
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
+// macro
+#include <parser/wasm/feature/feature_push_macro.h>
+// import
 #include <fast_io.h>
 #include <fast_io_dsal/string_view.h>
 #include "value_type.h"
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace parser::wasm::standard::wasm1::type
+
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
 {
     /// @brief      Value Types
     /// @details    Value types are encoded by a single byte.

@@ -22,27 +22,25 @@
 
 #pragma once
 
+#ifdef UWVM_MODULE
+import fast_io;
+#else
+// std
 #include <cstdint>
 #include <cstddef>
 #include <concepts>
 #include <bit>
-
+// macro
 #include <parser/wasm/feature/feature_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.type:value_type;
-#endif
-
-#ifdef UWVM_MODULE
-import fast_io;
-#else
+// import
 #include <fast_io.h>
 #endif
 
-#ifdef UWVM_MODULE
-export 
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace parser::wasm::standard::wasm1::type
+
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
 {
     /// @brief      Bytes
     /// @details    The simplest form of value are raw uninterpreted bytes. In the abstract syntax they are represented as hexadecimal

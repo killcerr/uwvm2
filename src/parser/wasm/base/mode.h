@@ -24,14 +24,11 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.base:mode;
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
 #endif
 
-#ifdef UWVM_MODULE
-export
-#endif
-    namespace parser::wasm::base
+UWVM_MODULE_EXPORT namespace parser::wasm::base
 {
     /// @brief wasm running mode
     enum class mode : unsigned

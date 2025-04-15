@@ -24,13 +24,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1.type;
-export import parser.wasm.standard.wasm1.section;
-export import parser.wasm.standard.wasm1.opcode;
-export import parser.wasm.standard.wasm1.features;
-#else
+#ifndef UWVM_MODULE
 #include "type/impl.h"
 #include "section/impl.h"
 #include "opcode/impl.h"

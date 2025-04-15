@@ -24,9 +24,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.proposal.relaxed_simd;
-export import parser.wasm.proposal.relaxed_simd.type;
-#else
+#ifndef UWVM_MODULE
 # include "type/impl.h"
 #endif

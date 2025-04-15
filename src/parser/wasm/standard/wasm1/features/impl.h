@@ -24,11 +24,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.features;
-export import :binfmt;
-export import :type_section;
-#else
+#ifndef UWVM_MODULE
 # include "binfmt.h"
 # include "type_section.h"
 #endif

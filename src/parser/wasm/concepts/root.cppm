@@ -22,6 +22,17 @@
 
 module;
 
+// std
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include <concepts>
+// macro
+#include <utils/macro/push_macros.h>
+
+export module parser.wasm.concepts:root;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "root.h"

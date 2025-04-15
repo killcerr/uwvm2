@@ -24,19 +24,6 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
-
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.features:binfmt;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
@@ -47,6 +34,16 @@ import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
 import :type_section;
 #else
+// std
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+// import
 #include <fast_io.h>
 #include <fast_io_dsal/string_view.h>
 #include <fast_io_dsal/tuple.h>
@@ -59,10 +56,11 @@ import :type_section;
 #include "type_section.h"
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace parser::wasm::standard::wasm1::features
+
+UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::features
 {
     struct wasm1
     {

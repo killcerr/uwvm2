@@ -24,7 +24,12 @@
 
 module;
 
+export module parser.wasm.base;
+export import :abi;
+export import :mode;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "impl.h"
 

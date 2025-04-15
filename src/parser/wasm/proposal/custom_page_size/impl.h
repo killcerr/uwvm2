@@ -24,9 +24,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.proposal.custom_page_size;
-export import parser.wasm.proposal.custom_page_size.type;
-#else
+#ifndef UWVM_MODULE
 # include "type/impl.h"
 #endif

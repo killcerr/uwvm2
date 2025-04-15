@@ -23,12 +23,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.proposal;
-export import parser.wasm.proposal.relaxed_simd;
-export import parser.wasm.proposal.half_precision;
-export import parser.wasm.proposal.custom_page_size;
-#else
+#ifndef UWVM_MODULE
 #include "relaxed_simd/impl.h"
 #include "half_precision/impl.h"
 #include "custom_page_size/impl.h"

@@ -24,6 +24,10 @@
 
 module;
 
+export module parser.wasm.standard.wasm2_MultiMemory;
+export import parser.wasm.standard.wasm2;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "impl.h"

@@ -24,9 +24,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.binfmt.base;
-export import :base;
-#else
+#ifndef UWVM_MODULE
 # include "base.h"
 #endif

@@ -22,20 +22,8 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
-#include <concepts>
-#include <utility>
-#include <algorithm>
-#include <vector>
-
 #if !(__cpp_pack_indexing >= 202311L)
 # error "UWVM requires at least C++26 standard compiler."
-#endif
-
-#ifdef UWVM_MODULE
-export module parser.wasm.concepts:operation;
 #endif
 
 #ifdef UWVM_MODULE
@@ -43,16 +31,26 @@ import fast_io;
 import parser.wasm.standard.wasm1.type;
 import :root;
 #else
+// std
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include <concepts>
+#include <utility>
+#include <algorithm>
+#include <vector>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 # include "root.h"
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace parser::wasm::concepts
+
+UWVM_MODULE_EXPORT  namespace parser::wasm::concepts
 {
     namespace details
     {

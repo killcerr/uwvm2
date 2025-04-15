@@ -22,24 +22,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
-
-#include <utils/macro/push_macros.h>
-#include <parser/wasm/feature/feature_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.type:modules;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import :value_type;
 import :value_binfmt;
 import :section_type;
 #else
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
+// macro
+#include <utils/macro/push_macros.h>
+#include <parser/wasm/feature/feature_push_macro.h>
+// import
 #include <fast_io.h>
 #include <fast_io_dsal/vector.h>
 #include <fast_io_dsal/string_view.h>
@@ -48,10 +45,11 @@ import :section_type;
 #include "section_type.h"
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace parser::wasm::standard::wasm1::type
+
+UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::type
 {
     /// @brief      Indices
     /// @details    Definitionsarereferencedwithzero-basedindices. Eachclassofdefinitionhasitsownindexspace, asdistinguished
@@ -165,10 +163,7 @@ namespace parser::wasm::standard::wasm1::type
 
 }  // namespace parser::wasm::standard::wasm1::type
 
-#ifdef UWVM_MODULE
-export 
-#endif
-namespace fast_io::freestanding
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
     struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_function_type>

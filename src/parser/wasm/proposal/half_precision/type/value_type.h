@@ -22,21 +22,22 @@
 
 #pragma once
 
+#ifdef UWVM_MODULE
+#else
+// std
 #include <cstdint>
 #include <cstddef>
 #include <concepts>
 #include <bit>
-
+// macro
 #include <parser/wasm/feature/feature_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.proposal.half_precision.type:value_type;
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace parser::wasm::proposal::half_precision::value_type
+
+UWVM_MODULE_EXPORT  namespace parser::wasm::proposal::half_precision::value_type
 {
     /// @brief      fp16
     /// @details    new feature

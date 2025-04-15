@@ -23,18 +23,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard;
-export import parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1p1;
-export import parser.wasm.standard.wasm2;
-export import parser.wasm.standard.wasm2_MultiMemory;
-export import parser.wasm.standard.wasm2_TailCalls;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
-export import parser.wasm.standard.wasm2_thread;
-export import parser.wasm.standard.wasm3;
-#else
+#ifndef UWVM_MODULE
 #include "wasm1/impl.h"
 #include "wasm1p1/impl.h"
 #include "wasm2/impl.h"

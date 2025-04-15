@@ -22,6 +22,17 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
+
+// macro
+#include <utils/macro/push_macros.h>
+#include <parser/wasm/feature/feature_push_macro.h>
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "modules.h"

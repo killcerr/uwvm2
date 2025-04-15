@@ -22,6 +22,17 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
+// macro
+#include <parser/wasm/feature/feature_push_macro.h>
+
+export module parser.wasm.proposal.half_precision.type:value_type;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "value_type.h"

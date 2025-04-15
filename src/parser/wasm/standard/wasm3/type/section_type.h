@@ -22,27 +22,24 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
-
-#include <parser/wasm/feature/feature_push_macro.h>
-
 #ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm3.type:section_type;
-#else
-
-# ifdef UWVM_MODULE
 import parser.wasm.standard.wasm2;
-# else
-#  include <parser/wasm/standard/wasm2/impl.h>
-# endif
+#else
+// std
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <bit>
+// macro
+# include <parser/wasm/feature/feature_push_macro.h>
+# include <parser/wasm/standard/wasm2/impl.h>
+#endif
 
-# ifdef UWVM_MODULE
-export
-# endif
-namespace parser::wasm::standard::wasm3::type
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
+#endif
+
+UWVM_MODULE_EXPORT   namespace parser::wasm::standard::wasm3::type
 {
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.

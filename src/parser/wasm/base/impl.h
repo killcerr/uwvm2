@@ -23,11 +23,7 @@
  ****************************************/
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.base;
-export import :abi;
-export import :mode;
-#else
+#ifndef UWVM_MODULE
 # include "abi.h"
 # include "mode.h"
 #endif

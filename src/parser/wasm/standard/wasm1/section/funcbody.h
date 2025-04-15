@@ -22,25 +22,23 @@
 
 #pragma once
 
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.section:funcbody;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.standard.wasm1.type;
 #else
+// macro
+# include <utils/macro/push_macros.h>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
 #endif
-    namespace parser::wasm::standard::wasm1::section
+
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
 {
     /// @brief function bodys, use to storage
     struct code_func_body UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
@@ -50,10 +48,7 @@ export
     };
 }  // namespace parser::wasm::standard::wasm1::section
 
-#ifdef UWVM_MODULE
-export
-#endif
-    namespace fast_io::freestanding
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
     struct is_trivially_copyable_or_relocatable<parser::wasm::standard::wasm1::section::code_func_body>

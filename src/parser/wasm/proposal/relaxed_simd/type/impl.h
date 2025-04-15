@@ -22,9 +22,6 @@
 
 #pragma once
 
-#define UWVM_MODULE
-export module parser.wasm.proposal.relaxed_simd.type;
-export import :value_type;
-#else
+#ifndef UWVM_MODULE
 #include "value_type.h"
 #endif

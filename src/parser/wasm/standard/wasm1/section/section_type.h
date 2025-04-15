@@ -23,14 +23,11 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.section:section_type;
-#endif
-
-#ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.standard.wasm1.type;
 import :funcbody;
 #else
+// import
 #include <fast_io.h>
 #include <fast_io_dsal/string_view.h>
 #include <fast_io_dsal/vector.h>
@@ -38,10 +35,11 @@ import :funcbody;
 #include "funcbody.h"
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace parser::wasm::standard::wasm1::section
+
+UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::section
 {
     /// @brief      Sections
     /// @details    Each section consists of a one-byte section id
@@ -219,10 +217,7 @@ namespace parser::wasm::standard::wasm1::section
     };
 }  // namespace parser::wasm::standard::wasm1::section
 
-#ifdef UWVM_MODULE
-export
-#endif
-namespace fast_io::freestanding
+UWVM_MODULE_EXPORT  namespace fast_io::freestanding
 {
     template <>
     struct is_zero_default_constructible<::parser::wasm::standard::wasm1::section::custom_section>

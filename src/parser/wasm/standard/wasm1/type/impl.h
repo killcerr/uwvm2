@@ -22,13 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.type;
-export import :value_type;
-export import :value_binfmt;
-export import :section_type;
-export import :modules;
-#else
+#ifndef UWVM_MODULE
 #include "value_type.h"
 #include "value_binfmt.h"
 #include "section_type.h"

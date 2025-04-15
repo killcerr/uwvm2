@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm3.type;
-export import :section_type;
-#else
+#ifndef UWVM_MODULE
 #include "section_type.h"
 #endif

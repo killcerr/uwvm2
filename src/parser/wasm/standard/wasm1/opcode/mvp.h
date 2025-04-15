@@ -22,27 +22,25 @@
 
 #pragma once
 
+#ifdef UWVM_MODULE
+import parser.wasm.standard.wasm1.type;
+#else
+// std
 #include <cstdint>
 #include <cstddef>
 #include <concepts>
 #include <bit>
-
+// macro
 #include <parser/wasm/feature/feature_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.opcode:mvp;
-#endif
-
-#ifdef UWVM_MODULE
-import parser.wasm.standard.wasm1.type;
-#else
+// import
 # include <parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace parser::wasm::standard::wasm1::opcode
+
+UWVM_MODULE_EXPORT   namespace parser::wasm::standard::wasm1::opcode
 {
     enum class op_basic : ::parser::wasm::standard::wasm1::type::op_basic_type
     {

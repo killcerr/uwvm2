@@ -22,6 +22,18 @@
 
 module;
 
+// std
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include <concepts>
+#include <utility>
+#include <algorithm>
+#include <vector>
+
+export module parser.wasm.concepts:operation;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "operation.h"

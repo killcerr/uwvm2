@@ -24,27 +24,25 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <type_traits>
-#include <memory>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.binfmt.base:base;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.standard.wasm1.type;
 #else
+// std
+# include <cstdint>
+# include <cstddef>
+# include <type_traits>
+# include <memory>
+// import
 # include <fast_io.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
 #endif
-    namespace parser::wasm::binfmt
+
+UWVM_MODULE_EXPORT namespace parser::wasm::binfmt
 {
     struct module_span_t
     {

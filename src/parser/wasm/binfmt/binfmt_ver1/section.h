@@ -24,33 +24,31 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.binfmt.binfmt_ver1:section;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
 #else
+// std
+# include <cstddef>
+# include <cstdint>
+# include <concepts>
+# include <type_traits>
+# include <utility>
+// macro
+# include <utils/macro/push_macros.h>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace parser::wasm::binfmt::ver1
+
+UWVM_MODULE_EXPORT   namespace parser::wasm::binfmt::ver1
 {
     /// @brief  The method that will get the extensible section type
     /// @see    test\non-platform-specific\0001.parser\0001.concept\splice_section_storage_structure.cc

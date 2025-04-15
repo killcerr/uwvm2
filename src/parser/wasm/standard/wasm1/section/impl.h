@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.section;
-export import :funcbody;
-export import :section_type;
-#else
+#ifndef UWVM_MODULE
 #include "funcbody.h"
 #include "section_type.h"
 #endif

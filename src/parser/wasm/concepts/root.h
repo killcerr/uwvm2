@@ -22,31 +22,29 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
-#include <concepts>
-
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.concepts:root;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.standard.wasm1.type;
 #else
+// std
+# include <cstddef>
+# include <cstdint>
+# include <type_traits>
+# include <concepts>
+// macro
+# include <utils/macro/push_macros.h>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
 # include <fast_io_dsal/string_view.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
 #endif
-    namespace parser::wasm::concepts
+
+UWVM_MODULE_EXPORT namespace parser::wasm::concepts
 {
     /// @brief Prevent inheritance effects when adl matching
     template <typename FeatureType>

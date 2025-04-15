@@ -22,21 +22,23 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
-
-#include <parser/wasm/feature/feature_push_macro.h>
-
 #ifdef UWVM_MODULE
-export module parser.wasm.proposal.relaxed_simd.type:value_type;
+// no import
+#else
+// std
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <bit>
+// macro
+# include <parser/wasm/feature/feature_push_macro.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
 #endif
-namespace parser::wasm::proposal::relaxed_simd::value_type
+
+UWVM_MODULE_EXPORT namespace parser::wasm::proposal::relaxed_simd::value_type
 {
 
     /// @brief      bf16

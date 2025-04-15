@@ -24,6 +24,20 @@
 
 module;
 
+// std
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+
+export module parser.wasm.standard.wasm1.features:type_section;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "type_section.h"

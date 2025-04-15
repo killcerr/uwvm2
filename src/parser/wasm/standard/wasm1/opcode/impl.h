@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1.opcode;
-import :mvp;
-#else
+#ifndef UWVM_MODULE
 #include "mvp.h"
 #endif

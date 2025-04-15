@@ -22,6 +22,18 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <type_traits>
+#include <concepts>
+#include <bit>
+// macro
+#include <parser/wasm/feature/feature_push_macro.h>
+
+export module parser.wasm.proposal.custom_page_size.type:value_type;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "value_type.h"

@@ -24,6 +24,15 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <type_traits>
+#include <memory>
+
+export module parser.wasm.binfmt.base:base;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "base.h"

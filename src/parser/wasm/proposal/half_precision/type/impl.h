@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.proposal.half_precision.type;
-export import :value_type;
-#else
+#ifndef UWVM_MODULE
 #include "value_type.h"
 #endif

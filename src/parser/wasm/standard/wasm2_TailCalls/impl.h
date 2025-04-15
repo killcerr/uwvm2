@@ -24,9 +24,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm2_TailCalls;
-export import parser.wasm.standard.wasm2;
-#else
+#ifndef UWVM_MODULE
 # include <parser/wasm/standard/wasm2/impl.h>
 #endif

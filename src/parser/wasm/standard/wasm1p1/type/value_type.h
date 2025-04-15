@@ -22,29 +22,27 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
-
-#include <parser/wasm/feature/feature_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm1p1.type:value_type;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.standard.wasm1;
 #else
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <bit>
+// macro
+#include <parser/wasm/feature/feature_push_macro.h>
+// import
 #include <fast_io.h>
 #include <parser/wasm/standard/wasm1/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace parser::wasm::standard::wasm1p1::type
+
+UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1p1::type
 {
     /// @brief      Vector Types
     /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,

@@ -23,9 +23,6 @@
  ****************************************/
 
 #pragma once
-#ifdef UWVM_MODULE
-export module parser.wasm.standard.wasm2;
-export import parser.wasm.standard.wasm1p1;
-#else
+#ifndef UWVM_MODULE
 #include <parser/wasm/standard/wasm1p1/impl.h>
 #endif
