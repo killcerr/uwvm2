@@ -28,19 +28,19 @@
 // no import
 #else
 // macro
-#include <utils/macro/push_macros.h>
+# include <utils/macro/push_macros.h>
 // include
 /// @brief      Including intrin.h in the absence of __builtin_prefetch
-#if !__has_builtin(__builtin_prefetch)
-# include <intrin.h>;
-#endif
+# if !__has_builtin(__builtin_prefetch)
+#  include <intrin.h>;
+# endif
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT   namespace utils::intrinsics
+UWVM_MODULE_EXPORT namespace utils::intrinsics
 {
     /// @brief      Direct conversion to cpu prefetch instructions
     /// @details    write: write or read sensitive

@@ -28,14 +28,14 @@
 import fast_io;
 #else
 // import
-#include <fast_io.h>
-#include <fast_io_dsal/vector.h>
+# include <fast_io.h>
+# include <fast_io_dsal/vector.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT  namespace uwvm::wasm::storage
+UWVM_MODULE_EXPORT namespace uwvm::wasm::storage
 {
     inline ::fast_io::vector<::fast_io::native_file_loader> import_wasm_file{};  // No global variable dependencies from other translation units
 

@@ -31,22 +31,22 @@ import uwvm.cmdline;
 import uwvm.run;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
+# include <cstdint>
+# include <cstddef>
 // macro
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
+# include <utils/macro/push_macros.h>
+# include <utils/ansies/ansi_push_macro.h>
 // import
-#include <fast_io.h>
-#include <utils/global/impl.h>
-#include <uwvm/cmdline/impl.h>
-#include <uwvm/run/impl.h>
+# include <fast_io.h>
+# include <utils/global/impl.h>
+# include <uwvm/cmdline/impl.h>
+# include <uwvm/run/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT  namespace uwvm
+UWVM_MODULE_EXPORT namespace uwvm
 {
     /// @brief      uwvm c++ uz u8 main function
     /// @param      argc Argument Count
@@ -58,7 +58,7 @@ UWVM_MODULE_EXPORT  namespace uwvm
         {
             case ::uwvm::cmdline::parsing_return_val::def: break;
             case ::uwvm::cmdline::parsing_return_val::return0: return 0;
-            case ::uwvm::cmdline::parsing_return_val::returnm1: return -1; // Invalid parameters
+            case ::uwvm::cmdline::parsing_return_val::returnm1: return -1;  // Invalid parameters
             default: ::fast_io::unreachable();
         }
 

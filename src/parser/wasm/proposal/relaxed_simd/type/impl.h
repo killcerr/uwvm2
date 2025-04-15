@@ -23,5 +23,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "value_type.h"
+# include "value_type.h"
 #endif

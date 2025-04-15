@@ -26,15 +26,15 @@
 import utils.cmdline;
 import uwvm.cmdline.params;
 #else
-// std 
-#include <memory>
+// std
+# include <memory>
 // import
-#include <utils/cmdline/impl.h>
-#include "params/impl.h"
+# include <utils/cmdline/impl.h>
+# include "params/impl.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm::cmdline

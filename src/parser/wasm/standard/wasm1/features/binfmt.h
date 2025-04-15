@@ -35,32 +35,32 @@ import parser.wasm.binfmt.binfmt_ver1;
 import :type_section;
 #else
 // std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
+# include <cstddef>
+# include <cstdint>
+# include <concepts>
+# include <type_traits>
+# include <utility>
+# include <memory>
 // macro
-#include <utils/macro/push_macros.h>
+# include <utils/macro/push_macros.h>
 // import
-#include <fast_io.h>
-#include <fast_io_dsal/string_view.h>
-#include <fast_io_dsal/tuple.h>
-#include <utils/io/impl.h>
-#include <parser/wasm/concepts/impl.h>
-#include <parser/wasm/standard/wasm1/type/impl.h>
-#include <parser/wasm/standard/wasm1/section/impl.h>
-#include <parser/wasm/standard/wasm1/opcode/impl.h>
-#include <parser/wasm/binfmt/binfmt_ver1/impl.h>
-#include "type_section.h"
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <fast_io_dsal/tuple.h>
+# include <utils/io/impl.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <parser/wasm/standard/wasm1/section/impl.h>
+# include <parser/wasm/standard/wasm1/opcode/impl.h>
+# include <parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include "type_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::features
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
     struct wasm1
     {

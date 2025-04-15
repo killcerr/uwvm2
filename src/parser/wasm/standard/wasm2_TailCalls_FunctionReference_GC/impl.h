@@ -25,5 +25,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include <parser/wasm/standard/wasm2_TailCalls_FunctionReference/impl.h>
+# include <parser/wasm/standard/wasm2_TailCalls_FunctionReference/impl.h>
 #endif

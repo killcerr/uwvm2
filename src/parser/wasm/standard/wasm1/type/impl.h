@@ -23,9 +23,9 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "value_type.h"
-#include "value_binfmt.h"
-#include "section_type.h"
-#include "modules.h"
+# include "value_type.h"
+# include "value_binfmt.h"
+# include "section_type.h"
+# include "modules.h"
 #endif
 

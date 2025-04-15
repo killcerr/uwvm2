@@ -25,9 +25,9 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
-#ifdef UWVM_TIMER
+# ifdef UWVM_TIMER
 import utils.debug;
-#endif
+# endif
 import uwvm.cmdline;
 import uwvm.wasm.storage;
 import uwvm.wasm.feature;
@@ -36,30 +36,30 @@ import parser.wasm.standard;
 import parser.wasm.binfmt.base;
 #else
 // std
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
+# include <cstddef>
+# include <cstdint>
+# include <type_traits>
 // macro
-#include <utils/ansies/ansi_push_macro.h>
+# include <utils/ansies/ansi_push_macro.h>
 // import
-#include <fast_io.h>
-#include <utils/io/impl.h>
-#ifdef UWVM_TIMER
-#include <utils/debug/impl.h>
-#endif
-#include <uwvm/cmdline/impl.h>
-#include <uwvm/wasm/storage/impl.h>
-#include <uwvm/wasm/feature/impl.h>
-#include <parser/wasm/concepts/impl.h>
-#include <parser/wasm/standard/impl.h>
-#include <parser/wasm/binfmt/base/impl.h>
+# include <fast_io.h>
+# include <utils/io/impl.h>
+# ifdef UWVM_TIMER
+#  include <utils/debug/impl.h>
+# endif
+# include <uwvm/cmdline/impl.h>
+# include <uwvm/wasm/storage/impl.h>
+# include <uwvm/wasm/feature/impl.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/impl.h>
+# include <parser/wasm/binfmt/base/impl.h>
 
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT  namespace uwvm::run
+UWVM_MODULE_EXPORT namespace uwvm::run
 {
     inline int run() noexcept
     {
@@ -68,7 +68,7 @@ UWVM_MODULE_EXPORT  namespace uwvm::run
             ::fast_io::io::perr(
                 ::utils::u8err,
                 UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No input file.\n\n" UWVM_AES_U8_RST_ALL);
-            return -2; // The specified file is not available or cannot be opened
+            return -2;  // The specified file is not available or cannot be opened
         }
 
         auto module_name{::uwvm::cmdline::wasm_file_ppos->str};
@@ -95,7 +95,7 @@ UWVM_MODULE_EXPORT  namespace uwvm::run
                                 u8"\n"
 # endif
                             );
-            return -2; // The specified file is not available or cannot be opened
+            return -2;  // The specified file is not available or cannot be opened
         }
 #endif
 
@@ -117,7 +117,7 @@ UWVM_MODULE_EXPORT  namespace uwvm::run
                                     ::fast_io::mnp::addrvw(nullptr),
                                     u8") Illegal WebAssembly file format." UWVM_AES_U8_RST_ALL u8"\n\n");
 #endif
-                return -3; // wasm parsing error
+                return -3;  // wasm parsing error
             }
             case 1:
             {
@@ -140,7 +140,7 @@ UWVM_MODULE_EXPORT  namespace uwvm::run
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                 catch(::fast_io::error e)
                 {
-                    return -3; // wasm parsing error
+                    return -3;  // wasm parsing error
                 }
 #endif
 
@@ -158,7 +158,7 @@ UWVM_MODULE_EXPORT  namespace uwvm::run
                                     ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
                                     UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
 #endif
-                return -3; // wasm parsing error
+                return -3;  // wasm parsing error
             }
         }
 

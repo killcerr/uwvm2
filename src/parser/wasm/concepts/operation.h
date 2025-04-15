@@ -32,13 +32,13 @@ import parser.wasm.standard.wasm1.type;
 import :root;
 #else
 // std
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
-#include <concepts>
-#include <utility>
-#include <algorithm>
-#include <vector>
+# include <cstddef>
+# include <cstdint>
+# include <type_traits>
+# include <concepts>
+# include <utility>
+# include <algorithm>
+# include <vector>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
@@ -47,10 +47,10 @@ import :root;
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT  namespace parser::wasm::concepts
+UWVM_MODULE_EXPORT namespace parser::wasm::concepts
 {
     namespace details
     {

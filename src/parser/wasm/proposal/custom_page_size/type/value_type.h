@@ -25,20 +25,17 @@
 #ifdef UWVM_MODULE
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <type_traits>
-#include <concepts>
-#include <bit>
+# include <cstdint>
+# include <cstddef>
+# include <type_traits>
+# include <concepts>
+# include <bit>
 // macro
-#include <parser/wasm/feature/feature_push_macro.h>
+# include <parser/wasm/feature/feature_push_macro.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT   namespace parser::wasm::proposal::custom_page_size::value_type
-{
-
-}  // namespace parser::wasm::proposal::custom_page_size::value_type
+UWVM_MODULE_EXPORT namespace parser::wasm::proposal::custom_page_size::value_type {}  // namespace parser::wasm::proposal::custom_page_size::value_type

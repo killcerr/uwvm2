@@ -27,22 +27,22 @@ import fast_io;
 import parser.wasm.standard.wasm1;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <bit>
 // macro
-#include <parser/wasm/feature/feature_push_macro.h>
+# include <parser/wasm/feature/feature_push_macro.h>
 // import
-#include <fast_io.h>
-#include <parser/wasm/standard/wasm1/impl.h>
+# include <fast_io.h>
+# include <parser/wasm/standard/wasm1/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1p1::type
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
 {
     /// @brief      Vector Types
     /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,
@@ -346,7 +346,7 @@ UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1p1::type
     }  // namespace details
 
     template <::std::integral char_type>
-    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, wasm_v128>, char_type* iter, wasm_v128 v128_val) noexcept
+    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, wasm_v128>, char_type * iter, wasm_v128 v128_val) noexcept
     {
         return details::print_reserve_v128_i8x16_impl(iter, v128_val);
     }

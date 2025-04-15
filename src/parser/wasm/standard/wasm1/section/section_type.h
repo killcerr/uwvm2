@@ -28,18 +28,18 @@ import parser.wasm.standard.wasm1.type;
 import :funcbody;
 #else
 // import
-#include <fast_io.h>
-#include <fast_io_dsal/string_view.h>
-#include <fast_io_dsal/vector.h>
-#include <parser/wasm/standard/wasm1/type/impl.h>
-#include "funcbody.h"
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <fast_io_dsal/vector.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+# include "funcbody.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::section
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
 {
     /// @brief      Sections
     /// @details    Each section consists of a one-byte section id
@@ -217,7 +217,7 @@ UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::section
     };
 }  // namespace parser::wasm::standard::wasm1::section
 
-UWVM_MODULE_EXPORT  namespace fast_io::freestanding
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
     struct is_zero_default_constructible<::parser::wasm::standard::wasm1::section::custom_section>

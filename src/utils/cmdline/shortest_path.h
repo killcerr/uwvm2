@@ -26,21 +26,21 @@
 import fast_io;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
 // macro
-#include <utils/macro/push_macros.h>
+# include <utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT  namespace utils::cmdline
+UWVM_MODULE_EXPORT namespace utils::cmdline
 {
     /// @brief      Shortest Path Algorithm for Strings
     /// @details    Compute the shortest path between two strings with a time complexity of O(n²) and a space complexity of O(n).
@@ -52,8 +52,10 @@ UWVM_MODULE_EXPORT  namespace utils::cmdline
     /// @param      y_length    second string length
 
     template <::std::size_t Stack_Len = 0, ::std::integral char_type>
-    UWVM_GNU_CONST inline constexpr ::std::size_t
-        shortest_path(char_type const* x_str, ::std::size_t x_length, char_type const* y_str, ::std::size_t y_length) noexcept
+    UWVM_GNU_CONST inline constexpr ::std::size_t shortest_path(char_type const* x_str,
+                                                                ::std::size_t x_length,
+                                                                char_type const* y_str,
+                                                                ::std::size_t y_length) noexcept
     {
         using Alloc = ::fast_io::native_typed_thread_local_allocator<::std::size_t>;
 

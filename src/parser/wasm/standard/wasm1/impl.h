@@ -25,8 +25,8 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "type/impl.h"
-#include "section/impl.h"
-#include "opcode/impl.h"
-#include "features/impl.h"
+# include "type/impl.h"
+# include "section/impl.h"
+# include "opcode/impl.h"
+# include "features/impl.h"
 #endif

@@ -24,7 +24,6 @@
 
 #pragma once
 
-
 #ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.base;
@@ -33,15 +32,15 @@ import parser.wasm.standard.wasm1.type;
 import uwvm.wasm.feature;
 #else
 // import
-#include <fast_io.h>
-#include <parser/wasm/base/impl.h>
-#include <parser/wasm/concepts/impl.h>
-#include <parser/wasm/standard/wasm1/type/impl.h>
-#include <uwvm/wasm/feature/impl.h>
+# include <fast_io.h>
+# include <parser/wasm/base/impl.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm/wasm/feature/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm::wasm::storage

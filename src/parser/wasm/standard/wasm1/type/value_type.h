@@ -26,18 +26,18 @@
 import fast_io;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <bit>
 // macro
-#include <parser/wasm/feature/feature_push_macro.h>
+# include <parser/wasm/feature/feature_push_macro.h>
 // import
-#include <fast_io.h>
+# include <fast_io.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type

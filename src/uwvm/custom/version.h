@@ -26,14 +26,14 @@
 export import utils.version;  // print defined method should be export
 #else
 // std
-#include <cstdint>
-#include <cstddef>
+# include <cstdint>
+# include <cstddef>
 // import
-#include <utils/version/impl.h>
+# include <utils/version/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm::custom

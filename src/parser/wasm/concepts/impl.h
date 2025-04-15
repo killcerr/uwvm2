@@ -23,6 +23,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "root.h"
-#include "operation.h"
+# include "root.h"
+# include "operation.h"
 #endif

@@ -24,7 +24,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "relaxed_simd/impl.h"
-#include "half_precision/impl.h"
-#include "custom_page_size/impl.h"
+# include "relaxed_simd/impl.h"
+# include "half_precision/impl.h"
+# include "custom_page_size/impl.h"
 #endif

@@ -41,22 +41,22 @@ import fast_io;
 import utils.io;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <memory>
-#include <bit>
+# include <cstdint>
+# include <cstddef>
+# include <memory>
+# include <bit>
 // macro
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
+# include <utils/macro/push_macros.h>
+# include <utils/ansies/ansi_push_macro.h>
 // import
-#include <fast_io.h>
-#include <fast_io_dsal/vector.h>
-#include <fast_io_dsal/string_view.h>
-#include <utils/io/impl.h>
+# include <fast_io.h>
+# include <fast_io_dsal/vector.h>
+# include <fast_io_dsal/string_view.h>
+# include <utils/io/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm::cmdline

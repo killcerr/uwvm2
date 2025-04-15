@@ -34,27 +34,27 @@ import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
 #else
 // std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
+# include <cstddef>
+# include <cstdint>
+# include <concepts>
+# include <type_traits>
+# include <utility>
+# include <memory>
 // macro
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
+# include <utils/macro/push_macros.h>
+# include <utils/ansies/ansi_push_macro.h>
 // import
-#include <fast_io.h>
-#include <utils/io/impl.h>
-#include <parser/wasm/concepts/impl.h>
-#include <parser/wasm/standard/wasm1/type/impl.h>
-#include <parser/wasm/standard/wasm1/section/impl.h>
-#include <parser/wasm/standard/wasm1/opcode/impl.h>
-#include <parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include <fast_io.h>
+# include <utils/io/impl.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <parser/wasm/standard/wasm1/section/impl.h>
+# include <parser/wasm/standard/wasm1/opcode/impl.h>
+# include <parser/wasm/binfmt/binfmt_ver1/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
@@ -68,11 +68,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     };
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr bool
-        handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<type_section_storage_t<Fs...>>>,
-                                                     ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                                     [[maybe_unused]]::std::byte const* section_begin,
-                                                     [[maybe_unused]]::std::byte const* section_end)
+    inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+        ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<type_section_storage_t<Fs...>>>,
+        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        [[maybe_unused]] ::std::byte const* section_begin,
+        [[maybe_unused]] ::std::byte const* section_end)
     {
         auto& type_section_storage{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         [[maybe_unused]] auto& typesec{type_section_storage.typesec};

@@ -23,5 +23,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "version.h"
+# include "version.h"
 #endif

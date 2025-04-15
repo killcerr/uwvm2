@@ -36,17 +36,17 @@ import :section;
 import :def;
 #else
 // std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include <algorithm>
-#include <memory>
+# include <cstddef>
+# include <cstdint>
+# include <concepts>
+# include <type_traits>
+# include <utility>
+# include <vector>
+# include <algorithm>
+# include <memory>
 // macro
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
+# include <utils/macro/push_macros.h>
+# include <utils/ansies/ansi_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string.h>
@@ -65,10 +65,10 @@ import :def;
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT   namespace parser::wasm::binfmt::ver1
+UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 {
     [[noreturn]] inline void throw_wasm_parse_code([[maybe_unused]] ::fast_io::parse_code code) UWVM_THROWS
     {
@@ -168,7 +168,7 @@ UWVM_MODULE_EXPORT   namespace parser::wasm::binfmt::ver1
     /// @throws     ::fast_io::error
     /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    inline void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
                                                           [[maybe_unused]] ::std::byte const* module_begin,
                                                           ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
                                                           ::std::byte const* section_begin,
@@ -202,7 +202,7 @@ UWVM_MODULE_EXPORT   namespace parser::wasm::binfmt::ver1
     /// @throws         ::fast_io::error
     /// @see            test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    inline void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
                                                           [[maybe_unused]] ::std::byte const* module_begin,
                                                           ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
                                                           ::std::byte const* section_begin,
@@ -249,8 +249,9 @@ UWVM_MODULE_EXPORT   namespace parser::wasm::binfmt::ver1
 #endif
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...>
-        wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const* const module_begin, ::std::byte const* const module_end) UWVM_THROWS
+    inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...> wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>,
+                                                                                                      ::std::byte const* const module_begin,
+                                                                                                      ::std::byte const* const module_end) UWVM_THROWS
     {
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 

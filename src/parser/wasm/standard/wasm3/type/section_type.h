@@ -36,10 +36,10 @@ import parser.wasm.standard.wasm2;
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT   namespace parser::wasm::standard::wasm3::type
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm3::type
 {
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.

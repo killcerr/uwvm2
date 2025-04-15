@@ -29,16 +29,16 @@
 import fast_io;
 # else
 // std
-#include <cstdint>
+#  include <cstdint>
 // macro
-#include <utils/macro/push_macros.h>
+#  include <utils/macro/push_macros.h>
 // import
 #  include <fast_io.h>
 # endif
 
-#ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
-#endif
+# ifndef UWVM_MODULE_EXPORT
+#  define UWVM_MODULE_EXPORT
+# endif
 
 UWVM_MODULE_EXPORT namespace utils::global
 {

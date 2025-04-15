@@ -24,13 +24,13 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "wasm1/impl.h"
-#include "wasm1p1/impl.h"
-#include "wasm2/impl.h"
-#include "wasm2_MultiMemory/impl.h"
-#include "wasm2_TailCalls/impl.h"
-#include "wasm2_TailCalls_FunctionReference/impl.h"
-#include "wasm2_TailCalls_FunctionReference_GC/impl.h"
-#include "wasm2_thread/impl.h"
-#include "wasm3/impl.h"
+# include "wasm1/impl.h"
+# include "wasm1p1/impl.h"
+# include "wasm2/impl.h"
+# include "wasm2_MultiMemory/impl.h"
+# include "wasm2_TailCalls/impl.h"
+# include "wasm2_TailCalls_FunctionReference/impl.h"
+# include "wasm2_TailCalls_FunctionReference_GC/impl.h"
+# include "wasm2_thread/impl.h"
+# include "wasm3/impl.h"
 #endif

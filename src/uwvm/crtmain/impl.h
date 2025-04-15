@@ -22,6 +22,6 @@
 
 #pragma once
 
-#ifndef UWVM_MODULE 
-#include "uwvm.h"
+#ifndef UWVM_MODULE
+# include "uwvm.h"
 #endif

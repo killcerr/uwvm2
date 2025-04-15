@@ -23,6 +23,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "install_path.h"
-#include "storage.h"
+# include "install_path.h"
+# include "storage.h"
 #endif

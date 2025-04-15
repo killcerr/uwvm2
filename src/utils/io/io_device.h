@@ -36,9 +36,9 @@ import fast_io;
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT  namespace utils
+UWVM_MODULE_EXPORT namespace utils
 {
     // io does not add meaningless namespaces.
 

@@ -39,9 +39,9 @@ import utils.cmdline;
 #  include <utils/cmdline/impl.h>
 # endif
 
-#ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
-#endif
+# ifndef UWVM_MODULE_EXPORT
+#  define UWVM_MODULE_EXPORT
+# endif
 
 UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
 {

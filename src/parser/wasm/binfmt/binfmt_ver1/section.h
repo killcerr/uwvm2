@@ -45,10 +45,10 @@ import parser.wasm.standard.wasm1.type;
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT   namespace parser::wasm::binfmt::ver1
+UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 {
     /// @brief  The method that will get the extensible section type
     /// @see    test\non-platform-specific\0001.parser\0001.concept\splice_section_storage_structure.cc

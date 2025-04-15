@@ -28,24 +28,24 @@ import :value_type;
 import :value_binfmt;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <bit>
 // macro
-#include <parser/wasm/feature/feature_push_macro.h>
+# include <parser/wasm/feature/feature_push_macro.h>
 // import
-#include <fast_io.h>
-#include <fast_io_dsal/string_view.h>
-#include "value_type.h"
-#include "value_binfmt.h"
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include "value_type.h"
+# include "value_binfmt.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::type
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
 {
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
@@ -265,14 +265,14 @@ UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::type
     }  // namespace details
 
     template <::std::integral char_type>
-    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, external_types>, char_type* iter, external_types exttype) noexcept
+    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, external_types>, char_type * iter, external_types exttype) noexcept
     {
         return details::print_reserve_extern_kind_impl(iter, exttype);
     }
 
 }  // namespace parser::wasm::standard::wasm1::type
 
-UWVM_MODULE_EXPORT  namespace fast_io::freestanding
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
     struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::function_type>

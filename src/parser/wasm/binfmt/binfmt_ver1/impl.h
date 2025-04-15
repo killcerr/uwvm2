@@ -25,7 +25,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "section.h"
-#include "def.h"
-#include "handler.h"
+# include "section.h"
+# include "def.h"
+# include "handler.h"
 #endif

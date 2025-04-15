@@ -27,18 +27,18 @@ import fast_io;
 import utils.cmdline;
 #else
 // std
-#include <memory>
+# include <memory>
 // macro
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
+# include <utils/macro/push_macros.h>
+# include <utils/ansies/ansi_push_macro.h>
 // improt
-#include <fast_io.h>
-#include <fast_io_dsal/string_view.h>
-#include <utils/cmdline/impl.h>
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <utils/cmdline/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras

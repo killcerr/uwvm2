@@ -29,19 +29,19 @@
 import fast_io;
 # else
 // std
-#include <cstdint>
-#include <memory>
+#  include <cstdint>
+#  include <memory>
 // macro
-#include <utils/macro/push_macros.h>
+#  include <utils/macro/push_macros.h>
 // import
 #  include <fast_io.h>
 # endif
 
-#ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
-#endif
+# ifndef UWVM_MODULE_EXPORT
+#  define UWVM_MODULE_EXPORT
+# endif
 
-UWVM_MODULE_EXPORT  namespace utils::global
+UWVM_MODULE_EXPORT namespace utils::global
 {
     /// @brief      cmd on windows nt does not enable ansi escaping by default.
     /// @details    Declare this via a global variable to set up ansi escaping at program runtime.

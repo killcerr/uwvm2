@@ -26,18 +26,18 @@
 import fast_io;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <compare>
-#include <concepts>
+# include <cstdint>
+# include <cstddef>
+# include <compare>
+# include <concepts>
 // import
 # include <fast_io.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT  namespace utils
+UWVM_MODULE_EXPORT namespace utils
 {
     // version does not add meaningless namespaces.
     struct version
@@ -97,7 +97,7 @@ UWVM_MODULE_EXPORT  namespace utils
     }  // namespace details
 
     template <::std::integral char_type>
-    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, version>, char_type* iter, version ver) noexcept
+    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, version>, char_type * iter, version ver) noexcept
     {
         return details::version_print_reserve_impl(iter, ver.x, ver.y, ver.z, ver.state);
     }

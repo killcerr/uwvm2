@@ -23,6 +23,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "funcbody.h"
-#include "section_type.h"
+# include "funcbody.h"
+# include "section_type.h"
 #endif

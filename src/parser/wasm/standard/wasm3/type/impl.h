@@ -23,5 +23,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "section_type.h"
+# include "section_type.h"
 #endif

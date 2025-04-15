@@ -23,7 +23,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "execute_wasm.h"
-#include "import_wasm.h"
-#include "import_dl.h"
+# include "execute_wasm.h"
+# include "import_wasm.h"
+# include "import_dl.h"
 #endif

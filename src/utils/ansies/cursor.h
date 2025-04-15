@@ -26,9 +26,9 @@
 import fast_io;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
 // import
 # include <fast_io.h>
 #endif
@@ -37,11 +37,11 @@ import fast_io;
 /// @details    These functions are not provided on these platforms to avoid unwanted behaviors
 
 #if !((defined(_WIN32) && defined(_WIN32_WINDOWS)) || defined(__MSDOS__) || defined(__DJGPP__))
-#ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
-#endif
+# ifndef UWVM_MODULE_EXPORT
+#  define UWVM_MODULE_EXPORT
+# endif
 
-UWVM_MODULE_EXPORT  namespace utils::ansies
+UWVM_MODULE_EXPORT namespace utils::ansies
 {
     struct crs
     {
@@ -82,7 +82,7 @@ UWVM_MODULE_EXPORT  namespace utils::ansies
 
     template <::std::integral char_type>
         requires (sizeof(char_type) == sizeof(char8_t))
-    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, crs>, char_type* iter, crs c) noexcept
+    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, crs>, char_type * iter, crs c) noexcept
     {
         return details::crs_print_reserve_impl(iter, c.cursor_var, c.feat);
     }

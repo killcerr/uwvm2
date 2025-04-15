@@ -23,5 +23,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "mvp.h"
+# include "mvp.h"
 #endif

@@ -27,12 +27,12 @@ import fast_io;
 import fast_io_crypto;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <memory>
-#include <algorithm>
+# include <cstdint>
+# include <cstddef>
+# include <memory>
+# include <algorithm>
 // import
-#include <utils/macro/push_macros.h>
+# include <utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
@@ -43,10 +43,10 @@ import fast_io_crypto;
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT   namespace utils::cmdline
+UWVM_MODULE_EXPORT namespace utils::cmdline
 {
     /// @brief Used to indicate parameter type
     enum class parameter_parsing_results_type : unsigned
@@ -150,14 +150,12 @@ UWVM_MODULE_EXPORT   namespace utils::cmdline
     using kns_u8_str_scatter_t = ::fast_io::basic_io_scatter_t<::fast_io::u8string_view>;
 
     /// @brief type for handle function
-    using handle_func_type = parameter_return_type (*)(parameter_parsing_results* para_begin,
-                                                       parameter_parsing_results* para_curr,
-                                                       parameter_parsing_results* para_end) noexcept;
+    using handle_func_type =
+        parameter_return_type (*)(parameter_parsing_results* para_begin, parameter_parsing_results* para_curr, parameter_parsing_results* para_end) noexcept;
 
     /// @brief type for pretreatment function
-    using parameter_func_type = void (*)(char8_t const* const*& argv_curr,
-                                         char8_t const* const* argv_end,
-                                         ::fast_io::vector<parameter_parsing_results>& pr) noexcept;
+    using parameter_func_type =
+        void (*)(char8_t const* const*& argv_curr, char8_t const* const* argv_end, ::fast_io::vector<parameter_parsing_results>& pr) noexcept;
 
     /// @brief Categorization of parameter types for help displays
     enum class categorization : unsigned
@@ -184,7 +182,7 @@ UWVM_MODULE_EXPORT   namespace utils::cmdline
     /// @details    Sort user-defined parameters.
     ///             This function only allows consteval to implement.
     template <::std::size_t N>
-    inline consteval auto parameter_sort(parameter const* const (&punsort)[N]) noexcept
+    inline consteval auto parameter_sort(parameter const* const(&punsort)[N]) noexcept
     {
         ::fast_io::array<parameter const*, N> res{};
         for(::std::size_t i{}; i < N; ++i) { res.index_unchecked(i) = punsort[i]; }

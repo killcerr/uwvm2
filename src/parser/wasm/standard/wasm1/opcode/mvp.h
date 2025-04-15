@@ -26,21 +26,21 @@
 import parser.wasm.standard.wasm1.type;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <bit>
 // macro
-#include <parser/wasm/feature/feature_push_macro.h>
+# include <parser/wasm/feature/feature_push_macro.h>
 // import
 # include <parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT   namespace parser::wasm::standard::wasm1::opcode
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::opcode
 {
     enum class op_basic : ::parser::wasm::standard::wasm1::type::op_basic_type
     {
