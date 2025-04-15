@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -22,10 +22,6 @@
 
 module;
 
-export module utils.global;
-export import :tzset;
-/// @brief only support on winnt (with win32 api)
-#if defined(_WIN32) && !defined(__CYGWIN__)
-export import :ansi_win32;
-export import :consolecp_win32;
-#endif
+#define UWVM_MODULE
+
+#include "impl.h"

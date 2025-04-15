@@ -22,5 +22,6 @@
 
 module;
 
-export module utils.debug;
-export import :timer;
+#define UWVM_MODULE
+
+#include "impl.h"

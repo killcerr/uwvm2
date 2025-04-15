@@ -22,5 +22,6 @@
 
 module;
 
-export module utils.intrinsics;
-export import :prefetch;
+#define UWVM_MODULE
+
+#include "impl.h"

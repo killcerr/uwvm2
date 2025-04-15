@@ -22,5 +22,6 @@
 
 module;
 
-export module utils.io;
-export import :io_device;
+#define UWVM_MODULE
+
+#include "impl.h"

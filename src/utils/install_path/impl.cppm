@@ -22,6 +22,6 @@
 
 module;
 
-export module utils.install_path;
-export import :install_path;
-export import :storage;
+#define UWVM_MODULE
+
+#include "impl.h"

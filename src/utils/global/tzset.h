@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-24
+ * @date        2025-03-21
  * @copyright   APL-2 License
  */
 
@@ -20,8 +20,30 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
-#define UWVM_MODULE
+#include <utils/macro/push_macros.h>
 
-#include "impl.h"
+#ifdef UWVM_MODULE
+export module utils.global:tzset;
+#endif
+
+#ifdef UWVM_MODULE
+import fast_io;
+#else
+# include <fast_io.h>
+#endif
+
+#ifdef UWVM_MODULE
+export
+#endif
+    namespace utils::global
+{
+    /// @brief      Declare this via a global variable to get the correct timezone data when the program is run.
+    struct tz_set_s
+    {
+        /// @brief      The tzset() function initializes the tzname variable from the TZ environment variable.
+        /// @see        tzset(3)
+        UWVM_GNU_COLD inline tz_set_s() noexcept { ::fast_io::posix_tzset(); }
+    };
+}  // namespace utils::global

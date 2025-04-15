@@ -22,35 +22,6 @@
 
 module;
 
-#include <utils/macro/push_macros.h>
+#define UWVM_MODULE
 
-#ifdef UWVM_SUPPORT_INSTALL_PATH
-# include <fast_io.h>
-# include <fast_io_driver/install_path.h>
-#endif
-
-export module utils.install_path:install_path;
-
-#ifdef UWVM_SUPPORT_INSTALL_PATH
-export namespace utils::install_path
-{
-    inline ::fast_io::install_path get_module_install_path_noexcept() noexcept
-    {
-        ::fast_io::install_path ret{};
-# ifdef __cpp_exceptions
-        try
-# endif
-        {
-            ret = ::fast_io::get_module_install_path();
-        }
-# ifdef __cpp_exceptions
-        catch(::fast_io::error)
-        {
-            // If you can't get the install path, do nothing!
-        }
-# endif
-        return ret;
-    }
-
-}  // namespace utils::install_path
-#endif
+#include "install_path.h"
