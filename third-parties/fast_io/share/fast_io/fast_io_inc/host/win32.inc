@@ -16,5 +16,7 @@ export namespace fast_io
         using ::fast_io::win32::SetConsoleOutputCP;
         using ::fast_io::win32::CommandLineToArgvW;
         using ::fast_io::win32::LocalFree;
+        using ::fast_io::win32::GetEnvironmentVariableW;
+        using ::fast_io::win32::GetEnvironmentVariableA;
     } // namespace win32
 }
