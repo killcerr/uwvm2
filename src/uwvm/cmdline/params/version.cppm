@@ -22,6 +22,15 @@
 
 module;
 
+// std
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+
+export module uwvm.cmdline.params:version;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "version.h"

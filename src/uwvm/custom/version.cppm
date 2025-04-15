@@ -22,6 +22,13 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+
+export module uwvm.custom:version;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "version.h"

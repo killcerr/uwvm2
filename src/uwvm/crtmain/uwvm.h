@@ -24,32 +24,29 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module uwvm.crtmain:uwvm;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.global;
 import uwvm.cmdline;
 import uwvm.run;
 #else
+// std
+#include <cstdint>
+#include <cstddef>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+// import
 #include <fast_io.h>
 #include <utils/global/impl.h>
 #include <uwvm/cmdline/impl.h>
 #include <uwvm/run/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm
+UWVM_MODULE_EXPORT  namespace uwvm
 {
     /// @brief      uwvm c++ uz u8 main function
     /// @param      argc Argument Count

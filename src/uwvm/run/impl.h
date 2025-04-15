@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module uwvm.run;
-export import :run;
-#else
+#ifndef UWVM_MODULE
 #include "run.h"
 #endif

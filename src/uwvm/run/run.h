@@ -22,16 +22,6 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
-
-#include <utils/ansies/ansi_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module uwvm.run:run;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
@@ -44,8 +34,14 @@ import uwvm.wasm.feature;
 import parser.wasm.concepts;
 import parser.wasm.standard;
 import parser.wasm.binfmt.base;
-
 #else
+// std
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+// macro
+#include <utils/ansies/ansi_push_macro.h>
+// import
 #include <fast_io.h>
 #include <utils/io/impl.h>
 #ifdef UWVM_TIMER
@@ -60,10 +56,10 @@ import parser.wasm.binfmt.base;
 
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm::run
+UWVM_MODULE_EXPORT  namespace uwvm::run
 {
     inline int run() noexcept
     {

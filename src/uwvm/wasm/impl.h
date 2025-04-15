@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module uwvm.wasm;
-export import uwvm.wasm.storage;
-export import uwvm.wasm.feature;
-#else
+#ifndef UWVM_MODULE
 #include "feature/impl.h"
 #include "storage/impl.h"
 #endif

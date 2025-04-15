@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE 
-export module uwvm.crtmain;
-export import :uwvm;
-#else
+#ifndef UWVM_MODULE 
 #include "uwvm.h"
 #endif

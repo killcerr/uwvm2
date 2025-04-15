@@ -22,23 +22,21 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-
-#ifdef UWVM_MODULE
-export module uwvm.custom:version;
-#endif
-
 #ifdef UWVM_MODULE
 export import utils.version;  // print defined method should be export
 #else
+// std
+#include <cstdint>
+#include <cstddef>
+// import
 #include <utils/version/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export 
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm::custom
+
+UWVM_MODULE_EXPORT namespace uwvm::custom
 {
     /// @brief      UWVM Version
     /// @details    2.major.minor.patch

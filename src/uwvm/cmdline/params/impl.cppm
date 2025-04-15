@@ -22,6 +22,19 @@
 
 module;
 
+export module uwvm.cmdline.params;
+export import :version;
+export import :run;
+export import :help;
+export import :mode;
+export import :wasm_abi;
+export import :wasm_binfmt;
+
+# ifdef _DEBUG
+export import :test;
+# endif
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "impl.h"

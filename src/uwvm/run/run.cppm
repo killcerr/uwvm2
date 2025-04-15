@@ -22,6 +22,16 @@
 
 module;
 
+// std
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+// macro
+#include <utils/ansies/ansi_push_macro.h>
+
+export module uwvm.run:run;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "run.h"

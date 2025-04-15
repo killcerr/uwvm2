@@ -25,20 +25,17 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-export module uwvm.wasm.storage:import_wasm;
-#endif
-
-#ifdef UWVM_MODULE
 import fast_io;
 #else
+// import
 #include <fast_io.h>
 #include <fast_io_dsal/vector.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm::wasm::storage
+UWVM_MODULE_EXPORT  namespace uwvm::wasm::storage
 {
     inline ::fast_io::vector<::fast_io::native_file_loader> import_wasm_file{};  // No global variable dependencies from other translation units
 

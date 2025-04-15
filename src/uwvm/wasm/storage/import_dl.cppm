@@ -24,6 +24,12 @@
 
 module;
 
+// macro
+#include <utils/macro/push_macros.h>
+
+export module uwvm.wasm.storage:import_dl;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "import_dl.h"

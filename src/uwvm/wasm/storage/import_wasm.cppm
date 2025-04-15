@@ -24,6 +24,9 @@
 
 module;
 
+export module uwvm.wasm.storage:import_wasm;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "import_wasm.h"

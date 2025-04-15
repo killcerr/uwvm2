@@ -22,24 +22,22 @@
 
 #pragma once
 
-#include <memory>
-
-#ifdef UWVM_MODULE
-export module uwvm.cmdline:params;
-#endif
-
 #ifdef UWVM_MODULE
 import utils.cmdline;
 import uwvm.cmdline.params;
 #else
+// std 
+#include <memory>
+// import
 #include <utils/cmdline/impl.h>
 #include "params/impl.h"
 #endif
 
-#ifdef UWVM_MODULE
-export 
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm::cmdline
+
+UWVM_MODULE_EXPORT namespace uwvm::cmdline
 {
     namespace details
     {

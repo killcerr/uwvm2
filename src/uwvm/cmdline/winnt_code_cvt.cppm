@@ -36,6 +36,18 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <memory>
+#include <bit>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+
+export module uwvm.cmdline:winnt_code_cvt;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "winnt_code_cvt.h"

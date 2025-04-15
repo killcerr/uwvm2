@@ -22,14 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module uwvm.cmdline;
-export import :parser;
-export import :params;
-# if defined(_WIN32) && !defined(_WIN32_WINDOWS)
-export import :winnt_code_cvt;
-# endif
-#else
+#ifndef UWVM_MODULE
 # include "parser.h"
 # include "params.h"
 # if defined(_WIN32) && !defined(_WIN32_WINDOWS)

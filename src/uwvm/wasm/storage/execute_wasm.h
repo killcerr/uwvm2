@@ -24,9 +24,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module uwvm.wasm.storage:execute_wasm;
-#endif
 
 #ifdef UWVM_MODULE
 import fast_io;
@@ -35,6 +32,7 @@ import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
 import uwvm.wasm.feature;
 #else
+// import
 #include <fast_io.h>
 #include <parser/wasm/base/impl.h>
 #include <parser/wasm/concepts/impl.h>
@@ -42,10 +40,11 @@ import uwvm.wasm.feature;
 #include <uwvm/wasm/feature/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export 
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm::wasm::storage
+
+UWVM_MODULE_EXPORT namespace uwvm::wasm::storage
 {
     inline ::fast_io::native_file_loader execute_wasm_file{};                                  // No global variable dependencies from other translation units
     inline ::parser::wasm::base::mode execute_wasm_mode{::parser::wasm::base::mode::objdump};  // No global variable dependencies from other translation units

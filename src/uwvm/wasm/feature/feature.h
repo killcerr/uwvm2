@@ -23,24 +23,21 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-export module uwvm.wasm.feature:feature;
-#endif
-
-#ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.concepts;
 import parser.wasm.standard;
 #else
+// import
 #include <fast_io.h>
 #include <fast_io_dsal/tuple.h>
 #include <parser/wasm/concepts/impl.h>
 #include <parser/wasm/standard/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm::wasm::feature
+UWVM_MODULE_EXPORT  namespace uwvm::wasm::feature
 {
     /// @brief All feature
     inline constexpr ::fast_io::tuple all_features{

@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module uwvm.wasm.feature;
-export import :feature;
-#else
+#ifndef UWVM_MODULE
 # include "feature.h"
 #endif

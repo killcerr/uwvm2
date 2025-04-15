@@ -22,6 +22,12 @@
 
 module;
 
+// std 
+#include <memory>
+
+export module uwvm.cmdline:params;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "params.h"

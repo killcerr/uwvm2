@@ -22,19 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module uwvm.cmdline.params;
-export import :version;
-export import :run;
-export import :help;
-export import :mode;
-export import :wasm_abi;
-export import :wasm_binfmt;
-
-# ifdef _DEBUG
-export import :test;
-# endif
-#else
+#ifndef UWVM_MODULE
 # include "version.h"
 # include "run.h"
 # include "help.h"

@@ -22,6 +22,18 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <memory>
+#include <bit>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+
+export module uwvm.cmdline:parser;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "parser.h"

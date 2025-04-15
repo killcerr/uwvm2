@@ -22,6 +22,9 @@
 
 module;
 
+export module uwvm.wasm.feature:feature;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "feature.h"

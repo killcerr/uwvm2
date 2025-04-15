@@ -24,24 +24,21 @@
 
 #pragma once
 
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module uwvm.wasm.storage:import_dl;
-#endif
-
 #ifdef UWVM_CAN_LOAD_DL
 #ifdef UWVM_MODULE
 import fast_io;
 #else
+// macro
+#include <utils/macro/push_macros.h>
+// import
 #include <fast_io.h>
 #include <fast_io_dsal/vector.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-namespace uwvm::wasm::storage
+UWVM_MODULE_EXPORT  namespace uwvm::wasm::storage
 {
     inline ::fast_io::vector<::fast_io::native_dll_file> import_dl_file{};  // No global variable dependencies from other translation units
 

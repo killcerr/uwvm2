@@ -22,21 +22,18 @@
 
 #pragma once
 
-#include <memory>
-
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module uwvm.cmdline.params:test;
-#endif
-
 #ifdef _DEBUG
 
 # ifdef UWVM_MODULE
 import fast_io;
 import utils.cmdline;
 # else
+// std
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+// import
 #  include <fast_io.h>
 #  include <fast_io_dsal/string_view.h>
 #  include <utils/cmdline/impl.h>
