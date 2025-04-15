@@ -99,7 +99,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
     /// @see WebAssembly Release 1.0 (2019-07-20) § 5.5.2
     template <typename Ty>
     concept has_section_id_define =
-        requires { requires ::std::same_as<decltype(::std::remove_cvref_t<Ty>::section_id), ::parser::wasm::standard::wasm1::type::wasm_u32>; };
+        requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_id)>, ::parser::wasm::standard::wasm1::type::wasm_u32>; };
 
     template <typename Ty, typename... Fs>
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
