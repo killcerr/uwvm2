@@ -25,7 +25,7 @@ module;
 export module utils.ansies;
 export import :cursor;
 export import :rgb;
-export import :storage;
+export import :no_color;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

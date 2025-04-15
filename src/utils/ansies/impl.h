@@ -25,5 +25,5 @@
 #ifndef UWVM_MODULE
 # include "cursor.h"
 # include "rgb.h"
-# include "storage.h"
+# include "no_color.h"
 #endif
