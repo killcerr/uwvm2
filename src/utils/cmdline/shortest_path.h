@@ -36,6 +36,7 @@ export module utils.cmdline:shortest_path;
 import fast_io;
 #else
 # include <fast_io.h>
+# include <fast_io_dsal/array.h>
 #endif
 
 #ifdef UWVM_MODULE

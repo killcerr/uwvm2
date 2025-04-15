@@ -37,7 +37,10 @@ import parser.wasm.standard;
 #include <parser/wasm/standard/impl.h>
 #endif
 
-export namespace uwvm::wasm::feature
+#ifdef UWVM_MODULE
+export
+#endif
+namespace uwvm::wasm::feature
 {
     /// @brief All feature
     inline constexpr ::fast_io::tuple all_features{

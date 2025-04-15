@@ -56,6 +56,7 @@ import :type_section;
 #include <parser/wasm/standard/wasm1/section/impl.h>
 #include <parser/wasm/standard/wasm1/opcode/impl.h>
 #include <parser/wasm/binfmt/binfmt_ver1/impl.h>
+#include "type_section.h"
 #endif
 
 #ifdef UWVM_MODULE
