@@ -32,7 +32,11 @@ module;
 
 export module utils.install_path:install_path;
 
-#define UWVM_MODULE
-#define UWVM_MODULE_EXPORT export
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "install_path.h"

@@ -28,7 +28,11 @@ export module parser.wasm.standard.wasm1.features;
 export import :binfmt;
 export import :type_section;
 
-#define UWVM_MODULE
-#define UWVM_MODULE_EXPORT export
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "impl.h"

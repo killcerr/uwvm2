@@ -47,7 +47,11 @@ module;
 
 export module uwvm.cmdline:winnt_code_cvt;
 
-#define UWVM_MODULE
-#define UWVM_MODULE_EXPORT export
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "winnt_code_cvt.h"

@@ -30,11 +30,15 @@ export import :mode;
 export import :wasm_abi;
 export import :wasm_binfmt;
 
-# ifdef _DEBUG
+#ifdef _DEBUG
 export import :test;
-# endif
+#endif
 
-#define UWVM_MODULE
-#define UWVM_MODULE_EXPORT export
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "impl.h"

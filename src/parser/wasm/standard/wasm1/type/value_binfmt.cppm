@@ -33,7 +33,11 @@ module;
 
 export module parser.wasm.standard.wasm1.type:value_binfmt;
 
-#define UWVM_MODULE
-#define UWVM_MODULE_EXPORT export
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "value_binfmt.h"

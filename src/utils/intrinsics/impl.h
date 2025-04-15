@@ -20,7 +20,7 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
 #ifndef UWVM_MODULE
 # include "prefetch.h"

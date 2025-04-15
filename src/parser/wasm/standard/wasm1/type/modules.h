@@ -29,27 +29,27 @@ import :value_binfmt;
 import :section_type;
 #else
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <bit>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <bit>
 // macro
-#include <utils/macro/push_macros.h>
-#include <parser/wasm/feature/feature_push_macro.h>
+# include <utils/macro/push_macros.h>
+# include <parser/wasm/feature/feature_push_macro.h>
 // import
-#include <fast_io.h>
-#include <fast_io_dsal/vector.h>
-#include <fast_io_dsal/string_view.h>
-#include "value_type.h"
-#include "value_binfmt.h"
-#include "section_type.h"
+# include <fast_io.h>
+# include <fast_io_dsal/vector.h>
+# include <fast_io_dsal/string_view.h>
+# include "value_type.h"
+# include "value_binfmt.h"
+# include "section_type.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
-#define UWVM_MODULE_EXPORT 
+# define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT  namespace parser::wasm::standard::wasm1::type
+UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
 {
     /// @brief      Indices
     /// @details    Definitionsarereferencedwithzero-basedindices. Eachclassofdefinitionhasitsownindexspace, asdistinguished

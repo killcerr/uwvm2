@@ -25,12 +25,16 @@ module;
 export module utils.global;
 export import :tzset;
 /// @brief only support on winnt (with win32 api)
-# if defined(_WIN32) && !defined(__CYGWIN__)
+#if defined(_WIN32) && !defined(__CYGWIN__)
 export import :ansi_win32;
 export import :consolecp_win32;
-# endif
+#endif
 
-#define UWVM_MODULE
-#define UWVM_MODULE_EXPORT export
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "impl.h"

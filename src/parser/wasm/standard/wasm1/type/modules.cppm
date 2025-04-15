@@ -32,7 +32,13 @@ module;
 #include <utils/macro/push_macros.h>
 #include <parser/wasm/feature/feature_push_macro.h>
 
-#define UWVM_MODULE
-#define UWVM_MODULE_EXPORT export
+export module parser.wasm.standard.wasm1.type:modules;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "modules.h"
