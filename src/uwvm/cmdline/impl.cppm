@@ -22,9 +22,6 @@
 
 module;
 
-export module uwvm.cmdline;
-export import :parser;
-export import :params;
-#if defined(_WIN32) && !defined(_WIN32_WINDOWS)
-export import :winnt_code_cvt;
-#endif
+#define UWVM_MODULE
+
+#include "impl.h"

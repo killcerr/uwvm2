@@ -22,33 +22,6 @@
 
 module;
 
-#include <memory>
+#define UWVM_MODULE
 
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
-
-export module uwvm.cmdline.params:test;
-
-#ifdef _DEBUG
-
-import fast_io;
-import utils.cmdline;
-
-export namespace uwvm::cmdline::paras
-{
-    namespace details
-    {
-        inline bool test_is_exist{};
-        extern "C++" ::utils::cmdline::parameter_return_type test_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                           ::utils::cmdline::parameter_parsing_results*,
-                                                                           ::utils::cmdline::parameter_parsing_results*) noexcept;
-
-    }  // namespace details
-
-    inline constexpr ::utils::cmdline::parameter test{.name{u8"--test"},
-                                                      .describe{u8"Debug Test."},
-                                                      .handle{::std::addressof(details::test_callback)},
-                                                      .is_exist{::std::addressof(details::test_is_exist)}};
-}  // namespace uwvm::cmdline::paras
-
-#endif
+#include "test.h"

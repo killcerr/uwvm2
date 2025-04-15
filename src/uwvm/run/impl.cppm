@@ -21,5 +21,7 @@
  ****************************************/
 
 module;
-export module uwvm.run;
-export import :run;
+
+#define UWVM_MODULE
+
+#include "impl.h"

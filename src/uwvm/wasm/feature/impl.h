@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-24
+ * @date        2025-04-15
  * @copyright   APL-2 License
  */
 
@@ -20,8 +20,11 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
-#define UWVM_MODULE
-
-#include "version.h"
+#ifdef UWVM_MODULE
+export module uwvm.wasm.feature;
+export import :feature;
+#else
+# include "feature.h"
+#endif

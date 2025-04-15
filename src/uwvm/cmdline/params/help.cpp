@@ -25,10 +25,18 @@
 #include <utils/macro/push_macros.h>
 #include <utils/ansies/ansi_push_macro.h>
 
+#ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
 import utils.cmdline;
 import uwvm.cmdline;
+#else
+#include <fast_io.h>
+#include <fast_io_dsal/array.h>
+#include <utils/io/impl.h>
+#include <utils/cmdline/impl.h>
+#include <uwvm/cmdline/impl.h>
+#endif
 
 namespace uwvm::cmdline::paras::details
 {

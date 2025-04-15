@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -22,8 +22,30 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
-#define UWVM_MODULE
+#include <utils/macro/push_macros.h>
 
-#include "import_dl.h"
+#ifdef UWVM_MODULE
+export module uwvm.wasm.storage:import_dl;
+#endif
+
+#ifdef UWVM_CAN_LOAD_DL
+#ifdef UWVM_MODULE
+import fast_io;
+#else
+#include <fast_io.h>
+#include <fast_io_dsal/vector.h>
+#endif
+
+#ifdef UWVM_MODULE
+export
+#endif
+namespace uwvm::wasm::storage
+{
+    inline ::fast_io::vector<::fast_io::native_dll_file> import_dl_file{};  // No global variable dependencies from other translation units
+
+    // TODO: import_dl_func // The result of parsing the dl is used to add the import module directly.
+}  // namespace uwvm::wasm::storage
+
+#endif

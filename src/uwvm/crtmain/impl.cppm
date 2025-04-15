@@ -22,5 +22,6 @@
 
 module;
 
-export module uwvm.crtmain;
-export import :uwvm;
+#define UWVM_MODULE
+
+#include "impl.h"

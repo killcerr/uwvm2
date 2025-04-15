@@ -25,6 +25,7 @@
 #include <utils/macro/push_macros.h>
 #include <utils/ansies/ansi_push_macro.h>
 
+#ifdef UWVM_MODULE
 import fast_io;
 import fast_io_crypto;
 import utils.io;
@@ -32,6 +33,15 @@ import utils.cmdline;
 import utils.install_path;
 import uwvm.custom;
 import uwvm.cmdline;
+#else
+#include <fast_io.h>
+#include <fast_io_crypto.h>
+#include <utils/io/impl.h>
+#include <utils/cmdline/impl.h>
+#include <utils/install_path/impl.h>
+#include <uwvm/custom/impl.h>
+#include <uwvm/cmdline/impl.h>
+#endif
 
 namespace uwvm::cmdline::paras::details
 {

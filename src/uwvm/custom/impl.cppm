@@ -22,5 +22,6 @@
 
 module;
 
-export module uwvm.custom;
-export import :version;
+#define UWVM_MODULE
+
+#include "impl.h"
