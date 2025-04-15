@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -20,7 +20,7 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
 #include <cstdint>
 #include <cstddef>
@@ -29,12 +29,20 @@ module;
 
 #include <parser/wasm/feature/feature_push_macro.h>
 
+#ifdef UWVM_MODULE
 export module parser.wasm.standard.wasm3.type:section_type;
+#else
 
-import fast_io;
+# ifdef UWVM_MODULE
 import parser.wasm.standard.wasm2;
+# else
+#  include <parser/wasm/standard/wasm2/impl.h>
+# endif
 
-export namespace parser::wasm::standard::wasm3::type
+# ifdef UWVM_MODULE
+export
+# endif
+namespace parser::wasm::standard::wasm3::type
 {
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.

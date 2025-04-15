@@ -22,5 +22,6 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.opcode;
-import :mvp;
+#define UWVM_MODULE
+
+#include "impl.h"

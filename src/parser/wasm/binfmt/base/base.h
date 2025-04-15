@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -22,19 +22,29 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
 #include <cstdint>
 #include <cstddef>
 #include <type_traits>
 #include <memory>
 
-export module parser.wasm.binfmt.base;
+#ifdef UWVM_MODULE
+export module parser.wasm.binfmt.base:base;
+#endif
 
+#ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.standard.wasm1.type;
+#else
+# include <fast_io.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+#endif
 
-export namespace parser::wasm::binfmt
+#ifdef UWVM_MODULE
+export
+#endif
+    namespace parser::wasm::binfmt
 {
     struct module_span_t
     {

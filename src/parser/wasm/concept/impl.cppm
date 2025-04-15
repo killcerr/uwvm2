@@ -22,6 +22,6 @@
 
 module;
 
-export module parser.wasm.concepts;
-export import :root;
-export import :operation;
+#define UWVM_MODULE
+
+#include "impl.h"

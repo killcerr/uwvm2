@@ -24,8 +24,6 @@
 
 module;
 
-export module parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1.type;
-export import parser.wasm.standard.wasm1.section;
-export import parser.wasm.standard.wasm1.opcode;
-export import parser.wasm.standard.wasm1.features;
+#define UWVM_MODULE
+
+#include "impl.h"

@@ -24,5 +24,6 @@
 
 module;
 
-export module parser.wasm.proposal.relaxed_simd;
-export import parser.wasm.proposal.relaxed_simd.type;
+#define UWVM_MODULE
+
+#include "impl.h"

@@ -1,15 +1,13 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
 /**
- * @brief       WebAssembly Release 2.0 + Threads (Draft 2023-10-10)
- * @details     antecedent dependency: WebAssembly Release 2.0 (Draft 2025-01-30)
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-02
+ * @date        2025-04-03
  * @copyright   APL-2 License
  */
 
@@ -22,7 +20,24 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
-export module parser.wasm.standard.wasm2_thread;
-export import parser.wasm.standard.wasm2;
+#include <cstdint>
+#include <cstddef>
+#include <type_traits>
+#include <concepts>
+#include <bit>
+
+#include <parser/wasm/feature/feature_push_macro.h>
+
+#ifdef UWVM_MODULE
+export module parser.wasm.proposal.custom_page_size.type:value_type;
+#endif
+
+#ifdef UWVM_MODULE
+export
+#endif
+    namespace parser::wasm::proposal::custom_page_size::value_type
+{
+
+}  // namespace parser::wasm::proposal::custom_page_size::value_type

@@ -24,47 +24,6 @@
 
 module;
 
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
+#define UWVM_MODULE
 
-#include <utils/macro/push_macros.h>
-
-export module parser.wasm.standard.wasm1.features:binfmt;
-
-import fast_io;
-import utils.io;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.standard.wasm1.opcode;
-import parser.wasm.binfmt.binfmt_ver1;
-import :type_section;
-
-export namespace parser::wasm::standard::wasm1::features
-{
-    struct wasm1
-    {
-        inline static constexpr ::fast_io::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
-
-        template <::parser::wasm::concepts::wasm_feature... Fs>
-        using binfmt_ver1_section_type = ::fast_io::tuple<::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>
-                                                          /// @todo
-                                                          >;
-    };
-
-    static_assert(::parser::wasm::concepts::wasm_feature<wasm1>, "struct wasm1 not match wasm feature");
-
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr auto define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<wasm1>, ::fast_io::tuple<Fs...>) noexcept
-    {
-        return ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>;
-    }
-
-    static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<wasm1>, "struct wasm1 did not has define_wasm_binfmt_parsering_strategy");
-
-}  // namespace parser::wasm::standard::wasm1::features
+#include "binfmt.h"

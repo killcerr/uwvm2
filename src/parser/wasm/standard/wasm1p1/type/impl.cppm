@@ -22,6 +22,6 @@
 
 module;
 
-export module parser.wasm.standard.wasm1p1.type;
-export import :value_type;
-export import :value_binfmt;
+#define UWVM_MODULE
+
+#include "impl.h"

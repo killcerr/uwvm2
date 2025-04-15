@@ -22,5 +22,6 @@
 
 module;
 
-export module parser.wasm.standard.wasm3.type;
-export import :section_type;
+#define UWVM_MODULE
+
+#include "impl.h"

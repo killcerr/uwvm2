@@ -24,5 +24,6 @@
 
 module;
 
-export module parser.wasm.proposal.custom_page_size;
-export import parser.wasm.proposal.custom_page_size.type;
+#define UWVM_MODULE
+
+#include "impl.h"

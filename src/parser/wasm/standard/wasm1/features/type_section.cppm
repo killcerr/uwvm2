@@ -24,48 +24,6 @@
 
 module;
 
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
+#define UWVM_MODULE
 
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
-
-export module parser.wasm.standard.wasm1.features:type_section;
-
-import fast_io;
-import utils.io;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.standard.wasm1.opcode;
-import parser.wasm.binfmt.binfmt_ver1;
-
-export namespace parser::wasm::standard::wasm1::features
-{
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    struct type_section_storage_t
-    {
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
-
-        ::parser::wasm::standard::wasm1::section::type_section typesec{};
-    };
-
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr bool
-        handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<type_section_storage_t<Fs...>>>,
-                                                     ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                                     [[maybe_unused]]::std::byte const* section_begin,
-                                                     [[maybe_unused]]::std::byte const* section_end)
-    {
-        auto& type_section_storage{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
-        [[maybe_unused]] auto& typesec{type_section_storage.typesec};
-
-        /// @todo
-
-        return true;
-    }
-}  // namespace parser::wasm::standard::wasm1::features
+#include "type_section.h"

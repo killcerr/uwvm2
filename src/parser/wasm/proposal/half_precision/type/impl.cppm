@@ -22,6 +22,6 @@
 
 module;
 
-export module parser.wasm.proposal.half_precision.type;
-export import :value_type;
+#define UWVM_MODULE
 
+#include "impl.h"

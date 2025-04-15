@@ -24,14 +24,6 @@
 
 module;
 
-export module parser.wasm.base:mode;
+#define UWVM_MODULE
 
-export namespace parser::wasm::base
-{
-    /// @brief wasm running mode
-    enum class mode : unsigned
-    {
-        objdump
-    };
-
-}  // namespace parser::wasm::base
+#include "mode.h"

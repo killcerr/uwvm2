@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -24,37 +24,6 @@
 
 module;
 
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
+#define UWVM_MODULE
 
-#include <utils/macro/push_macros.h>
-
-export module parser.wasm.binfmt.binfmt_ver1:def;
-
-import fast_io;
-import utils.io;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.binfmt.base;
-import :section;
-
-export namespace parser::wasm::binfmt::ver1
-{
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    struct wasm_binfmt_ver1_module_extensible_storage_t
-    {
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
-
-        ::parser::wasm::binfmt::module_span_t module_span{};
-        ::fast_io::u8string_view module_name{};
-
-        ::fast_io::vector<::parser::wasm::standard::wasm1::section::custom_section> custom_sections{};
-
-        ::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> sections{};
-    };
-
-}  // namespace parser::wasm::binfmt::ver1
+#include "def.h"

@@ -24,5 +24,6 @@
 
 module;
 
-export module parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference;
+#define UWVM_MODULE
+
+#include "impl.h"

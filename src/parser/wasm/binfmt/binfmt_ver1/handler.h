@@ -22,7 +22,7 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -36,8 +36,11 @@ module;
 #include <utils/macro/push_macros.h>
 #include <utils/ansies/ansi_push_macro.h>
 
+#ifdef UWVM_MODULE
 export module parser.wasm.binfmt.binfmt_ver1:handler;
+#endif
 
+#ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
 import parser.wasm.base;
@@ -47,8 +50,27 @@ import parser.wasm.standard.wasm1.section;
 import parser.wasm.binfmt.base;
 import :section;
 import :def;
+#else
+# include <fast_io.h>
+# include <fast_io_dsal/string.h>
+# include <fast_io_dsal/string_view.h>
+# include <fast_io_dsal/vector.h>
+# include <fast_io_dsal/array.h>
+# include <fast_io_dsal/tuple.h>
+# include <utils/io/impl.h>
+# include <parser/wasm/base/impl.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <parser/wasm/standard/wasm1/section/impl.h>
+# include <parser/wasm/binfmt/base/impl.h>
+# include "section.h"
+# include "def.h"
+#endif
 
-export namespace parser::wasm::binfmt::ver1
+#ifdef UWVM_MODULE
+export
+#endif
+    namespace parser::wasm::binfmt::ver1
 {
     [[noreturn]] inline void throw_wasm_parse_code([[maybe_unused]] ::fast_io::parse_code code) UWVM_THROWS
     {

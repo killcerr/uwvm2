@@ -24,5 +24,6 @@
 
 module;
 
-export module parser.wasm.standard.wasm2;
-export import parser.wasm.standard.wasm1p1;
+#define UWVM_MODULE
+
+#include "impl.h"

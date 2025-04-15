@@ -22,6 +22,6 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.section;
-export import :funcbody;
-export import :section_type;
+#define UWVM_MODULE
+
+#include "impl.h"

@@ -23,13 +23,6 @@
 
 module;
 
-export module parser.wasm.standard;
-export import parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1p1;
-export import parser.wasm.standard.wasm2;
-export import parser.wasm.standard.wasm2_MultiMemory;
-export import parser.wasm.standard.wasm2_TailCalls;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
-export import parser.wasm.standard.wasm2_thread;
-export import parser.wasm.standard.wasm3;
+#define UWVM_MODULE
+
+#include "impl.h"
