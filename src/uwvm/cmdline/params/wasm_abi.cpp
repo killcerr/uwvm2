@@ -68,7 +68,7 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"|",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                "-Wa",
+                                u8"-Wa",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"] ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
