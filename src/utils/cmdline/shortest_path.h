@@ -29,6 +29,7 @@ import fast_io;
 # include <cstdint>
 # include <cstddef>
 # include <concepts>
+# include <new>
 // macro
 # include <utils/macro/push_macros.h>
 // import

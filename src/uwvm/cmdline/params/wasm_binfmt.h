@@ -53,8 +53,8 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
     }  // namespace details
 
     inline constexpr ::utils::cmdline::parameter wasm_binfmt{.name{u8"--wasm-binfmt"},
-                                                             .describe{u8"Specifies the Binary Format Version used by the WASM module, (DEFAULT: 1)."},
-                                                             .usage{u8"[1]"},
+                                                             .describe{u8"Specifies the Binary Format Version used by the WASM module, (DEFAULT: detect)."},
+                                                             .usage{u8"[detect|1]"},
                                                              .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_binfmt_alias), 1}},
                                                              .handle{::std::addressof(details::wasm_binfmt_callback)},
                                                              .is_exist{::std::addressof(details::wasm_binfmt_is_exist)},

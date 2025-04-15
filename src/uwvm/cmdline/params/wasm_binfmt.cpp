@@ -59,7 +59,7 @@ namespace uwvm::cmdline::paras::details
             ::fast_io::io::perr(
                  ::utils::u8err,
                  UWVM_AES_U8_RST_ALL
-                     UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Usage: " u8"[" UWVM_AES_U8_GREEN u8"--wasm-binfmt" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN "-Wbf" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[1]" UWVM_AES_U8_RST_ALL u8"\n\n");
+                     UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Usage: " u8"[" UWVM_AES_U8_GREEN u8"--wasm-binfmt" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN "-Wbf" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[detect|1]" UWVM_AES_U8_RST_ALL u8"\n\n");
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
@@ -67,6 +67,12 @@ namespace uwvm::cmdline::paras::details
         currp1->type = ::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
         auto currp1_str{currp1->str};
+
+        if(currp1_str == u8"detect")
+        {
+            ::uwvm::wasm::storage::execute_wasm_binfmt_ver = 0;
+            return ::utils::cmdline::parameter_return_type::def;
+        }
 
         parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{};
         auto const [next, err]{::fast_io::parse_by_scan(currp1_str.cbegin(), currp1_str.cend(), binfmt_version)};
@@ -78,7 +84,7 @@ namespace uwvm::cmdline::paras::details
                 ::utils::u8err,
                 UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Invalid Binary Format Version \"" UWVM_AES_U8_CYAN,
                 currp1_str,
-                UWVM_AES_U8_WHITE u8"\". Usage: "  u8"[" UWVM_AES_U8_GREEN u8"--wasm-binfmt" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-Wbf" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[1]" UWVM_AES_U8_RST_ALL u8"\n\n");
+                UWVM_AES_U8_WHITE u8"\". Usage: "  u8"[" UWVM_AES_U8_GREEN u8"--wasm-binfmt" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-Wbf" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[detect|1]" UWVM_AES_U8_RST_ALL u8"\n\n");
 
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
@@ -93,10 +99,11 @@ namespace uwvm::cmdline::paras::details
                 ::utils::u8err,
                 UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Invalid Binary Format Version \"" UWVM_AES_U8_CYAN,
                 binfmt_version,
-                UWVM_AES_U8_WHITE u8"\". Usage: "  u8"[" UWVM_AES_U8_GREEN u8"--wasm-binfmt" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-Wbf" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[1]" UWVM_AES_U8_RST_ALL u8"\n\n");
+                UWVM_AES_U8_WHITE u8"\". Usage: "  u8"[" UWVM_AES_U8_GREEN u8"--wasm-binfmt" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-Wbf" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"[detect|1]" UWVM_AES_U8_RST_ALL u8"\n\n");
 
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
+
         return ::utils::cmdline::parameter_return_type::def;
     }
 
