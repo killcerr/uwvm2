@@ -22,6 +22,15 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+
+export module utils.global:ansi_win32;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "ansi_win32.h"

@@ -22,28 +22,25 @@
 
 #pragma once
 
+#ifdef UWVM_MODULE
+import :install_path;
+#else
+// macro
 #include <utils/macro/push_macros.h>
-
+// include
 #ifdef UWVM_SUPPORT_INSTALL_PATH
 # include <fast_io.h>
 # include <fast_io_driver/install_path.h>
 #endif
-
-#ifdef UWVM_MODULE
-export module utils.install_path:storage;
-#endif
-
-#ifdef UWVM_MODULE
-import :install_path;
-#else
+// import
 # include "install_path.h"
 #endif
 
-#ifdef UWVM_SUPPORT_INSTALL_PATH
-# ifdef UWVM_MODULE
-export
-# endif
-    namespace utils::install_path
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
+#endif
+
+UWVM_MODULE_EXPORT namespace utils::install_path
 {
     /// @brief Path to the program binary itself
     /// @details Only support to get by system parameter, not support to get by argv0, argv0 may be wrong

@@ -22,6 +22,14 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+
+export module utils.ansies:cursor;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "cursor.h"

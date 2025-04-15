@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module utils.version;
-export import :version;
-#else
+#ifndef UWVM_MODULE
 #include "version.h"
 #endif

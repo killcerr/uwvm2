@@ -26,6 +26,9 @@
 
 module;
 
+export module utils.io:io_device;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "io_device.h"

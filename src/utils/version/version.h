@@ -22,25 +22,22 @@
 
 #pragma once
 
+#ifdef UWVM_MODULE
+import fast_io;
+#else
+// std
 #include <cstdint>
 #include <cstddef>
 #include <compare>
 #include <concepts>
-
-#ifdef UWVM_MODULE
-export module utils.version:version;
-#endif
-
-#ifdef UWVM_MODULE
-import fast_io;
-#else
+// import
 # include <fast_io.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace utils
+UWVM_MODULE_EXPORT  namespace utils
 {
     // version does not add meaningless namespaces.
     struct version

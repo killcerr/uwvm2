@@ -22,6 +22,17 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <memory>
+#include <algorithm>
+// import
+#include <utils/macro/push_macros.h>
+
+export module utils.cmdline:handle;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "handle.h"

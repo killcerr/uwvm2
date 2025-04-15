@@ -22,21 +22,18 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <memory>
-#include <algorithm>
-
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module utils.cmdline:handle;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import fast_io_crypto;
 #else
+// std
+#include <cstdint>
+#include <cstddef>
+#include <memory>
+#include <algorithm>
+// import
+#include <utils/macro/push_macros.h>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
@@ -45,10 +42,11 @@ import fast_io_crypto;
 # include <fast_io_crypto.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace utils::cmdline
+
+UWVM_MODULE_EXPORT   namespace utils::cmdline
 {
     /// @brief Used to indicate parameter type
     enum class parameter_parsing_results_type : unsigned

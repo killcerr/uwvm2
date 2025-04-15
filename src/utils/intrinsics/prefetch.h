@@ -24,21 +24,23 @@
 
 #pragma once
 
+#ifdef UWVM_MODULE
+// no import
+#else
+// macro
 #include <utils/macro/push_macros.h>
-
+// include
 /// @brief      Including intrin.h in the absence of __builtin_prefetch
 #if !__has_builtin(__builtin_prefetch)
 # include <intrin.h>;
 #endif
-
-#ifdef UWVM_MODULE
-export module utils.intrinsics:prefetch;
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace utils::intrinsics
+
+UWVM_MODULE_EXPORT   namespace utils::intrinsics
 {
     /// @brief      Direct conversion to cpu prefetch instructions
     /// @details    write: write or read sensitive

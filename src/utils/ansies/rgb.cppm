@@ -22,6 +22,14 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+
+export module utils.ansies:rgb;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "rgb.h"

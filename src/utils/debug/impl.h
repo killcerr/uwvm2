@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module utils.debug;
-export import :timer;
-#else
+#ifndef UWVM_MODULE
 # include "timer.h"
 #endif

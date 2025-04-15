@@ -24,6 +24,17 @@
 
 module;
 
+// macro
+#include <utils/macro/push_macros.h>
+// include
+/// @brief      Including intrin.h in the absence of __builtin_prefetch
+#if !__has_builtin(__builtin_prefetch)
+# include <intrin.h>;
+#endif
+
+export module utils.intrinsics:prefetch;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "prefetch.h"

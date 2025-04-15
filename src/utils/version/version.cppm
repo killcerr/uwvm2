@@ -22,6 +22,15 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <compare>
+#include <concepts>
+
+export module utils.version:version;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "version.h"

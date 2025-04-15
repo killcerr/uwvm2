@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module utils.cmdline;
-export import :shortest_path;
-export import :handle;
-#else
+#ifndef UWVM_MODULE
 # include "shortest_path.h"
 # include "handle.h"
 #endif

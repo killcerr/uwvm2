@@ -22,6 +22,16 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+// macro
+#include <utils/macro/push_macros.h>
+
+export module utils.cmdline:shortest_path;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "shortest_path.h"

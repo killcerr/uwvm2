@@ -22,6 +22,12 @@
 
 module;
 
+// macro
+#include <utils/macro/push_macros.h>
+
+export module utils.global:tzset;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "tzset.h"

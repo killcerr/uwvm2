@@ -22,22 +22,23 @@
 
 #pragma once
 
+#ifdef UWVM_MODULE
+// no import
+#else
+// macro
 #include <utils/macro/push_macros.h>
-
+// include
 #ifdef UWVM_SUPPORT_INSTALL_PATH
 # include <fast_io.h>
 # include <fast_io_driver/install_path.h>
 #endif
-
-#ifdef UWVM_MODULE
-export module utils.install_path:install_path;
 #endif
 
-#ifdef UWVM_SUPPORT_INSTALL_PATH
-# ifdef UWVM_MODULE
-export
-# endif
-    namespace utils::install_path
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
+#endif
+
+UWVM_MODULE_EXPORT namespace utils::install_path
 {
     inline ::fast_io::install_path get_module_install_path_noexcept() noexcept
     {

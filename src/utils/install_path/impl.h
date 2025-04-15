@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module utils.install_path;
-export import :install_path;
-export import :storage;
-#else
+#ifndef UWVM_MODULE
 #include "install_path.h"
 #include "storage.h"
 #endif

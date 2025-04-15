@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module utils.ansies;
-export import :cursor;
-export import :rgb;
-#else
+#ifndef UWVM_MODULE
 # include "cursor.h"
 # include "rgb.h"
 #endif

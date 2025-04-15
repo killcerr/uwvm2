@@ -22,27 +22,25 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module utils.global:consolecp_win32;
-#endif
-
 /// @brief      only support on winnt (with win32 api)
 #if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
 
 # ifdef UWVM_MODULE
 import fast_io;
 # else
+// std
+#include <cstdint>
+// macro
+#include <utils/macro/push_macros.h>
+// import
 #  include <fast_io.h>
 # endif
 
-# ifdef UWVM_MODULE
-export
-# endif
-    namespace utils::global
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
+#endif
+
+UWVM_MODULE_EXPORT namespace utils::global
 {
     /// @brief      The ConsoleCP of Windows is affected by system environment variables.
     ///             By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8.

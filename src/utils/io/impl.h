@@ -22,9 +22,6 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export module utils.io;
-export import :io_device;
-#else
+#ifndef UWVM_MODULE
 # include "io_device.h"
 #endif

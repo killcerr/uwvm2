@@ -22,27 +22,25 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-
-#include <utils/macro/push_macros.h>
-
-#ifdef UWVM_MODULE
-export module utils.cmdline:shortest_path;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 #else
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+// macro
+#include <utils/macro/push_macros.h>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace utils::cmdline
+
+UWVM_MODULE_EXPORT  namespace utils::cmdline
 {
     /// @brief      Shortest Path Algorithm for Strings
     /// @details    Compute the shortest path between two strings with a time complexity of O(n²) and a space complexity of O(n).

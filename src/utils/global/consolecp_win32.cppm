@@ -22,6 +22,14 @@
 
 module;
 
+// std
+#include <cstdint>
+// macro
+#include <utils/macro/push_macros.h>
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
+
+export module utils.global:consolecp_win32;
 
 #include "consolecp_win32.h"

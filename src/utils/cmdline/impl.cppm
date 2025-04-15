@@ -22,6 +22,11 @@
 
 module;
 
+export module utils.cmdline;
+export import :shortest_path;
+export import :handle;
+
 #define UWVM_MODULE
+#define UWVM_MODULE_EXPORT export
 
 #include "impl.h"

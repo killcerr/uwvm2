@@ -22,26 +22,24 @@
 
 #pragma once
 
-#include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
-
-#ifdef UWVM_MODULE
-export module utils.debug:timer;
-#endif
-
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
 #else
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <utils/io/impl.h>
 #endif
 
-#ifdef UWVM_MODULE
-export
+#ifndef UWVM_MODULE_EXPORT
+#define UWVM_MODULE_EXPORT 
 #endif
-    namespace utils::debug
+
+UWVM_MODULE_EXPORT  namespace utils::debug
 {
     struct timer
     {
