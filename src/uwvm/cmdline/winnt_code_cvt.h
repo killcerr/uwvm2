@@ -39,6 +39,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
+import utils.ansies;
 #else
 // std
 # include <cstdint>
@@ -53,6 +54,7 @@ import utils.io;
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
 # include <utils/io/impl.h>
+# include <utils/ansies/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -112,9 +114,16 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         if(u16_cmdline_argv == nullptr) [[unlikely]]
         {
             ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[fatal] " UWVM_AES_U8_WHITE u8"CommandLineToArgvW failed: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[fatal] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"CommandLineToArgvW failed: ",
                                 ::fast_io::error{::fast_io::win32_domain_value, ::fast_io::win32::GetLastError()},
-                                u8"\n" UWVM_AES_U8_RST_ALL u8"Terminate.\n\n");
+                                u8"\n",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"Terminate.\n\n");
             ::fast_io::fast_terminate();
         }
 

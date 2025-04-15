@@ -25,6 +25,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
+import utils.ansies;
 import utils.cmdline;
 # ifdef UWVM_TIMER
 import utils.debug;
@@ -45,6 +46,7 @@ import :params;
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
 # include <utils/io/impl.h>
+# include <utils/ansies/impl.h>
 # include <utils/cmdline/impl.h>
 # ifdef UWVM_TIMER
 #  include <utils/debug/impl.h>
@@ -89,10 +91,15 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         // If argc is 0, prohibit running
         if(argc == 0) [[unlikely]]
         {
-            ::fast_io::io::perr(
-                ::utils::u8err,
-                UWVM_AES_U8_RST_ALL
-                    UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No Parameters." UWVM_AES_U8_RST_ALL u8"\n\n");
+            ::fast_io::io::perr(::utils::u8err,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"No Parameters.",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
             return parsing_return_val::returnm1;
         }
 
@@ -145,10 +152,25 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     // grammatical error
                     if(++curr_argv == argv_end) [[unlikely]]
                     {
-                        ::fast_io::io::perr(
-                            ::utils::u8err,
-                            UWVM_AES_U8_RST_ALL
-                                UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Usage: " u8"[" UWVM_AES_U8_GREEN u8"--run" UWVM_AES_U8_WHITE u8"|" UWVM_AES_U8_GREEN u8"-r" UWVM_AES_U8_WHITE u8"] " UWVM_AES_U8_YELLOW u8"<file> <argv[1]> <argv[2]> ..." UWVM_AES_U8_RST_ALL u8"\n\n");
+                        ::fast_io::io::perr(::utils::u8err,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"Usage: " u8"[",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
+                                            u8"--run",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"|",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
+                                            u8"-r",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"] ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
+                                            u8"<file> <argv[1]> <argv[2]> ...",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                            u8"\n\n");
 
                         return parsing_return_val::returnm1;
                     }
@@ -207,11 +229,15 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                 if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::invalid_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(
-                        ::utils::u8err,
-                        UWVM_AES_U8_RST_ALL
-                            UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"invalid parameter: " UWVM_AES_U8_CYAN,
-                        curr_pr->str);
+                    ::fast_io::io::perr(::utils::u8err,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                        u8"[error] ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                        u8"invalid parameter: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                        curr_pr->str);
 
                     // Finding the most similar parameters
                     ::fast_io::u8string_view f_test_str{};
@@ -251,26 +277,36 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     if(f_test_str.empty())
                     {
                         // The most similar parameters were not found
-                        ::fast_io::io::perr(::utils::u8err, UWVM_AES_U8_RST_ALL u8"\n");
+                        ::fast_io::io::perr(::utils::u8err, ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL), u8"\n");
                     }
                     else
                     {
                         // Output the most similar parameter
                         ::fast_io::io::perr(::utils::u8err,
-                                            UWVM_AES_U8_WHITE u8" (did you mean: " UWVM_AES_U8_GREEN,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8" (did you mean: ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
                                             f_test_str,
-                                            UWVM_AES_U8_WHITE u8")" UWVM_AES_U8_RST_ALL u8"\n");
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8")",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                            u8"\n");
                     }
                 }
                 else if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::duplicate_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(
-                        ::utils::u8err,
-                        UWVM_AES_U8_RST_ALL
-                            UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"duplicate parameter: " UWVM_AES_U8_CYAN,
-                        curr_pr->str,
-                        UWVM_AES_U8_RST_ALL u8"\n");
+                    ::fast_io::io::perr(::utils::u8err,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                        u8"[error] ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                        u8"duplicate parameter: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                        curr_pr->str,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                        u8"\n");
                 }
             }
 
@@ -325,11 +361,17 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                 {
                     shouldreturn = true;
 
-                    ::fast_io::io::perr(
-                        ::utils::u8err,
-                        UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"invalid option: " UWVM_AES_U8_CYAN,
-                        curr_pr->str,
-                        UWVM_AES_U8_RST_ALL u8"\n");
+                    ::fast_io::io::perr(::utils::u8err,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                        u8"[error] ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                        u8"invalid option: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                        curr_pr->str,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                        u8"\n");
                 }
             }
 

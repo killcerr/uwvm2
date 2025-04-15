@@ -29,6 +29,7 @@
 import fast_io;
 import fast_io_crypto;
 import utils.io;
+import utils.ansies;
 import utils.cmdline;
 import utils.install_path;
 import uwvm.custom;
@@ -37,6 +38,7 @@ import uwvm.cmdline;
 # include <fast_io.h>
 # include <fast_io_crypto.h>
 # include <utils/io/impl.h>
+# include <utils/ansies/impl.h>
 # include <utils/cmdline/impl.h>
 # include <utils/install_path/impl.h>
 # include <uwvm/custom/impl.h>
@@ -51,38 +53,93 @@ namespace uwvm::cmdline::paras::details
     {
         ::fast_io::io::perr(::utils::u8err,
                                 // logo
-                                UWVM_AES_U8_RST_ALL u8"\n"
-                                UWVM_AES_U8_RGB(72, 61, 139) u8" ----------------------------------------- \n"
-                                UWVM_AES_U8_RGB(72, 61, 139) u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8"  _   _  "  UWVM_AES_U8_RGB(152, 37, 206) u8"__        __ "    UWVM_AES_U8_RGB(113, 37, 206) u8"__     __  "  UWVM_AES_U8_RGB(70, 37, 206) u8"__  __  "   UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n" 
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | | | | "  UWVM_AES_U8_RGB(152, 37, 206) u8"\\ \\      / / "  UWVM_AES_U8_RGB(113, 37, 206) u8"\\ \\   / / " UWVM_AES_U8_RGB(70, 37, 206) u8"|  \\/  | " UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | | | | "  UWVM_AES_U8_RGB(152, 37, 206) u8" \\ \\ /\\ / /  " UWVM_AES_U8_RGB(113, 37, 206) u8" \\ \\ / /  " UWVM_AES_U8_RGB(70, 37, 206) u8"| |\\/| | " UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | |_| | "  UWVM_AES_U8_RGB(152, 37, 206) u8"  \\ V  V /     " UWVM_AES_U8_RGB(113, 37, 206) u8"\\ V /   "    UWVM_AES_U8_RGB(70, 37, 206) u8"| |  | | "  UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8"  \\___/ "  UWVM_AES_U8_RGB(152, 37, 206) u8"    \\_/\\_/    " UWVM_AES_U8_RGB(113, 37, 206) u8"   \\_/    "  UWVM_AES_U8_RGB(70, 37, 206) u8"|_|  |_| "  UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|                                         |\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" Ultimate " UWVM_AES_U8_RGB(152, 37, 206) u8"WebAssembly "     UWVM_AES_U8_RGB(113, 37, 206) u8" Virtual "    UWVM_AES_U8_RGB(70, 37, 206) u8"  Machine"  UWVM_AES_U8_RGB(72, 61, 139) u8" |" u8"\n"
-                                                             u8" ----------------------------------------- \n\n"
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL), 
+                                u8"\n",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)), 
+                                u8" ----------------------------------------- \n",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                u8"|",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                u8"  _   _  ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                u8"__        __ ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                u8"__     __  ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                u8"__  __  ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                u8"|" u8"\n" u8"|",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                u8" | | | | ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                u8"\\ \\      / / ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                u8"\\ \\   / / ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                u8"|  \\/  | ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                u8"|" u8"\n" u8"|",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                u8" | | | | ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                u8" \\ \\ /\\ / /  ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                u8" \\ \\ / /  ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                u8"| |\\/| | ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                u8"|" u8"\n" u8"|",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                u8" | |_| | ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                u8"  \\ V  V /     ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                u8"\\ V /   ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                u8"| |  | | ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                u8"|" u8"\n" u8"|",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                u8"  \\___/ ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                u8"    \\_/\\_/    ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                u8"   \\_/    ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                u8"|_|  |_| ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                u8"|" u8"\n" u8"|                                         |\n" u8"|",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                u8" Ultimate ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                u8"WebAssembly ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                u8" Virtual ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                u8"  Machine",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                u8" |" u8"\n" u8" ----------------------------------------- \n\n",                        
                                 // uwvm
-                                UWVM_AES_U8_RST_ALL
-                                UWVM_AES_U8_WHITE
-                                u8"Ultimate WebAssembly Virtual Machine\n"
-        // Debug Mode
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"Ultimate WebAssembly Virtual Machine\n",
+                                // Debug Mode
 #ifdef _DEBUG
-                                UWVM_AES_U8_GREEN
-                                u8"(Debug Mode)\n"
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
+                                u8"(Debug Mode)\n",
 #endif
-                                UWVM_AES_U8_RST_ALL
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 // Copyright
                                 u8"Copyright (c) 2025 MacroModel. All rights reserved."
-// Install Path
+                                // Install Path
 #if defined(UWVM_SUPPORT_INSTALL_PATH)
                                 u8"\nInstall Path: ",
                                 ::utils::install_path::install_path.path_name,
 #endif
                                 // Version
-                                u8"\nVersion: "
-                                UWVM_AES_U8_GREEN,
+                                u8"\nVersion: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
                                 ::uwvm::custom::uwvm_version,
-                                UWVM_AES_U8_RST_ALL
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 // Compiler
                                 u8"\nCompiler: "
 #if defined(__clang__)

@@ -25,6 +25,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
+import utils.ansies;
 #else
 // macro
 # include <utils/macro/push_macros.h>
@@ -33,6 +34,7 @@ import utils.io;
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <utils/io/impl.h>
+# include <utils/ansies/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -85,13 +87,20 @@ UWVM_MODULE_EXPORT namespace utils::debug
                 return;
             }
 #endif
-            ::fast_io::io::perr(
-                ::utils::u8err,
-                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_LT_CYAN u8"[debug] " UWVM_AES_U8_WHITE u8"timer \"" UWVM_AES_U8_YELLOW,
-                s,
-                UWVM_AES_U8_WHITE u8"\": ",
-                t1 - t0,
-                u8"s\n" UWVM_AES_U8_RST_ALL);
+            ::fast_io::io::perr(::utils::u8err,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_LT_CYAN),
+                                u8"[debug] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"timer \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
+                                s,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\": ",
+                                t1 - t0,
+                                u8"s\n",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL));
         }
     };
 

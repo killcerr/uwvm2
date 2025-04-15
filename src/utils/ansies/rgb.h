@@ -33,13 +33,9 @@ import fast_io;
 # include <fast_io.h>
 #endif
 
-/// @brief      not support on win9x and msdos
-/// @details    These functions are not provided on these platforms to avoid unwanted behaviors
-
-#if !((defined(_WIN32) && defined(_WIN32_WINDOWS)) || defined(__MSDOS__) || defined(__DJGPP__))
-# ifndef UWVM_MODULE_EXPORT
-#  define UWVM_MODULE_EXPORT
-# endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
 
 UWVM_MODULE_EXPORT namespace utils::ansies
 {
@@ -86,4 +82,3 @@ UWVM_MODULE_EXPORT namespace utils::ansies
     }
 
 }  // namespace utils::ansies
-#endif

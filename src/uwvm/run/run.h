@@ -25,6 +25,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
+import utils.ansies;
 # ifdef UWVM_TIMER
 import utils.debug;
 # endif
@@ -44,6 +45,7 @@ import parser.wasm.binfmt.base;
 // import
 # include <fast_io.h>
 # include <utils/io/impl.h>
+# include <utils/ansies/impl.h>
 # ifdef UWVM_TIMER
 #  include <utils/debug/impl.h>
 # endif
@@ -65,9 +67,14 @@ UWVM_MODULE_EXPORT namespace uwvm::run
     {
         if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
-            ::fast_io::io::perr(
-                ::utils::u8err,
-                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"No input file.\n\n" UWVM_AES_U8_RST_ALL);
+            ::fast_io::io::perr(::utils::u8err,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"No input file.\n\n",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL));
             return -2;  // The specified file is not available or cannot be opened
         }
 
@@ -86,15 +93,23 @@ UWVM_MODULE_EXPORT namespace uwvm::run
         catch(::fast_io::error e)
         {
             ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"Unable to open WASM file \"" UWVM_AES_U8_CYAN,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"Unable to open WASM file \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                 module_name,
-                                UWVM_AES_U8_WHITE u8"\": ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\": ",
                                 e,
-                                UWVM_AES_U8_RST_ALL u8"\n"
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n"
 # ifndef _WIN32  // Win32 automatically adds a newline (winnt and win9x)
                                 u8"\n"
 # endif
-                            );
+            );
             return -2;  // The specified file is not available or cannot be opened
         }
 #endif
@@ -113,9 +128,16 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::u8err,
-                                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
                                     ::fast_io::mnp::addrvw(nullptr),
-                                    u8") Illegal WebAssembly file format." UWVM_AES_U8_RST_ALL u8"\n\n");
+                                    u8") Illegal WebAssembly file format.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
 #endif
                 return -3;  // wasm parsing error
             }
@@ -152,11 +174,20 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::u8err,
-                                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
                                     ::fast_io::mnp::addrvw(4U * sizeof(char8_t)),
-                                    u8") Unknown Binary Format Version of WebAssembly: \"" UWVM_AES_U8_CYAN,
+                                    u8") Unknown Binary Format Version of WebAssembly: \"",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
-                                    UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"\"",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
 #endif
                 return -3;  // wasm parsing error
             }

@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -20,10 +20,23 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <cstdlib>
+// macro
+#include "ansi_push_macro.h"
+
+export module utils.ansies:storage;
 
 #ifndef UWVM_MODULE
-# include "cursor.h"
-# include "rgb.h"
-# include "storage.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "storage.h"

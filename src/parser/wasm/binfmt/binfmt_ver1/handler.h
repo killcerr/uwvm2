@@ -27,6 +27,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
+import utils.ansies;
 import parser.wasm.base;
 import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
@@ -55,6 +56,7 @@ import :def;
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/tuple.h>
 # include <utils/io/impl.h>
+# include <utils/ansies/impl.h>
 # include <parser/wasm/base/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
@@ -185,12 +187,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
             ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
                                 ::fast_io::mnp::addrvw(section_begin - module_begin),
                                 u8") Unknown WebAssembly Section ID: \"",
-                                UWVM_AES_U8_CYAN,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                 section_id,
-                                UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
 # endif
             throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
@@ -236,12 +246,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
             ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
                                 ::fast_io::mnp::addrvw(section_begin - module_begin),
                                 u8") Unknown WebAssembly Section ID: \"",
-                                UWVM_AES_U8_CYAN,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                 section_id,
-                                UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
 # endif
             throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
@@ -270,9 +288,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
             ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
                                 ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                u8") Illegal WebAssembly file format." UWVM_AES_U8_RST_ALL u8"\n\n");
+                                u8") Illegal WebAssembly file format.",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
 #endif
             throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
@@ -289,9 +314,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             // No need to check module_curr > module_end, always false
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
             ::fast_io::io::perr(::utils::u8err,
-                                UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
                                 ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                u8") No WebAssembly sections found." UWVM_AES_U8_RST_ALL u8"\n\n");
+                                u8") No WebAssembly sections found.",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
 #endif
             throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
@@ -321,12 +353,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::u8err,
-                                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
                                     ::fast_io::mnp::addrvw(module_curr - module_begin),
                                     u8") Invalid Section Length: \"",
-                                    UWVM_AES_U8_CYAN,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     sec_len,
-                                    UWVM_AES_U8_WHITE u8"\"" UWVM_AES_U8_RST_ALL u8"\n\n");
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"\"",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
 #endif
                 throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
@@ -344,9 +384,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                 // No need to check module_curr > module_end, always false
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::u8err,
-                                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE u8"uwvm: " UWVM_AES_U8_RED u8"[error] " UWVM_AES_U8_WHITE u8"(offset=",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
                                     ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                    u8") Unable to read leb128, not enough space left." UWVM_AES_U8_RST_ALL u8"\n\n");
+                                    u8") Unable to read leb128, not enough space left.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
 #endif
                 throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
