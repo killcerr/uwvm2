@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -24,10 +24,17 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.features;
-export import :def;
-export import :binfmt;
-export import :type_section;
+// std
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+
+export module parser.wasm.standard.wasm1.features:def;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -36,4 +43,4 @@ export import :type_section;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "def.h"

@@ -34,6 +34,7 @@ import parser.wasm.standard.wasm1.type;
 import parser.wasm.standard.wasm1.section;
 import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
+import :def;
 #else
 // std
 # include <cstddef>
@@ -55,6 +56,7 @@ import parser.wasm.binfmt.binfmt_ver1;
 # include <parser/wasm/standard/wasm1/section/impl.h>
 # include <parser/wasm/standard/wasm1/opcode/impl.h>
 # include <parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include "def.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -68,7 +70,9 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     {
         inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
 
-        ::parser::wasm::standard::wasm1::section::type_section typesec{};
+        ::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
+        
+        ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>> types{};
     };
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
@@ -79,8 +83,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         ::std::byte const* const section_end) UWVM_THROWS
     {
         // get type_section_storage_t from storages
-        auto& type_section_storage{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
-        auto& typesec{type_section_storage.typesec};
+        auto& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
         // check duplicate
         if(typesec.sec_span.sec_begin) [[unlikely]]
@@ -142,7 +145,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
         section_curr = reinterpret_cast<::std::byte const*>(type_count_next);
 
-        [[maybe_unused]] ::parser::wasm::standard::wasm1::type::function_type ft{};
-        /// @todo
+        [[maybe_unused]] ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
+
+        // for(; section_curr != section_end;)
+        // {
+        //     ::parser::wasm::standard::wasm1::features::final_value_type<Fs...> vt{};
+
+        // }
     }
 }  // namespace parser::wasm::standard::wasm1::features

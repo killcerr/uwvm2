@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -32,8 +32,6 @@ import parser.wasm.standard.wasm1.type;
 import parser.wasm.standard.wasm1.section;
 import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
-import :def;
-import :type_section;
 #else
 // std
 # include <cstddef>
@@ -54,8 +52,6 @@ import :type_section;
 # include <parser/wasm/standard/wasm1/section/impl.h>
 # include <parser/wasm/standard/wasm1/opcode/impl.h>
 # include <parser/wasm/binfmt/binfmt_ver1/impl.h>
-# include "def.h"
-# include "type_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -64,29 +60,43 @@ import :type_section;
 
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
-    struct wasm1
-    {
-        inline static constexpr ::fast_io::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
-
-        using value_type = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement,
-                                                                              ::parser::wasm::standard::wasm1::type::value_type>;
-
-        template <::parser::wasm::concepts::wasm_feature... Fs>
-        using binfmt_ver1_section_type = ::fast_io::tuple<::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>
-                                                          /// @todo
-                                                          >;
+    template <typename FeatureType>
+    concept has_value_type = requires {
+        typename FeatureType::value_type;
+        ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+                                                                             typename FeatureType::value_type>;
     };
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr auto define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<wasm1>, ::fast_io::tuple<Fs...>) noexcept
-    {
-        return ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>;
-    }
+    using final_value_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<
+        ::std::conditional_t<has_value_type<Fs>, typename Fs::value_type, ::parser::wasm::concepts::operation::irreplaceable_t>...>;
 
-    static_assert(::parser::wasm::concepts::wasm_feature<wasm1>);
-    static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<wasm1>);
-    static_assert(::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
-    static_assert(::parser::wasm::standard::wasm1::features::has_value_type<wasm1>);
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    struct vec_value_type
+    {
+        static_assert(::std::is_enum_v<final_value_type_t<Fs...>>);
+
+        final_value_type_t<Fs...> const* begin{};
+        final_value_type_t<Fs...> const* end{};
+    };
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    using final_result_type = vec_value_type<Fs...>;
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_function_type
+    {
+        final_result_type<Fs...> parameter{};
+        final_result_type<Fs...> result{};
+    };
 
 }  // namespace parser::wasm::standard::wasm1::features
+
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+}

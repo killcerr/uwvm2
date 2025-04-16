@@ -25,6 +25,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+# include "def.h"
 # include "binfmt.h"
 # include "type_section.h"
 #endif

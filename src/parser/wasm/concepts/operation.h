@@ -416,6 +416,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
 
             inline consteval type_wrapper<void> operator, (type_wrapper<void>, type_wrapper<void>) noexcept { return type_wrapper<void>{}; }
 
+            /// @details No substitution, for filling, use at your own risk
+            struct irreplaceable_t1
+            {
+            };
+
+            struct irreplaceable_t2
+            {
+            };
+
             // Type Calculation
             template <template <typename, typename> typename T, typename Superseded, typename... Args>
                 requires (::std::same_as<T<typename Args::superseded, typename Args::replacement>,
@@ -430,6 +439,14 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                         ((
                              [&is_repeatable, &repeating]<typename ArgCurr>() constexpr noexcept
                              {
+                                 // check irreplaceable
+                                 if constexpr(::std::same_as<typename ArgCurr::superseded, irreplaceable_t1> ||
+                                              ::std::same_as<typename ArgCurr::superseded, irreplaceable_t2> || ::std::same_as<Superseded, irreplaceable_t1> ||
+                                              ::std::same_as<Superseded, irreplaceable_t2>)
+                                 {
+                                     return type_wrapper<void>{};
+                                 }
+
                                  if constexpr(::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>)
                                  {
                                      // Replacement of the same type
@@ -470,7 +487,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                     else { return ret; }
                 }(::std::make_index_sequence<sizeof...(Args)>{});
             }
+
+            /// @details check_is_type_replacer<type_replacer, typename T::test>;
+            template <template <typename, typename> typename TypeReplacer, typename Args>
+            concept check_is_type_replacer = ::std::same_as<TypeReplacer<typename Args::superseded, typename Args::replacement>,
+                                                            type_replacer<typename Args::superseded, typename Args::replacement>>;
+
         }  // namespace details
+
+        using irreplaceable_t = type_replacer<details::irreplaceable_t1, details::irreplaceable_t2>;
 
         template <typename... Args>
         inline consteval auto replacement_structure() noexcept
