@@ -51,7 +51,7 @@ namespace uwvm::cmdline::paras::details
                                                                                   ::utils::cmdline::parameter_parsing_results*,
                                                                                   ::utils::cmdline::parameter_parsing_results*) noexcept
     {
-        ::fast_io::io::perr(::utils::u8err,
+        ::fast_io::io::perr(::utils::debug_output,
                                 // logo
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL), 
                                 u8"\n",

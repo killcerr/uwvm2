@@ -54,7 +54,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
 
     inline constexpr ::utils::cmdline::parameter help{.name{u8"--help"},
                                                       .describe{u8"Get help information."},
-                                                      .usage{u8"[<null>|all|global|wasm]"},
+                                                      .usage{u8"[<null>|all|global|debug|wasm]"},
                                                       .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::help_alias), 1}},
                                                       .handle{::std::addressof(details::help_callback)},
                                                       .is_exist{::std::addressof(details::help_is_exist)}};

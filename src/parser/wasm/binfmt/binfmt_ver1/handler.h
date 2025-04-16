@@ -186,7 +186,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         if(!success) [[unlikely]]
         {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -245,7 +245,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         if(!finish) [[unlikely]]
         {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -287,7 +287,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -313,7 +313,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         {
             // No need to check module_curr > module_end, always false
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -352,7 +352,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             if(static_cast<::std::size_t>(module_end - module_curr) < sec_len) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::u8err,
+                ::fast_io::io::perr(::utils::debug_output,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -383,7 +383,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             {
                 // No need to check module_curr > module_end, always false
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::u8err,
+                ::fast_io::io::perr(::utils::debug_output,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),

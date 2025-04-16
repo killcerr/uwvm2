@@ -87,7 +87,7 @@ UWVM_MODULE_EXPORT namespace utils::debug
                 return;
             }
 #endif
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_LT_CYAN),

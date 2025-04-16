@@ -162,6 +162,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
     enum class categorization : unsigned
     {
         global = 0u,
+        debug,
         wasm,
     };
 

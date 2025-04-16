@@ -24,4 +24,5 @@
 
 #ifndef UWVM_MODULE
 # include "io_device.h"
+# include "output.h"
 #endif

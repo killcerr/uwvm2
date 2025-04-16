@@ -113,7 +113,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         auto const u16_cmdline_argv{::fast_io::win32::CommandLineToArgvW(nt_proc_cmdline.Buffer, ::std::addressof(u16_cmdline_argc))};
         if(u16_cmdline_argv == nullptr) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),

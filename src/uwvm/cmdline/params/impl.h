@@ -29,6 +29,7 @@
 # include "mode.h"
 # include "wasm_abi.h"
 # include "wasm_binfmt.h"
+# include "debug_output.h"
 # ifdef _DEBUG
 #  include "test.h"
 # endif

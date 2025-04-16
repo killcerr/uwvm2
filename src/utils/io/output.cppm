@@ -1,13 +1,13 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-04-16
  * @copyright   APL-2 License
  */
 
@@ -22,9 +22,7 @@
 
 module;
 
-export module utils.io;
-export import :io_device;
-export import :output;
+export module utils.io:output;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -33,4 +31,4 @@ export import :output;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "output.h"

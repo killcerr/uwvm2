@@ -51,7 +51,7 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::u8err, u8"test1\n");
+    ::fast_io::io::perrln(::utils::debug_output, u8"test1\n");
     return true;
 }
 
@@ -79,7 +79,7 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::u8err, u8"test2\n");
+    ::fast_io::io::perrln(::utils::debug_output, u8"test2\n");
 
     return true;
 }
@@ -98,7 +98,7 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::u8err, u8"test3\n");
+    ::fast_io::io::perrln(::utils::debug_output, u8"test3\n");
 
     return true;
 }
@@ -151,20 +151,20 @@ int main()
 
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
-    ::fast_io::io::perr(::utils::u8err, u8"sec1:\n");
+    ::fast_io::io::perr(::utils::debug_output, u8"sec1:\n");
     ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 1, nullptr, nullptr);
-    ::fast_io::io::perr(::utils::u8err, u8"sec2:\n");
+    ::fast_io::io::perr(::utils::debug_output, u8"sec2:\n");
     ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 2, nullptr, nullptr);
-    ::fast_io::io::perr(::utils::u8err, u8"sec3:\n");
+    ::fast_io::io::perr(::utils::debug_output, u8"sec3:\n");
     ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 3, nullptr, nullptr);
-    ::fast_io::io::perr(::utils::u8err, u8"sec4:\n");
+    ::fast_io::io::perr(::utils::debug_output, u8"sec4:\n");
     try
     {
         ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 4, nullptr, nullptr);
     }
     catch(::fast_io::error e)
     {
-        ::fast_io::perr(::utils::u8err, u8"test4, not found\n");
+        ::fast_io::perr(::utils::debug_output, u8"test4, not found\n");
     }
 }
 

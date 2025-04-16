@@ -1,13 +1,13 @@
-﻿/********************************************************
- * Ultimate WebAssembly Virtual Machine (Version 2)     *
+/********************************************************
+ * Ultimate WebAssembly Virtual Machine (help 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-04-16
  * @copyright   APL-2 License
  */
 
@@ -22,9 +22,12 @@
 
 module;
 
-export module utils.io;
-export import :io_device;
-export import :output;
+#include <memory>
+
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+
+export module uwvm.cmdline.params:debug_output;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -33,4 +36,4 @@ export import :output;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "debug_output.h"

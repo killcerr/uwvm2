@@ -41,8 +41,9 @@ import fast_io;
 UWVM_MODULE_EXPORT namespace utils
 {
     // io does not add meaningless namespaces.
-
-#ifndef __AVR__
+    /// @deprecated It is no longer recommended to use u8err, use debug_output.
+#if 0
+# ifndef __AVR__
 
     /// @brief      native stdout
     /// @details    on non-windows (POSIX) systems (fd): (int)[0, 1, 2]
@@ -51,19 +52,17 @@ UWVM_MODULE_EXPORT namespace utils
     ///             set in out err __init_priority__ to 250, set xxx_buf __init_priority__ to 260
 
     inline ::fast_io::u8native_io_observer u8in{::fast_io::u8in()};                  // No global variable dependencies from other translation units
-    inline ::fast_io::basic_ibuf<::fast_io::u8native_io_observer> u8in_buf{u8in};    // No global variable dependencies from other translation units
     inline ::fast_io::u8native_io_observer u8out{::fast_io::u8out()};                // No global variable dependencies from other translation units
-    inline ::fast_io::basic_obuf<::fast_io::u8native_io_observer> u8out_buf{u8out};  // No global variable dependencies from other translation units
     inline ::fast_io::u8native_io_observer u8err{::fast_io::u8err()};                // No global variable dependencies from other translation units
     // No buffer is provided to u8err
-#else
-    // The C API of avrlibc does not have any buffers.
+# else
+    /// @brief      C's STDOUT
+    /// @details    The C API of avrlibc does not have any buffers.
 
     inline ::fast_io::u8c_io_observer u8in{::fast_io::u8c_stdin()};             // No global variable dependencies from other translation units
-    inline ::fast_io::basic_ibuf<::fast_io::u8c_io_observer> u8in_buf{u8in};    // No global variable dependencies from other translation units
     inline ::fast_io::u8c_io_observer u8out{::fast_io::u8c_stdout()};           // No global variable dependencies from other translation units
-    inline ::fast_io::basic_obuf<::fast_io::u8c_io_observer> u8out_buf{u8out};  // No global variable dependencies from other translation units
     inline ::fast_io::u8c_io_observer u8err{::fast_io::u8c_stderr()};           // No global variable dependencies from other translation units
     // No buffer is provided to u8err
+# endif
 #endif
 }  // namespace utils

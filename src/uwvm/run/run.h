@@ -67,7 +67,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
     {
         if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -92,7 +92,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #ifdef __cpp_exceptions
         catch(::fast_io::error e)
         {
-            ::fast_io::io::perr(::utils::u8err,
+            ::fast_io::io::perr(::utils::debug_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -127,7 +127,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             case 0:
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::u8err,
+                ::fast_io::io::perr(::utils::debug_output,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -173,7 +173,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             default:
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::u8err,
+                ::fast_io::io::perr(::utils::debug_output,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
