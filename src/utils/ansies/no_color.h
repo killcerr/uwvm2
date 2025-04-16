@@ -30,6 +30,7 @@ import fast_io;
 # include <cstddef>
 # include <concepts>
 # include <cstdlib>
+# include <memory>
 // macro
 # include "ansi_push_macro.h"
 // import
@@ -56,16 +57,20 @@ UWVM_MODULE_EXPORT namespace utils::ansies
     inline bool check_has_no_color() noexcept
     {
 #if defined(_WIN32) && !defined(__CYGWIN__) && !defined(__WINE__)
-        if constexpr(::fast_io::win32_family::native == ::fast_io::win32_family::wide_nt)
-        {
-            auto no_color_env{::fast_io::win32::GetEnvironmentVariableW(u"NO_COLOR", nullptr, 0)};
-            return static_cast<bool>(no_color_env);
-        }
-        else
-        {
-            auto no_color_env{::fast_io::win32::GetEnvironmentVariableA(reinterpret_cast<char const*>(u8"NO_COLOR"), nullptr, 0)};
-            return static_cast<bool>(no_color_env);
-        }
+# ifndef _WIN32_WINDOWS
+        auto const curr_peb{::fast_io::win32::nt::nt_get_current_peb()};
+        decltype(auto) env_str{u"NO_COLOR"};
+        ::fast_io::win32::nt::unicode_string env_us{.Length = sizeof(env_str) - sizeof(char16_t),
+                                                    .MaximumLength = sizeof(env_str),
+                                                    .Buffer = const_cast<char16_t*>(env_str)};
+        ::fast_io::win32::nt::unicode_string out_us{};
+        auto status{
+            ::fast_io::win32::nt::RtlQueryEnvironmentVariable_U(curr_peb->ProcessParameters->Environment, ::std::addressof(env_us), ::std::addressof(out_us))};
+        return status == 0xc0000023 || status == 0x00000000;
+# else
+        auto no_color_env{::fast_io::win32::GetEnvironmentVariableA(reinterpret_cast<char const*>(u8"NO_COLOR"), nullptr, 0)};
+        return static_cast<bool>(no_color_env);
+# endif
 #else
         auto no_color_env{details::libc_getenv(reinterpret_cast<char const*>(u8"NO_COLOR"))};
         return static_cast<bool>(no_color_env);

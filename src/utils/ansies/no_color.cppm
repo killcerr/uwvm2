@@ -27,6 +27,7 @@ module;
 #include <cstddef>
 #include <concepts>
 #include <cstdlib>
+# include <memory>
 // macro
 #include "ansi_push_macro.h"
 
