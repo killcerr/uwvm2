@@ -295,6 +295,7 @@
 #pragma comment(linker,"/alternatename:__imp_?ZwDeviceIoControlFile@nt@win32@fast_io@@YGIPAX0PAP6AX0PAUio_status_block@123@I@_E01I0I0I@Z=__imp__ZwDeviceIoControlFile@40")
 #pragma comment(linker,"/alternatename:__imp_?RtlAcquirePrivilege@nt@win32@fast_io@@YGIPAW4privileges@123@IIPAPAX@Z=__imp__RtlAcquirePrivilege@16")
 #pragma comment(linker,"/alternatename:__imp_?RtlReleasePrivilege@nt@win32@fast_io@@YGXPAX@Z=__imp__RtlReleasePrivilege@4")
+#pragma comment(linker,"/alternatename:__imp_?RtlQueryEnvironmentVariable_U@nt@win32@fast_io@@YGIPAXPAUunicode_string@123@1@Z=__imp__RtlQueryEnvironmentVariable_U@12")
 // msvc
 #pragma comment(linker,"/alternatename:__imp_?msvc__RTtypeid@msvc@fast_io@@YAPAXPAX@Z=__imp____RTtypeid")
 #pragma comment(linker,"/alternatename:?msvc__RTtypeid@msvc@fast_io@@YAPAXPAX@Z=___RTtypeid")
