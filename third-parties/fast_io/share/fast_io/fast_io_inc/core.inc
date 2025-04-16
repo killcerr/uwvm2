@@ -43,6 +43,9 @@ using ::fast_io::cstr_nlen;
 using ::fast_io::parse_by_scan;
 using ::fast_io::parse_code;
 
+using ::fast_io::io_dup;
+using ::fast_io::open_mode;
+
 #if !defined(__clang__) // The gcc and msvc module does not support non-exported functions adl matching
 using ::fast_io::input_stream_ref_define;
 using ::fast_io::output_stream_ref_define;

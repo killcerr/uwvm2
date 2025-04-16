@@ -6,5 +6,6 @@ export namespace fast_io
         using ::fast_io::win32::nt::nt_get_current_peb;
         using ::fast_io::win32::nt::CsrClientCallServer;
         using ::fast_io::win32::nt::RtlQueryEnvironmentVariable_U;
+        using ::fast_io::win32::nt::unicode_string;
     } // namespace win32::nt
 }

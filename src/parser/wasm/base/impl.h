@@ -26,4 +26,5 @@
 #ifndef UWVM_MODULE
 # include "abi.h"
 # include "mode.h"
+# include "error.h"
 #endif
