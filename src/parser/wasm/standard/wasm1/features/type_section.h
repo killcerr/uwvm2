@@ -81,8 +81,286 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>> types{};
     };
 
+    template <typename... Fs>
+    concept has_check_value_type = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                            ::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> value_type) {
+        { define_check_value_type(sec_adl, value_type) } -> ::std::same_as<bool>;
+    };
+
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>>,
+    inline constexpr bool define_check_value_type([[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                  ::parser::wasm::standard::wasm1::type::value_type value_type) noexcept
+    {
+        switch(value_type)
+        {
+            case ::parser::wasm::standard::wasm1::type::value_type::i32: [[fallthrough]];
+            case ::parser::wasm::standard::wasm1::type::value_type::i64: [[fallthrough]];
+            case ::parser::wasm::standard::wasm1::type::value_type::f32: [[fallthrough]];
+            case ::parser::wasm::standard::wasm1::type::value_type::f64: return true;
+            default: return false;
+        }
+    }
+
+    template <typename... Fs>
+    concept has_type_prefix_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                               ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
+                                               ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                               ::std::byte const* const section_curr,
+                                               ::std::byte const* const section_end) {
+        { define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
+    };
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline ::std::byte const* define_type_prefix_handler(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                         ::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
+                                                         ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+                                                         ::std::byte const* section_curr,
+                                                         ::std::byte const* const section_end) UWVM_THROWS
+    {
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+        using value_type_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> const*;
+
+        // ... 60 ?? ?? ...
+        //        ^^ section_curr
+        switch(prefix)
+        {
+            case ::parser::wasm::standard::wasm1::type::function_type_prefix::functype:
+            {
+                ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
+
+                // For safety, add parentheses to indicate the scope
+                // parameter
+                {
+                    ::parser::wasm::standard::wasm1::type::wasm_u32 para_len{};
+                    auto const [next_para_len, err_para_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                      reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                      ::fast_io::mnp::leb128_get(para_len))};
+                    if(err_para_len != ::fast_io::parse_code::ok) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        ::fast_io::io::perr(::utils::debug_output,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"(offset=",
+                                            ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                            u8") Invalid Parameter Length.",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                            u8"\n\n");
+#endif
+                        ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    section_curr = reinterpret_cast<::std::byte const*>(next_para_len);
+
+                    // ... 60 length ... length ... ...
+                    //               ^^ section_curr
+                    // If it's a null return value, there's at least one more parameter, so add 1u
+                    if(static_cast<::std::size_t>(section_end - section_curr) < para_len + 1u) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        ::fast_io::io::perr(::utils::debug_output,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"(offset=",
+                                            ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                            u8") Invalid Parameter Length: \"",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                            para_len,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"\"",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                            u8"\n\n");
+#endif
+                        ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    // set parameters
+                    ft.parameter.begin = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
+                    section_curr += para_len;
+                    // ... 60 length ... length ... ...
+                    //                   ^^ section_curr
+                    ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
+
+                    // check handler
+                    static_assert(has_check_value_type<Fs...>);
+                    // check parameters
+                    for(auto parameter_curr{ft.parameter.begin}; parameter_curr != ft.parameter.end; ++parameter_curr)
+                    {
+                        if(!define_check_value_type(sec_adl, *parameter_curr)) [[unlikely]]
+                        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                            ::fast_io::io::perr(::utils::debug_output,
+                                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                                u8"[error] ",
+                                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                                u8"(offset=",
+                                                ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                                u8") Invalid Value Type: \"",
+                                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                                ::fast_io::mnp::hex0x<true>(
+                                                    static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(
+                                                        *parameter_curr)),
+                                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                                u8"\"",
+                                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                                u8"\n\n");
+#endif
+                        }
+                    }
+                }
+
+                // result
+                {
+                    ::parser::wasm::standard::wasm1::type::wasm_u32 result_len{};
+                    auto const [next_result_len, err_result_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                          reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                          ::fast_io::mnp::leb128_get(result_len))};
+                    if(err_result_len != ::fast_io::parse_code::ok) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        ::fast_io::io::perr(::utils::debug_output,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"(offset=",
+                                            ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                            u8") Invalid Result Length.",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                            u8"\n\n");
+#endif
+                        ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    section_curr = reinterpret_cast<::std::byte const*>(next_result_len);
+                    // ... 60 length ... length ... ...
+                    //                          ^^ section_curr
+
+                    /// @details    In the current version of WebAssembly, the length of the result type vector of a valid function type may be
+                    ///             at most 1. This restriction may be removed in future versions.
+                    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
+                    constexpr bool allow_multi_value{::parser::wasm::standard::wasm1::features::allow_multi_result_vector<Fs...>()};
+                    if constexpr(allow_multi_value)
+                    {
+                        if(result_len > 1) [[unlikely]]
+                        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                            ::fast_io::io::perr(
+                                ::utils::debug_output,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                u8") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
+#endif
+                            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+                    }
+
+                    if(static_cast<::std::size_t>(section_end - section_curr) < result_len) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        ::fast_io::io::perr(::utils::debug_output,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"(offset=",
+                                            ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                            u8") Invalid Result Length: \"",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                            result_len,
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                            u8"\"",
+                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                            u8"\n\n");
+#endif
+                        ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    // set parameters
+                    ft.result.begin = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
+                    section_curr += result_len;
+                    // ... 60 length ... length ... ...
+                    //                              ^^ section_curr
+                    ft.result.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
+
+                    // check results
+                    for(auto result_curr{ft.result.begin}; result_curr != ft.result.end; ++result_curr)
+                    {
+                        if(!define_check_value_type(sec_adl, *result_curr)) [[unlikely]]
+                        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                            ::fast_io::io::perr(
+                                ::utils::debug_output,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                u8") Invalid Value Type: \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                ::fast_io::mnp::hex0x<true>(
+                                    static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*result_curr)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
+#endif
+                        }
+                    }
+                }
+
+                // push back
+                auto& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+                typesec.types.push_back_unchecked(::std::move(ft));
+
+                break;
+            }
+            default: [[unlikely]] {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                    ::fast_io::io::perr(
+                        ::utils::debug_output,
+                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                        u8"uwvm: ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                        u8"[error] ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                        u8"(offset=",
+                        ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                        u8") Invalid Type Prefix: \"",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                        ::fast_io::mnp::hex0x<true>(static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::type::function_type_prefix>>(prefix)),
+                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                        u8"\"",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                        u8"\n\n");
+#endif
+                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+        }
+        return section_curr;
+    }
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                              ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
                                                              ::std::byte const* const section_begin,
                                                              ::std::byte const* const section_end) UWVM_THROWS
@@ -152,19 +430,47 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
         typesec.types.reserve(type_count);
 
-        section_curr = reinterpret_cast<::std::byte const*>(type_count_next); // never out of bounds
+        section_curr = reinterpret_cast<::std::byte const*>(type_count_next);  // never out of bounds
 
-        ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
+        ::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
 
-        /// @todo
-        
-        // for(; section_curr != section_end;) 
-        // { 
-        //     ::parser::wasm::standard::wasm1::features::final_type_prefix<Fs...> vt{}; 
-        //     // no necessary to check, because section_curr != section_end
-        //     ::fast_io::freestanding::my_memcpy(::std::addressof(vt), section_curr, sizeof(vt));
-        //
-        // }
-        
+        for(; section_curr != section_end;)
+        {
+            // ... 60 ?? ?? ...
+            //     ^^ section_curr
+            ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix{};
+            // no necessary to check, because section_curr != section_end
+            ::fast_io::freestanding::my_memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));
+            // set section_curr to next
+            ++section_curr;
+            // ... 60 ?? ?? ...
+            //        ^^ section_curr
+            // check has func
+            static_assert(has_type_prefix_handler<Fs...>);
+            // check type count
+            if(++type_counter > type_count) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::debug_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") The number of types resolved does not match the actual number: \"",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                    type_counter,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"\"",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+            // handle it
+            section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end);
+        }
     }
 }  // namespace parser::wasm::standard::wasm1::features

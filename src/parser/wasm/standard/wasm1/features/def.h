@@ -61,7 +61,7 @@ import parser.wasm.binfmt.binfmt_ver1;
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
     /// @brief      has value type
-    /// @details    
+    /// @details
     ///             ```cpp
     ///             struct F
     ///             {
@@ -99,6 +99,60 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         final_result_type<Fs...> result{};
     };
 
+    /// @brief      has type prefie
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using type_prefix = type_replacer<root_of_replacement, type_prefix>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_type_prefix = requires {
+        typename FeatureType::type_prefix;
+        ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+                                                                             typename FeatureType::type_prefix>;
+    };
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    using final_type_prefix_t = ::parser::wasm::concepts::operation::replacement_structure_t<
+        ::std::conditional_t<has_type_prefix<Fs>, typename Fs::type_prefix, ::parser::wasm::concepts::operation::irreplaceable_t>...>;
+
+    /// @brief      allow multi value
+    /// @details    In the current version of WebAssembly, the length of the result type vector of a valid function type may be
+    ///             at most 1. This restriction may be removed in future versions.
+    ///             
+    ///             Define this to eliminate checking the length of the result.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool allow_multi_result_vector{true};
+    ///             };
+    ///             ```
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
+    template <typename FsCurr>
+    concept has_allow_multi_result_vector = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_result_vector)>, bool>; };
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool allow_multi_result_vector() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_allow_multi_result_vector<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::allow_multi_result_vector};
+                                                                            return tallow;
+                                                                        }
+                                                                        else { return false; }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
 }  // namespace parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

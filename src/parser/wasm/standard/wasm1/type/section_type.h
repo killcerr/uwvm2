@@ -51,7 +51,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
-    struct limits
+    struct limits_type
     {
         ::parser::wasm::standard::wasm1::type::wasm_u32 min{};
         ::parser::wasm::standard::wasm1::type::wasm_u32 max{};
@@ -74,7 +74,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.5
     struct memory_type
     {
-        limits limits{};
+        limits_type limits{};
 
         bool is_exported{};
     };
@@ -85,7 +85,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.6
     struct table_type
     {
-        limits limits{};
+        limits_type limits{};
         ::parser::wasm::standard::wasm1::type::value_type reftype{};
 
         bool is_exported{};
