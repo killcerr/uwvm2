@@ -163,6 +163,7 @@
 #pragma comment(linker,"/alternatename:?CreateThread$exit_thunk@win32@fast_io@@$$hYAPEAXPEAUsecurity_attributes@12@_KP6AIPEAX@Z2IPEAI@Z=#CreateThread")
 #pragma comment(linker,"/alternatename:?CommandLineToArgvW@win32@fast_io@@YAPEAPEA_SPEB_SPEAH@Z=#CommandLineToArgvW")
 #pragma comment(linker,"/alternatename:?LocalFree@win32@fast_io@@YAPEAXPEAX@Z=#LocalFree")
+#pragma comment(linker,"/alternatename:?PrefetchVirtualMemory@win32@fast_io@@$$hYAHPEAX_KPEAUwin32_memory_range_entry@12@I@Z=#PrefetchVirtualMemory")
 // NT
 #pragma comment(linker,"/alternatename:?rtl_nt_status_to_dos_error$exit_thunk@nt@win32@fast_io@@$$hYAII@Z=#RtlNtStatusToDosError")
 #pragma comment(linker,"/alternatename:?NtClose$exit_thunk@nt@win32@fast_io@@$$hYAIPEAX@Z=#NtClose")

@@ -18,5 +18,6 @@ export namespace fast_io
         using ::fast_io::win32::LocalFree;
         using ::fast_io::win32::GetEnvironmentVariableW;
         using ::fast_io::win32::GetEnvironmentVariableA;
+        using ::fast_io::win32::PrefetchVirtualMemory;
     } // namespace win32
 }
