@@ -7,5 +7,6 @@ export namespace fast_io
         using ::fast_io::win32::nt::CsrClientCallServer;
         using ::fast_io::win32::nt::RtlQueryEnvironmentVariable_U;
         using ::fast_io::win32::nt::unicode_string;
+        using ::fast_io::win32::nt::nt_set_information_virtual_memory;
     } // namespace win32::nt
 }

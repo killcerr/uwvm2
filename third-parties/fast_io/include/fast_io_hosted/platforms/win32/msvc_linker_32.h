@@ -296,6 +296,8 @@
 #pragma comment(linker,"/alternatename:__imp_?RtlAcquirePrivilege@nt@win32@fast_io@@YAIPAW4privileges@123@IIPAPAX@Z=__imp_RtlAcquirePrivilege")
 #pragma comment(linker,"/alternatename:__imp_?RtlReleasePrivilege@nt@win32@fast_io@@YAXPAX@Z=__imp_RtlReleasePrivilege")
 #pragma comment(linker,"/alternatename:__imp_?RtlQueryEnvironmentVariable_U@nt@win32@fast_io@@YAIPAXPAUunicode_string@123@1@Z=__imp_RtlQueryEnvironmentVariable_U")
+#pragma comment(linker,"/alternatename:__imp_?NtSetInformationVirtualMemory@nt@win32@fast_io@@YAIPAXW4virtual_memory_information_class@123@IPAUmemory_range_entry@123@0I@Z=__imp_NtSetInformationVirtualMemory")
+#pragma comment(linker,"/alternatename:__imp_?ZwSetInformationVirtualMemory@nt@win32@fast_io@@YAIPAXW4virtual_memory_information_class@123@IPAUmemory_range_entry@123@0I@Z=__imp_ZwSetInformationVirtualMemory")
 //msvc
 #pragma comment(linker,"/alternatename:__imp_?msvc__RTtypeid@msvc@fast_io@@YAPAXPAX@Z=__imp___RTtypeid")
 #pragma comment(linker,"/alternatename:?msvc__RTtypeid@msvc@fast_io@@YAPAXPAX@Z=__RTtypeid")

@@ -296,6 +296,8 @@
 #pragma comment(linker,"/alternatename:?RtlAcquirePrivilege$exit_thunk@nt@win32@fast_io@@$$hYAIPEAW4privileges@123@IIPEAPEAX@Z=#RtlAcquirePrivilege")
 #pragma comment(linker,"/alternatename:?RtlReleasePrivilege$exit_thunk@nt@win32@fast_io@@$$hYAXPEAX@Z=#RtlReleasePrivilege")
 #pragma comment(linker,"/alternatename:?RtlQueryEnvironmentVariable_U@nt@win32@fast_io@@$$hYAIPEAXPEAUunicode_string@123@1@Z=#RtlQueryEnvironmentVariable_U")
+#pragma comment(linker,"/alternatename:?NtSetInformationVirtualMemory@nt@win32@fast_io@@$$hYAIPEAXW4virtual_memory_information_class@123@_KPEAUmemory_range_entry@123@0I@Z=#NtSetInformationVirtualMemory")
+#pragma comment(linker,"/alternatename:?ZwSetInformationVirtualMemory@nt@win32@fast_io@@$$hYAIPEAXW4virtual_memory_information_class@123@_KPEAUmemory_range_entry@123@0I@Z=#ZwSetInformationVirtualMemory")
 // msvc
 #pragma comment(linker,"/alternatename:?msvc__RTtypeid@msvc@fast_io@@$$hYAPEAXPEAX@Z=#__RTtypeid")
 // clang-format on
