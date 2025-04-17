@@ -249,7 +249,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     ///             at most 1. This restriction may be removed in future versions.
                     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
                     constexpr bool allow_multi_value{::parser::wasm::standard::wasm1::features::allow_multi_result_vector<Fs...>()};
-                    if constexpr(allow_multi_value)
+                    if constexpr(!allow_multi_value)
                     {
                         if(result_len > 1) [[unlikely]]
                         {
@@ -471,6 +471,33 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             }
             // handle it
             section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end);
+        }
+
+        // check type counter match
+        if(type_counter != type_count) [[unlikely]]
+        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+            ::fast_io::io::perr(::utils::debug_output,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                u8") The number of types resolved \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                type_counter,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\" does not match the actual number \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_LT_GREEN),
+                                type_count,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\".",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
+#endif
+            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
 }  // namespace parser::wasm::standard::wasm1::features
