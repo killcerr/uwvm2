@@ -28,6 +28,9 @@
 import fast_io;
 import utils.io;
 import utils.ansies;
+# ifdef UWVM_TIMER
+import utils.debug;
+# endif
 import parser.wasm.base;
 import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
@@ -50,6 +53,9 @@ import :def;
 # include <fast_io.h>
 # include <utils/io/impl.h>
 # include <utils/ansies/impl.h>
+# ifdef UWVM_TIMER
+#  include <utils/debug/impl.h>
+# endif
 # include <parser/wasm/base/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
@@ -76,12 +82,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     };
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void handle_binfmt_ver1_extensible_section_define(
-        ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<type_section_storage_t<Fs...>>>,
-        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-        ::std::byte const* const section_begin,
-        ::std::byte const* const section_end) UWVM_THROWS
+    inline void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>>,
+                                                             ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+                                                             ::std::byte const* const section_begin,
+                                                             ::std::byte const* const section_end) UWVM_THROWS
     {
+#ifdef UWVM_TIMER
+        ::utils::debug::timer parsing_timer{u8"parse type section"};
+#endif
+
         // get type_section_storage_t from storages
         auto& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
@@ -143,15 +152,19 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
         typesec.types.reserve(type_count);
 
-        section_curr = reinterpret_cast<::std::byte const*>(type_count_next);
+        section_curr = reinterpret_cast<::std::byte const*>(type_count_next); // never out of bounds
 
-        [[maybe_unused]] ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
+        ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
 
-        // for(; section_curr != section_end;)
-        // {
-        //     ::parser::wasm::standard::wasm1::features::final_value_type<Fs...> vt{};
-
-        // }
         /// @todo
+        
+        // for(; section_curr != section_end;) 
+        // { 
+        //     ::parser::wasm::standard::wasm1::features::final_type_prefix<Fs...> vt{}; 
+        //     // no necessary to check, because section_curr != section_end
+        //     ::fast_io::freestanding::my_memcpy(::std::addressof(vt), section_curr, sizeof(vt));
+        //
+        // }
+        
     }
 }  // namespace parser::wasm::standard::wasm1::features

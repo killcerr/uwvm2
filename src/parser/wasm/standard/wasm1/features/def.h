@@ -60,6 +60,14 @@ import parser.wasm.binfmt.binfmt_ver1;
 
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
+    /// @brief      has value type
+    /// @details    
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using value_type = type_replacer<root_of_replacement, value_type>;
+    ///             };
+    ///             ```
     template <typename FeatureType>
     concept has_value_type = requires {
         typename FeatureType::value_type;
@@ -75,6 +83,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     struct vec_value_type
     {
         static_assert(::std::is_enum_v<final_value_type_t<Fs...>>);
+        static_assert(::std::same_as<::std::underlying_type_t<final_value_type_t<Fs...>>, ::parser::wasm::standard::wasm1::type::wasm_byte>);
 
         final_value_type_t<Fs...> const* begin{};
         final_value_type_t<Fs...> const* end{};

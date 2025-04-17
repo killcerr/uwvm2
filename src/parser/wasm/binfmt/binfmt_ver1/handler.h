@@ -379,7 +379,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             module_curr = sec_end;
 
             // check next section
-            if(auto const dif{static_cast<::std::size_t>(module_end - module_curr)}; dif == 0U) { break; }
+            if(auto const dif{static_cast<::std::size_t>(module_end - module_curr)}; dif == 0U) 
+            { 
+                // there are no sections remaining
+                break; 
+            }
             else if(dif < 2U) [[unlikely]]
             {
                 // No need to check module_curr > module_end, always false
