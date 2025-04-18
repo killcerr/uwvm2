@@ -46,9 +46,9 @@ import fast_io;
 namespace uwvm::posix
 {
 # if defined(__DARWIN_C_LEVEL)
-    extern int posix_madvise(void const* addr, ::std::size_t length, int flag) noexcept __asm__("_posix_madvise");
+    extern int posix_madvise(void* addr, ::std::size_t length, int flag) noexcept __asm__("_posix_madvise");
 # else
-    extern int posix_madvise(void const* addr, ::std::size_t length, int flag) noexcept __asm__("posix_madvise");
+    extern int posix_madvise(void* addr, ::std::size_t length, int flag) noexcept __asm__("posix_madvise");
 # endif
 }  // namespace uwvm::posix
 #endif
@@ -141,7 +141,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
     /// @brief      madvise
     /// @details    Instructs the system to mmap Instructs the system to specify memory operations for mmap
     ///             No exception is thrown because this is an instructional message, not a command.
-    inline void my_madvise(void const* addr, ::std::size_t length, madvise_flag flag) noexcept
+    inline void my_madvise([[maybe_unused]] void const* addr, [[maybe_unused]] ::std::size_t length, [[maybe_unused]] madvise_flag flag) noexcept
     {
 #if defined(_WIN32)
 # if (!defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x0A00) && !defined(_WIN32_WINDOWS)
@@ -197,7 +197,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
 # elif _POSIX_C_SOURCE >= 200112L
         // The madvise function first appeared in 4.4BSD.  The posix_madvise function
         // is part of IEEE 1003.1-2001 and was first implemented in Mac OS X 10.2.
-        ::uwvm::posix::posix_madvise(addr, length, static_cast<int>(flag));
+        ::uwvm::posix::posix_madvise(const_cast<void*>(addr), length, static_cast<int>(flag));
 # endif
 #endif
     }
