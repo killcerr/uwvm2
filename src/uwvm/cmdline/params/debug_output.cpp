@@ -138,7 +138,11 @@ namespace uwvm::cmdline::paras::details
                                     u8"\": ",
                                     e,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                    u8"\n");
+                                    u8"\n"
+#ifndef _WIN32
+                                    u8"\n"
+#endif
+                                    );
                 return ::utils::cmdline::parameter_return_type::return_m1_imme;
             }
         }
