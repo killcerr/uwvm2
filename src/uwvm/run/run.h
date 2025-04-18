@@ -29,6 +29,7 @@ import utils.ansies;
 # ifdef UWVM_TIMER
 import utils.debug;
 # endif
+import utils.madvise;
 import uwvm.cmdline;
 import uwvm.wasm.storage;
 import uwvm.wasm.feature;
@@ -49,6 +50,7 @@ import parser.wasm.binfmt.base;
 # ifdef UWVM_TIMER
 #  include <utils/debug/impl.h>
 # endif
+# include <utils/madvise/impl.h>
 # include <uwvm/cmdline/impl.h>
 # include <uwvm/wasm/storage/impl.h>
 # include <uwvm/wasm/feature/impl.h>
@@ -114,6 +116,11 @@ UWVM_MODULE_EXPORT namespace uwvm::run
         }
 #endif
 
+        // Instructs to read the file all the way into memory
+        ::utils::madvise::my_madvise(::uwvm::wasm::storage::execute_wasm_file.cbegin(),
+                                     ::uwvm::wasm::storage::execute_wasm_file.size(),
+                                     ::utils::madvise::madvise_flag::willneed);
+
         // If not specified by the user, detect it
         if(::uwvm::wasm::storage::execute_wasm_binfmt_ver == 0)
         {
@@ -165,9 +172,6 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                     return -3;  // wasm parsing error
                 }
 #endif
-
-                /// @todo run vm
-
                 break;
             }
             default:
@@ -191,6 +195,17 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #endif
                 return -3;  // wasm parsing error
             }
+        }
+
+        // run vm
+        switch(::uwvm::wasm::storage::execute_wasm_mode)
+        {
+            case ::parser::wasm::base::mode::objdump:
+            {
+                /// @todo objdump
+                break;
+            }
+            default: ::fast_io::unreachable();
         }
 
         return 0;
