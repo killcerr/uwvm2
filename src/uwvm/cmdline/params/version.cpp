@@ -527,6 +527,10 @@ namespace uwvm::cmdline::paras::details
 #else
                                 u8"Unknown"
 #endif
+#ifdef _POSIX_C_SOURCE
+                                u8"\nPOSIX: ",
+                                _POSIX_C_SOURCE,
+#endif
                                 u8"\nAllocator: "
 #if defined(FAST_IO_USE_CUSTOM_GLOBAL_ALLOCATOR)
                                 u8"custom global"
