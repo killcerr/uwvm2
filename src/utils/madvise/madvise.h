@@ -148,6 +148,19 @@ UWVM_MODULE_EXPORT namespace utils::madvise
         // win10
         switch(flag)
         {
+            case madvise_flag::willneed:
+            {
+                void* va{const_cast<void*>(addr)};
+                ::fast_io::win32::nt::memory_range_entry mre{.VirtualAddress = va, .NumberOfBytes = length};
+                ::std::uint_least32_t VmInformation{0u};
+                ::fast_io::win32::nt::nt_set_information_virtual_memory<false>(reinterpret_cast<void*>(static_cast<::std::ptrdiff_t>(-1)),
+                                                                               ::fast_io::win32::nt::virtual_memory_information_class::VmPrefetchInformation,
+                                                                               1,
+                                                                               ::std::addressof(mre),
+                                                                               ::std::addressof(VmInformation),
+                                                                               sizeof(::std::uint_least32_t));
+                [[fallthrough]]; // Also set the default (highest) priority
+            }
             case madvise_flag::normal:
             {
                 void* va{const_cast<void*>(addr)};
@@ -160,19 +173,6 @@ UWVM_MODULE_EXPORT namespace utils::madvise
                     ::std::addressof(mre),
                     ::std::addressof(VmInformation),
                     sizeof(::std::uint_least32_t));
-                break;
-            }
-            case madvise_flag::willneed:
-            {
-                void* va{const_cast<void*>(addr)};
-                ::fast_io::win32::nt::memory_range_entry mre{.VirtualAddress = va, .NumberOfBytes = length};
-                ::std::uint_least32_t VmInformation{0u};
-                ::fast_io::win32::nt::nt_set_information_virtual_memory<false>(reinterpret_cast<void*>(static_cast<::std::ptrdiff_t>(-1)),
-                                                                               ::fast_io::win32::nt::virtual_memory_information_class::VmPrefetchInformation,
-                                                                               1,
-                                                                               ::std::addressof(mre),
-                                                                               ::std::addressof(VmInformation),
-                                                                               sizeof(::std::uint_least32_t));
                 break;
             }
             case madvise_flag::dontneed:
@@ -190,7 +190,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
                 break;
             }
             default:
-                [[unlikely]] { return; }
+                [[unlikely]] { break; }
         }
 # elif (!defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x0602) && !defined(_WIN32_WINDOWS)
         // win8
@@ -204,7 +204,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
                 break;
             }
             default:
-                [[unlikely]] { return; }
+                [[unlikely]] { break; }
         }
 # endif
 #elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !defined(_PICOLIBC__)
