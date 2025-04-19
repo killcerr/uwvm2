@@ -129,22 +129,29 @@ for _, file in ipairs(os.files("test/non-platform-specific/**.cc")) do
 		def_build()
         set_default(false)
 			
+		local enable_cxx_module = get_config("use-cxx-module")
+
 		-- third-parties/fast_io
 		add_includedirs("third-parties/fast_io/include")
-		add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_debug_mode})
-		add_files("third-parties/fast_io/share/fast_io/fast_io_crypto.cppm", {public = is_debug_mode})
-		
+
+		if enable_cxx_module then
+			add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_debug_mode})
+			add_files("third-parties/fast_io/share/fast_io/fast_io_crypto.cppm", {public = is_debug_mode})
+		end
+
 		-- src
 		add_includedirs("src/")
 
-		-- utils
-		add_files("src/utils/**.cppm", {public = is_debug_mode})
+		if enable_cxx_module then
+			-- utils
+			add_files("src/utils/**.cppm", {public = is_debug_mode})
 
-		-- wasm parser
-		add_files("src/parser/wasm/**.cppm", {public = is_debug_mode})
+			-- wasm parser
+			add_files("src/parser/wasm/**.cppm", {public = is_debug_mode})
 
-		-- uwvm
-		add_files("src/uwvm/**.cppm", {public = is_debug_mode})
+			-- uwvm
+			add_files("src/uwvm/**.cppm", {public = is_debug_mode})
+		end 
 
 		-- uwvm cmd callback
 		add_files("src/uwvm/cmdline/params/**.cpp")

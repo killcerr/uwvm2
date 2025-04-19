@@ -24,7 +24,7 @@
 
 #pragma once
 
-#if UWVM_MODULE
+#ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
 import utils.ansies;

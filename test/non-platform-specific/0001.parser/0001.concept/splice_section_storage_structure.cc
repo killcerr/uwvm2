@@ -28,12 +28,22 @@
 
 #include <utils/macro/push_macros.h>
 
+#ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.base;
 import uwvm.wasm.storage;
-import parser.wasm.standard.wasm1.type;
 import parser.wasm.concepts;
+import parser.wasm.standard.wasm1.type;
 import parser.wasm.binfmt.binfmt_ver1;
+#else
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <fast_io_dsal/tuple.h>
+# include <utils/io/impl.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <parser/wasm/binfmt/binfmt_ver1/impl.h>
+#endif
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
