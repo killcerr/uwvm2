@@ -68,6 +68,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     ///                 using value_type = type_replacer<root_of_replacement, value_type>;
     ///             };
     ///             ```
+    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FeatureType>
     concept has_value_type = requires {
         typename FeatureType::value_type;
@@ -75,9 +76,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                                                              typename FeatureType::value_type>;
     };
 
+    template <typename FeatureType>
+    inline consteval auto get_value_type() noexcept
+    {
+        if constexpr(has_value_type<FeatureType>) { return typename FeatureType::value_type{}; }
+        else { return ::parser::wasm::concepts::operation::irreplaceable_t{}; }
+    }
+
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    using final_value_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<
-        ::std::conditional_t<has_value_type<Fs>, typename Fs::value_type, ::parser::wasm::concepts::operation::irreplaceable_t>...>;
+    using final_value_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_value_type<Fs>())...>;
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
     struct vec_value_type
@@ -107,6 +114,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     ///                 using type_prefix = type_replacer<root_of_replacement, type_prefix>;
     ///             };
     ///             ```
+    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FeatureType>
     concept has_type_prefix = requires {
         typename FeatureType::type_prefix;
@@ -114,9 +122,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                                                              typename FeatureType::type_prefix>;
     };
 
+    template <typename FeatureType>
+    inline consteval auto get_type_prefix() noexcept
+    {
+        if constexpr(has_type_prefix<FeatureType>) { return typename FeatureType::type_prefix{}; }
+        else { return ::parser::wasm::concepts::operation::irreplaceable_t{}; }
+    }
+
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    using final_type_prefix_t = ::parser::wasm::concepts::operation::replacement_structure_t<
-        ::std::conditional_t<has_type_prefix<Fs>, typename Fs::type_prefix, ::parser::wasm::concepts::operation::irreplaceable_t>...>;
+    using final_type_prefix_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_type_prefix<Fs>())...>;
 
     /// @brief      allow multi value
     /// @details    In the current version of WebAssembly, the length of the result type vector of a valid function type may be
