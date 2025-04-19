@@ -148,6 +148,20 @@ UWVM_MODULE_EXPORT namespace utils::madvise
         // win10
         switch(flag)
         {
+            case madvise_flag::normal:
+            {
+                void* va{const_cast<void*>(addr)};
+                ::fast_io::win32::nt::memory_range_entry mre{.VirtualAddress = va, .NumberOfBytes = length};
+                ::std::uint_least32_t VmInformation{5u};  // Default priority is highest priority 5
+                ::fast_io::win32::nt::nt_set_information_virtual_memory<false>(
+                    reinterpret_cast<void*>(static_cast<::std::ptrdiff_t>(-1)),
+                    ::fast_io::win32::nt::virtual_memory_information_class::VmPagePriorityInformation,
+                    1,
+                    ::std::addressof(mre),
+                    ::std::addressof(VmInformation),
+                    sizeof(::std::uint_least32_t));
+                break;
+            }
             case madvise_flag::willneed:
             {
                 void* va{const_cast<void*>(addr)};
@@ -159,6 +173,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
                                                                                ::std::addressof(mre),
                                                                                ::std::addressof(VmInformation),
                                                                                sizeof(::std::uint_least32_t));
+                break;
             }
             case madvise_flag::dontneed:
             {
@@ -172,6 +187,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
                     ::std::addressof(mre),
                     ::std::addressof(VmInformation),
                     sizeof(::std::uint_least32_t));
+                break;
             }
             default:
                 [[unlikely]] { return; }
@@ -185,6 +201,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
                 void* va{const_cast<void*>(addr)};
                 ::fast_io::win32::win32_memory_range_entry mre{.VirtualAddress = va, .NumberOfBytes = length};
                 ::fast_io::win32::PrefetchVirtualMemory(reinterpret_cast<void*>(static_cast<::std::ptrdiff_t>(-1)), 1, ::std::addressof(mre), 0);
+                break;
             }
             default:
                 [[unlikely]] { return; }
