@@ -24,6 +24,10 @@
 
 #pragma once
 
+#if !(__cpp_structured_bindings >= 202411L)
+# error "UWVM requires at least C++26 standard compiler."
+#endif
+
 #ifdef UWVM_MODULE
 import fast_io;
 import utils.io;
