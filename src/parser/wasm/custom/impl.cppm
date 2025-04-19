@@ -32,6 +32,7 @@ module;
 #include <utils/macro/push_macros.h>
 
 export module parser.wasm.custom;
+export import parser.wasm.custom.customs;
 export import :storage;
 
 #ifndef UWVM_MODULE
