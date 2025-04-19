@@ -35,6 +35,7 @@ import parser.wasm.standard.wasm1.section;
 import parser.wasm.binfmt.base;
 import :section;
 import :def;
+import :custom_section;
 #else
 // std
 # include <cstddef>
@@ -64,6 +65,7 @@ import :def;
 # include <parser/wasm/binfmt/base/impl.h>
 # include "section.h"
 # include "def.h"
+# include "custom_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -165,8 +167,14 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 
         bool success{};
 
-        details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end);
-
+        // llvm can gen jump table here
+        if(section_id == 0) 
+        {
+            ::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end);
+            success = true;
+        }
+        else { details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end); }
+        
         if(!success) [[unlikely]]
         {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE

@@ -161,7 +161,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #endif
                 {
 #ifdef UWVM_TIMER
-                    ::utils::debug::timer parsing_timer{u8"parse binfmt1"};
+                    ::utils::debug::timer parsing_timer{u8"parse binfmt ver1"};
 #endif
                     ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage =
                         ::uwvm::wasm::feature::binfmt_ver1_handler(::uwvm::wasm::feature::wasm_binfmt1_features,

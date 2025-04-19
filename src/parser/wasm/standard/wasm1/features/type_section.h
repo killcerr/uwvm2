@@ -154,7 +154,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                             u8"\n\n");
 #endif
-                        ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        ::parser::wasm::base::throw_wasm_parse_code(err_para_len);
                     }
 
                     section_curr = reinterpret_cast<::std::byte const*>(next_para_len);
@@ -242,7 +242,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                             u8"\n\n");
 #endif
-                        ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        ::parser::wasm::base::throw_wasm_parse_code(err_result_len);
                     }
 
                     section_curr = reinterpret_cast<::std::byte const*>(next_result_len);
@@ -371,7 +371,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                                              ::std::byte const* const section_end) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
-        ::utils::debug::timer parsing_timer{u8"parse type section"};
+        ::utils::debug::timer parsing_timer{u8"parse type section (id: 1)"};
 #endif
 
         // get type_section_storage_t from storages
@@ -430,7 +430,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 u8"\n\n");
 #endif
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            ::parser::wasm::base::throw_wasm_parse_code(type_count_err);
         }
 
         typesec.types.reserve(type_count);
