@@ -32,21 +32,39 @@ import utils.io;
 import utils.ansies;
 import utils.cmdline;
 import utils.install_path;
+import parser.wasm.concepts;
 import uwvm.custom;
 import uwvm.cmdline;
+import uwvm.wasm.feature;
 #else
 # include <fast_io.h>
 # include <fast_io_crypto.h>
+# include <fast_io_dsal/tuple.h>
 # include <utils/io/impl.h>
 # include <utils/ansies/impl.h>
 # include <utils/cmdline/impl.h>
 # include <utils/install_path/impl.h>
+# include <parser/wasm/concepts/impl.h>
 # include <uwvm/custom/impl.h>
 # include <uwvm/cmdline/impl.h>
+# include <uwvm/wasm/feature/impl.h>
 #endif
 
 namespace uwvm::cmdline::paras::details
 {
+    template <::parser::wasm::concepts::has_feature_name F0, ::parser::wasm::concepts::has_feature_name... Fs>
+    inline void version_print_wasm_feature_impl() noexcept
+    {
+        ::fast_io::io::perrln(::utils::debug_output, u8"        ", F0::feature_name);
+        if constexpr (sizeof...(Fs) != 0) {version_print_wasm_feature_impl<Fs...>();}
+    }
+
+    template <::parser::wasm::concepts::has_feature_name... Fs>
+    inline void version_print_wasm_feature_from_tuple(::fast_io::tuple<Fs...>) noexcept
+    {
+        version_print_wasm_feature_impl<Fs...>();
+    }
+
     UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type version_callback(::utils::cmdline::parameter_parsing_results*,
                                                                                   ::utils::cmdline::parameter_parsing_results*,
                                                                                   ::utils::cmdline::parameter_parsing_results*) noexcept
@@ -576,9 +594,14 @@ namespace uwvm::cmdline::paras::details
                                 u8", SZ=",
                                 ::uwvm::cmdline::hash_table_byte_sz,
                                 u8"\n"
-                                // End lf
+                                u8"    WebAssembly Features Supported: "
                                 u8"\n"
             );
+            // wasm feature
+            version_print_wasm_feature_from_tuple(::uwvm::wasm::feature::all_features);
+            // end ln
+            ::fast_io::io::perrln(::utils::debug_output);
+
         return ::utils::cmdline::parameter_return_type::return_imme;
     }
 
