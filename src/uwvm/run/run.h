@@ -33,6 +33,7 @@ import utils.madvise;
 import uwvm.cmdline;
 import uwvm.wasm.storage;
 import uwvm.wasm.feature;
+import parser.wasm.base;
 import parser.wasm.concepts;
 import parser.wasm.standard;
 import parser.wasm.binfmt.base;
@@ -54,6 +55,7 @@ import parser.wasm.binfmt.base;
 # include <uwvm/cmdline/impl.h>
 # include <uwvm/wasm/storage/impl.h>
 # include <uwvm/wasm/feature/impl.h>
+# include <parser/wasm/base/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/impl.h>
 # include <parser/wasm/binfmt/base/impl.h>

@@ -32,7 +32,7 @@ module;
 # include <sys/mman.h>
 #endif
 
-export module utils.advise:madvise;
+export module utils.madvise:madvise;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
