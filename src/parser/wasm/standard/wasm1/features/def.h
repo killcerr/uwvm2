@@ -145,6 +145,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     ///             };
     ///             ```
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
+    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FsCurr>
     concept has_allow_multi_result_vector = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_result_vector)>, bool>; };
 

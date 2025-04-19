@@ -81,12 +81,14 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>> types{};
     };
 
+    /// @brief Define functions for checking value_type to provide extensibility
     template <typename... Fs>
     concept has_check_value_type = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                             ::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> value_type) {
         { define_check_value_type(sec_adl, value_type) } -> ::std::same_as<bool>;
     };
 
+    /// @brief Define functions for value_type against wasm1 for checking value_type
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr bool define_check_value_type([[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                   ::parser::wasm::standard::wasm1::type::value_type value_type) noexcept
@@ -101,6 +103,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         }
     }
 
+    /// @brief Define functions for checking valuetype to type_prefix extensibility
     template <typename... Fs>
     concept has_type_prefix_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
@@ -110,6 +113,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         { define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
     };
 
+    /// @brief Define type_prefix for wasm1 Functions for checking type_prefix
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline ::std::byte const* define_type_prefix_handler(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                          ::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
@@ -359,6 +363,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         return section_curr;
     }
 
+    /// @brief Define the handler function for type_section
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                              ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
