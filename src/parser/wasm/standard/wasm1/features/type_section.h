@@ -142,7 +142,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     if(err_para_len != ::fast_io::parse_code::ok) [[unlikely]]
                     {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        ::fast_io::io::perr(::utils::debug_output,
+                        ::fast_io::io::perr(::utils::log_output,
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -165,7 +165,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     if(static_cast<::std::size_t>(section_end - section_curr) < para_len + 1u) [[unlikely]]
                     {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        ::fast_io::io::perr(::utils::debug_output,
+                        ::fast_io::io::perr(::utils::log_output,
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -199,7 +199,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         if(!define_check_value_type(sec_adl, *parameter_curr)) [[unlikely]]
                         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                            ::fast_io::io::perr(::utils::debug_output,
+                            ::fast_io::io::perr(::utils::log_output,
                                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                                 u8"uwvm: ",
                                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -230,7 +230,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     if(err_result_len != ::fast_io::parse_code::ok) [[unlikely]]
                     {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        ::fast_io::io::perr(::utils::debug_output,
+                        ::fast_io::io::perr(::utils::log_output,
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -259,7 +259,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                             ::fast_io::io::perr(
-                                ::utils::debug_output,
+                                ::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -278,7 +278,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     if(static_cast<::std::size_t>(section_end - section_curr) < result_len) [[unlikely]]
                     {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        ::fast_io::io::perr(::utils::debug_output,
+                        ::fast_io::io::perr(::utils::log_output,
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -311,7 +311,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                             ::fast_io::io::perr(
-                                ::utils::debug_output,
+                                ::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -341,7 +341,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             default: [[unlikely]] {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                     ::fast_io::io::perr(
-                        ::utils::debug_output,
+                        ::utils::log_output,
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                         u8"uwvm: ",
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -381,7 +381,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(typesec.sec_span.sec_begin) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -418,7 +418,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(type_count_err != ::fast_io::parse_code::ok) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -456,7 +456,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(++type_counter > type_count) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::debug_output,
+                ::fast_io::io::perr(::utils::log_output,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -482,7 +482,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(type_counter != type_count) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),

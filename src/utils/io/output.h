@@ -39,9 +39,9 @@ UWVM_MODULE_EXPORT namespace utils
 {
     /// @brief Control VM output via virtual functions, can be set via option in --debug-output, not supported by avr
 #ifndef __AVR__
-    inline ::fast_io::u8native_file debug_output{::fast_io::io_dup, ::fast_io::u8err()};  // No global variable dependencies from other translation units
+    inline ::fast_io::u8native_file log_output{::fast_io::io_dup, ::fast_io::u8err()};  // No global variable dependencies from other translation units
 #else
-    inline ::fast_io::u8c_io_observer debug_output{::fast_io::u8c_stderr()};  // No global variable dependencies from other translation units
+    inline ::fast_io::u8c_io_observer log_output{::fast_io::u8c_stderr()};  // No global variable dependencies from other translation units
 #endif
 
 }  // namespace utils

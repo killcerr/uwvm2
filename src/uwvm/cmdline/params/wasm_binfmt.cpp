@@ -58,7 +58,7 @@ namespace uwvm::cmdline::paras::details
         // Check for out-of-bounds and not-argument
         if(currp1 == para_end || currp1->type != ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -97,7 +97,7 @@ namespace uwvm::cmdline::paras::details
         // parse u32 error
         if(err != ::fast_io::parse_code::ok || next != currp1_str.cend()) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -130,7 +130,7 @@ namespace uwvm::cmdline::paras::details
         }
         else [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),

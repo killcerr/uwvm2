@@ -27,7 +27,7 @@ module;
 #include <utils/macro/push_macros.h>
 #include <utils/ansies/ansi_push_macro.h>
 
-export module uwvm.cmdline.params:debug_output;
+export module uwvm.cmdline.params:log_output;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -36,4 +36,4 @@ export module uwvm.cmdline.params:debug_output;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "debug_output.h"
+#include "log_output.h"

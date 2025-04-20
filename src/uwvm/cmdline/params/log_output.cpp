@@ -42,7 +42,7 @@ import uwvm.cmdline;
 
 namespace uwvm::cmdline::paras::details
 {
-    UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type debug_output_callback([[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_begin,
+    UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type log_output_callback([[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_begin,
                                                                                        ::utils::cmdline::parameter_parsing_results* para_curr,
                                                                                        ::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
@@ -51,7 +51,7 @@ namespace uwvm::cmdline::paras::details
         // Check for out-of-bounds and not-argument
         if(currp1 == para_end || currp1->type != ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -59,11 +59,11 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"Usage: " u8"[",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                u8"--debug-output",
+                                u8"--log-output",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"|",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                u8"-Dop",
+                                u8"-log",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"] ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
@@ -83,8 +83,8 @@ namespace uwvm::cmdline::paras::details
 
 #if !defined(__AVR__)
         // win32 and posix
-        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::utils::debug_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8out()}; }
-        else if(currp1_str == u8"err") { ::utils::debug_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8err()}; }
+        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::utils::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8out()}; }
+        else if(currp1_str == u8"err") { ::utils::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8err()}; }
         else if(currp1_str == u8"file")
         {
             auto currp2{para_curr + 2};
@@ -92,7 +92,7 @@ namespace uwvm::cmdline::paras::details
             // Check for out-of-bounds and not-argument
             if(currp2 == para_end || currp2->type != ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
             {
-                ::fast_io::io::perr(::utils::debug_output,
+                ::fast_io::io::perr(::utils::log_output,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -100,11 +100,11 @@ namespace uwvm::cmdline::paras::details
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                     u8"Usage: " u8"[",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                    u8"--debug-output",
+                                    u8"--log-output",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                     u8"|",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                    u8"-Dop",
+                                    u8"-log",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                     u8"] ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
@@ -121,17 +121,17 @@ namespace uwvm::cmdline::paras::details
 
             try
             {
-                ::utils::debug_output = ::fast_io::u8native_file{currp2_str, ::fast_io::open_mode::out};
+                ::utils::log_output = ::fast_io::u8native_file{currp2_str, ::fast_io::open_mode::out};
             }
             catch(::fast_io::error e)
             {
-                ::fast_io::io::perr(::utils::debug_output,
+                ::fast_io::io::perr(::utils::log_output,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
                                     u8"[error] ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                    u8"Unable to open debug output file \"",
+                                    u8"Unable to open log output file \"",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     currp2_str,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
@@ -148,7 +148,7 @@ namespace uwvm::cmdline::paras::details
         }
         else
         {
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -156,11 +156,11 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"Usage: " u8"[",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                u8"--debug-output",
+                                u8"--log-output",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"|",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                u8"-Dop",
+                                u8"-log",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"] ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
@@ -172,11 +172,11 @@ namespace uwvm::cmdline::paras::details
 
 #else
         // on AVR only support cstdout and cstderr
-        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::utils::debug_output = ::fast_io::u8c_stdout(); }
-        else if(currp1_str == u8"err") { ::utils::debug_output = ::fast_io::u8c_stderr(); }
+        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::utils::log_output = ::fast_io::u8c_stdout(); }
+        else if(currp1_str == u8"err") { ::utils::log_output = ::fast_io::u8c_stderr(); }
         else
         {
-            ::fast_io::io::perr(::utils::debug_output,
+            ::fast_io::io::perr(::utils::log_output,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
@@ -184,11 +184,11 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"Usage: " u8"[",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                u8"--debug-output",
+                                u8"--log-output",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"|",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                u8"-Dop",
+                                u8"-log",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"] ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
