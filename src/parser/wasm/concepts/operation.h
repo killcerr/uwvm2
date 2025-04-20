@@ -460,7 +460,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                         ((
                              [&is_repeatable, &repeating]<typename ArgCurr>() constexpr noexcept
                              {
-                                 static_assert(::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>);
+                                 static_assert(!::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>);
 
                                  // check irreplaceable
                                  if constexpr(::std::same_as<typename ArgCurr::superseded, irreplaceable_t1> ||
