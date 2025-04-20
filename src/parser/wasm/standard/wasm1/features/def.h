@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -135,7 +135,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     /// @brief      allow multi value
     /// @details    In the current version of WebAssembly, the length of the result type vector of a valid function type may be
     ///             at most 1. This restriction may be removed in future versions.
-    ///             
+    ///
     ///             Define this to eliminate checking the length of the result.
     ///
     ///             ```cpp

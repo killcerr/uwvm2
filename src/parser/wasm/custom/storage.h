@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -32,7 +32,7 @@ import parser.wasm.standard.wasm1.type;
 # include <concepts>
 # include <type_traits>
 # include <utility>
-# include <map> /// @todo use fast_io::string_hashmap instead
+# include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <utils/macro/push_macros.h>
 // import

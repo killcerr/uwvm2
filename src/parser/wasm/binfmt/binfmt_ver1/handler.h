@@ -176,13 +176,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         bool success{};
 
         // llvm can gen jump table here
-        if(section_id == 0) 
+        if(section_id == 0)
         {
             ::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end);
             success = true;
         }
         else { details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end); }
-        
+
         if(!success) [[unlikely]]
         {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
@@ -395,10 +395,10 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             module_curr = sec_end;
 
             // check next section
-            if(auto const dif{static_cast<::std::size_t>(module_end - module_curr)}; dif == 0U) 
-            { 
+            if(auto const dif{static_cast<::std::size_t>(module_end - module_curr)}; dif == 0U)
+            {
                 // there are no sections remaining
-                break; 
+                break;
             }
             else if(dif < 2U) [[unlikely]]
             {

@@ -264,9 +264,9 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         for(auto const& i: res)
         {
 #if __cpp_contracts >= 202502L
-            contract_assert(i.str != check && // Duplicate parameters are not allowed
-                            i.str.front_unchecked == u8'-' && // The first character of the parameter must be '-'
-                            i.str.size() != 1); // "-" is invalid
+            contract_assert(i.str != check &&                  // Duplicate parameters are not allowed
+                            i.str.front_unchecked == u8'-' &&  // The first character of the parameter must be '-'
+                            i.str.size() != 1);                // "-" is invalid
 #else
             if(i.str == check || i.str.front_unchecked() != u8'-')
             {

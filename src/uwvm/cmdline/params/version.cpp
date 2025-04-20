@@ -56,7 +56,7 @@ namespace uwvm::cmdline::paras::details
     inline void version_print_wasm_feature_impl() noexcept
     {
         ::fast_io::io::perrln(::utils::log_output, u8"        ", F0::feature_name);
-        if constexpr (sizeof...(Fs) != 0) {version_print_wasm_feature_impl<Fs...>();}
+        if constexpr(sizeof...(Fs) != 0) { version_print_wasm_feature_impl<Fs...>(); }
     }
 
     template <::parser::wasm::concepts::has_feature_name... Fs>
@@ -140,7 +140,7 @@ namespace uwvm::cmdline::paras::details
                                 // uwvm
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                 u8"Ultimate WebAssembly Virtual Machine\n",
-                                // Debug Mode
+        // Debug Mode
 #ifdef _DEBUG
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
                                 u8"(Debug Mode)\n",
@@ -148,7 +148,7 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 // Copyright
                                 u8"Copyright (c) 2025 MacroModel. All rights reserved."
-                                // Install Path
+        // Install Path
 #if defined(UWVM_SUPPORT_INSTALL_PATH)
                                 u8"\nInstall Path: ",
                                 ::utils::install_path::install_path.path_name,
@@ -597,10 +597,10 @@ namespace uwvm::cmdline::paras::details
                                 u8"    WebAssembly Features Supported: "
                                 u8"\n"
             );
-            // wasm feature
-            version_print_wasm_feature_from_tuple(::uwvm::wasm::feature::all_features);
-            // end ln
-            ::fast_io::io::perrln(::utils::log_output);
+        // wasm feature
+        version_print_wasm_feature_from_tuple(::uwvm::wasm::feature::all_features);
+        // end ln
+        ::fast_io::io::perrln(::utils::log_output);
 
         return ::utils::cmdline::parameter_return_type::return_imme;
     }

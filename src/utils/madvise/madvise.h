@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -159,7 +159,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
                                                                                ::std::addressof(mre),
                                                                                ::std::addressof(VmInformation),
                                                                                sizeof(::std::uint_least32_t));
-                [[fallthrough]]; // Also set the default (highest) priority
+                [[fallthrough]];  // Also set the default (highest) priority
             }
             case madvise_flag::normal:
             {

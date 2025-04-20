@@ -107,11 +107,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                                       if constexpr(::std::same_as<F1, F2>)
                                       {
 #if __cpp_contracts >= 202502L
-                                        contract_assert(!has);
+                                          contract_assert(!has);
 #else
                                           if(has) { ::fast_io::fast_terminate(); }
 #endif
-                                        has = true;
+                                          has = true;
                                       }
                                   }.template operator()<Fs...[I2]>()),
                               ...);
@@ -460,7 +460,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                         ((
                              [&is_repeatable, &repeating]<typename ArgCurr>() constexpr noexcept
                              {
-                                static_assert(::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>);
+                                 static_assert(::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>);
 
                                  // check irreplaceable
                                  if constexpr(::std::same_as<typename ArgCurr::superseded, irreplaceable_t1> ||
@@ -473,7 +473,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                                  if constexpr(::std::same_as<typename ArgCurr::superseded, Superseded>)
                                  {
 #if __cpp_contracts >= 202502L
-                                    contract_assert(!is_repeatable && !repeating[I]);
+                                     contract_assert(!is_repeatable && !repeating[I]);
 #else
                                      if(is_repeatable)
                                      {
@@ -481,16 +481,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                                          // a -> b, a -> c X
                                          ::fast_io::fast_terminate();
                                      }
-                                    if(repeating[I])
-                                    {
-                                        // Type Loop
-                                        ::fast_io::fast_terminate();
-                                    }
+                                     if(repeating[I])
+                                     {
+                                         // Type Loop
+                                         ::fast_io::fast_terminate();
+                                     }
 #endif
-                                    repeating[I] = true;
-                                    using replacement = typename ArgCurr::replacement;
-                                    is_repeatable = true;
-                                    return replacement_structure_followup_impl<T, replacement, Args...>(repeating);
+                                     repeating[I] = true;
+                                     using replacement = typename ArgCurr::replacement;
+                                     is_repeatable = true;
+                                     return replacement_structure_followup_impl<T, replacement, Args...>(repeating);
                                  }
                                  else { return type_wrapper<void>{}; }
                              }.template operator()<Args...[I]>()),

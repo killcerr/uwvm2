@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -23,6 +23,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-#include "customs/impl.h"
-#include "storage.h"
+# include "customs/impl.h"
+# include "storage.h"
 #endif

@@ -1,4 +1,4 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (help 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -43,8 +43,8 @@ import uwvm.cmdline;
 namespace uwvm::cmdline::paras::details
 {
     UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type log_output_callback([[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_begin,
-                                                                                       ::utils::cmdline::parameter_parsing_results* para_curr,
-                                                                                       ::utils::cmdline::parameter_parsing_results* para_end) noexcept
+                                                                                     ::utils::cmdline::parameter_parsing_results* para_curr,
+                                                                                     ::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
         auto currp1{para_curr + 1};
 
@@ -139,10 +139,10 @@ namespace uwvm::cmdline::paras::details
                                     e,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                     u8"\n"
-#ifndef _WIN32
+# ifndef _WIN32
                                     u8"\n"
-#endif
-                                    );
+# endif
+                );
                 return ::utils::cmdline::parameter_return_type::return_m1_imme;
             }
         }

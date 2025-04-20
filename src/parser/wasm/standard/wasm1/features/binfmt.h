@@ -72,7 +72,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         using value_type = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement,
                                                                               ::parser::wasm::standard::wasm1::type::value_type>;
         using type_prefix = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement,
-                                                                              ::parser::wasm::standard::wasm1::type::function_type_prefix>;
+                                                                               ::parser::wasm::standard::wasm1::type::function_type_prefix>;
 
         template <::parser::wasm::concepts::wasm_feature... Fs>
         using binfmt_ver1_section_type = ::fast_io::tuple<::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>

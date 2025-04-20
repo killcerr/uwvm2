@@ -143,9 +143,7 @@ namespace uwvm::cmdline::paras::details
         // Check for out-of-bounds and not-argument
         if(currp1 == para_end || currp1->type != ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                u8"Arguments:\n");
+            ::fast_io::io::perr(::utils::log_output, ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE), u8"Arguments:\n");
             help_output_singal_cate(::utils::cmdline::categorization::global);
 
             // display other parameter
@@ -188,9 +186,7 @@ namespace uwvm::cmdline::paras::details
 
         if(auto currp1_str{currp1->str}; currp1_str == u8"all")
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                u8"Arguments:\n");
+            ::fast_io::io::perr(::utils::log_output, ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE), u8"Arguments:\n");
             help_output_all();
             ::fast_io::io::perr(::utils::log_output, ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL), u8"\n");
         }
