@@ -263,32 +263,36 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         ::fast_io::u8string_view check{};  // Empty strings will be sorted and placed first.
         for(auto const& i: res)
         {
+#if __cpp_contracts >= 202502L
+            contract_assert(i.str != check && // Duplicate parameters are not allowed
+                            i.str.front_unchecked == u8'-' && // The first character of the parameter must be '-'
+                            i.str.size() != 1); // "-" is invalid
+#else
             if(i.str == check || i.str.front_unchecked() != u8'-')
             {
                 // Duplicate parameters are not allowed
                 // The first character of the parameter must be '-'
                 ::fast_io::fast_terminate();
             }
-            else
+            if(i.str.size() == 1)
             {
-                if(i.str.size() == 1)
+                // "-" is invalid
+                ::fast_io::fast_terminate();
+            }
+#endif
+            for(auto c: i.str)
+            {
+#if __cpp_contracts >= 202502L
+                contract_assert(!is_invalid_paramater_char(c));
+#else
+                if(is_invalid_paramater_char(c))
                 {
-                    // "-" is invalid
+                    // invalid parameter character
                     ::fast_io::fast_terminate();
                 }
-                else
-                {
-                    for(auto c: i.str)
-                    {
-                        if(is_invalid_paramater_char(c))
-                        {
-                            // invalid parameter character
-                            ::fast_io::fast_terminate();
-                        }
-                    }
-                }
-                check = i.str;  // check duplicate
+#endif
             }
+            check = i.str;  // check duplicate
         }
         return res;
     }

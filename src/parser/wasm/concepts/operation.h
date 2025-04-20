@@ -75,8 +75,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
         inline consteval ::parser::wasm::standard::wasm1::type::wasm_u32 get_binfmt_version() noexcept
         {
             constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{::std::remove_cvref_t<FeatureType>::binfmt_version};
+#if __cpp_contracts >= 202502L
             // Can't be 0.
+            contract_assert(binfmt_version != 0);
+#else
             if constexpr(binfmt_version == 0) { ::fast_io::fast_terminate(); }
+#endif
             return binfmt_version;
         }
 
@@ -102,8 +106,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                                   {
                                       if constexpr(::std::same_as<F1, F2>)
                                       {
+#if __cpp_contracts >= 202502L
+                                        contract_assert(!has);
+#else
                                           if(has) { ::fast_io::fast_terminate(); }
-                                          else { has = true; }
+#endif
+                                        has = true;
                                       }
                                   }.template operator()<Fs...[I2]>()),
                               ...);
@@ -156,12 +164,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
             // Check for duplicates
             for(::parser::wasm::standard::wasm1::type::wasm_u32 tmp{0u}; auto curr: binfmt_handlers)
             {
+#if __cpp_contracts >= 202502L
+                contract_assert(curr != tmp);
+#else
                 if(curr == tmp) { ::fast_io::fast_terminate(); }
+#endif
                 tmp = curr;
             }
 
+#if __cpp_contracts >= 202502L
             // Ensure that the version corresponds to the processing
+            contract_assert(binfmt_vers == binfmt_handlers);
+#else
             if(binfmt_vers != binfmt_handlers) { ::fast_io::fast_terminate(); }
+#endif
         }
 
         /// @brief      Checking for duplicate binfmt version handler functions from tuple
@@ -342,11 +358,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                  ...);
             }(::std::make_index_sequence<sizeof...(Fs)>{});
 
+#if __cpp_contracts >= 202502L
+            contract_assert(handle_func_p != nullptr);
+#else
             if(handle_func_p == nullptr)
             {
                 // not found
                 ::fast_io::fast_terminate();
             }
+#endif
 
             return handle_func_p;
         }
@@ -440,6 +460,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                         ((
                              [&is_repeatable, &repeating]<typename ArgCurr>() constexpr noexcept
                              {
+                                static_assert(::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>);
+
                                  // check irreplaceable
                                  if constexpr(::std::same_as<typename ArgCurr::superseded, irreplaceable_t1> ||
                                               ::std::same_as<typename ArgCurr::superseded, irreplaceable_t2> || ::std::same_as<Superseded, irreplaceable_t1> ||
@@ -448,32 +470,27 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                                      return type_wrapper<void>{};
                                  }
 
-                                 if constexpr(::std::same_as<typename ArgCurr::superseded, typename ArgCurr::replacement>)
-                                 {
-                                     // Replacement of the same type
-                                     ::fast_io::fast_terminate();
-                                 }
-
                                  if constexpr(::std::same_as<typename ArgCurr::superseded, Superseded>)
                                  {
+#if __cpp_contracts >= 202502L
+                                    contract_assert(!is_repeatable && !repeating[I]);
+#else
                                      if(is_repeatable)
                                      {
                                          // Prohibition of duplicate substitutions
                                          // a -> b, a -> c X
                                          ::fast_io::fast_terminate();
                                      }
-                                     else
-                                     {
-                                         if(repeating[I])
-                                         {
-                                             // Type Loop
-                                             ::fast_io::fast_terminate();
-                                         }
-                                         repeating[I] = true;
-                                         using replacement = typename ArgCurr::replacement;
-                                         is_repeatable = true;
-                                         return replacement_structure_followup_impl<T, replacement, Args...>(repeating);
-                                     }
+                                    if(repeating[I])
+                                    {
+                                        // Type Loop
+                                        ::fast_io::fast_terminate();
+                                    }
+#endif
+                                    repeating[I] = true;
+                                    using replacement = typename ArgCurr::replacement;
+                                    is_repeatable = true;
+                                    return replacement_structure_followup_impl<T, replacement, Args...>(repeating);
                                  }
                                  else { return type_wrapper<void>{}; }
                              }.template operator()<Args...[I]>()),
@@ -547,7 +564,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
                  ...);
             }(::std::make_index_sequence<sizeof...(Tys)>{});
 
+#if __cpp_contracts >= 202502L
+            contract_assert(ret != SIZE_MAX);
+#else
             if(ret == SIZE_MAX) { ::fast_io::fast_terminate(); }
+#endif
 
             return ret;
         };
