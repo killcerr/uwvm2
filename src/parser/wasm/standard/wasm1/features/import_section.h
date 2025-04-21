@@ -99,6 +99,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
 #ifndef UWVM_MODULE
 // macro
-#include <utils/ansies/ansi_pop_macro.h>
-#include <utils/macro/pop_macros.h>
+# include <utils/ansies/ansi_pop_macro.h>
+# include <utils/macro/pop_macros.h>
 #endif

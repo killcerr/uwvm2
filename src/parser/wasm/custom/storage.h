@@ -59,5 +59,5 @@ UWVM_MODULE_EXPORT namespace parser::wasm::custom
 
 #ifndef UWVM_MODULE
 // macro
-#include <utils/macro/pop_macros.h>
+# include <utils/macro/pop_macros.h>
 #endif
