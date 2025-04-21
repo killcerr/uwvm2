@@ -176,7 +176,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         bool success{};
 
         // llvm can gen jump table here
-        if(section_id == 0)
+        if(section_id == static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(::parser::wasm::standard::wasm1::section::section_id::custom_sec))
         {
             ::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end);
             success = true;
@@ -424,6 +424,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
     }
 }  // namespace parser::wasm::binfmt::ver1
 
+#ifndef UWVM_MODULE
 // macro
 #include <utils/ansies/ansi_pop_macro.h>
 #include <utils/macro/pop_macros.h>
+#endif

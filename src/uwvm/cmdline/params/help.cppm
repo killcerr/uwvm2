@@ -37,7 +37,3 @@ export module uwvm.cmdline.params:help;
 #endif
 
 #include "help.h"
-
-// macro
-# include <utils/ansies/ansi_pop_macro.h>
-# include <utils/macro/pop_macros.h>

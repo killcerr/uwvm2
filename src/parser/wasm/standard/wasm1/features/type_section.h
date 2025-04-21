@@ -74,7 +74,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <::parser::wasm::concepts::wasm_feature... Fs>
     struct type_section_storage_t
     {
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
+        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{
+            static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(::parser::wasm::standard::wasm1::section::section_id::type_sec)};
 
         ::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
@@ -507,6 +508,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     }
 }  // namespace parser::wasm::standard::wasm1::features
 
+#ifndef UWVM_MODULE
 // macro
 #include <utils/ansies/ansi_pop_macro.h>
 #include <utils/macro/pop_macros.h>
+#endif

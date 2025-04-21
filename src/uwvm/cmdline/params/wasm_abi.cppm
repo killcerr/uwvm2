@@ -38,7 +38,3 @@ export module uwvm.cmdline.params:wasm_abi;
 #endif
 
 #include "wasm_abi.h"
-
-// macro
-# include <utils/ansies/ansi_pop_macro.h>
-# include <utils/macro/pop_macros.h>

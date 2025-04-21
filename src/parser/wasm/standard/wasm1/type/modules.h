@@ -214,6 +214,8 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
     };
 }  // namespace fast_io::freestanding
 
+#ifndef UWVM_MODULE
 // macro
 #include <parser/wasm/feature/feature_pop_macro.h>
 #include <utils/macro/pop_macros.h>
+#endif

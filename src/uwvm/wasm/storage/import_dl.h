@@ -44,5 +44,8 @@ UWVM_MODULE_EXPORT namespace uwvm::wasm::storage
 
     // TODO: import_dl_func // The result of parsing the dl is used to add the import module directly.
 }  // namespace uwvm::wasm::storage
-
+#ifndef UWVM_MODULE
+// macro
+#  include <utils/macro/pop_macros.h>
+#endif
 #endif

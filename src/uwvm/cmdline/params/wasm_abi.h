@@ -62,6 +62,8 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
                                                           .cate{::utils::cmdline::categorization::wasm}};
 }  // namespace uwvm::cmdline::paras
 
+#ifndef UWVM_MODULE
 // macro
 #include <utils/ansies/ansi_pop_macro.h>
 #include <utils/macro/pop_macros.h>
+#endif

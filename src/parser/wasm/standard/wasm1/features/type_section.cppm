@@ -45,7 +45,3 @@ export module parser.wasm.standard.wasm1.features:type_section;
 #endif
 
 #include "type_section.h"
-
-// macro
-# include <utils/ansies/ansi_pop_macro.h>
-# include <utils/macro/pop_macros.h>

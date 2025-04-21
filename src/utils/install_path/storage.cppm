@@ -41,5 +41,3 @@ export module utils.install_path:storage;
 
 #include "storage.h"
 
-// macro
-# include <utils/macro/pop_macros.h>

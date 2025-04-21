@@ -44,6 +44,3 @@ export module parser.wasm.standard.wasm1.features:binfmt;
 #endif
 
 #include "binfmt.h"
-
-// macro
-# include <utils/macro/pop_macros.h>

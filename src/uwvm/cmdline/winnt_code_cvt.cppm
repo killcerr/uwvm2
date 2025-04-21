@@ -55,7 +55,3 @@ export module uwvm.cmdline:winnt_code_cvt;
 #endif
 
 #include "winnt_code_cvt.h"
-
-// macro
-# include <utils/ansies/ansi_pop_macro.h>
-# include <utils/macro/pop_macros.h>

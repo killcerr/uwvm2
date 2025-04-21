@@ -38,5 +38,3 @@ export module utils.global:consolecp_win32;
 
 #include "consolecp_win32.h"
 
-// macro
-# include <utils/macro/pop_macros.h>

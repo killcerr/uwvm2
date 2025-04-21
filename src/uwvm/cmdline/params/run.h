@@ -53,6 +53,8 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
                                                      .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
 }  // namespace uwvm::cmdline::paras
 
+#ifndef UWVM_MODULE
 // macro
 #include <utils/ansies/ansi_pop_macro.h>
 #include <utils/macro/pop_macros.h>
+#endif

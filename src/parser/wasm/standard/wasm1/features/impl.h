@@ -27,5 +27,6 @@
 #ifndef UWVM_MODULE
 # include "def.h"
 # include "type_section.h"
+# include "import_section.h"
 # include "binfmt.h"
 #endif

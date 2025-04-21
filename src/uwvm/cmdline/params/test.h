@@ -60,4 +60,8 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
                                                       .is_exist{::std::addressof(details::test_is_exist)}};
 }  // namespace uwvm::cmdline::paras
 
+#ifndef UWVM_MODULE
+#  include <utils/ansies/ansi_pop_macro.h>
+#  include <utils/macro/pop_macros.h>
+#endif
 #endif

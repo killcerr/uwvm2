@@ -39,6 +39,3 @@ export module uwvm.run:run;
 #endif
 
 #include "run.h"
-
-// macro
-# include <utils/ansies/ansi_pop_macro.h>

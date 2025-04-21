@@ -43,6 +43,3 @@ export import :storage;
 #endif
 
 #include "impl.h"
-
-// macro
-# include <utils/macro/pop_macros.h>

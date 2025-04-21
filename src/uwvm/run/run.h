@@ -214,4 +214,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
     }
 }  // namespace uwvm::run
 
+#ifndef UWVM_MODULE
+// macro
 #include <utils/ansies/ansi_pop_macro.h>
+#endif

@@ -63,5 +63,10 @@ UWVM_MODULE_EXPORT namespace utils::global
         }
     };
 }  // namespace utils::global
+
+#ifndef UWVM_MODULE
+// macro
+# include <utils/macro/pop_macros.h>
+#endif
 #endif
 

@@ -27,6 +27,7 @@ module;
 export module parser.wasm.standard.wasm1.features;
 export import :def;
 export import :type_section;
+export import :import_section;
 export import :binfmt;
 
 #ifndef UWVM_MODULE

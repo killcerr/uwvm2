@@ -62,5 +62,7 @@ UWVM_MODULE_EXPORT namespace utils::install_path
 }  // namespace utils::install_path
 #endif
 
+#ifndef UWVM_MODULE
 // macro
 #include <utils/macro/pop_macros.h>
+#endif

@@ -34,6 +34,7 @@ import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :type_section;
+import :import_section;
 #else
 // std
 # include <cstddef>
@@ -56,6 +57,7 @@ import :type_section;
 # include <parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
 # include "type_section.h"
+# include "import_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -75,7 +77,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                                                                ::parser::wasm::standard::wasm1::type::function_type_prefix>;
 
         template <::parser::wasm::concepts::wasm_feature... Fs>
-        using binfmt_ver1_section_type = ::fast_io::tuple<::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>
+        using binfmt_ver1_section_type = ::fast_io::tuple<::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
+                                                          ::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>
                                                           /// @todo
                                                           >;
     };
@@ -93,5 +96,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     static_assert(::parser::wasm::standard::wasm1::features::has_type_prefix<wasm1>);
 }  // namespace parser::wasm::standard::wasm1::features
 
+#ifndef UWVM_MODULE
 // macro
-#include <utils/macro/pop_macros.h>
+# include <utils/macro/pop_macros.h>
+#endif

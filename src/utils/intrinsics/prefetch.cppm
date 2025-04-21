@@ -42,6 +42,3 @@ export module utils.intrinsics:prefetch;
 #endif
 
 #include "prefetch.h"
-
-// macro
-# include <utils/macro/pop_macros.h>

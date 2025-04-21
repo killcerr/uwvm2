@@ -35,6 +35,3 @@ export module parser.wasm.standard.wasm1.section:funcbody;
 #endif
 
 #include "funcbody.h"
-
-// macro
-# include <utils/macro/pop_macros.h>

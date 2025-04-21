@@ -40,6 +40,3 @@ export module utils.install_path:install_path;
 #endif
 
 #include "install_path.h"
-
-// macro
-# include <utils/macro/pop_macros.h>
