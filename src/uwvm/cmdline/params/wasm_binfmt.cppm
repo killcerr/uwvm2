@@ -38,3 +38,7 @@ export module uwvm.cmdline.params:wasm_binfmt;
 #endif
 
 #include "wasm_binfmt.h"
+
+// macro
+# include <utils/ansies/ansi_pop_macro.h>
+# include <utils/macro/pop_macros.h>

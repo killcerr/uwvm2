@@ -42,3 +42,6 @@ export module parser.wasm.custom:storage;
 #endif
 
 #include "storage.h"
+
+// macro
+# include <utils/macro/pop_macros.h>

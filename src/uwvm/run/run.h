@@ -213,3 +213,5 @@ UWVM_MODULE_EXPORT namespace uwvm::run
         return 0;
     }
 }  // namespace uwvm::run
+
+#include <utils/ansies/ansi_pop_macro.h>

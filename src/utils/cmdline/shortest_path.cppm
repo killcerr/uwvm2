@@ -40,3 +40,6 @@ export module utils.cmdline:shortest_path;
 #endif
 
 #include "shortest_path.h"
+
+// macro
+# include <utils/macro/pop_macros.h>

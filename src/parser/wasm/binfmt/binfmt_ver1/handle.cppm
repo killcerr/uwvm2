@@ -47,3 +47,7 @@ export module parser.wasm.binfmt.binfmt_ver1:handler;
 #endif
 
 #include "handler.h"
+
+// macro
+# include <utils/ansies/ansi_pop_macro.h>
+# include <utils/macro/pop_macros.h>

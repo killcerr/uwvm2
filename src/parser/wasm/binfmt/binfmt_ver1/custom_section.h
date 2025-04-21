@@ -152,3 +152,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         }
     }
 }
+
+// macro
+#include <utils/ansies/ansi_pop_macro.h>
+#include <utils/macro/pop_macros.h>

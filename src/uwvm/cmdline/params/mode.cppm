@@ -38,3 +38,7 @@ export module uwvm.cmdline.params:mode;
 #endif
 
 #include "mode.h"
+
+// macro
+# include <utils/ansies/ansi_pop_macro.h>
+# include <utils/macro/pop_macros.h>

@@ -40,3 +40,6 @@ export module parser.wasm.concepts:root;
 #endif
 
 #include "root.h"
+
+// macro
+# include <utils/macro/pop_macros.h>

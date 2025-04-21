@@ -110,3 +110,5 @@ int main()
     static_assert(::std::same_as<T, ::fast_io::tuple<Sec1<Feature1, Feature2, Feature3>, Sec2<Feature1, Feature2, Feature3>, Sec3>>);
 }
 
+// macro
+# include <utils/macro/pop_macros.h>

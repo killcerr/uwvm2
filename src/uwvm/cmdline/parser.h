@@ -384,3 +384,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         return parsing_return_val::def;
     }
 }  // namespace uwvm::cmdline
+
+// macro
+#include <utils/ansies/ansi_pop_macro.h>
+#include <utils/macro/pop_macros.h>

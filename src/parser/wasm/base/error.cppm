@@ -35,3 +35,6 @@ export module parser.wasm.base:error;
 #endif
 
 #include "error.h"
+
+// macro
+# include <utils/macro/pop_macros.h>

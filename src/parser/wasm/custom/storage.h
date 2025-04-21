@@ -56,3 +56,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::custom
 
     inline ::std::map<::fast_io::u8string, handlefunc_ptr_t> custom_handle_funcs{};  // No global variable dependencies from other translation units
 }
+
+// macro
+#include <utils/macro/pop_macros.h>

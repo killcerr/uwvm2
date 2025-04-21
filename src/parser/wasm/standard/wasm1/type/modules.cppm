@@ -42,3 +42,7 @@ export module parser.wasm.standard.wasm1.type:modules;
 #endif
 
 #include "modules.h"
+
+// macro
+#include <parser/wasm/feature/feature_pop_macro.h>
+# include <utils/macro/pop_macros.h>

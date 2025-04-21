@@ -62,3 +62,6 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
         inline static constexpr bool value = true;
     };
 }  // namespace fast_io::freestanding
+
+// macro
+#include <utils/macro/pop_macros.h>

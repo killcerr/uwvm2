@@ -63,3 +63,5 @@ UWVM_MODULE_EXPORT namespace utils::intrinsics
 
 }  // namespace utils::intrinsics
 
+// macro
+#include <utils/macro/pop_macros.h>

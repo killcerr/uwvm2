@@ -60,3 +60,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
                                                              .is_exist{::std::addressof(details::wasm_binfmt_is_exist)},
                                                              .cate{::utils::cmdline::categorization::wasm}};
 }  // namespace uwvm::cmdline::paras
+
+// macro
+#include <utils/ansies/ansi_pop_macro.h>
+#include <utils/macro/pop_macros.h>

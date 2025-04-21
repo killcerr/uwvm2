@@ -48,3 +48,6 @@ UWVM_MODULE_EXPORT namespace utils::install_path
     inline ::fast_io::install_path install_path{get_module_install_path_noexcept()};  // No global variable dependencies from other translation units
 }  // namespace utils::install_path
 #endif
+
+// macro
+#include <utils/macro/pop_macros.h>

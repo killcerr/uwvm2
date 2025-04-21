@@ -52,3 +52,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
                                                      .usage{u8"<file> <argv[1]> <arg[2]> ..."},
                                                      .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
 }  // namespace uwvm::cmdline::paras
+
+// macro
+#include <utils/ansies/ansi_pop_macro.h>
+#include <utils/macro/pop_macros.h>

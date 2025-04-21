@@ -54,3 +54,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
 #endif
     }
 }  // namespace parser::wasm::base
+
+// macro
+#include <utils/macro/pop_macros.h>

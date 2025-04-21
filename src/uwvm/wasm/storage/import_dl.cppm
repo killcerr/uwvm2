@@ -37,3 +37,6 @@ export module uwvm.wasm.storage:import_dl;
 #endif
 
 #include "import_dl.h"
+
+// macro
+# include <utils/macro/pop_macros.h>

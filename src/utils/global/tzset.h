@@ -44,3 +44,6 @@ UWVM_MODULE_EXPORT namespace utils::global
         UWVM_GNU_COLD inline tz_set_s() noexcept { ::fast_io::posix_tzset(); }
     };
 }  // namespace utils::global
+
+// macro
+#include <utils/macro/pop_macros.h>

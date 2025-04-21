@@ -172,3 +172,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
     template <typename FeatureType>
     concept wasm_feature = has_feature_name<FeatureType> && has_wasm_binfmt_version<FeatureType> && ::std::is_empty_v<FeatureType>;
 }  // namespace parser::wasm::concepts
+
+// macro
+#include <utils/macro/pop_macros.h>

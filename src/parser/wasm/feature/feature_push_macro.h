@@ -20,7 +20,7 @@
  *                                      *
  ****************************************/
 
-#pragma once
+// #pragma once
 
 #pragma push_macro("UWVM_WASM_SUPPORT_WASM1")
 #undef UWVM_WASM_SUPPORT_WASM1

@@ -20,7 +20,7 @@
  *                                      *
  ****************************************/
 
-#pragma once
+// #pragma once
 
 #pragma pop_macro("UWVM_WASM_SUPPORT_FP128")
 #pragma pop_macro("UWVM_WASM_SUPPORT_BF16")

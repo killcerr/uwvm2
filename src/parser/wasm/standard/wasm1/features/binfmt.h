@@ -92,3 +92,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     static_assert(::parser::wasm::standard::wasm1::features::has_value_type<wasm1>);
     static_assert(::parser::wasm::standard::wasm1::features::has_type_prefix<wasm1>);
 }  // namespace parser::wasm::standard::wasm1::features
+
+// macro
+#include <utils/macro/pop_macros.h>

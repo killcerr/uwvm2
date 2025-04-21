@@ -47,3 +47,7 @@ export module parser.wasm.binfmt.binfmt_ver1:custom_section;
 #endif
 
 #include "custom_section.h"
+
+// macro
+# include <utils/ansies/ansi_pop_macro.h>
+# include <utils/macro/pop_macros.h>

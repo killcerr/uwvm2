@@ -103,3 +103,6 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
     }
 
 }  // namespace utils::cmdline
+
+// macro
+#include <utils/macro/pop_macros.h>

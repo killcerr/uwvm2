@@ -44,3 +44,6 @@ export module parser.wasm.standard.wasm1.features:def;
 #endif
 
 #include "def.h"
+
+// macro
+# include <utils/macro/pop_macros.h>

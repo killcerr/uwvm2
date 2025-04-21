@@ -506,3 +506,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         }
     }
 }  // namespace parser::wasm::standard::wasm1::features
+
+// macro
+#include <utils/ansies/ansi_pop_macro.h>
+#include <utils/macro/pop_macros.h>

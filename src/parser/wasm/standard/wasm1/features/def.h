@@ -178,3 +178,6 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
         inline static constexpr bool value = true;
     };
 }
+
+// macro
+#include <utils/macro/pop_macros.h>

@@ -99,3 +99,7 @@ UWVM_MODULE_EXPORT namespace uwvm
     }
 
 }  // namespace uwvm
+
+// macro
+#include <utils/ansies/ansi_pop_macro.h>
+#include <utils/macro/pop_macros.h>
