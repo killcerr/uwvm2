@@ -43,6 +43,6 @@ UWVM_MODULE_EXPORT namespace uwvm::custom
 #if defined(UWVM_VERSION_X) && defined(UWVM_VERSION_Y) && defined(UWVM_VERSION_Z) && defined(UWVM_VERSION_S)
     inline constexpr ::utils::version uwvm_version{UWVM_VERSION_X, UWVM_VERSION_Y, UWVM_VERSION_Z, UWVM_VERSION_S};
 #else
-    inline constexpr ::utils::version uwvm_version{0, 0, 0, 0};
+    inline constexpr ::utils::version uwvm_version{2, 0, 0, 0};
 #endif
 }  // namespace uwvm::custom
