@@ -72,8 +72,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <typename FeatureType>
     concept has_value_type = requires {
         typename FeatureType::value_type;
-        ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
-                                                                             typename FeatureType::value_type>;
+        requires ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+                                                                                      typename FeatureType::value_type>;
     };
 
     template <typename FeatureType>
@@ -118,8 +118,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <typename FeatureType>
     concept has_type_prefix = requires {
         typename FeatureType::type_prefix;
-        ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
-                                                                             typename FeatureType::type_prefix>;
+        requires ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+                                                                                      typename FeatureType::type_prefix>;
     };
 
     template <typename FeatureType>
