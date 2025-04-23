@@ -60,6 +60,10 @@ import parser.wasm.binfmt.binfmt_ver1;
 
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
+    ////////////////////////////
+    //      Type Section      //
+    ////////////////////////////
+
     /// @brief      has value type
     /// @details
     ///             ```cpp
@@ -89,8 +93,9 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <::parser::wasm::concepts::wasm_feature... Fs>
     struct vec_value_type
     {
-        static_assert(::std::is_enum_v<final_value_type_t<Fs...>>);
-        static_assert(::std::same_as<::std::underlying_type_t<final_value_type_t<Fs...>>, ::parser::wasm::standard::wasm1::type::wasm_byte>);
+        static_assert(::std::is_enum_v<final_value_type_t<Fs...>>, "final_value_type_t<Fs...> is not enumeration");
+        static_assert(::std::same_as<::std::underlying_type_t<final_value_type_t<Fs...>>, ::parser::wasm::standard::wasm1::type::wasm_byte>,
+                      "final_value_type_t<Fs...> enumeration is not base on wasm_byte");
 
         final_value_type_t<Fs...> const* begin{};
         final_value_type_t<Fs...> const* end{};
@@ -168,12 +173,72 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     ...);
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
+
+    /////////////////////////////
+    //      Import Section     //
+    /////////////////////////////
+
+    /// @brief      has extern type
+    /// @details
+    ///             ```cpp
+    ///             enum class basic_extern_type : wasm_byte
+    ///             {
+    ///                 e1 = 0x00u,
+    ///                 e2 = 0x01u,
+    ///                 extern_type_end = e2 // Used to generate the length of the array
+    ///             };
+    ///
+    ///             struct F
+    ///             {
+    ///                 using extern_type = type_replacer<root_of_replacement, basic_extern_type>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_extern_type = requires {
+        typename FeatureType::extern_type;
+        requires ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+                                                                                      typename FeatureType::extern_type>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_extern_type() noexcept
+    {
+        if constexpr(has_extern_type<FeatureType>) { return typename FeatureType::extern_type{}; }
+        else { return ::parser::wasm::concepts::operation::irreplaceable_t{}; }
+    }
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    using final_extern_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_extern_type<Fs>())...>;
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_import_type
+    {
+        static_assert(::std::is_enum_v<final_extern_type_t<Fs...>>, "final_extern_type_t<Fs...> is not enumeration");
+        static_assert(::std::same_as<::std::underlying_type_t<final_extern_type_t<Fs...>>, ::parser::wasm::standard::wasm1::type::wasm_byte>,
+                      "final_extern_type_t<Fs...> enumeration is not base on wasm_byte");
+        static_assert(
+            requires { final_extern_type_t<Fs...>::extern_type_end; },
+            "final_extern_type_t<Fs...> enumeration does not have \"extern_type_end\" element");
+
+        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
+
+        ::fast_io::u8string_view module{};
+        ::fast_io::u8string_view name{};
+        final_extern_type_t<Fs...> importdesc{};
+    };
+
 }  // namespace parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::features::final_import_type<Fs...>>
     {
         inline static constexpr bool value = true;
     };

@@ -113,6 +113,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
         table = 0x01u,
         memory = 0x02u,
         global = 0x03u,
+        // extern_type_end: for concept, not standard
+        extern_type_end = global
     };
 
     /// @brief      Exports

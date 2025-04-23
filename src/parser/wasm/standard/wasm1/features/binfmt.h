@@ -71,11 +71,17 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         inline static constexpr ::fast_io::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
         inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
+        // type section
         using value_type = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement,
                                                                               ::parser::wasm::standard::wasm1::type::value_type>;
         using type_prefix = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement,
                                                                                ::parser::wasm::standard::wasm1::type::function_type_prefix>;
 
+        // import section
+        using extern_type = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement,
+                                                                               ::parser::wasm::standard::wasm1::type::external_types>;
+
+        // binfmt ver1
         template <::parser::wasm::concepts::wasm_feature... Fs>
         using binfmt_ver1_section_type = ::fast_io::tuple<::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
                                                           ::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>
@@ -89,11 +95,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         return ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>;
     }
 
+    // feature
     static_assert(::parser::wasm::concepts::wasm_feature<wasm1>);
     static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<wasm1>);
-    static_assert(::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
+    // type section
     static_assert(::parser::wasm::standard::wasm1::features::has_value_type<wasm1>);
     static_assert(::parser::wasm::standard::wasm1::features::has_type_prefix<wasm1>);
+    // import section
+    static_assert(::parser::wasm::standard::wasm1::features::has_extern_type<wasm1>);
+    // binfmt ver1
+    static_assert(::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
 }  // namespace parser::wasm::standard::wasm1::features
 
 #ifndef UWVM_MODULE

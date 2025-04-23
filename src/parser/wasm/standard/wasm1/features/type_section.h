@@ -51,6 +51,7 @@ import :def;
 # include <utils/ansies/ansi_push_macro.h>
 // import
 # include <fast_io.h>
+# include <fast_io_dsal/vector.h>
 # include <utils/io/impl.h>
 # include <utils/ansies/impl.h>
 # ifdef UWVM_TIMER
@@ -193,7 +194,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
                     // check handler
-                    static_assert(has_check_value_type<Fs...>);
+                    static_assert(has_check_value_type<Fs...>, "define_check_value_type(...) not found");
                     // check parameters
                     for(auto parameter_curr{ft.parameter.begin}; parameter_curr != ft.parameter.end; ++parameter_curr)
                     {
@@ -392,7 +393,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                 ::fast_io::mnp::addrvw(section_begin - module_storage.module_span.module_begin),
                                 u8") Duplicate WebAssembly Section: \"",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
-                                u8"Type",
+                                u8"Type (ID=1)",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"\"",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
@@ -452,7 +453,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             // ... 60 ?? ?? ...
             //        ^^ section_curr
             // check has func
-            static_assert(has_type_prefix_handler<Fs...>);
+            static_assert(has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
             // check type count
             if(++type_counter > type_count) [[unlikely]]
             {
