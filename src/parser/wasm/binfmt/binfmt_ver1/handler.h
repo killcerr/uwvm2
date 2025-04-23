@@ -78,6 +78,8 @@ import :custom_section;
 
 UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 {
+    static_assert(sizeof(::std::byte) == sizeof(char8_t));
+
     template <typename Sec, typename... Fs>
     concept has_handle_binfmt_ver1_extensible_section_define =
         requires(::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec>> ref,
@@ -284,7 +286,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         // 00 61 73 6D 01 00 00 00 01 7D ...
         // ^^ module_curr
 
-        if(static_cast<::std::size_t>(module_end - module_curr) < 8U * sizeof(char8_t) || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr))
+        if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr))
             [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
@@ -305,12 +307,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 
         // uncheck binfmt version, user-selected, or auto-detect
 
-        module_curr += 8U * sizeof(char8_t);
+        module_curr += 8uz;
 
         // 00 61 73 6D 01 00 00 00 01 7D ...
         //                         ^^ module_curr
 
-        if(static_cast<::std::size_t>(module_end - module_curr) < 2U * sizeof(char8_t)) [[unlikely]]
+        if(static_cast<::std::size_t>(module_end - module_curr) < 2uz) [[unlikely]]
         {
             // No need to check module_curr > module_end, always false
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE

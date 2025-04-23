@@ -222,8 +222,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
         ::fast_io::u8string_view custom_name{};  // The name used for the data segment
 
-        ::fast_io::u8string_view module{};
-        ::fast_io::u8string_view name{};
+        ::fast_io::u8string_view module_name{};
+        ::fast_io::u8string_view extern_name{};
         final_extern_type_t<Fs...> importdesc{};
     };
 

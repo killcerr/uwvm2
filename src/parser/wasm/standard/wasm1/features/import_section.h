@@ -53,6 +53,7 @@ import :def;
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/vector.h>
+# include <fast_io_dsal/string_view.h>
 # include <utils/io/impl.h>
 # include <utils/ansies/impl.h>
 # ifdef UWVM_TIMER
@@ -82,18 +83,80 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         ::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
         ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...>> imports{};
-        ::fast_io::array<::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>,
-                         static_cast<::std::size_t>(::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>::extern_type_end) + 1>
-            importdesc{};
+
+        inline static constexpr ::std::size_t importdesc_count{
+            static_cast<::std::size_t>(::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>::extern_type_end) + 1};
+        ::fast_io::array<::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>, importdesc_count> importdesc{};
     };
+
+    /// @brief Define functions for handle extern_prefix
+    template <typename... Fs>
+    concept has_extern_prefix_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                                                 ::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...> prefix,
+                                                 ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                                 ::std::byte const* const section_curr,
+                                                 ::std::byte const* const section_end) {
+        { define_extern_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
+    };
+
+    /// @brief Define function for wasm1 external_types
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline ::std::byte const* define_extern_prefix_handler(
+        [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        [[maybe_unused]] ::parser::wasm::standard::wasm1::type::external_types prefix,
+        [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        [[maybe_unused]] ::std::byte const* const section_curr,
+        [[maybe_unused]] ::std::byte const* const section_end) UWVM_THROWS
+    {
+        switch(prefix)
+        {
+            case ::parser::wasm::standard::wasm1::type::external_types::func:
+            {
+                break;
+            }
+            case ::parser::wasm::standard::wasm1::type::external_types::table:
+            {
+                break;
+            }
+            case ::parser::wasm::standard::wasm1::type::external_types::memory:
+            {
+                break;
+            }
+            case ::parser::wasm::standard::wasm1::type::external_types::global:
+            {
+                break;
+            }
+            default: [[unlikely]] {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                    ::fast_io::io::perr(::utils::log_output,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                        u8"[error] ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                        u8"(offset=",
+                                        ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                        u8") Invalid Extern Prefix: \"",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                        ::fast_io::mnp::hex0x<true>(static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(prefix)),
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                        u8"\".",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                        u8"\n\n");
+#endif
+                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+        }
+        /// @todo
+        return section_curr;
+    }
 
     /// @brief Define the handler function for type_section
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_binfmt_ver1_extensible_section_define(
-        [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-        ::std::byte const* const section_begin,
-        ::std::byte const* const section_end) UWVM_THROWS
+    inline void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                                                             ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+                                                             ::std::byte const* const section_begin,
+                                                             ::std::byte const* const section_end) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
         ::utils::debug::timer parsing_timer{u8"parse import section (id: 2)"};
@@ -159,6 +222,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         importsec.sec_span.sec_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_end);
 
         auto section_curr{section_begin};
+        // ... count namelen ?? ...
+        //           ^^ section_curr
 
         ::parser::wasm::standard::wasm1::type::wasm_u32 import_count{};
 
@@ -188,8 +253,217 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
         importsec.imports.reserve(import_count);
 
-        /// @todo
-        ::fast_io::fast_terminate();
+        section_curr = reinterpret_cast<::std::byte const*>(import_count_next);  // never out of bounds
+
+        // ... count ?? ?? ...
+        //           ^^ section_curr
+
+        ::std::size_t import_counter{};
+        [[maybe_unused]] ::fast_io::array<::std::size_t, import_section_storage_t<Fs...>::importdesc_count> importdesc_counter{};
+
+        for(; section_curr != section_end;)
+        {
+            ::parser::wasm::standard::wasm1::features::final_import_type<Fs...> fit{};
+            if(++import_counter > import_count) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::log_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") The number of imports resolved does not match the actual number: \"",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                    import_count,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"\"",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            ::parser::wasm::standard::wasm1::type::wasm_u32 module_namelen{};
+            auto const [module_namelen_next, module_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                          reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                          ::fast_io::mnp::leb128_get(module_namelen))};
+
+            if(module_namelen_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::log_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") Invalid Module Name Length.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(module_namelen_err);
+            }
+
+            if(module_namelen == static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::log_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") Imported module name should not have strings of length 0.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            section_curr = reinterpret_cast<::std::byte const*>(module_namelen_next);  // never out of bounds
+
+            // ... count modulenamelen ?? ...
+            //                         ^^ section_curr
+
+            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+            fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
+
+            section_curr += module_namelen;
+            // ... count modulenamelen name ... externnamelen externname ... index
+            //                                  ^^ section_curr
+
+            // check curr: externnamelen min = 0, minimum remaining 2 "... 00 index ..."
+            if(static_cast<::std::size_t>(section_end - section_curr) < 2uz || section_curr > section_end) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::log_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") Module Name Too Length.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            ::parser::wasm::standard::wasm1::type::wasm_u32 extern_namelen{};
+            auto const [extern_namelen_next, extern_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                          reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                          ::fast_io::mnp::leb128_get(extern_namelen))};
+
+            if(extern_namelen_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::log_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") Invalid Extern Name Length.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(extern_namelen_err);
+            }
+
+            if(extern_namelen == static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::log_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") Imported extern name should not have strings of length 0.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            section_curr = reinterpret_cast<::std::byte const*>(extern_namelen_next);  // never out of bounds
+
+            fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
+
+            section_curr += extern_namelen;
+            // ... count modulenamelen name ... externnamelen externname ... index
+            //                                                               ^^ section_curr
+
+            // same as (static_cast<::std::size_t>(section_end - section_curr) < 1uz || section_curr > section_end)
+            if(section_curr >= section_end) [[unlikely]]
+            {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                ::fast_io::io::perr(::utils::log_output,
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                    u8") Extern Name Too Length.",
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    u8"\n\n");
+#endif
+                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            ::fast_io::freestanding::my_memcpy(::std::addressof(fit.importdesc), section_curr, sizeof(fit.importdesc));
+
+            ++section_curr;
+            // ... count modulenamelen name ... externnamelen externname ... index ...
+            //                                                                     ^^ section_curr
+
+            static_assert(has_extern_prefix_handler<Fs...>, "define_extern_prefix_handler(...) not found");
+            // handle it
+            section_curr = define_extern_prefix_handler(sec_adl, fit.importdesc, module_storage, section_curr, section_end);
+        }
+
+        // check import counter match
+        if(import_counter != import_count) [[unlikely]]
+        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+            ::fast_io::io::perr(::utils::log_output,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                u8") The number of import resolved \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                import_counter,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\" does not match the actual number \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_LT_GREEN),
+                                import_count,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\".",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                u8"\n\n");
+#endif
+            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
     }
 }  // namespace parser::wasm::standard::wasm1::features
 

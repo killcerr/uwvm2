@@ -105,7 +105,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         }
     }
 
-    /// @brief Define functions for checking valuetype to type_prefix extensibility
+    /// @brief Define functions to handle type prefix
     template <typename... Fs>
     concept has_type_prefix_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
@@ -468,7 +468,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                     ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                     u8") The number of types resolved does not match the actual number: \"",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
-                                    type_counter,
+                                    type_count,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                     u8"\"",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
