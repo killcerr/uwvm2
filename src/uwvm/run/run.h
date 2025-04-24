@@ -133,7 +133,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
                     ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
                                          UWVM_AES_U8_RST_ALL,
-                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_ret_all})
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_rst_all})
 #else
                     UWVM_AES_U8_RST_ALL
 #endif
@@ -218,7 +218,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 # if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
                     ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
                                          UWVM_AES_U8_RST_ALL,
-                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_ret_all})
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_rst_all})
 # else
                     UWVM_AES_U8_RST_ALL
 # endif
@@ -291,7 +291,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                                                          ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
                                                                               UWVM_AES_U8_RST_ALL,
                                                                               ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
-                                                                                                               ::utils::ansies::text_attr::foreground_ret_all})
+                                                                                                               ::utils::ansies::text_attr::foreground_rst_all})
 # else
                                                          UWVM_AES_U8_RST_ALL
 # endif
@@ -392,7 +392,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                                                          ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
                                                                               UWVM_AES_U8_RST_ALL,
                                                                               ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
-                                                                                                               ::utils::ansies::text_attr::foreground_ret_all})
+                                                                                                               ::utils::ansies::text_attr::foreground_rst_all})
 # else
                                                          UWVM_AES_U8_RST_ALL
 # endif

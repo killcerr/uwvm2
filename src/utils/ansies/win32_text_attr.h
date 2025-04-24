@@ -81,7 +81,7 @@ UWVM_MODULE_EXPORT namespace utils::ansies
         foreground_lt_cyan = 0x0008 | 0x0001 | 0x0002,
         foreground_white = 0x0008 | 0x0001 | 0x0002 | 0x0004,
 
-        foreground_ret_all = foreground_gray,
+        foreground_rst_all = foreground_gray,
     };
 
     inline constexpr text_attr operator& (text_attr x, text_attr y) noexcept
