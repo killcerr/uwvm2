@@ -286,8 +286,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         // 00 61 73 6D 01 00 00 00 01 7D ...
         // ^^ module_curr
 
-        if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr))
-            [[unlikely]]
+        if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
             ::fast_io::io::perr(::utils::log_output,

@@ -30,7 +30,7 @@
 #pragma push_macro("UWVM_COLOR_U8_RST_ALL")
 #undef UWVM_COLOR_U8_RST_ALL
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_RST_ALL                                                                                                                                    \
+# define UWVM_COLOR_U8_RST_ALL                                                                                                                                 \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_RST_ALL,                                                                                                                 \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_rst_all})
@@ -41,7 +41,7 @@
 #pragma push_macro("UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE")
 #undef UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE                                                                                                                      \
+# define UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE                                                                                                                   \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,                                                                                               \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_white})
@@ -52,7 +52,7 @@
 #pragma push_macro("UWVM_COLOR_U8_BLACK")
 #undef UWVM_COLOR_U8_BLACK
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_BLACK                                                                                                                                      \
+# define UWVM_COLOR_U8_BLACK                                                                                                                                   \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_BLACK,                                                                                                                   \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_black})
@@ -63,7 +63,7 @@
 #pragma push_macro("UWVM_COLOR_U8_RED")
 #undef UWVM_COLOR_U8_RED
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_RED                                                                                                                                        \
+# define UWVM_COLOR_U8_RED                                                                                                                                     \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_RED,                                                                                                                     \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_red})
@@ -74,7 +74,7 @@
 #pragma push_macro("UWVM_COLOR_U8_GREEN")
 #undef UWVM_COLOR_U8_GREEN
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_GREEN                                                                                                                                      \
+# define UWVM_COLOR_U8_GREEN                                                                                                                                   \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_GREEN,                                                                                                                   \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_green})
@@ -85,7 +85,7 @@
 #pragma push_macro("UWVM_COLOR_U8_ORANGE")
 #undef UWVM_COLOR_U8_ORANGE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_ORANGE                                                                                                                                     \
+# define UWVM_COLOR_U8_ORANGE                                                                                                                                  \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_ORANGE,                                                                                                                  \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_orange})
@@ -96,7 +96,7 @@
 #pragma push_macro("UWVM_COLOR_U8_BLUE")
 #undef UWVM_COLOR_U8_BLUE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_BLUE                                                                                                                                       \
+# define UWVM_COLOR_U8_BLUE                                                                                                                                    \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_BLUE,                                                                                                                    \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_blue})
@@ -106,7 +106,7 @@
 #pragma push_macro("UWVM_COLOR_U8_PURPLE")
 #undef UWVM_COLOR_U8_PURPLE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_PURPLE                                                                                                                                     \
+# define UWVM_COLOR_U8_PURPLE                                                                                                                                  \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_PURPLE,                                                                                                                  \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_purple})
@@ -117,7 +117,7 @@
 #pragma push_macro("UWVM_COLOR_U8_CYAN")
 #undef UWVM_COLOR_U8_CYAN
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_CYAN                                                                                                                                       \
+# define UWVM_COLOR_U8_CYAN                                                                                                                                    \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_CYAN,                                                                                                                    \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_cyan})
@@ -128,7 +128,7 @@
 #pragma push_macro("UWVM_COLOR_U8_GRAY")
 #undef UWVM_COLOR_U8_GRAY
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_GRAY                                                                                                                                       \
+# define UWVM_COLOR_U8_GRAY                                                                                                                                    \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_GRAY,                                                                                                                    \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_gray})
@@ -139,7 +139,7 @@
 #pragma push_macro("UWVM_COLOR_U8_DK_GRAY")
 #undef UWVM_COLOR_U8_DK_GRAY
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_DK_GRAY                                                                                                                                    \
+# define UWVM_COLOR_U8_DK_GRAY                                                                                                                                 \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_DK_GRAY,                                                                                                                 \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_dk_gray})
@@ -150,7 +150,7 @@
 #pragma push_macro("UWVM_COLOR_U8_LT_RED")
 #undef UWVM_COLOR_U8_LT_RED
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_LT_RED                                                                                                                                     \
+# define UWVM_COLOR_U8_LT_RED                                                                                                                                  \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_LT_RED,                                                                                                                  \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_lt_red})
@@ -161,7 +161,7 @@
 #pragma push_macro("UWVM_COLOR_U8_LT_GREEN")
 #undef UWVM_COLOR_U8_LT_GREEN
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_LT_GREEN                                                                                                                                   \
+# define UWVM_COLOR_U8_LT_GREEN                                                                                                                                \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_LT_GREEN,                                                                                                                \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_lt_green})
@@ -172,7 +172,7 @@
 #pragma push_macro("UWVM_COLOR_U8_YELLOW")
 #undef UWVM_COLOR_U8_YELLOW
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_YELLOW                                                                                                                                     \
+# define UWVM_COLOR_U8_YELLOW                                                                                                                                  \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_YELLOW,                                                                                                                  \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_yellow})
@@ -183,7 +183,7 @@
 #pragma push_macro("UWVM_COLOR_U8_LT_BLUE")
 #undef UWVM_COLOR_U8_LT_BLUE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_LT_BLUE                                                                                                                                    \
+# define UWVM_COLOR_U8_LT_BLUE                                                                                                                                 \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_LT_BLUE,                                                                                                                 \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_lt_blue})
@@ -194,7 +194,7 @@
 #pragma push_macro("UWVM_COLOR_U8_LT_PURPLE")
 #undef UWVM_COLOR_U8_LT_PURPLE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_LT_PURPLE                                                                                                                                  \
+# define UWVM_COLOR_U8_LT_PURPLE                                                                                                                               \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_LT_PURPLE,                                                                                                               \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_lt_purple})
@@ -205,7 +205,7 @@
 #pragma push_macro("UWVM_COLOR_U8_LT_CYAN")
 #undef UWVM_COLOR_U8_LT_CYAN
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_LT_CYAN                                                                                                                                    \
+# define UWVM_COLOR_U8_LT_CYAN                                                                                                                                 \
      ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,                                                                                               \
                           UWVM_AES_U8_LT_CYAN,                                                                                                                 \
                           ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_lt_cyan})
