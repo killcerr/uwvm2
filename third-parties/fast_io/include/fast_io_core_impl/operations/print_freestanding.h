@@ -85,6 +85,9 @@ inline constexpr contiguous_scatter_result find_continuous_scatters_n()
 		ret.neededscatters =
 			::fast_io::details::intrinsics::add_or_overflow_die_chain(ret.neededscatters, scatszres.scatters_size);
 	}
+	else if constexpr (::fast_io::printable<char_type, Arg>)
+	{
+	}
 	return ret;
 }
 
@@ -253,26 +256,28 @@ inline constexpr void print_control_single(output outstm, T t)
 			write(outstm,scatter.base,scatter.base+scatter.len);
 		}
 #endif
+		basic_io_scatter_t<char_type> scatter_res{print_scatter_define(::fast_io::io_reserve_type<char_type, value_type>, t)};
+
 		if constexpr (line)
 		{
 			if constexpr (::fast_io::operations::decay::defines::has_any_of_write_or_seek_pwrite_bytes_operations<
 							  output>)
 			{
 				::fast_io::io_scatter_t scatters[2]{
-					{t.base, t.len * sizeof(char_type)},
+					{scatter_res.base, scatter_res.len * sizeof(char_type)},
 					{__builtin_addressof(char_literal_v<u8'\n', char_type>), sizeof(char_type)}};
 				::fast_io::operations::decay::scatter_write_all_bytes_decay(outstm, scatters, 2);
 			}
 			else
 			{
 				::fast_io::basic_io_scatter_t<char_type> scatters[2]{
-					t, {__builtin_addressof(char_literal_v<u8'\n', char_type>), 1}};
+					scatter_res, {__builtin_addressof(char_literal_v<u8'\n', char_type>), 1}};
 				::fast_io::operations::decay::scatter_write_all_decay(outstm, scatters, 2);
 			}
 		}
 		else
 		{
-			::fast_io::operations::decay::write_all_decay(outstm, t.base, t.base + t.len);
+			::fast_io::operations::decay::write_all_decay(outstm, scatter_res.base, scatter_res.base + scatter_res.len);
 		}
 	}
 	else if constexpr (reserve_printable<char_type, value_type>)
@@ -611,6 +616,9 @@ inline constexpr void print_control_single(output outstm, T t)
 		{
 			::fast_io::operations::decay::char_put_decay(outstm, lfch);
 		}
+	}
+	else if constexpr (::std::same_as<::std::remove_cvref_t<value_type>, ::fast_io::io_null_t>)
+	{
 	}
 	else
 	{
@@ -1063,6 +1071,10 @@ inline constexpr void print_controls_impl(outputstmtype optstm, T t, Args... arg
 					::fast_io::operations::decay::scatter_write_all_decay(optstm, scatters, scatterscount);
 				}
 			}
+			if constexpr (res.position != n)
+			{
+				print_controls_impl<line, outputstmtype, res.position - 1>(optstm, args...);
+			}
 		}
 		else
 		{
@@ -1353,7 +1365,7 @@ concept print_freestanding_params_okay =
 	((::fast_io::printable<char_type, Args> || ::fast_io::reserve_printable<char_type, Args> ||
 	  ::fast_io::dynamic_reserve_printable<char_type, Args> || ::fast_io::scatter_printable<char_type, Args> ||
 	  ::fast_io::reserve_scatters_printable<char_type, Args> || ::fast_io::context_printable<char_type, Args> ||
-	  ::fast_io::transcode_imaginary_printable<char_type, Args>) &&
+	  ::fast_io::transcode_imaginary_printable<char_type, Args> || ::std::same_as<::std::remove_cvref_t<Args>, ::fast_io::io_null_t>) &&
 	 ...);
 
 template <typename output, typename... Args>

@@ -796,7 +796,7 @@ namespace uwvm::cmdline::paras::details
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
-        return ::utils::cmdline::parameter_return_type::return_imme;
+        return ::utils::cmdline::parameter_return_type::return_soon;
     }
 
 }  // namespace uwvm::cmdline::paras::details

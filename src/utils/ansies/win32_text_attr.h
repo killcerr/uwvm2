@@ -120,17 +120,10 @@ UWVM_MODULE_EXPORT namespace utils::ansies
         text_attr attr{};
     };
 
-    template <::std::integral char_type>
-    inline constexpr ::std::size_t print_reserve_size(::fast_io::io_reserve_type_t<char_type, win32_text_attr>) noexcept
-    {
-        return 0uz;
-    }
-
-    template <::std::integral char_type>
-    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, win32_text_attr>, char_type * iter, win32_text_attr attr) noexcept
+    template <::std::integral char_type, typename s>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, win32_text_attr>, s&&, win32_text_attr attr) noexcept
     {
         ::fast_io::win32::SetConsoleTextAttribute(attr.handle, static_cast<::std::int_least32_t>(attr.attr));
-        return iter;
     }
 }  // namespace utils::ansies
 
