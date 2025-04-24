@@ -56,7 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
     inline constexpr ::utils::cmdline::parameter log_output{.name{u8"--log-output"},
                                                             .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
                                                             .usage{
-#if !defined(__AVR__)
+#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
                                                                 u8"[out|err|file <file>]"
 #else
                                                                 u8"[out|err]"

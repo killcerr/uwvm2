@@ -163,7 +163,7 @@ namespace uwvm::cmdline::paras::details
         // Setting the argument is already taken
         currp1->type = ::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
-#if !defined(__AVR__)
+#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
         // win32 and posix
         if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::utils::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8out()}; }
         else if(currp1_str == u8"err") { ::utils::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8err()}; }
@@ -472,8 +472,22 @@ namespace uwvm::cmdline::paras::details
 
 #else
         // on AVR only support cstdout and cstderr
-        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::utils::log_output = ::fast_io::u8c_stdout(); }
-        else if(currp1_str == u8"err") { ::utils::log_output = ::fast_io::u8c_stderr(); }
+        if(auto currp1_str{currp1->str}; currp1_str == u8"out")
+        {
+# if defined(__AVR__)
+            ::utils::log_output = ::fast_io::u8c_stdout();
+# elif (defined(_WIN32) && defined(_WIN32_WINDOWS))
+            ::utils::log_output = ::fast_io::u8out();
+# endif
+        }
+        else if(currp1_str == u8"err")
+        {
+# if defined(__AVR__)
+            ::utils::log_output = ::fast_io::u8c_stderr();
+# elif (defined(_WIN32) && defined(_WIN32_WINDOWS))
+            ::utils::log_output = ::fast_io::u8err();
+# endif
+        }
         else
         {
             ::fast_io::io::perr(

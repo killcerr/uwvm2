@@ -38,10 +38,14 @@ import fast_io;
 UWVM_MODULE_EXPORT namespace utils
 {
     /// @brief Control VM output via virtual functions, can be set via option in --debug-output, not supported by avr
-#ifndef __AVR__
-    inline ::fast_io::u8native_file log_output{::fast_io::io_dup, ::fast_io::u8err()};  // No global variable dependencies from other translation units
-#else
+#if defined(__AVR__)
+    // avr does not have posix
     inline ::fast_io::u8c_io_observer log_output{::fast_io::u8c_stderr()};  // No global variable dependencies from other translation units
+#elif defined(_WIN32) && defined(_WIN32_WINDOWS)
+    // win9x cannot dup stderr
+    inline ::fast_io::u8native_io_observer log_output{::fast_io::u8err()};  // No global variable dependencies from other translation units
+#else
+    inline ::fast_io::u8native_file log_output{::fast_io::io_dup, ::fast_io::u8err()};  // No global variable dependencies from other translation units
 #endif
 
 }  // namespace utils
