@@ -159,7 +159,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             // ... 60 length ... length ... ...
             //               ^^ section_curr
             // If it's a null return value, there's at least one more parameter, so add 1u
-            if(static_cast<::std::size_t>(section_end - section_curr) < para_len + 1u) [[unlikely]]
+            if(static_cast<::std::size_t>(section_end - section_curr) < para_len + static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(1u))
+                [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::log_output,
@@ -252,7 +253,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             constexpr bool allow_multi_value{::parser::wasm::standard::wasm1::features::allow_multi_result_vector<Fs...>()};
             if constexpr(!allow_multi_value)
             {
-                if(result_len > 1) [[unlikely]]
+                if(result_len > static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                 {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                     ::fast_io::io::perr(

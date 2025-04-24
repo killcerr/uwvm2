@@ -263,8 +263,9 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         // ... count ?? ?? ...
         //           ^^ section_curr
 
-        ::std::size_t import_counter{};                                                                           // use for check
-        ::fast_io::array<::std::size_t, import_section_storage_t<Fs...>::importdesc_count> importdesc_counter{};  // use for reserve
+        ::parser::wasm::standard::wasm1::type::wasm_u32 import_counter{};  // use for check
+        ::fast_io::array<::parser::wasm::standard::wasm1::type::wasm_u32, import_section_storage_t<Fs...>::importdesc_count>
+            importdesc_counter{};  // use for reserve
 
         for(; section_curr != section_end;)
         {
@@ -436,9 +437,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
             // desc counter
             constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
-            // importdesc_count never > 255, convert to 8 bits, use integer promotion to int calculation
-            if(static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(fit.importdesc) >=
-               static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(importdesc_count)) [[unlikely]]
+            // importdesc_count never > 256 (max=255+1), convert to unsigned
+            if(static_cast<unsigned>(fit.importdesc) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::log_output,
