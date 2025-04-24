@@ -58,7 +58,7 @@ UWVM_MODULE_EXPORT namespace utils::ansies
     inline constexpr ::std::size_t print_reserve_size(::fast_io::io_reserve_type_t<char_type, crs>) noexcept
     {
         constexpr ::std::size_t ul32_real_size{::fast_io::pr_rsv_size<char_type, ::std::uint_least32_t>};
-        constexpr ::std::size_t max_size{3 + ul32_real_size};
+        constexpr ::std::size_t max_size{3uz + ul32_real_size};
         return max_size;
     }
 
@@ -68,8 +68,8 @@ UWVM_MODULE_EXPORT namespace utils::ansies
             requires (sizeof(char_type) == sizeof(char8_t))
         inline constexpr char_type* crs_print_reserve_impl(char_type* iter, crs::cursor_variables cv, ::std::uint_least32_t f) noexcept
         {
-            ::fast_io::freestanding::my_memcpy(iter, u8"\033[", 2u);
-            char_type* curr_pos{iter + 2u};
+            ::fast_io::freestanding::my_memcpy(iter, u8"\033[", 2uz);
+            char_type* curr_pos{iter + 2uz};
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(curr_pos, f);
             *curr_pos = static_cast<char_type>(cv);
             return ++curr_pos;

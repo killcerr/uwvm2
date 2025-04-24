@@ -164,6 +164,7 @@
 #pragma comment(linker,"/alternatename:__imp_?CommandLineToArgvW@win32@fast_io@@YGPAPA_SPB_SPAH@Z=__imp__CommandLineToArgvW@8")
 #pragma comment(linker,"/alternatename:__imp_?LocalFree@win32@fast_io@@YGPAXPAX@Z=__imp__LocalFree@4")
 #pragma comment(linker,"/alternatename:__imp_?PrefetchVirtualMemory@win32@fast_io@@YGHPAXIPAUwin32_memory_range_entry@12@I@Z=__imp__PrefetchVirtualMemory@16")
+#pragma comment(linker,"/alternatename:__imp_?SetConsoleTextAttribute@win32@fast_io@@YGHPAXH@Z=__imp__SetConsoleTextAttribute@8")
 // NT
 #pragma comment(linker,"/alternatename:__imp_?rtl_nt_status_to_dos_error@nt@win32@fast_io@@YGII@Z=__imp__RtlNtStatusToDosError@4")
 #pragma comment(linker,"/alternatename:__imp_?NtClose@nt@win32@fast_io@@YGIPAX@Z=__imp__NtClose@4")

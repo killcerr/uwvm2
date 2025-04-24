@@ -27,6 +27,10 @@ export import :cursor;
 export import :rgb;
 export import :no_color;
 
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+export import :win32_text_attr;
+#endif
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

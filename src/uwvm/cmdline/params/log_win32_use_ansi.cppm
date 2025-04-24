@@ -1,4 +1,4 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-03-31
  * @copyright   APL-2 License
  */
 
@@ -20,23 +20,21 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+
+export module uwvm.cmdline.params:log_win32_use_ansi;
 
 #ifndef UWVM_MODULE
-# include "version.h"
-# include "run.h"
-# include "help.h"
-# include "mode.h"
-# include "wasm_abi.h"
-# include "wasm_binfmt.h"
-# include "log_output.h"
-
-# ifdef _DEBUG
-#  include "test.h"
-# endif
-
-# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-#include "log_win32_use_ansi.h"
-# endif
-
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "log_win32_use_ansi.h"

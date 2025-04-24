@@ -38,6 +38,7 @@ import parser.wasm.standard.wasm1.section;
 import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
 import :def;
+import :type_section;
 #else
 // std
 # include <cstddef>
@@ -66,6 +67,7 @@ import :def;
 # include <parser/wasm/standard/wasm1/opcode/impl.h>
 # include <parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
+# include "type_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

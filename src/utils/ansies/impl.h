@@ -26,4 +26,8 @@
 # include "cursor.h"
 # include "rgb.h"
 # include "no_color.h"
+
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+#include "win32_text_attr.h"
+#endif
 #endif

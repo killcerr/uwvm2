@@ -35,6 +35,10 @@ export import :log_output;
 export import :test;
 #endif
 
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+export import :log_win32_use_ansi;
+# endif
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

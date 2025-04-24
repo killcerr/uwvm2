@@ -20,5 +20,6 @@ export namespace fast_io
         using ::fast_io::win32::GetEnvironmentVariableA;
         using ::fast_io::win32::PrefetchVirtualMemory;
         using ::fast_io::win32::win32_memory_range_entry;
+        using ::fast_io::win32::SetConsoleTextAttribute;
     } // namespace win32
 }

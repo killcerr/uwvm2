@@ -339,7 +339,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         ::fast_io::crc32c_context crc32c{};
         for(auto i{hash_size_base}; i < sizet_d10; ++i)
         {
-            ::std::size_t const hash_size{static_cast<::std::size_t>(1u) << i};
+            ::std::size_t const hash_size{1uz << i};
             bool c{};
             ::std::size_t extra_size{};
             ::std::size_t real_max_conflict_size{};

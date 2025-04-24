@@ -53,6 +53,10 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 #ifdef _DEBUG
             ::std::addressof(::uwvm::cmdline::paras::test),
 #endif
+
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+            ::std::addressof(::uwvm::cmdline::paras::log_win32_use_ansi),
+#endif
         };
     }  // namespace details
 

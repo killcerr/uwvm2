@@ -25,8 +25,10 @@
 #ifndef UWVM_MODULE
 # include "parser.h"
 # include "params.h"
+
 # if defined(_WIN32) && !defined(_WIN32_WINDOWS)
 #  include "winnt_code_cvt.h"
 # endif
+
 #endif
 
