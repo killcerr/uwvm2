@@ -27,6 +27,7 @@
 # ifdef UWVM_MODULE
 import fast_io;
 import utils.cmdline;
+import utils.ansies;
 # else
 // std
 #  include <memory>
@@ -37,6 +38,7 @@ import utils.cmdline;
 #  include <fast_io.h>
 #  include <fast_io_dsal/string_view.h>
 #  include <utils/cmdline/impl.h>
+#  include <utils/ansies/impl.h>
 # endif
 
 # ifndef UWVM_MODULE_EXPORT
@@ -47,20 +49,14 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
 {
     namespace details
     {
-        inline bool log_win32_use_ansi_is_exist{};
         inline constexpr ::fast_io::u8string_view log_win32_use_ansi_alias{u8"-ansi-log"};
-        extern "C++" ::utils::cmdline::parameter_return_type log_win32_use_ansi_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                                         ::utils::cmdline::parameter_parsing_results*,
-                                                                                         ::utils::cmdline::parameter_parsing_results*) noexcept;
-
     }  // namespace details
 
     inline constexpr ::utils::cmdline::parameter log_win32_use_ansi{
         .name{u8"--log-win32-use-ansi"},
         .describe{u8"Log on Win32 system using ANSI sequence under Win10. SetConsoleTextAttribute api is used by default."},
         .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_win32_use_ansi_alias), 1}},
-        .handle{::std::addressof(details::log_win32_use_ansi_callback)},
-        .is_exist{::std::addressof(details::log_win32_use_ansi_is_exist)}};
+        .is_exist{::std::addressof(::utils::ansies::log_win32_use_ansi_b)}};
 }  // namespace uwvm::cmdline::paras
 
 # ifndef UWVM_MODULE
