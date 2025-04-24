@@ -174,7 +174,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     para_len,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                    u8"\"",
+                                    u8"\".",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                     u8"\n\n");
 #endif
@@ -210,7 +210,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         ::fast_io::mnp::hex0x<true>(
                             static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*parameter_curr)),
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                        u8"\"",
+                        u8"\".",
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                         u8"\n\n");
 #endif
@@ -287,7 +287,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     result_len,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                    u8"\"",
+                                    u8"\".",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                     u8"\n\n");
 #endif
@@ -321,7 +321,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         ::fast_io::mnp::hex0x<true>(
                             static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*result_curr)),
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                        u8"\"",
+                        u8"\".",
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                         u8"\n\n");
 #endif
@@ -346,7 +346,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
-        
+
         switch(prefix)
         {
             case ::parser::wasm::standard::wasm1::type::function_type_prefix::functype:
@@ -368,7 +368,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                         ::fast_io::mnp::hex0x<true>(static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::type::function_type_prefix>>(prefix)),
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                        u8"\"",
+                        u8"\".",
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                         u8"\n\n");
 #endif
@@ -407,7 +407,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                 u8"Type (ID=1)",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"\"",
+                                u8"\".",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 u8"\n\n");
 #endif
@@ -482,7 +482,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     type_count,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                    u8"\"",
+                                    u8"\".",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                     u8"\n\n");
 #endif

@@ -124,7 +124,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                                      ::utils::madvise::madvise_flag::willneed);
 
         // If not specified by the user, detect it
-        if(::uwvm::wasm::storage::execute_wasm_binfmt_ver == 0)
+        if(::uwvm::wasm::storage::execute_wasm_binfmt_ver == 0u)
         {
             ::uwvm::wasm::storage::execute_wasm_binfmt_ver =
                 ::parser::wasm::binfmt::detect_wasm_binfmt_version(reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
@@ -186,12 +186,12 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                                     u8"[error] ",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                     u8"(offset=",
-                                    ::fast_io::mnp::addrvw(4U * sizeof(char8_t)),
+                                    ::fast_io::mnp::addrvw(4uz),
                                     u8") Unknown Binary Format Version of WebAssembly: \"",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                    u8"\"",
+                                    u8"\".",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                     u8"\n\n");
 #endif

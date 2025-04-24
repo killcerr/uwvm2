@@ -200,7 +200,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                 section_id,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"\"",
+                                u8"\".",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 u8"\n\n");
 # endif
@@ -260,7 +260,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                 section_id,
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"\"",
+                                u8"\".",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 u8"\n\n");
 # endif
@@ -383,7 +383,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
                                     sec_len,
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                    u8"\"",
+                                    u8"\".",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                     u8"\n\n");
 #endif
