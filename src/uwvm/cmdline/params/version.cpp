@@ -843,7 +843,7 @@ namespace uwvm::cmdline::paras::details
         // end ln
         ::fast_io::io::perrln(::utils::log_output);
 
-        return ::utils::cmdline::parameter_return_type::return_soon;
+        return ::utils::cmdline::parameter_return_type::return_imme;
     }
 
 }  // namespace uwvm::cmdline::paras::details
