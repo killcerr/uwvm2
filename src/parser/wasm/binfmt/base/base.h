@@ -52,7 +52,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt
 
     inline constexpr bool is_wasm_file_unchecked(::std::byte const* module_curr) noexcept
     {
-        return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4u * sizeof(char8_t)) == 0;
+        return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4uz) == 0;
     }
 
     inline constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
@@ -69,13 +69,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt
     {
         ::std::byte const* module_curr{module_begin};
 
-        if(static_cast<::std::size_t>(module_end - module_curr) < 8U * sizeof(char8_t) || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr))
-            [[unlikely]]
+        if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
         {
             return 0;
         }
 
-        module_curr += 4U * sizeof(char8_t);
+        module_curr += 4uz;
 
         // 00 61 73 6D 01 00 00 00 ...
         //             ^^ module_curr

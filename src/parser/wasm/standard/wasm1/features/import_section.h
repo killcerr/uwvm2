@@ -112,18 +112,22 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         {
             case ::parser::wasm::standard::wasm1::type::external_types::func:
             {
+                /// @todo
                 break;
             }
             case ::parser::wasm::standard::wasm1::type::external_types::table:
             {
+                /// @todo
                 break;
             }
             case ::parser::wasm::standard::wasm1::type::external_types::memory:
             {
+                /// @todo
                 break;
             }
             case ::parser::wasm::standard::wasm1::type::external_types::global:
             {
+                /// @todo
                 break;
             }
             default: [[unlikely]] {
@@ -147,7 +151,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                     ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
         }
-        /// @todo
         return section_curr;
     }
 
