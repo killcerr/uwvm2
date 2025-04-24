@@ -23,7 +23,7 @@
 #include <memory>
 
 #include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
+#include <utils/ansies/uwvm_color_push_macro.h>
 
 #ifdef UWVM_MODULE
 import fast_io;
@@ -71,81 +71,81 @@ namespace uwvm::cmdline::paras::details
     {
         ::fast_io::io::perr(::utils::log_output,
                                 // logo
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL), 
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), 
                                 u8"\n",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)), 
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)), 
                                 u8" ----------------------------------------- \n",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
                                 u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
                                 u8"  _   _  ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
                                 u8"__        __ ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
                                 u8"__     __  ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
                                 u8"__  __  ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
                                 u8"|" u8"\n" u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
                                 u8" | | | | ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
                                 u8"\\ \\      / / ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
                                 u8"\\ \\   / / ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
                                 u8"|  \\/  | ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
                                 u8"|" u8"\n" u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
                                 u8" | | | | ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
                                 u8" \\ \\ /\\ / /  ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
                                 u8" \\ \\ / /  ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
                                 u8"| |\\/| | ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
                                 u8"|" u8"\n" u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
                                 u8" | |_| | ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
                                 u8"  \\ V  V /     ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
                                 u8"\\ V /   ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
                                 u8"| |  | | ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
                                 u8"|" u8"\n" u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
                                 u8"  \\___/ ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
                                 u8"    \\_/\\_/    ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
                                 u8"   \\_/    ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
                                 u8"|_|  |_| ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
                                 u8"|" u8"\n" u8"|                                         |\n" u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(189, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
                                 u8" Ultimate ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(152, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
                                 u8"WebAssembly ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(113, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
                                 u8" Virtual ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(70, 37, 206)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
                                 u8"  Machine",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RGB(72, 61, 139)),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
                                 u8" |" u8"\n" u8" ----------------------------------------- \n\n",                        
                                 // uwvm
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Ultimate WebAssembly Virtual Machine\n",
         // Debug Mode
 #ifdef _DEBUG
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"(Debug Mode)\n",
 #endif
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 // Copyright
                                 u8"Copyright (c) 2025 MacroModel. All rights reserved."
         // Install Path
@@ -155,9 +155,9 @@ namespace uwvm::cmdline::paras::details
 #endif
                                 // Version
                                 u8"\nVersion: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 ::uwvm::custom::uwvm_version,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 // Compiler
                                 u8"\nCompiler: "
 #if defined(__clang__)
@@ -608,5 +608,5 @@ namespace uwvm::cmdline::paras::details
 }  // namespace uwvm::cmdline::paras::details
 
 // macro
-#include <utils/ansies/ansi_pop_macro.h>
+#include <utils/ansies/uwvm_color_pop_macro.h>
 #include <utils/macro/pop_macros.h>

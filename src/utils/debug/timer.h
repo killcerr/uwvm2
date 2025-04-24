@@ -29,7 +29,7 @@ import utils.ansies;
 #else
 // macro
 # include <utils/macro/push_macros.h>
-# include <utils/ansies/ansi_push_macro.h>
+# include <utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
@@ -88,19 +88,19 @@ UWVM_MODULE_EXPORT namespace utils::debug
             }
 #endif
             ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_LT_CYAN),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"[debug] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"timer \"",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 s,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\": ",
                                 t1 - t0,
                                 u8"s\n",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL));
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
         }
     };
 
@@ -108,6 +108,6 @@ UWVM_MODULE_EXPORT namespace utils::debug
 
 #ifndef UWVM_MODULE
 // macro
-# include <utils/ansies/ansi_pop_macro.h>
+# include <utils/ansies/uwvm_color_pop_macro.h>
 # include <utils/macro/pop_macros.h>
 #endif
