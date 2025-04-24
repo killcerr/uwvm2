@@ -175,8 +175,9 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
                                 u8"--help wasm",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"\" to display the wasm arguments."
+                                u8"\" to display the wasm arguments.",
                                 // endl
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
                                 u8"\n\n");
 
             return ::utils::cmdline::parameter_return_type::return_imme;

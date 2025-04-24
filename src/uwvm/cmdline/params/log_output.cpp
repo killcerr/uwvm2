@@ -67,7 +67,7 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
                                 u8"] ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
-#if !defined(__AVR__)
+#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
                                 u8"[out|err|file <file>]"
 #else
                                 u8"[out|err]"
