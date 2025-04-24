@@ -36,7 +36,7 @@
 # endif
 
 # if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-#include "log_win32_use_ansi.h"
+#  include "log_win32_use_ansi.h"
 # endif
 
 #endif

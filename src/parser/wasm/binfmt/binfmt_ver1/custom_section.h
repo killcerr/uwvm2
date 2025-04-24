@@ -96,17 +96,54 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         if(err_name_len != ::fast_io::parse_code::ok) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"(offset=",
-                                ::fast_io::mnp::addrvw(section_begin - module_storage.module_span.module_begin),
-                                u8") Invalid Custom Name Length.",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                u8"\n\n");
+            ::fast_io::io::perr(
+                ::utils::log_output,
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_white})
+# else
+                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+# endif
+                        ),
+                u8"uwvm: ",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RED,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_red})
+# else
+                    UWVM_AES_U8_RED
+# endif
+                        ),
+                u8"[error] ",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_WHITE,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_white})
+# else
+                    UWVM_AES_U8_WHITE
+# endif
+                        ),
+                u8"(offset=",
+                ::fast_io::mnp::addrvw(section_begin - module_storage.module_span.module_begin),
+                u8") Invalid Custom Name Length.",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RST_ALL,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_ret_all})
+# else
+                    UWVM_AES_U8_RST_ALL
+# endif
+                        ),
+                u8"\n\n");
 #endif
             ::parser::wasm::base::throw_wasm_parse_code(err_name_len);
         }
@@ -132,19 +169,73 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                         ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                              UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                                                              ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                               ::utils::ansies::text_attr::foreground_white})
+# else
+                                                         UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+# endif
+                                                             ),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                         ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                              UWVM_AES_U8_RED,
+                                                                              ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                               ::utils::ansies::text_attr::foreground_red})
+# else
+                                                         UWVM_AES_U8_RED
+# endif
+                                                             ),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                         ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                              UWVM_AES_U8_WHITE,
+                                                                              ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                               ::utils::ansies::text_attr::foreground_white})
+# else
+                                                         UWVM_AES_U8_WHITE
+# endif
+                                                             ),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(reinterpret_cast<::std::byte const*>(cs.custom_begin) - module_storage.module_span.module_begin),
                                     u8") Handle Custom Section \"",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                         ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                              UWVM_AES_U8_CYAN,
+                                                                              ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                               ::utils::ansies::text_attr::foreground_cyan})
+# else
+                                                         UWVM_AES_U8_CYAN
+# endif
+                                                             ),
                                     cs.custom_name,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                         ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                              UWVM_AES_U8_WHITE,
+                                                                              ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                               ::utils::ansies::text_attr::foreground_white})
+# else
+                                                         UWVM_AES_U8_WHITE
+# endif
+                                                             ),
                                     u8"\" Fault!",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                         ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                              UWVM_AES_U8_RST_ALL,
+                                                                              ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                               ::utils::ansies::text_attr::foreground_ret_all})
+# else
+                                                         UWVM_AES_U8_RST_ALL
+# endif
+                                                             ),
                                     u8"\n\n");
 #endif
                 ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);

@@ -91,15 +91,52 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         // If argc is 0, prohibit running
         if(argc == 0) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"No Parameters.",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                u8"\n\n");
+            ::fast_io::io::perr(
+                ::utils::log_output,
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_white})
+#else
+                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+#endif
+                        ),
+                u8"uwvm: ",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RED,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_red})
+#else
+                    UWVM_AES_U8_RED
+#endif
+                        ),
+                u8"[error] ",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_WHITE,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_white})
+#else
+                    UWVM_AES_U8_WHITE
+#endif
+                        ),
+                u8"No Parameters.",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RST_ALL,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_ret_all})
+#else
+                    UWVM_AES_U8_RST_ALL
+#endif
+                        ),
+                u8"\n\n");
             return parsing_return_val::returnm1;
         }
 
@@ -152,25 +189,107 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     // grammatical error
                     if(++curr_argv == argv_end) [[unlikely]]
                     {
-                        ::fast_io::io::perr(::utils::log_output,
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                            u8"uwvm: ",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
-                                            u8"[error] ",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                            u8"Usage: " u8"[",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                            u8"--run",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                            u8"|",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                            u8"-r",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                            u8"] ",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_YELLOW),
-                                            u8"<file> <argv[1]> <argv[2]> ...",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                            u8"\n\n");
+                        ::fast_io::io::perr(
+                            ::utils::log_output,
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_white})
+#else
+                                                 UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+#endif
+                                                     ),
+                            u8"uwvm: ",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_RED,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_red})
+#else
+                                                 UWVM_AES_U8_RED
+#endif
+                                                     ),
+                            u8"[error] ",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_WHITE,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_white})
+#else
+                                                 UWVM_AES_U8_WHITE
+#endif
+                                                     ),
+                            u8"Usage: " u8"[",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_GREEN,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_green})
+#else
+                                                 UWVM_AES_U8_GREEN
+#endif
+                                                     ),
+                            u8"--run",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_WHITE,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_white})
+#else
+                                                 UWVM_AES_U8_WHITE
+#endif
+                                                     ),
+                            u8"|",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_GREEN,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_green})
+#else
+                                                 UWVM_AES_U8_GREEN
+#endif
+                                                     ),
+                            u8"-r",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_WHITE,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_white})
+#else
+                                                 UWVM_AES_U8_WHITE
+#endif
+                                                     ),
+                            u8"] ",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_YELLOW,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_yellow})
+#else
+                                                 UWVM_AES_U8_YELLOW
+#endif
+                                                     ),
+                            u8"<file> <argv[1]> <argv[2]> ...",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_RST_ALL,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_ret_all})
+#else
+                                                 UWVM_AES_U8_RST_ALL
+#endif
+                                                     ),
+                            u8"\n\n");
 
                         return parsing_return_val::returnm1;
                     }
@@ -229,15 +348,52 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                 if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::invalid_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(::utils::log_output,
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                        u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
-                                        u8"[error] ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                        u8"invalid parameter: ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
-                                        curr_pr->str);
+                    ::fast_io::io::perr(
+                        ::utils::log_output,
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_white})
+#else
+                                             UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+#endif
+                                                 ),
+                        u8"uwvm: ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RED,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_red})
+#else
+                                             UWVM_AES_U8_RED
+#endif
+                                                 ),
+                        u8"[error] ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_WHITE,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_white})
+#else
+                                             UWVM_AES_U8_WHITE
+#endif
+                                                 ),
+                        u8"invalid parameter: ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_CYAN,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_cyan})
+#else
+                                             UWVM_AES_U8_CYAN
+#endif
+                                                 ),
+                        curr_pr->str);
 
                     // Finding the most similar parameters
                     ::fast_io::u8string_view f_test_str{};
@@ -277,36 +433,131 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     if(f_test_str.empty())
                     {
                         // The most similar parameters were not found
-                        ::fast_io::io::perr(::utils::log_output, ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL), u8"\n");
+                        ::fast_io::io::perr(
+                            ::utils::log_output,
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_RST_ALL,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_ret_all})
+#else
+                                                 UWVM_AES_U8_RST_ALL
+#endif
+                                                     ),
+                            u8"\n");
                     }
                     else
                     {
                         // Output the most similar parameter
-                        ::fast_io::io::perr(::utils::log_output,
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                            u8" (did you mean: ",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
-                                            f_test_str,
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                            u8")",
-                                            ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                            u8"\n");
+                        ::fast_io::io::perr(
+                            ::utils::log_output,
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_WHITE,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_white})
+#else
+                                                 UWVM_AES_U8_WHITE
+#endif
+                                                     ),
+                            u8" (did you mean: ",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_GREEN,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_green})
+#else
+                                                 UWVM_AES_U8_GREEN
+#endif
+                                                     ),
+                            f_test_str,
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_WHITE,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_white})
+#else
+                                                 UWVM_AES_U8_WHITE
+#endif
+                                                     ),
+                            u8")",
+                            ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                                 ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                      UWVM_AES_U8_RST_ALL,
+                                                                      ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                       ::utils::ansies::text_attr::foreground_ret_all})
+#else
+                                                 UWVM_AES_U8_RST_ALL
+#endif
+                                                     ),
+                            u8"\n");
                     }
                 }
                 else if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::duplicate_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(::utils::log_output,
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                        u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
-                                        u8"[error] ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                        u8"duplicate parameter: ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
-                                        curr_pr->str,
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                        u8"\n");
+                    ::fast_io::io::perr(
+                        ::utils::log_output,
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_white})
+#else
+                                             UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+#endif
+                                                 ),
+                        u8"uwvm: ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RED,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_red})
+#else
+                                             UWVM_AES_U8_RED
+#endif
+                                                 ),
+                        u8"[error] ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_WHITE,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_white})
+#else
+                                             UWVM_AES_U8_WHITE
+#endif
+                                                 ),
+                        u8"duplicate parameter: ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_CYAN,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_cyan})
+#else
+                                             UWVM_AES_U8_CYAN
+#endif
+                                                 ),
+                        curr_pr->str,
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RST_ALL,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_ret_all})
+#else
+                                             UWVM_AES_U8_RST_ALL
+#endif
+                                                 ),
+                        u8"\n");
                 }
             }
 
@@ -361,17 +612,63 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                 {
                     shouldreturn = true;
 
-                    ::fast_io::io::perr(::utils::log_output,
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                        u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
-                                        u8"[error] ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                        u8"invalid option: ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_CYAN),
-                                        curr_pr->str,
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                        u8"\n");
+                    ::fast_io::io::perr(
+                        ::utils::log_output,
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_white})
+#else
+                                             UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+#endif
+                                                 ),
+                        u8"uwvm: ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RED,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_red})
+#else
+                                             UWVM_AES_U8_RED
+#endif
+                                                 ),
+                        u8"[error] ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_WHITE,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_white})
+#else
+                                             UWVM_AES_U8_WHITE
+#endif
+                                                 ),
+                        u8"invalid option: ",
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_CYAN,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_cyan})
+#else
+                                             UWVM_AES_U8_CYAN
+#endif
+                                                 ),
+                        curr_pr->str,
+                        ::fast_io::mnp::cond(::utils::ansies::put_color,
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                                             ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                                                  UWVM_AES_U8_RST_ALL,
+                                                                  ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(),
+                                                                                                   ::utils::ansies::text_attr::foreground_ret_all})
+#else
+                                             UWVM_AES_U8_RST_ALL
+#endif
+                                                 ),
+                        u8"\n");
                 }
             }
 

@@ -50,8 +50,8 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
         inline bool log_win32_use_ansi_is_exist{};
         inline constexpr ::fast_io::u8string_view log_win32_use_ansi_alias{u8"-ansi-log"};
         extern "C++" ::utils::cmdline::parameter_return_type log_win32_use_ansi_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                                     ::utils::cmdline::parameter_parsing_results*,
-                                                                                     ::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                                         ::utils::cmdline::parameter_parsing_results*,
+                                                                                         ::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 

@@ -80,6 +80,8 @@ UWVM_MODULE_EXPORT namespace utils::ansies
         foreground_lt_purple = 0x0008 | 0x0001 | 0x0004,
         foreground_lt_cyan = 0x0008 | 0x0001 | 0x0002,
         foreground_white = 0x0008 | 0x0001 | 0x0002 | 0x0004,
+
+        foreground_ret_all = foreground_gray,
     };
 
     inline constexpr text_attr operator& (text_attr x, text_attr y) noexcept
@@ -127,7 +129,7 @@ UWVM_MODULE_EXPORT namespace utils::ansies
     template <::std::integral char_type>
     inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, win32_text_attr>, char_type * iter, win32_text_attr attr) noexcept
     {
-        ::fast_io::win32::SetConsoleTextAttribute(attr.handle, stati_cast<::std::int_least32_t>(attr.attr));
+        ::fast_io::win32::SetConsoleTextAttribute(attr.handle, static_cast<::std::int_least32_t>(attr.attr));
         return iter;
     }
 }  // namespace utils::ansies

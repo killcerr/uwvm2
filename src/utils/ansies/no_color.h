@@ -80,6 +80,6 @@ UWVM_MODULE_EXPORT namespace utils::ansies
     inline bool const put_color{!check_has_no_color()};  // No global variable dependencies from other translation units
 
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-    inline bool log_win32_use_ansi_b{false}; // No global variable dependencies from other translation units
+    inline bool log_win32_use_ansi_b{false};  // No global variable dependencies from other translation units
 #endif
 }  // namespace utils::ansies

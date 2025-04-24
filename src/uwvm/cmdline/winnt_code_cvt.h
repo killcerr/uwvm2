@@ -113,17 +113,54 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         auto const u16_cmdline_argv{::fast_io::win32::CommandLineToArgvW(nt_proc_cmdline.Buffer, ::std::addressof(u16_cmdline_argc))};
         if(u16_cmdline_argv == nullptr) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
-                                u8"[fatal] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"CommandLineToArgvW failed: ",
-                                ::fast_io::error{::fast_io::win32_domain_value, ::fast_io::win32::GetLastError()},
-                                u8"\n",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL),
-                                u8"Terminate.\n\n");
+            ::fast_io::io::perr(
+                ::utils::log_output,
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_white})
+# else
+                    UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE
+# endif
+                        ),
+                u8"uwvm: ",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RED,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_red})
+# else
+                    UWVM_AES_U8_RED
+# endif
+                        ),
+                u8"[fatal] ",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_WHITE,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_white})
+# else
+                    UWVM_AES_U8_WHITE
+# endif
+                        ),
+                u8"CommandLineToArgvW failed: ",
+                ::fast_io::error{::fast_io::win32_domain_value, ::fast_io::win32::GetLastError()},
+                u8"\n",
+                ::fast_io::mnp::cond(
+                    ::utils::ansies::put_color,
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    ::fast_io::mnp::cond(::utils::ansies::log_win32_use_ansi_b,
+                                         UWVM_AES_U8_RST_ALL,
+                                         ::utils::ansies::win32_text_attr{::utils::log_output.native_handle(), ::utils::ansies::text_attr::foreground_ret_all})
+# else
+                    UWVM_AES_U8_RST_ALL
+# endif
+                        ),
+                u8"Terminate.\n\n");
             ::fast_io::fast_terminate();
         }
 
