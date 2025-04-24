@@ -77,7 +77,13 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RED),
                                 u8"[error] ",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
-                                u8"No input file.\n\n",
+                                u8"No input file.\n"
+                                u8"Try \"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_GREEN),
+                                u8"--help",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_WHITE),
+                                u8"\" for more information.\n"
+                                u8"\n",
                                 ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_AES_U8_RST_ALL));
             return -2;  // The specified file is not available or cannot be opened
         }

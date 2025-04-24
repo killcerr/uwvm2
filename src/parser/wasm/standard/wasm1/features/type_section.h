@@ -110,11 +110,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     concept has_type_prefix_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
                                                ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                               ::std::byte const* const section_curr,
+                                               ::std::byte const* section_curr,
                                                ::std::byte const* const section_end) {
         { define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
     };
 
+    /// @brief      handle type_prefix: "functype"
+    /// @details    Separate processing to facilitate reuse in subsequent expansion
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline ::std::byte const* handle_type_prefix_functype(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                                                           ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
