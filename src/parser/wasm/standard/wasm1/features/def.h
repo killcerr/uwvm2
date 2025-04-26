@@ -60,6 +60,10 @@ import parser.wasm.binfmt.binfmt_ver1;
 
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
+    ///
+    /// @brief Define structures or concepts related to the version of binfmt
+    ///
+
     ////////////////////////////
     //      Type Section      //
     ////////////////////////////

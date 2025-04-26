@@ -93,16 +93,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         ::fast_io::array<::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>, importdesc_count> importdesc{};
     };
 
-    /// @brief Define functions for handle extern_prefix
-    template <typename... Fs>
-    concept has_extern_prefix_imports_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-                                                         ::parser::wasm::standard::wasm1::features::final_import_type<Fs...>& fit,
-                                                         ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                                         ::std::byte const* section_curr,
-                                                         ::std::byte const* const section_end) {
-        { define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
-    };
-
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline ::std::byte const* extern_prefix_imports_func_handler(
         [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -519,7 +509,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             // ... count modulenamelen name ... externnamelen externname ... index ...
             //                                                                     ^^ section_curr
 
-            static_assert(has_extern_prefix_imports_handler<Fs...>, "define_extern_prefix_imports_handler(...) not found");
+            static_assert(::parser::wasm::standard::wasm1::features::has_extern_prefix_imports_handler<Fs...>,
+                          "define_extern_prefix_imports_handler(...) not found");
             // handle it, fit.imports.type is always valid
             section_curr = define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end);
 

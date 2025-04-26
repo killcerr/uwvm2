@@ -85,13 +85,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>> types{};
     };
 
-    /// @brief Define functions for checking value_type to provide extensibility
-    template <typename... Fs>
-    concept has_check_value_type = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                            ::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> value_type) {
-        { define_check_value_type(sec_adl, value_type) } -> ::std::same_as<bool>;
-    };
-
     /// @brief Define functions for value_type against wasm1 for checking value_type
     template <::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr bool define_check_value_type([[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
@@ -106,16 +99,6 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             default: return false;
         }
     }
-
-    /// @brief Define functions to handle type prefix
-    template <typename... Fs>
-    concept has_type_prefix_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                               ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
-                                               ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                               ::std::byte const* section_curr,
-                                               ::std::byte const* const section_end) {
-        { define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
-    };
 
     /// @brief      handle type_prefix: "functype"
     /// @details    Separate processing to facilitate reuse in subsequent expansion
@@ -194,7 +177,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check handler
-            static_assert(has_check_value_type<Fs...>, "define_check_value_type(...) not found");
+            static_assert(::parser::wasm::standard::wasm1::features::has_check_value_type<Fs...>, "define_check_value_type(...) not found");
             // check parameters
             for(auto parameter_curr{ft.parameter.begin}; parameter_curr != ft.parameter.end; ++parameter_curr)
             {
@@ -470,7 +453,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             // ... 60 ?? ?? ...
             //        ^^ section_curr
             // check has func
-            static_assert(has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
+            static_assert(::parser::wasm::standard::wasm1::features::has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
             // check type count
             if(++type_counter > type_count) [[unlikely]]
             {
