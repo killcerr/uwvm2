@@ -267,10 +267,7 @@ function mingw_target()
     end
 
     local march = get_config("march")
-    if not march or march == "none" then
-    elseif march == "default" then
-        add_cxflags("-march=native")
-    else
+    if not (not march or march == "none" or march == "default") then
         local march_target = "-march=" .. march
         add_cxflags(march_target)
     end
