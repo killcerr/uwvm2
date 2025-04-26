@@ -278,10 +278,13 @@ function windows_target()
         end
     
         local march = get_config("march")
-        if not (not march or march == "none" or march == "default") then
+        if not march or march == "none" then
+        elseif march == "default" then
+            add_cxflags("-march=native")
+        else
             local march_target = "-march=" .. march
             add_cxflags(march_target)
-        end    
+        end
     else -- msvc
         if is_kind("binary") then
             set_extension(".exe")
