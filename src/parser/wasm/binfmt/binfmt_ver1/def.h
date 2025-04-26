@@ -58,7 +58,7 @@ import :section;
 UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 {
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    struct wasm_binfmt_ver1_module_extensible_storage_t
+    struct wasm_binfmt_ver1_module_extensible_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 

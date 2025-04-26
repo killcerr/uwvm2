@@ -79,7 +79,7 @@ import :type_section;
 UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 {
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    struct import_section_storage_t
+    struct import_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{
             static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(::parser::wasm::standard::wasm1::section::section_id::import_sec)};
