@@ -38,6 +38,7 @@ import parser.wasm.standard.wasm1.section;
 import parser.wasm.standard.wasm1.opcode;
 import parser.wasm.binfmt.binfmt_ver1;
 import :def;
+import :feature_def;
 import :type_section;
 #else
 // std
@@ -67,6 +68,7 @@ import :type_section;
 # include <parser/wasm/standard/wasm1/opcode/impl.h>
 # include <parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
+# include "feature_def.h"
 # include "type_section.h"
 #endif
 
@@ -87,35 +89,104 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...>> imports{};
 
         inline static constexpr ::std::size_t importdesc_count{
-            static_cast<::std::size_t>(::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>::extern_type_end) + 1};
+            static_cast<::std::size_t>(decltype(::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>{}.type)::external_type_end) + 1};
         ::fast_io::array<::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>, importdesc_count> importdesc{};
     };
 
     /// @brief Define functions for handle extern_prefix
     template <typename... Fs>
-    concept has_extern_prefix_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-                                                 ::parser::wasm::standard::wasm1::features::final_import_type<Fs...>& fit,
-                                                 ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                                 ::std::byte const* section_curr,
-                                                 ::std::byte const* const section_end) {
-        { define_extern_prefix_handler(sec_adl, fit, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
+    concept has_extern_prefix_imports_handler = requires(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                                                         ::parser::wasm::standard::wasm1::features::final_import_type<Fs...>& fit,
+                                                         ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                                         ::std::byte const* section_curr,
+                                                         ::std::byte const* const section_end) {
+        { define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
     };
+
+    template <::parser::wasm::concepts::wasm_feature... Fs>
+    inline ::std::byte const* extern_prefix_imports_func_handler(
+        [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
+        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end) UWVM_THROWS
+    {
+        // ... descindex typeindex ...
+        //               ^^ section_curr
+
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+        // get type index
+
+        ::parser::wasm::standard::wasm1::type::wasm_u32 type_index{};
+        auto const [type_index_next, type_index_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                              reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                              ::fast_io::mnp::leb128_get(type_index))};
+        if(type_index_err != ::fast_io::parse_code::ok) [[unlikely]]
+        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+            ::fast_io::io::perr(::utils::log_output,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                u8") Invalid Type Index.",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                u8"\n\n");
+#endif
+            ::parser::wasm::base::throw_wasm_parse_code(type_index_err);
+        }
+
+        auto const& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+        ::std::size_t const type_section_count{typesec.types.size()};
+
+        // check
+        if(type_index >= type_section_count) [[unlikely]]
+        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+            ::fast_io::io::perr(::utils::log_output,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
+                                u8") Invalid Type Index :\"",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                type_index,
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\".",
+                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                u8"\n\n");
+#endif
+            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        fit_imports.storage.function = typesec.types.cbegin() + type_index;
+
+        // set curr
+        section_curr = reinterpret_cast<::std::byte const*>(type_index_next);
+
+        return section_curr;
+    }
 
     /// @brief Define function for wasm1 external_types
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline ::std::byte const* define_extern_prefix_handler(
-        [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        [[maybe_unused]] ::parser::wasm::standard::wasm1::features::final_import_type<Fs...> & fit,
-        [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-        [[maybe_unused]] ::std::byte const* section_curr,
-        [[maybe_unused]] ::std::byte const* const section_end) UWVM_THROWS
+    inline ::std::byte const* define_extern_prefix_imports_handler(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                                                                   ::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
+                                                                   ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+                                                                       module_storage,
+                                                                   ::std::byte const* section_curr,
+                                                                   ::std::byte const* const section_end) UWVM_THROWS
     {
-        switch(fit.importdesc)
+        switch(fit_imports.type)
         {
             case ::parser::wasm::standard::wasm1::type::external_types::func:
             {
-                /// @todo
-                break;
+                return extern_prefix_imports_func_handler(sec_adl, fit_imports, module_storage, section_curr, section_end);
             }
             case ::parser::wasm::standard::wasm1::type::external_types::table:
             {
@@ -414,12 +485,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(fit.importdesc), section_curr, sizeof(fit.importdesc));
+            ::fast_io::freestanding::my_memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
 
             // desc counter
             constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
             // importdesc_count never > 256 (max=255+1), convert to unsigned
-            if(static_cast<unsigned>(fit.importdesc) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]
+            if(static_cast<unsigned>(fit.imports.type) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::log_output,
@@ -432,7 +503,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                     ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                     u8") Invalid Importdesc Prefix: \"",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                    ::fast_io::mnp::hex0x<true>(static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(fit.importdesc)),
+                                    ::fast_io::mnp::hex0x<true>(static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)),
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\".",
                                     ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
@@ -442,15 +513,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             }
 
             // use for reserve
-            ++importdesc_counter.index_unchecked(static_cast<::std::size_t>(static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(fit.importdesc)));
+            ++importdesc_counter.index_unchecked(static_cast<::std::size_t>(static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
 
             ++section_curr;
             // ... count modulenamelen name ... externnamelen externname ... index ...
             //                                                                     ^^ section_curr
 
-            static_assert(has_extern_prefix_handler<Fs...>, "define_extern_prefix_handler(...) not found");
-            // handle it, fit.importdesc is always valid
-            section_curr = define_extern_prefix_handler(sec_adl, fit, module_storage, section_curr, section_end);
+            static_assert(has_extern_prefix_imports_handler<Fs...>, "define_extern_prefix_imports_handler(...) not found");
+            // handle it, fit.imports.type is always valid
+            section_curr = define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end);
 
             importsec.imports.push_back_unchecked(::std::move(fit));
         }

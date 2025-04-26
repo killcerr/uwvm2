@@ -181,50 +181,69 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     /// @brief      has extern type
     /// @details
     ///             ```cpp
-    ///             enum class basic_extern_type : wasm_byte
+    ///             enum class basic_external_type : wasm_byte
     ///             {
     ///                 e1 = 0x00u,
     ///                 e2 = 0x01u,
-    ///                 extern_type_end = e2 // Used to generate the length of the array
+    ///                 external_type_end = e2 // Used to generate the length of the array
+    ///             };
+    ///
+    ///             template <typename ... Fs> // Fs is used as an extension to an existing type, but does not extend the type
+    ///             struct basic_extern_type
+    ///             {
+    ///                 union storage_t
+    ///                 {
+    ///                     basic_function_type<Fs ...> const* function;
+    ///                     basic_table_type<Fs ...> table;
+    ///                     basic_memory_type<Fs ...> memory;
+    ///                     basic_global_type<Fs ...> global;
+    ///                 } storage;
+    ///
+    ///                 basic_external_type type{};
     ///             };
     ///
     ///             struct F
     ///             {
-    ///                 using extern_type = type_replacer<root_of_replacement, basic_extern_type>;
+    ///                 template <typename ... Fs>
+    ///                 using extern_type = type_replacer<root_of_replacement, basic_extern_type<Fs...>>;
     ///             };
     ///             ```
-    template <typename FeatureType>
+    template <typename FeatureType, typename... Fs>
     concept has_extern_type = requires {
-        typename FeatureType::extern_type;
+        typename FeatureType::template extern_type<Fs...>;
         requires ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
-                                                                                      typename FeatureType::extern_type>;
+                                                                                      typename FeatureType::template extern_type<Fs...>>;
     };
 
-    template <typename FeatureType>
+    template <typename FeatureType, typename... Fs>
     inline consteval auto get_extern_type() noexcept
     {
-        if constexpr(has_extern_type<FeatureType>) { return typename FeatureType::extern_type{}; }
+        if constexpr(has_extern_type<FeatureType>) { return typename FeatureType::template extern_type<Fs...>{}; }
         else { return ::parser::wasm::concepts::operation::irreplaceable_t{}; }
     }
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    using final_extern_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_extern_type<Fs>())...>;
+    using final_extern_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_extern_type<Fs, Fs...>())...>;
+
+    template <typename... Fs>
+    concept is_valid_final_extern_type_t = requires(final_extern_type_t<Fs...> ext) {
+        requires ::std::is_enum_v<decltype(ext.type)>;
+        requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::parser::wasm::standard::wasm1::type::wasm_byte>;
+        decltype(ext.type)::external_type_end;
+        requires ::std::is_union_v<decltype(ext.storage)>;
+    };
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
     struct final_import_type
     {
-        static_assert(::std::is_enum_v<final_extern_type_t<Fs...>>, "final_extern_type_t<Fs...> is not enumeration");
-        static_assert(::std::same_as<::std::underlying_type_t<final_extern_type_t<Fs...>>, ::parser::wasm::standard::wasm1::type::wasm_byte>,
-                      "final_extern_type_t<Fs...> enumeration is not base on wasm_byte");
-        static_assert(
-            requires { final_extern_type_t<Fs...>::extern_type_end; },
-            "final_extern_type_t<Fs...> enumeration does not have \"extern_type_end\" element");
+        static_assert(is_valid_final_extern_type_t<Fs...>);
 
         ::fast_io::u8string_view custom_name{};  // The name used for the data segment
 
         ::fast_io::u8string_view module_name{};
         ::fast_io::u8string_view extern_name{};
-        final_extern_type_t<Fs...> importdesc{};
+
+        final_extern_type_t<Fs...> imports{};
     };
 
 }  // namespace parser::wasm::standard::wasm1::features

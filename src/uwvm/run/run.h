@@ -122,11 +122,6 @@ UWVM_MODULE_EXPORT namespace uwvm::run
         }
 #endif
 
-        // Instructs to read the file all the way into memory
-        ::utils::madvise::my_madvise(::uwvm::wasm::storage::execute_wasm_file.cbegin(),
-                                     ::uwvm::wasm::storage::execute_wasm_file.size(),
-                                     ::utils::madvise::madvise_flag::willneed);
-
         // If not specified by the user, detect it
         if(::uwvm::wasm::storage::execute_wasm_binfmt_ver == 0u)
         {
@@ -134,6 +129,12 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                 ::parser::wasm::binfmt::detect_wasm_binfmt_version(reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                                                    reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
         }
+
+        // After detect
+        // Instructs to read the file all the way into memory
+        ::utils::madvise::my_madvise(::uwvm::wasm::storage::execute_wasm_file.cbegin(),
+                                     ::uwvm::wasm::storage::execute_wasm_file.size(),
+                                     ::utils::madvise::madvise_flag::willneed);
 
         switch(::uwvm::wasm::storage::execute_wasm_binfmt_ver)
         {

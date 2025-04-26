@@ -114,7 +114,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
         memory = 0x02u,
         global = 0x03u,
         // extern_type_end: for concept, not standard
-        extern_type_end = global
+        external_type_end = global
     };
 
     /// @brief      Exports
@@ -124,13 +124,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.10
     struct extern_type
     {
-        union
+        union storage_t
         {
             function_type const* function;
             table_type table;
             memory_type memory;
             global_type global;
-        };
+        } storage;
 
         external_types type{};
     };
