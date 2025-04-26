@@ -94,10 +94,10 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     };
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline ::std::byte const* extern_prefix_imports_func_handler(
+    inline ::std::byte const* extern_imports_func_handler(
         [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        ::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
-        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*& funcptr_r,
+        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end) UWVM_THROWS
     {
@@ -155,7 +155,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        fit_imports.storage.function = typesec.types.cbegin() + type_index;
+        funcptr_r = typesec.types.cbegin() + type_index;
 
         // set curr
         section_curr = reinterpret_cast<::std::byte const*>(type_index_next);
@@ -176,7 +176,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         {
             case ::parser::wasm::standard::wasm1::type::external_types::func:
             {
-                return extern_prefix_imports_func_handler(sec_adl, fit_imports, module_storage, section_curr, section_end);
+                return extern_imports_func_handler(sec_adl, fit_imports.storage.function, module_storage, section_curr, section_end);
             }
             case ::parser::wasm::standard::wasm1::type::external_types::table:
             {
