@@ -105,7 +105,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
         { ((vec.push_back(Ty...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
         ::std::ranges::sort(vec);
-        ::parser::wasm::standard::wasm1::type::wasm_u32 counter{1};
+        ::parser::wasm::standard::wasm1::type::wasm_u32 counter{1u};
         for(auto i: vec)
         {
 #if __cpp_contracts >= 202502L

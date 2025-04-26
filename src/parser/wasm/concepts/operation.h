@@ -56,6 +56,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
     namespace details
     {
         /// @brief Determine if parameters can be passed through registers under the current abi.
+        /// @todo  check abi
         template <typename T>
         concept abi_transferable_value = ::std::is_trivially_copyable_v<T> &&
 #if (defined(_WIN32) && !defined(__WINE__)) || defined(__CYGWIN__)
@@ -75,12 +76,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
         inline consteval ::parser::wasm::standard::wasm1::type::wasm_u32 get_binfmt_version() noexcept
         {
             constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{::std::remove_cvref_t<FeatureType>::binfmt_version};
-#if __cpp_contracts >= 202502L
-            // Can't be 0.
-            contract_assert(binfmt_version != 0);
-#else
-            if constexpr(binfmt_version == 0) { ::fast_io::fast_terminate(); }
-#endif
+            static_assert(binfmt_version != 0);
             return binfmt_version;
         }
 
