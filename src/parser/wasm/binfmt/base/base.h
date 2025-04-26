@@ -71,7 +71,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt
 
         if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
         {
-            return 0;
+            return 0u;
         }
 
         module_curr += 4uz;

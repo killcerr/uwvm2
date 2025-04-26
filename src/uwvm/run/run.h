@@ -138,7 +138,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 
         switch(::uwvm::wasm::storage::execute_wasm_binfmt_ver)
         {
-            case 0:
+            case 0u:
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::utils::log_output,
@@ -155,7 +155,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #endif
                 return -3;  // wasm parsing error
             }
-            case 1:
+            case 1u:
             {
                 // set module name
                 ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.module_name = ::fast_io::u8string_view{module_name};
@@ -181,27 +181,26 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #endif
                 break;
             }
-            default:
-            {
+            default: [[unlikely]] {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                    u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                    u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"(offset=",
-                                    ::fast_io::mnp::addrvw(4uz),
-                                    u8") Unknown Binary Format Version of WebAssembly: \"",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                    ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"\".",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                    u8"\n\n");
+                    ::fast_io::io::perr(::utils::log_output,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                        u8"[error] ",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"(offset=",
+                                        ::fast_io::mnp::addrvw(4uz),
+                                        u8") Unknown Binary Format Version of WebAssembly: \"",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"\".",
+                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                        u8"\n\n");
 #endif
-                return -3;  // wasm parsing error
-            }
+                    return -3;  // wasm parsing error
+                }
         }
 
         // run vm
