@@ -26,7 +26,6 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
 import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
 import parser.wasm.standard.wasm1.section;
@@ -50,7 +49,6 @@ import :import_section;
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
-# include <utils/io/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 # include <parser/wasm/standard/wasm1/section/impl.h>
