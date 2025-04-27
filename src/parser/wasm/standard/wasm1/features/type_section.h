@@ -103,10 +103,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     /// @brief      handle type_prefix: "functype"
     /// @details    Separate processing to facilitate reuse in subsequent expansion
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline ::std::byte const* handle_type_prefix_functype(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                          ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                                          ::std::byte const* section_curr,
-                                                          ::std::byte const* const section_end) UWVM_THROWS
+    inline constexpr ::std::byte const* handle_type_prefix_functype(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                                    ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+                                                                        module_storage,
+                                                                    ::std::byte const* section_curr,
+                                                                    ::std::byte const* const section_end) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
@@ -328,11 +329,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
     /// @brief Define type_prefix for wasm1 Functions for checking type_prefix
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline ::std::byte const* define_type_prefix_handler(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                         ::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
-                                                         ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                                         ::std::byte const* section_curr,
-                                                         ::std::byte const* const section_end) UWVM_THROWS
+    inline constexpr ::std::byte const* define_type_prefix_handler(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                                   ::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
+                                                                   ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+                                                                       module_storage,
+                                                                   ::std::byte const* section_curr,
+                                                                   ::std::byte const* const section_end) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
@@ -369,10 +371,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
     /// @brief Define the handler function for type_section
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                             ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                                             ::std::byte const* const section_begin,
-                                                             ::std::byte const* const section_end) UWVM_THROWS
+    inline constexpr void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                                       ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+                                                                           module_storage,
+                                                                       ::std::byte const* const section_begin,
+                                                                       ::std::byte const* const section_end) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
         ::utils::debug::timer parsing_timer{u8"parse type section (id: 1)"};

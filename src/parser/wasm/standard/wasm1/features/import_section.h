@@ -94,7 +94,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     };
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline ::std::byte const* extern_imports_func_handler(
+    inline constexpr ::std::byte const* extern_imports_func_handler(
         [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
         ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*& funcptr_r,
         ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
@@ -165,12 +165,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
     /// @brief Define function for wasm1 external_types
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline ::std::byte const* define_extern_prefix_imports_handler(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-                                                                   ::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
-                                                                   ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
-                                                                       module_storage,
-                                                                   ::std::byte const* section_curr,
-                                                                   ::std::byte const* const section_end) UWVM_THROWS
+    inline constexpr ::std::byte const* define_extern_prefix_imports_handler(
+        ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
+        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end) UWVM_THROWS
     {
         switch(fit_imports.type)
         {
@@ -200,10 +200,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
     /// @brief Define the handler function for type_section
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-                                                             ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                                             ::std::byte const* const section_begin,
-                                                             ::std::byte const* const section_end) UWVM_THROWS
+    inline constexpr void handle_binfmt_ver1_extensible_section_define(
+        ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* const section_begin,
+        ::std::byte const* const section_end) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
         ::utils::debug::timer parsing_timer{u8"parse import section (id: 2)"};

@@ -131,7 +131,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 
         /// @throw ::fast_io::error
         template <typename SecCurr, typename... Secs, ::parser::wasm::concepts::wasm_feature... Fs>
-        inline void
+        inline constexpr void
             handle_all_binfmt_ver1_extensible_section_impl(bool& success,
                                                            ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                                                            ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
@@ -166,11 +166,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
     /// @throws     ::fast_io::error
     /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                                          [[maybe_unused]] ::std::byte const* module_begin,
-                                                          ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
-                                                          ::std::byte const* section_begin,
-                                                          ::std::byte const* section_end) UWVM_THROWS
+    inline constexpr void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+                                                                        module_storage,
+                                                                    [[maybe_unused]] ::std::byte const* module_begin,
+                                                                    ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
+                                                                    ::std::byte const* section_begin,
+                                                                    ::std::byte const* section_end) UWVM_THROWS
     {
         auto [... secs]{module_storage.sections};
         check_extensible_section_is_series<decltype(secs)...>();
@@ -214,11 +215,12 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
     /// @throws         ::fast_io::error
     /// @see            test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
     template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                                          [[maybe_unused]] ::std::byte const* module_begin,
-                                                          ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
-                                                          ::std::byte const* section_begin,
-                                                          ::std::byte const* section_end) UWVM_THROWS
+    inline constexpr void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+                                                                        module_storage,
+                                                                    [[maybe_unused]] ::std::byte const* module_begin,
+                                                                    ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
+                                                                    ::std::byte const* section_begin,
+                                                                    ::std::byte const* section_end) UWVM_THROWS
     {
         auto [... secs]{module_storage.sections};
         check_extensible_section_is_series(module_storage.sections);
