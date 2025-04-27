@@ -66,25 +66,25 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         if constexpr(Stack_Len) { d = storage.data(); }
         else
         {
-            if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[y_length + 1]; }
-            else { d = Alloc::allocate(y_length + 1); }
+            if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[y_length + 1uz]; }
+            else { d = Alloc::allocate(y_length + 1uz); }
         }
 
         for(::std::size_t j{}; j <= y_length; j++) { d[j] = j; }
 
         for(::std::size_t i{1}; i <= x_length; i++)
         {
-            ::std::size_t old{i - 1};
-            d[0] = i;
-            for(::std::size_t j{1}; j <= y_length; j++)
+            ::std::size_t old{i - 1uz};
+            d[0uz] = i;
+            for(::std::size_t j{1uz}; j <= y_length; j++)
             {
                 ::std::size_t const temp{d[j]};
-                if(x_str[i - 1] == y_str[j - 1]) { d[j] = old; }
+                if(x_str[i - 1] == y_str[j - 1uz]) { d[j] = old; }
                 else
                 {
-                    ::std::size_t min{d[j] + 1};
-                    if(d[j - 1] + 1 < min) { min = d[j - 1] + 1; }
-                    if(old + 1 < min) { min = old + 1; }
+                    ::std::size_t min{d[j] + 1uz};
+                    if(d[j - 1uz] + 1uz < min) { min = d[j - 1uz] + 1uz; }
+                    if(old + 1uz < min) { min = old + 1uz; }
                     d[j] = min;
                 }
                 old = temp;
@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         if constexpr(!Stack_Len)
         {
             if UWVM_IF_CONSTEVAL { ::delete[] d; }
-            else { Alloc::deallocate_n(d, y_length + 1); }
+            else { Alloc::deallocate_n(d, y_length + 1uz); }
         }
 
         return ret;

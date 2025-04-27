@@ -28,17 +28,19 @@
 import fast_io;
 import utils.cmdline;
 import utils.ansies;
+import uwvm.utils.ansies;
 # else
 // std
 #  include <memory>
 // macro
 #  include <utils/macro/push_macros.h>
-#  include <utils/ansies/uwvm_color_push_macro.h>
+#  include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 // improt
 #  include <fast_io.h>
 #  include <fast_io_dsal/string_view.h>
 #  include <utils/cmdline/impl.h>
 #  include <utils/ansies/impl.h>
+#  include <uwvm/utils/ansies/impl.h>
 # endif
 
 # ifndef UWVM_MODULE_EXPORT
@@ -56,12 +58,12 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
         .name{u8"--log-win32-use-ansi"},
         .describe{u8"Log on Win32 system using ANSI sequence under Win10. SetConsoleTextAttribute api is used by default."},
         .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_win32_use_ansi_alias), 1}},
-        .is_exist{::std::addressof(::utils::ansies::log_win32_use_ansi_b)}};
+        .is_exist{::std::addressof(::uwvm::utils::ansies::log_win32_use_ansi_b)}};
 }  // namespace uwvm::cmdline::paras
 
 # ifndef UWVM_MODULE
 // macro
-#  include <utils/ansies/uwvm_color_pop_macro.h>
+#  include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
 #  include <utils/macro/pop_macros.h>
 # endif
 

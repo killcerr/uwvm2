@@ -5,9 +5,11 @@
  ********************************************************/
 
 /**
+ * @brief       The wasm file that will be run
+ * @details     "--run" or "-r"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-29
+ * @date        2025-03-31
  * @copyright   APL-2 License
  */
 
@@ -19,9 +21,9 @@
  *  \___/    \_/\_/      \_/   |_|  |_| *
  *                                      *
  ****************************************/
-
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "install_path.h"
+# include "abi.h"
+# include "mode.h"
 #endif

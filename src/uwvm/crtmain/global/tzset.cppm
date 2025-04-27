@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-29
+ * @date        2025-03-21
  * @copyright   APL-2 License
  */
 
@@ -24,13 +24,8 @@ module;
 
 // macro
 #include <utils/macro/push_macros.h>
-// include
-#ifdef UWVM_SUPPORT_INSTALL_PATH
-# include <fast_io.h>
-# include <fast_io_driver/install_path.h>
-#endif
 
-export module utils.install_path:storage;
+export module uwvm.crtmain.global:tzset;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -39,5 +34,4 @@ export module utils.install_path:storage;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "storage.h"
-
+#include "tzset.h"

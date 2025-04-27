@@ -37,7 +37,7 @@ import fast_io;
 #endif
 UWVM_MODULE_EXPORT namespace uwvm::wasm::storage
 {
-    inline ::fast_io::vector<::fast_io::native_file_loader> import_wasm_file{};  // No global variable dependencies from other translation units
+    inline ::fast_io::vector<::fast_io::native_file_loader> import_wasm_file{};  // [global] No global variable dependencies from other translation units
 
     // TODO: import_wasm_module // The result of parsing the wasm is used to add the import module directly.
 }  // namespace uwvm::wasm::storage

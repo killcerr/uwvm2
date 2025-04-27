@@ -5,11 +5,9 @@
  ********************************************************/
 
 /**
- * @brief       The wasm file that will be run
- * @details     "--run" or "-r"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-31
+ * @date        2025-03-29
  * @copyright   APL-2 License
  */
 
@@ -24,7 +22,8 @@
 
 module;
 
-export module parser.wasm.base:abi;
+export module uwvm.utils.install_path;
+export import :storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -33,4 +32,4 @@ export module parser.wasm.base:abi;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "abi.h"
+#include "impl.h"

@@ -26,8 +26,6 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
-import utils.ansies;
 # ifdef UWVM_TIMER
 import utils.debug;
 # endif
@@ -49,12 +47,9 @@ import :feature_def;
 # include <memory>
 // macro
 # include <utils/macro/push_macros.h>
-# include <utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
-# include <utils/io/impl.h>
-# include <utils/ansies/impl.h>
 # ifdef UWVM_TIMER
 #  include <utils/debug/impl.h>
 # endif
@@ -127,16 +122,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(err_para_len != ::fast_io::parse_code::ok) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                     u8") Invalid Parameter Length.",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
                 ::parser::wasm::base::throw_wasm_parse_code(err_para_len);
@@ -151,20 +146,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                     u8") Invalid Parameter Length: \"",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                     para_len,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\".",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
                 ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -186,21 +181,21 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                     ::fast_io::io::perr(
-                        ::utils::log_output,
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                        ::uwvm::log_output,
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                         u8"uwvm: ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                         u8"[error] ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                         u8"(offset=",
                         ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                         u8") Invalid Value Type: \"",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                         ::fast_io::mnp::hex0x<true>(
                             static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*parameter_curr)),
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                         u8"\".",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                         u8"\n\n");
 #endif
                     ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -217,16 +212,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(err_result_len != ::fast_io::parse_code::ok) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                     u8") Invalid Result Length.",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
                 ::parser::wasm::base::throw_wasm_parse_code(err_result_len);
@@ -246,16 +241,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                     ::fast_io::io::perr(
-                        ::utils::log_output,
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                        ::uwvm::log_output,
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                         u8"uwvm: ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                         u8"[error] ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                         u8"(offset=",
                         ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                         u8") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                         u8"\n\n");
 #endif
                     ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -265,20 +260,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(static_cast<::std::size_t>(section_end - section_curr) < result_len) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                     u8") Invalid Result Length: \"",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                     result_len,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\".",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
                 ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -298,21 +293,21 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                     ::fast_io::io::perr(
-                        ::utils::log_output,
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                        ::uwvm::log_output,
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                         u8"uwvm: ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                         u8"[error] ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                         u8"(offset=",
                         ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                         u8") Invalid Value Type: \"",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                         ::fast_io::mnp::hex0x<true>(
                             static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*result_curr)),
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                         u8"\".",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                         u8"\n\n");
 #endif
                     ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -348,20 +343,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             default: [[unlikely]] {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                     ::fast_io::io::perr(
-                        ::utils::log_output,
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                        ::uwvm::log_output,
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                         u8"uwvm: ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                         u8"[error] ",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                         u8"(offset=",
                         ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                         u8") Invalid Type Prefix: \"",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                         ::fast_io::mnp::hex0x<true>(static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::type::function_type_prefix>>(prefix)),
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                         u8"\".",
-                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                         u8"\n\n");
 #endif
                     ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -388,20 +383,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(typesec.sec_span.sec_begin) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(section_begin - module_storage.module_span.module_begin),
                                 u8") Duplicate WebAssembly Section: \"",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                 u8"Type (ID=1)",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\".",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
 #endif
             ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -425,16 +420,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(type_count_err != ::fast_io::parse_code::ok) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                 u8") Invalid Type Count.",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
 #endif
             ::parser::wasm::base::throw_wasm_parse_code(type_count_err);
@@ -463,20 +458,20 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(++type_counter > type_count) [[unlikely]]
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                     u8") The number of types resolved does not match the actual number: \"",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                     type_count,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\".",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
                 ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -489,24 +484,24 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(type_counter != type_count) [[unlikely]]
         {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(section_curr - module_storage.module_span.module_begin),
                                 u8") The number of types resolved \"",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                 type_counter,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" does not match the actual number \"",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
                                 type_count,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\".",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
 #endif
             ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -516,6 +511,5 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
 
 #ifndef UWVM_MODULE
 // macro
-# include <utils/ansies/uwvm_color_pop_macro.h>
 # include <utils/macro/pop_macros.h>
 #endif

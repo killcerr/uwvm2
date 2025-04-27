@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-29
+ * @date        2025-03-21
  * @copyright   APL-2 License
  */
 
@@ -20,8 +20,21 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstdint>
+#include <memory>
+// macro
+#include <utils/macro/push_macros.h>
+
+export module uwvm.crtmain.global:ansi_win32;
 
 #ifndef UWVM_MODULE
-# include "install_path.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "ansi_win32.h"

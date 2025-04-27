@@ -5,9 +5,9 @@
  ********************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-04-16
  * @copyright   APL-2 License
  */
 
@@ -22,13 +22,7 @@
 
 module;
 
-export module utils.global;
-export import :tzset;
-/// @brief only support on winnt (with win32 api)
-#if defined(_WIN32) && !defined(__CYGWIN__)
-export import :ansi_win32;
-export import :consolecp_win32;
-#endif
+export module uwvm.io:output;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -37,4 +31,4 @@ export import :consolecp_win32;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "output.h"

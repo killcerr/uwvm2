@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-03-24
  * @copyright   APL-2 License
  */
 
@@ -22,13 +22,9 @@
 
 module;
 
-// std
-#include <cstdint>
-#include <memory>
-// macro
-#include <utils/macro/push_macros.h>
+export module uwvm.utils.ansies;
+export import :no_color;
 
-export module utils.global:ansi_win32;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -37,4 +33,4 @@ export module utils.global:ansi_win32;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "ansi_win32.h"
+#include "impl.h"

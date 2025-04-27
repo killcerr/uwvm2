@@ -30,7 +30,6 @@ import fast_io;
 # else
 // std
 #  include <cstdint>
-#  include <memory>
 // macro
 #  include <utils/macro/push_macros.h>
 // import
@@ -41,28 +40,24 @@ import fast_io;
 #  define UWVM_MODULE_EXPORT
 # endif
 
-UWVM_MODULE_EXPORT namespace utils::global
+UWVM_MODULE_EXPORT namespace uwvm::global
 {
-    /// @brief      cmd on windows nt does not enable ansi escaping by default.
-    /// @details    Declare this via a global variable to set up ansi escaping at program runtime.
+    /// @brief      The ConsoleCP of Windows is affected by system environment variables.
+    ///             By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8.
     ///             No need to restore, the console is automatically restored at the end of the program
-    struct enable_win32_ansi
+    /// @see        https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
+    struct set_win32_console_io_cp_to_utf8
     {
-        inline static constexpr ::std::uint_least32_t enable_virtual_terminal_processing{0x0004u /*ENABLE_VIRTUAL_TERMINAL_PROCESSING*/};
+        inline static constexpr ::std::uint_least32_t utf8_coding{65001u /*Unicode (UTF-8)*/};
 
-        UWVM_GNU_COLD inline enable_win32_ansi() noexcept
+        UWVM_GNU_COLD inline set_win32_console_io_cp_to_utf8() noexcept
         {
-            ::std::uint_least32_t out_omode{};
-            ::std::uint_least32_t err_omode{};
-            void* out_handle{::fast_io::win32::GetStdHandle(::fast_io::win32_stdout_number)};
-            void* err_handle{::fast_io::win32::GetStdHandle(::fast_io::win32_stderr_number)};
-            ::fast_io::win32::GetConsoleMode(out_handle, ::std::addressof(out_omode));
-            ::fast_io::win32::GetConsoleMode(err_handle, ::std::addressof(err_omode));
-            ::fast_io::win32::SetConsoleMode(out_handle, out_omode | enable_virtual_terminal_processing);
-            ::fast_io::win32::SetConsoleMode(err_handle, err_omode | enable_virtual_terminal_processing);
+            ::fast_io::win32::SetConsoleOutputCP(utf8_coding);
+            ::fast_io::win32::SetConsoleCP(utf8_coding);
         }
     };
-}  // namespace utils::global
+
+}  // namespace uwvm::global
 
 # ifndef UWVM_MODULE
 // macro

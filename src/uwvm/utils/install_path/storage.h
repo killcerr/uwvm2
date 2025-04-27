@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-16
+ * @date        2025-03-29
  * @copyright   APL-2 License
  */
 
@@ -23,29 +23,33 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-// import
-import fast_io;
+import utils.install_path;
 #else
+// macro
+# include <utils/macro/push_macros.h>
+// include
+# ifdef UWVM_SUPPORT_INSTALL_PATH
+#  include <fast_io.h>
+#  include <fast_io_driver/install_path.h>
+# endif
 // import
-# include <fast_io.h>
-# include <fast_io_device.h>
+# include <utils/install_path/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils
+#ifdef UWVM_SUPPORT_INSTALL_PATH
+UWVM_MODULE_EXPORT namespace uwvm::utils::install_path
 {
-    /// @brief Control VM output via virtual functions, can be set via option in --debug-output, not supported by avr
-#if defined(__AVR__)
-    // avr does not have posix
-    inline ::fast_io::u8c_io_observer log_output{::fast_io::u8c_stderr()};  // No global variable dependencies from other translation units
-#elif defined(_WIN32) && defined(_WIN32_WINDOWS)
-    // win9x cannot dup stderr
-    inline ::fast_io::u8native_io_observer log_output{::fast_io::u8err()};  // No global variable dependencies from other translation units
-#else
-    inline ::fast_io::u8native_file log_output{::fast_io::io_dup, ::fast_io::u8err()};  // No global variable dependencies from other translation units
+    /// @brief Path to the program binary itself
+    /// @details Only support to get by system parameter, not support to get by argv0, argv0 may be wrong
+    inline ::fast_io::install_path install_path{::utils::install_path::get_module_install_path_noexcept()};  // [global] No global variable dependencies from other translation units
+}  // namespace utils::install_path
 #endif
 
-}  // namespace utils
+#ifndef UWVM_MODULE
+// macro
+# include <utils/macro/pop_macros.h>
+#endif

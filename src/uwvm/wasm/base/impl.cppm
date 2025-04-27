@@ -5,9 +5,11 @@
  ********************************************************/
 
 /**
+ * @brief       The wasm file that will be run
+ * @details     "--run" or "-r"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-03-31
  * @copyright   APL-2 License
  */
 
@@ -22,10 +24,9 @@
 
 module;
 
-// macro
-#include <utils/macro/push_macros.h>
-
-export module utils.global:tzset;
+export module uwvm.wasm.base;
+export import :abi;
+export import :mode;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -34,4 +35,5 @@ export module utils.global:tzset;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "tzset.h"
+#include "impl.h"
+

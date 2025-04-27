@@ -1,15 +1,13 @@
-﻿/********************************************************
+/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
 /**
- * @brief       The wasm file that will be run
- * @details     "--run" or "-r"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-31
+ * @date        2025-04-27
  * @copyright   APL-2 License
  */
 
@@ -22,23 +20,18 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
 
+// macro
+# include <utils/macro/push_macros.h>
+
+export module parser.wasm.base:error_code_output;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::base
-{
-    /// @brief Default automatic import of wasm libraries
-    enum class abi : unsigned
-    {
-        detect,
-        bare,
-        emscripten,
-        wasip1,
-        wasip2,
-        wasix
-    };
-
-}  // namespace parser::wasm::base
+#include "error_code_output.h"

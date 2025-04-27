@@ -24,7 +24,6 @@ module;
 
 export module utils.install_path;
 export import :install_path;
-export import :storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

@@ -70,7 +70,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         parameter_parsing_results_type type{};  // Parameter type
     };
 
-    // Not recommended
+    /// @deprecated Not recommended
 #if 0
     /// @brief Structure to storage parameter_parsing_results
     struct parameter_parsing_results_storage UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
@@ -266,7 +266,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
 #if __cpp_contracts >= 202502L
             contract_assert(i.str != check &&                  // Duplicate parameters are not allowed
                             i.str.front_unchecked == u8'-' &&  // The first character of the parameter must be '-'
-                            i.str.size() != 1);                // "-" is invalid
+                            i.str.size() != 1uz);              // "-" is invalid
 #else
             if(i.str == check || i.str.front_unchecked() != u8'-')
             {
@@ -274,7 +274,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
                 // The first character of the parameter must be '-'
                 ::fast_io::fast_terminate();
             }
-            if(i.str.size() == 1)
+            if(i.str.size() == 1uz)
             {
                 // "-" is invalid
                 ::fast_io::fast_terminate();
@@ -318,10 +318,10 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
 
     /// @brief      Minimum hash table size to start generating
     /// @details    2 ^ hash_size_base
-    inline constexpr ::std::size_t hash_size_base{4u};
+    inline constexpr ::std::size_t hash_size_base{4uz};
 
     /// @brief      Maximum conflict size above which the hashtable will be expanded.
-    inline constexpr ::std::size_t max_conflict_size{8u};
+    inline constexpr ::std::size_t max_conflict_size{8uz};
 
     struct calculate_hash_table_size_res
     {
@@ -378,7 +378,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
     struct conflict_table
     {
         // Add one, store the last nullptr, to reduce the number of judgments when looking up
-        ::fast_io::array<ct_para_str, real_max_conflict_size + 1> ctmem{};
+        ::fast_io::array<ct_para_str, real_max_conflict_size + 1uz> ctmem{};
     };
 
     template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
@@ -398,7 +398,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> res{};
 
         ::fast_io::crc32c_context crc32c{};
-        ::std::size_t conflictplace{1u};
+        ::std::size_t conflictplace{1uz};
 
         for(auto const& j: ord)
         {
@@ -437,13 +437,13 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
                 else
                 {
                     // Move the data to the conflict table
-                    res.ct.index_unchecked(conflictplace - 1).ctmem.front_unchecked().para = res.ht.index_unchecked(val).para;
-                    res.ct.index_unchecked(conflictplace - 1).ctmem.front_unchecked().str = res.ht.index_unchecked(val).str;
+                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().para = res.ht.index_unchecked(val).para;
+                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().str = res.ht.index_unchecked(val).str;
                     res.ht.index_unchecked(val).para = nullptr;         // Mark this as no available
                     res.ht.index_unchecked(val).str.ptr = nullptr;      // Mark this as no available
                     res.ht.index_unchecked(val).str.n = conflictplace;  // Conflict Table Location
-                    res.ct.index_unchecked(conflictplace - 1).ctmem.index_unchecked(1).para = j.para;
-                    res.ct.index_unchecked(conflictplace - 1).ctmem.index_unchecked(1).str = j.str;
+                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).para = j.para;
+                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).str = j.str;
                     ++conflictplace;
                 }
             }

@@ -24,7 +24,9 @@ module;
 
 // macro
 #include <utils/macro/push_macros.h>
-#include <utils/ansies/uwvm_color_push_macro.h>
+#ifdef UWVM
+# include <uwvm/utils/ansies/uwvm_color_push_macro.h>
+#endif
 
 export module utils.debug:timer;
 

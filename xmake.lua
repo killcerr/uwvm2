@@ -99,6 +99,9 @@ target("uwvm")
 		add_files("third-parties/fast_io/share/fast_io/fast_io_crypto.cppm", {public = is_debug_mode})
 	end 
 
+	-- uwvm
+	add_defines("UWVM=2")
+
 	-- src
 	add_includedirs("src/")
 

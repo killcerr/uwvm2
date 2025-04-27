@@ -24,41 +24,43 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
+import uwvm.io;
 import utils.ansies;
 # ifdef UWVM_TIMER
 import utils.debug;
 # endif
 import utils.madvise;
-import uwvm.cmdline;
-import uwvm.wasm.storage;
-import uwvm.wasm.feature;
-import parser.wasm.base;
 import parser.wasm.concepts;
 import parser.wasm.standard;
 import parser.wasm.binfmt.base;
+import uwvm.utils.ansies;
+import uwvm.cmdline;
+import uwvm.wasm.base;
+import uwvm.wasm.storage;
+import uwvm.wasm.feature;
 #else
 // std
 # include <cstddef>
 # include <cstdint>
 # include <type_traits>
 // macro
-# include <utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
-# include <utils/io/impl.h>
+# include <uwvm/io/impl.h>
 # include <utils/ansies/impl.h>
 # ifdef UWVM_TIMER
 #  include <utils/debug/impl.h>
 # endif
 # include <utils/madvise/impl.h>
-# include <uwvm/cmdline/impl.h>
-# include <uwvm/wasm/storage/impl.h>
-# include <uwvm/wasm/feature/impl.h>
-# include <parser/wasm/base/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/impl.h>
 # include <parser/wasm/binfmt/base/impl.h>
+# include <uwvm/utils/ansies/impl.h>
+# include <uwvm/cmdline/impl.h>
+# include <uwvm/wasm/base/impl.h>
+# include <uwvm/wasm/storage/impl.h>
+# include <uwvm/wasm/feature/impl.h>
 
 #endif
 
@@ -71,18 +73,18 @@ UWVM_MODULE_EXPORT namespace uwvm::run
     {
         if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"No input file.\n" u8"Try \"",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"--help",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" for more information.\n" u8"\n",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
             return -2;  // The specified file is not available or cannot be opened
         }
 
@@ -100,19 +102,19 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #ifdef __cpp_exceptions
         catch(::fast_io::error e)
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Unable to open WASM file \"",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                 module_name,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\": ",
                                 e,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n"
 # ifndef _WIN32  // Win32 automatically adds a newline (winnt and win9x)
                                 u8"\n"
@@ -141,16 +143,16 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             case 0u:
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(nullptr),
                                     u8") Illegal WebAssembly file format.",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
                 return -3;  // wasm parsing error
@@ -183,20 +185,20 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             }
             default: [[unlikely]] {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                    ::fast_io::io::perr(::utils::log_output,
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                    ::fast_io::io::perr(::uwvm::log_output,
+                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                         u8"[error] ",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"(offset=",
                                         ::fast_io::mnp::addrvw(4uz),
                                         u8") Unknown Binary Format Version of WebAssembly: \"",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                         ::uwvm::wasm::storage::execute_wasm_binfmt_ver,
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"\".",
-                                        ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                         u8"\n\n");
 #endif
                     return -3;  // wasm parsing error
@@ -206,7 +208,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
         // run vm
         switch(::uwvm::wasm::storage::execute_wasm_mode)
         {
-            case ::parser::wasm::base::mode::objdump:
+            case ::uwvm::wasm::base::mode::objdump:
             {
                 /// @todo objdump
                 break;
@@ -220,5 +222,5 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 
 #ifndef UWVM_MODULE
 // macro
-# include <utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
 #endif

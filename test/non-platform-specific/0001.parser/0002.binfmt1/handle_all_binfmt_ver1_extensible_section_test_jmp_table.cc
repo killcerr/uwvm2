@@ -67,7 +67,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test1\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test1\n");
     return true;
 }
 
@@ -95,7 +95,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test2\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test2\n");
 
     return true;
 }
@@ -114,7 +114,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test3\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test3\n");
 
     return true;
 }
@@ -133,7 +133,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test4\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test4\n");
 
     return true;
 }
@@ -152,7 +152,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test5\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test5\n");
 
     return true;
 }
@@ -171,7 +171,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test6\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test6\n");
 
     return true;
 }
@@ -190,7 +190,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test7\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test7\n");
 
     return true;
 }
@@ -209,7 +209,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test8\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test8\n");
 
     return true;
 }
@@ -228,7 +228,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test9\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test9\n");
 
     return true;
 }
@@ -247,7 +247,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test10\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test10\n");
 
     return true;
 }
@@ -266,7 +266,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test11\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test11\n");
 
     return true;
 }
@@ -285,7 +285,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test12\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test12\n");
 
     return true;
 }
@@ -304,7 +304,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test13\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test13\n");
 
     return true;
 }
@@ -323,7 +323,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test14\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test14\n");
 
     return true;
 }
@@ -342,7 +342,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test15\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test15\n");
 
     return true;
 }
@@ -361,7 +361,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test16\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test16\n");
 
     return true;
 }
@@ -380,7 +380,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test17\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test17\n");
 
     return true;
 }
@@ -399,7 +399,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test18\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test18\n");
 
     return true;
 }
@@ -418,7 +418,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test19\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test19\n");
 
     return true;
 }
@@ -437,7 +437,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end)
 {
-    ::fast_io::io::perrln(::utils::log_output, u8"test20\n");
+    ::fast_io::io::perrln(::uwvm::log_output, u8"test20\n");
 
     return true;
 }
@@ -491,7 +491,7 @@ int main(int argc, char**)
 
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
-    ::fast_io::io::perr(::utils::log_output, u8"sec", argc, u8":\n");
+    ::fast_io::io::perr(::uwvm::log_output, u8"sec", argc, u8":\n");
     ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, argc, nullptr, nullptr);
 }
 

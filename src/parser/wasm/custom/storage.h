@@ -54,7 +54,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::custom
     /// @return int
     using handlefunc_ptr_t = int (*)(parser::wasm::standard::wasm1::type::wasm_byte const*, parser::wasm::standard::wasm1::type::wasm_byte const*) noexcept;
 
-    inline ::std::map<::fast_io::u8string, handlefunc_ptr_t> custom_handle_funcs{};  // No global variable dependencies from other translation units
+    inline ::std::map<::fast_io::u8string, handlefunc_ptr_t> custom_handle_funcs{};  // [global] No global variable dependencies from other translation units
 }
 
 #ifndef UWVM_MODULE

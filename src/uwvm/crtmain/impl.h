@@ -23,5 +23,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+# include "global/impl.h"
 # include "uwvm.h"
 #endif

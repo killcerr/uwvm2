@@ -24,7 +24,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "abi.h"
-# include "mode.h"
 # include "error.h"
+# include "error_code.h"
+# include "error_code_output.h"
 #endif

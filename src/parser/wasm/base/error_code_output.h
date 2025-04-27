@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-31
+ * @date        2025-04-27
  * @copyright   APL-2 License
  */
 
@@ -20,21 +20,43 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
+#ifdef UWVM_MODULE
+import fast_io;
+import :error_code;
+#else
 // std
-#include <memory>
+# include <cstddef>
 // macro
-#include <utils/macro/push_macros.h>
-#include <uwvm/utils/ansies/uwvm_color_push_macro.h>
+# include <utils/macro/push_macros.h>
+// import
+# include <fast_io.h>
+# include "error_code.h"
+#endif
 
-export module uwvm.cmdline.params:log_win32_use_ansi;
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace parser::wasm::base
+{
+    struct error_output_flag_t
+    {
+        ::std::uint_least8_t enable_ansi : 1;
+        ::std::uint_least8_t win32_use_text_attr : 1;  // on win95 - win7
+    };
+
+    struct error_output_t
+    {
+        ::std::byte const* module_begin{};
+        ::parser::wasm::base::error_impl err{};
+        error_output_flag_t flag{};
+    };
+
+}  // namespace parser::wasm::base
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+// macro
+# include <utils/macro/pop_macros.h>
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "log_win32_use_ansi.h"

@@ -23,6 +23,7 @@
 module;
 
 export module uwvm.wasm;
+export import uwvm.wasm.base;
 export import uwvm.wasm.storage;
 export import uwvm.wasm.feature;
 

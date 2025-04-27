@@ -22,15 +22,23 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
-export module parser.wasm.base:mode;
-
-#ifndef UWVM_MODULE
-# define UWVM_MODULE
-#endif
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
+# define UWVM_MODULE_EXPORT
 #endif
 
-#include "mode.h"
+UWVM_MODULE_EXPORT namespace uwvm::wasm::base
+{
+    /// @brief Default automatic import of wasm libraries
+    enum class abi : unsigned
+    {
+        detect,
+        bare,
+        emscripten,
+        wasip1,
+        wasip2,
+        wasix
+    };
+
+}  // namespace parser::wasm::base

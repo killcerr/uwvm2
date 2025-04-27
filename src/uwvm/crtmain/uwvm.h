@@ -26,7 +26,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.global;
+import uwvm.crtmain.global;
 import uwvm.cmdline;
 import uwvm.run;
 #else
@@ -35,10 +35,10 @@ import uwvm.run;
 # include <cstddef>
 // macro
 # include <utils/macro/push_macros.h>
-# include <utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
-# include <utils/global/impl.h>
+# include "global/impl.h"
 # include <uwvm/cmdline/impl.h>
 # include <uwvm/run/impl.h>
 #endif
@@ -78,12 +78,12 @@ UWVM_MODULE_EXPORT namespace uwvm
         // Generate guard to protect global pod pointer
 #if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
         // set win32 console output and windows cp to utf8
-        ::utils::global::set_win32_console_io_cp_to_utf8 set_native_console_io_cp_to_utf8_ele{};
+        ::uwvm::global::set_win32_console_io_cp_to_utf8 set_native_console_io_cp_to_utf8_ele{};
         // set win32 console ansi escape
-        ::utils::global::enable_win32_ansi enable_native_ansi_ele{};
+        ::uwvm::global::enable_win32_ansi enable_native_ansi_ele{};
 #endif
         // Automatically get the correct timezone data
-        ::utils::global::tz_set_s tz_set_ele{};
+        ::uwvm::global::tz_set_s tz_set_ele{};
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
         // codecvt parameters on winnt
         ::uwvm::cmdline::nt_code_cvt_argv_storage const u8_cmdline{::uwvm::cmdline::nt_code_cvt_argv()};
@@ -102,6 +102,6 @@ UWVM_MODULE_EXPORT namespace uwvm
 
 #ifndef UWVM_MODULE
 // macro
-# include <utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <utils/macro/pop_macros.h>
 #endif

@@ -23,20 +23,22 @@
 #include <memory>
 
 #include <utils/macro/push_macros.h>
-#include <utils/ansies/uwvm_color_push_macro.h>
+#include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
+import uwvm.io;
 import utils.ansies;
 import utils.cmdline;
+import uwvm.utils.ansies;
 import uwvm.cmdline;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
-# include <utils/io/impl.h>
+# include <uwvm/io/impl.h>
 # include <utils/ansies/impl.h>
 # include <utils/cmdline/impl.h>
+# include <uwvm/utils/ansies/impl.h>
 # include <uwvm/cmdline/impl.h>
 #endif
 
@@ -51,29 +53,29 @@ namespace uwvm::cmdline::paras::details
         // Check for out-of-bounds and not-argument
         if(currp1 == para_end || currp1->type != ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Usage: " u8"[",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"--log-output",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"-log",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__))
                                 u8"[out|err|file <file>]"
 #else
                                 u8"[out|err]"
 #endif
                                 ,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
@@ -81,10 +83,10 @@ namespace uwvm::cmdline::paras::details
         // Setting the argument is already taken
         currp1->type = ::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
-#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
+#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__))
         // win32 and posix
-        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::utils::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8out()}; }
-        else if(currp1_str == u8"err") { ::utils::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8err()}; }
+        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::uwvm::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8out()}; }
+        else if(currp1_str == u8"err") { ::uwvm::log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8err()}; }
         else if(currp1_str == u8"file")
         {
             auto currp2{para_curr + 2};
@@ -92,24 +94,24 @@ namespace uwvm::cmdline::paras::details
             // Check for out-of-bounds and not-argument
             if(currp2 == para_end || currp2->type != ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
             {
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Usage: " u8"[",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                     u8"--log-output",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"|",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                     u8"-log",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     u8"file <file>",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
                 return ::utils::cmdline::parameter_return_type::return_m1_imme;
             }
@@ -121,23 +123,23 @@ namespace uwvm::cmdline::paras::details
 
             try
             {
-                ::utils::log_output = ::fast_io::u8native_file{currp2_str, ::fast_io::open_mode::out};
+                ::uwvm::log_output = ::fast_io::u8native_file{currp2_str, ::fast_io::open_mode::out};
             }
             catch(::fast_io::error e)
             {
-                ::fast_io::io::perr(::utils::log_output,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                ::fast_io::io::perr(::uwvm::log_output,
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Unable to open log output file \"",
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                     currp2_str,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\": ",
                                     e,
-                                    ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n"
 # ifndef _WIN32
                                     u8"\n"
@@ -148,66 +150,66 @@ namespace uwvm::cmdline::paras::details
         }
         else
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Usage: " u8"[",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"--log-output",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"-log",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 u8"[out|err|file <file>]",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
 #else
         // on AVR only support cstdout and cstderr
-        if(auto currp1_str{currp1->str}; currp1_str == u8"out")
+        if(auto const currp1_str{currp1->str}; currp1_str == u8"out")
         {
 # if defined(__AVR__)
-            ::utils::log_output = ::fast_io::u8c_stdout();
-# elif (defined(_WIN32) && defined(_WIN32_WINDOWS))
-            ::utils::log_output = ::fast_io::u8out();
+            ::uwvm::log_output = ::fast_io::u8c_stdout();
+# elif (defined(_WIN32) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__))
+            ::uwvm::log_output = ::fast_io::u8out();
 # endif
         }
         else if(currp1_str == u8"err")
         {
 # if defined(__AVR__)
-            ::utils::log_output = ::fast_io::u8c_stderr();
-# elif (defined(_WIN32) && defined(_WIN32_WINDOWS))
-            ::utils::log_output = ::fast_io::u8err();
+            ::uwvm::log_output = ::fast_io::u8c_stderr();
+# elif (defined(_WIN32) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__))
+            ::uwvm::log_output = ::fast_io::u8err();
 # endif
         }
         else
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Usage: " u8"[",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"--log-output",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"|",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"-log",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 u8"[out|err]",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
             return ::utils::cmdline::parameter_return_type::return_m1_imme;
         }
@@ -219,5 +221,5 @@ namespace uwvm::cmdline::paras::details
 }  // namespace uwvm::cmdline::paras::details
 
 // macro
-#include <utils/ansies/uwvm_color_pop_macro.h>
+#include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
 #include <utils/macro/pop_macros.h>

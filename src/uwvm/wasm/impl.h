@@ -23,6 +23,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+# include "base/impl.h"
 # include "feature/impl.h"
 # include "storage/impl.h"
 #endif

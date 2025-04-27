@@ -29,15 +29,15 @@
 # include <memory>
 
 # include <utils/macro/push_macros.h>
-# include <utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 
 # ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
+import uwvm.io;
 import utils.cmdline;
 # else
 #  include <fast_io.h>
-#  include <utils/io/impl.h>
+#  include <uwvm/io/impl.h>
 #  include <utils/cmdline/impl.h>
 # endif
 
@@ -56,7 +56,7 @@ namespace uwvm::cmdline::paras::details
 }  // namespace uwvm::cmdline::paras::details
 
 // macro
-# include <utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <utils/macro/pop_macros.h>
 
 #endif

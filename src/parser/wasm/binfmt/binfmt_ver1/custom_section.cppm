@@ -35,7 +35,6 @@ module;
 #include <memory>
 // macro
 #include <utils/macro/push_macros.h>
-#include <utils/ansies/uwvm_color_push_macro.h>
 
 export module parser.wasm.binfmt.binfmt_ver1:custom_section;
 

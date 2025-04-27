@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-16
+ * @date        2025-03-21
  * @copyright   APL-2 License
  */
 
@@ -22,7 +22,10 @@
 
 module;
 
-export module utils.io:output;
+// std
+#include <cstdint>
+// macro
+#include <utils/macro/push_macros.h>
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -31,4 +34,7 @@ export module utils.io:output;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "output.h"
+export module uwvm.crtmain.global:consolecp_win32;
+
+#include "consolecp_win32.h"
+

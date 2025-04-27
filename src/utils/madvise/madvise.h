@@ -42,19 +42,19 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
-namespace uwvm::posix
-{
-# if defined(__DARWIN_C_LEVEL)
-    extern int posix_madvise(void* addr, ::std::size_t length, int flag) noexcept __asm__("_posix_madvise");
-# else
-    extern int posix_madvise(void* addr, ::std::size_t length, int flag) noexcept __asm__("posix_madvise");
-# endif
-}  // namespace uwvm::posix
-#endif
-
 UWVM_MODULE_EXPORT namespace utils::madvise
 {
+#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
+    namespace details::posix
+    {
+# if defined(__DARWIN_C_LEVEL)
+        extern int posix_madvise(void* addr, ::std::size_t length, int flag) noexcept __asm__("_posix_madvise");
+# else
+        extern int posix_madvise(void* addr, ::std::size_t length, int flag) noexcept __asm__("posix_madvise");
+# endif
+    }  // namespace posix
+#endif
+
     enum class madvise_flag
     {
 #if defined(_WIN32) || !((!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !defined(_PICOLIBC__))
@@ -214,7 +214,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
 # elif _POSIX_C_SOURCE >= 200112L
         // The madvise function first appeared in 4.4BSD.  The posix_madvise function
         // is part of IEEE 1003.1-2001 and was first implemented in Mac OS X 10.2.
-        ::uwvm::posix::posix_madvise(const_cast<void*>(addr), length, static_cast<int>(flag));
+        details::posix::posix_madvise(const_cast<void*>(addr), length, static_cast<int>(flag));
 # endif
 #endif
     }

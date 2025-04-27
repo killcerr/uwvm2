@@ -38,8 +38,9 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
 import utils.ansies;
+import uwvm.io;
+import uwvm.utils.ansies;
 #else
 // std
 # include <cstdint>
@@ -48,13 +49,14 @@ import utils.ansies;
 # include <bit>
 // macro
 # include <utils/macro/push_macros.h>
-# include <utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
-# include <utils/io/impl.h>
 # include <utils/ansies/impl.h>
+# include <uwvm/io/impl.h>
+# include <uwvm/utils/ansies/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -113,16 +115,16 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         auto const u16_cmdline_argv{::fast_io::win32::CommandLineToArgvW(nt_proc_cmdline.Buffer, ::std::addressof(u16_cmdline_argc))};
         if(u16_cmdline_argv == nullptr) [[unlikely]]
         {
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[fatal] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"CommandLineToArgvW failed: ",
                                 ::fast_io::error{::fast_io::win32_domain_value, ::fast_io::win32::GetLastError()},
                                 u8"\n",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"Terminate.\n\n");
             ::fast_io::fast_terminate();
         }
@@ -157,6 +159,6 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
 #ifndef UWVM_MODULE
 // macro
-# include <utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <utils/macro/pop_macros.h>
 #endif

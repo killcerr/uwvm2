@@ -24,17 +24,25 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
 import utils.ansies;
+# ifdef UWVM
+import uwvm.io;
+import uwvm.utils.ansies;
+# endif
 #else
 // macro
 # include <utils/macro/push_macros.h>
-# include <utils/ansies/uwvm_color_push_macro.h>
+# ifdef UWVM
+#  include <uwvm/utils/ansies/uwvm_color_push_macro.h>
+# endif
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
-# include <utils/io/impl.h>
 # include <utils/ansies/impl.h>
+# ifdef UWVM
+#  include <uwvm/io/impl.h>
+#  include <uwvm/utils/ansies/impl.h>
+# endif
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -87,20 +95,24 @@ UWVM_MODULE_EXPORT namespace utils::debug
                 return;
             }
 #endif
-            ::fast_io::io::perr(::utils::log_output,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+#ifdef UWVM
+            ::fast_io::io::perr(::uwvm::log_output,
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"[debug] ",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"timer \"",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 s,
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\": ",
                                 t1 - t0,
                                 u8"s\n",
-                                ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+#else
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [debug] timer \"", s, u8"\": ", t1 - t0, u8"s\n");
+#endif
         }
     };
 
@@ -108,6 +120,8 @@ UWVM_MODULE_EXPORT namespace utils::debug
 
 #ifndef UWVM_MODULE
 // macro
-# include <utils/ansies/uwvm_color_pop_macro.h>
+# ifdef UWVM
+#  include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# endif
 # include <utils/macro/pop_macros.h>
 #endif

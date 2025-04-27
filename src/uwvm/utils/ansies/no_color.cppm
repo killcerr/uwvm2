@@ -28,10 +28,8 @@ module;
 #include <concepts>
 #include <cstdlib>
 # include <memory>
-// macro
-#include "ansi_push_macro.h"
 
-export module utils.ansies:no_color;
+export module uwvm.utils.ansies:no_color;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

@@ -71,7 +71,7 @@ UWVM_MODULE_EXPORT namespace utils
     inline constexpr ::std::size_t print_reserve_size(::fast_io::io_reserve_type_t<char_type, version>) noexcept
     {
         constexpr ::std::size_t ul32_real_size{::fast_io::pr_rsv_size<char_type, ::std::uint_least32_t>};
-        constexpr ::std::size_t max_size{3 + 4 * ul32_real_size};
+        constexpr ::std::size_t max_size{3uz + 4uz * ul32_real_size};
         return max_size;
     }
 

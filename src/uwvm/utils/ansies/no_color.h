@@ -31,8 +31,6 @@ import fast_io;
 # include <concepts>
 # include <cstdlib>
 # include <memory>
-// macro
-# include "ansi_push_macro.h"
 // import
 # include <fast_io.h>
 #endif
@@ -41,9 +39,9 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils::ansies
+UWVM_MODULE_EXPORT namespace uwvm::utils::ansies
 {
-    namespace details
+    namespace details::posix
     {
 #if !(defined(_WIN32) && !defined(__CYGWIN__) && !defined(__WINE__))
 # if defined(__DARWIN_C_LEVEL) || defined(__MSDOS__)
@@ -54,12 +52,13 @@ UWVM_MODULE_EXPORT namespace utils::ansies
 #endif
     }  // namespace details
 
+    /// @brief Determine if there is NO_COLOR by environment variable
     inline bool check_has_no_color() noexcept
     {
 #if defined(_WIN32) && !defined(__CYGWIN__) && !defined(__WINE__)
 # ifndef _WIN32_WINDOWS
         auto const curr_peb{::fast_io::win32::nt::nt_get_current_peb()};
-        decltype(auto) env_str{u"NO_COLOR"};
+        constexpr decltype(auto) env_str{u"NO_COLOR"};
         ::fast_io::win32::nt::unicode_string env_us{.Length = sizeof(env_str) - sizeof(char16_t),
                                                     .MaximumLength = sizeof(env_str),
                                                     .Buffer = const_cast<char16_t*>(env_str)};
@@ -72,14 +71,15 @@ UWVM_MODULE_EXPORT namespace utils::ansies
         return static_cast<bool>(no_color_env);
 # endif
 #else
-        auto no_color_env{details::libc_getenv(reinterpret_cast<char const*>(u8"NO_COLOR"))};
+        auto no_color_env{details::posix::libc_getenv(reinterpret_cast<char const*>(u8"NO_COLOR"))};
         return static_cast<bool>(no_color_env);
 #endif
     }
 
-    inline bool const put_color{!check_has_no_color()};  // No global variable dependencies from other translation units
+    inline bool const put_color{!check_has_no_color()};  // [global] No global variable dependencies from other translation units
 
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-    inline bool log_win32_use_ansi_b{false};  // No global variable dependencies from other translation units
+    /// @brief Used to determine whether or not to output colors via win32_text_attr
+    inline bool log_win32_use_ansi_b{false};  // [global] No global variable dependencies from other translation units
 #endif
 }  // namespace utils::ansies

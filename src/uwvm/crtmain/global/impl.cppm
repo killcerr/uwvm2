@@ -5,11 +5,7 @@
  ********************************************************/
 
 /**
- * @file        io_device.cppm
- * @brief       Set up the lowest-level implementation of uwvm.
- *              Use the C API in the minimal C host environment and the user-space lowest-level API in other environments.
- *              Automatically add file-form buffers to out and in.
- * @author      MacroModel
+ * @author      24bit-xjkp
  * @version     2.0.0
  * @date        2025-03-21
  * @copyright   APL-2 License
@@ -26,7 +22,13 @@
 
 module;
 
-export module utils.io:io_device;
+export module uwvm.crtmain.global;
+export import :tzset;
+/// @brief only support on winnt (with win32 api)
+#if defined(_WIN32) && !defined(__CYGWIN__)
+export import :ansi_win32;
+export import :consolecp_win32;
+#endif
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -35,4 +37,4 @@ export module utils.io:io_device;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "io_device.h"
+#include "impl.h"
