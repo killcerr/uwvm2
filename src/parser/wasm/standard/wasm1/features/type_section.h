@@ -202,6 +202,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                         u8"\n\n");
 #endif
+                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
         }
@@ -313,6 +314,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                         ::fast_io::mnp::cond(::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                         u8"\n\n");
 #endif
+                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
         }
