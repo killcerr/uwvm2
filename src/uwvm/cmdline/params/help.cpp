@@ -241,7 +241,7 @@ namespace uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                 currp1_str,
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"\". Usage: " u8"[",
+                                u8"\". Usage: [",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"--help",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),

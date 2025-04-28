@@ -160,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                             u8"[error] ",
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                            u8"Usage: " u8"[",
+                                            u8"Usage: [",
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                             u8"--run",
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
