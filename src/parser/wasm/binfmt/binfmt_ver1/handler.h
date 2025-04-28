@@ -80,14 +80,19 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         requires(::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec>> ref,
                  ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                  ::std::byte const* section_begin,
-                 ::std::byte const* section_end) {
-            { handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end) };
+                 ::std::byte const* section_end,
+                 ::parser::wasm::base::error_impl& err) {
+            { handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err) };
         };
 
     /// @see WebAssembly Release 1.0 (2019-07-20) § 5.5.2
     template <typename Ty>
     concept has_section_id_define =
         requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_id)>, ::parser::wasm::standard::wasm1::type::wasm_u32>; };
+
+    template <typename Ty>
+    concept has_section_name_define =
+        requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_name)>, ::fast_io::u8string_view>; };
 
     template <typename Ty, typename... Fs>
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
@@ -111,6 +116,29 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         }
     }
 
+    template <typename... Ty>
+    inline consteval auto generate_section_name_table_max() noexcept
+    {
+        ::std::vector<::parser::wasm::standard::wasm1::type::wasm_u32> vec{};
+        [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        { ((vec.push_back(Ty...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
+        ::std::ranges::sort(vec);
+        auto const max{vec.back()};
+        return max;
+    }
+
+    template <typename... Ty>
+    inline consteval auto generate_section_name_table() noexcept
+    {
+        constexpr auto max{generate_section_name_table_max<Ty...>};
+        ::fast_io::array<::fast_io::u8string_view, max> res{};
+
+        [&res]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        { ((res[Ty...[I] ::section_id] = Ty...[I] ::section_name), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
+
+        return res;
+    }
+
     namespace details
     {
         template <::parser::wasm::concepts::wasm_feature... Fs>
@@ -118,7 +146,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                                                              ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>&,
                                                                              ::parser::wasm::standard::wasm1::type::wasm_u32,
                                                                              ::std::byte const*,
-                                                                             ::std::byte const*) noexcept
+                                                                             ::std::byte const*,
+                                                                             ::parser::wasm::base::error_impl&) noexcept
         {
             // do nothing
         }
@@ -130,7 +159,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                                            ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                                                            ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
                                                            ::std::byte const* section_begin,
-                                                           ::std::byte const* section_end) UWVM_THROWS
+                                                           ::std::byte const* section_end,
+                                                           ::parser::wasm::base::error_impl& err) UWVM_THROWS
         {
             static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
 
@@ -142,14 +172,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                 handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<SecCurr>>,
                                                              module_storage,
                                                              section_begin,
-                                                             section_end);
+                                                             section_end,
+                                                             err);
                 success = true;
             }
             else
             {
                 if constexpr(sizeof...(Secs) != 0)
                 {
-                    handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success, module_storage, section_id, section_begin, section_end);
+                    handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success, module_storage, section_id, section_begin, section_end, err);
                 }
             }
         }
@@ -165,7 +196,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                                                     [[maybe_unused]] ::std::byte const* module_begin,
                                                                     ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
                                                                     ::std::byte const* section_begin,
-                                                                    ::std::byte const* section_end) UWVM_THROWS
+                                                                    ::std::byte const* section_end,
+                                                                    ::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
         auto [... secs]{module_storage.sections};
         check_extensible_section_is_series<decltype(secs)...>();
@@ -175,100 +207,28 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         // llvm can gen jump table here
         if(section_id == static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(::parser::wasm::standard::wasm1::section::section_id::custom_sec))
         {
-            ::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end);
+            ::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end, err);
             success = true;
         }
-        else { details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end); }
+        else
+        {
+            details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end, err);
+        }
 
         if(!success) [[unlikely]]
         {
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::uwvm::log_output,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"(offset=",
-                                ::fast_io::mnp::addrvw(section_begin - module_begin),
-                                u8") Unknown WebAssembly Section ID: \"",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                section_id,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"\".",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                u8"\n\n");
-#endif
+            err.err_curr = section_begin;
+            err.err_selectable.u32 = section_id;
+            err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_section_id;
             ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
-
-#if 0
-    /// @brief          handle all binfmt ver1 extensible section
-    /// @deprecated     Twice lambda, compiler inconvenient optimization
-    /// @throws         ::fast_io::error
-    /// @see            test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void handle_all_binfmt_ver1_extensible_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
-                                                                        module_storage,
-                                                                    [[maybe_unused]] ::std::byte const* module_begin,
-                                                                    ::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
-                                                                    ::std::byte const* section_begin,
-                                                                    ::std::byte const* section_end) UWVM_THROWS
-    {
-        auto [... secs]{module_storage.sections};
-        check_extensible_section_is_series(module_storage.sections);
-        constexpr auto Secs_sz{sizeof...(secs)};
-
-        bool finish{};
-
-        [&finish, &module_storage, section_id, section_begin, section_end]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-        {
-            ((
-                 [&finish, &module_storage, section_id, section_begin, section_end]<typename SecCurr>() constexpr noexcept
-                 {
-                     static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
-                     if(section_id == SecCurr::section_id)
-                     {
-                         if(finish) { return; }
-                         handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type<::std::remove_cvref_t<SecCurr>>,
-                                                                      module_storage,
-                                                                      section_begin,
-                                                                      section_end);
-                         finish = true;
-                     }
-                 }.template operator()<decltype(secs...[I])>()),
-             ...);
-        }(::std::make_index_sequence<Secs_sz>{});
-
-        if(!finish) [[unlikely]]
-        {
-# ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::uwvm::log_output,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"(offset=",
-                                ::fast_io::mnp::addrvw(section_begin - module_begin),
-                                u8") Unknown WebAssembly Section ID: \"",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                section_id,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"\".",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                u8"\n\n");
-# endif
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
-    }
-#endif
 
     template <::parser::wasm::concepts::wasm_feature... Fs>
     [[nodiscard]] inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...> wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>,
                                                                                                                     ::std::byte const* const module_begin,
-                                                                                                                    ::std::byte const* const module_end)
+                                                                                                                    ::std::byte const* const module_end,
+                                                                                                                    ::parser::wasm::base::error_impl& err)
         UWVM_THROWS
     {
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
@@ -285,19 +245,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
 
         if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
         {
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::uwvm::log_output,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"(offset=",
-                                ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                u8") Illegal WebAssembly file format.",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                u8"\n\n");
-#endif
+            err.err_curr = module_curr;
+            err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_wasm_file_format;
             ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
@@ -311,19 +260,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         if(static_cast<::std::size_t>(module_end - module_curr) < 2uz) [[unlikely]]
         {
             // No need to check module_curr > module_end, always false
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-            ::fast_io::io::perr(::uwvm::log_output,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"(offset=",
-                                ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                u8") No WebAssembly sections found.",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                u8"\n\n");
-#endif
+            err.err_curr = module_curr;
+            err.err_code = ::parser::wasm::base::wasm_parse_error_code::no_wasm_section_found;
             ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
@@ -344,19 +282,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                                                             ::fast_io::mnp::leb128_get(sec_len))};
             if(sec_len_err != ::fast_io::parse_code::ok) [[unlikely]]
             {
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::uwvm::log_output,
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                    u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                    u8"[error] ",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"(offset=",
-                                    ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                    u8") Invalid Section Length.",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                    u8"\n\n");
-#endif
+                err.err_curr = module_curr;
+                err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_section_length;
                 ::parser::wasm::base::throw_wasm_parse_code(sec_len_err);
             }
 
@@ -366,29 +293,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             // check length
             if(static_cast<::std::size_t>(module_end - module_curr) < sec_len) [[unlikely]]
             {
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::uwvm::log_output,
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                    u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                    u8"[error] ",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"(offset=",
-                                    ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                    u8") Invalid Section Length: \"",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                    sec_len,
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"\".",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                    u8"\n\n");
-#endif
+                err.err_curr = module_curr;
+                err.err_selectable.u32 = sec_len;
+                err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_section_length;
                 ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
             auto const sec_end{module_curr + sec_len};
 
-            handle_all_binfmt_ver1_extensible_section(ret, module_begin, sec_id, module_curr, sec_end);
+            handle_all_binfmt_ver1_extensible_section(ret, module_begin, sec_id, module_curr, sec_end, err);
 
             module_curr = sec_end;
 
@@ -401,19 +314,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
             else if(dif < 2uz) [[unlikely]]
             {
                 // No need to check module_curr > module_end, always false
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::uwvm::log_output,
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                    u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                    u8"[error] ",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"(offset=",
-                                    ::fast_io::mnp::addrvw(module_curr - module_begin),
-                                    u8") Unable to read leb128, not enough space left.",
-                                    ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                    u8"\n\n");
-#endif
+                err.err_curr = module_curr;
+                err.err_code = ::parser::wasm::base::wasm_parse_error_code::no_enough_space;
                 ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
         }

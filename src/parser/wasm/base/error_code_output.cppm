@@ -22,8 +22,12 @@
 
 module;
 
+// std
+# include <cstddef>
 // macro
 # include <utils/macro/push_macros.h>
+# include <utils/ansies/ansi_push_macro.h>
+# include "wasm_code_color_push_macro.h"
 
 export module parser.wasm.base:error_code_output;
 

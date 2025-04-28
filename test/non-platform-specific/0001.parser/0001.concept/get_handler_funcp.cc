@@ -34,16 +34,16 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm.io;
 import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
+import uwvm.io;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
-# include <utils/io/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm/io/impl.h>
 #endif
 
 struct B1F1

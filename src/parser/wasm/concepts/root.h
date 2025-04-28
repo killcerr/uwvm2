@@ -24,6 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import parser.wasm.base;
 import parser.wasm.standard.wasm1.type;
 #else
 // std
@@ -37,6 +38,7 @@ import parser.wasm.standard.wasm1.type;
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
 # include <fast_io_dsal/string_view.h>
+# include <parser/wasm/base/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
@@ -96,7 +98,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
 
     /// @brief      binfmt handle version func
     template <typename module_stroate_t, has_feature_name... Fs>
-    using binfmt_handle_version_func_p_type = module_stroate_t (*)(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS;
+    using binfmt_handle_version_func_p_type =
+        module_stroate_t (*)(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*, ::parser::wasm::base::error_impl&) UWVM_THROWS;
 
     /// @brief      Define the version number of the required wasm file binary format tagging
     /// @see        test\non-platform-specific\0001.parser\0001.concept\binfmt.cc

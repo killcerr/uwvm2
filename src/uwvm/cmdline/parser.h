@@ -93,7 +93,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         // If argc is 0, prohibit running
         if(argc == 0) [[unlikely]]
         {
-            ::fast_io::io::perr(::uwvm::log_output,
+            ::fast_io::io::perr(::uwvm::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -154,7 +154,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     // grammatical error
                     if(++curr_argv == argv_end) [[unlikely]]
                     {
-                        ::fast_io::io::perr(::uwvm::log_output,
+                        ::fast_io::io::perr(::uwvm::u8log_output,
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -231,7 +231,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                 if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::invalid_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(::uwvm::log_output,
+                    ::fast_io::io::perr(::uwvm::u8log_output,
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -279,12 +279,12 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     if(f_test_str.empty())
                     {
                         // The most similar parameters were not found
-                        ::fast_io::io::perr(::uwvm::log_output, ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
+                        ::fast_io::io::perr(::uwvm::u8log_output, ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
                     }
                     else
                     {
                         // Output the most similar parameter
-                        ::fast_io::io::perr(::uwvm::log_output,
+                        ::fast_io::io::perr(::uwvm::u8log_output,
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8" (did you mean: ",
                                             ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
@@ -298,7 +298,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                 else if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::duplicate_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(::uwvm::log_output,
+                    ::fast_io::io::perr(::uwvm::u8log_output,
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -314,7 +314,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
             if(shouldreturn) [[unlikely]]
             {
-                ::fast_io::io::perrln(::uwvm::log_output);
+                ::fast_io::io::perrln(::uwvm::u8log_output);
                 return parsing_return_val::returnm1;
             }
         }
@@ -363,7 +363,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                 {
                     shouldreturn = true;
 
-                    ::fast_io::io::perr(::uwvm::log_output,
+                    ::fast_io::io::perr(::uwvm::u8log_output,
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -379,7 +379,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
             if(shouldreturn) [[unlikely]]
             {
-                ::fast_io::io::perrln(::uwvm::log_output);
+                ::fast_io::io::perrln(::uwvm::u8log_output);
                 return parsing_return_val::returnm1;
             }
         }

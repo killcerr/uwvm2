@@ -58,7 +58,7 @@ namespace uwvm::cmdline::paras::details
         // Check for out-of-bounds and not-argument
         if(currp1 == para_end || currp1->type != ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
-            ::fast_io::io::perr(::uwvm::log_output,
+            ::fast_io::io::perr(::uwvm::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -90,7 +90,7 @@ namespace uwvm::cmdline::paras::details
         else if(currp1_str == u8"wasix") { ::uwvm::wasm::storage::execute_wasm_abi = ::uwvm::wasm::base::abi::wasix; }
         else [[unlikely]]
         {
-            ::fast_io::io::perr(::uwvm::log_output,
+            ::fast_io::io::perr(::uwvm::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),

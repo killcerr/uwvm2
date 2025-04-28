@@ -1,5 +1,5 @@
 ﻿/********************************************************
- * Ultimate WebAssembly Virtual Machine (log_output 2)     *
+ * Ultimate WebAssembly Virtual Machine (u8log_output 2)     *
  * Copyright (c) 2025 MacroModel. All rights reserved.  *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
@@ -53,18 +53,18 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
 
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter log_output{.name{u8"--log-output"},
-                                                            .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
-                                                            .usage{
+    inline constexpr ::utils::cmdline::parameter u8log_output{.name{u8"--log-output"},
+                                                              .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
+                                                              .usage{
 #if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
-                                                                u8"[out|err|file <file>]"
+                                                                  u8"[out|err|file <file>]"
 #else
-                                                                u8"[out|err]"
+                                                                  u8"[out|err]"
 #endif
-                                                            },
-                                                            .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1}},
-                                                            .handle{::std::addressof(details::log_output_callback)},
-                                                            .is_exist{::std::addressof(details::log_output_is_exist)}};
+                                                              },
+                                                              .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1}},
+                                                              .handle{::std::addressof(details::log_output_callback)},
+                                                              .is_exist{::std::addressof(details::log_output_is_exist)}};
 }  // namespace uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE

@@ -31,23 +31,27 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import parser.wasm.base;
-import uwvm.wasm.storage;
 import parser.wasm.concepts;
 import parser.wasm.standard.wasm1.type;
 import parser.wasm.binfmt.binfmt_ver1;
+import uwvm.io;
+import uwvm.wasm.storage;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
-# include <utils/io/impl.h>
+# include <parser/wasm/base/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
 # include <parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include <uwvm/io/impl.h>
+# include <uwvm/wasm/storage/impl.h>
 #endif
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
+    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec1"};
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
 
     // Expand on Sec1 here
@@ -76,6 +80,7 @@ struct Feature1
 template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec2
 {
+    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec2"};
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{2};
 
     // Expand on Sec2 here
@@ -94,7 +99,8 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 }
 
 struct Sec3
-{
+{    
+    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec3"};
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{3};
 
     // Unexpandable section

@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace utils::debug
             }
 #endif
 #ifdef UWVM
-            ::fast_io::io::perr(::uwvm::log_output,
+            ::fast_io::io::perr(::uwvm::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),

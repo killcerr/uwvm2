@@ -29,7 +29,7 @@ export import :help;
 export import :mode;
 export import :wasm_abi;
 export import :wasm_binfmt;
-export import :log_output;
+export import :u8log_output;
 
 #ifdef _DEBUG
 export import :test;

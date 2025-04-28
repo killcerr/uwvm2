@@ -22,6 +22,9 @@
 
 module;
 
+// std
+# include <cstddef>
+# include <cstdint>
 // macro
 # include <utils/macro/push_macros.h>
 

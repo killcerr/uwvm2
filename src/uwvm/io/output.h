@@ -40,12 +40,12 @@ UWVM_MODULE_EXPORT namespace uwvm
     /// @brief Control VM output via virtual functions, can be set via option in --debug-output, not supported by avr
 #if defined(__AVR__)
     // avr does not have posix
-    inline ::fast_io::u8c_io_observer log_output{::fast_io::u8c_stderr()};  // [global] No global variable dependencies from other translation units
+    inline ::fast_io::u8c_io_observer u8log_output{::fast_io::u8c_stderr()};  // [global] No global variable dependencies from other translation units
 #elif (defined(_WIN32) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__))
     // win9x cannot dup stderr
-    inline ::fast_io::u8native_io_observer log_output{::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
+    inline ::fast_io::u8native_io_observer u8log_output{::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
 #else
-    inline ::fast_io::u8native_file log_output{::fast_io::io_dup, ::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
+    inline ::fast_io::u8native_file u8log_output{::fast_io::io_dup, ::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
 #endif
 
 }  // namespace utils

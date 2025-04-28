@@ -30,6 +30,7 @@ import utils.ansies;
 import utils.debug;
 # endif
 import utils.madvise;
+import parser.wasm.base;
 import parser.wasm.concepts;
 import parser.wasm.standard;
 import parser.wasm.binfmt.base;
@@ -53,6 +54,7 @@ import uwvm.wasm.feature;
 #  include <utils/debug/impl.h>
 # endif
 # include <utils/madvise/impl.h>
+# include <parser/wasm/base/impl.h>
 # include <parser/wasm/concepts/impl.h>
 # include <parser/wasm/standard/impl.h>
 # include <parser/wasm/binfmt/base/impl.h>
@@ -73,7 +75,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
     {
         if(!::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
-            ::fast_io::io::perr(::uwvm::log_output,
+            ::fast_io::io::perr(::uwvm::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -102,7 +104,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #ifdef __cpp_exceptions
         catch(::fast_io::error e)
         {
-            ::fast_io::io::perr(::uwvm::log_output,
+            ::fast_io::io::perr(::uwvm::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -143,7 +145,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             case 0u:
             {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                ::fast_io::io::perr(::uwvm::log_output,
+                ::fast_io::io::perr(::uwvm::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -162,6 +164,9 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                 // set module name
                 ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.module_name = ::fast_io::u8string_view{module_name};
 
+                // storage wasm err
+                ::parser::wasm::base::error_impl wasm_err{};
+
                 // parse wasm 1
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                 try
@@ -173,11 +178,23 @@ UWVM_MODULE_EXPORT namespace uwvm::run
                     ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage =
                         ::uwvm::wasm::feature::binfmt_ver1_handler(::uwvm::wasm::feature::wasm_binfmt1_features,
                                                                    reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin()),
-                                                                   reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()));
+                                                                   reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cend()),
+                                                                   wasm_err);
                 }
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                 catch(::fast_io::error e)
                 {
+                    if(wasm_err.err_code != ::parser::wasm::base::wasm_parse_error_code::ok) [[likely]]
+                    {
+                        ::parser::wasm::base::error_output_t errout;
+                        errout.module_begin = reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin());
+                        errout.err = wasm_err;
+                        errout.flag.enable_ansi = static_cast<::std::uint_least8_t>(::uwvm::utils::ansies::put_color);
+# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                        errout.flag.win32_use_text_attr = static_cast<::std::uint_least8_t>(!::uwvm::utils::ansies::log_win32_use_ansi_b);
+# endif
+                        ::fast_io::io::perr(::uwvm::u8log_output, errout, u8"\n\n");
+                    }
                     return -3;  // wasm parsing error
                 }
 #endif
@@ -185,7 +202,7 @@ UWVM_MODULE_EXPORT namespace uwvm::run
             }
             default: [[unlikely]] {
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                    ::fast_io::io::perr(::uwvm::log_output,
+                    ::fast_io::io::perr(::uwvm::u8log_output,
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
                                         ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),

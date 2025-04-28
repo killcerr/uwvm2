@@ -84,8 +84,9 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                                ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
                                                ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                                                ::std::byte const* section_curr,
-                                               ::std::byte const* const section_end) {
-        { define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
+                                               ::std::byte const* const section_end,
+                                               ::parser::wasm::base::error_impl& err) {
+        { define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end, err) } -> ::std::same_as<::std::byte const*>;
     };
 
     /////////////////////////////
@@ -101,8 +102,9 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                                                          ::parser::wasm::standard::wasm1::features::final_import_type<Fs...>& fit,
                                                          ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                                                          ::std::byte const* section_curr,
-                                                         ::std::byte const* const section_end) {
-        { define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end) } -> ::std::same_as<::std::byte const*>;
+                                                         ::std::byte const* const section_end,
+                                                         ::parser::wasm::base::error_impl& err) {
+        { define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err) } -> ::std::same_as<::std::byte const*>;
     };
 
     /// @brief Defining structures or concepts related to wasm versions

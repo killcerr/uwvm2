@@ -41,7 +41,7 @@ import fast_io;
 UWVM_MODULE_EXPORT namespace uwvm
 {
     // io does not add meaningless namespaces.
-    /// @deprecated It is no longer recommended to use u8err, use log_output.
+    /// @deprecated It is no longer recommended to use u8err, use u8log_output.
 #if 0
 # ifndef __AVR__
 
