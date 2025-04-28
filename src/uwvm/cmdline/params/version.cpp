@@ -28,10 +28,10 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import fast_io_crypto;
-import uwvm.io;
 import utils.ansies;
 import utils.cmdline;
 import parser.wasm.concepts;
+import uwvm.io;
 import uwvm.utils.ansies;
 import uwvm.custom;
 import uwvm.cmdline;
@@ -41,10 +41,10 @@ import uwvm.utils.install_path;
 # include <fast_io.h>
 # include <fast_io_crypto.h>
 # include <fast_io_dsal/tuple.h>
-# include <uwvm/io/impl.h>
 # include <utils/ansies/impl.h>
 # include <utils/cmdline/impl.h>
 # include <parser/wasm/concepts/impl.h>
+# include <uwvm/io/impl.h>
 # include <uwvm/utils/ansies/impl.h>
 # include <uwvm/custom/impl.h>
 # include <uwvm/cmdline/impl.h>

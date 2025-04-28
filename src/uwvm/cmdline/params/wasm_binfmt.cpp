@@ -27,20 +27,20 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm.io;
 import utils.ansies;
 import utils.cmdline;
 import parser.wasm.standard.wasm1.type;
+import uwvm.io;
 import uwvm.utils.ansies;
 import uwvm.cmdline;
 import uwvm.wasm.base;
 import uwvm.wasm.storage;
 #else
 # include <fast_io.h>
-# include <uwvm/io/impl.h>
 # include <utils/ansies/impl.h>
 # include <utils/cmdline/impl.h>
 # include <parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm/io/impl.h>
 # include <uwvm/utils/ansies/impl.h>
 # include <uwvm/cmdline/impl.h>
 # include <uwvm/wasm/base/impl.h>

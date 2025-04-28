@@ -27,17 +27,17 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm.io;
 import utils.ansies;
 import utils.cmdline;
+import uwvm.io;
 import uwvm.utils.ansies;
 import uwvm.cmdline;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
-# include <uwvm/io/impl.h>
 # include <utils/ansies/impl.h>
 # include <utils/cmdline/impl.h>
+# include <uwvm/io/impl.h>
 # include <uwvm/utils/ansies/impl.h>
 # include <uwvm/cmdline/impl.h>
 #endif
