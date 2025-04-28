@@ -22,7 +22,7 @@
 
 module;
 
-export module parser.wasm.proposal.half_precision.type;
+export module ulte.parser.wasm.proposal.half_precision.type;
 export import :value_type;
 
 #ifndef UWVM_MODULE

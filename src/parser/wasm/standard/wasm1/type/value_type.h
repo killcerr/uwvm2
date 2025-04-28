@@ -40,7 +40,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::type
 {
     /// @brief      Bytes
     /// @details    The simplest form of value are raw uninterpreted bytes. In the abstract syntax they are represented as hexadecimal
@@ -164,4 +164,4 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     template <::std::size_t StorageSize, bool Unsigned>
     using varint_type_from_max_ssz = decltype(details::get_varint_type_from_max_storage_size_impl<StorageSize, Unsigned>());
 
-}  // namespace parser::wasm::standard::wasm1::type
+}  // namespace ulte::parser::wasm::standard::wasm1::type

@@ -22,7 +22,7 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.opcode;
+export module ulte.parser.wasm.standard.wasm1.opcode;
 import :mvp;
 
 #ifndef UWVM_MODULE

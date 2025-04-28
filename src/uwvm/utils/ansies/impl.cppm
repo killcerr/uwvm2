@@ -22,9 +22,8 @@
 
 module;
 
-export module uwvm.utils.ansies;
+export module ulte.uwvm.utils.ansies;
 export import :no_color;
-
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

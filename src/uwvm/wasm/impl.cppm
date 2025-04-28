@@ -22,11 +22,11 @@
 
 module;
 
-export module uwvm.wasm;
-export import uwvm.wasm.base;
-export import uwvm.wasm.storage;
-export import uwvm.wasm.feature;
-export import uwvm.wasm.custom;
+export module ulte.uwvm.wasm;
+export import ulte.uwvm.wasm.base;
+export import ulte.uwvm.wasm.storage;
+export import ulte.uwvm.wasm.feature;
+export import ulte.uwvm.wasm.custom;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

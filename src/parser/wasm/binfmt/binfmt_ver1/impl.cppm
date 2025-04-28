@@ -24,7 +24,7 @@
 
 module;
 
-export module parser.wasm.binfmt.binfmt_ver1;
+export module ulte.parser.wasm.binfmt.binfmt_ver1;
 export import :section;
 export import :def;
 export import :custom_section;

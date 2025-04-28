@@ -26,7 +26,7 @@
 
 module;
 
-export module uwvm.io:io_device;
+export module ulte.uwvm.io:io_device;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

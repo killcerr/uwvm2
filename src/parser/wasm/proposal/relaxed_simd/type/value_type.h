@@ -38,7 +38,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::proposal::relaxed_simd::value_type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::proposal::relaxed_simd::value_type
 {
 
     /// @brief      bf16
@@ -48,4 +48,4 @@ UWVM_MODULE_EXPORT namespace parser::wasm::proposal::relaxed_simd::value_type
     using wasm_bf16 = decltype(0.0bf16);
 #endif
 
-}  // namespace parser::wasm::proposal::relaxed_simd::value_type
+}  // namespace ulte::parser::wasm::proposal::relaxed_simd::value_type

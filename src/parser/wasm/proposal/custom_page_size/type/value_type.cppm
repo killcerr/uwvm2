@@ -31,7 +31,7 @@ module;
 // macro
 #include <parser/wasm/feature/feature_push_macro.h>
 
-export module parser.wasm.proposal.custom_page_size.type:value_type;
+export module ulte.parser.wasm.proposal.custom_page_size.type:value_type;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

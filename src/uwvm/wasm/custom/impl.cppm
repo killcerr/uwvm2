@@ -31,7 +31,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module uwvm.wasm.custom;
+export module ulte.uwvm.wasm.custom;
 export import :base;
 export import :storage;
 

@@ -26,9 +26,9 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm.crtmain.global;
-import uwvm.cmdline;
-import uwvm.run;
+import ulte.uwvm.crtmain.global;
+import ulte.uwvm.cmdline;
+import ulte.uwvm.run;
 #else
 // std
 # include <cstdint>
@@ -46,7 +46,7 @@ import uwvm.run;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm
+UWVM_MODULE_EXPORT namespace ulte::uwvm
 {
     /// @brief      uwvm c++ uz u8 main function
     /// @param      argc Argument Count
@@ -54,15 +54,15 @@ UWVM_MODULE_EXPORT namespace uwvm
     /// @return     exit value
     inline int uwvm_uz_u8main(::std::size_t argc, char8_t const* const* argv) noexcept
     {
-        switch(::uwvm::cmdline::parsing(argc, argv))
+        switch(::ulte::uwvm::cmdline::parsing(argc, argv))
         {
-            case ::uwvm::cmdline::parsing_return_val::def: break;
-            case ::uwvm::cmdline::parsing_return_val::return0: return 0;
-            case ::uwvm::cmdline::parsing_return_val::returnm1: return -1;  // Invalid parameters
+            case ::ulte::uwvm::cmdline::parsing_return_val::def: break;
+            case ::ulte::uwvm::cmdline::parsing_return_val::return0: return 0;
+            case ::ulte::uwvm::cmdline::parsing_return_val::returnm1: return -1;  // Invalid parameters
             default: ::fast_io::unreachable();
         }
 
-        return ::uwvm::run::run();
+        return ::ulte::uwvm::run::run();
     }
 
     /// @brief      uwvm c++ main function
@@ -78,15 +78,15 @@ UWVM_MODULE_EXPORT namespace uwvm
         // Generate guard to protect global pod pointer
 #if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
         // set win32 console output and windows cp to utf8
-        ::uwvm::global::set_win32_console_io_cp_to_utf8 set_native_console_io_cp_to_utf8_ele{};
+        ::ulte::uwvm::global::set_win32_console_io_cp_to_utf8 set_native_console_io_cp_to_utf8_ele{};
         // set win32 console ansi escape
-        ::uwvm::global::enable_win32_ansi enable_native_ansi_ele{};
+        ::ulte::uwvm::global::enable_win32_ansi enable_native_ansi_ele{};
 #endif
         // Automatically get the correct timezone data
-        ::uwvm::global::tz_set_s tz_set_ele{};
+        ::ulte::uwvm::global::tz_set_s tz_set_ele{};
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
         // codecvt parameters on winnt
-        ::uwvm::cmdline::nt_code_cvt_argv_storage const u8_cmdline{::uwvm::cmdline::nt_code_cvt_argv()};
+        ::ulte::uwvm::cmdline::nt_code_cvt_argv_storage const u8_cmdline{::ulte::uwvm::cmdline::nt_code_cvt_argv()};
         auto const argc_uz{u8_cmdline.argc};
         auto const argv_u8{u8_cmdline.argv.data()};
 #else
@@ -98,7 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm
         return uwvm_uz_u8main(argc_uz, argv_u8);
     }
 
-}  // namespace uwvm
+}  // namespace ulte::uwvm
 
 #ifndef UWVM_MODULE
 // macro

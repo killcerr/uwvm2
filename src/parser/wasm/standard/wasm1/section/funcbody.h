@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.type;
 #else
 // macro
 # include <utils/macro/push_macros.h>
@@ -38,26 +38,26 @@ import parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::section
 {
     /// @brief function bodys, use to storage
     struct code_func_body UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::local_entry> locals{};
-        ::parser::wasm::standard::wasm1::type::vec_byte body{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::local_entry> locals{};
+        ::ulte::parser::wasm::standard::wasm1::type::vec_byte body{};
     };
-}  // namespace parser::wasm::standard::wasm1::section
+}  // namespace ulte::parser::wasm::standard::wasm1::section
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
-    struct is_trivially_copyable_or_relocatable<parser::wasm::standard::wasm1::section::code_func_body>
+    struct is_trivially_copyable_or_relocatable<::ulte::parser::wasm::standard::wasm1::section::code_func_body>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<parser::wasm::standard::wasm1::section::code_func_body>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::section::code_func_body>
     {
         inline static constexpr bool value = true;
     };

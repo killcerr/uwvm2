@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.crtmain.global;
+export module ulte.uwvm.crtmain.global;
 export import :tzset;
 /// @brief only support on winnt (with win32 api)
 #if defined(_WIN32) && !defined(__CYGWIN__)

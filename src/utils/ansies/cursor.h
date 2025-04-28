@@ -37,7 +37,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils::ansies
+UWVM_MODULE_EXPORT namespace ulte::utils::ansies
 {
     struct crs
     {
@@ -83,4 +83,4 @@ UWVM_MODULE_EXPORT namespace utils::ansies
         return details::crs_print_reserve_impl(iter, c.cursor_var, c.feat);
     }
 
-}  // namespace utils::ansies
+}  // namespace ulte::utils::ansies

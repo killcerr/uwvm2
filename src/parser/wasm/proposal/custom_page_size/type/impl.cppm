@@ -22,7 +22,7 @@
 
 module;
 
-export module parser.wasm.proposal.custom_page_size.type;
+export module ulte.parser.wasm.proposal.custom_page_size.type;
 export import :value_type;
 
 #ifndef UWVM_MODULE

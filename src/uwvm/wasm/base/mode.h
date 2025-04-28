@@ -28,7 +28,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::wasm::base
+UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::base
 {
     /// @brief wasm running mode
     enum class mode : unsigned
@@ -36,4 +36,4 @@ UWVM_MODULE_EXPORT namespace uwvm::wasm::base
         objdump
     };
 
-}  // namespace parser::wasm::base
+}  // namespace ulte::parser::wasm::base

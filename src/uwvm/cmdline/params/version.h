@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.cmdline;
+import ulte.utils.cmdline;
 #else
 // std
 # include <memory>
@@ -41,25 +41,25 @@ import utils.cmdline;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
+UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
 {
     namespace details
     {
         inline bool version_is_exist{};
         inline constexpr ::fast_io::array<::fast_io::u8string_view, 2> version_alias{u8"-v", u8"-ver"};
-        extern "C++" ::utils::cmdline::parameter_return_type version_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                              ::utils::cmdline::parameter_parsing_results*,
-                                                                              ::utils::cmdline::parameter_parsing_results*) noexcept;
+        extern "C++" ::ulte::utils::cmdline::parameter_return_type version_callback(::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                              ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                              ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter version{
+    inline constexpr ::ulte::utils::cmdline::parameter version{
         .name{u8"--version"},
         .describe{u8"Output version information."},
-        .alias{::utils::cmdline::kns_u8_str_scatter_t{details::version_alias.data(), details::version_alias.size()}},
+        .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{details::version_alias.data(), details::version_alias.size()}},
         .handle{::std::addressof(details::version_callback)},
         .is_exist{::std::addressof(details::version_is_exist)}};
-}  // namespace uwvm::cmdline::paras
+}  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE
 // macro

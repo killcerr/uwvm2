@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1;
+import ulte.parser.wasm.standard.wasm1;
 import :value_type;
 #else
 // std
@@ -43,13 +43,13 @@ import :value_type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1p1::type
 {
     /// @brief      Number Types
     /// @details    Number types are encoded by a single byte.
     /// @details    New feature
     /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.1
-    enum class number_type : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class number_type : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types
         i32 = 0x7F,
@@ -62,7 +62,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
     /// @details    Vector types are also encoded by a single byte.
     /// @details    New feature
     /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.2
-    enum class vector_type : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class vector_type : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         // Vector types
         v128 = 0x7B
@@ -72,7 +72,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
     /// @details    Reference types are also encoded by a single byte.
     /// @details    New feature
     /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.3
-    enum class reference_type : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class reference_type : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         // Reference Types
         funcref = 0x70,
@@ -83,7 +83,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
     /// @details    Value types are encoded with their respective encoding as a number type or reference type.
     /// @details    Extends wasm1's value_type
     /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.4
-    enum class value_type : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class value_type : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types
         i32 = 0x7F,
@@ -103,7 +103,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
     /// @details    Result types are encoded by the respective vectors of value types `.
     /// @details    Modify the result type of wasm1 to support multiple returns.
     /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 5.3.5
-    using result_type = ::parser::wasm::standard::wasm1::type::vec_value_type;
+    using result_type = ::ulte::parser::wasm::standard::wasm1::type::vec_value_type;
 
     // func
 
@@ -317,4 +317,4 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
     {
         return details::print_reserve_value_type_impl(iter, valtype);
     }
-}  // namespace parser::wasm::standard::wasm1p1::type
+}  // namespace ulte::parser::wasm::standard::wasm1p1::type

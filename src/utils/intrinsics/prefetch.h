@@ -40,7 +40,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils::intrinsics
+UWVM_MODULE_EXPORT namespace ulte::utils::intrinsics
 {
     /// @brief      Direct conversion to cpu prefetch instructions
     /// @details    write: write or read sensitive
@@ -61,7 +61,7 @@ UWVM_MODULE_EXPORT namespace utils::intrinsics
 #endif
     }
 
-}  // namespace utils::intrinsics
+}  // namespace ulte::utils::intrinsics
 
 #ifndef UWVM_MODULE
 // macro

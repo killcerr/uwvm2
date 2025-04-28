@@ -23,7 +23,7 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-export import utils.version;  // print defined method should be export
+export import ulte.utils.version;  // print defined method should be export
 #else
 // std
 # include <cstdint>
@@ -36,13 +36,13 @@ export import utils.version;  // print defined method should be export
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::custom
+UWVM_MODULE_EXPORT namespace ulte::uwvm::custom
 {
     /// @brief      UWVM Version
     /// @details    2.major.minor.patch
 #if defined(UWVM_VERSION_X) && defined(UWVM_VERSION_Y) && defined(UWVM_VERSION_Z) && defined(UWVM_VERSION_S)
-    inline constexpr ::utils::version uwvm_version{UWVM_VERSION_X, UWVM_VERSION_Y, UWVM_VERSION_Z, UWVM_VERSION_S};
+    inline constexpr ::ulte::utils::version uwvm_version{UWVM_VERSION_X, UWVM_VERSION_Y, UWVM_VERSION_Z, UWVM_VERSION_S};
 #else
-    inline constexpr ::utils::version uwvm_version{2, 0, 0, 0};
+    inline constexpr ::ulte::utils::version uwvm_version{2, 0, 0, 0};
 #endif
-}  // namespace uwvm::custom
+}  // namespace ulte::uwvm::custom

@@ -27,7 +27,7 @@ module;
 #include <cstddef>
 #include <concepts>
 
-export module utils.ansies:cursor;
+export module ulte.utils.ansies:cursor;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

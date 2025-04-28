@@ -26,7 +26,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.type;
 #else
 // std
 # include <cstdint>
@@ -42,7 +42,7 @@ import parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::binfmt
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt
 {
     struct module_span_t
     {
@@ -55,21 +55,21 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt
         return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4uz) == 0;
     }
 
-    inline constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
+    inline constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
     {
-        ::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
-        ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::parser::wasm::standard::wasm1::type::wasm_u32));
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
+        ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::ulte::parser::wasm::standard::wasm1::type::wasm_u32));
         return ::fast_io::little_endian(temp);
     }
 
     /// @brief      detect wasm binfmt version
     /// @return     0 : error, other : binfmt version
-    inline constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version(::std::byte const* const module_begin,
+    inline constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version(::std::byte const* const module_begin,
                                                                                                 ::std::byte const* const module_end) noexcept
     {
         ::std::byte const* module_curr{module_begin};
 
-        if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
+        if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::ulte::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
         {
             return 0u;
         }
@@ -83,4 +83,4 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt
 
         return binfmt_ver;
     }
-}  // namespace parser::wasm::binfmt
+}  // namespace ulte::parser::wasm::binfmt

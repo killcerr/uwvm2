@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.wasm.feature:feature;
+export module ulte.uwvm.wasm.feature:feature;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

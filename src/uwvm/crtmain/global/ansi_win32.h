@@ -41,7 +41,7 @@ import fast_io;
 #  define UWVM_MODULE_EXPORT
 # endif
 
-UWVM_MODULE_EXPORT namespace uwvm::global
+UWVM_MODULE_EXPORT namespace ulte::uwvm::global
 {
     /// @brief      cmd on windows nt does not enable ansi escaping by default.
     /// @details    Declare this via a global variable to set up ansi escaping at program runtime.
@@ -62,7 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm::global
             ::fast_io::win32::SetConsoleMode(err_handle, err_omode | enable_virtual_terminal_processing);
         }
     };
-}  // namespace uwvm::global
+}  // namespace ulte::uwvm::global
 
 # ifndef UWVM_MODULE
 // macro

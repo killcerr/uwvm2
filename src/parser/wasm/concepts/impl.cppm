@@ -22,7 +22,7 @@
 
 module;
 
-export module parser.wasm.concepts;
+export module ulte.parser.wasm.concepts;
 export import :root;
 export import :operation;
 

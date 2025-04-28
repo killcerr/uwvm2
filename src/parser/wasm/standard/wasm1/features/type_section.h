@@ -27,14 +27,14 @@
 #ifdef UWVM_MODULE
 import fast_io;
 # ifdef UWVM_TIMER
-import utils.debug;
+import ulte.utils.debug;
 # endif
-import parser.wasm.base;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.standard.wasm1.opcode;
-import parser.wasm.binfmt.binfmt_ver1;
+import ulte.parser.wasm.base;
+import ulte.parser.wasm.concepts;
+import ulte.parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.section;
+import ulte.parser.wasm.standard.wasm1.opcode;
+import ulte.parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :feature_def;
 #else
@@ -67,65 +67,65 @@ import :feature_def;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 {
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     struct type_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         inline static constexpr ::fast_io::u8string_view section_name{u8"Type"};
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{
-            static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(::parser::wasm::standard::wasm1::section::section_id::type_sec)};
+        inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 section_id{
+            static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(::ulte::parser::wasm::standard::wasm1::section::section_id::type_sec)};
 
-        ::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
+        ::ulte::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>> types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::features::final_function_type<Fs...>> types{};
     };
 
     /// @brief Define functions for value_type against wasm1 for checking value_type
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr bool define_check_value_type([[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                  ::parser::wasm::standard::wasm1::type::value_type value_type) noexcept
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr bool define_check_value_type([[maybe_unused]] ::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                  ::ulte::parser::wasm::standard::wasm1::type::value_type value_type) noexcept
     {
         switch(value_type)
         {
-            case ::parser::wasm::standard::wasm1::type::value_type::i32: [[fallthrough]];
-            case ::parser::wasm::standard::wasm1::type::value_type::i64: [[fallthrough]];
-            case ::parser::wasm::standard::wasm1::type::value_type::f32: [[fallthrough]];
-            case ::parser::wasm::standard::wasm1::type::value_type::f64: return true;
+            case ::ulte::parser::wasm::standard::wasm1::type::value_type::i32: [[fallthrough]];
+            case ::ulte::parser::wasm::standard::wasm1::type::value_type::i64: [[fallthrough]];
+            case ::ulte::parser::wasm::standard::wasm1::type::value_type::f32: [[fallthrough]];
+            case ::ulte::parser::wasm::standard::wasm1::type::value_type::f64: return true;
             default: return false;
         }
     }
 
     /// @brief      handle type_prefix: "functype"
     /// @details    Separate processing to facilitate reuse in subsequent expansion
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr ::std::byte const* handle_type_prefix_functype(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                                    ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* handle_type_prefix_functype(::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                                    ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
                                                                         module_storage,
                                                                     ::std::byte const* section_curr,
                                                                     ::std::byte const* const section_end,
-                                                                    ::parser::wasm::base::error_impl& err) UWVM_THROWS
+                                                                    ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
 
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
-        using value_type_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> const*;
+        using value_type_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> const*;
 
-        ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
+        ::ulte::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
 
         // For safety, add parentheses to indicate the scope
         // parameter
         {
-            ::parser::wasm::standard::wasm1::type::wasm_u32 para_len{};
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 para_len{};
             auto const [next_para_len, err_para_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                               reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                               ::fast_io::mnp::leb128_get(para_len))};
             if(err_para_len != ::fast_io::parse_code::ok) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_parameter_length;
-                ::parser::wasm::base::throw_wasm_parse_code(err_para_len);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_parameter_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(err_para_len);
             }
 
             section_curr = reinterpret_cast<::std::byte const*>(next_para_len);
@@ -133,13 +133,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             // ... 60 length ... length ... ...
             //               ^^ section_curr
             // If it's a null return value, there's at least one more parameter, so add 1u
-            if(static_cast<::std::size_t>(section_end - section_curr) < para_len + static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(1u))
+            if(static_cast<::std::size_t>(section_end - section_curr) < para_len + static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(1u))
                 [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = para_len;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_parameter_length;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_parameter_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
             // set parameters
@@ -150,7 +150,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check handler
-            static_assert(::parser::wasm::standard::wasm1::features::has_check_value_type<Fs...>, "define_check_value_type(...) not found");
+            static_assert(::ulte::parser::wasm::standard::wasm1::features::has_check_value_type<Fs...>, "define_check_value_type(...) not found");
             // check parameters
             for(auto parameter_curr{ft.parameter.begin}; parameter_curr != ft.parameter.end; ++parameter_curr)
             {
@@ -158,24 +158,24 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.u8 =
-                        static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*parameter_curr);
-                    err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_value_type;
-                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        static_cast<::std::underlying_type_t<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*parameter_curr);
+                    err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_value_type;
+                    ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
         }
 
         // result
         {
-            ::parser::wasm::standard::wasm1::type::wasm_u32 result_len{};
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 result_len{};
             auto const [next_result_len, err_result_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                   reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                                   ::fast_io::mnp::leb128_get(result_len))};
             if(err_result_len != ::fast_io::parse_code::ok) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_result_length;
-                ::parser::wasm::base::throw_wasm_parse_code(err_result_len);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_result_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(err_result_len);
             }
 
             section_curr = reinterpret_cast<::std::byte const*>(next_result_len);
@@ -185,14 +185,14 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             /// @details    In the current version of WebAssembly, the length of the result type vector of a valid function type may be
             ///             at most 1. This restriction may be removed in future versions.
             /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
-            constexpr bool allow_multi_value{::parser::wasm::standard::wasm1::features::allow_multi_result_vector<Fs...>()};
+            constexpr bool allow_multi_value{::ulte::parser::wasm::standard::wasm1::features::allow_multi_result_vector<Fs...>()};
             if constexpr(!allow_multi_value)
             {
-                if(result_len > static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
+                if(result_len > static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                 {
                     err.err_curr = section_curr;
-                    err.err_code = ::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
-                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
+                    ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
 
@@ -200,8 +200,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = result_len;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_result_length;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_result_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
             // set parameters
@@ -218,36 +218,36 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.u8 =
-                        static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*result_curr);
-                    err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_value_type;
-                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        static_cast<::std::underlying_type_t<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*result_curr);
+                    err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_value_type;
+                    ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
         }
 
         // push back
-        auto& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+        auto& typesec{::ulte::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         typesec.types.push_back_unchecked(::std::move(ft));
 
         return section_curr;
     }
 
     /// @brief Define type_prefix for wasm1 Functions for checking type_prefix
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr ::std::byte const* define_type_prefix_handler(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                                   ::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
-                                                                   ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* define_type_prefix_handler(::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                                   ::ulte::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
+                                                                   ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
                                                                        module_storage,
                                                                    ::std::byte const* section_curr,
                                                                    ::std::byte const* const section_end,
-                                                                   ::parser::wasm::base::error_impl& err) UWVM_THROWS
+                                                                   ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
 
         switch(prefix)
         {
-            case ::parser::wasm::standard::wasm1::type::function_type_prefix::functype:
+            case ::ulte::parser::wasm::standard::wasm1::type::function_type_prefix::functype:
             {
                 return handle_type_prefix_functype(sec_adl, module_storage, section_curr, section_end, err);
             }
@@ -255,46 +255,46 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
                 [[unlikely]]
                 {
                     err.err_curr = section_curr;
-                    err.err_selectable.u8 = static_cast<::std::underlying_type_t<::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix);
-                    err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix;
-                    ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    err.err_selectable.u8 = static_cast<::std::underlying_type_t<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix);
+                    err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix;
+                    ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
         }
     }
 
     /// @brief Define the handler function for type_section
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void handle_binfmt_ver1_extensible_section_define(::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                                       ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void handle_binfmt_ver1_extensible_section_define(::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                                       ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
                                                                            module_storage,
                                                                        ::std::byte const* const section_begin,
                                                                        ::std::byte const* const section_end,
-                                                                       ::parser::wasm::base::error_impl& err) UWVM_THROWS
+                                                                       ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
-        ::utils::debug::timer parsing_timer{u8"parse type section (id: 1)"};
+        ::ulte::utils::debug::timer parsing_timer{u8"parse type section (id: 1)"};
 #endif
 
         // get type_section_storage_t from storages
-        auto& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+        auto& typesec{::ulte::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
         // check duplicate
         if(typesec.sec_span.sec_begin) [[unlikely]]
         {
             err.err_curr = section_begin;
             err.err_selectable.u32 = typesec.section_id;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::duplicate_section;
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::duplicate_section;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::parser::wasm::standard::wasm1::type::wasm_byte const*;
+        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const*;
 
         typesec.sec_span.sec_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_begin);
         typesec.sec_span.sec_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_end);
 
         auto section_curr{section_begin};
 
-        ::parser::wasm::standard::wasm1::type::wasm_u32 type_count{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 type_count{};
 
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
@@ -305,21 +305,21 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(type_count_err != ::fast_io::parse_code::ok) [[unlikely]]
         {
             err.err_curr = section_curr;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_type_count;
-            ::parser::wasm::base::throw_wasm_parse_code(type_count_err);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_type_count;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(type_count_err);
         }
 
         typesec.types.reserve(type_count);
 
         section_curr = reinterpret_cast<::std::byte const*>(type_count_next);  // never out of bounds
 
-        ::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
 
         for(; section_curr != section_end;)
         {
             // ... 60 ?? ?? ...
             //     ^^ section_curr
-            ::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix{};
+            ::ulte::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix{};
             // no necessary to check, because section_curr != section_end
             ::fast_io::freestanding::my_memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));
             // set section_curr to next
@@ -327,14 +327,14 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             // ... 60 ?? ?? ...
             //        ^^ section_curr
             // check has func
-            static_assert(::parser::wasm::standard::wasm1::features::has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
+            static_assert(::ulte::parser::wasm::standard::wasm1::features::has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
             // check type count
             if(++type_counter > type_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = type_count;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
             // handle it
             section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err);
@@ -346,11 +346,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             err.err_curr = section_curr;
             err.err_selectable.u32arr[0] = type_counter;
             err.err_selectable.u32arr[1] = type_count;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number;
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
-}  // namespace parser::wasm::standard::wasm1::features
+}  // namespace ulte::parser::wasm::standard::wasm1::features
 
 #ifndef UWVM_MODULE
 // macro

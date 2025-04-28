@@ -42,7 +42,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils::madvise
+UWVM_MODULE_EXPORT namespace ulte::utils::madvise
 {
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
     namespace details::posix
@@ -218,4 +218,4 @@ UWVM_MODULE_EXPORT namespace utils::madvise
 # endif
 #endif
     }
-}  // namespace utils::ansies
+}  // namespace ulte::utils::ansies

@@ -22,7 +22,7 @@
 
 module;
 
-export module parser.wasm.proposal.relaxed_simd.type;
+export module ulte.parser.wasm.proposal.relaxed_simd.type;
 export import :value_type;
 
 #ifndef UWVM_MODULE

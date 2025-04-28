@@ -24,8 +24,8 @@
 
 module;
 
-export module parser.wasm.proposal.half_precision;
-export import parser.wasm.proposal.half_precision.type;
+export module ulte.parser.wasm.proposal.half_precision;
+export import ulte.parser.wasm.proposal.half_precision.type;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

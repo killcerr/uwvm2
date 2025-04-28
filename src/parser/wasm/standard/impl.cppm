@@ -23,16 +23,16 @@
 
 module;
 
-export module parser.wasm.standard;
-export import parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1p1;
-export import parser.wasm.standard.wasm2;
-export import parser.wasm.standard.wasm2_MultiMemory;
-export import parser.wasm.standard.wasm2_TailCalls;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
-export import parser.wasm.standard.wasm2_thread;
-export import parser.wasm.standard.wasm3;
+export module ulte.parser.wasm.standard;
+export import ulte.parser.wasm.standard.wasm1;
+export import ulte.parser.wasm.standard.wasm1p1;
+export import ulte.parser.wasm.standard.wasm2;
+export import ulte.parser.wasm.standard.wasm2_MultiMemory;
+export import ulte.parser.wasm.standard.wasm2_TailCalls;
+export import ulte.parser.wasm.standard.wasm2_TailCalls_FunctionReference;
+export import ulte.parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
+export import ulte.parser.wasm.standard.wasm2_thread;
+export import ulte.parser.wasm.standard.wasm3;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

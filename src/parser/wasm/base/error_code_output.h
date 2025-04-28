@@ -43,7 +43,7 @@ import :error_code;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::base
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
 {
     struct error_output_flag_t
     {
@@ -54,7 +54,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
     struct error_output_t
     {
         ::std::byte const* module_begin{};
-        ::parser::wasm::base::error_impl err{};
+        ::ulte::parser::wasm::base::error_impl err{};
         error_output_flag_t flag{};
     };
 
@@ -243,7 +243,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::ok:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::ok:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -362,7 +362,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_wasm_file_format:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_wasm_file_format:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -541,7 +541,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::no_wasm_section_found:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::no_wasm_section_found:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -720,7 +720,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_section_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_section_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -899,7 +899,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_section_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_section_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -1118,7 +1118,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::no_enough_space:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::no_enough_space:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -1297,7 +1297,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_section_id:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_section_id:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -1516,7 +1516,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_custom_name_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_custom_name_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -1695,7 +1695,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_parameter_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_parameter_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -1875,7 +1875,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
 
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_parameter_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_parameter_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -2094,7 +2094,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_value_type:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_value_type:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -2313,7 +2313,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_result_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_result_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -2493,7 +2493,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
 
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_result_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_result_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -2712,7 +2712,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -2901,7 +2901,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -3120,7 +3120,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::duplicate_section:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::duplicate_section:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -3339,7 +3339,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_type_count:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_type_count:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -3518,7 +3518,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -3737,7 +3737,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::type_section_resolved_not_match_the_actual_number:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::type_section_resolved_not_match_the_actual_number:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -3996,7 +3996,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::forward_dependency_missing:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::forward_dependency_missing:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -4255,7 +4255,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_import_count:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_import_count:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -4434,7 +4434,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::import_section_resolved_exceeded_the_actual_number:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::import_section_resolved_exceeded_the_actual_number:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -4653,7 +4653,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::import_section_resolved_not_match_the_actual_number:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::import_section_resolved_not_match_the_actual_number:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -4912,7 +4912,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_import_module_name_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_import_module_name_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -5091,7 +5091,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::import_module_name_length_cannot_be_zero:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::import_module_name_length_cannot_be_zero:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -5270,7 +5270,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::import_module_name_too_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::import_module_name_too_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -5449,7 +5449,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_import_extern_name_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_import_extern_name_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -5628,7 +5628,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -5807,7 +5807,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::import_extern_name_too_length:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::import_extern_name_too_length:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -5986,7 +5986,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_importdesc_prefix:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_importdesc_prefix:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -6205,7 +6205,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::invalid_type_index:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_type_index:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -6384,7 +6384,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                 }
                 return;
             }
-            case ::parser::wasm::base::wasm_parse_error_code::illegal_type_index:
+            case ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_type_index:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -6606,7 +6606,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
         }
     }
 
-}  // namespace parser::wasm::base
+}  // namespace ulte::parser::wasm::base
 
 #ifndef UWVM_MODULE
 // macro

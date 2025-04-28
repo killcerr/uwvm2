@@ -30,7 +30,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module parser.wasm.concepts:root;
+export module ulte.parser.wasm.concepts:root;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

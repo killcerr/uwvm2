@@ -27,9 +27,9 @@ module;
 #include <cstddef>
 #include <concepts>
 #include <cstdlib>
-# include <memory>
+#include <memory>
 
-export module uwvm.utils.ansies:no_color;
+export module ulte.uwvm.utils.ansies:no_color;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

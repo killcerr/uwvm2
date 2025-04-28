@@ -22,7 +22,7 @@
 
 module;
 
-export module utils.ansies;
+export module ulte.utils.ansies;
 export import :cursor;
 export import :rgb;
 

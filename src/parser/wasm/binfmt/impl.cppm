@@ -24,9 +24,9 @@
 
 module;
 
-export module parser.wasm.binfmt;
-export import parser.wasm.binfmt.base;
-export import parser.wasm.binfmt.binfmt_ver1;
+export module ulte.parser.wasm.binfmt;
+export import ulte.parser.wasm.binfmt.base;
+export import ulte.parser.wasm.binfmt.binfmt_ver1;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

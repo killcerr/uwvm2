@@ -38,4 +38,4 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::proposal::custom_page_size::value_type {}  // namespace parser::wasm::proposal::custom_page_size::value_type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::proposal::custom_page_size::value_type {}  // namespace ulte::parser::wasm::proposal::custom_page_size::value_type

@@ -24,7 +24,7 @@
 
 module;
 
-export module parser.wasm.base;
+export module ulte.parser.wasm.base;
 export import :error;
 export import :error_code;
 export import :error_code_output;

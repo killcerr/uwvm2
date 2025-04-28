@@ -25,7 +25,7 @@ module;
 // std
 #include <memory>
 
-export module uwvm.cmdline:params;
+export module ulte.uwvm.cmdline:params;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

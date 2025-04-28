@@ -37,7 +37,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::proposal::half_precision::value_type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::proposal::half_precision::value_type
 {
     /// @brief      fp16
     /// @details    new feature
@@ -46,4 +46,4 @@ UWVM_MODULE_EXPORT namespace parser::wasm::proposal::half_precision::value_type
     using wasm_fp16 = __float16;
 #endif
 
-}  // namespace parser::wasm::proposal::half_precision::value_type
+}  // namespace ulte::parser::wasm::proposal::half_precision::value_type

@@ -30,7 +30,7 @@ module;
 // macro
 #include <parser/wasm/feature/feature_push_macro.h>
 
-export module parser.wasm.standard.wasm1p1.type:value_binfmt;
+export module ulte.parser.wasm.standard.wasm1p1.type:value_binfmt;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

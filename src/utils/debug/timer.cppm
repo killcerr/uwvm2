@@ -28,7 +28,7 @@ module;
 # include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 #endif
 
-export module utils.debug:timer;
+export module ulte.utils.debug:timer;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

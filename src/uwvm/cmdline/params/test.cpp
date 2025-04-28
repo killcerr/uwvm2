@@ -33,27 +33,28 @@
 
 # ifdef UWVM_MODULE
 import fast_io;
-import utils.cmdline;
-import uwvm.io;
+import ulte.utils.cmdline;
+import ulte.uwvm.io;
 # else
 #  include <fast_io.h>
 #  include <utils/cmdline/impl.h>
 #  include <uwvm/io/impl.h>
 # endif
 
-namespace uwvm::cmdline::paras::details
+namespace ulte::uwvm::cmdline::paras::details
 {
-    UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type test_callback([[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_begin,
-                                                                               [[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_curr,
-                                                                               [[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_end) noexcept
+    UWVM_GNU_COLD extern ::ulte::utils::cmdline::parameter_return_type
+        test_callback([[maybe_unused]] ::ulte::utils::cmdline::parameter_parsing_results* para_begin,
+                      [[maybe_unused]] ::ulte::utils::cmdline::parameter_parsing_results* para_curr,
+                      [[maybe_unused]] ::ulte::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
         // Write the test here
 
         // return imme
-        return ::utils::cmdline::parameter_return_type::return_imme;
+        return ::ulte::utils::cmdline::parameter_return_type::return_imme;
     }
 
-}  // namespace uwvm::cmdline::paras::details
+}  // namespace ulte::uwvm::cmdline::paras::details
 
 // macro
 # include <uwvm/utils/ansies/uwvm_color_pop_macro.h>

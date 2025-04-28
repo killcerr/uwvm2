@@ -24,7 +24,7 @@
 
 module;
 
-export module uwvm.wasm.base;
+export module ulte.uwvm.wasm.base;
 export import :abi;
 export import :mode;
 

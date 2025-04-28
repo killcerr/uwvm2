@@ -24,7 +24,7 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.features;
+export module ulte.parser.wasm.standard.wasm1.features;
 export import :def;
 export import :feature_def;
 export import :type_section;

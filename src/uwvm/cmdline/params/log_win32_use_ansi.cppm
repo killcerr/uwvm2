@@ -28,7 +28,7 @@ module;
 #include <utils/macro/push_macros.h>
 #include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 
-export module uwvm.cmdline.params:log_win32_use_ansi;
+export module ulte.uwvm.cmdline.params:log_win32_use_ansi;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

@@ -24,7 +24,7 @@
 
 module;
 
-export module uwvm.wasm.base:abi;
+export module ulte.uwvm.wasm.base:abi;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

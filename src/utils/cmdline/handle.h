@@ -47,7 +47,7 @@ import fast_io_crypto;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils::cmdline
+UWVM_MODULE_EXPORT namespace ulte::utils::cmdline
 {
     /// @brief Used to indicate parameter type
     enum class parameter_parsing_results_type : unsigned
@@ -514,7 +514,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         }
     }
 
-}  // namespace utils::cmdline
+}  // namespace ulte::utils::cmdline
 
 #ifndef UWVM_MODULE
 // macro

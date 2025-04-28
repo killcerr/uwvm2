@@ -23,15 +23,15 @@
 module;
 
 // std
-# include <cstddef>
-# include <cstdint>
-# include <concepts>
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
 // macro
-# include <utils/macro/push_macros.h>
-# include <utils/ansies/ansi_push_macro.h>
-# include "wasm_code_color_push_macro.h"
+#include <utils/macro/push_macros.h>
+#include <utils/ansies/ansi_push_macro.h>
+#include "wasm_code_color_push_macro.h"
 
-export module parser.wasm.base:error_code_output;
+export module ulte.parser.wasm.base:error_code_output;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

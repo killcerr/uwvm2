@@ -49,14 +49,14 @@ import :section_type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::type
 {
     /// @brief      Indices
     /// @details    Definitionsarereferencedwithzero-basedindices. Eachclassofdefinitionhasitsownindexspace, asdistinguished
     ///             by the following classes.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.1
-    using indices = ::parser::wasm::standard::wasm1::type::wasm_u32;
+    using indices = ::ulte::parser::wasm::standard::wasm1::type::wasm_u32;
 
     /// @brief      Function Types
     /// @details    Function types are encoded by the byte 0x60 followed by the respective vectors of parameter and result types.
@@ -66,7 +66,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     {
         ::fast_io::u8string_view custom_name{};  // The name used for the data segment
 
-        ::parser::wasm::standard::wasm1::type::function_type const* func_type{};
+        ::ulte::parser::wasm::standard::wasm1::type::function_type const* func_type{};
         bool is_exported{};
     };
 
@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
         ::fast_io::u8string_view custom_name{};  // The name used for the data segment
 
         indices count{};
-        ::parser::wasm::standard::wasm1::type::value_type type{};
+        ::ulte::parser::wasm::standard::wasm1::type::value_type type{};
     };
 
     /// @brief      Exports
@@ -91,7 +91,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     {
         ::fast_io::u8string_view export_name{};
         indices index{};
-        ::parser::wasm::standard::wasm1::type::external_types kind{};
+        ::ulte::parser::wasm::standard::wasm1::type::external_types kind{};
     };
 
     /// @brief      Imports
@@ -104,7 +104,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
 
         ::fast_io::u8string_view module_name{};
         ::fast_io::u8string_view extern_name{};
-        ::parser::wasm::standard::wasm1::type::external_types importdesc{};
+        ::ulte::parser::wasm::standard::wasm1::type::external_types importdesc{};
     };
 
     /// @brief      Expressions
@@ -116,13 +116,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     {
         union GlobalStorage
         {
-            ::parser::wasm::standard::wasm1::type::wasm_i32 i32;
-            ::parser::wasm::standard::wasm1::type::wasm_i64 i64;
-            ::parser::wasm::standard::wasm1::type::wasm_f32 f32;
-            ::parser::wasm::standard::wasm1::type::wasm_f64 f64;
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_i32 i32;
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_i64 i64;
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_f32 f32;
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_f64 f64;
         } global_storage;
 
-        ::parser::wasm::standard::wasm1::type::op_basic_type type_opcode{};
+        ::ulte::parser::wasm::standard::wasm1::type::op_basic_type type_opcode{};
     };
 
     /// @brief      Globals
@@ -133,7 +133,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     {
         ::fast_io::u8string_view custom_name;  // The name used for the data segment
 
-        ::parser::wasm::standard::wasm1::type::global_type type{};
+        ::ulte::parser::wasm::standard::wasm1::type::global_type type{};
         initializer_exp init{};
     };
 
@@ -158,57 +158,57 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     {
         indices data{};
         initializer_exp offset{};
-        ::parser::wasm::standard::wasm1::type::vec_byte init{};
+        ::ulte::parser::wasm::standard::wasm1::type::vec_byte init{};
     };
 
-}  // namespace parser::wasm::standard::wasm1::type
+}  // namespace ulte::parser::wasm::standard::wasm1::type
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_function_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::local_function_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_entry>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::local_entry>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::import_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::import_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::local_global_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::local_global_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::export_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::export_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_trivially_copyable_or_relocatable<::parser::wasm::standard::wasm1::type::elem_segment_type>
+    struct is_trivially_copyable_or_relocatable<::ulte::parser::wasm::standard::wasm1::type::elem_segment_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::elem_segment_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::elem_segment_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::data_segment>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::data_segment>
     {
         inline static constexpr bool value = true;
     };

@@ -41,7 +41,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils::cmdline
+UWVM_MODULE_EXPORT namespace ulte::utils::cmdline
 {
     /// @brief      Shortest Path Algorithm for Strings
     /// @details    Compute the shortest path between two strings with a time complexity of O(n²) and a space complexity of O(n).
@@ -102,7 +102,7 @@ UWVM_MODULE_EXPORT namespace utils::cmdline
         return ret;
     }
 
-}  // namespace utils::cmdline
+}  // namespace ulte::utils::cmdline
 
 #ifndef UWVM_MODULE
 // macro

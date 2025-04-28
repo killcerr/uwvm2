@@ -45,7 +45,7 @@ import :value_binfmt;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::type
 {
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
@@ -53,8 +53,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
     struct limits_type
     {
-        ::parser::wasm::standard::wasm1::type::wasm_u32 min{};
-        ::parser::wasm::standard::wasm1::type::wasm_u32 max{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 min{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 max{};
         bool present_max{};
     };
 
@@ -64,8 +64,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.3
     struct function_type
     {
-        ::parser::wasm::standard::wasm1::type::vec_value_type parameter{};
-        ::parser::wasm::standard::wasm1::type::vec_value_type result{};
+        ::ulte::parser::wasm::standard::wasm1::type::vec_value_type parameter{};
+        ::ulte::parser::wasm::standard::wasm1::type::vec_value_type result{};
     };
 
     /// @brief      Memory Types
@@ -86,7 +86,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     struct table_type
     {
         limits_type limits{};
-        ::parser::wasm::standard::wasm1::type::value_type reftype{};
+        ::ulte::parser::wasm::standard::wasm1::type::value_type reftype{};
 
         bool is_exported{};
     };
@@ -97,7 +97,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.7
     struct global_type
     {
-        ::parser::wasm::standard::wasm1::type::value_type type{};
+        ::ulte::parser::wasm::standard::wasm1::type::value_type type{};
         bool is_mutable{};
 
         bool is_exported{};
@@ -107,7 +107,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @details    External types classify imports and external values with their respective types
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.8
-    enum class external_types : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class external_types : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         func = 0x00u,
         table = 0x01u,
@@ -272,24 +272,24 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
         return details::print_reserve_extern_kind_impl(iter, exttype);
     }
 
-}  // namespace parser::wasm::standard::wasm1::type
+}  // namespace ulte::parser::wasm::standard::wasm1::type
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::function_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::function_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::table_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::table_type>
     {
         inline static constexpr bool value = true;
     };
 
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::type::memory_type>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::type::memory_type>
     {
         inline static constexpr bool value = true;
     };

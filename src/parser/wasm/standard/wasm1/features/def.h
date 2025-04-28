@@ -26,11 +26,11 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.standard.wasm1.opcode;
-import parser.wasm.binfmt.binfmt_ver1;
+import ulte.parser.wasm.concepts;
+import ulte.parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.section;
+import ulte.parser.wasm.standard.wasm1.opcode;
+import ulte.parser.wasm.binfmt.binfmt_ver1;
 #else
 // std
 # include <cstddef>
@@ -56,7 +56,7 @@ import parser.wasm.binfmt.binfmt_ver1;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 {
     ///
     /// @brief Define structures or concepts related to the version of binfmt
@@ -78,7 +78,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <typename FeatureType>
     concept has_value_type = requires {
         typename FeatureType::value_type;
-        requires ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+        requires ::ulte::parser::wasm::concepts::operation::details::check_is_type_replacer<::ulte::parser::wasm::concepts::operation::type_replacer,
                                                                                       typename FeatureType::value_type>;
     };
 
@@ -86,27 +86,27 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     inline consteval auto get_value_type() noexcept
     {
         if constexpr(has_value_type<FeatureType>) { return typename FeatureType::value_type{}; }
-        else { return ::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else { return ::ulte::parser::wasm::concepts::operation::irreplaceable_t{}; }
     }
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    using final_value_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_value_type<Fs>())...>;
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    using final_value_type_t = ::ulte::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_value_type<Fs>())...>;
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     struct vec_value_type
     {
         static_assert(::std::is_enum_v<final_value_type_t<Fs...>>, "final_value_type_t<Fs...> is not enumeration");
-        static_assert(::std::same_as<::std::underlying_type_t<final_value_type_t<Fs...>>, ::parser::wasm::standard::wasm1::type::wasm_byte>,
+        static_assert(::std::same_as<::std::underlying_type_t<final_value_type_t<Fs...>>, ::ulte::parser::wasm::standard::wasm1::type::wasm_byte>,
                       "final_value_type_t<Fs...> enumeration is not base on wasm_byte");
 
         final_value_type_t<Fs...> const* begin{};
         final_value_type_t<Fs...> const* end{};
     };
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     using final_result_type = vec_value_type<Fs...>;
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     struct final_function_type
     {
         final_result_type<Fs...> parameter{};
@@ -125,7 +125,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <typename FeatureType>
     concept has_type_prefix = requires {
         typename FeatureType::type_prefix;
-        requires ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+        requires ::ulte::parser::wasm::concepts::operation::details::check_is_type_replacer<::ulte::parser::wasm::concepts::operation::type_replacer,
                                                                                       typename FeatureType::type_prefix>;
     };
 
@@ -133,11 +133,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     inline consteval auto get_type_prefix() noexcept
     {
         if constexpr(has_type_prefix<FeatureType>) { return typename FeatureType::type_prefix{}; }
-        else { return ::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else { return ::ulte::parser::wasm::concepts::operation::irreplaceable_t{}; }
     }
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    using final_type_prefix_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_type_prefix<Fs>())...>;
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    using final_type_prefix_t = ::ulte::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_type_prefix<Fs>())...>;
 
     /// @brief      allow multi value
     /// @details    In the current version of WebAssembly, the length of the result type vector of a valid function type may be
@@ -156,7 +156,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <typename FsCurr>
     concept has_allow_multi_result_vector = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_result_vector)>, bool>; };
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     inline consteval bool allow_multi_result_vector() noexcept
     {
         return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
@@ -213,7 +213,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     template <typename FeatureType, typename... Fs>
     concept has_extern_type = requires {
         typename FeatureType::template extern_type<Fs...>;
-        requires ::parser::wasm::concepts::operation::details::check_is_type_replacer<::parser::wasm::concepts::operation::type_replacer,
+        requires ::ulte::parser::wasm::concepts::operation::details::check_is_type_replacer<::ulte::parser::wasm::concepts::operation::type_replacer,
                                                                                       typename FeatureType::template extern_type<Fs...>>;
     };
 
@@ -221,21 +221,21 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     inline consteval auto get_extern_type() noexcept
     {
         if constexpr(has_extern_type<FeatureType>) { return typename FeatureType::template extern_type<Fs...>{}; }
-        else { return ::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else { return ::ulte::parser::wasm::concepts::operation::irreplaceable_t{}; }
     }
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    using final_extern_type_t = ::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_extern_type<Fs, Fs...>())...>;
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    using final_extern_type_t = ::ulte::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_extern_type<Fs, Fs...>())...>;
 
     template <typename... Fs>
     concept is_valid_final_extern_type_t = requires(final_extern_type_t<Fs...> ext) {
         requires ::std::is_enum_v<decltype(ext.type)>;
-        requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::parser::wasm::standard::wasm1::type::wasm_byte>;
+        requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::ulte::parser::wasm::standard::wasm1::type::wasm_byte>;
         decltype(ext.type)::external_type_end;
         requires ::std::is_union_v<decltype(ext.storage)>;
     };
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     struct final_import_type
     {
         static_assert(is_valid_final_extern_type_t<Fs...>);
@@ -248,18 +248,18 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         final_extern_type_t<Fs...> imports{};
     };
 
-}  // namespace parser::wasm::standard::wasm1::features
+}  // namespace ulte::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::features::final_function_type<Fs...>>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::features::final_function_type<Fs...>>
     {
         inline static constexpr bool value = true;
     };
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::features::final_import_type<Fs...>>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::features::final_import_type<Fs...>>
     {
         inline static constexpr bool value = true;
     };

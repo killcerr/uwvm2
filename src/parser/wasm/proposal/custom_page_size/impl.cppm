@@ -24,8 +24,8 @@
 
 module;
 
-export module parser.wasm.proposal.custom_page_size;
-export import parser.wasm.proposal.custom_page_size.type;
+export module ulte.parser.wasm.proposal.custom_page_size;
+export import ulte.parser.wasm.proposal.custom_page_size.type;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

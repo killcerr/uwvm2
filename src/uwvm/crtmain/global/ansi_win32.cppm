@@ -28,7 +28,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module uwvm.crtmain.global:ansi_win32;
+export module ulte.uwvm.crtmain.global:ansi_win32;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

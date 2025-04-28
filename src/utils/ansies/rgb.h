@@ -37,7 +37,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace utils::ansies
+UWVM_MODULE_EXPORT namespace ulte::utils::ansies
 {
     struct rgb
     {
@@ -81,4 +81,4 @@ UWVM_MODULE_EXPORT namespace utils::ansies
         return details::rgb_print_reserve_impl(iter, color.r, color.g, color.b);
     }
 
-}  // namespace utils::ansies
+}  // namespace ulte::utils::ansies

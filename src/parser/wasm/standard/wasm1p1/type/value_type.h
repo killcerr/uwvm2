@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1;
+import ulte.parser.wasm.standard.wasm1;
 #else
 // std
 # include <cstdint>
@@ -42,7 +42,7 @@ import parser.wasm.standard.wasm1;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1p1::type
 {
     /// @brief      Vector Types
     /// @details    Vector types classify vectors of numeric values processed by vector instructions (also known as SIMD instructions,
@@ -350,4 +350,4 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1p1::type
     {
         return details::print_reserve_v128_i8x16_impl(iter, v128_val);
     }
-}  // namespace parser::wasm::standard::wasm1p1::type
+}  // namespace ulte::parser::wasm::standard::wasm1p1::type

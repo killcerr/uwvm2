@@ -28,7 +28,7 @@ module;
 #include <compare>
 #include <concepts>
 
-export module utils.version:version;
+export module ulte.utils.version:version;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

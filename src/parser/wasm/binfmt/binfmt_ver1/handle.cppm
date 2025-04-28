@@ -36,7 +36,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module parser.wasm.binfmt.binfmt_ver1:handler;
+export module ulte.parser.wasm.binfmt.binfmt_ver1:handler;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

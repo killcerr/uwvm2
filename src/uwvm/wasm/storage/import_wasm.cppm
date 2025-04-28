@@ -24,7 +24,7 @@
 
 module;
 
-export module uwvm.wasm.storage:import_wasm;
+export module ulte.uwvm.wasm.storage:import_wasm;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

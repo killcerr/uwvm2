@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.run;
+export module ulte.uwvm.run;
 export import :run;
 
 #ifndef UWVM_MODULE

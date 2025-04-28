@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.type;
 #else
 // std
 # include <cstddef>
@@ -46,7 +46,7 @@ import parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::wasm::custom
+UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::custom
 {
     /// @param  0: custom_begin
     /// @param  1: custom_end

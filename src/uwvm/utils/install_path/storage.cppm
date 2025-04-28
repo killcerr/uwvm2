@@ -30,7 +30,7 @@ module;
 # include <fast_io_driver/install_path.h>
 #endif
 
-export module uwvm.utils.install_path:storage;
+export module ulte.uwvm.utils.install_path:storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

@@ -31,7 +31,7 @@ module;
 #include <algorithm>
 #include <vector>
 
-export module parser.wasm.concepts:operation;
+export module ulte.parser.wasm.concepts:operation;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

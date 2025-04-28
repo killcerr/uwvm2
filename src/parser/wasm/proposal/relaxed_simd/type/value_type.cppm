@@ -30,7 +30,7 @@ module;
 // macro
 #include <parser/wasm/feature/feature_push_macro.h>
 
-export module parser.wasm.proposal.relaxed_simd.type:value_type;
+export module ulte.parser.wasm.proposal.relaxed_simd.type:value_type;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

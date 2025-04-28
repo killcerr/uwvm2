@@ -23,7 +23,7 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-import parser.wasm.standard.wasm2;
+import ulte.parser.wasm.standard.wasm2;
 #else
 // std
 # include <cstdint>
@@ -39,7 +39,7 @@ import parser.wasm.standard.wasm2;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm3::type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm3::type
 {
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
@@ -47,9 +47,9 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm3::type
     /// @see        WebAssembly Release 3.0 (Draft 2024-09-21) § 2.3.12
     struct limits
     {
-        ::parser::wasm::standard::wasm1::type::wasm_u64 min{};
-        ::parser::wasm::standard::wasm1::type::wasm_u64 max{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u64 min{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u64 max{};
         bool present_max{};
     };
 
-}  // namespace parser::wasm::standard::wasm3::type
+}  // namespace ulte::parser::wasm::standard::wasm3::type

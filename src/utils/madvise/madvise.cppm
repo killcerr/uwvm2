@@ -26,13 +26,13 @@ module;
 #include <cstdint>
 #include <cstddef>
 #include <concepts>
-# include <memory>
+#include <memory>
 // sys
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 # include <sys/mman.h>
 #endif
 
-export module utils.madvise:madvise;
+export module ulte.utils.madvise:madvise;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

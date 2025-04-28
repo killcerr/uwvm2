@@ -22,7 +22,7 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.section:section_type;
+export module ulte.parser.wasm.standard.wasm1.section:section_type;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

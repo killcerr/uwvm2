@@ -26,11 +26,11 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.base;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.binfmt.base;
+import ulte.parser.wasm.base;
+import ulte.parser.wasm.concepts;
+import ulte.parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.section;
+import ulte.parser.wasm.binfmt.base;
 import :section;
 import :def;
 #else
@@ -65,23 +65,23 @@ import :def;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
 {
-    template <::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void handle_binfmt_ver1_custom_section(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void handle_binfmt_ver1_custom_section(::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
                                                             ::std::byte const* section_begin,
                                                             ::std::byte const* section_end,
-                                                            ::parser::wasm::base::error_impl& err) UWVM_THROWS
+                                                            ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
-        ::parser::wasm::standard::wasm1::section::custom_section cs{};
+        ::ulte::parser::wasm::standard::wasm1::section::custom_section cs{};
 
-        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::parser::wasm::standard::wasm1::type::wasm_byte const*;
+        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const*;
         cs.sec_span.sec_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_begin);
         cs.sec_span.sec_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_end);
 
         // ... | name_length ... name ... custombegin ... | section_end
         //       ^^ section_begin
-        ::parser::wasm::standard::wasm1::type::wasm_u32 name_len{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 name_len{};
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
         auto const [next_name_len, err_name_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_begin),
                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
@@ -90,8 +90,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         if(err_name_len != ::fast_io::parse_code::ok) [[unlikely]]
         {
             err.err_curr = section_begin;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_custom_name_length;
-            ::parser::wasm::base::throw_wasm_parse_code(err_name_len);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_custom_name_length;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(err_name_len);
         }
 
         // ... | name_length ... name ... custombegin ... | section_end

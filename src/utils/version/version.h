@@ -37,7 +37,7 @@ import fast_io;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace utils
+UWVM_MODULE_EXPORT namespace ulte::utils
 {
     // version does not add meaningless namespaces.
     struct version
@@ -102,4 +102,4 @@ UWVM_MODULE_EXPORT namespace utils
         return details::version_print_reserve_impl(iter, ver.x, ver.y, ver.z, ver.state);
     }
 
-}  // namespace utils
+}  // namespace ulte::utils

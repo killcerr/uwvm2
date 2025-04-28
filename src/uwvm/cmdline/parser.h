@@ -24,14 +24,14 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm.io;
-import utils.ansies;
-import utils.cmdline;
+import ulte.uwvm.io;
+import ulte.utils.ansies;
+import ulte.utils.cmdline;
 # ifdef UWVM_TIMER
-import utils.debug;
+import ulte.utils.debug;
 # endif
-import uwvm.utils.ansies;
-import uwvm.cmdline.params;
+import ulte.uwvm.utils.ansies;
+import ulte.uwvm.cmdline.params;
 import :params;
 #else
 // std
@@ -60,7 +60,7 @@ import :params;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm::cmdline
+UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline
 {
     enum class parsing_return_val : unsigned
     {
@@ -70,19 +70,19 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
     };
 
     // globals
-    inline ::fast_io::vector<::utils::cmdline::parameter_parsing_results> parsing_result{};
+    inline ::fast_io::vector<::ulte::utils::cmdline::parameter_parsing_results> parsing_result{};
     inline char8_t const* argv0_dir{};
-    inline ::utils::cmdline::parameter_parsing_results* wasm_file_ppos{};
+    inline ::ulte::utils::cmdline::parameter_parsing_results* wasm_file_ppos{};
 
     /// @brief parsing cmdline
     inline constexpr parsing_return_val parsing(::std::size_t argc, char8_t const* const* argv) noexcept
     {
 #ifdef UWVM_TIMER
-        ::utils::debug::timer parsing_timer{u8"parsing parameters"};
+        ::ulte::utils::debug::timer parsing_timer{u8"parsing parameters"};
 #endif
 
         auto& pr{parsing_result};
-        auto const& ht{::uwvm::cmdline::hash_table};
+        auto const& ht{::ulte::uwvm::cmdline::hash_table};
 
         // It is assumed that they are all initialized by default and no checks will be made
 #if 0 
@@ -93,14 +93,14 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         // If argc is 0, prohibit running
         if(argc == 0) [[unlikely]]
         {
-            ::fast_io::io::perr(::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::ulte::uwvm::u8log_output,
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"No Parameters.",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
             return parsing_return_val::returnm1;
         }
@@ -112,7 +112,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         {
             pr.emplace_back_unchecked(::fast_io::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
                                       nullptr,
-                                      ::utils::cmdline::parameter_parsing_results_type::dir);
+                                      ::ulte::utils::cmdline::parameter_parsing_results_type::dir);
             // storage argv0
             argv0_dir = *curr_argv;
         }
@@ -136,42 +136,42 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
             {
                 // this is a parameter
                 // Special treatment for run
-                constexpr auto run_para{::std::addressof(::uwvm::cmdline::paras::run)};
+                constexpr auto run_para{::std::addressof(::ulte::uwvm::cmdline::paras::run)};
 
                 // find hash table
-                auto const para{::utils::cmdline::find_from_hash_table(ht, argv_str)};
+                auto const para{::ulte::utils::cmdline::find_from_hash_table(ht, argv_str)};
 
                 if(para == nullptr) [[unlikely]]
                 {
                     // invalid parameter
-                    pr.emplace_back_unchecked(argv_str, nullptr, ::utils::cmdline::parameter_parsing_results_type::invalid_parameter);
+                    pr.emplace_back_unchecked(argv_str, nullptr, ::ulte::utils::cmdline::parameter_parsing_results_type::invalid_parameter);
                 }
                 else if(para == run_para)
                 {
                     // All subsequent parameters are runtime parameters and need not be parsed further, jumping directly out of the
-                    pr.emplace_back_unchecked(argv_str, run_para, ::utils::cmdline::parameter_parsing_results_type::parameter);  // -- run
+                    pr.emplace_back_unchecked(argv_str, run_para, ::ulte::utils::cmdline::parameter_parsing_results_type::parameter);  // -- run
 
                     // grammatical error
                     if(++curr_argv == argv_end) [[unlikely]]
                     {
-                        ::fast_io::io::perr(::uwvm::u8log_output,
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                        ::fast_io::io::perr(::ulte::uwvm::u8log_output,
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                             u8"uwvm: ",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                             u8"[error] ",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"Usage: [",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                             u8"--run",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"|",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                             u8"-r",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"] ",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                             u8"<file> <argv[1]> <argv[2]> ...",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                             u8"\n\n");
 
                         return parsing_return_val::returnm1;
@@ -179,13 +179,13 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
                     wasm_file_ppos = ::std::addressof(pr.emplace_back_unchecked(fast_io::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
                                                                                 nullptr,
-                                                                                ::utils::cmdline::parameter_parsing_results_type::occupied_arg));  // wasm file
+                                                                                ::ulte::utils::cmdline::parameter_parsing_results_type::occupied_arg));  // wasm file
 
                     for(++curr_argv; curr_argv != argv_end; ++curr_argv)
                     {
                         pr.emplace_back_unchecked(::fast_io::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
                                                   nullptr,
-                                                  ::utils::cmdline::parameter_parsing_results_type::occupied_arg);  // wasm parameters
+                                                  ::ulte::utils::cmdline::parameter_parsing_results_type::occupied_arg);  // wasm parameters
                     }
 
                     break;  // End preprocessing
@@ -197,15 +197,15 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                         // not nullptr
                         if(auto& para_is_exist{*para->is_exist}; para_is_exist)
                         {
-                            pr.emplace_back_unchecked(argv_str, para, ::utils::cmdline::parameter_parsing_results_type::duplicate_parameter);
+                            pr.emplace_back_unchecked(argv_str, para, ::ulte::utils::cmdline::parameter_parsing_results_type::duplicate_parameter);
                         }
                         else
                         {
                             para_is_exist = true;  // Marker already exists
-                            pr.emplace_back_unchecked(argv_str, para, ::utils::cmdline::parameter_parsing_results_type::parameter);
+                            pr.emplace_back_unchecked(argv_str, para, ::ulte::utils::cmdline::parameter_parsing_results_type::parameter);
                         }
                     }
-                    else { pr.emplace_back_unchecked(argv_str, para, ::utils::cmdline::parameter_parsing_results_type::parameter); }
+                    else { pr.emplace_back_unchecked(argv_str, para, ::ulte::utils::cmdline::parameter_parsing_results_type::parameter); }
 
                     // The preprocessor that calls this function
                     // Preprocessing is used to jump directly to the backmarked section.
@@ -215,7 +215,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     if(para->pretreatment) { para->pretreatment(curr_argv, argv_end, pr); }
                 }
             }
-            else { pr.emplace_back_unchecked(argv_str, nullptr, ::utils::cmdline::parameter_parsing_results_type::arg); }
+            else { pr.emplace_back_unchecked(argv_str, nullptr, ::ulte::utils::cmdline::parameter_parsing_results_type::arg); }
         }
 
         //   "--run" (end)         "wasm file name"
@@ -228,17 +228,17 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
             for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
             {
-                if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::invalid_parameter) [[unlikely]]
+                if(curr_pr->type == ::ulte::utils::cmdline::parameter_parsing_results_type::invalid_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(::uwvm::u8log_output,
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                    ::fast_io::io::perr(::ulte::uwvm::u8log_output,
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                         u8"[error] ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"invalid parameter: ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                         curr_pr->str);
 
                     // Finding the most similar parameters
@@ -255,7 +255,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     ::std::size_t const test_size{str_size * 4u / 10u};
                     ::std::size_t f_test_size{test_size};
 
-                    for(auto const& j: ::uwvm::cmdline::parameter_lookup_table)
+                    for(auto const& j: ::ulte::uwvm::cmdline::parameter_lookup_table)
                     {
                         if(j.str.size() < str_size - f_test_size || j.str.size() > str_size + f_test_size)
                         {
@@ -268,7 +268,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
                         // Calculate the shortest path distance
                         if(auto const dp_res{
-                               ::utils::cmdline::shortest_path<shortest_path_stack_size>(curr_pr->str.data(), curr_pr->str.size(), j.str.data(), j.str.size())};
+                               ::ulte::utils::cmdline::shortest_path<shortest_path_stack_size>(curr_pr->str.data(), curr_pr->str.size(), j.str.data(), j.str.size())};
                            dp_res <= test_size)
                         {
                             f_test_str = j.str;
@@ -279,42 +279,42 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
                     if(f_test_str.empty())
                     {
                         // The most similar parameters were not found
-                        ::fast_io::io::perr(::uwvm::u8log_output, ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
+                        ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
                     }
                     else
                     {
                         // Output the most similar parameter
-                        ::fast_io::io::perr(::uwvm::u8log_output,
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        ::fast_io::io::perr(::ulte::uwvm::u8log_output,
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8" (did you mean: ",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                             f_test_str,
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8")",
-                                            ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                            ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                             u8"\n");
                     }
                 }
-                else if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::duplicate_parameter) [[unlikely]]
+                else if(curr_pr->type == ::ulte::utils::cmdline::parameter_parsing_results_type::duplicate_parameter) [[unlikely]]
                 {
                     shouldreturn = true;
-                    ::fast_io::io::perr(::uwvm::u8log_output,
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                    ::fast_io::io::perr(::ulte::uwvm::u8log_output,
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                         u8"[error] ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"duplicate parameter: ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                         curr_pr->str,
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                         u8"\n");
                 }
             }
 
             if(shouldreturn) [[unlikely]]
             {
-                ::fast_io::io::perrln(::uwvm::u8log_output);
+                ::fast_io::io::perrln(::ulte::uwvm::u8log_output);
                 return parsing_return_val::returnm1;
             }
         }
@@ -334,15 +334,15 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
                 if(auto const cb{curr_pr->para->handle}; cb != nullptr)
                 {
-                    ::utils::cmdline::parameter_return_type const res{cb(pr.begin(), curr_pr, pr.end())};
+                    ::ulte::utils::cmdline::parameter_return_type const res{cb(pr.begin(), curr_pr, pr.end())};
                     switch(res)
                     {
-                        case ::utils::cmdline::parameter_return_type::def: break;
-                        case ::utils::cmdline::parameter_return_type::return_m1_imme: return parsing_return_val::returnm1;
-                        case ::utils::cmdline::parameter_return_type::return_imme: return parsing_return_val::return0;
-                        case ::utils::cmdline::parameter_return_type::return_soon: needexit = true; break;
-                        case ::utils::cmdline::parameter_return_type::err_imme: ::fast_io::fast_terminate();
-                        case ::utils::cmdline::parameter_return_type::err_soon: needterminal = true; break;
+                        case ::ulte::utils::cmdline::parameter_return_type::def: break;
+                        case ::ulte::utils::cmdline::parameter_return_type::return_m1_imme: return parsing_return_val::returnm1;
+                        case ::ulte::utils::cmdline::parameter_return_type::return_imme: return parsing_return_val::return0;
+                        case ::ulte::utils::cmdline::parameter_return_type::return_soon: needexit = true; break;
+                        case ::ulte::utils::cmdline::parameter_return_type::err_imme: ::fast_io::fast_terminate();
+                        case ::ulte::utils::cmdline::parameter_return_type::err_soon: needterminal = true; break;
                         default:
                             ::fast_io::unreachable();  // A correct implementation will not show any other results, and if it does, the behavior is undefined.
                     }
@@ -359,33 +359,33 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
 
             for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
             {
-                if(curr_pr->type == ::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
+                if(curr_pr->type == ::ulte::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
                 {
                     shouldreturn = true;
 
-                    ::fast_io::io::perr(::uwvm::u8log_output,
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                    ::fast_io::io::perr(::ulte::uwvm::u8log_output,
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                         u8"[error] ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"invalid option: ",
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                         curr_pr->str,
-                                        ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                        ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                         u8"\n");
                 }
             }
 
             if(shouldreturn) [[unlikely]]
             {
-                ::fast_io::io::perrln(::uwvm::u8log_output);
+                ::fast_io::io::perrln(::ulte::uwvm::u8log_output);
                 return parsing_return_val::returnm1;
             }
         }
         return parsing_return_val::def;
     }
-}  // namespace uwvm::cmdline
+}  // namespace ulte::uwvm::cmdline
 
 #ifndef UWVM_MODULE
 // macro

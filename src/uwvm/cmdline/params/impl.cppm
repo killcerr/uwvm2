@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.cmdline.params;
+export module ulte.uwvm.cmdline.params;
 export import :version;
 export import :run;
 export import :help;
@@ -35,9 +35,9 @@ export import :log_output;
 export import :test;
 #endif
 
-# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
 export import :log_win32_use_ansi;
-# endif
+#endif
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

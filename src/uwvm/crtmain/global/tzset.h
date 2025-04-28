@@ -34,7 +34,7 @@ import fast_io;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm::global
+UWVM_MODULE_EXPORT namespace ulte::uwvm::global
 {
     /// @brief      Declare this via a global variable to get the correct timezone data when the program is run.
     struct tz_set_s
@@ -43,7 +43,7 @@ UWVM_MODULE_EXPORT namespace uwvm::global
         /// @see        tzset(3)
         UWVM_GNU_COLD inline tz_set_s() noexcept { ::fast_io::posix_tzset(); }
     };
-}  // namespace uwvm::global
+}  // namespace ulte::uwvm::global
 
 #ifndef UWVM_MODULE
 // macro

@@ -27,7 +27,7 @@ module;
 #include <cstddef>
 #include <concepts>
 
-export module utils.ansies:rgb;
+export module ulte.utils.ansies:rgb;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

@@ -26,7 +26,7 @@ module;
 #include <cstdint>
 #include <cstddef>
 
-export module uwvm.custom:version;
+export module ulte.uwvm.custom:version;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

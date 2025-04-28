@@ -26,8 +26,8 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.concepts;
+import ulte.parser.wasm.standard.wasm1.type;
 #else
 // std
 # include <cstddef>
@@ -48,7 +48,7 @@ import parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
 {
     /// @brief  The method that will get the extensible section type
     /// @see    test\non-platform-specific\0001.parser\0001.concept\splice_section_storage_structure.cc
@@ -58,26 +58,26 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
     template <typename Feature, typename... Fs>
     concept has_binfmt_ver1_section_define = ::fast_io::is_tuple<typename Feature::binfmt_ver1_section_type>;
 
-    template <::parser::wasm::concepts::wasm_feature... Features>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Features>
     inline consteval auto splice_section_storage_structure() noexcept
     {
-        if constexpr(sizeof...(Features) == 0) { return ::parser::wasm::concepts::operation::tuple_megger<>{}; }
+        if constexpr(sizeof...(Features) == 0) { return ::ulte::parser::wasm::concepts::operation::tuple_megger<>{}; }
         else
         {
             return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             {
                 return ((
-                            []<::parser::wasm::concepts::wasm_feature FeatureCurr>() constexpr noexcept
+                            []<::ulte::parser::wasm::concepts::wasm_feature FeatureCurr>() constexpr noexcept
                             {
                                 if constexpr(has_binfmt_ver1_extensible_section_define<FeatureCurr, Features...>)
                                 {
                                     using extensible_section_t = typename FeatureCurr::template binfmt_ver1_section_type<Features...>;
-                                    return ::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(extensible_section_t{});
+                                    return ::ulte::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(extensible_section_t{});
                                 }
                                 else if constexpr(has_binfmt_ver1_section_define<FeatureCurr>)
                                 {
                                     using section_t = typename FeatureCurr::binfmt_ver1_section_type;
-                                    return ::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(section_t{});
+                                    return ::ulte::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(section_t{});
                                 }
                                 else
                                 {
@@ -86,7 +86,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
                                                         requires { typename FeatureCurr::binfmt_ver1_section_type; }) &&
                                                     !has_binfmt_ver1_extensible_section_define<FeatureCurr, Features...>),
                                                   "binfmt_ver1_section_type is not tuple");
-                                    return ::parser::wasm::concepts::operation::tuple_megger<>{};
+                                    return ::ulte::parser::wasm::concepts::operation::tuple_megger<>{};
                                 }
                             }.template operator()<Features...[I]>()),
                         ...);
@@ -94,16 +94,16 @@ UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
         }
     }
 
-    template <::parser::wasm::concepts::wasm_feature... Features>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Features>
     using splice_section_storage_structure_t = decltype(splice_section_storage_structure<Features...>())::Type;
 
-    template <::parser::wasm::concepts::wasm_feature... Features>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Features>
     inline consteval auto splice_section_storage_structure_from_tuple(::fast_io::tuple<Features...>) noexcept
     {
         return splice_section_storage_structure<Features...>();
     }
 
-}  // namespace parser::wasm::binfmt::ver1
+}  // namespace ulte::parser::wasm::binfmt::ver1
 
 #ifndef UWVM_MODULE
 // macro

@@ -40,7 +40,7 @@ import fast_io;
 #  define UWVM_MODULE_EXPORT
 # endif
 
-UWVM_MODULE_EXPORT namespace uwvm::global
+UWVM_MODULE_EXPORT namespace ulte::uwvm::global
 {
     /// @brief      The ConsoleCP of Windows is affected by system environment variables.
     ///             By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8.
@@ -57,7 +57,7 @@ UWVM_MODULE_EXPORT namespace uwvm::global
         }
     };
 
-}  // namespace uwvm::global
+}  // namespace ulte::uwvm::global
 
 # ifndef UWVM_MODULE
 // macro

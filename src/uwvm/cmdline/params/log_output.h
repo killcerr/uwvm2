@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.cmdline;
+import ulte.utils.cmdline;
 #else
 // std
 # include <memory>
@@ -41,19 +41,19 @@ import utils.cmdline;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
+UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
 {
     namespace details
     {
         inline bool log_output_is_exist{};
         inline constexpr ::fast_io::u8string_view log_output_alias{u8"-log"};
-        extern "C++" ::utils::cmdline::parameter_return_type log_output_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                                 ::utils::cmdline::parameter_parsing_results*,
-                                                                                 ::utils::cmdline::parameter_parsing_results*) noexcept;
+        extern "C++" ::ulte::utils::cmdline::parameter_return_type log_output_callback(::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter u8log_output{.name{u8"--log-output"},
+    inline constexpr ::ulte::utils::cmdline::parameter u8log_output{.name{u8"--log-output"},
                                                               .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
                                                               .usage{
 #if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
@@ -62,10 +62,10 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
                                                                   u8"[out|err]"
 #endif
                                                               },
-                                                              .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1}},
+                                                              .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1}},
                                                               .handle{::std::addressof(details::log_output_callback)},
                                                               .is_exist{::std::addressof(details::log_output_is_exist)}};
-}  // namespace uwvm::cmdline::paras
+}  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE
 // macro

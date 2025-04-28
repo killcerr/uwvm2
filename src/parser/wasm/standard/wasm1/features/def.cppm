@@ -34,7 +34,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module parser.wasm.standard.wasm1.features:def;
+export module ulte.parser.wasm.standard.wasm1.features:def;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

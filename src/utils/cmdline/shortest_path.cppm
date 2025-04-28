@@ -30,7 +30,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module utils.cmdline:shortest_path;
+export module ulte.utils.cmdline:shortest_path;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

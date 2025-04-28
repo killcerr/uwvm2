@@ -26,10 +26,10 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.binfmt.base;
+import ulte.parser.wasm.concepts;
+import ulte.parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.section;
+import ulte.parser.wasm.binfmt.base;
 import :section;
 #else
 // std
@@ -55,22 +55,22 @@ import :section;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::binfmt::ver1
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
 {
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     struct wasm_binfmt_ver1_module_extensible_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+        inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-        ::parser::wasm::binfmt::module_span_t module_span{};
+        ::ulte::parser::wasm::binfmt::module_span_t module_span{};
         ::fast_io::u8string_view module_name{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::section::custom_section> custom_sections{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::section::custom_section> custom_sections{};
 
-        ::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> sections{};
+        ::ulte::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> sections{};
     };
 
-}  // namespace parser::wasm::binfmt::ver1
+}  // namespace ulte::parser::wasm::binfmt::ver1
 
 #ifndef UWVM_MODULE
 // macro

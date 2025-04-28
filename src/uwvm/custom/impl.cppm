@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.custom;
+export module ulte.uwvm.custom;
 export import :version;
 
 #ifndef UWVM_MODULE

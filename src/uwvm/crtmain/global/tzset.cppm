@@ -25,7 +25,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module uwvm.crtmain.global:tzset;
+export module ulte.uwvm.crtmain.global:tzset;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

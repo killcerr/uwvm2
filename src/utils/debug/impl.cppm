@@ -22,7 +22,7 @@
 
 module;
 
-export module utils.debug;
+export module ulte.utils.debug;
 export import :timer;
 
 #ifndef UWVM_MODULE

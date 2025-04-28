@@ -22,7 +22,7 @@
 
 module;
 
-export module utils.intrinsics;
+export module ulte.utils.intrinsics;
 export import :prefetch;
 
 #ifndef UWVM_MODULE

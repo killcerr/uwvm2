@@ -43,13 +43,13 @@ import :value_type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::type
 {
     /// @brief      Value Types
     /// @details    Value types are encoded by a single byte.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.1
-    enum class value_type : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class value_type : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         // Number types
         i32 = 0x7F,
@@ -63,7 +63,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     ///             pressed form, by either the byte 0x40 indicating the empty type or as a single value type.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.2
-    enum class result_type : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class result_type : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         // Empty Types
         empty = 0x40,
@@ -78,7 +78,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @details    Function types are encoded by the byte 0x60 followed by the respective vectors of parameter and result types.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.3
-    enum class function_type_prefix : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class function_type_prefix : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         // Function Types
         functype = 0x60,
@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @details    A prefix to limit to indicate whether to provide a maximum value.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.4
-    enum class limits_preceding_flag : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class limits_preceding_flag : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         non_max = 0x00,
         have_max = 0x01,
@@ -106,8 +106,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
     /// @details    the respective vectors of value byte
     struct vec_byte
     {
-        ::parser::wasm::standard::wasm1::type::wasm_byte const* byte_begin{};
-        ::parser::wasm::standard::wasm1::type::wasm_byte const* byte_end{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const* byte_begin{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const* byte_end{};
     };
 
     // func
@@ -258,4 +258,4 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::type
         return details::print_reserve_value_type_impl(iter, valtype);
     }
 
-}  // namespace parser::wasm::standard::wasm1::type
+}  // namespace ulte::parser::wasm::standard::wasm1::type

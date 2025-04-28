@@ -38,7 +38,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::base
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
 {
     enum class wasm_parse_error_code : ::std::uint_least32_t
     {
@@ -112,7 +112,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
         wasm_parse_error_code err_code{};
     };
 
-}  // namespace parser::wasm::base
+}  // namespace ulte::parser::wasm::base
 
 #ifndef UWVM_MODULE
 // macro

@@ -38,12 +38,12 @@ import fast_io;
 # ifndef UWVM_MODULE_EXPORT
 #  define UWVM_MODULE_EXPORT
 # endif
-UWVM_MODULE_EXPORT namespace uwvm::wasm::storage
+UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::storage
 {
     inline ::fast_io::vector<::fast_io::native_dll_file> import_dl_file{};  // [global] No global variable dependencies from other translation units
 
     // TODO: import_dl_func // The result of parsing the dl is used to add the import module directly.
-}  // namespace uwvm::wasm::storage
+}  // namespace ulte::uwvm::wasm::storage
 # ifndef UWVM_MODULE
 // macro
 #  include <utils/macro/pop_macros.h>

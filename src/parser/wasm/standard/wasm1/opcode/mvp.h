@@ -23,7 +23,7 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.type;
 #else
 // std
 # include <cstdint>
@@ -40,9 +40,9 @@ import parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::opcode
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::opcode
 {
-    enum class op_basic : ::parser::wasm::standard::wasm1::type::op_basic_type
+    enum class op_basic : ::ulte::parser::wasm::standard::wasm1::type::op_basic_type
     {
         /// @brief      Control Instructions
         /// @details    Control instructions have varying encodings. For structured instructions, the instruction sequences forming nested

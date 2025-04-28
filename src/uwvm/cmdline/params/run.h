@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.cmdline;
+import ulte.utils.cmdline;
 #else
 // std
 # include <memory>
@@ -40,18 +40,18 @@ import utils.cmdline;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
+UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
 {
     namespace details
     {
         inline constexpr ::fast_io::u8string_view run_alias{u8"-r"};
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter run{.name{u8"--run"},
+    inline constexpr ::ulte::utils::cmdline::parameter run{.name{u8"--run"},
                                                      .describe{u8"Run WebAssembly."},
                                                      .usage{u8"<file> <argv[1]> <arg[2]> ..."},
-                                                     .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
-}  // namespace uwvm::cmdline::paras
+                                                     .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
+}  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE
 // macro

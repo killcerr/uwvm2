@@ -27,7 +27,7 @@ module;
 #include <cstddef>
 #include <concepts>
 
-export module utils.ansies:win32_text_attr;
+export module ulte.utils.ansies:win32_text_attr;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

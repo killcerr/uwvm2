@@ -39,7 +39,7 @@
 #endif
 
 #ifdef UWVM_SUPPORT_INSTALL_PATH
-UWVM_MODULE_EXPORT namespace utils::install_path
+UWVM_MODULE_EXPORT namespace ulte::utils::install_path
 {
     inline ::fast_io::install_path get_module_install_path_noexcept() noexcept
     {
@@ -59,7 +59,7 @@ UWVM_MODULE_EXPORT namespace utils::install_path
         return ret;
     }
 
-}  // namespace utils::install_path
+}  // namespace ulte::utils::install_path
 #endif
 
 #ifndef UWVM_MODULE

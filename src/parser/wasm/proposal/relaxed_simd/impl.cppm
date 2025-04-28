@@ -24,8 +24,8 @@
 
 module;
 
-export module parser.wasm.proposal.relaxed_simd;
-export import parser.wasm.proposal.relaxed_simd.type;
+export module ulte.parser.wasm.proposal.relaxed_simd;
+export import ulte.parser.wasm.proposal.relaxed_simd.type;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

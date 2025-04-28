@@ -39,7 +39,7 @@ import fast_io;
 #  define UWVM_MODULE_EXPORT
 # endif
 
-UWVM_MODULE_EXPORT namespace utils::ansies
+UWVM_MODULE_EXPORT namespace ulte::utils::ansies
 {
     enum class text_attr : ::std::int_least32_t
     {
@@ -125,6 +125,6 @@ UWVM_MODULE_EXPORT namespace utils::ansies
     {
         ::fast_io::win32::SetConsoleTextAttribute(attr.handle, static_cast<::std::int_least32_t>(attr.attr));
     }
-}  // namespace utils::ansies
+}  // namespace ulte::utils::ansies
 
 #endif

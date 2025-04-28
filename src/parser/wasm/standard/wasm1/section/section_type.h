@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.type;
 import :funcbody;
 #else
 // import
@@ -39,13 +39,13 @@ import :funcbody;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::section
 {
     /// @brief      Sections
     /// @details    Each section consists of a one-byte section id
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.5.2
-    enum class section_id : ::parser::wasm::standard::wasm1::type::wasm_byte
+    enum class section_id : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
     {
         custom_sec = 0u,
         type_sec = 1u,
@@ -65,8 +65,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     /// @details    Used to mark the corresponding range of wasm files
     struct section_span_view
     {
-        ::parser::wasm::standard::wasm1::type::wasm_byte const* sec_begin{};
-        ::parser::wasm::standard::wasm1::type::wasm_byte const* sec_end{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const* sec_begin{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const* sec_end{};
     };
 
     /// @brief      Custom Section
@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
         ::fast_io::u8string_view custom_name{};
-        ::parser::wasm::standard::wasm1::type::wasm_byte const* custom_begin{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const* custom_begin{};
     };
 
     /// @brief      Type Section
@@ -90,7 +90,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::function_type> types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::function_type> types{};
     };
 
     /// @brief      Import Section
@@ -101,11 +101,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::import_type> importsec{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::import_type const*> importdesc_func_types{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::import_type const*> importdesc_table_types{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::import_type const*> importdesc_memory_types{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::import_type const*> importdesc_global_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::import_type> importsec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::import_type const*> importdesc_func_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::import_type const*> importdesc_table_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::import_type const*> importdesc_memory_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::import_type const*> importdesc_global_types{};
     };
 
     /// @brief      Function Section
@@ -118,7 +118,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::local_function_type> funcsec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::local_function_type> funcsec{};
     };
 
     /// @brief      Table Section
@@ -129,7 +129,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::table_type> tablesec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::table_type> tablesec{};
     };
 
     /// @brief      Memory Section
@@ -140,7 +140,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::memory_type> memsec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::memory_type> memsec{};
     };
 
     /// @brief      Global Section
@@ -151,7 +151,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::local_global_type> globalsec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::local_global_type> globalsec{};
     };
 
     /// @brief      Export Section
@@ -162,11 +162,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::export_type> exportsec{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_func_types{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_table_types{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_memory_types{};
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_global_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::export_type> exportsec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_func_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_table_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_memory_types{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::export_type const*> exportdesc_global_types{};
     };
 
     /// @brief      Start Section
@@ -177,7 +177,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::parser::wasm::standard::wasm1::type::indices start{};
+        ::ulte::parser::wasm::standard::wasm1::type::indices start{};
     };
 
     /// @brief      Element Section
@@ -189,7 +189,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::elem_segment_type> elemsec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::elem_segment_type> elemsec{};
     };
 
     /// @brief      Code Section
@@ -203,7 +203,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::section::code_func_body> codesec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::section::code_func_body> codesec{};
     };
 
     /// @brief      Data Section
@@ -214,14 +214,14 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::section
     {
         section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::type::data_segment> datasec{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::type::data_segment> datasec{};
     };
-}  // namespace parser::wasm::standard::wasm1::section
+}  // namespace ulte::parser::wasm::standard::wasm1::section
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
-    struct is_zero_default_constructible<::parser::wasm::standard::wasm1::section::custom_section>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::section::custom_section>
     {
         inline static constexpr bool value = true;
     };

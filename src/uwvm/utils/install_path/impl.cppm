@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.utils.install_path;
+export module ulte.uwvm.utils.install_path;
 export import :storage;
 
 #ifndef UWVM_MODULE

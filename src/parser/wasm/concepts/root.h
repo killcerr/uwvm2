@@ -24,8 +24,8 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.base;
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.base;
+import ulte.parser.wasm.standard.wasm1.type;
 #else
 // std
 # include <cstddef>
@@ -46,7 +46,7 @@ import parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::concepts
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::concepts
 {
     /// @brief Prevent inheritance effects when adl matching
     template <typename FeatureType>
@@ -61,13 +61,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
     inline constexpr feature_reserve_type_t<FeatureType> feature_reserve_type{};
 
     /// @brief For adl function "define_wasm_binfmt_parsering_strategy()" matching
-    template <::parser::wasm::standard::wasm1::type::wasm_u32 Version>
+    template <::ulte::parser::wasm::standard::wasm1::type::wasm_u32 Version>
     struct binfmt_version_t
     {
         explicit constexpr binfmt_version_t() noexcept = default;
     };
 
-    template <::parser::wasm::standard::wasm1::type::wasm_u32 Version>
+    template <::ulte::parser::wasm::standard::wasm1::type::wasm_u32 Version>
     inline constexpr binfmt_version_t<Version> binfmt_version{};
 
     /// @brief      Determine if there is a feature name
@@ -99,7 +99,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
     /// @brief      binfmt handle version func
     template <typename module_stroate_t, has_feature_name... Fs>
     using binfmt_handle_version_func_p_type =
-        module_stroate_t (*)(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*, ::parser::wasm::base::error_impl&) UWVM_THROWS;
+        module_stroate_t (*)(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*, ::ulte::parser::wasm::base::error_impl&) UWVM_THROWS;
 
     /// @brief      Define the version number of the required wasm file binary format tagging
     /// @see        test\non-platform-specific\0001.parser\0001.concept\binfmt.cc
@@ -114,7 +114,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
     ///             ```cpp
     ///             struct feature
     ///             {
-    ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    ///                 inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
     ///             };
     ///             ```
     ///
@@ -123,13 +123,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
     ///             ```cpp
     ///             struct feature
     ///             {
-    ///                 ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    ///                 ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
     ///             };
     ///             ```
     template <typename FeatureType>
     concept has_wasm_binfmt_version = requires {
         requires ::std::same_as<::std::remove_cvref_t<decltype(::std::remove_cvref_t<FeatureType>::binfmt_version)>,
-                                ::parser::wasm::standard::wasm1::type::wasm_u32>;
+                                ::ulte::parser::wasm::standard::wasm1::type::wasm_u32>;
     };
 
     /// @brief      Checks if a "define_wasm_binfmt_parsering_strategy" function is defined
@@ -142,7 +142,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
     ///             ```cpp
     ///             struct feature
     ///             {
-    ///                 inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    ///                 inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
     ///             };
     ///
     ///             template <wasm_feature ... Fs>
@@ -174,7 +174,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::concepts
 
     template <typename FeatureType>
     concept wasm_feature = has_feature_name<FeatureType> && has_wasm_binfmt_version<FeatureType> && ::std::is_empty_v<FeatureType>;
-}  // namespace parser::wasm::concepts
+}  // namespace ulte::parser::wasm::concepts
 
 #ifndef UWVM_MODULE
 // macro

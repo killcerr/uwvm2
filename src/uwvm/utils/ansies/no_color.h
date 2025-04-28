@@ -39,7 +39,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::utils::ansies
+UWVM_MODULE_EXPORT namespace ulte::uwvm::ulte::utils::ansies
 {
     namespace details::posix
     {
@@ -82,4 +82,4 @@ UWVM_MODULE_EXPORT namespace uwvm::utils::ansies
     /// @brief Used to determine whether or not to output colors via win32_text_attr
     inline bool log_win32_use_ansi_b{false};  // [global] No global variable dependencies from other translation units
 #endif
-}  // namespace utils::ansies
+}  // namespace ulte::utils::ansies

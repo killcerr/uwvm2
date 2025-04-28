@@ -24,7 +24,7 @@
 
 module;
 
-export module uwvm.wasm.base:mode;
+export module ulte.uwvm.wasm.base:mode;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

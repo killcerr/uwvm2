@@ -26,7 +26,7 @@
 
 # ifdef UWVM_MODULE
 import fast_io;
-import utils.cmdline;
+import ulte.utils.cmdline;
 # else
 // std
 #  include <memory>
@@ -43,22 +43,22 @@ import utils.cmdline;
 #  define UWVM_MODULE_EXPORT
 # endif
 
-UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
+UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
 {
     namespace details
     {
         inline bool test_is_exist{};
-        extern "C++" ::utils::cmdline::parameter_return_type test_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                           ::utils::cmdline::parameter_parsing_results*,
-                                                                           ::utils::cmdline::parameter_parsing_results*) noexcept;
+        extern "C++" ::ulte::utils::cmdline::parameter_return_type test_callback(::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                           ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                           ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter test{.name{u8"--test"},
+    inline constexpr ::ulte::utils::cmdline::parameter test{.name{u8"--test"},
                                                       .describe{u8"Debug Test."},
                                                       .handle{::std::addressof(details::test_callback)},
                                                       .is_exist{::std::addressof(details::test_is_exist)}};
-}  // namespace uwvm::cmdline::paras
+}  // namespace ulte::uwvm::cmdline::paras
 
 # ifndef UWVM_MODULE
 #  include <uwvm/utils/ansies/uwvm_color_pop_macro.h>

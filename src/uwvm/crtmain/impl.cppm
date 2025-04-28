@@ -22,8 +22,8 @@
 
 module;
 
-export module uwvm.crtmain;
-export import uwvm.crtmain.global;
+export module ulte.uwvm.crtmain;
+export import ulte.uwvm.crtmain.global;
 export import :uwvm;
 
 #ifndef UWVM_MODULE

@@ -31,7 +31,7 @@ module;
 // import
 #include <utils/macro/push_macros.h>
 
-export module utils.cmdline:handle;
+export module ulte.utils.cmdline:handle;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

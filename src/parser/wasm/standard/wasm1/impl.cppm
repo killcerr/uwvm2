@@ -24,11 +24,11 @@
 
 module;
 
-export module parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1.type;
-export import parser.wasm.standard.wasm1.section;
-export import parser.wasm.standard.wasm1.opcode;
-export import parser.wasm.standard.wasm1.features;
+export module ulte.parser.wasm.standard.wasm1;
+export import ulte.parser.wasm.standard.wasm1.type;
+export import ulte.parser.wasm.standard.wasm1.section;
+export import ulte.parser.wasm.standard.wasm1.opcode;
+export import ulte.parser.wasm.standard.wasm1.features;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

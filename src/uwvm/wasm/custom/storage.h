@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.type;
 import :base;
 #else
 // std
@@ -49,9 +49,9 @@ import :base;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::wasm::custom
+UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::custom
 {
-    inline ::std::map<::fast_io::u8string, ::uwvm::wasm::custom::handlefunc_ptr_t>
+    inline ::std::map<::fast_io::u8string, ::ulte::uwvm::wasm::custom::handlefunc_ptr_t>
         custom_handle_funcs{};  // [global] No global variable dependencies from other translation units
 }
 

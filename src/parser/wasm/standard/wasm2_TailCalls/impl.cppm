@@ -24,8 +24,8 @@
 
 module;
 
-export module parser.wasm.standard.wasm2_TailCalls;
-export import parser.wasm.standard.wasm2;
+export module ulte.parser.wasm.standard.wasm2_TailCalls;
+export import ulte.parser.wasm.standard.wasm2;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

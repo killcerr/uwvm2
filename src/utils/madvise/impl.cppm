@@ -22,7 +22,7 @@
 
 module;
 
-export module utils.madvise;
+export module ulte.utils.madvise;
 
 export import :madvise;
 

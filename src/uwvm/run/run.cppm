@@ -30,7 +30,7 @@ module;
 #include <utils/macro/push_macros.h>
 #include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 
-export module uwvm.run:run;
+export module ulte.uwvm.run:run;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

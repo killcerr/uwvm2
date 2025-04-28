@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.io;
+export module ulte.uwvm.io;
 export import :io_device;
 export import :output;
 

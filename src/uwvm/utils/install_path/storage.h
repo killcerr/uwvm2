@@ -23,7 +23,7 @@
 #pragma once
 
 #ifdef UWVM_MODULE
-import utils.install_path;
+import ulte.utils.install_path;
 #else
 // macro
 # include <utils/macro/push_macros.h>
@@ -41,13 +41,13 @@ import utils.install_path;
 #endif
 
 #ifdef UWVM_SUPPORT_INSTALL_PATH
-UWVM_MODULE_EXPORT namespace uwvm::utils::install_path
+UWVM_MODULE_EXPORT namespace ulte::uwvm::ulte::utils::install_path
 {
     /// @brief Path to the program binary itself
     /// @details Only support to get by system parameter, not support to get by argv0, argv0 may be wrong
     inline ::fast_io::install_path install_path{
-        ::utils::install_path::get_module_install_path_noexcept()};  // [global] No global variable dependencies from other translation units
-}  // namespace utils::install_path
+        ::ulte::utils::install_path::get_module_install_path_noexcept()};  // [global] No global variable dependencies from other translation units
+}  // namespace ulte::utils::install_path
 #endif
 
 #ifndef UWVM_MODULE

@@ -38,7 +38,7 @@ import fast_io;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm
+UWVM_MODULE_EXPORT namespace ulte::uwvm
 {
     // io does not add meaningless namespaces.
     /// @deprecated It is no longer recommended to use u8err, use u8log_output.
@@ -65,4 +65,4 @@ UWVM_MODULE_EXPORT namespace uwvm
     // No buffer is provided to u8err
 # endif
 #endif
-}  // namespace utils
+}  // namespace ulte::utils

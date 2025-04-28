@@ -32,7 +32,7 @@ module;
 # include <intrin.h>;
 #endif
 
-export module utils.intrinsics:prefetch;
+export module ulte.utils.intrinsics:prefetch;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

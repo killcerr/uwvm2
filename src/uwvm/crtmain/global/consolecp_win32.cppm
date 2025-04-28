@@ -34,7 +34,7 @@ module;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-export module uwvm.crtmain.global:consolecp_win32;
+export module ulte.uwvm.crtmain.global:consolecp_win32;
 
 #include "consolecp_win32.h"
 

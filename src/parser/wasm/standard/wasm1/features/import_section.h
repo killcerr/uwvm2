@@ -27,14 +27,14 @@
 #ifdef UWVM_MODULE
 import fast_io;
 # ifdef UWVM_TIMER
-import utils.debug;
+import ulte.utils.debug;
 # endif
-import parser.wasm.base;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.standard.wasm1.section;
-import parser.wasm.standard.wasm1.opcode;
-import parser.wasm.binfmt.binfmt_ver1;
+import ulte.parser.wasm.base;
+import ulte.parser.wasm.concepts;
+import ulte.parser.wasm.standard.wasm1.type;
+import ulte.parser.wasm.standard.wasm1.section;
+import ulte.parser.wasm.standard.wasm1.opcode;
+import ulte.parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :feature_def;
 import :type_section;
@@ -71,32 +71,32 @@ import :type_section;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 {
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     struct import_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         inline static constexpr ::fast_io::u8string_view section_name{u8"Import"};
-        inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{
-            static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(::parser::wasm::standard::wasm1::section::section_id::import_sec)};
+        inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 section_id{
+            static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(::ulte::parser::wasm::standard::wasm1::section::section_id::import_sec)};
 
-        ::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
+        ::ulte::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
-        ::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...>> imports{};
+        ::fast_io::vector<::ulte::parser::wasm::standard::wasm1::features::final_import_type<Fs...>> imports{};
 
         inline static constexpr ::std::size_t importdesc_count{
-            static_cast<::std::size_t>(decltype(::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>{}.type)::external_type_end) + 1};
-        ::fast_io::array<::fast_io::vector<::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>, importdesc_count> importdesc{};
+            static_cast<::std::size_t>(decltype(::ulte::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>{}.type)::external_type_end) + 1};
+        ::fast_io::array<::fast_io::vector<::ulte::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>, importdesc_count> importdesc{};
     };
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_func_handler(
-        [[maybe_unused]] ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        ::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*& funcptr_r,
-        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+        [[maybe_unused]] ::ulte::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::ulte::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*& funcptr_r,
+        ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
-        ::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
         // ... descindex typeindex ...
         //               ^^ section_curr
@@ -104,18 +104,18 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
         // get type index
 
-        ::parser::wasm::standard::wasm1::type::wasm_u32 type_index{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 type_index{};
         auto const [type_index_next, type_index_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                               reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                               ::fast_io::mnp::leb128_get(type_index))};
         if(type_index_err != ::fast_io::parse_code::ok) [[unlikely]]
         {
             err.err_curr = section_curr;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
-            ::parser::wasm::base::throw_wasm_parse_code(type_index_err);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(type_index_err);
         }
 
-        auto const& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+        auto const& typesec{::ulte::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         ::std::size_t const type_section_count{typesec.types.size()};
 
         // check
@@ -123,8 +123,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         {
             err.err_curr = section_curr;
             err.err_selectable.u32 = type_index;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
         funcptr_r = typesec.types.cbegin() + type_index;
@@ -136,32 +136,32 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     }
 
     /// @brief Define function for wasm1 external_types
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_extern_prefix_imports_handler(
-        ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        ::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
-        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::ulte::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::ulte::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
+        ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
-        ::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
         switch(fit_imports.type)
         {
-            case ::parser::wasm::standard::wasm1::type::external_types::func:
+            case ::ulte::parser::wasm::standard::wasm1::type::external_types::func:
             {
                 return extern_imports_func_handler(sec_adl, fit_imports.storage.function, module_storage, section_curr, section_end, err);
             }
-            case ::parser::wasm::standard::wasm1::type::external_types::table:
+            case ::ulte::parser::wasm::standard::wasm1::type::external_types::table:
             {
                 /// @todo
                 break;
             }
-            case ::parser::wasm::standard::wasm1::type::external_types::memory:
+            case ::ulte::parser::wasm::standard::wasm1::type::external_types::memory:
             {
                 /// @todo
                 break;
             }
-            case ::parser::wasm::standard::wasm1::type::external_types::global:
+            case ::ulte::parser::wasm::standard::wasm1::type::external_types::global:
             {
                 /// @todo
                 break;
@@ -172,42 +172,42 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
     }
 
     /// @brief Define the handler function for type_section
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(
-        ::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::ulte::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
-        ::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
-        ::utils::debug::timer parsing_timer{u8"parse import section (id: 2)"};
+        ::ulte::utils::debug::timer parsing_timer{u8"parse import section (id: 2)"};
 #endif
         // get import_section_storage_t from storages
-        auto& importsec{::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(module_storage.sections)};
+        auto& importsec{::ulte::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(module_storage.sections)};
 
         // check duplicate
         if(importsec.sec_span.sec_begin) [[unlikely]]
         {
             err.err_curr = section_begin;
             err.err_selectable.u32 = importsec.section_id;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::duplicate_section;
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::duplicate_section;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
         // check has typesec
-        auto const& typesec{::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+        auto const& typesec{::ulte::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
         if(!typesec.sec_span.sec_begin) [[unlikely]]
         {
             err.err_curr = section_begin;
             err.err_selectable.u32arr[0] = typesec.section_id;
             err.err_selectable.u32arr[1] = importsec.section_id;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::forward_dependency_missing;
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::forward_dependency_missing;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::parser::wasm::standard::wasm1::type::wasm_byte const*;
+        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const*;
 
         importsec.sec_span.sec_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_begin);
         importsec.sec_span.sec_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_end);
@@ -216,7 +216,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         // ... count namelen ?? ...
         //           ^^ section_curr
 
-        ::parser::wasm::standard::wasm1::type::wasm_u32 import_count{};
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 import_count{};
 
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
@@ -227,8 +227,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         if(import_count_err != ::fast_io::parse_code::ok) [[unlikely]]
         {
             err.err_curr = section_curr;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_import_count;
-            ::parser::wasm::base::throw_wasm_parse_code(import_count_err);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_import_count;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(import_count_err);
         }
 
         importsec.imports.reserve(import_count);
@@ -238,22 +238,22 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
         // ... count ?? ?? ...
         //           ^^ section_curr
 
-        ::parser::wasm::standard::wasm1::type::wasm_u32 import_counter{};  // use for check
-        ::fast_io::array<::parser::wasm::standard::wasm1::type::wasm_u32, import_section_storage_t<Fs...>::importdesc_count>
+        ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 import_counter{};  // use for check
+        ::fast_io::array<::ulte::parser::wasm::standard::wasm1::type::wasm_u32, import_section_storage_t<Fs...>::importdesc_count>
             importdesc_counter{};  // use for reserve
 
         for(; section_curr != section_end;)
         {
-            ::parser::wasm::standard::wasm1::features::final_import_type<Fs...> fit{};
+            ::ulte::parser::wasm::standard::wasm1::features::final_import_type<Fs...> fit{};
             if(++import_counter > import_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = import_count;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::import_section_resolved_exceeded_the_actual_number;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_section_resolved_exceeded_the_actual_number;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            ::parser::wasm::standard::wasm1::type::wasm_u32 module_namelen{};
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 module_namelen{};
             auto const [module_namelen_next, module_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                                           ::fast_io::mnp::leb128_get(module_namelen))};
@@ -261,15 +261,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(module_namelen_err != ::fast_io::parse_code::ok) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_import_module_name_length;
-                ::parser::wasm::base::throw_wasm_parse_code(module_namelen_err);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_import_module_name_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(module_namelen_err);
             }
 
-            if(module_namelen == static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+            if(module_namelen == static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::import_module_name_length_cannot_be_zero;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_module_name_length_cannot_be_zero;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
             section_curr = reinterpret_cast<::std::byte const*>(module_namelen_next);  // never out of bounds
@@ -289,11 +289,11 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(static_cast<::std::size_t>(section_end - section_curr) < 2uz || section_curr > section_end) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::import_module_name_too_length;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_module_name_too_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            ::parser::wasm::standard::wasm1::type::wasm_u32 extern_namelen{};
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 extern_namelen{};
             auto const [extern_namelen_next, extern_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                                           ::fast_io::mnp::leb128_get(extern_namelen))};
@@ -301,15 +301,15 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(extern_namelen_err != ::fast_io::parse_code::ok) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::invalid_import_extern_name_length;
-                ::parser::wasm::base::throw_wasm_parse_code(extern_namelen_err);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::invalid_import_extern_name_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(extern_namelen_err);
             }
 
-            if(extern_namelen == static_cast<::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+            if(extern_namelen == static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
             section_curr = reinterpret_cast<::std::byte const*>(extern_namelen_next);  // never out of bounds
@@ -324,8 +324,8 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(section_curr >= section_end) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::import_extern_name_too_length;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_extern_name_too_length;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
             ::fast_io::freestanding::my_memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
@@ -336,19 +336,19 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             if(static_cast<unsigned>(fit.imports.type) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_selectable.u8 = static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type);
-                err.err_code = ::parser::wasm::base::wasm_parse_error_code::illegal_importdesc_prefix;
-                ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                err.err_selectable.u8 = static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type);
+                err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_importdesc_prefix;
+                ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
             // use for reserve
-            ++importdesc_counter.index_unchecked(static_cast<::std::size_t>(static_cast<::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
+            ++importdesc_counter.index_unchecked(static_cast<::std::size_t>(static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
 
             ++section_curr;
             // ... count modulenamelen name ... externnamelen externname ... index ...
             //                                                                     ^^ section_curr
 
-            static_assert(::parser::wasm::standard::wasm1::features::has_extern_prefix_imports_handler<Fs...>,
+            static_assert(::ulte::parser::wasm::standard::wasm1::features::has_extern_prefix_imports_handler<Fs...>,
                           "define_extern_prefix_imports_handler(...) not found");
             // handle it, fit.imports.type is always valid
             section_curr = define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err);
@@ -362,13 +362,13 @@ UWVM_MODULE_EXPORT namespace parser::wasm::standard::wasm1::features
             err.err_curr = section_curr;
             err.err_selectable.u32arr[0] = import_counter;
             err.err_selectable.u32arr[1] = import_count;
-            err.err_code = ::parser::wasm::base::wasm_parse_error_code::import_section_resolved_exceeded_the_actual_number;
-            ::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_section_resolved_exceeded_the_actual_number;
+            ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
         /// @todo reserve and pushback
     }
-}  // namespace parser::wasm::standard::wasm1::features
+}  // namespace ulte::parser::wasm::standard::wasm1::features
 
 #ifndef UWVM_MODULE
 // macro

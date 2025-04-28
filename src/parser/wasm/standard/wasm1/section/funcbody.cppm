@@ -25,7 +25,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module parser.wasm.standard.wasm1.section:funcbody;
+export module ulte.parser.wasm.standard.wasm1.section:funcbody;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

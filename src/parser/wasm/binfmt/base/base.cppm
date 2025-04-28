@@ -30,7 +30,7 @@ module;
 #include <type_traits>
 #include <memory>
 
-export module parser.wasm.binfmt.base:base;
+export module ulte.parser.wasm.binfmt.base:base;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

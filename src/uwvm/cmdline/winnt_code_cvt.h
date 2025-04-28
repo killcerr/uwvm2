@@ -38,9 +38,9 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.ansies;
-import uwvm.io;
-import uwvm.utils.ansies;
+import ulte.utils.ansies;
+import ulte.uwvm.io;
+import ulte.uwvm.utils.ansies;
 #else
 // std
 # include <cstdint>
@@ -63,7 +63,7 @@ import uwvm.utils.ansies;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::cmdline
+UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline
 {
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
     struct nt_code_cvt_argv_storage UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
@@ -115,16 +115,16 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
         auto const u16_cmdline_argv{::fast_io::win32::CommandLineToArgvW(nt_proc_cmdline.Buffer, ::std::addressof(u16_cmdline_argc))};
         if(u16_cmdline_argv == nullptr) [[unlikely]]
         {
-            ::fast_io::io::perr(::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+            ::fast_io::io::perr(::ulte::uwvm::u8log_output,
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[fatal] ",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"CommandLineToArgvW failed: ",
                                 ::fast_io::error{::fast_io::win32_domain_value, ::fast_io::win32::GetLastError()},
                                 u8"\n",
-                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"Terminate.\n\n");
             ::fast_io::fast_terminate();
         }
@@ -155,7 +155,7 @@ UWVM_MODULE_EXPORT namespace uwvm::cmdline
     }
 
 #endif
-}  // namespace uwvm::cmdline
+}  // namespace ulte::uwvm::cmdline
 
 #ifndef UWVM_MODULE
 // macro

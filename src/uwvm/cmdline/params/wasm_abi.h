@@ -24,7 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import utils.cmdline;
+import ulte.utils.cmdline;
 #else
 // std
 # include <memory>
@@ -41,26 +41,26 @@ import utils.cmdline;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm::cmdline::paras
+UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
 {
     namespace details
     {
         inline bool wasm_abi_is_exist{};
         inline constexpr ::fast_io::u8string_view wasm_abi_alias{u8"-Wa"};
-        extern "C++" ::utils::cmdline::parameter_return_type wasm_abi_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                               ::utils::cmdline::parameter_parsing_results*,
-                                                                               ::utils::cmdline::parameter_parsing_results*) noexcept;
+        extern "C++" ::ulte::utils::cmdline::parameter_return_type wasm_abi_callback(::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                               ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                               ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
-    inline constexpr ::utils::cmdline::parameter wasm_abi{.name{u8"--wasm-abi"},
+    inline constexpr ::ulte::utils::cmdline::parameter wasm_abi{.name{u8"--wasm-abi"},
                                                           .describe{u8"Specifies the ABI used by the WASM module, (DEFAULT: auto-detection)."},
                                                           .usage{u8"[bare|emscripten|wasip1|wasip2|wasix]"},
-                                                          .alias{::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
+                                                          .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
                                                           .handle{::std::addressof(details::wasm_abi_callback)},
                                                           .is_exist{::std::addressof(details::wasm_abi_is_exist)},
-                                                          .cate{::utils::cmdline::categorization::wasm}};
-}  // namespace uwvm::cmdline::paras
+                                                          .cate{::ulte::utils::cmdline::categorization::wasm}};
+}  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE
 // macro

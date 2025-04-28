@@ -35,7 +35,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm
+UWVM_MODULE_EXPORT namespace ulte::uwvm
 {
     /// @brief Control VM output via virtual functions, can be set via option in --debug-output, not supported by avr
 #if defined(__AVR__)
@@ -49,4 +49,4 @@ UWVM_MODULE_EXPORT namespace uwvm
                                                  ::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
 #endif
 
-}  // namespace utils
+}  // namespace ulte::utils

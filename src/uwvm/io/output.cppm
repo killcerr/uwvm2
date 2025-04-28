@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm.io:output;
+export module ulte.uwvm.io:output;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

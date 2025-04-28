@@ -36,7 +36,7 @@ module;
 // macro
 #include <utils/macro/push_macros.h>
 
-export module parser.wasm.binfmt.binfmt_ver1:custom_section;
+export module ulte.parser.wasm.binfmt.binfmt_ver1:custom_section;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -46,5 +46,4 @@ export module parser.wasm.binfmt.binfmt_ver1:custom_section;
 #endif
 
 #include "custom_section.h"
-
 

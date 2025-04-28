@@ -24,7 +24,7 @@
 
 module;
 
-export module parser.wasm.binfmt.base;
+export module ulte.parser.wasm.binfmt.base;
 export import :base;
 
 #ifndef UWVM_MODULE

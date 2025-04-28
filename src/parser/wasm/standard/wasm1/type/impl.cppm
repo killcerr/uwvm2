@@ -22,7 +22,7 @@
 
 module;
 
-export module parser.wasm.standard.wasm1.type;
+export module ulte.parser.wasm.standard.wasm1.type;
 export import :value_type;
 export import :value_binfmt;
 export import :section_type;

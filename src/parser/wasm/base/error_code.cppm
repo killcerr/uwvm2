@@ -23,12 +23,12 @@
 module;
 
 // std
-# include <cstddef>
-# include <cstdint>
+#include <cstddef>
+#include <cstdint>
 // macro
-# include <utils/macro/push_macros.h>
+#include <utils/macro/push_macros.h>
 
-export module parser.wasm.base:error_code;
+export module ulte.parser.wasm.base:error_code;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

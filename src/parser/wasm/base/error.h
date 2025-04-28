@@ -35,7 +35,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace parser::wasm::base
+UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
 {
     [[noreturn]] inline void throw_wasm_parse_code([[maybe_unused]] ::fast_io::parse_code code) UWVM_THROWS
     {
@@ -53,7 +53,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
 # endif
 #endif
     }
-}  // namespace parser::wasm::base
+}  // namespace ulte::parser::wasm::base
 
 #ifndef UWVM_MODULE
 // macro
