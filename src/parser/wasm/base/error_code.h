@@ -78,7 +78,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
 
     union err_selectable_t
     {
-        ::std::byte const* err_end; 
+        ::std::byte const* err_end;
         ::std::size_t err_uz;
         ::std::ptrdiff_t err_pdt;
 
@@ -107,7 +107,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
 
     struct error_impl
     {
-        err_selectable_t err_selectable{}; // end_selectable can be null
+        err_selectable_t err_selectable{};  // end_selectable can be null
         ::std::byte const* err_curr{};
         wasm_parse_error_code err_code{};
     };

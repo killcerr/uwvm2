@@ -52,7 +52,7 @@ UWVM_MODULE_EXPORT namespace utils::madvise
 # else
         extern int posix_madvise(void* addr, ::std::size_t length, int flag) noexcept __asm__("posix_madvise");
 # endif
-    }  // namespace posix
+    }  // namespace details::posix
 #endif
 
     enum class madvise_flag

@@ -45,7 +45,8 @@ UWVM_MODULE_EXPORT namespace uwvm
     // win9x cannot dup stderr
     inline ::fast_io::u8native_io_observer u8log_output{::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
 #else
-    inline ::fast_io::u8native_file u8log_output{::fast_io::io_dup, ::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
+    inline ::fast_io::u8native_file u8log_output{::fast_io::io_dup,
+                                                 ::fast_io::u8err()};  // [global] No global variable dependencies from other translation units
 #endif
 
 }  // namespace utils

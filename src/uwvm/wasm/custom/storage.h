@@ -53,7 +53,6 @@ UWVM_MODULE_EXPORT namespace uwvm::wasm::custom
 {
     inline ::std::map<::fast_io::u8string, ::uwvm::wasm::custom::handlefunc_ptr_t>
         custom_handle_funcs{};  // [global] No global variable dependencies from other translation units
-
 }
 
 #ifndef UWVM_MODULE

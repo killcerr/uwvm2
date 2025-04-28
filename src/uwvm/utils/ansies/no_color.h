@@ -50,7 +50,7 @@ UWVM_MODULE_EXPORT namespace uwvm::utils::ansies
         extern char* libc_getenv(char const*) noexcept __asm__("getenv");
 # endif
 #endif
-    }  // namespace details
+    }  // namespace details::posix
 
     /// @brief Determine if there is NO_COLOR by environment variable
     inline bool check_has_no_color() noexcept

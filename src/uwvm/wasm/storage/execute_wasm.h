@@ -45,10 +45,11 @@ import uwvm.wasm.feature;
 
 UWVM_MODULE_EXPORT namespace uwvm::wasm::storage
 {
-    inline ::fast_io::native_file_loader execute_wasm_file{};                                  // [global] No global variable dependencies from other translation units
-    inline ::uwvm::wasm::base::mode execute_wasm_mode{::uwvm::wasm::base::mode::objdump};  // [global] No global variable dependencies from other translation units
-    inline ::uwvm::wasm::base::abi execute_wasm_abi{::uwvm::wasm::base::abi::detect};      // [global] No global variable dependencies from other translation units
-    inline ::parser::wasm::standard::wasm1::type::wasm_u32 execute_wasm_binfmt_ver{};          // [global] No global variable dependencies from other translation units
+    inline ::fast_io::native_file_loader execute_wasm_file{};  // [global] No global variable dependencies from other translation units
+    inline ::uwvm::wasm::base::mode execute_wasm_mode{
+        ::uwvm::wasm::base::mode::objdump};                                            // [global] No global variable dependencies from other translation units
+    inline ::uwvm::wasm::base::abi execute_wasm_abi{::uwvm::wasm::base::abi::detect};  // [global] No global variable dependencies from other translation units
+    inline ::parser::wasm::standard::wasm1::type::wasm_u32 execute_wasm_binfmt_ver{};  // [global] No global variable dependencies from other translation units
 
     // WASM Module Binfmt 1
     inline ::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t
