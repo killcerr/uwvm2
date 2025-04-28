@@ -62,9 +62,10 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec1<Fs...>>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test1\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test1\n");
     return true;
 }
 
@@ -91,15 +92,16 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec2<Fs...>>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test2\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test2\n");
 
     return true;
 }
 
 struct Sec3
-{    
+{
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec3"};
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{3};
 
@@ -111,9 +113,10 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec3>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test3\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test3\n");
 
     return true;
 }
@@ -166,20 +169,22 @@ int main()
 
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
-    ::fast_io::io::perr(::uwvm::log_output, u8"sec1:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 1, nullptr, nullptr);
-    ::fast_io::io::perr(::uwvm::log_output, u8"sec2:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 2, nullptr, nullptr);
-    ::fast_io::io::perr(::uwvm::log_output, u8"sec3:\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 3, nullptr, nullptr);
-    ::fast_io::io::perr(::uwvm::log_output, u8"sec4:\n");
+    ::parser::wasm::base::error_impl e{};
+
+    ::fast_io::io::perr(::uwvm::u8log_output, u8"sec1:\n");
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 1, nullptr, nullptr, e);
+    ::fast_io::io::perr(::uwvm::u8log_output, u8"sec2:\n");
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 2, nullptr, nullptr, e);
+    ::fast_io::io::perr(::uwvm::u8log_output, u8"sec3:\n");
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 3, nullptr, nullptr, e);
+    ::fast_io::io::perr(::uwvm::u8log_output, u8"sec4:\n");
     try
     {
-        ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 4, nullptr, nullptr);
+        ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, 4, nullptr, nullptr, e);
     }
     catch(::fast_io::error e)
     {
-        ::fast_io::perr(::uwvm::log_output, u8"test4, not found\n");
+        ::fast_io::perr(::uwvm::u8log_output, u8"test4, not found\n");
     }
 }
 
@@ -202,4 +207,4 @@ test4, not found
 */
 
 // macro
-# include <utils/macro/pop_macros.h>
+#include <utils/macro/pop_macros.h>

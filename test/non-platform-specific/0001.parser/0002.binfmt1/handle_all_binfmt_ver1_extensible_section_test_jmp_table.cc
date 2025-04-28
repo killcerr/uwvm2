@@ -69,9 +69,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec1<Fs...>>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test1\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test1\n");
     return true;
 }
 
@@ -98,9 +99,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec2<Fs...>>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test2\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test2\n");
 
     return true;
 }
@@ -118,9 +120,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec3>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test3\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test3\n");
 
     return true;
 }
@@ -138,9 +141,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec4>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test4\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test4\n");
 
     return true;
 }
@@ -158,9 +162,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec5>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test5\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test5\n");
 
     return true;
 }
@@ -178,9 +183,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec6>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test6\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test6\n");
 
     return true;
 }
@@ -198,9 +204,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec7>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test7\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test7\n");
 
     return true;
 }
@@ -218,9 +225,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec8>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test8\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test8\n");
 
     return true;
 }
@@ -238,9 +246,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec9>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test9\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test9\n");
 
     return true;
 }
@@ -258,9 +267,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec10>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test10\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test10\n");
 
     return true;
 }
@@ -278,9 +288,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec11>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test11\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test11\n");
 
     return true;
 }
@@ -298,9 +309,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec12>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test12\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test12\n");
 
     return true;
 }
@@ -318,9 +330,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec13>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test13\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test13\n");
 
     return true;
 }
@@ -338,9 +351,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec14>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test14\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test14\n");
 
     return true;
 }
@@ -358,9 +372,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec15>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test15\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test15\n");
 
     return true;
 }
@@ -378,9 +393,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec16>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test16\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test16\n");
 
     return true;
 }
@@ -398,9 +414,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec17>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test17\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test17\n");
 
     return true;
 }
@@ -418,9 +435,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec18>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test18\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test18\n");
 
     return true;
 }
@@ -438,9 +456,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec19>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test19\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test19\n");
 
     return true;
 }
@@ -458,9 +477,10 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec20>>,
     [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
-    [[maybe_unused]] ::std::byte const* section_end)
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::log_output, u8"test20\n");
+    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test20\n");
 
     return true;
 }
@@ -514,8 +534,10 @@ int main(int argc, char**)
 
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
-    ::fast_io::io::perr(::uwvm::log_output, u8"sec", argc, u8":\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, argc, nullptr, nullptr);
+    ::parser::wasm::base::error_impl e{};
+
+    ::fast_io::io::perr(::uwvm::u8log_output, u8"sec", argc, u8":\n");
+    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, argc, nullptr, nullptr, e);
 }
 
 /*
@@ -526,4 +548,4 @@ int main(int argc, char**)
 */
 
 // macro
-# include <utils/macro/pop_macros.h>
+#include <utils/macro/pop_macros.h>

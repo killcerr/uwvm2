@@ -59,12 +59,13 @@ struct binfmt_ver1_module_storage_t
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr binfmt_ver1_module_storage_t binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+inline constexpr binfmt_ver1_module_storage_t
+    binfmt_ver1_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*, ::parser::wasm::base::error_impl&) UWVM_THROWS
 {
     // This defines the function that handles binary format 1.
     // Supported by <::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
     []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-    { ((::fast_io::io::perrln(::uwvm::log_output, u8"binfmt1: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+    { ((::fast_io::io::perrln(::uwvm::u8log_output, u8"binfmt1: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
     return {};
 }
 
@@ -95,12 +96,13 @@ struct binfmt_ver2_module_storage_t
 };
 
 template <::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr binfmt_ver2_module_storage_t<Fs...> binfmt_ver2_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+inline constexpr binfmt_ver2_module_storage_t<Fs...>
+    binfmt_ver2_handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*, ::parser::wasm::base::error_impl&) UWVM_THROWS
 {
     // This defines the function that handles binary format 2.
     // Supported by <::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
     []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-    { ((::fast_io::io::perrln(::uwvm::log_output, u8"binfmt2: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+    { ((::fast_io::io::perrln(::uwvm::u8log_output, u8"binfmt2: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
     return {};
 }
 
@@ -115,13 +117,15 @@ int main()
 {
     constexpr ::fast_io::tuple<B1F1, B1F2, B2F3> features{};
 
+    ::parser::wasm::base::error_impl e{};
+
     constexpr auto binfmt1_funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(features)};
     using wasm_binfmt1_features_t = decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(features));
     static_assert(::std::same_as<wasm_binfmt1_features_t, ::fast_io::tuple<B1F1, B1F2>>, "wasm_binfmt1_features_t includes only features with a binfmt of 1");
     using wasm_binfmt1_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features_t{}));
     static_assert(::std::same_as<wasm_binfmt1_storage_t, binfmt_ver1_module_storage_t>,
                   "wasm_binfmt1_storage_t is the type returned by binfmt_ver1_handle_func<B1F1, B1F2>");
-    [[maybe_unused]] wasm_binfmt1_storage_t storage1 = binfmt1_funcp(wasm_binfmt1_features_t{}, nullptr, nullptr);
+    [[maybe_unused]] wasm_binfmt1_storage_t storage1 = binfmt1_funcp(wasm_binfmt1_features_t{}, nullptr, nullptr, e);
 
     constexpr auto binfmt2_funcp{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<2>(features)};
     using wasm_binfmt2_features_t = decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<2>(features));
@@ -129,7 +133,7 @@ int main()
     using wasm_binfmt2_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt2_features_t{}));
     static_assert(::std::same_as<wasm_binfmt2_storage_t, binfmt_ver2_module_storage_t<B2F3>>,
                   "wasm_binfmt2_storage_t is the type of binfmt_ver2_handle_func<B2F3> return");
-    [[maybe_unused]] wasm_binfmt2_storage_t storage2 = binfmt2_funcp(wasm_binfmt2_features_t{}, nullptr, nullptr);
+    [[maybe_unused]] wasm_binfmt2_storage_t storage2 = binfmt2_funcp(wasm_binfmt2_features_t{}, nullptr, nullptr, e);
 }
 
 /*
@@ -140,4 +144,4 @@ binfmt2: B2F3
 */
 
 // macro
-# include <utils/macro/pop_macros.h>
+#include <utils/macro/pop_macros.h>

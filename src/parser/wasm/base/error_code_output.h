@@ -3765,8 +3765,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 "\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                "\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -3788,8 +3787,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                         "\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL),
-                                        "\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, wchar_t>)
@@ -3818,8 +3816,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 L"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                L"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -3841,8 +3838,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                         L"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL),
-                                        L"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char8_t>)
@@ -3871,8 +3867,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 u8"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                u8"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -3894,8 +3889,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                         u8"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL),
-                                        u8"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char16_t>)
@@ -3924,8 +3918,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 u"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                u"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -3947,8 +3940,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                         u"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL),
-                                        u"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char32_t>)
@@ -3977,8 +3969,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 U"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                U"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4000,8 +3991,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                         U"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL),
-                                        U"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
                     return;
                 }
                 return;
@@ -4034,8 +4024,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 "\" section.",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                "\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4057,8 +4046,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                         "\" section.",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL),
-                                        "\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, wchar_t>)
@@ -4087,8 +4075,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 L"\" section.",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                L"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4110,8 +4097,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                         L"\" section.",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL),
-                                        L"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char8_t>)
@@ -4140,8 +4126,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 u8"\" section.",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                u8"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4163,8 +4148,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                         u8"\" section.",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL),
-                                        u8"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char16_t>)
@@ -4193,8 +4177,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 u"\" section.",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                u"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4216,8 +4199,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                         u"\" section.",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL),
-                                        u"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char32_t>)
@@ -4246,8 +4228,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 U"\" section.",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                U"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4269,8 +4250,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                         U"\" section.",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL),
-                                        U"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
                     return;
                 }
                 return;
@@ -4701,8 +4681,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 "\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                "\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4724,8 +4703,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                         "\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL),
-                                        "\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, wchar_t>)
@@ -4754,8 +4732,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 L"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                L"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4777,8 +4754,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                         L"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL),
-                                        L"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char8_t>)
@@ -4807,8 +4783,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 u8"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                u8"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4830,8 +4805,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                         u8"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL),
-                                        u8"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char16_t>)
@@ -4860,8 +4834,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 u"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                u"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4883,8 +4856,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                         u"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL),
-                                        u"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
                     return;
                 }
                 else if constexpr(::std::same_as<char_type, char32_t>)
@@ -4913,8 +4885,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                                 errout.err.err_selectable.u32arr[1],
                                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                                 U"\".",
-                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)),
-                                                U"\n\n");
+                                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
                     }
@@ -4936,8 +4907,7 @@ UWVM_MODULE_EXPORT namespace parser::wasm::base
                                         errout.err.err_selectable.u32arr[1],
                                         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                         U"\".",
-                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL),
-                                        U"\n\n");
+                                        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
                     return;
                 }
                 return;

@@ -52,7 +52,7 @@ struct Sec1
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec1 ext"};
     inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
-    
+
     // Expand on Sec1 here
 };
 
@@ -100,12 +100,12 @@ struct Feature3
 /*
 root:                    wasm
                           |
-                         / 
-                        /                          
-binfmt:           binfmt_ver1(binfmt1)               
-                 /             |        \.  
-featurs:       Feature1     Feature2   Feature3 
-                 |          /      \            
+                         /
+                        /
+binfmt:           binfmt_ver1(binfmt1)
+                 /             |        \.
+featurs:       Feature1     Feature2   Feature3
+                 |          /      \
 sections:      Sec1(ext) Sec2(ext) Sec3
 */
 
@@ -116,4 +116,4 @@ int main()
 }
 
 // macro
-# include <utils/macro/pop_macros.h>
+#include <utils/macro/pop_macros.h>
