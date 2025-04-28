@@ -28,6 +28,8 @@ import :error_code;
 #else
 // std
 # include <cstddef>
+# include <cstdint>
+# include <concepts>
 // macro
 # include <utils/macro/push_macros.h>
 # include <utils/ansies/ansi_push_macro.h>
