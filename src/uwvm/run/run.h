@@ -39,12 +39,14 @@ import uwvm.cmdline;
 import uwvm.wasm.base;
 import uwvm.wasm.storage;
 import uwvm.wasm.feature;
+import uwvm.wasm.custom;
 #else
 // std
 # include <cstddef>
 # include <cstdint>
 # include <type_traits>
 // macro
+# include <utils/macro/push_macros.h>
 # include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
@@ -63,7 +65,7 @@ import uwvm.wasm.feature;
 # include <uwvm/wasm/base/impl.h>
 # include <uwvm/wasm/storage/impl.h>
 # include <uwvm/wasm/feature/impl.h>
-
+# include <uwvm/wasm/custom/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -184,20 +186,55 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                 catch(::fast_io::error e)
                 {
+# ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                     if(wasm_err.err_code != ::parser::wasm::base::wasm_parse_error_code::ok) [[likely]]
                     {
                         ::parser::wasm::base::error_output_t errout;
                         errout.module_begin = reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin());
                         errout.err = wasm_err;
                         errout.flag.enable_ansi = static_cast<::std::uint_least8_t>(::uwvm::utils::ansies::put_color);
-# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+#  if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
                         errout.flag.win32_use_text_attr = static_cast<::std::uint_least8_t>(!::uwvm::utils::ansies::log_win32_use_ansi_b);
-# endif
+#  endif
                         ::fast_io::io::perr(::uwvm::u8log_output, errout, u8"\n\n");
                     }
+# endif
                     return -3;  // wasm parsing error
                 }
 #endif
+                // handle custom
+                for(auto const& cs: ::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.custom_sections)
+                {
+                    if(auto const curr_custom_handler{::uwvm::wasm::custom::custom_handle_funcs.find(::fast_io::u8string{cs.custom_name})};
+                       curr_custom_handler != ::uwvm::wasm::custom::custom_handle_funcs.cend())
+                    {
+                        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = parser::wasm::standard::wasm1::type::wasm_byte const*;
+                        auto res{(curr_custom_handler->second)(cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end))};
+                        if(!res) [[unlikely]]
+                        {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                            ::fast_io::io::perr(::uwvm::u8log_output,
+                                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                u8"[error] ",
+                                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"(offset=",
+                                                ::fast_io::mnp::addrvw(reinterpret_cast<::std::byte const*>(cs.custom_begin) -
+                                                                       reinterpret_cast<::std::byte const*>(::uwvm::wasm::storage::execute_wasm_file.cbegin())),
+                                                u8") Handle Custom Section \"",
+                                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                                cs.custom_name,
+                                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"\" Fault!",
+                                                ::fast_io::mnp::cond(::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                                u8"\n\n");
+#endif
+                            return -4;  // wasm custom handle error
+                        }
+                    }
+                }
+
                 break;
             }
             default: [[unlikely]] {
@@ -240,4 +277,5 @@ UWVM_MODULE_EXPORT namespace uwvm::run
 #ifndef UWVM_MODULE
 // macro
 # include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# include <utils/macro/pop_macros.h>
 #endif

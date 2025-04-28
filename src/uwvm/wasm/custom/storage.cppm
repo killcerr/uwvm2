@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-05
+ * @date        2025-04-19
  * @copyright   APL-2 License
  */
 
@@ -22,11 +22,17 @@
 
 module;
 
-export module uwvm.wasm;
-export import uwvm.wasm.base;
-export import uwvm.wasm.storage;
-export import uwvm.wasm.feature;
-export import uwvm.wasm.custom;
+// std
+# include <cstddef>
+# include <cstdint>
+# include <concepts>
+# include <type_traits>
+# include <utility>
+# include <map> /// @todo use fast_io::string_hashmap instead
+// macro
+# include <utils/macro/push_macros.h>
+
+export module uwvm.wasm.custom:storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -35,4 +41,4 @@ export import uwvm.wasm.custom;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "storage.h"
