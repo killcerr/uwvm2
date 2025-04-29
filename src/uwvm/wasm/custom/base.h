@@ -64,11 +64,11 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::custom
 {
     /// @param  0: custom_begin
     /// @param  1: custom_end
-    /// @return int
+    /// @return int. 0: success, others: fault
     using handlefunc_ptr_t = int (*)(parser::wasm::standard::wasm1::type::wasm_byte const*, parser::wasm::standard::wasm1::type::wasm_byte const*) noexcept;
 
-    inline void handle_binfmt1_custom_section(::ulte::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t const& module,
-                                              ::std::map<::fast_io::u8string, handlefunc_ptr_t> const& custom_handler) noexcept
+    inline int handle_binfmt1_custom_section(::ulte::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t const& module,
+                                             ::std::map<::fast_io::u8string, handlefunc_ptr_t> const& custom_handler) noexcept
     {
         for(auto& cs: module.custom_sections)
         {
@@ -76,31 +76,11 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::custom
             {
                 using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = parser::wasm::standard::wasm1::type::wasm_byte const*;
                 auto res{(curr_custom_handler->second)(cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end))};
-                if(!res) [[unlikely]]
-                {
-#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                    ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                        ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                        u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                        u8"[error] ",
-                                        ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"(offset=",
-                                        ::fast_io::mnp::addrvw(reinterpret_cast<::std::byte const*>(cs.custom_begin) - module.module_span.module_begin),
-                                        u8") Handle Custom Section \"",
-                                        ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        cs.custom_name,
-                                        ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"\" Fault!\nparser: [curr] -> ",
-                                        ::ulte::uwvm::utils::memory::print_memory{module.module_span.module_begin,
-                                                                                  reinterpret_cast<::std::byte const*>(cs.custom_begin),
-                                                                                  module.module_span.module_end},
-                                        ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                        u8"\n\n");
-#endif
-                }
+                // 0: success, others: fault
+                if(res) [[unlikely]] { return res; }
             }
         }
+        return 0;
     }
 }
 
