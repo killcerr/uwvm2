@@ -71,6 +71,7 @@ jobs:
         run: xmake test -vD
   # ---------------------------------------------------------------------------
   freebsd:
+    if: ${{ !always() }} # Remove it once support "202411L: Structured bindings can introduce a pack"
     name: FreeBSD
     runs-on: ubuntu-latest
     strategy:
