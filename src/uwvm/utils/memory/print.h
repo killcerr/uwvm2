@@ -76,6 +76,17 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::utils::memory
             print_end_ext = true;
         }
 
+        if (err_begin == err_end) [[unlikely]]
+        {
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(stream, "(null) "); }
+            else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(stream, L"(null) "); }
+            else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(stream, u8"(null) "); }
+            else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(stream, u"(null) "); }
+            else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(stream, U"(null) "); }
+            
+            return;
+        }
+
         if(print_front_ext)
         {
             if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(stream, "... "); }
