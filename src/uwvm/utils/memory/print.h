@@ -61,8 +61,29 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::utils::memory
         auto err_curr{mem.err_curr};
         auto err_end{mem.err_end};
 
-        if(static_cast<::std::size_t>(err_curr - err_begin) > mem.front) { err_begin = err_curr - mem.front; }
-        if(static_cast<::std::size_t>(err_end - err_curr) > mem.back) { err_end = err_curr + mem.back; }
+        bool print_front_ext{};
+        bool print_end_ext{};
+
+        if(static_cast<::std::size_t>(err_curr - err_begin) > mem.front)
+        {
+            err_begin = err_curr - mem.front;
+            print_front_ext = true;
+        }
+
+        if(static_cast<::std::size_t>(err_end - err_curr) > mem.back)
+        {
+            err_end = err_curr + mem.back;
+            print_end_ext = true;
+        }
+
+        if(print_front_ext)
+        {
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(stream, "... "); }
+            else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(stream, L"... "); }
+            else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(stream, u8"... "); }
+            else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(stream, u"... "); }
+            else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(stream, U"... "); }
+        }
 
         for(auto acc_curr{err_begin}; acc_curr != err_end; ++acc_curr)
         {
@@ -70,42 +91,91 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::utils::memory
             {
                 if(acc_curr != err_curr) [[likely]]
                 {
-                    ::fast_io::io::perr(stream, ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), " ");
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     " ");
                 }
-                else { ::fast_io::io::perr(stream, "[", ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), "] "); }
+                else
+                {
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     "[",
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     "] ");
+                }
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
                 if(acc_curr != err_curr) [[likely]]
                 {
-                    ::fast_io::io::perr(stream, ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), L" ");
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     L" ");
                 }
-                else { ::fast_io::io::perr(stream, L"[", ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), L"] "); }
+                else
+                {
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     L"[",
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     L"] ");
+                }
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
                 if(acc_curr != err_curr) [[likely]]
                 {
-                    ::fast_io::io::perr(stream, ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), u8" ");
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     u8" ");
                 }
-                else { ::fast_io::io::perr(stream, u8"[", ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), u8"] "); }
+                else
+                {
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     u8"[",
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     u8"] ");
+                }
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
                 if(acc_curr != err_curr) [[likely]]
                 {
-                    ::fast_io::io::perr(stream, ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), u" ");
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     u" ");
                 }
-                else { ::fast_io::io::perr(stream, u"[", ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), u"] "); }
+                else
+                {
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     u"[",
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     u"] ");
+                }
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
                 if(acc_curr != err_curr) [[likely]]
                 {
-                    ::fast_io::io::perr(stream, ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), U" ");
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     U" ");
                 }
-                else { ::fast_io::io::perr(stream, U"[", ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)), U"] "); }
+                else
+                {
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     U"[",
+                                                                     ::fast_io::mnp::hex<false, true>(static_cast<::std::uint_least8_t>(*acc_curr)),
+                                                                     U"] ");
+                }
             }
+        }
+
+        if(print_end_ext)
+        {
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(stream, "... "); }
+            else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(stream, L"... "); }
+            else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(stream, u8"... "); }
+            else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(stream, u"... "); }
+            else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(stream, U"... "); }
         }
     }
 

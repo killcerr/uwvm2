@@ -91,7 +91,7 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::custom
                                         ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                         cs.custom_name,
                                         ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"\" Fault!\nMemory: ",
+                                        u8"\" Fault!\nparser: [curr] -> ",
                                         ::ulte::uwvm::utils::memory::print_memory{module.module_span.module_begin,
                                                                                   reinterpret_cast<::std::byte const*>(cs.custom_begin),
                                                                                   module.module_span.module_end},
