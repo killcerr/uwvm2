@@ -51,7 +51,7 @@ template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec1 ext"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{1};
 
     // Expand on Sec1 here
 };
@@ -69,7 +69,7 @@ template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec2
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec2 ext"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{2};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{2};
 
     // Expand on Sec2 here
 };
@@ -77,7 +77,7 @@ struct Sec2
 struct Sec3
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec3"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{3};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{3};
 
     // Unexpandable section
 };

@@ -59,7 +59,7 @@ template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec1"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{1};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{1};
 
     // Expand on Sec1 here
 };
@@ -89,7 +89,7 @@ template <::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec2
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec2"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{2};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{2};
 
     // Expand on Sec2 here
 };
@@ -110,7 +110,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec3
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec3"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{3};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{3};
 
     // Unexpandable section
 };
@@ -131,7 +131,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec4
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec4"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{4};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{4};
 
     // Unexpandable section
 };
@@ -152,7 +152,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec5
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec5"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{5};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{5};
 
     // Unexpandable section
 };
@@ -173,7 +173,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec6
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec6"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{6};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{6};
 
     // Unexpandable section
 };
@@ -194,7 +194,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec7
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec7"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{7};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{7};
 
     // Unexpandable section
 };
@@ -215,7 +215,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec8
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec8"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{8};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{8};
 
     // Unexpandable section
 };
@@ -236,7 +236,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec9
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec9"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{9};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{9};
 
     // Unexpandable section
 };
@@ -257,7 +257,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec10
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec10"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{10};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{10};
 
     // Unexpandable section
 };
@@ -278,7 +278,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec11
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec11"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{11};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{11};
 
     // Unexpandable section
 };
@@ -299,7 +299,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec12
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec12"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{12};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{12};
 
     // Unexpandable section
 };
@@ -320,7 +320,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec13
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec13"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{13};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{13};
 
     // Unexpandable section
 };
@@ -341,7 +341,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec14
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec14"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{14};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{14};
 
     // Unexpandable section
 };
@@ -362,7 +362,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec15
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec15"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{15};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{15};
 
     // Unexpandable section
 };
@@ -383,7 +383,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec16
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec16"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{16};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{16};
 
     // Unexpandable section
 };
@@ -404,7 +404,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec17
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec17"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{17};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{17};
 
     // Unexpandable section
 };
@@ -425,7 +425,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec18
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec18"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{18};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{18};
 
     // Unexpandable section
 };
@@ -446,7 +446,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec19
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec19"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{19};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{19};
 
     // Unexpandable section
 };
@@ -467,7 +467,7 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec20
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec20"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 section_id{20};
+    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{20};
 
     // Unexpandable section
 };

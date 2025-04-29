@@ -73,8 +73,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
     struct type_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         inline static constexpr ::fast_io::u8string_view section_name{u8"Type"};
-        inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 section_id{
-            static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(::ulte::parser::wasm::standard::wasm1::section::section_id::type_sec)};
+        inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{
+            static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_byte>(::ulte::parser::wasm::standard::wasm1::section::section_id::type_sec)};
 
         ::ulte::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
@@ -284,7 +284,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
         if(typesec.sec_span.sec_begin) [[unlikely]]
         {
             err.err_curr = section_begin;
-            err.err_selectable.u32 = typesec.section_id;
+            err.err_selectable.u8 = typesec.section_id;
             err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::duplicate_section;
             ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
