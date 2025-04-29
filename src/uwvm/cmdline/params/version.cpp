@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -149,7 +149,7 @@ namespace ulte::uwvm::cmdline::paras::details
 #endif
                                 ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 // Copyright
-                                u8"Copyright (c) 2025 MacroModel. All rights reserved."
+                                u8"Copyright (c) 2025 UlteSoft. All rights reserved.  "
         // Install Path
 #if defined(UWVM_SUPPORT_INSTALL_PATH)
                                 u8"\nInstall Path: ",
