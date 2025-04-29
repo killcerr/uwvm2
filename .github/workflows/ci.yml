@@ -13,12 +13,12 @@ on:
 jobs:
   # ---------------------------------------------------------------------------
   ubuntu:
-    name: Ubuntu
-    runs-on: ubuntu-24.04 # noble
     strategy:
       matrix:
         mode: ["debug"]
         policies: ["build.sanitizer.address"]
+    name: Ubuntu
+    runs-on: ubuntu-24.04 # noble
     steps:
       - uses: actions/checkout@v4
       - name: Setup
@@ -38,8 +38,6 @@ jobs:
   # ---------------------------------------------------------------------------
   msys2:
     if: ${{ !always() }} # Remove it once update to LLVM21
-    name: MINGW ${{ matrix.env.name }}
-    runs-on: windows-latest
     strategy:
       matrix:
         env:
@@ -49,6 +47,8 @@ jobs:
             prefix: mingw-w64-clang-aarch64
         mode: ["debug"]
         policies: ["build.sanitizer.address"]
+    name: MINGW ${{ matrix.env.name }}
+    runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
@@ -71,12 +71,12 @@ jobs:
         run: xmake test -vD
   # ---------------------------------------------------------------------------
   freebsd:
-    name: FreeBSD
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         mode: ["debug"]
         policies: ["build.sanitizer.address"]
+    name: FreeBSD
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: cross-platform-actions/action@v0.27.0
