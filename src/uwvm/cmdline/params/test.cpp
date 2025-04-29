@@ -1,6 +1,6 @@
-/********************************************************
+﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (help 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -29,27 +29,35 @@
 # include <memory>
 
 # include <utils/macro/push_macros.h>
-# include <utils/ansies/ansi_push_macro.h>
+# include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 
+# ifdef UWVM_MODULE
 import fast_io;
-import utils.io;
-import utils.cmdline;
-import uwvm.cmdline;
-import parser.wasm.base;
-import uwvm.wasm.storage;
-import parser.wasm.standard.wasm1.type;
-import parser.wasm.concepts;
+import ulte.utils.cmdline;
+import ulte.uwvm.io;
+# else
+#  include <fast_io.h>
+#  include <utils/cmdline/impl.h>
+#  include <uwvm/io/impl.h>
+# endif
 
-namespace uwvm::cmdline::paras::details
+namespace ulte::uwvm::cmdline::paras::details
 {
-    UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type test_callback([[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_begin,
-                                                                               [[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_curr,
-                                                                               [[maybe_unused]] ::utils::cmdline::parameter_parsing_results* para_end) noexcept
+    UWVM_GNU_COLD extern ::ulte::utils::cmdline::parameter_return_type
+        test_callback([[maybe_unused]] ::ulte::utils::cmdline::parameter_parsing_results* para_begin,
+                      [[maybe_unused]] ::ulte::utils::cmdline::parameter_parsing_results* para_curr,
+                      [[maybe_unused]] ::ulte::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
+        // Write the test here
 
-        return ::utils::cmdline::parameter_return_type::return_soon;
+        // return imme
+        return ::ulte::utils::cmdline::parameter_return_type::return_imme;
     }
 
-}  // namespace uwvm::cmdline::paras::details
+}  // namespace ulte::uwvm::cmdline::paras::details
+
+// macro
+# include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# include <utils/macro/pop_macros.h>
 
 #endif

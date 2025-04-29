@@ -27,18 +27,15 @@
 * newlib: unknown-elf; (x86\_64, i386, etc.)-(cygwin, msys2)
 * avr: avr-elf
 
-## Freestanding
-* ISO C++26 Freestanding Support
-
-# C++ version support
+# C++ Version Required
 - Full ISO C++26
 
 # Compiler Support
 - LLVM Clang >= 21 (recommended)
-- (The GCC module does not support non-exported functions adl matching, not supported at this time)
-- (MSVC has bugs in module handling, not supported at this time)
+- GCC >= 16
+- (MSVC hasn't support c++26 currently, not supported at this time)
 
-# C++ standard library support (Version is the same as the version released with the corresponding supported compiler)
+# C++ Standard Library Support (Version is the same as the version released with the corresponding supported compiler)
 - GNU libstdc++ (recommended)
 - LLVM libc++
 - MSVC STL

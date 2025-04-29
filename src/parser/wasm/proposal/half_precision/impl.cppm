@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -24,5 +24,14 @@
 
 module;
 
-export module parser.wasm.proposal.half_precision;
-export import parser.wasm.proposal.half_precision.type;
+export module ulte.parser.wasm.proposal.half_precision;
+export import ulte.parser.wasm.proposal.half_precision.type;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "impl.h"

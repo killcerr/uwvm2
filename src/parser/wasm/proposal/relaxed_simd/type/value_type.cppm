@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -22,25 +22,21 @@
 
 module;
 
+// std
 #include <cstdint>
 #include <cstddef>
 #include <concepts>
 #include <bit>
-
+// macro
 #include <parser/wasm/feature/feature_push_macro.h>
 
-export module parser.wasm.proposal.relaxed_simd.type:value_type;
+export module ulte.parser.wasm.proposal.relaxed_simd.type:value_type;
 
-import fast_io;
-
-export namespace parser::wasm::proposal::relaxed_simd::value_type
-{
-
-    /// @brief      bf16
-    /// @details    new feature
-    /// @see        https://github.com/WebAssembly/relaxed-simd/issues/77
-#if defined(UWVM_WASM_SUPPORT_BF16)
-    using wasm_bf16 = decltype(0.0bf16);
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-}  // namespace parser::wasm::proposal::relaxed_simd::value_type
+#include "value_type.h"

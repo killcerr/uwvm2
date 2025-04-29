@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -22,5 +22,14 @@
 
 module;
 
-export module utils.intrinsics;
+export module ulte.utils.intrinsics;
 export import :prefetch;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "impl.h"

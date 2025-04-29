@@ -25,22 +25,29 @@
 #include <type_traits>
 #include <concepts>
 
+#ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1.type;
 import parser.wasm.concepts;
+import parser.wasm.standard.wasm1.type;
+#else
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+#endif
 
 struct feature1
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::parser::wasm::concepts::has_feature_name<feature1>);
+static_assert(::ulte::parser::wasm::concepts::has_feature_name<feature1>);
 
 struct feature2
 {
     ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
+static_assert(::ulte::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
 
 int main() {}

@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -23,56 +23,143 @@
 #include <memory>
 
 #include <utils/macro/push_macros.h>
-#include <utils/ansies/ansi_push_macro.h>
+#include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 
+#ifdef UWVM_MODULE
 import fast_io;
 import fast_io_crypto;
-import utils.io;
-import utils.cmdline;
-import utils.install_path;
-import uwvm.custom;
-import uwvm.cmdline;
+import ulte.utils.ansies;
+import ulte.utils.cmdline;
+import ulte.parser.wasm.concepts;
+import ulte.uwvm.io;
+import ulte.uwvm.utils.ansies;
+import ulte.uwvm.custom;
+import ulte.uwvm.cmdline;
+import ulte.uwvm.wasm.feature;
+import ulte.uwvm.utils.install_path;
+#else
+# include <fast_io.h>
+# include <fast_io_crypto.h>
+# include <fast_io_dsal/tuple.h>
+# include <utils/ansies/impl.h>
+# include <utils/cmdline/impl.h>
+# include <parser/wasm/concepts/impl.h>
+# include <uwvm/io/impl.h>
+# include <uwvm/utils/ansies/impl.h>
+# include <uwvm/custom/impl.h>
+# include <uwvm/cmdline/impl.h>
+# include <uwvm/wasm/feature/impl.h>
+# include <uwvm/utils/install_path/impl.h>
+#endif
 
-namespace uwvm::cmdline::paras::details
+namespace ulte::uwvm::cmdline::paras::details
 {
-    UWVM_GNU_COLD extern ::utils::cmdline::parameter_return_type version_callback(::utils::cmdline::parameter_parsing_results*,
-                                                                                  ::utils::cmdline::parameter_parsing_results*,
-                                                                                  ::utils::cmdline::parameter_parsing_results*) noexcept
+    template <::ulte::parser::wasm::concepts::has_feature_name F0, ::ulte::parser::wasm::concepts::has_feature_name... Fs>
+    inline void version_print_wasm_feature_impl() noexcept
     {
-        ::fast_io::io::perr(::utils::u8err,
+        ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"        ", F0::feature_name);
+        if constexpr(sizeof...(Fs) != 0) { version_print_wasm_feature_impl<Fs...>(); }
+    }
+
+    template <::ulte::parser::wasm::concepts::has_feature_name... Fs>
+    inline void version_print_wasm_feature_from_tuple(::fast_io::tuple<Fs...>) noexcept
+    {
+        version_print_wasm_feature_impl<Fs...>();
+    }
+
+    UWVM_GNU_COLD extern ::ulte::utils::cmdline::parameter_return_type version_callback(::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                        ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                        ::ulte::utils::cmdline::parameter_parsing_results*) noexcept
+    {
+        ::fast_io::io::perr(::ulte::uwvm::u8log_output,
                                 // logo
-                                UWVM_AES_U8_RST_ALL u8"\n"
-                                UWVM_AES_U8_RGB(72, 61, 139) u8" ----------------------------------------- \n"
-                                UWVM_AES_U8_RGB(72, 61, 139) u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8"  _   _  "  UWVM_AES_U8_RGB(152, 37, 206) u8"__        __ "    UWVM_AES_U8_RGB(113, 37, 206) u8"__     __  "  UWVM_AES_U8_RGB(70, 37, 206) u8"__  __  "   UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n" 
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | | | | "  UWVM_AES_U8_RGB(152, 37, 206) u8"\\ \\      / / "  UWVM_AES_U8_RGB(113, 37, 206) u8"\\ \\   / / " UWVM_AES_U8_RGB(70, 37, 206) u8"|  \\/  | " UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | | | | "  UWVM_AES_U8_RGB(152, 37, 206) u8" \\ \\ /\\ / /  " UWVM_AES_U8_RGB(113, 37, 206) u8" \\ \\ / /  " UWVM_AES_U8_RGB(70, 37, 206) u8"| |\\/| | " UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" | |_| | "  UWVM_AES_U8_RGB(152, 37, 206) u8"  \\ V  V /     " UWVM_AES_U8_RGB(113, 37, 206) u8"\\ V /   "    UWVM_AES_U8_RGB(70, 37, 206) u8"| |  | | "  UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8"  \\___/ "  UWVM_AES_U8_RGB(152, 37, 206) u8"    \\_/\\_/    " UWVM_AES_U8_RGB(113, 37, 206) u8"   \\_/    "  UWVM_AES_U8_RGB(70, 37, 206) u8"|_|  |_| "  UWVM_AES_U8_RGB(72, 61, 139) u8"|" u8"\n"
-                                                             u8"|                                         |\n"
-                                                             u8"|" UWVM_AES_U8_RGB(189, 37, 206) u8" Ultimate " UWVM_AES_U8_RGB(152, 37, 206) u8"WebAssembly "     UWVM_AES_U8_RGB(113, 37, 206) u8" Virtual "    UWVM_AES_U8_RGB(70, 37, 206) u8"  Machine"  UWVM_AES_U8_RGB(72, 61, 139) u8" |" u8"\n"
-                                                             u8" ----------------------------------------- \n\n"
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), 
+                                u8"\n",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)), 
+                                u8" ----------------------------------------- \n",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
+                                u8"|",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
+                                u8"  _   _  ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
+                                u8"__        __ ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
+                                u8"__     __  ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
+                                u8"__  __  ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
+                                u8"|\n|",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
+                                u8" | | | | ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
+                                u8"\\ \\      / / ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
+                                u8"\\ \\   / / ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
+                                u8"|  \\/  | ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
+                                u8"|\n|",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
+                                u8" | | | | ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
+                                u8" \\ \\ /\\ / /  ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
+                                u8" \\ \\ / /  ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
+                                u8"| |\\/| | ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
+                                u8"|\n|",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
+                                u8" | |_| | ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
+                                u8"  \\ V  V /     ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
+                                u8"\\ V /   ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
+                                u8"| |  | | ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
+                                u8"|\n|",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
+                                u8"  \\___/ ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
+                                u8"    \\_/\\_/    ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
+                                u8"   \\_/    ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
+                                u8"|_|  |_| ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
+                                u8"|\n|                                         |\n|",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(189, 37, 206)),
+                                u8" Ultimate ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(152, 37, 206)),
+                                u8"WebAssembly ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(113, 37, 206)),
+                                u8" Virtual ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(70, 37, 206)),
+                                u8"  Machine",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RGB(72, 61, 139)),
+                                u8" |\n ----------------------------------------- \n\n",                        
                                 // uwvm
-                                UWVM_AES_U8_RST_ALL
-                                UWVM_AES_U8_WHITE
-                                u8"Ultimate WebAssembly Virtual Machine\n"
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"Ultimate WebAssembly Virtual Machine\n",
         // Debug Mode
 #ifdef _DEBUG
-                                UWVM_AES_U8_GREEN
-                                u8"(Debug Mode)\n"
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                u8"(Debug Mode)\n",
 #endif
-                                UWVM_AES_U8_RST_ALL
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 // Copyright
-                                u8"Copyright (c) 2025 MacroModel. All rights reserved."
-// Install Path
+                                u8"Copyright (c) 2025 UlteSoft. All rights reserved.  "
+        // Install Path
 #if defined(UWVM_SUPPORT_INSTALL_PATH)
                                 u8"\nInstall Path: ",
-                                ::utils::install_path::install_path.path_name,
+                                ::ulte::uwvm::utils::install_path::install_path.path_name,
 #endif
                                 // Version
-                                u8"\nVersion: "
-                                UWVM_AES_U8_GREEN,
-                                ::uwvm::custom::uwvm_version,
-                                UWVM_AES_U8_RST_ALL
+                                u8"\nVersion: ",
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::ulte::uwvm::custom::uwvm_version,
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 // Compiler
                                 u8"\nCompiler: "
 #if defined(__clang__)
@@ -460,6 +547,10 @@ namespace uwvm::cmdline::paras::details
 #else
                                 u8"Unknown"
 #endif
+#ifdef _POSIX_C_SOURCE
+                                u8"\nPOSIX: ",
+                                _POSIX_C_SOURCE,
+#endif
                                 u8"\nAllocator: "
 #if defined(FAST_IO_USE_CUSTOM_GLOBAL_ALLOCATOR)
                                 u8"custom global"
@@ -497,18 +588,27 @@ namespace uwvm::cmdline::paras::details
                                 u8"\n"
                                 u8"    CMDLHash: "
                                 u8"HT=",
-                                ::uwvm::cmdline::hash_table_size.hash_table_size,
+                                ::ulte::uwvm::cmdline::hash_table_size.hash_table_size,
                                 u8", EX=",
-                                ::uwvm::cmdline::hash_table_size.extra_size,
+                                ::ulte::uwvm::cmdline::hash_table_size.extra_size,
                                 u8", RC=",
-                                ::uwvm::cmdline::hash_table_size.real_max_conflict_size,
+                                ::ulte::uwvm::cmdline::hash_table_size.real_max_conflict_size,
                                 u8", SZ=",
-                                ::uwvm::cmdline::hash_table_byte_sz,
+                                ::ulte::uwvm::cmdline::hash_table_byte_sz,
                                 u8"\n"
-                                // End lf
+                                u8"    WebAssembly Features Supported: "
                                 u8"\n"
             );
-        return ::utils::cmdline::parameter_return_type::return_imme;
+        // wasm feature
+        version_print_wasm_feature_from_tuple(::ulte::uwvm::wasm::feature::all_features);
+        // end ln
+        ::fast_io::io::perrln(::ulte::uwvm::u8log_output);
+
+        return ::ulte::utils::cmdline::parameter_return_type::return_imme;
     }
 
-}  // namespace uwvm::cmdline::paras::details
+}  // namespace ulte::uwvm::cmdline::paras::details
+
+// macro
+#include <uwvm/utils/ansies/uwvm_color_pop_macro.h>
+#include <utils/macro/pop_macros.h>

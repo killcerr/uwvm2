@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -20,7 +20,7 @@
  *                                      *
  ****************************************/
 
-#pragma once
+// #pragma once
 
 #pragma pop_macro("UWVM_WASM_SUPPORT_FP128")
 #pragma pop_macro("UWVM_WASM_SUPPORT_BF16")

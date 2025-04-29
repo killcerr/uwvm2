@@ -1,38 +1,54 @@
 name: CI
 on:
-  push:
-    paths-ignore:
-      - "documents/**"
   pull_request:
     paths-ignore:
       - "documents/**"
+      - "**.md"
+  push:
+    paths-ignore:
+      - "documents/**"
+      - "**.md"
+  workflow_dispatch:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # linux:
-  #   name: Linux
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: xmake-io/github-action-setup-xmake@v1
-  #     - name: Setup
-  #       run: sudo apt install clang clang-tools
-  #     - name: Check Clang Version
-  #       run: clang -v
-  #     - name: symlink clang-scan-deps
-  #       run: sudo ln -s /usr/lib/llvm-18/bin/clang-scan-deps /usr/bin/clang-scan-deps
-  #     - name: Check Xmake Version
-  #       run: xmake --version
-  #     - name: Configure
-  #       run: xmake f --use-llvm=y -m debug
-  #     - name: Build
-  #       run: xmake -v
-  #     - name: Test
-  #       run: xmake run uwvm --version
+  ubuntu:
+    name: Ubuntu
+    runs-on: ubuntu-24.04 # noble
+    strategy:
+      matrix:
+        mode: ["debug"]
+        policies: ["build.sanitizer.address"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
+          sudo add-apt-repository ppa:xmake-io/xmake
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
+          sudo apt-get install clang clang-tools lld xmake
+      - name: Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
+      - name: Build
+        run: xmake b -v
+      - name: Check UWVM version
+        run: xmake run uwvm --version
+      - name: Unit tests
+        run: xmake test -vD
   # ---------------------------------------------------------------------------
-  msys2-clang64:
-    name: MSYS2 CLANG64
+  msys2:
+    if: ${{ !always() }} # Remove it once update to LLVM21
+    name: MINGW ${{ matrix.env.name }}
     runs-on: windows-latest
+    strategy:
+      matrix:
+        env:
+          - name: "CLANG64"
+            prefix: mingw-w64-clang-x86_64
+          - name: "CLANGARM64"
+            prefix: mingw-w64-clang-aarch64
+        mode: ["debug"]
+        policies: ["build.sanitizer.address"]
     defaults:
       run:
         shell: msys2 {0}
@@ -40,18 +56,37 @@ jobs:
       - uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
         with:
-          msystem: CLANG64
+          msystem: ${{ matrix.env.name }}
           update: true
           install: |
-            mingw-w64-clang-x86_64-cc
-            mingw-w64-clang-x86_64-xmake
-      - name: Check Xmake Version
-        run: xmake --version
+            ${{ matrix.env.prefix }}-cc
+            ${{ matrix.env.prefix }}-xmake
       - name: Configure
-        run: xmake f -p mingw --use-llvm=y -m debug
+        run: xmake f -p mingw --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
       - name: Build
-        run: xmake -v
-      - name: Test UWVM
+        run: xmake b -v
+      - name: Check UWVM version
         run: xmake run uwvm --version
-      - name: Test units
+      - name: Unit tests
         run: xmake test -vD
+  # ---------------------------------------------------------------------------
+  freebsd:
+    if: ${{ !always() }} # Remove it once support "202411L: Structured bindings can introduce a pack"
+    name: FreeBSD
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: ["debug"]
+        policies: ["build.sanitizer.address"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cross-platform-actions/action@v0.27.0
+        with:
+          operating_system: freebsd
+          version: "14.2"
+          run: |
+            sudo pkg install -y llvm-devel xmake-io
+            xmake f -m debug --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
+            xmake b -v
+            xmake run uwvm --version
+            xmake test -vD

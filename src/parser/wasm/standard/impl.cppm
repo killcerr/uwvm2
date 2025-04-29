@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -23,13 +23,22 @@
 
 module;
 
-export module parser.wasm.standard;
-export import parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1p1;
-export import parser.wasm.standard.wasm2;
-export import parser.wasm.standard.wasm2_MultiMemory;
-export import parser.wasm.standard.wasm2_TailCalls;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference;
-export import parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
-export import parser.wasm.standard.wasm2_thread;
-export import parser.wasm.standard.wasm3;
+export module ulte.parser.wasm.standard;
+export import ulte.parser.wasm.standard.wasm1;
+export import ulte.parser.wasm.standard.wasm1p1;
+export import ulte.parser.wasm.standard.wasm2;
+export import ulte.parser.wasm.standard.wasm2_MultiMemory;
+export import ulte.parser.wasm.standard.wasm2_TailCalls;
+export import ulte.parser.wasm.standard.wasm2_TailCalls_FunctionReference;
+export import ulte.parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
+export import ulte.parser.wasm.standard.wasm2_thread;
+export import ulte.parser.wasm.standard.wasm3;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "impl.h"

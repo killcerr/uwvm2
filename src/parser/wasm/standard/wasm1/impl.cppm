@@ -1,6 +1,6 @@
 ﻿/********************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
+ * Copyright (c) 2025 UlteSoft. All rights reserved.    *
  * Licensed under the APL-2 License (see LICENSE file). *
  ********************************************************/
 
@@ -24,9 +24,17 @@
 
 module;
 
-export module parser.wasm.standard.wasm1;
-export import parser.wasm.standard.wasm1.type;
-export import parser.wasm.standard.wasm1.section;
-export import parser.wasm.standard.wasm1.opcode;
-export import parser.wasm.standard.wasm1.binfmt;
-export import parser.wasm.standard.wasm1.features;
+export module ulte.parser.wasm.standard.wasm1;
+export import ulte.parser.wasm.standard.wasm1.type;
+export import ulte.parser.wasm.standard.wasm1.section;
+export import ulte.parser.wasm.standard.wasm1.opcode;
+export import ulte.parser.wasm.standard.wasm1.features;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "impl.h"

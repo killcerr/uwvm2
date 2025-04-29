@@ -28,29 +28,34 @@
 
 #include <utils/macro/push_macros.h>
 
+#ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.standard.wasm1.type;
 import parser.wasm.concepts;
-
+import parser.wasm.standard.wasm1.type;
+#else
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+#endif
 struct feature1
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"1"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
 struct binfmt_ver1_module_storage_t
 {
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 inline constexpr binfmt_ver1_module_storage_t handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
 {
     return {};
 }
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr auto
-    define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<feature1>, ::fast_io::tuple<Fs...>) noexcept
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+inline constexpr auto define_wasm_binfmt_parsering_strategy(::ulte::parser::wasm::concepts::feature_reserve_type_t<feature1>, ::fast_io::tuple<Fs...>) noexcept
 {
     return ::std::addressof(handle_func<Fs...>);
 }
@@ -58,9 +63,12 @@ inline constexpr auto
 struct feature2
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"2"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-static_assert(::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<feature1>);
+static_assert(::ulte::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<feature1>);
 
-int main() { ::parser::wasm::concepts::operation::check_has_duplicate_binfmt_handler<feature1, feature2>(); }
+int main() { ::ulte::parser::wasm::concepts::operation::check_has_duplicate_binfmt_handler<feature1, feature2>(); }
+
+// macro
+#include <utils/macro/pop_macros.h>
