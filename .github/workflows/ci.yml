@@ -12,32 +12,43 @@ on:
 
 jobs:
   # ---------------------------------------------------------------------------
-  linux:
-    name: Linux
-    runs-on: ubuntu-24.04
+  ubuntu:
+    name: Ubuntu
+    runs-on: ubuntu-24.04 # noble
+    strategy:
+      matrix:
+        mode: ["debug"]
+        policies: ["build.sanitizer.address"]
     steps:
       - uses: actions/checkout@v4
       - name: Setup
         run: |
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
           sudo add-apt-repository ppa:xmake-io/xmake
-          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main"
-          sudo apt-get install -t llvm-toolchain-noble-20 clang-20 clang-tools-20 lld-20
-          sudo apt-get install xmake
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
+          sudo apt-get install clang clang-tools lld xmake
       - name: Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-20
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
       - name: Build
         run: xmake b -v
-      - name: Test UWVM
+      - name: Check UWVM version
         run: xmake run uwvm --version
-      - name: Test Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-20 --policies=build.sanitizer.address
-      - name: Test units
+      - name: Unit tests
         run: xmake test -vD
   # ---------------------------------------------------------------------------
-  msys2-clang64:
-    name: MSYS2 CLANG64
+  msys2:
+    if: ${{ !always() }} # Remove it once update to LLVM21
+    name: MINGW ${{ matrix.env.name }}
     runs-on: windows-latest
+    strategy:
+      matrix:
+        env:
+          - name: "CLANG64"
+            prefix: mingw-w64-clang-x86_64
+          - name: "CLANGARM64"
+            prefix: mingw-w64-clang-aarch64
+        mode: ["debug"]
+        policies: ["build.sanitizer.address"]
     defaults:
       run:
         shell: msys2 {0}
@@ -45,39 +56,36 @@ jobs:
       - uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
         with:
-          msystem: CLANG64
+          msystem: ${{ matrix.env.name }}
           update: true
           install: |
-            mingw-w64-clang-x86_64-cc
-            mingw-w64-clang-x86_64-xmake
+            ${{ matrix.env.prefix }}-cc
+            ${{ matrix.env.prefix }}-xmake
       - name: Configure
-        run: xmake f -p mingw --use-llvm=y -m debug
+        run: xmake f -p mingw --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
       - name: Build
         run: xmake b -v
-      - name: Test UWVM
+      - name: Check UWVM version
         run: xmake run uwvm --version
-      - name: Test Configure
-        run: xmake f -p mingw --use-llvm=y -m debug --policies=build.sanitizer.address
-      - name: Test units
+      - name: Unit tests
         run: xmake test -vD
   # ---------------------------------------------------------------------------
-  #freebsd:
-  #  name: FreeBSD
-  #  runs-on: ubuntu-latest
-  #  defaults:
-  #    run:
-  #      shell: freebsd {0}
-  #  steps:
-  #    - uses: actions/checkout@v4
-  #    - uses: vmactions/freebsd-vm@v1
-  #      with:
-  #        prepare: |
-  #          pkg install -y llvm20 xmake-io
-  #    - name: Build
-  #      run: |
-  #        export XMAKE_ROOT=y
-  #        cd ${GITHUB_WORKSPACE}
-  #        xmake f -m debug
-  #        xmake b -v
-  #        xmake run uwvm --version
-  #        xmake test -vD
+  freebsd:
+    name: FreeBSD
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: ["debug"]
+        policies: ["build.sanitizer.address"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cross-platform-actions/action@v0.27.0
+        with:
+          operating_system: freebsd
+          version: "14.2"
+          run: |
+            sudo pkg install -y llvm-devel xmake-io
+            xmake f -m debug -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
+            xmake b -v
+            xmake run uwvm --version
+            xmake test -vD
