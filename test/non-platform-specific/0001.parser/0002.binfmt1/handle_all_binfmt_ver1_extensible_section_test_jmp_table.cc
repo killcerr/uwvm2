@@ -55,54 +55,54 @@ import uwvm.wasm.storage;
 # define GNU_NOINLINE [[__gnu__::__noinline__]]
 #endif
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec1"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{1};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{1};
 
     // Expand on Sec1 here
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec1<Fs...>>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec1<Fs...>>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test1\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test1\n");
     return true;
 }
 
 struct Feature1
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature1"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     using binfmt_ver1_section_type = ::fast_io::tuple<Sec1<Fs...>>;
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec2
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec2"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{2};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{2};
 
     // Expand on Sec2 here
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec2<Fs...>>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec2<Fs...>>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test2\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test2\n");
 
     return true;
 }
@@ -110,20 +110,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec3
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec3"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{3};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{3};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec3>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec3>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test3\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test3\n");
 
     return true;
 }
@@ -131,20 +131,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec4
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec4"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{4};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{4};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec4>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec4>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test4\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test4\n");
 
     return true;
 }
@@ -152,20 +152,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec5
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec5"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{5};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{5};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec5>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec5>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test5\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test5\n");
 
     return true;
 }
@@ -173,20 +173,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec6
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec6"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{6};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{6};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec6>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec6>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test6\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test6\n");
 
     return true;
 }
@@ -194,20 +194,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec7
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec7"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{7};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{7};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec7>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec7>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test7\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test7\n");
 
     return true;
 }
@@ -215,20 +215,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec8
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec8"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{8};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{8};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec8>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec8>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test8\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test8\n");
 
     return true;
 }
@@ -236,20 +236,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec9
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec9"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{9};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{9};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec9>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec9>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test9\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test9\n");
 
     return true;
 }
@@ -257,20 +257,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec10
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec10"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{10};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{10};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec10>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec10>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test10\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test10\n");
 
     return true;
 }
@@ -278,20 +278,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec11
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec11"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{11};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{11};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec11>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec11>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test11\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test11\n");
 
     return true;
 }
@@ -299,20 +299,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec12
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec12"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{12};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{12};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec12>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec12>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test12\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test12\n");
 
     return true;
 }
@@ -320,20 +320,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec13
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec13"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{13};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{13};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec13>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec13>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test13\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test13\n");
 
     return true;
 }
@@ -341,20 +341,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec14
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec14"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{14};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{14};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec14>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec14>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test14\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test14\n");
 
     return true;
 }
@@ -362,20 +362,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec15
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec15"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{15};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{15};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec15>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec15>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test15\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test15\n");
 
     return true;
 }
@@ -383,20 +383,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec16
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec16"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{16};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{16};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec16>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec16>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test16\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test16\n");
 
     return true;
 }
@@ -404,20 +404,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec17
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec17"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{17};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{17};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec17>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec17>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test17\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test17\n");
 
     return true;
 }
@@ -425,20 +425,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec18
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec18"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{18};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{18};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec18>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec18>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test18\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test18\n");
 
     return true;
 }
@@ -446,20 +446,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec19
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec19"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{19};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{19};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec19>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec19>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test19\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test19\n");
 
     return true;
 }
@@ -467,20 +467,20 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Sec20
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec20"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{20};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{20};
 
     // Unexpandable section
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
-    ::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec20>>,
-    [[maybe_unused]] ::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    ::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec20>>,
+    [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&)
 {
-    ::fast_io::io::perrln(::uwvm::u8log_output, u8"test20\n");
+    ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test20\n");
 
     return true;
 }
@@ -488,9 +488,9 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
 struct Feature2
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature2"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     using binfmt_ver1_section_type =
         ::fast_io::tuple<Sec2<Fs...>, Sec3, Sec4, Sec5, Sec6, Sec7, Sec8, Sec9, Sec10, Sec11, Sec12, Sec13, Sec14, Sec15, Sec16, Sec17, Sec18, Sec19, Sec20>;
 };
@@ -498,13 +498,13 @@ struct Feature2
 struct Feature3
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature3"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr auto define_wasm_binfmt_parsering_strategy(::parser::wasm::concepts::feature_reserve_type_t<Feature1>, ::fast_io::tuple<Fs...>) noexcept
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+inline constexpr auto define_wasm_binfmt_parsering_strategy(::ulte::parser::wasm::concepts::feature_reserve_type_t<Feature1>, ::fast_io::tuple<Fs...>) noexcept
 {
-    return ::std::addressof(::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>);
+    return ::std::addressof(::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>);
 }
 
 /*
@@ -527,17 +527,18 @@ int main(int argc, char**)
 
     /// @brief wasm binfmt ver1 features
     using wasm_binfmt_ver1_features_t =
-        decltype(::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(all_features));
+        decltype(::ulte::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(all_features));
     constexpr wasm_binfmt_ver1_features_t wasm_binfmt1_features{};
-    using wasm_binfmt_ver1_module_storage_t = decltype(::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features));
-    [[maybe_unused]] constexpr auto binfmt_ver1_handler{::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(wasm_binfmt1_features)};
+    using wasm_binfmt_ver1_module_storage_t = decltype(::ulte::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features));
+    [[maybe_unused]] constexpr auto binfmt_ver1_handler{
+        ::ulte::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(wasm_binfmt1_features)};
 
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
-    ::parser::wasm::base::error_impl e{};
+    ::ulte::parser::wasm::base::error_impl e{};
 
-    ::fast_io::io::perr(::uwvm::u8log_output, u8"sec", argc, u8":\n");
-    ::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, nullptr, argc, nullptr, nullptr, e);
+    ::fast_io::io::perr(::ulte::uwvm::u8log_output, u8"sec", argc, u8":\n");
+    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, argc, nullptr, nullptr, e);
 }
 
 /*

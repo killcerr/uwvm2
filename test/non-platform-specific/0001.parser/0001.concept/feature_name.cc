@@ -41,13 +41,13 @@ struct feature1
     inline static constexpr ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::parser::wasm::concepts::has_feature_name<feature1>);
+static_assert(::ulte::parser::wasm::concepts::has_feature_name<feature1>);
 
 struct feature2
 {
     ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
+static_assert(::ulte::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
 
 int main() {}

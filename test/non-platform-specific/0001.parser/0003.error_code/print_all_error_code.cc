@@ -56,11 +56,11 @@ int main()
         ::fast_io::u8obuf_file u8cf{u8"error_code_test_u8c.log"};
         ::fast_io::u16obuf_file u16cf{u8"error_code_test_u16c.log"};
         ::fast_io::u32obuf_file u32f{u8"error_code_test_u32c.log"};
-        ::parser::wasm::base::error_output_t errout;
+        ::ulte::parser::wasm::base::error_output_t errout;
         errout.err.err_selectable.u64 = 0xcdcdcdcdcdcdcdcd;
-        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::parser::wasm::base::wasm_parse_error_code::illegal_type_index) + 1u; ++i)
+        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::ulte::parser::wasm::base::wasm_parse_error_code::illegal_type_index) + 1u; ++i)
         {
-            errout.err.err_code = static_cast<::parser::wasm::base::wasm_parse_error_code>(i);
+            errout.err.err_code = static_cast<::ulte::parser::wasm::base::wasm_parse_error_code>(i);
             ::fast_io::io::perrln(cf, errout);
             ::fast_io::io::perrln(wcf, errout);
             ::fast_io::io::perrln(u8cf, errout);

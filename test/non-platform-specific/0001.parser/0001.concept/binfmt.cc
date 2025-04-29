@@ -38,16 +38,16 @@ import parser.wasm.standard.wasm1.type;
 
 struct feature1
 {
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-static_assert(::parser::wasm::concepts::has_wasm_binfmt_version<feature1>);
+static_assert(::ulte::parser::wasm::concepts::has_wasm_binfmt_version<feature1>);
 
 struct feature2
 {
-    ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-static_assert(::parser::wasm::concepts::has_wasm_binfmt_version<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
+static_assert(::ulte::parser::wasm::concepts::has_wasm_binfmt_version<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
 
 int main() {}

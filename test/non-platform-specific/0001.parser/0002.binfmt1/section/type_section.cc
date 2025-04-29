@@ -48,22 +48,22 @@ import uwvm.wasm.storage;
 # include <uwvm/wasm/storage/impl.h>
 #endif
 
-enum class vt1 : ::parser::wasm::standard::wasm1::type::wasm_u32
+enum class vt1 : ::ulte::parser::wasm::standard::wasm1::type::wasm_u32
 {
 
 };
 
-enum class vt2 : ::parser::wasm::standard::wasm1::type::wasm_u32
+enum class vt2 : ::ulte::parser::wasm::standard::wasm1::type::wasm_u32
 {
 
 };
 
-enum class ftp1 : ::parser::wasm::standard::wasm1::type::wasm_byte
+enum class ftp1 : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
 {
 
 };
 
-enum class ftp2 : ::parser::wasm::standard::wasm1::type::wasm_byte
+enum class ftp2 : ::ulte::parser::wasm::standard::wasm1::type::wasm_byte
 {
 
 };
@@ -71,46 +71,46 @@ enum class ftp2 : ::parser::wasm::standard::wasm1::type::wasm_byte
 struct F1
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"F1"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-    using value_type = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement, vt1>;
-    using type_prefix = ::parser::wasm::concepts::operation::type_replacer<::parser::wasm::concepts::operation::root_of_replacement, ftp1>;
+    using value_type = ::ulte::parser::wasm::concepts::operation::type_replacer<::ulte::parser::wasm::concepts::operation::root_of_replacement, vt1>;
+    using type_prefix = ::ulte::parser::wasm::concepts::operation::type_replacer<::ulte::parser::wasm::concepts::operation::root_of_replacement, ftp1>;
 };
 
 struct F2
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"F2"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-    using type_prefix = ::parser::wasm::concepts::operation::type_replacer<ftp1, ftp2>;
+    using type_prefix = ::ulte::parser::wasm::concepts::operation::type_replacer<ftp1, ftp2>;
     inline static constexpr bool allow_multi_result_vector{false};
 };
 
 struct F3
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"F2"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-    using value_type = ::parser::wasm::concepts::operation::type_replacer<vt1, vt2>;
+    using value_type = ::ulte::parser::wasm::concepts::operation::type_replacer<vt1, vt2>;
     inline static constexpr bool allow_multi_result_vector{true};
 };
 
 int main()
 {
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_value_type_t<F1>, vt1>);
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_value_type_t<F1, F2>, vt1>);
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_value_type_t<F1, F3>, vt2>);
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_value_type_t<F1, F2, F3>, vt2>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<F1>, vt1>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<F1, F2>, vt1>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<F1, F3>, vt2>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<F1, F2, F3>, vt2>);
 
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1>, ftp1>);
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1, F2>, ftp2>);
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1, F3>, ftp1>);
-    static_assert(::std::same_as<::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1, F2, F3>, ftp2>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1>, ftp1>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1, F2>, ftp2>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1, F3>, ftp1>);
+    static_assert(::std::same_as<::ulte::parser::wasm::standard::wasm1::features::final_type_prefix_t<F1, F2, F3>, ftp2>);
 
-    static_assert(::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1>() == false);
-    static_assert(::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2>() == false);
-    static_assert(::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F3>() == true);
-    static_assert(::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2, F3>() == true);
+    static_assert(::ulte::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1>() == false);
+    static_assert(::ulte::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2>() == false);
+    static_assert(::ulte::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F3>() == true);
+    static_assert(::ulte::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2, F3>() == true);
 }
 
 

@@ -47,11 +47,11 @@ import uwvm.wasm.storage;
 # include <uwvm/wasm/storage/impl.h>
 #endif
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec1 ext"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{1};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{1};
 
     // Expand on Sec1 here
 };
@@ -59,17 +59,17 @@ struct Sec1
 struct Feature1
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature1"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     using binfmt_ver1_section_type = ::fast_io::tuple<Sec1<Fs...>>;
 };
 
-template <::parser::wasm::concepts::wasm_feature... Fs>
+template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec2
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec2 ext"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{2};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{2};
 
     // Expand on Sec2 here
 };
@@ -77,7 +77,7 @@ struct Sec2
 struct Sec3
 {
     inline static constexpr ::fast_io::u8string_view section_name{u8"Sec3"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_byte section_id{3};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id{3};
 
     // Unexpandable section
 };
@@ -85,16 +85,16 @@ struct Sec3
 struct Feature2
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature2"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-    template <::parser::wasm::concepts::wasm_feature... Fs>
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     using binfmt_ver1_section_type = ::fast_io::tuple<Sec2<Fs...>, Sec3>;
 };
 
 struct Feature3
 {
     inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature3"};
-    inline static constexpr ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
 /*
@@ -111,7 +111,7 @@ sections:      Sec1(ext) Sec2(ext) Sec3
 
 int main()
 {
-    using T = ::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Feature1, Feature2, Feature3>;
+    using T = ::ulte::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Feature1, Feature2, Feature3>;
     static_assert(::std::same_as<T, ::fast_io::tuple<Sec1<Feature1, Feature2, Feature3>, Sec2<Feature1, Feature2, Feature3>, Sec3>>);
 }
 
