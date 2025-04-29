@@ -83,8 +83,9 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 
     /// @brief Define functions for value_type against wasm1 for checking value_type
     template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr bool define_check_value_type([[maybe_unused]] ::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                  ::ulte::parser::wasm::standard::wasm1::type::value_type value_type) noexcept
+    inline constexpr bool define_check_value_type(
+        [[maybe_unused]] ::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+        ::ulte::parser::wasm::standard::wasm1::type::value_type value_type) noexcept
     {
         switch(value_type)
         {
@@ -99,12 +100,12 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
     /// @brief      handle type_prefix: "functype"
     /// @details    Separate processing to facilitate reuse in subsequent expansion
     template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr ::std::byte const* handle_type_prefix_functype(::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                                    ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
-                                                                        module_storage,
-                                                                    ::std::byte const* section_curr,
-                                                                    ::std::byte const* const section_end,
-                                                                    ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
+    inline constexpr ::std::byte const* handle_type_prefix_functype(
+        ::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+        ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
@@ -234,13 +235,13 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 
     /// @brief Define type_prefix for wasm1 Functions for checking type_prefix
     template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr ::std::byte const* define_type_prefix_handler(::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                                   ::ulte::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
-                                                                   ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
-                                                                       module_storage,
-                                                                   ::std::byte const* section_curr,
-                                                                   ::std::byte const* const section_end,
-                                                                   ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
+    inline constexpr ::std::byte const* define_type_prefix_handler(
+        ::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+        ::ulte::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
+        ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
@@ -255,7 +256,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
                 [[unlikely]]
                 {
                     err.err_curr = section_curr;
-                    err.err_selectable.u8 = static_cast<::std::underlying_type_t<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix);
+                    err.err_selectable.u8 =
+                        static_cast<::std::underlying_type_t<::ulte::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix);
                     err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix;
                     ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
@@ -264,12 +266,12 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 
     /// @brief Define the handler function for type_section
     template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void handle_binfmt_ver1_extensible_section_define(::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                                                       ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
-                                                                           module_storage,
-                                                                       ::std::byte const* const section_begin,
-                                                                       ::std::byte const* const section_end,
-                                                                       ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
+    inline constexpr void handle_binfmt_ver1_extensible_section_define(
+        ::ulte::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+        ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* const section_begin,
+        ::std::byte const* const section_end,
+        ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
         ::ulte::utils::debug::timer parsing_timer{u8"parse type section (id: 1)"};
@@ -351,6 +353,21 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
         }
     }
 }  // namespace ulte::parser::wasm::standard::wasm1::features
+
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::ulte::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+}
 
 #ifndef UWVM_MODULE
 // macro

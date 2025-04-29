@@ -72,6 +72,20 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
 
 }  // namespace ulte::parser::wasm::binfmt::ver1
 
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+}
 #ifndef UWVM_MODULE
 // macro
 # include <utils/macro/pop_macros.h>

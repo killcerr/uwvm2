@@ -342,7 +342,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
             }
 
             // use for reserve
-            ++importdesc_counter.index_unchecked(static_cast<::std::size_t>(static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
+            ++importdesc_counter.index_unchecked(
+                static_cast<::std::size_t>(static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
 
             ++section_curr;
             // ... count modulenamelen name ... externnamelen externname ... index ...
@@ -369,6 +370,21 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
         /// @todo reserve and pushback
     }
 }  // namespace ulte::parser::wasm::standard::wasm1::features
+
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::ulte::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::ulte::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+}
 
 #ifndef UWVM_MODULE
 // macro
