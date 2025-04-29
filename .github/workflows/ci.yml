@@ -37,7 +37,7 @@ jobs:
         run: xmake test -vD
   # ---------------------------------------------------------------------------
   msys2:
-    if: ${{ !always() }} # Remove it once LLVM21
+    if: ${{ !always() }} # Remove it once update to LLVM21
     name: MINGW ${{ matrix.env.name }}
     runs-on: windows-latest
     strategy:
@@ -82,7 +82,6 @@ jobs:
       - uses: cross-platform-actions/action@v0.27.0
         with:
           operating_system: freebsd
-          shutdown_vm: false
           version: "14.2"
           run: |
             sudo pkg install -y llvm-devel xmake-io
