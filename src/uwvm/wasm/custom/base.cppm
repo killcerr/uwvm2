@@ -28,8 +28,10 @@ module;
 #include <concepts>
 #include <type_traits>
 #include <utility>
+#include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 #include <utils/macro/push_macros.h>
+#include <uwvm/utils/ansies/uwvm_color_push_macro.h>
 
 export module ulte.uwvm.wasm.custom:base;
 

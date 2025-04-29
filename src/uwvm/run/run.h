@@ -223,9 +223,8 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::run
                     }
 #endif
                     // handle custom
-                    ::ulte::uwvm::wasm::custom::handle_binfmt1_custom_section(
-                        ::ulte::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.custom_sections.cbegin(),
-                        ::ulte::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage.custom_sections.cend());
+                    ::ulte::uwvm::wasm::custom::handle_binfmt1_custom_section(::ulte::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
+                                                                              ::ulte::uwvm::wasm::custom::custom_handle_funcs);
                 }
 
                 /// @todo handle import modules

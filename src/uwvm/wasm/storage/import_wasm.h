@@ -26,10 +26,17 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import ulte.parser.wasm.concepts;
+import ulte.parser.wasm.standard.wasm1.type;
+import ulte.uwvm.wasm.base;
+import ulte.uwvm.wasm.feature;
 #else
 // import
 # include <fast_io.h>
-# include <fast_io_dsal/vector.h>
+# include <parser/wasm/concepts/impl.h>
+# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm/wasm/base/impl.h>
+# include <uwvm/wasm/feature/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
