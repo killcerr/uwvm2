@@ -24,17 +24,17 @@
 
 #pragma once
 
-#ifdef UWVM_CAN_LOAD_DL
-# ifdef UWVM_MODULE
+#ifdef UWVM_MODULE
 import fast_io;
-# else
+#else
 // macro
-#  include <utils/macro/push_macros.h>
+# include <utils/macro/push_macros.h>
 // import
-#  include <fast_io.h>
-#  include <fast_io_dsal/vector.h>
-# endif
+# include <fast_io.h>
+# include <fast_io_dsal/vector.h>
+#endif
 
+#ifdef UWVM_CAN_LOAD_DL
 # ifndef UWVM_MODULE_EXPORT
 #  define UWVM_MODULE_EXPORT
 # endif
@@ -44,8 +44,10 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::wasm::storage
 
     // TODO: import_dl_func // The result of parsing the dl is used to add the import module directly.
 }  // namespace ulte::uwvm::wasm::storage
-# ifndef UWVM_MODULE
-// macro
-#  include <utils/macro/pop_macros.h>
-# endif
 #endif
+
+#ifndef UWVM_MODULE
+// macro
+# include <utils/macro/pop_macros.h>
+#endif
+
