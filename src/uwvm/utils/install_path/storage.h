@@ -41,7 +41,7 @@ import ulte.utils.install_path;
 #endif
 
 #ifdef UWVM_SUPPORT_INSTALL_PATH
-UWVM_MODULE_EXPORT namespace ulte::uwvm::ulte::utils::install_path
+UWVM_MODULE_EXPORT namespace ulte::uwvm::utils::install_path
 {
     /// @brief Path to the program binary itself
     /// @details Only support to get by system parameter, not support to get by argv0, argv0 may be wrong

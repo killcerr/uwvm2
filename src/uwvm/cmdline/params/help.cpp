@@ -66,35 +66,35 @@ namespace ulte::uwvm::cmdline::paras::details
             if(p->cate != cate) { continue; }
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
                                 u8"  ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 ::fast_io::mnp::left(p->name, ::ulte::uwvm::cmdline::parameter_max_principal_name_size));
             ::fast_io::io::perrln(::ulte::uwvm::u8log_output,
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                   u8"  -----  ",
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                   p->describe);
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
                                 parameter_max_principal_name_size_u8nspace.element,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
                                 u8"Usage: ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"[",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 p->name);
             for(auto curr_base{p->alias.base}; curr_base != p->alias.base + p->alias.len; ++curr_base)
             {
                 ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                    ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"|",
-                                    ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                     *curr_base);
             }
             ::fast_io::io::perrln(::ulte::uwvm::u8log_output,
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                   u8"] ",
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                   p->usage,
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
         }
     }
 
@@ -104,35 +104,35 @@ namespace ulte::uwvm::cmdline::paras::details
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
                                 u8"  ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 ::fast_io::mnp::left(p->name, ::ulte::uwvm::cmdline::parameter_max_principal_name_size));
             ::fast_io::io::perrln(::ulte::uwvm::u8log_output,
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                   u8"  -----  ",
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                   p->describe);
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
                                 parameter_max_principal_name_size_u8nspace.element,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
                                 u8"Usage: ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"[",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 p->name);
             for(auto curr_base{p->alias.base}; curr_base != p->alias.base + p->alias.len; ++curr_base)
             {
                 ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                    ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"|",
-                                    ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                     *curr_base);
             }
             ::fast_io::io::perrln(::ulte::uwvm::u8log_output,
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                   u8"] ",
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                   p->usage,
-                                  ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                  ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
         }
     }
 
@@ -147,7 +147,7 @@ namespace ulte::uwvm::cmdline::paras::details
         if(currp1 == para_end || currp1->type != ::ulte::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n");
             help_output_singal_cate(::ulte::utils::cmdline::categorization::global);
 
@@ -156,33 +156,33 @@ namespace ulte::uwvm::cmdline::paras::details
                                 // ln
                                 u8"\n",
                                 // debug
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"  ",
                                 ::fast_io::mnp::left(u8"<debug>", ::ulte::uwvm::cmdline::parameter_max_principal_name_size),
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 u8"  -----  ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Use \"",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 u8"--help debug",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" to display the debug arguments."
                                 // endl
                                 u8"\n\n",
                                 // wasm
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"  ",
                                 ::fast_io::mnp::left(u8"<wasm>", ::ulte::uwvm::cmdline::parameter_max_principal_name_size),
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 u8"  -----  ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Use \"",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 u8"--help wasm",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" to display the wasm arguments.",
                                 // endl
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
 
             return ::ulte::utils::cmdline::parameter_return_type::return_imme;
@@ -193,71 +193,71 @@ namespace ulte::uwvm::cmdline::paras::details
         if(auto const currp1_str{currp1->str}; currp1_str == u8"all")
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n");
             help_output_all();
-            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
+            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
         }
         else if(currp1_str == u8"global")
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"  <global>",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(::ulte::utils::cmdline::categorization::global);
-            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
+            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
         }
         else if(currp1_str == u8"debug")
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"  <debug>",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(::ulte::utils::cmdline::categorization::debug);
-            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
+            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
         }
         else if(currp1_str == u8"wasm")
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"  <wasm>",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(::ulte::utils::cmdline::categorization::wasm);
-            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
+            ::fast_io::io::perr(::ulte::uwvm::u8log_output, ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
         }
         else
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Invalid Extra Help Name \"",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                 currp1_str,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\". Usage: [",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"--help",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"|",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 u8"-h",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"] ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                 u8"[<null>|all|global|debug|wasm]",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
 
             return ::ulte::utils::cmdline::parameter_return_type::return_m1_imme;

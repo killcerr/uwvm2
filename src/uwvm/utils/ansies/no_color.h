@@ -39,7 +39,7 @@ import fast_io;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace ulte::uwvm::ulte::utils::ansies
+UWVM_MODULE_EXPORT namespace ulte::uwvm::utils::ansies
 {
     namespace details::posix
     {

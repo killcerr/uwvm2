@@ -58,7 +58,7 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         .name{u8"--log-win32-use-ansi"},
         .describe{u8"Log on Win32 system using ANSI sequence under Win10. SetConsoleTextAttribute api is used by default."},
         .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_win32_use_ansi_alias), 1}},
-        .is_exist{::std::addressof(::ulte::uwvm::ulte::utils::ansies::log_win32_use_ansi_b)}};
+        .is_exist{::std::addressof(::ulte::uwvm::utils::ansies::log_win32_use_ansi_b)}};
 }  // namespace ulte::uwvm::cmdline::paras
 
 # ifndef UWVM_MODULE

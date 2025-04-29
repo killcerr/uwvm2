@@ -116,15 +116,15 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline
         if(u16_cmdline_argv == nullptr) [[unlikely]]
         {
             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[fatal] ",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"CommandLineToArgvW failed: ",
                                 ::fast_io::error{::fast_io::win32_domain_value, ::fast_io::win32::GetLastError()},
                                 u8"\n",
-                                ::fast_io::mnp::cond(::ulte::uwvm::ulte::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"Terminate.\n\n");
             ::fast_io::fast_terminate();
         }

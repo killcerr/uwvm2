@@ -5,12 +5,9 @@
  ********************************************************/
 
 /**
- * @file        main.cc
- * @brief       main function for crt startup
- * @details     This function does nothing but call the cpp boot method of the other module
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-20
+ * @date        2025-04-29
  * @copyright   APL-2 License
  */
 
@@ -23,23 +20,8 @@
  *                                      *
  ****************************************/
 
-#ifdef UWVM_MODULE
-import ulte.uwvm.crtmain;
-#else
-// import
-# include "crtmain/impl.h"
-#endif
+#pragma once
 
-/// @brief      (crt) main func. The main function is a special function, but there are still meaningless [[gnu::used]].
-/// @param      argc Argument Count
-/// @param      argv Argument Vector
-/// @return     exit(3)
-/// @see        ::ulte::uwvm::uwvm_main()
-
-#if __has_cpp_attribute(__gnu__::__used__)
-[[__gnu__::__used__]]
+#ifndef UWVM_MODULE
+# include "print.h"
 #endif
-int main(int argc, char** argv)
-{
-    return ::ulte::uwvm::uwvm_main(argc, argv);
-}
