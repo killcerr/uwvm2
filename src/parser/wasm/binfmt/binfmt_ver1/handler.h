@@ -141,25 +141,26 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
     namespace details
     {
         template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
-        inline constexpr void handle_all_binfmt_ver1_extensible_section_impl(bool&,
-                                                                             ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>&,
-                                                                             ::ulte::parser::wasm::standard::wasm1::type::wasm_u32,
-                                                                             ::std::byte const*,
-                                                                             ::std::byte const*,
-                                                                             ::ulte::parser::wasm::base::error_impl&) noexcept
+        inline constexpr void
+            handle_all_binfmt_ver1_extensible_section_impl(bool&,
+                                                           ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>&,
+                                                           ::ulte::parser::wasm::standard::wasm1::type::wasm_u32,
+                                                           ::std::byte const*,
+                                                           ::std::byte const*,
+                                                           ::ulte::parser::wasm::base::error_impl&) noexcept
         {
             // do nothing
         }
 
         /// @throw ::fast_io::error
         template <typename SecCurr, typename... Secs, ::ulte::parser::wasm::concepts::wasm_feature... Fs>
-        inline constexpr void
-            handle_all_binfmt_ver1_extensible_section_impl(bool& success,
-                                                           ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                                           ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
-                                                           ::std::byte const* section_begin,
-                                                           ::std::byte const* section_end,
-                                                           ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
+        inline constexpr void handle_all_binfmt_ver1_extensible_section_impl(
+            bool& success,
+            ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
+            ::std::byte const* section_begin,
+            ::std::byte const* section_end,
+            ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
         {
             static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
 
@@ -192,7 +193,6 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
     template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_all_binfmt_ver1_extensible_section(::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
                                                                         module_storage,
-                                                                    [[maybe_unused]] ::std::byte const* module_begin,
                                                                     ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 section_id,
                                                                     ::std::byte const* section_begin,
                                                                     ::std::byte const* section_end,
@@ -204,7 +204,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
         bool success{};
 
         // llvm can gen jump table here
-        if(section_id == static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(::ulte::parser::wasm::standard::wasm1::section::section_id::custom_sec))
+        if(section_id ==
+           static_cast<::ulte::parser::wasm::standard::wasm1::type::wasm_u32>(::ulte::parser::wasm::standard::wasm1::section::section_id::custom_sec))
         {
             ::ulte::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end, err);
             success = true;
@@ -300,7 +301,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
 
             auto const sec_end{module_curr + sec_len};
 
-            handle_all_binfmt_ver1_extensible_section(ret, module_begin, sec_id, module_curr, sec_end, err);
+            handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err);
 
             module_curr = sec_end;
 
