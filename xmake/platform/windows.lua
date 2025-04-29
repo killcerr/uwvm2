@@ -8,7 +8,6 @@ function windows_target()
         set_toolchains("clang")
 
         add_ldflags("-fuse-ld=lld", {force = true})
-        add_cxflags("-Wno-braced-scalar-init")
 
         local sysroot_para = get_config("sysroot")
         if sysroot_para ~= "detect" and sysroot_para then

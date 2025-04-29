@@ -47,17 +47,24 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         inline bool help_is_exist{};
         inline constexpr ::fast_io::u8string_view help_alias{u8"-h"};
         extern "C++" ::ulte::utils::cmdline::parameter_return_type help_callback(::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                           ::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                           ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wbraced-scalar-init"
+#endif
     inline constexpr ::ulte::utils::cmdline::parameter help{.name{u8"--help"},
-                                                      .describe{u8"Get help information."},
-                                                      .usage{u8"[<null>|all|global|debug|wasm]"},
-                                                      .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::help_alias), 1}},
-                                                      .handle{::std::addressof(details::help_callback)},
-                                                      .is_exist{::std::addressof(details::help_is_exist)}};
+                                                            .describe{u8"Get help information."},
+                                                            .usage{u8"[<null>|all|global|debug|wasm]"},
+                                                            .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::help_alias), 1}},
+                                                            .handle{::std::addressof(details::help_callback)},
+                                                            .is_exist{::std::addressof(details::help_is_exist)}};
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 }  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE

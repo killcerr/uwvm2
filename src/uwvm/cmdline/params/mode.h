@@ -48,17 +48,24 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         inline bool mode_is_exist{};
         inline constexpr ::fast_io::u8string_view mode_alias{u8"-m"};
         extern "C++" ::ulte::utils::cmdline::parameter_return_type mode_callback(::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                           ::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                           ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wbraced-scalar-init"
+#endif
     inline constexpr ::ulte::utils::cmdline::parameter mode{.name{u8"--mode"},
-                                                      .describe{u8"Select operation mode, (DEFAULT: objdump)."},
-                                                      .usage{u8"[objdump]"},
-                                                      .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::mode_alias), 1}},
-                                                      .handle{::std::addressof(details::mode_callback)},
-                                                      .is_exist{::std::addressof(details::mode_is_exist)}};
+                                                            .describe{u8"Select operation mode, (DEFAULT: objdump)."},
+                                                            .usage{u8"[objdump]"},
+                                                            .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::mode_alias), 1}},
+                                                            .handle{::std::addressof(details::mode_callback)},
+                                                            .is_exist{::std::addressof(details::mode_is_exist)}};
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 }  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE

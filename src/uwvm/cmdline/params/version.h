@@ -48,17 +48,24 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         inline bool version_is_exist{};
         inline constexpr ::fast_io::array<::fast_io::u8string_view, 2> version_alias{u8"-v", u8"-ver"};
         extern "C++" ::ulte::utils::cmdline::parameter_return_type version_callback(::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                              ::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                              ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                                    ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                    ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wbraced-scalar-init"
+#endif
     inline constexpr ::ulte::utils::cmdline::parameter version{
         .name{u8"--version"},
         .describe{u8"Output version information."},
         .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{details::version_alias.data(), details::version_alias.size()}},
         .handle{::std::addressof(details::version_callback)},
         .is_exist{::std::addressof(details::version_is_exist)}};
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 }  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE

@@ -10,7 +10,6 @@ function mingw_target()
     if use_llvm_toolchain then	
         set_toolchains("clang")
         add_ldflags("-fuse-ld=lld", {force = true})
-        add_cxflags("-Wno-braced-scalar-init")
     end
 
     local sysroot_para = get_config("sysroot")

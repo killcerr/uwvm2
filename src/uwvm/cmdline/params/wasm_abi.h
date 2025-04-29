@@ -48,18 +48,26 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         inline bool wasm_abi_is_exist{};
         inline constexpr ::fast_io::u8string_view wasm_abi_alias{u8"-Wa"};
         extern "C++" ::ulte::utils::cmdline::parameter_return_type wasm_abi_callback(::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                               ::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                               ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                                     ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                     ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
-    inline constexpr ::ulte::utils::cmdline::parameter wasm_abi{.name{u8"--wasm-abi"},
-                                                          .describe{u8"Specifies the ABI used by the WASM module, (DEFAULT: auto-detection)."},
-                                                          .usage{u8"[bare|emscripten|wasip1|wasip2|wasix]"},
-                                                          .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
-                                                          .handle{::std::addressof(details::wasm_abi_callback)},
-                                                          .is_exist{::std::addressof(details::wasm_abi_is_exist)},
-                                                          .cate{::ulte::utils::cmdline::categorization::wasm}};
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wbraced-scalar-init"
+#endif
+    inline constexpr ::ulte::utils::cmdline::parameter wasm_abi{
+        .name{u8"--wasm-abi"},
+        .describe{u8"Specifies the ABI used by the WASM module, (DEFAULT: auto-detection)."},
+        .usage{u8"[bare|emscripten|wasip1|wasip2|wasix]"},
+        .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
+        .handle{::std::addressof(details::wasm_abi_callback)},
+        .is_exist{::std::addressof(details::wasm_abi_is_exist)},
+        .cate{::ulte::utils::cmdline::categorization::wasm}};
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 }  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE

@@ -47,10 +47,17 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         inline constexpr ::fast_io::u8string_view run_alias{u8"-r"};
     }  // namespace details
 
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wbraced-scalar-init"
+#endif
     inline constexpr ::ulte::utils::cmdline::parameter run{.name{u8"--run"},
-                                                     .describe{u8"Run WebAssembly."},
-                                                     .usage{u8"<file> <argv[1]> <arg[2]> ..."},
-                                                     .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
+                                                           .describe{u8"Run WebAssembly."},
+                                                           .usage{u8"<file> <argv[1]> <arg[2]> ..."},
+                                                           .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::run_alias), 1}}};
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 }  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE

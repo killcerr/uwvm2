@@ -48,23 +48,31 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         inline bool log_output_is_exist{};
         inline constexpr ::fast_io::u8string_view log_output_alias{u8"-log"};
         extern "C++" ::ulte::utils::cmdline::parameter_return_type log_output_callback(::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                                       ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                       ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
-    inline constexpr ::ulte::utils::cmdline::parameter u8log_output{.name{u8"--log-output"},
-                                                              .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
-                                                              .usage{
-#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
-                                                                  u8"[out|err|file <file>]"
-#else
-                                                                  u8"[out|err]"
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wbraced-scalar-init"
 #endif
-                                                              },
-                                                              .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1}},
-                                                              .handle{::std::addressof(details::log_output_callback)},
-                                                              .is_exist{::std::addressof(details::log_output_is_exist)}};
+    inline constexpr ::ulte::utils::cmdline::parameter u8log_output{
+        .name{u8"--log-output"},
+        .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
+        .usage{
+#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
+            u8"[out|err|file <file>]"
+#else
+            u8"[out|err]"
+#endif
+        },
+        .alias{::ulte::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1}},
+        .handle{::std::addressof(details::log_output_callback)},
+        .is_exist{::std::addressof(details::log_output_is_exist)}};
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#endif
 }  // namespace ulte::uwvm::cmdline::paras
 
 #ifndef UWVM_MODULE

@@ -49,15 +49,22 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
     {
         inline bool test_is_exist{};
         extern "C++" ::ulte::utils::cmdline::parameter_return_type test_callback(::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                           ::ulte::utils::cmdline::parameter_parsing_results*,
-                                                                           ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*,
+                                                                                 ::ulte::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
+# if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wbraced-scalar-init"
+# endif
     inline constexpr ::ulte::utils::cmdline::parameter test{.name{u8"--test"},
-                                                      .describe{u8"Debug Test."},
-                                                      .handle{::std::addressof(details::test_callback)},
-                                                      .is_exist{::std::addressof(details::test_is_exist)}};
+                                                            .describe{u8"Debug Test."},
+                                                            .handle{::std::addressof(details::test_callback)},
+                                                            .is_exist{::std::addressof(details::test_is_exist)}};
+# if defined(__clang__)
+#  pragma clang diagnostic pop
+# endif
 }  // namespace ulte::uwvm::cmdline::paras
 
 # ifndef UWVM_MODULE
