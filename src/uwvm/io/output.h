@@ -37,7 +37,7 @@ import fast_io;
 
 UWVM_MODULE_EXPORT namespace ulte::uwvm
 {
-    /// @brief Control VM output via virtual functions, can be set via option in --debug-output, not supported by avr
+    /// @brief Control VM output via virtual functions, can be set via option in `--log-output`, not supported by avr
 #if defined(__AVR__)
     // avr does not have posix
     inline ::fast_io::u8c_io_observer u8log_output{::fast_io::u8c_stderr()};  // [global] No global variable dependencies from other translation units

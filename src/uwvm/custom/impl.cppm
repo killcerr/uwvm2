@@ -24,6 +24,7 @@ module;
 
 export module ulte.uwvm.custom;
 export import :version;
+export import :git;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
