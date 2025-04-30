@@ -53,20 +53,6 @@ import :root;
 
 UWVM_MODULE_EXPORT namespace ulte::parser::wasm::concepts
 {
-    namespace details
-    {
-        /// @brief Determine if parameters can be passed through registers under the current abi.
-        /// @todo  check abi
-        template <typename T>
-        concept abi_transferable_value = ::std::is_trivially_copyable_v<T> &&
-#if (defined(_WIN32) && !defined(__WINE__)) || defined(__CYGWIN__)
-                                         sizeof(T) <= 8u
-#else
-                                         sizeof(T) <= (sizeof(::std::size_t) * 2)
-#endif
-            ;
-    }  // namespace details
-
     namespace operation
     {
         /// @brief      Get the version of binfmt

@@ -166,7 +166,11 @@ namespace ulte::uwvm::cmdline::paras::details
                                 u8")"
 #endif
 #if defined(UWVM_GIT_COMMIT_DATA) || defined(UWVM_GIT_REMOTE_URL) || defined(UWVM_GIT_COMMIT_ID)
-                                u8"\nGit: ",
+                                u8"\nGit: "
+# ifdef UWVM_GIT_HAS_UNCOMMITTED_MODIFICATIONS
+                                u8"(M) "
+# endif
+                                ,
                                 ::ulte::uwvm::custom::git_commit_id,
                                 u8" branch \'",
                                 ::ulte::uwvm::custom::git_upstream_branch,
