@@ -61,7 +61,8 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::cmdline::paras
         .name{u8"--log-output"},
         .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
         .usage{
-#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS))
+#if !defined(__AVR__) && !((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
+    !(defined(__NEWLIB__) && !defined(__CYGWIN__))
             u8"[out|err|file <file>]"
 #else
             u8"[out|err]"

@@ -70,7 +70,7 @@ UWVM_MODULE_EXPORT namespace ulte::utils::cmdline
         parameter_parsing_results_type type{};  // Parameter type
     };
 
-    /// @deprecated Not recommended
+    /// @deprecated Not recommended, use fast_io::vector instead
 #if 0
     /// @brief Structure to storage parameter_parsing_results
     struct parameter_parsing_results_storage UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE

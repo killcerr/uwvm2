@@ -94,7 +94,7 @@ namespace ulte::uwvm::cmdline::paras::details
             return ::ulte::utils::cmdline::parameter_return_type::def;
         }
 
-        parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{};
+        ::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{};
         auto const [next, err]{::fast_io::parse_by_scan(currp1_str.cbegin(), currp1_str.cend(), binfmt_version)};
 
         // parse u32 error
