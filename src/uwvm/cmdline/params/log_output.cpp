@@ -70,7 +70,8 @@ namespace ulte::uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"] ",
                                 ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__))
+#if !defined(__AVR__) && !((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
+    !(defined(__NEWLIB__) && !defined(__CYGWIN__))
                                 u8"[out|err|file <file>]"
 #else
                                 u8"[out|err]"
@@ -84,7 +85,8 @@ namespace ulte::uwvm::cmdline::paras::details
         // Setting the argument is already taken
         currp1->type = ::ulte::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
-#if !defined(__AVR__) && !(defined(_WIN32) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__))
+#if !defined(__AVR__) && !((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
+    !(defined(__NEWLIB__) && !defined(__CYGWIN__))
         // win32 and posix
         if(auto currp1_str{currp1->str}; currp1_str == u8"out")
         {
@@ -182,7 +184,8 @@ namespace ulte::uwvm::cmdline::paras::details
         {
 # if defined(__AVR__)
             ::ulte::uwvm::u8log_output = ::fast_io::u8c_stdout();
-# elif (defined(_WIN32) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__))
+# elif ((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__)) ||                                   \
+     (defined(__NEWLIB__) && !defined(__CYGWIN__))
             ::ulte::uwvm::u8log_output = ::fast_io::u8out();
 # endif
         }
@@ -190,7 +193,8 @@ namespace ulte::uwvm::cmdline::paras::details
         {
 # if defined(__AVR__)
             ::ulte::uwvm::u8log_output = ::fast_io::u8c_stderr();
-# elif (defined(_WIN32) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__))
+# elif ((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__)) ||                                   \
+     (defined(__NEWLIB__) && !defined(__CYGWIN__))
             ::ulte::uwvm::u8log_output = ::fast_io::u8err();
 # endif
         }
