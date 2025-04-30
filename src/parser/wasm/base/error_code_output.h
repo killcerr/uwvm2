@@ -24,6 +24,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import ulte.utils.ansies;
 import :error_code;
 #else
 // std
@@ -36,6 +37,7 @@ import :error_code;
 # include "wasm_code_color_push_macro.h"
 // import
 # include <fast_io.h>
+# include <utils/ansies/impl.h>
 # include "error_code.h"
 #endif
 
@@ -81,7 +83,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Unknown Error.",
@@ -389,7 +391,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Illegal WebAssembly file format.",
@@ -573,7 +575,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") No WebAssembly sections found.",
@@ -757,7 +759,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Section Length.",
@@ -1165,7 +1167,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Not enough space left.",
@@ -1573,7 +1575,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Custom Name Length.",
@@ -1757,7 +1759,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Parameter Length.",
@@ -2390,7 +2392,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Result Length.",
@@ -2799,7 +2801,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
@@ -3436,7 +3438,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Type Count.",
@@ -4372,7 +4374,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Import Count.",
@@ -5044,7 +5046,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Module Name Length.",
@@ -5228,7 +5230,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Imported module name should not have strings of length 0.",
@@ -5412,10 +5414,14 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                ") Imported Module Name Too Length.",
+                                ") Imported Module Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -5429,7 +5435,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                                      "(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     ") Imported Module Name Too Length.",
+                                                                     ") Imported Module Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
                     return;
                 }
@@ -5451,7 +5461,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 L"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                L") Imported Module Name Too Length.",
+                                L") Imported Module Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -5465,7 +5479,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                                      L"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     L") Imported Module Name Too Length.",
+                                                                     L") Imported Module Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
                     return;
                 }
@@ -5487,7 +5505,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u8") Imported Module Name Too Length.",
+                                u8") Imported Module Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -5501,7 +5523,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                                      u8"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u8") Imported Module Name Too Length.",
+                                                                     u8") Imported Module Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
                     return;
                 }
@@ -5523,7 +5549,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u") Imported Module Name Too Length.",
+                                u") Imported Module Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -5537,7 +5567,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                                      u"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u") Imported Module Name Too Length.",
+                                                                     u") Imported Module Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
                     return;
                 }
@@ -5559,7 +5593,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 U"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                U") Imported Module Name Too Length.",
+                                U") Imported Module Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -5573,7 +5611,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                                      U"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     U") Imported Module Name Too Length.",
+                                                                     U") Imported Module Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
                     return;
                 }
@@ -5596,7 +5638,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Imported Extern Name Length.",
@@ -5780,7 +5822,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Imported extern name should not have strings of length 0.",
@@ -5964,10 +6006,14 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                ") Imported Extern Name Too Length.",
+                                ") Imported Extern Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -5981,7 +6027,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                                      "(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     ") Imported Extern Name Too Length.",
+                                                                     ") Imported Extern Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
                     return;
                 }
@@ -6003,7 +6053,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 L"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                L") Imported Extern Name Too Length.",
+                                L") Imported Extern Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -6017,7 +6071,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                                      L"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     L") Imported Extern Name Too Length.",
+                                                                     L") Imported Extern Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
                     return;
                 }
@@ -6039,7 +6097,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u8") Imported Extern Name Too Length.",
+                                u8") Imported Extern Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -6053,7 +6115,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                                      u8"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u8") Imported Extern Name Too Length.",
+                                                                     u8") Imported Extern Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
                     return;
                 }
@@ -6075,7 +6141,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u") Imported Extern Name Too Length.",
+                                u") Imported Extern Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -6089,7 +6159,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                                      u"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u") Imported Extern Name Too Length.",
+                                                                     u") Imported Extern Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
                     return;
                 }
@@ -6111,7 +6185,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 U"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                U") Imported Extern Name Too Length.",
+                                U") Imported Extern Name Too Length: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                errout.err.err_selectable.u32,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -6125,7 +6203,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                                      U"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     U") Imported Extern Name Too Length.",
+                                                                     U") Imported Extern Name Too Length: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
+                                                                     errout.err.err_selectable.u32,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
                     return;
                 }
@@ -6372,7 +6454,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
                                 "uwvm: ",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLORHITE(stream_handle)),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") Invalid Type Index.",

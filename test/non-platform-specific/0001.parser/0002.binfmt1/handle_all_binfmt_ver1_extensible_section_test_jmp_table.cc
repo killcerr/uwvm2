@@ -70,7 +70,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test1\n");
     return true;
@@ -100,7 +101,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test2\n");
 
@@ -121,7 +123,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test3\n");
 
@@ -142,7 +145,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test4\n");
 
@@ -163,7 +167,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test5\n");
 
@@ -184,7 +189,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test6\n");
 
@@ -205,7 +211,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test7\n");
 
@@ -226,7 +233,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test8\n");
 
@@ -247,7 +255,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test9\n");
 
@@ -268,7 +277,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test10\n");
 
@@ -289,7 +299,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test11\n");
 
@@ -310,7 +321,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test12\n");
 
@@ -331,7 +343,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test13\n");
 
@@ -352,7 +365,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test14\n");
 
@@ -373,7 +387,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test15\n");
 
@@ -394,7 +409,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test16\n");
 
@@ -415,7 +431,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test17\n");
 
@@ -436,7 +453,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test18\n");
 
@@ -457,7 +475,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test19\n");
 
@@ -478,7 +497,8 @@ GNU_NOINLINE inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test20\n");
 
@@ -538,7 +558,14 @@ int main(int argc, char**)
     ::ulte::parser::wasm::base::error_impl e{};
 
     ::fast_io::io::perr(::ulte::uwvm::u8log_output, u8"sec", argc, u8":\n");
-    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, argc, nullptr, nullptr, e);
+    try
+    {
+        ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, argc, nullptr, nullptr, e, nullptr);
+    }
+    catch(::fast_io::error e)
+    {
+        ::fast_io::perr(::ulte::uwvm::u8log_output, u8"test4, not found\n");
+    }
 }
 
 /*

@@ -79,10 +79,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
     concept has_handle_binfmt_ver1_extensible_section_define =
         requires(::ulte::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec>> ref,
                  ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                 ::std::byte const* section_begin,
-                 ::std::byte const* section_end,
-                 ::ulte::parser::wasm::base::error_impl& err) {
-            { handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err) };
+                 ::std::byte const* const section_begin,
+                 ::std::byte const* const section_end,
+                 ::ulte::parser::wasm::base::error_impl& err,
+                 ::std::byte const* const sec_id_module_ptr) {
+            { handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, sec_id_module_ptr) };
         };
 
     /// @see WebAssembly Release 1.0 (2019-07-20) § 5.5.2
@@ -144,10 +145,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
         inline constexpr void
             handle_all_binfmt_ver1_extensible_section_impl(bool&,
                                                            ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>&,
-                                                           ::ulte::parser::wasm::standard::wasm1::type::wasm_byte,
-                                                           ::std::byte const*,
-                                                           ::std::byte const*,
-                                                           ::ulte::parser::wasm::base::error_impl&) noexcept
+                                                           ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const,
+                                                           ::std::byte const* const,
+                                                           ::std::byte const* const,
+                                                           ::ulte::parser::wasm::base::error_impl&,
+                                                           ::std::byte const* const) noexcept
         {
             // do nothing
         }
@@ -157,10 +159,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
         inline constexpr void handle_all_binfmt_ver1_extensible_section_impl(
             bool& success,
             ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-            ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id,
-            ::std::byte const* section_begin,
-            ::std::byte const* section_end,
-            ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
+            ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const section_id,
+            ::std::byte const* const section_begin,
+            ::std::byte const* const section_end,
+            ::ulte::parser::wasm::base::error_impl& err,
+            ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
         {
             static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
 
@@ -173,14 +176,15 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
                                                              module_storage,
                                                              section_begin,
                                                              section_end,
-                                                             err);
+                                                             err,
+                                                             sec_id_module_ptr);
                 success = true;
             }
             else
             {
                 if constexpr(sizeof...(Secs) != 0)
                 {
-                    handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success, module_storage, section_id, section_begin, section_end, err);
+                    handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success, module_storage, section_id, section_begin, section_end, err, sec_id_module_ptr);
                 }
             }
         }
@@ -193,10 +197,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
     template <::ulte::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_all_binfmt_ver1_extensible_section(::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
                                                                         module_storage,
-                                                                    ::ulte::parser::wasm::standard::wasm1::type::wasm_byte section_id,
-                                                                    ::std::byte const* section_begin,
-                                                                    ::std::byte const* section_end,
-                                                                    ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
+                                                                    ::ulte::parser::wasm::standard::wasm1::type::wasm_byte const section_id,
+                                                                    ::std::byte const* const section_begin,
+                                                                    ::std::byte const* const section_end,
+                                                                    ::ulte::parser::wasm::base::error_impl& err,
+                                                                    ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
         auto [... secs]{module_storage.sections};
         check_extensible_section_is_series<decltype(secs)...>();
@@ -212,12 +217,12 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
         }
         else
         {
-            details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end, err);
+            details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end, err, sec_id_module_ptr);
         }
 
         if(!success) [[unlikely]]
         {
-            err.err_curr = section_begin;
+            err.err_curr = sec_id_module_ptr;
             err.err_selectable.u8 = section_id;
             err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::illegal_section_id;
             ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -267,6 +272,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
 
         for(;;)
         {
+            auto const sec_id_module_ptr{module_curr};  // for error
+
             // get section type
             ::ulte::parser::wasm::standard::wasm1::type::wasm_byte sec_id{};
             ::fast_io::freestanding::my_memcpy(::std::addressof(sec_id), module_curr, sizeof(::ulte::parser::wasm::standard::wasm1::type::wasm_byte));
@@ -301,7 +308,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
 
             auto const sec_end{module_curr + sec_len};
 
-            handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err);
+            handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, sec_id_module_ptr);
 
             module_curr = sec_end;
 

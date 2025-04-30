@@ -94,7 +94,7 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::run
             return -2;  // The specified file is not available or cannot be opened
         }
 
-        auto module_name{::ulte::uwvm::cmdline::wasm_file_ppos->str};
+        auto const module_name{::ulte::uwvm::cmdline::wasm_file_ppos->str};
 
 #ifdef __cpp_exceptions
         try
@@ -160,9 +160,9 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::run
                     ::fast_io::mnp::addrvw(nullptr),
                     u8") Illegal WebAssembly file format.",
                     ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                    u8"\nparser: ",
+                    u8"\nuwvm: ",
                     ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
-                    u8"[curr]",
+                    u8"[parser]",
                     ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                     u8" -> ",
                     ::ulte::uwvm::utils::memory::print_memory{reinterpret_cast<::std::byte const*>(::ulte::uwvm::wasm::storage::execute_wasm_file.cbegin()),
@@ -214,9 +214,9 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::run
                             ::fast_io::io::perr(::ulte::uwvm::u8log_output,
                                                 errout,
                                                 ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                                u8"\nparser: ",
+                                                u8"\nuwvm: ",
                                                 ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
-                                                u8"[curr]",
+                                                u8"[parser]",
                                                 ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8" -> ",
                                                 ::ulte::uwvm::utils::memory::print_memory{
@@ -231,8 +231,9 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::run
                     }
 #endif
                     // handle custom
-                    auto custom_res{::ulte::uwvm::wasm::custom::handle_binfmt1_custom_section(::ulte::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
-                                                                                              ::ulte::uwvm::wasm::custom::custom_handle_funcs)};
+                    auto const custom_res{
+                        ::ulte::uwvm::wasm::custom::handle_binfmt1_custom_section(::ulte::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
+                                                                                  ::ulte::uwvm::wasm::custom::custom_handle_funcs)};
                     // 0: success, others: fault
                     if(custom_res) [[unlikely]]
                     {
@@ -260,9 +261,9 @@ UWVM_MODULE_EXPORT namespace ulte::uwvm::run
                                         ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"\".",
                                         ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"\nparser: ",
+                                        u8"\nuwvm: ",
                                         ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
-                                        u8"[curr]",
+                                        u8"[parser]",
                                         ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8" -> ",
                                         ::ulte::uwvm::utils::memory::print_memory{

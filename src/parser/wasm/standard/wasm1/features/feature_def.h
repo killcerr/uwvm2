@@ -87,8 +87,11 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
                                                ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                                                ::std::byte const* section_curr,
                                                ::std::byte const* const section_end,
-                                               ::ulte::parser::wasm::base::error_impl& err) {
-        { define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end, err) } -> ::std::same_as<::std::byte const*>;
+                                               ::ulte::parser::wasm::base::error_impl& err,
+                                               ::std::byte const* const prefix_module_ptr) {
+        {
+            define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end, err, prefix_module_ptr)
+        } -> ::std::same_as<::std::byte const*>;
     };
 
     /////////////////////////////
@@ -100,14 +103,17 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 
     /// @brief Define functions for handle extern_prefix
     template <typename... Fs>
-    concept has_extern_prefix_imports_handler = requires(::ulte::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-                                                         ::ulte::parser::wasm::standard::wasm1::features::final_import_type<Fs...>& fit,
-                                                         ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                                         ::std::byte const* section_curr,
-                                                         ::std::byte const* const section_end,
-                                                         ::ulte::parser::wasm::base::error_impl& err) {
-        { define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err) } -> ::std::same_as<::std::byte const*>;
-    };
+    concept has_extern_prefix_imports_handler =
+        requires(::ulte::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                 ::ulte::parser::wasm::standard::wasm1::features::final_import_type<Fs...>& fit,
+                 ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::ulte::parser::wasm::base::error_impl& err) {
+            {
+                define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err)
+            } -> ::std::same_as<::std::byte const*>;
+        };
 
     /// @brief Defining structures or concepts related to wasm versions
     template <::ulte::parser::wasm::concepts::wasm_feature... Fs>

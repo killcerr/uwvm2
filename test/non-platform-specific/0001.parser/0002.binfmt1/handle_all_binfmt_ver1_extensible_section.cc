@@ -63,7 +63,8 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test1\n");
     return true;
@@ -93,7 +94,8 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test2\n");
 
@@ -114,7 +116,8 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
     [[maybe_unused]] ::std::byte const* section_end,
-    ::ulte::parser::wasm::base::error_impl&)
+    ::ulte::parser::wasm::base::error_impl&,
+    ::std::byte const* const)
 {
     ::fast_io::io::perrln(::ulte::uwvm::u8log_output, u8"test3\n");
 
@@ -173,15 +176,15 @@ int main()
     ::ulte::parser::wasm::base::error_impl e{};
 
     ::fast_io::io::perr(::ulte::uwvm::u8log_output, u8"sec1:\n");
-    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 1, nullptr, nullptr, e);
+    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 1, nullptr, nullptr, e, nullptr);
     ::fast_io::io::perr(::ulte::uwvm::u8log_output, u8"sec2:\n");
-    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 2, nullptr, nullptr, e);
+    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 2, nullptr, nullptr, e, nullptr);
     ::fast_io::io::perr(::ulte::uwvm::u8log_output, u8"sec3:\n");
-    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 3, nullptr, nullptr, e);
+    ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 3, nullptr, nullptr, e, nullptr);
     ::fast_io::io::perr(::ulte::uwvm::u8log_output, u8"sec4:\n");
     try
     {
-        ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 4, nullptr, nullptr, e);
+        ::ulte::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1, 4, nullptr, nullptr, e, nullptr);
     }
     catch(::fast_io::error e)
     {

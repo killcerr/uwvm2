@@ -178,7 +178,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
         ::ulte::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
-        ::ulte::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::ulte::parser::wasm::base::error_impl& err,
+        ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
         ::ulte::utils::debug::timer parsing_timer{u8"parse import section (id: 2)"};
@@ -189,7 +190,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
         // check duplicate
         if(importsec.sec_span.sec_begin) [[unlikely]]
         {
-            err.err_curr = section_begin;
+            err.err_curr = sec_id_module_ptr;
             err.err_selectable.u8 = importsec.section_id;
             err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::duplicate_section;
             ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -200,7 +201,7 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
 
         if(!typesec.sec_span.sec_begin) [[unlikely]]
         {
-            err.err_curr = section_begin;
+            err.err_curr = sec_id_module_ptr;
             err.err_selectable.u8arr[0] = typesec.section_id;
             err.err_selectable.u8arr[1] = importsec.section_id;
             err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::forward_dependency_missing;
@@ -272,6 +273,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
                 ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            auto const import_module_name_too_length_ptr{section_curr};
+
             section_curr = reinterpret_cast<::std::byte const*>(module_namelen_next);  // never out of bounds
 
             // ... count modulenamelen ?? ...
@@ -288,7 +291,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
             // check curr: externnamelen min = 0, minimum remaining 2 "... 00 index ..."
             if(static_cast<::std::size_t>(section_end - section_curr) < 2uz || section_curr > section_end) [[unlikely]]
             {
-                err.err_curr = section_curr;
+                err.err_curr = import_module_name_too_length_ptr;
+                err.err_selectable.u32 = module_namelen;
                 err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_module_name_too_length;
                 ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
@@ -311,6 +315,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
                 err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero;
                 ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
+            
+            auto const import_extern_name_too_length_ptr{section_curr};
 
             section_curr = reinterpret_cast<::std::byte const*>(extern_namelen_next);  // never out of bounds
 
@@ -323,7 +329,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::standard::wasm1::features
             // same as (static_cast<::std::size_t>(section_end - section_curr) < 1uz || section_curr > section_end)
             if(section_curr >= section_end) [[unlikely]]
             {
-                err.err_curr = section_curr;
+                err.err_curr = import_extern_name_too_length_ptr;
+                err.err_selectable.u32 = extern_namelen;
                 err.err_code = ::ulte::parser::wasm::base::wasm_parse_error_code::import_extern_name_too_length;
                 ::ulte::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
