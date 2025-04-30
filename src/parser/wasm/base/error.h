@@ -25,6 +25,9 @@
 #ifdef UWVM_MODULE
 import fast_io;
 #else
+// std
+# include <cstdint>
+# include <cstddef>
 // macro
 # include <utils/macro/push_macros.h>
 // import
