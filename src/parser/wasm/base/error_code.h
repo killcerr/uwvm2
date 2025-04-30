@@ -95,6 +95,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
         float f32;
         bool boolean;
 
+        ::std::uint_least64_t u64arr[1];
+        ::std::int_least64_t i64arr[1];
         ::std::uint_least32_t u32arr[2];
         ::std::int_least32_t i32arr[2];
         ::std::uint_least16_t u16arr[4];
@@ -102,7 +104,9 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::base
         ::std::uint_least8_t u8arr[8];
         ::std::int_least8_t i8arr[8];
 
+        double f64arr[1];
         float f32arr[2];
+        bool booleanarr[8];
     };
 
     struct error_impl
