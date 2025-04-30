@@ -1,8 +1,8 @@
-﻿/********************************************************
- * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 UlteSoft. All rights reserved.    *
- * Licensed under the APL-2 License (see LICENSE file). *
- ********************************************************/
+﻿/*************************************************************
+ * Ultimate WebAssembly Virtual Machine (Version 2)          *
+ * Copyright (c) 2025-present UlteSoft. All rights reserved. *
+ * Licensed under the APL-2 License (see LICENSE file).      *
+ *************************************************************/
 
 /// @brief      codecvt parameters on winnt
 /// @details    In Windows NT, process parameters are stored in the Process Environment Block (PEB) as UTF-16 encoded strings.
