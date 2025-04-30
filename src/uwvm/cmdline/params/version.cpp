@@ -160,15 +160,19 @@ namespace ulte::uwvm::cmdline::paras::details
                                 ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 ::ulte::uwvm::custom::uwvm_version,
                                 ::fast_io::mnp::cond(::ulte::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                ::fast_io::mnp::cond(!::ulte::uwvm::custom::git_commit_data.empty(), u8" ("),
+#if defined(UWVM_GIT_COMMIT_DATA)
+                                u8" (",
                                 ::ulte::uwvm::custom::git_commit_data,
-                                ::fast_io::mnp::cond(!::ulte::uwvm::custom::git_commit_data.empty(), u8")"),
+                                u8")"
+#endif
+#if defined(UWVM_GIT_COMMIT_DATA) || defined(UWVM_GIT_REMOTE_URL) || defined(UWVM_GIT_COMMIT_ID)
                                 u8"\nGit: ",
                                 ::ulte::uwvm::custom::git_commit_id,
                                 u8" branch \'",
                                 ::ulte::uwvm::custom::git_upstream_branch,
                                 u8"\' of ",
                                 ::ulte::uwvm::custom::git_remote_url,
+#endif
                                 // Compiler
                                 u8"\nCompiler: "
 #if defined(__clang__)

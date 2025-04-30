@@ -85,67 +85,91 @@ function def_build()
 
 	before_build(
 		function (target)
-			-- General Git commands execute functions and return results or nil
-			local function git_command(cmd)
-				local result = os.iorun(cmd)
-				if result and not result:find("fatal:") then
-					return result:trim()
-				end
-				return nil
-			end
-
-			-- Get Commit ID
-			local commit_id = git_command("git rev-parse HEAD") or "unknown"
-
-			-- Get the current branch name (may be empty, such as the separation HEAD status)
-			local current_branch = git_command("git branch --show-current")
-
-			-- Dynamically resolve the associated remote name
-			local remote_name = nil
-			if current_branch then
-				-- Get the traced remote name through git config
-				remote_name = git_command("git config branch." .. current_branch .. ".remote")
-			end
-
-			-- If the remote name is not found, try to resolve it through HEAD upstream
-			local upstream_branch = git_command("git rev-parse --abbrev-ref --symbolic-full-name HEAD") or "unknown"
-			if not remote_name then
-				local upstream_branch_tmp = git_command("git rev-parse --abbrev-ref --symbolic-full-name @{u}")
-				if upstream_branch_tmp then
-					-- Resolve the remote name of the upstream branch (format: remote_name/branch_name)
-					remote_name = upstream_branch_tmp:match("^(.-)/")
-				end
-			end
-
-			-- If there is still no remote name, go back to the first remote or default value
-			local remote_url = "unknown"
-			if remote_name then
-				remote_url = git_command("git remote get-url " .. remote_name) or "unknown"
-			else
-				-- Get all remote lists, the first one
-				local remotes = git_command("git remote")
-				if remotes then
-					local first_remote = remotes:match("[^\r\n]+")
-					if first_remote then
-						remote_url = git_command("git remote get-url " .. first_remote) or "unknown"
+			try 
+			{
+				function()
+					local function git_available()
+						local result = os.iorun("git --version")
+						return result and not result:find("fatal:") and not result:find("not found")
 					end
-				end
-			end
-			
-			-- Get submission timestamp (UTC)
-			local timestamp_str = git_command("git log -1 --format=%ct HEAD")
-			local timestamp = tonumber(timestamp_str) or 0
 
-			-- Convert timestamp to date string (UTC time zone)
-			local commit_date = "unknown"
-			if timestamp > 0 then
-				commit_date = os.date("!%Y-%m-%d", timestamp) -- Attention '! 'means forcing UTC
-			end
+					local function is_git_repo()
+						if not git_available() then return false end
+						local result = os.iorun("git rev-parse --is-inside-work-tree")
+						return result and result:trim() == "true"
+					end
+					
+					if not git_available() or not is_git_repo() then
+						return
+					end
+					
+					-- General Git commands execute functions and return results or nil
+					local function git_command(cmd)
+						local result = os.iorun(cmd)
+						if result and not result:find("fatal:") then
+							return result:trim()
+						end
+						return nil
+					end
 
-			target:add("defines", "UWVM_GIT_COMMIT_ID=u8\"" .. commit_id .. "\"")
-			target:add("defines", "UWVM_GIT_REMOTE_URL=u8\"" .. remote_url .. "\"")
-			target:add("defines", "UWVM_GIT_COMMIT_DATA=u8\"" .. commit_date .. "\"")
-			target:add("defines", "UWVM_GIT_UPSTREAM_BRANCH=u8\"" .. upstream_branch .. "\"")
+					-- Get Commit ID
+					local commit_id = git_command("git rev-parse HEAD") or "unknown"
+
+					-- Get the current branch name (may be empty, such as the separation HEAD status)
+					local current_branch = git_command("git branch --show-current")
+
+					-- Dynamically resolve the associated remote name
+					local remote_name = nil
+					if current_branch then
+						-- Get the traced remote name through git config
+						remote_name = git_command("git config branch." .. current_branch .. ".remote")
+					end
+
+					-- If the remote name is not found, try to resolve it through HEAD upstream
+					local upstream_branch = git_command("git rev-parse --abbrev-ref --symbolic-full-name HEAD") or "unknown"
+					if not remote_name then
+						local upstream_branch_tmp = git_command("git rev-parse --abbrev-ref --symbolic-full-name @{u}")
+						if upstream_branch_tmp then
+							-- Resolve the remote name of the upstream branch (format: remote_name/branch_name)
+							remote_name = upstream_branch_tmp:match("^(.-)/")
+						end
+					end
+
+					-- If there is still no remote name, go back to the first remote or default value
+					local remote_url = "unknown"
+					if remote_name then
+						remote_url = git_command("git remote get-url " .. remote_name) or "unknown"
+					else
+						-- Get all remote lists, the first one
+						local remotes = git_command("git remote")
+						if remotes then
+							local first_remote = remotes:match("[^\r\n]+")
+							if first_remote then
+								remote_url = git_command("git remote get-url " .. first_remote) or "unknown"
+							end
+						end
+					end
+					
+					-- Get submission timestamp (UTC)
+					local timestamp_str = git_command("git log -1 --format=%ct HEAD")
+					local timestamp = tonumber(timestamp_str) or 0
+
+					-- Convert timestamp to date string (UTC time zone)
+					local commit_date = "unknown"
+					if timestamp > 0 then
+						commit_date = os.date("!%Y-%m-%d", timestamp) -- Attention '! 'means forcing UTC
+					end
+
+					target:add("defines", "UWVM_GIT_COMMIT_ID=u8\"" .. commit_id .. "\"")
+					target:add("defines", "UWVM_GIT_REMOTE_URL=u8\"" .. remote_url .. "\"")
+					target:add("defines", "UWVM_GIT_COMMIT_DATA=u8\"" .. commit_date .. "\"")
+					target:add("defines", "UWVM_GIT_UPSTREAM_BRANCH=u8\"" .. upstream_branch .. "\"")
+ 				end,
+				catch  
+				{
+            	    function() return nil end -- 任何异常都捕获并返回 nil
+            	}
+        	}
 		end
 	)
 
