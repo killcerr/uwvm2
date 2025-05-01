@@ -1,8 +1,8 @@
-/********************************************************
- * Ultimate WebAssembly Virtual Machine (Version 2)     *
- * Copyright (c) 2025 MacroModel. All rights reserved.  *
- * Licensed under the APL-2 License (see LICENSE file). *
- ********************************************************/
+/*************************************************************
+ * Ultimate WebAssembly Virtual Machine (Version 2)          *
+ * Copyright (c) 2025-present UlteSoft. All rights reserved. *
+ * Licensed under the APL-2 License (see LICENSE file).      *
+ *************************************************************/
 
 /**
  * @author      MacroModel
@@ -32,22 +32,22 @@ import parser.wasm.standard.wasm1.type;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
-# include <parser/wasm/concepts/impl.h>
-# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
 struct feature1
 {
-    inline static constexpr ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-static_assert(::ulte::parser::wasm::concepts::has_wasm_binfmt_version<feature1>);
+static_assert(::uwvm2::parser::wasm::concepts::has_wasm_binfmt_version<feature1>);
 
 struct feature2
 {
-    ::ulte::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
-static_assert(::ulte::parser::wasm::concepts::has_wasm_binfmt_version<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
+static_assert(::uwvm2::parser::wasm::concepts::has_wasm_binfmt_version<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
 
 int main() {}

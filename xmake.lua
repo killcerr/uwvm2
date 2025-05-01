@@ -82,6 +82,106 @@ function def_build()
 	elseif is_plat("unix", "bsd", "freebsd", "dragonflybsd", "netbsd", "openbsd") then
         bsd_target()
     end
+
+	before_build(
+		function (target)
+			try 
+			{
+				function()
+					local function git_available()
+						local result = os.iorun("git --version")
+						return result and not result:find("fatal:") and not result:find("not found")
+					end
+
+					local function is_git_repo()
+						if not git_available() then return false end
+						local result = os.iorun("git rev-parse --is-inside-work-tree")
+						return result and result:trim() == "true"
+					end
+					
+					if not git_available() or not is_git_repo() then
+						return
+					end
+					
+					-- General Git commands execute functions and return results or nil
+					local function git_command(cmd)
+						local result = os.iorun(cmd)
+						if result and not result:find("fatal:") then
+							return result:trim()
+						end
+						return nil
+					end
+
+					-- Get Commit ID
+					local commit_id = git_command("git rev-parse HEAD") or "unknown"
+
+					-- Get the current branch name (may be empty, such as the separation HEAD status)
+					local current_branch = git_command("git branch --show-current")
+
+					-- Dynamically resolve the associated remote name
+					local remote_name = nil
+					if current_branch then
+						-- Get the traced remote name through git config
+						remote_name = git_command("git config branch." .. current_branch .. ".remote")
+					end
+
+					-- If the remote name is not found, try to resolve it through HEAD upstream
+					local upstream_branch = git_command("git rev-parse --abbrev-ref --symbolic-full-name HEAD") or "unknown"
+					if not remote_name then
+						local upstream_branch_tmp = git_command("git rev-parse --abbrev-ref --symbolic-full-name @{u}")
+						if upstream_branch_tmp then
+							-- Resolve the remote name of the upstream branch (format: remote_name/branch_name)
+							remote_name = upstream_branch_tmp:match("^(.-)/")
+						end
+					end
+
+					-- If there is still no remote name, go back to the first remote or default value
+					local remote_url = "unknown"
+					if remote_name then
+						remote_url = git_command("git remote get-url " .. remote_name) or "unknown"
+					else
+						-- Get all remote lists, the first one
+						local remotes = git_command("git remote")
+						if remotes then
+							local first_remote = remotes:match("[^\r\n]+")
+							if first_remote then
+								remote_url = git_command("git remote get-url " .. first_remote) or "unknown"
+							end
+						end
+					end
+					
+					-- Get submission timestamp (UTC)
+					local timestamp_str = git_command("git log -1 --format=%ct HEAD")
+					local timestamp = tonumber(timestamp_str) or 0
+
+					-- Convert timestamp to date string (UTC time zone)
+					local commit_date = "unknown"
+					if timestamp > 0 then
+						commit_date = os.date("!%Y-%m-%d", timestamp) -- Attention '! 'means forcing UTC
+					end
+
+					local is_dirty = false
+					local status_output = git_command("git status --porcelain")
+					if status_output and status_output ~= "" then
+						is_dirty = true -- There are uncommitted modifications or untracked files
+					end
+
+					target:add("defines", "UWVM_GIT_COMMIT_ID=u8\"" .. commit_id .. "\"")
+					target:add("defines", "UWVM_GIT_REMOTE_URL=u8\"" .. remote_url .. "\"")
+					target:add("defines", "UWVM_GIT_COMMIT_DATA=u8\"" .. commit_date .. "\"")
+					target:add("defines", "UWVM_GIT_UPSTREAM_BRANCH=u8\"" .. upstream_branch .. "\"")
+					if is_dirty then 
+						target:add("defines", "UWVM_GIT_HAS_UNCOMMITTED_MODIFICATIONS")
+					end
+ 				end,
+				catch  
+				{
+            	    function() return nil end -- 任何异常都捕获并返回 nil
+            	}
+        	}
+		end
+	)
+
 end
 
 target("uwvm")
@@ -107,20 +207,20 @@ target("uwvm")
 
 	if enable_cxx_module then
 		-- utils
-		add_files("src/utils/**.cppm", {public = is_debug_mode})
+		add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
 		-- wasm parser
-		add_files("src/parser/wasm/**.cppm", {public = is_debug_mode})
+		add_files("src/uwvm2/parser/wasm/**.cppm", {public = is_debug_mode})
 
 		-- uwvm
-		add_files("src/uwvm/**.cppm", {public = is_debug_mode})
+		add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
 	end 
 
 	-- uwvm cmd callback
-	add_files("src/uwvm/cmdline/params/**.cpp")
+	add_files("src/uwvm2/uwvm/cmdline/params/**.cpp")
 
 	-- uwvm main
-	add_files("src/uwvm/main.cpp")
+	add_files("src/uwvm2/uwvm/main.cpp")
 
 target_end()
 
@@ -147,17 +247,17 @@ for _, file in ipairs(os.files("test/non-platform-specific/**.cc")) do
 
 		if enable_cxx_module then
 			-- utils
-			add_files("src/utils/**.cppm", {public = is_debug_mode})
+			add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
 			-- wasm parser
-			add_files("src/parser/wasm/**.cppm", {public = is_debug_mode})
+			add_files("src/uwvm2/parser/wasm/**.cppm", {public = is_debug_mode})
 
 			-- uwvm
-			add_files("src/uwvm/**.cppm", {public = is_debug_mode})
+			add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
 		end 
 
 		-- uwvm cmd callback
-		add_files("src/uwvm/cmdline/params/**.cpp")
+		add_files("src/uwvm2/uwvm/cmdline/params/**.cpp")
 
         add_files(file)
 
