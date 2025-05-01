@@ -32,8 +32,8 @@ import parser.wasm.standard.wasm1.type;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
-# include <parser/wasm/concepts/impl.h>
-# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <ulte/parser/wasm/concepts/impl.h>
+# include <ulte/parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
 struct feature1
