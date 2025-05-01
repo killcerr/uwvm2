@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-07
+ * @date        2025-05-02
  * @copyright   APL-2 License
  */
 
@@ -96,7 +96,7 @@ inline constexpr binfmt_ver1_module_storage_t
                             ::std::byte const*,
                             ::std::byte const*,
                             ::uwvm2::parser::wasm::base::error_impl&,
-                            [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& feapara) UWVM_THROWS
+                            ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& feapara) UWVM_THROWS
 {
     // This defines the function that handles binary format 1.
     // Supported by <::uwvm2::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
@@ -106,14 +106,14 @@ inline constexpr binfmt_ver1_module_storage_t
     if constexpr((::std::same_as<B1F1, Fs> || ...))
     {
         /// @brief Before using it, you must determine if there is a desired type in the Fs.
-        auto& B1F1_feapara_r{::uwvm2::parser::wasm::concepts::get_curr_feature_parameter<B1F1>(feapara)};
+        auto const& B1F1_feapara_r{::uwvm2::parser::wasm::concepts::get_curr_feature_parameter<B1F1>(feapara)};
         ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"B1F1_feapara_r: ", B1F1_feapara_r.test);
     }
 
     if constexpr((::std::same_as<B1F2, Fs> || ...))
     {
         /// @brief Before using it, you must determine if there is a desired type in the Fs.
-        auto& B1F2_feapara_r{::uwvm2::parser::wasm::concepts::get_curr_feature_parameter<B1F2>(feapara)};
+        auto const& B1F2_feapara_r{::uwvm2::parser::wasm::concepts::get_curr_feature_parameter<B1F2>(feapara)};
         ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"B1F2_feapara_r: ", B1F2_feapara_r.test);
     }
     return {};
