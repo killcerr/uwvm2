@@ -32,8 +32,8 @@ import parser.wasm.standard.wasm1.type;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
-# include <ulte/parser/wasm/concepts/impl.h>
-# include <ulte/parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
 struct feature1
@@ -41,13 +41,13 @@ struct feature1
     inline static constexpr ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::ulte::parser::wasm::concepts::has_feature_name<feature1>);
+static_assert(::uwvm2::parser::wasm::concepts::has_feature_name<feature1>);
 
 struct feature2
 {
     ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::ulte::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
+static_assert(::uwvm2::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
 
 int main() {}

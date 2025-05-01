@@ -207,20 +207,20 @@ target("uwvm")
 
 	if enable_cxx_module then
 		-- utils
-		add_files("src/ulte/utils/**.cppm", {public = is_debug_mode})
+		add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
 		-- wasm parser
-		add_files("src/ulte/parser/wasm/**.cppm", {public = is_debug_mode})
+		add_files("src/uwvm2/parser/wasm/**.cppm", {public = is_debug_mode})
 
 		-- uwvm
-		add_files("src/ulte/uwvm/**.cppm", {public = is_debug_mode})
+		add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
 	end 
 
 	-- uwvm cmd callback
-	add_files("src/ulte/uwvm/cmdline/params/**.cpp")
+	add_files("src/uwvm2/uwvm/cmdline/params/**.cpp")
 
 	-- uwvm main
-	add_files("src/ulte/uwvm/main.cpp")
+	add_files("src/uwvm2/uwvm/main.cpp")
 
 target_end()
 
@@ -247,17 +247,17 @@ for _, file in ipairs(os.files("test/non-platform-specific/**.cc")) do
 
 		if enable_cxx_module then
 			-- utils
-			add_files("src/ulte/utils/**.cppm", {public = is_debug_mode})
+			add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
 			-- wasm parser
-			add_files("src/ulte/parser/wasm/**.cppm", {public = is_debug_mode})
+			add_files("src/uwvm2/parser/wasm/**.cppm", {public = is_debug_mode})
 
 			-- uwvm
-			add_files("src/ulte/uwvm/**.cppm", {public = is_debug_mode})
+			add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
 		end 
 
 		-- uwvm cmd callback
-		add_files("src/ulte/uwvm/cmdline/params/**.cpp")
+		add_files("src/uwvm2/uwvm/cmdline/params/**.cpp")
 
         add_files(file)
 

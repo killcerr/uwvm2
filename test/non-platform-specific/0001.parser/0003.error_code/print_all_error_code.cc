@@ -26,7 +26,7 @@
 #include <concepts>
 #include <memory>
 
-#include <ulte/utils/macro/push_macros.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
 #ifdef UWVM_MODULE
 import fast_io;
@@ -40,12 +40,12 @@ import uwvm.wasm.storage;
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
-# include <ulte/parser/wasm/base/impl.h>
-# include <ulte/parser/wasm/concepts/impl.h>
-# include <ulte/parser/wasm/standard/wasm1/type/impl.h>
-# include <ulte/parser/wasm/binfmt/binfmt_ver1/impl.h>
-# include <ulte/uwvm/io/impl.h>
-# include <ulte/uwvm/wasm/storage/impl.h>
+# include <uwvm2/parser/wasm/base/impl.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/uwvm/wasm/storage/impl.h>
 #endif
 
 int main()
@@ -56,11 +56,11 @@ int main()
         ::fast_io::u8obuf_file u8cf{u8"error_code_test_u8c.log"};
         ::fast_io::u16obuf_file u16cf{u8"error_code_test_u16c.log"};
         ::fast_io::u32obuf_file u32f{u8"error_code_test_u32c.log"};
-        ::ulte::parser::wasm::base::error_output_t errout;
+        ::uwvm2::parser::wasm::base::error_output_t errout;
         errout.err.err_selectable.u64 = 0xcdcdcdcdcdcdcdcd;
-        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::ulte::parser::wasm::base::wasm_parse_error_code::illegal_type_index) + 1u; ++i)
+        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index) + 1u; ++i)
         {
-            errout.err.err_code = static_cast<::ulte::parser::wasm::base::wasm_parse_error_code>(i);
+            errout.err.err_code = static_cast<::uwvm2::parser::wasm::base::wasm_parse_error_code>(i);
             ::fast_io::io::perrln(cf, errout);
             ::fast_io::io::perrln(wcf, errout);
             ::fast_io::io::perrln(u8cf, errout);
@@ -89,4 +89,4 @@ test4, not found
 */
 
 // macro
-#include <ulte/utils/macro/pop_macros.h>
+#include <uwvm2/utils/macro/pop_macros.h>
