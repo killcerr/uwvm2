@@ -333,7 +333,7 @@ namespace ulte::uwvm::cmdline::paras::details
 // SIMD
 #if defined(__wasm_simd128__)
                                 u8"\nSIMD support: WebAssembly SIMD 128"
-#elif defined(__loongarch__) && (defined(__loongarch_sx) || __has_builtin(__builtin_loongarch_crc32c_b))
+#elif defined(__loongarch__) && (defined(__loongarch_sx) || UWVM_HAS_BUILTIN(__builtin_loongarch_crc32c_b))
                                 u8"\nSIMD support: LoongSX "
 # if defined(__loongarch_asx)
                                 u8"LoongASX "

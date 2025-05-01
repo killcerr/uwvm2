@@ -103,12 +103,8 @@ inline void *my_malloc_crt(::std::size_t buffer_size) noexcept
 https://github.com/mirror/mingw-w64/blob/master/mingw-w64-headers/crt/crtdbg.h
 CRT heap debugging does not exist on mingw-w64
 */
-#if defined(__has_builtin)
-#if __has_builtin(__builtin_malloc)
+#if FAST_IO_HAS_BUILTIN(__builtin_malloc)
 		__builtin_malloc(buffer_size)
-#else
-		malloc(buffer_size)
-#endif
 #else
 		malloc(buffer_size)
 #endif

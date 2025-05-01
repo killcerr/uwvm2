@@ -37,6 +37,7 @@
 #pragma pop_macro("UWVM_GNU_COLD")
 #pragma pop_macro("UWVM_THROWS")
 #pragma pop_macro("UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE")
+#pragma pop_macro("UWVM_HAS_BUILTIN")
 #pragma pop_macro("UWVM_ASSERT")
 #pragma pop_macro("UWVM_GNU_RETURNS_NONNULL")
 #pragma pop_macro("UWVM_GNU_MALLOC")
