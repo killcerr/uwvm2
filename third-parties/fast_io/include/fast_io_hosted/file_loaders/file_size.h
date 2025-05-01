@@ -1,8 +1,6 @@
 ﻿#pragma once
 
-#if !FAST_IO_HAS_BUILTIN(__builtin_malloc) || !FAST_IO_HAS_BUILTIN(__builtin_free)
-#include <cstdlib>
-#elif !defined(_MSC_VER)
+#if !FAST_IO_HAS_BUILTIN(__builtin_malloc) || !FAST_IO_HAS_BUILTIN(__builtin_free) || !defined(_MSC_VER)
 #include <cstdlib>
 #endif
 namespace fast_io

@@ -636,12 +636,10 @@ inline constexpr ::std::uint_least8_t c_weekday_impl(::std::int_least64_t year, 
 inline constexpr ::std::uint_least8_t weekday_impl(::std::int_least64_t year, ::std::uint_least8_t month_minus1,
 												   ::std::uint_least8_t day) noexcept
 {
-#if FAST_IO_HAS_BUILTIN(__builtin_unreachable)
 	if (12u <= month_minus1)
 	{
-		__builtin_unreachable();
+		::fast_io::unreachable();
 	}
-#endif
 	return static_cast<::std::uint_least8_t>(
 		static_cast<::std::uint_least64_t>(
 			static_cast<::std::uint_least64_t>(year) + static_cast<::std::uint_least64_t>(year / 4) -
@@ -1554,9 +1552,7 @@ scan_iso8601_context_2_digits_phase(timestamp_scan_state_t<char_type> &state, ch
 		break;
 	}
 	default:;
-#if FAST_IO_HAS_BUILTIN(__builtin_unreachable)
-		__builtin_unreachable();
-#endif
+		::fast_io::unreachable();
 	}
 	return {begin, parse_code::ok};
 }
@@ -1818,9 +1814,7 @@ scn_ctx_define_iso8601_impl(timestamp_scan_state_t<char_type> &state, char_type 
 	case scan_timestamp_context_phase::ok:
 		return {begin, parse_code::ok};
 	}
-#if FAST_IO_HAS_BUILTIN(__builtin_unreachable)
-	__builtin_unreachable();
-#endif
+	::fast_io::unreachable();
 #undef FAST_IO_SCAN_ISO8601_CONTEXT_TOKEN_PHASE
 }
 

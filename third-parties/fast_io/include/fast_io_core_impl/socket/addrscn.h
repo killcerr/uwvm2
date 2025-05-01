@@ -315,9 +315,7 @@ inline constexpr parse_result<char_type const *> scn_ctx_define_port_impl(ip_por
 		}
 		return scan_context_define_parse_impl<10, true, false, false>(state, begin, end, t);
 	default:;
-#if FAST_IO_HAS_BUILTIN(__builtin_unreachable)
-		__builtin_unreachable();
-#endif
+		::fast_io::unreachable();
 	}
 }
 
@@ -840,9 +838,7 @@ scan_context_define(::fast_io::io_reserve_type_t<char_type, ::fast_io::manipulat
 			return {details::scn_ctx_define_port_type_general_impl(state, begin, end, t.reference->port)};
 		}
 #endif
-#if FAST_IO_HAS_BUILTIN(__builtin_unreachable)
-		__builtin_unreachable();
-#endif
+		::fast_io::unreachable();
 	}
 }
 
