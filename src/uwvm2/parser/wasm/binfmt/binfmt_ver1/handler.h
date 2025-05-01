@@ -257,7 +257,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     [[nodiscard]] inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...> wasm_binfmt_ver1_handle_func(
-        ::fast_io::tuple<Fs...>,
         ::std::byte const* const module_begin,
         ::std::byte const* const module_end,
         ::uwvm2::parser::wasm::base::error_impl& err,

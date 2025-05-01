@@ -192,7 +192,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         ::uwvm2::utils::debug::timer parsing_timer{u8"parse binfmt ver1"};
 #endif
                         ::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage = ::uwvm2::uwvm::wasm::feature::binfmt_ver1_handler(
-                            ::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features,
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend()),
                             execute_wasm_binfmt_ver1_storage_wasm_err,
