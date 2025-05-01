@@ -26,7 +26,7 @@
 #include <concepts>
 #include <memory>
 
-#include <utils/macro/push_macros.h>
+#include <ulte/utils/macro/push_macros.h>
 
 #ifdef UWVM_MODULE
 import fast_io;
@@ -35,8 +35,8 @@ import parser.wasm.standard.wasm1.type;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
-# include <parser/wasm/concepts/impl.h>
-# include <parser/wasm/standard/wasm1/type/impl.h>
+# include <ulte/parser/wasm/concepts/impl.h>
+# include <ulte/parser/wasm/standard/wasm1/type/impl.h>
 #endif
 struct feature1
 {
@@ -71,4 +71,4 @@ static_assert(::ulte::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy
 int main() { ::ulte::parser::wasm::concepts::operation::check_has_duplicate_binfmt_handler<feature1, feature2>(); }
 
 // macro
-#include <utils/macro/pop_macros.h>
+#include <ulte/utils/macro/pop_macros.h>
