@@ -1,9 +1,7 @@
 ﻿#pragma once
 
-#if defined(__has_builtin)
-#if !__has_builtin(__builtin_malloc) || !__has_builtin(__builtin_free)
+#if !FAST_IO_HAS_BUILTIN(__builtin_malloc) || !FAST_IO_HAS_BUILTIN(__builtin_free)
 #include <cstdlib>
-#endif
 #elif !defined(_MSC_VER)
 #include <cstdlib>
 #endif
