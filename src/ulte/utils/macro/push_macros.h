@@ -274,7 +274,7 @@
 #endif
 
 /// @brief        __has_builtin
-
+/// @details      Avoid use __has_builtin on unsupport compiler
 #pragma push_macro("UWVM_HAS_BUILTIN")
 #undef UWVM_HAS_BUILTIN
 #ifdef __has_builtin
