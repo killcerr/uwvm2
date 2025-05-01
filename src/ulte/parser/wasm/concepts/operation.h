@@ -529,6 +529,8 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::concepts
             return tuple_megger<Fs...>{};
         }
 
+        /// @brief  get first type index in tuple
+        /// @see    get_first_type_in_tuple
         template <typename TyGet, typename... Tys>
         inline consteval ::std::size_t get_first_type_index_in_tuple() noexcept
         {

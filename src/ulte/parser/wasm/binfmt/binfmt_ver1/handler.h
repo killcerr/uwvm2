@@ -184,7 +184,13 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
             {
                 if constexpr(sizeof...(Secs) != 0)
                 {
-                    handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success, module_storage, section_id, section_begin, section_end, err, sec_id_module_ptr);
+                    handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success,
+                                                                            module_storage,
+                                                                            section_id,
+                                                                            section_begin,
+                                                                            section_end,
+                                                                            err,
+                                                                            sec_id_module_ptr);
                 }
             }
         }
@@ -203,8 +209,9 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
                                                                     ::ulte::parser::wasm::base::error_impl& err,
                                                                     ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
-        auto [... secs]{module_storage.sections};
-        check_extensible_section_is_series<decltype(secs)...>();
+        // Avoid meaningless copies with references
+        auto const& [... secs]{module_storage.sections};
+        check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
 
         bool success{};
 
@@ -217,7 +224,13 @@ UWVM_MODULE_EXPORT namespace ulte::parser::wasm::binfmt::ver1
         }
         else
         {
-            details::handle_all_binfmt_ver1_extensible_section_impl<decltype(secs)...>(success, module_storage, section_id, section_begin, section_end, err, sec_id_module_ptr);
+            details::handle_all_binfmt_ver1_extensible_section_impl<::std::remove_cvref_t<decltype(secs)>...>(success,
+                                                                                                              module_storage,
+                                                                                                              section_id,
+                                                                                                              section_begin,
+                                                                                                              section_end,
+                                                                                                              err,
+                                                                                                              sec_id_module_ptr);
         }
 
         if(!success) [[unlikely]]
