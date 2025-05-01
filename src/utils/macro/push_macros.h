@@ -273,6 +273,16 @@
 # define UWVM_GNU_RETURNS_NONNULL
 #endif
 
+/// @brief        __has_builtin
+
+#pragma push_macro("UWVM_HAS_BUILTIN")
+#undef UWVM_HAS_BUILTIN
+#ifdef __has_builtin
+# define UWVM_HAS_BUILTIN(...) __has_builtin(__VA_ARGS__)
+#else
+# define UWUWVM_HAS_BUILTIN(...) 0
+#endif
+
 /// @brief        assert
 /// @details      Avoid using C++26 contracts. Different modules including different handle_contract_violation
 ///               implementations may result in multiple handling approaches. If a module without handle_contract_violation
@@ -282,7 +292,7 @@
 #pragma push_macro("UWVM_ASSERT")
 #undef UWVM_ASSERT
 #if defined(_DEBUG) || defined(DEBUG)
-# if (defined(_MSC_VER) && !defined(__clang__)) || !__has_builtin(__builtin_trap)
+# if (defined(_MSC_VER) && !defined(__clang__)) || !UWVM_HAS_BUILTIN(__builtin_trap)
 #  define UWVM_ASSERT(x)                                                                                                                                       \
       if(!__builtin_is_constant_evaluated() && !(x)) ::std::abort()
 # else
