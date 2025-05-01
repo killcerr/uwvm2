@@ -91,12 +91,10 @@ struct binfmt_ver1_module_storage_t
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr binfmt_ver1_module_storage_t
-    binfmt_ver1_handle_func(::fast_io::tuple<Fs...>,
-                            ::std::byte const*,
-                            ::std::byte const*,
-                            ::uwvm2::parser::wasm::base::error_impl&,
-                            ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& feapara) UWVM_THROWS
+inline constexpr binfmt_ver1_module_storage_t binfmt_ver1_handle_func(::std::byte const*,
+                                                                      ::std::byte const*,
+                                                                      ::uwvm2::parser::wasm::base::error_impl&,
+                                                                      ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& feapara) UWVM_THROWS
 {
     // This defines the function that handles binary format 1.
     // Supported by <::uwvm2::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
@@ -142,8 +140,7 @@ struct binfmt_ver2_module_storage_t
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr binfmt_ver2_module_storage_t<Fs...> binfmt_ver2_handle_func(::fast_io::tuple<Fs...>,
-                                                                             ::std::byte const*,
+inline constexpr binfmt_ver2_module_storage_t<Fs...> binfmt_ver2_handle_func(::std::byte const*,
                                                                              ::std::byte const*,
                                                                              ::uwvm2::parser::wasm::base::error_impl&,
                                                                              ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&) UWVM_THROWS
@@ -187,7 +184,7 @@ int main()
     auto& B1F2_feapara_r{::uwvm2::parser::wasm::concepts::get_curr_feature_parameter<B1F2>(wasm_binfmt1_feature_parameter)};
     static_assert(::std::same_as<::std::remove_cvref_t<decltype(B1F2_feapara_r)>, B1F2_feapara>);
     B1F2_feapara_r.test = 2.2;
-    [[maybe_unused]] wasm_binfmt1_storage_t storage1 = binfmt1_funcp(wasm_binfmt1_features_t{}, nullptr, nullptr, e, wasm_binfmt1_feature_parameter);
+    [[maybe_unused]] wasm_binfmt1_storage_t storage1 = binfmt1_funcp(nullptr, nullptr, e, wasm_binfmt1_feature_parameter);
 
     // binfmt 2
     constexpr auto binfmt2_funcp{::uwvm2::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<2>(features)};
@@ -199,7 +196,7 @@ int main()
                   "wasm_binfmt2_storage_t is the type of binfmt_ver2_handle_func<B2F4> return");
     using wasm_binfmt2_feature_parameter_t = decltype(::uwvm2::parser::wasm::concepts::get_feature_parameter_type_from_tuple(wasm_binfmt2_features_t{}));
     wasm_binfmt2_feature_parameter_t wasm_binfmt2_feature_parameter{};
-    [[maybe_unused]] wasm_binfmt2_storage_t storage2 = binfmt2_funcp(wasm_binfmt2_features_t{}, nullptr, nullptr, e, wasm_binfmt2_feature_parameter);
+    [[maybe_unused]] wasm_binfmt2_storage_t storage2 = binfmt2_funcp(nullptr, nullptr, e, wasm_binfmt2_feature_parameter);
 }
 
 /*
