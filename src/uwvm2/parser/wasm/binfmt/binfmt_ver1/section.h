@@ -88,7 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                   "binfmt_ver1_section_type is not tuple");
                                     return ::uwvm2::parser::wasm::concepts::operation::tuple_megger<>{};
                                 }
-                            }.template operator()<Features...[I]>()),
+                            }.template operator()<Features...[I]>()),  // This is an overloaded comma expression
                         ...);
             }(::std::make_index_sequence<sizeof...(Features)>{});
         }

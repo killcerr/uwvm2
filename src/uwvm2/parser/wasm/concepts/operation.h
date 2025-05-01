@@ -268,7 +268,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         }  // namespace details
 
         /// @brief Get the module storage type from all features in the same binfmt
-        template <::uwvm2::parser::wasm::concepts::wasm_feature F, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs1, ::uwvm2::parser::wasm::concepts::wasm_feature... AllFs>
+        template <::uwvm2::parser::wasm::concepts::wasm_feature F,
+                  ::uwvm2::parser::wasm::concepts::wasm_feature... Fs1,
+                  ::uwvm2::parser::wasm::concepts::wasm_feature... AllFs>
         inline consteval auto get_module_storage_type_from_singal_tuple(::fast_io::tuple<AllFs...> all_feature_tuple) noexcept
         {
             constexpr bool can_func_get_module_storage_type{::uwvm2::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<F>};
@@ -475,7 +477,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
                                      return replacement_structure_followup_impl<T, replacement, Args...>(repeating);
                                  }
                                  else { return type_wrapper<void>{}; }
-                             }.template operator()<Args...[I]>()),
+                             }.template operator()<Args...[I]>()),  // This is an overloaded comma expression
                          ...)
                     };
                     using rettype = decltype(ret);

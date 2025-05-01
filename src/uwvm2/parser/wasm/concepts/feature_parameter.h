@@ -72,7 +72,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
                                     return ::uwvm2::parser::wasm::concepts::operation::tuple_megger<fc_para>{};
                                 }
                                 else { return ::uwvm2::parser::wasm::concepts::operation::tuple_megger<>{}; }
-                            }.template operator()<Fs...[I]>()),
+                            }.template operator()<Fs...[I]>()),  // This is an overloaded comma expression
                         ...);
             }(::std::make_index_sequence<sizeof...(Fs)>{});
         }
