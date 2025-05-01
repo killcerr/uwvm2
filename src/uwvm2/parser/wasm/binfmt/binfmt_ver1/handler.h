@@ -73,6 +73,7 @@ import :custom_section;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
+    // Check if the size of char8_t is equal to the size of ::std::byte, if it is not, parsing will be wrong.
     static_assert(sizeof(::std::byte) == sizeof(char8_t));
 
     template <typename Sec, typename... Fs>
@@ -82,8 +83,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                  ::std::byte const* const section_begin,
                  ::std::byte const* const section_end,
                  ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
                  ::std::byte const* const sec_id_module_ptr) {
-            { handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, sec_id_module_ptr) };
+            { handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, fs_para, sec_id_module_ptr) };
         };
 
     /// @see WebAssembly Release 1.0 (2019-07-20) § 5.5.2
@@ -149,6 +151,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                            ::std::byte const* const,
                                                            ::std::byte const* const,
                                                            ::uwvm2::parser::wasm::base::error_impl&,
+                                                           ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
                                                            ::std::byte const* const) noexcept
         {
             // do nothing
@@ -163,8 +166,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             ::std::byte const* const section_begin,
             ::std::byte const* const section_end,
             ::uwvm2::parser::wasm::base::error_impl& err,
+            ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
             ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
         {
+            // Check if the current section has a handler function
             static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
 
             /// @details    This can be optimized to jump tables, which is fine under llvm, not gcc or msvc.
@@ -177,6 +182,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                              section_begin,
                                                              section_end,
                                                              err,
+                                                             fs_para,
                                                              sec_id_module_ptr);
                 success = true;
             }
@@ -190,6 +196,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                             section_begin,
                                                                             section_end,
                                                                             err,
+                                                                            fs_para,
                                                                             sec_id_module_ptr);
                 }
             }
@@ -207,6 +214,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                     ::std::byte const* const section_begin,
                                                                     ::std::byte const* const section_end,
                                                                     ::uwvm2::parser::wasm::base::error_impl& err,
+                                                                    ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
                                                                     ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
         // Avoid meaningless copies with references
@@ -230,6 +238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                                                               section_begin,
                                                                                                               section_end,
                                                                                                               err,
+                                                                                                              fs_para,
                                                                                                               sec_id_module_ptr);
         }
 
@@ -243,11 +252,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    [[nodiscard]] inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...> wasm_binfmt_ver1_handle_func(::fast_io::tuple<Fs...>,
-                                                                                                                    ::std::byte const* const module_begin,
-                                                                                                                    ::std::byte const* const module_end,
-                                                                                                                    ::uwvm2::parser::wasm::base::error_impl& err)
-        UWVM_THROWS
+    [[nodiscard]] inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...> wasm_binfmt_ver1_handle_func(
+        ::fast_io::tuple<Fs...>,
+        ::std::byte const* const module_begin,
+        ::std::byte const* const module_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
@@ -321,7 +331,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
             auto const sec_end{module_curr + sec_len};
 
-            handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, sec_id_module_ptr);
+            handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, fs_para, sec_id_module_ptr);
 
             module_curr = sec_end;
 

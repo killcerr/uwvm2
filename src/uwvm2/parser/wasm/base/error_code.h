@@ -40,6 +40,7 @@ import fast_io;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 {
+    /// @brief define possible errors in wasm parser
     enum class wasm_parse_error_code : ::std::uint_least32_t
     {
         ok = 0u,
@@ -76,6 +77,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         illegal_type_index,
     };
 
+    /// @brief Additional information provided by wasm error, no more than 8 bytes
     union err_selectable_t
     {
         ::std::byte const* err_end;
@@ -109,9 +111,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         bool booleanarr[8];
     };
 
+    /// @brief Structured structure, with reference form as formal parameter
     struct error_impl
     {
-        err_selectable_t err_selectable{};  // end_selectable can be null
+        err_selectable_t err_selectable{};
         ::std::byte const* err_curr{};
         wasm_parse_error_code err_code{};
     };

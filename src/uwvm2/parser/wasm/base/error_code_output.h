@@ -47,12 +47,14 @@ import :error_code;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 {
+    /// @brief Define the flag used for output
     struct error_output_flag_t
     {
         ::std::uint_least8_t enable_ansi : 1;
         ::std::uint_least8_t win32_use_text_attr : 1;  // on win95 - win7
     };
 
+    /// @brief Provide information for output
     struct error_output_t
     {
         ::std::byte const* module_begin{};
@@ -60,6 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         error_output_flag_t flag{};
     };
 
+    /// @brief Output, support: char, wchar_t, char8_t, char16_t, char32_t
     template <::std::integral char_type, typename Stm>
     inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, error_output_t>, Stm && stream, error_output_t const& errout) noexcept
     {

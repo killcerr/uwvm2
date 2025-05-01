@@ -179,6 +179,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
@@ -315,7 +316,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
-            
+
             auto const import_extern_name_too_length_ptr{section_curr};
 
             section_curr = reinterpret_cast<::std::byte const*>(extern_namelen_next);  // never out of bounds

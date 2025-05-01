@@ -141,8 +141,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // After detect
         // Instructs to read the file all the way into memory
         ::uwvm2::utils::madvise::my_madvise(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin(),
-                                           ::uwvm2::uwvm::wasm::storage::execute_wasm_file.size(),
-                                           ::uwvm2::utils::madvise::madvise_flag::willneed);
+                                            ::uwvm2::uwvm::wasm::storage::execute_wasm_file.size(),
+                                            ::uwvm2::utils::madvise::madvise_flag::willneed);
 
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver)
         {
@@ -166,8 +166,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                     u8" -> ",
                     ::uwvm2::uwvm::utils::memory::print_memory{reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
-                                                              reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
-                                                              reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend())},
+                                                               reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
+                                                               reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend())},
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                     u8"\n\n");
 #endif
@@ -195,7 +195,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                             ::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features,
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend()),
-                            execute_wasm_binfmt_ver1_storage_wasm_err);
+                            execute_wasm_binfmt_ver1_storage_wasm_err,
+                            ::uwvm2::uwvm::wasm::storage::global_wasm_binfmt_ver1_paramaters);
                     }
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     catch(::fast_io::error e)
@@ -233,7 +234,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     // handle custom
                     auto const custom_res{
                         ::uwvm2::uwvm::wasm::custom::handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
-                                                                                  ::uwvm2::uwvm::wasm::custom::custom_handle_funcs)};
+                                                                                   ::uwvm2::uwvm::wasm::custom::custom_handle_funcs)};
                     // 0: success, others: fault
                     if(custom_res) [[unlikely]]
                     {

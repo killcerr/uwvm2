@@ -273,6 +273,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER

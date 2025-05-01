@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         // 00 61 73 6D 01 00 00 00 ...
         //             ^^ module_curr
 
-        auto binfmt_ver{detect_wasm_binfmt_version_unchecked(module_curr)};
+        auto const binfmt_ver{detect_wasm_binfmt_version_unchecked(module_curr)};
 
         return binfmt_ver;
     }

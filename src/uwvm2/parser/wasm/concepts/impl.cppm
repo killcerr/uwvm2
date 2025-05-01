@@ -25,6 +25,7 @@ module;
 export module uwvm2.parser.wasm.concepts;
 export import :root;
 export import :operation;
+export import :feature_parameter;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
