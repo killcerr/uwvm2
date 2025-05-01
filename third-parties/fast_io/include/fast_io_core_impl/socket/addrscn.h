@@ -268,9 +268,7 @@ scn_ctx_define_inaddr_impl(ipv4_scan_state_t<char_type> &state, char_type const 
 		return {begin, parse_code::ok};
 	}
 	}
-#if FAST_IO_HAS_BUILTIN(__builtin_unreachable)
-	__builtin_unreachable();
-#endif
+	::fast_io::unreachable();
 }
 
 template <::std::integral char_type>

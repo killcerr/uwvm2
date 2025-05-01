@@ -619,12 +619,10 @@ inline constexpr ::std::uint_least8_t c_weekday_tb[]{0, 3, 2, 5, 0, 3, 5, 1, 4, 
 inline constexpr ::std::uint_least8_t c_weekday_impl(::std::int_least64_t year, ::std::uint_least8_t month_minus1,
 													 ::std::uint_least8_t day) noexcept
 {
-#if FAST_IO_HAS_BUILTIN(__builtin_unreachable)
 	if (12u <= month_minus1)
 	{
-		__builtin_unreachable();
+		::fast_io::unreachable();
 	}
-#endif
 	return static_cast<::std::uint_least8_t>(
 		static_cast<::std::uint_least64_t>(
 			static_cast<::std::uint_least64_t>(year) + static_cast<::std::uint_least64_t>(year / 4) -
