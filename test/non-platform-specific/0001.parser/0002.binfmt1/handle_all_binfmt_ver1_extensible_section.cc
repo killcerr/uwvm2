@@ -58,7 +58,7 @@ struct Sec1
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+inline constexpr void handle_binfmt_ver1_extensible_section_define(
     ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec1<Fs...>>>,
     [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -68,7 +68,6 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test1\n");
-    return true;
 }
 
 struct Feature1
@@ -90,7 +89,7 @@ struct Sec2
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+inline constexpr void handle_binfmt_ver1_extensible_section_define(
     ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec2<Fs...>>>,
     [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -100,8 +99,6 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test2\n");
-
-    return true;
 }
 
 struct Sec3
@@ -113,7 +110,7 @@ struct Sec3
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr bool handle_binfmt_ver1_extensible_section_define(
+inline constexpr void handle_binfmt_ver1_extensible_section_define(
     ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec3>>,
     [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
     [[maybe_unused]] ::std::byte const* section_begin,
@@ -123,8 +120,6 @@ inline constexpr bool handle_binfmt_ver1_extensible_section_define(
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test3\n");
-
-    return true;
 }
 
 struct Feature2

@@ -73,8 +73,9 @@ import :custom_section;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
-    // Check if the size of char8_t is equal to the size of ::std::byte, if it is not, parsing will be wrong.
-    static_assert(sizeof(::std::byte) == sizeof(char8_t));
+    // Check if the size of char8_t is equal to the size of ::std::byte. if it is not, parsing will be wrong.
+    static_assert(sizeof(::std::byte) == sizeof(char8_t),
+                  "Check if the size of char8_t is equal to the size of ::std::byte. if it is not, parsing will be wrong.");
 
     template <typename Sec, typename... Fs>
     concept has_handle_binfmt_ver1_extensible_section_define =
@@ -85,7 +86,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                  ::uwvm2::parser::wasm::base::error_impl& err,
                  ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
                  ::std::byte const* const sec_id_module_ptr) {
-            { handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, fs_para, sec_id_module_ptr) };
+            {
+                handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, fs_para, sec_id_module_ptr)
+            } -> ::std::same_as<void>;
         };
 
     /// @see WebAssembly Release 1.0 (2019-07-20) § 5.5.2
@@ -154,6 +157,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                            ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
                                                            ::std::byte const* const) noexcept
         {
+            // func without template SecCurr used for adl matching
             // do nothing
         }
 
@@ -227,7 +231,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         if(section_id ==
            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(::uwvm2::parser::wasm::standard::wasm1::section::section_id::custom_sec))
         {
-            ::uwvm2::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end, err);
+            ::uwvm2::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end, err, fs_para);
             success = true;
         }
         else

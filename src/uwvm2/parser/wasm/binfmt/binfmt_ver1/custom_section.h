@@ -68,10 +68,12 @@ import :def;
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void handle_binfmt_ver1_custom_section(::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                                            ::std::byte const* section_begin,
-                                                            ::std::byte const* section_end,
-                                                            ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    inline constexpr void handle_binfmt_ver1_custom_section(
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_begin,
+        ::std::byte const* section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
         ::uwvm2::parser::wasm::standard::wasm1::section::custom_section cs{};
 

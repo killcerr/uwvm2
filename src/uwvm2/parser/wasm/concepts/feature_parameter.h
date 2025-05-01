@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    using splice_splice_feature_parameter_t = decltype(splice_feature_parameter<Fs...>())::Type;
+    using splice_feature_parameter_t = decltype(splice_feature_parameter<Fs...>())::Type;
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline consteval auto splice_splice_feature_parameter_from_tuple(::fast_io::tuple<Fs...>) noexcept
@@ -91,11 +91,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     /// @details    feature_parameter_t<Fs...> is used to store those parameters used to control feature parsing, such as whether or not to start the parsing
     ///             function, and is passed as a constant reference.
     /// @see        root.h
+    /// @see        test/non-platform-specific/0001.parser/0001.concept/feature_parameters.cc
     template <typename... Fs>
     struct feature_parameter_t
     {
         static_assert((::uwvm2::parser::wasm::concepts::wasm_feature<Fs> && ...), "Fs is not wasm feature");  // check is wasm feature
-        using storage_t = splice_splice_feature_parameter_t<Fs...>;                                           // ::fast_io::tuple
+        using storage_t = splice_feature_parameter_t<Fs...>;                                           // ::fast_io::tuple
         static_assert(::fast_io::is_tuple<storage_t>, "storage_t is not fast_io::tuple");                     // check is tuple
 
         storage_t parameters{};
@@ -114,7 +115,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     {
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
-        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para);
+        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature Fc, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -122,7 +123,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     {
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
-        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para);
+        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature Fc, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -130,7 +131,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     {
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
-        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para);
+        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature Fc, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -138,7 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     {
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
-        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para);
+        return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
     }
 
 }  // namespace uwvm2::parser::wasm::concepts
