@@ -30,7 +30,7 @@
 #include <concepts>
 #include <memory>
 
-#include <utils/macro/push_macros.h>
+#include <ulte/utils/macro/push_macros.h>
 
 #ifdef UWVM_MODULE
 import fast_io;
@@ -41,9 +41,9 @@ import uwvm.io;
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
-# include <parser/wasm/concepts/impl.h>
-# include <parser/wasm/standard/wasm1/type/impl.h>
-# include <uwvm/io/impl.h>
+# include <ulte/parser/wasm/concepts/impl.h>
+# include <ulte/parser/wasm/standard/wasm1/type/impl.h>
+# include <ulte/uwvm/io/impl.h>
 #endif
 
 struct B1F1
@@ -144,4 +144,4 @@ binfmt2: B2F3
 */
 
 // macro
-#include <utils/macro/pop_macros.h>
+#include <ulte/utils/macro/pop_macros.h>

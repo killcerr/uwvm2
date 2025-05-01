@@ -27,7 +27,7 @@
 #include <concepts>
 #include <memory>
 
-#include <utils/macro/push_macros.h>
+#include <ulte/utils/macro/push_macros.h>
 
 #ifdef UWVM_MODULE
 import fast_io;
@@ -41,11 +41,11 @@ import uwvm.wasm.storage;
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
-# include <parser/wasm/concepts/impl.h>
-# include <parser/wasm/standard/wasm1/type/impl.h>
-# include <parser/wasm/binfmt/binfmt_ver1/impl.h>
-# include <uwvm/io/impl.h>
-# include <uwvm/wasm/storage/impl.h>
+# include <ulte/parser/wasm/concepts/impl.h>
+# include <ulte/parser/wasm/standard/wasm1/type/impl.h>
+# include <ulte/parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include <ulte/uwvm/io/impl.h>
+# include <ulte/uwvm/wasm/storage/impl.h>
 #endif
 
 enum class vt1 : ::ulte::parser::wasm::standard::wasm1::type::wasm_u32
@@ -115,4 +115,4 @@ int main()
 
 
 // macro
-# include <utils/macro/pop_macros.h>
+# include <ulte/utils/macro/pop_macros.h>
