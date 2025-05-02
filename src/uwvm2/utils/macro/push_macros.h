@@ -375,6 +375,8 @@
 #undef UWVM_GNU_MAY_ALIAS
 #if __has_cpp_attribute(__gnu__::__may_alias__)
 # define UWVM_GNU_MAY_ALIAS [[__gnu__::__may_alias__]]
+#else
+# define UWVM_GNU_MAY_ALIAS
 #endif
 
 /// @details      Allow or disallow loading dynamic libraries,
@@ -414,4 +416,6 @@
 #undef UWVM_GNU_USED
 #if __has_cpp_attribute(__gnu__::__used__)
 # define UWVM_GNU_USED [[__gnu__::__used__]]
+#else
+# define UWVM_GNU_USED
 #endif
