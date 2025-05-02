@@ -89,6 +89,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::array<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>, importdesc_count> importdesc{};
     };
 
+    /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_func_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -96,7 +97,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
-        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
         // ... descindex typeindex ...
         //               ^^ section_curr
@@ -135,26 +137,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return section_curr;
     }
 
+    /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* extern_imports_table_handler(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        [[maybe_unused]] ::uwvm2::parser::wasm::standard::wasm1::type::table_type & table_r,  // [adl] can be replaced
+        [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        [[maybe_unused]] ::std::byte const* section_curr,
+        [[maybe_unused]] ::std::byte const* const section_end,
+        [[maybe_unused]] ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
+    {
+        /// @todo
+        return section_curr;
+    }
+
     /// @brief Define function for wasm1 external_types
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_extern_prefix_imports_handler(
         ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,
+        ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> & fit_imports,  // [adl] can be replaced
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
-        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
         switch(fit_imports.type)
         {
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::func:
             {
-                return extern_imports_func_handler(sec_adl, fit_imports.storage.function, module_storage, section_curr, section_end, err);
+                // fit_imports.storage.function won't be replaced.
+                return extern_imports_func_handler(sec_adl, fit_imports.storage.function, module_storage, section_curr, section_end, err, fs_para);
             }
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::table:
             {
-                /// @todo
-                break;
+                static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_extern_imports_table_handler<Fs...>);
+                return extern_imports_table_handler(sec_adl, fit_imports.storage.table, module_storage, section_curr, section_end, err, fs_para);
             }
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::memory:
             {
@@ -179,7 +198,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
@@ -360,7 +379,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_extern_prefix_imports_handler<Fs...>,
                           "define_extern_prefix_imports_handler(...) not found");
             // handle it, fit.imports.type is always valid
-            section_curr = define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err);
+            section_curr = define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err, fs_para);
 
             importsec.imports.push_back_unchecked(::std::move(fit));
         }

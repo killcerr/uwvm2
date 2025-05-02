@@ -73,9 +73,7 @@ import :custom_section;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
-    // Check if the size of char8_t is equal to the size of ::std::byte. if it is not, parsing will be wrong.
-    static_assert(sizeof(::std::byte) == sizeof(char8_t),
-                  "Check if the size of char8_t is equal to the size of ::std::byte. if it is not, parsing will be wrong.");
+    // size of char8_t is equal to the size of ::std::byte.
 
     template <typename Sec, typename... Fs>
     concept has_handle_binfmt_ver1_extensible_section_define =

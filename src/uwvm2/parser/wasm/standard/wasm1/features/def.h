@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     concept has_value_type = requires {
         typename FeatureType::value_type;
         requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
-                                                                                      typename FeatureType::value_type>;
+                                                                                             typename FeatureType::value_type>;
     };
 
     template <typename FeatureType>
@@ -126,7 +126,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     concept has_type_prefix = requires {
         typename FeatureType::type_prefix;
         requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
-                                                                                      typename FeatureType::type_prefix>;
+                                                                                             typename FeatureType::type_prefix>;
     };
 
     template <typename FeatureType>
@@ -214,7 +214,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     concept has_extern_type = requires {
         typename FeatureType::template extern_type<Fs...>;
         requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
-                                                                                      typename FeatureType::template extern_type<Fs...>>;
+                                                                                             typename FeatureType::template extern_type<Fs...>>;
     };
 
     template <typename FeatureType, typename... Fs>
@@ -247,6 +247,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         final_extern_type_t<Fs...> imports{};
     };
+
+    /// @brief      has table_type
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using table_type = type_replacer<root_of_replacement, table_type>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_table_type = requires {
+        typename FeatureType::table_type;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::table_type>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_table_type() noexcept
+    {
+        if constexpr(has_table_type<FeatureType>) { return typename FeatureType::table_type{}; }
+        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_table_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_table_type<Fs>())...>;
 
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 

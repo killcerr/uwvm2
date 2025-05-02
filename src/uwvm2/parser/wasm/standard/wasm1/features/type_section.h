@@ -85,7 +85,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr bool define_check_value_type(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-        ::uwvm2::parser::wasm::standard::wasm1::type::value_type value_type) noexcept
+        ::uwvm2::parser::wasm::standard::wasm1::type::value_type value_type  // [adl] can be replaced
+        ) noexcept
     {
         switch(value_type)
         {
@@ -105,7 +106,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
-        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
         //        ^^ section_curr
@@ -237,11 +239,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_type_prefix_handler(
         ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-        ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix prefix,
+        ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix prefix,  // [adl] can be replaced
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const prefix_module_ptr) UWVM_THROWS
     {
         // ... 60 ?? ?? ...
@@ -251,7 +254,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             case ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix::functype:
             {
-                return handle_type_prefix_functype(sec_adl, module_storage, section_curr, section_end, err);
+                return handle_type_prefix_functype(sec_adl, module_storage, section_curr, section_end, err, fs_para);
             }
             default:
                 [[unlikely]]
@@ -273,7 +276,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
@@ -343,7 +346,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
             // handle it
-            section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err, prefix_module_ptr);
+            section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr);
         }
 
         // check type counter match
