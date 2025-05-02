@@ -109,6 +109,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::base::error_impl& err,
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
+        // Note that section_curr may be equal to section_end
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
         // ... 60 ?? ?? ...
         //        ^^ section_curr
 
@@ -132,6 +135,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             section_curr = reinterpret_cast<::std::byte const*>(next_para_len);
+            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
             // ... 60 length ... length ... ...
             //               ^^ section_curr
@@ -182,6 +186,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             section_curr = reinterpret_cast<::std::byte const*>(next_result_len);
+            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
             // ... 60 length ... length ... ...
             //                          ^^ section_curr
 
@@ -247,6 +253,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const prefix_module_ptr) UWVM_THROWS
     {
+        // Note that section_curr may be equal to section_end, which needs to be checked
+
         // ... 60 ?? ?? ...
         //        ^^ section_curr
 
@@ -282,6 +290,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #ifdef UWVM_TIMER
         ::uwvm2::utils::debug::timer parsing_timer{u8"parse type section (id: 1)"};
 #endif
+        // Note that section_begin may be equal to section_end
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
         // get type_section_storage_t from storages
         auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
@@ -320,6 +330,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         typesec.types.reserve(type_count);
 
         section_curr = reinterpret_cast<::std::byte const*>(type_count_next);  // never out of bounds
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
 
@@ -328,15 +339,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const prefix_module_ptr{section_curr};
             // ... 60 ?? ?? ...
             //     ^^ section_curr
+
             ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix{};
-            // no necessary to check, because section_curr != section_end
+
+            // no necessary to check, because (section_curr != section_end)
             ::fast_io::freestanding::my_memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));
             // set section_curr to next
+            // No sense check, never cross the line because (section_curr < section_end)
+
             ++section_curr;
             // ... 60 ?? ?? ...
             //        ^^ section_curr
+
+            // Note that maybe (section_curr == section_end) now, follow-up needs to be checked (in define_type_prefix_handler)
+
             // check has func
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
+            
             // check type count
             if(++type_counter > type_count) [[unlikely]]
             {
@@ -345,6 +364,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
+
             // handle it
             section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr);
         }

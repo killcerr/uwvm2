@@ -65,10 +65,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
     /// @brief      detect wasm binfmt version
     /// @return     0 : error, other : binfmt version
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version(::std::byte const* const module_begin,
-                                                                                                ::std::byte const* const module_end) noexcept
+                                                                                                       ::std::byte const* const module_end) noexcept
     {
+        // Checking for invalid pointer parameters
+        if(module_begin > module_end) [[unlikely]] { return 0u; }
+
         ::std::byte const* module_curr{module_begin};
 
+        // Due to wasm magic and versioning, wasm must be greater than or equal to 8
         if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::uwvm2::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
         {
             return 0u;

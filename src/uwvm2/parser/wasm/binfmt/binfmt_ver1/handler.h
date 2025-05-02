@@ -155,6 +155,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                            ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
                                                            ::std::byte const* const) noexcept
         {
+            // Note that section_begin may be equal to section_end
+
             // func without template SecCurr used for adl matching
             // do nothing
         }
@@ -171,6 +173,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
             ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
         {
+            // Note that section_begin may be equal to section_end
+
             // Check if the current section has a handler function
             static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
 
@@ -219,6 +223,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
                                                                     ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
+        // Note that section_begin may be equal to section_end
+
         // Avoid meaningless copies with references
         auto const& [... secs]{module_storage.sections};
         check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
@@ -260,6 +266,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         ::uwvm2::parser::wasm::base::error_impl& err,
         ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
+        // Note that the pointer may have any two values, and since it will only subsequently check for not equal to rather than greater than, it is checked
+        // here in one go
+        if(module_begin > module_end) [[unlikely]]
+        {
+            err.err_curr = module_begin;
+            err.err_selectable.err_end = module_end;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_begin_pointer;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
         wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
@@ -281,14 +297,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
         // uncheck binfmt version, user-selected, or auto-detect
 
-        module_curr += 8uz;
+        module_curr += 8uz;  // safe (8uz)
 
         // 00 61 73 6D 01 00 00 00 01 7D ...
         //                         ^^ module_curr
 
-        if(static_cast<::std::size_t>(module_end - module_curr) < 2uz) [[unlikely]]
+        // Note that module_curr may be equal to module_end
+        // Check here to see if there is a one-byte section_id
+        // same as static_cast<::std::size_t>(module_end - module_curr) < 1uz
+        if(module_curr == module_end) [[unlikely]]
         {
-            // No need to check module_curr > module_end, always false
             err.err_curr = module_curr;
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::no_wasm_section_found;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -296,6 +314,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
         for(;;)
         {
+            // Each time loop, module_curr is less than module_end.
+
             auto const sec_id_module_ptr{module_curr};  // for error
 
             // get section type
@@ -303,10 +323,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             ::fast_io::freestanding::my_memcpy(::std::addressof(sec_id), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte));
 
             // get section length
-            ++module_curr;
+            ++module_curr;  // safe (1uz)
             // 00 61 73 6D 01 00 00 00 01 7D ...
             //                            ^^ module_curr
 
+            // Note that module_curr may be equal to module_end
+            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 sec_len{};
             auto const [sec_len_next, sec_len_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(module_curr),
                                                                             reinterpret_cast<char8_t_const_may_alias_ptr>(module_end),
@@ -331,24 +353,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             }
 
             auto const sec_end{module_curr + sec_len};
+            // Safe memory space from module_curr to sec_end
 
+            // Note that module_curr may be equal to sec_end (sec_len == 0), need check after call handle_all_binfmt_ver1_extensible_section
             handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, fs_para, sec_id_module_ptr);
 
             module_curr = sec_end;
 
             // check next section
-            if(auto const dif{static_cast<::std::size_t>(module_end - module_curr)}; dif == 0uz)
+            if(module_curr == module_end)
             {
                 // there are no sections remaining
                 break;
             }
-            else if(dif < 2uz) [[unlikely]]
-            {
-                // No need to check module_curr > module_end, always false
-                err.err_curr = module_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::no_enough_space;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
+
+            // No point in checking if dif, module_curr is less than module_end, after ++module_curr in the next round of loops possibly module_curr ==
+            // module_curr will be checked in ::fast_io::parse_by_scan and throw ::fast_io::parse_code::end_of_file
         }
 
         return ret;

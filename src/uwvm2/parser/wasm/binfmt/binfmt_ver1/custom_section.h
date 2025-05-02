@@ -75,6 +75,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         ::uwvm2::parser::wasm::base::error_impl& err,
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
+        // Note that section_begin may be equal to section_end
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
         ::uwvm2::parser::wasm::standard::wasm1::section::custom_section cs{};
 
         using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*;
