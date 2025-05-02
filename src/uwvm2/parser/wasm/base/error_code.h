@@ -49,7 +49,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         no_wasm_section_found,
         invalid_section_length,
         illegal_section_length,
-        no_enough_space,
+        not_enough_space_unmarked,
         illegal_section_id,
         invalid_custom_name_length,
         invalid_parameter_length,

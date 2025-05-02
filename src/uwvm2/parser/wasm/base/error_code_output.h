@@ -1393,7 +1393,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                 }
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::no_enough_space:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::not_enough_space_unmarked:
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -7158,7 +7158,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 u8") Illegal Type Index: \"",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
-                                ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
+                                errout.err.err_selectable.u32,
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u8"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
@@ -7176,7 +7176,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                      u8") Illegal Type Index: \"",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
-                                                                     ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
+                                                                     errout.err.err_selectable.u32,
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                                      u8"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
@@ -7202,7 +7202,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 u") Illegal Type Index: \"",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
-                                ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
+                                errout.err.err_selectable.u32,
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
@@ -7220,7 +7220,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                      u") Illegal Type Index: \"",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
-                                                                     ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
+                                                                     errout.err.err_selectable.u32,
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                                      u"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
@@ -7246,7 +7246,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 U") Illegal Type Index: \"",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
-                                ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
+                                errout.err.err_selectable.u32,
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 U"\".",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
@@ -7264,7 +7264,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                      U") Illegal Type Index: \"",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
-                                                                     ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
+                                                                     errout.err.err_selectable.u32,
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                                      U"\".",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
