@@ -312,7 +312,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        for(;;)
+        do
         {
             // Each time loop, module_curr is less than module_end.
 
@@ -360,16 +360,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
             module_curr = sec_end;
 
-            // check next section
-            if(module_curr == module_end)
-            {
-                // there are no sections remaining
-                break;
-            }
-
             // No point in checking if dif, module_curr is less than module_end, after ++module_curr in the next round of loops possibly module_curr ==
             // module_curr will be checked in ::fast_io::parse_by_scan and throw ::fast_io::parse_code::end_of_file
         }
+        // check has next section
+        while(module_curr != module_end);
 
         return ret;
     }

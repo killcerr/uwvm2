@@ -334,7 +334,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
 
-        for(; section_curr != section_end;)
+        while(section_curr != section_end)
         {
             auto const prefix_module_ptr{section_curr};
             // ... 60 ?? ?? ...

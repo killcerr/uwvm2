@@ -154,14 +154,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         // Note that section_curr may be equal to section_end, which needs to be checked
         // check here
-        if(static_cast<::std::size_t>(section_end - section_curr) < 1uz) [[unlikely]] 
+        if(static_cast<::std::size_t>(section_end - section_curr) < 1uz) [[unlikely]]
         {
             err.err_curr = section_curr;
             err.err_selectable.err_end = section_end;
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::not_enough_space;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
-        
+
         // ... descindex value_type ...
         //               ^^ section_curr
 
@@ -286,8 +286,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, import_section_storage_t<Fs...>::importdesc_count>
             importdesc_counter{};  // use for reserve
 
-        for(; section_curr != section_end;)
-        {
+        do {
+            // Note that section_curr may be equal to section_end
+            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
             ::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> fit{};
             if(++import_counter > import_count) [[unlikely]]
             {
@@ -330,7 +332,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // No access, security
             fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
 
-            section_curr += module_namelen; // unsafe, need check
+            section_curr += module_namelen;  // unsafe, need check
             // ... count modulenamelen name ... externnamelen externname ... index
             //                                  ^^ section_curr
 
@@ -370,7 +372,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
 
-            section_curr += extern_namelen; // unsafe, need check
+            section_curr += extern_namelen;  // unsafe, need check
             // ... count modulenamelen name ... externnamelen externname ... index
             //                                                               ^^ section_curr
 
@@ -421,6 +423,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             importsec.imports.push_back_unchecked(::std::move(fit));
         }
+        while(section_curr != section_end);
 
         // check import counter match
         if(import_counter != import_count) [[unlikely]]
