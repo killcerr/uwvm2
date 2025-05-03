@@ -8558,7 +8558,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                ") Illegal Minimum Limit.",
+                                ") Invalid Minimum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8572,7 +8572,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                                      "(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     ") Illegal Minimum Limit.",
+                                                                     ") Invalid Minimum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
                     return;
                 }
@@ -8594,7 +8594,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 L"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                L") Illegal Minimum Limit.",
+                                L") Invalid Minimum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8608,7 +8608,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                                      L"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     L") Illegal Minimum Limit.",
+                                                                     L") Invalid Minimum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
                     return;
                 }
@@ -8630,7 +8630,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u8") Illegal Minimum Limit.",
+                                u8") Invalid Minimum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8644,7 +8644,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                                      u8"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u8") Illegal Minimum Limit.",
+                                                                     u8") Invalid Minimum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
                     return;
                 }
@@ -8666,7 +8666,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u") Illegal Minimum Limit.",
+                                u") Invalid Minimum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8680,7 +8680,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                                      u"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u") Illegal Minimum Limit.",
+                                                                     u") Invalid Minimum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
                     return;
                 }
@@ -8702,7 +8702,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 U"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                U") Illegal Minimum Limit.",
+                                U") Invalid Minimum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8716,7 +8716,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                                      U"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     U") Illegal Minimum Limit.",
+                                                                     U") Invalid Minimum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
                     return;
                 }
@@ -8742,7 +8742,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                ") Illegal Maximum Limit.",
+                                ") Invalid Maximum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8756,7 +8756,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                                      "(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     ") Illegal Maximum Limit.",
+                                                                     ") Invalid Maximum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
                     return;
                 }
@@ -8778,7 +8778,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 L"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                L") Illegal Maximum Limit.",
+                                L") Invalid Maximum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8792,7 +8792,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                                      L"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     L") Illegal Maximum Limit.",
+                                                                     L") Invalid Maximum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
                     return;
                 }
@@ -8814,7 +8814,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u8") Illegal Maximum Limit.",
+                                u8") Invalid Maximum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8828,7 +8828,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                                      u8"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u8") Illegal Maximum Limit.",
+                                                                     u8") Invalid Maximum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
                     return;
                 }
@@ -8850,7 +8850,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 u"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                u") Illegal Maximum Limit.",
+                                u") Invalid Maximum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8864,7 +8864,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                                      u"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     u") Illegal Maximum Limit.",
+                                                                     u") Invalid Maximum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
                     return;
                 }
@@ -8886,7 +8886,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
                                 U"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                U") Illegal Maximum Limit.",
+                                U") Invalid Maximum Limit.",
                                 ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
                             return;
                         }
@@ -8900,7 +8900,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                                      U"(offset=",
                                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                                     U") Illegal Maximum Limit.",
+                                                                     U") Invalid Maximum Limit.",
                                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
                     return;
                 }
