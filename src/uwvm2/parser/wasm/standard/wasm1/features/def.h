@@ -273,6 +273,56 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using final_table_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_table_type<Fs>())...>;
 
+    /// @brief      has memory_type
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using memory_type = type_replacer<root_of_replacement, memory_type>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_memory_type = requires {
+        typename FeatureType::memory_type;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::memory_type>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_memory_type() noexcept
+    {
+        if constexpr(has_memory_type<FeatureType>) { return typename FeatureType::memory_type{}; }
+        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_memory_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_memory_type<Fs>())...>;
+
+    /// @brief      has global_type
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using global_type = type_replacer<root_of_replacement, global_type>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_global_type = requires {
+        typename FeatureType::global_type;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::global_type>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_global_type() noexcept
+    {
+        if constexpr(has_global_type<FeatureType>) { return typename FeatureType::global_type{}; }
+        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_global_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_global_type<Fs>())...>;
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

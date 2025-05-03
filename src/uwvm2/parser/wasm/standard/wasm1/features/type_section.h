@@ -37,6 +37,7 @@ import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :feature_def;
+import :types;
 #else
 // std
 # include <cstddef>
@@ -61,6 +62,7 @@ import :feature_def;
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
 # include "feature_def.h"
+# include "types.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -88,14 +90,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::value_type value_type  // [adl] can be replaced
         ) noexcept
     {
-        switch(value_type)
-        {
-            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i32: [[fallthrough]];
-            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i64: [[fallthrough]];
-            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f32: [[fallthrough]];
-            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64: return true;
-            default: return false;
-        }
+        return uwvm2::parser::wasm::standard::wasm1::features::is_valid_value_type(value_type);
     }
 
     /// @brief      handle type_prefix: "functype"

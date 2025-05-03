@@ -165,6 +165,36 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return ::uwvm2::parser::wasm::standard::wasm1::features::scan_table_type(table_r, section_curr, section_end, err);
     }
 
+    /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* extern_imports_memory_handler(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::standard::wasm1::type::memory_type & memory_r,  // [adl] can be replaced
+        [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
+    {
+        // Note that section_curr may be equal to section_end, which needs to be checked
+        return ::uwvm2::parser::wasm::standard::wasm1::features::scan_memory_type(memory_r, section_curr, section_end, err);
+    }
+
+    /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* extern_imports_global_handler(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::standard::wasm1::type::global_type & global_r,  // [adl] can be replaced
+        [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
+    {
+        // Note that section_curr may be equal to section_end, which needs to be checked
+        return ::uwvm2::parser::wasm::standard::wasm1::features::scan_global_type(global_r, section_curr, section_end, err);
+    }
+
     /// @brief Define function for wasm1 external_types
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_extern_prefix_imports_handler(
@@ -192,13 +222,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::memory:
             {
-                /// @todo
-                break;
+                static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_extern_imports_memory_handler<Fs...>);
+                // Note that section_curr may be equal to section_end, which needs to be checked
+                return extern_imports_memory_handler(sec_adl, fit_imports.storage.memory, module_storage, section_curr, section_end, err, fs_para);
             }
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::global:
             {
-                /// @todo
-                break;
+                static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_extern_imports_global_handler<Fs...>);
+                // Note that section_curr may be equal to section_end, which needs to be checked
+                return extern_imports_global_handler(sec_adl, fit_imports.storage.global, module_storage, section_curr, section_end, err, fs_para);
             }
             default: ::fast_io::unreachable();  // never match, checked before
         }

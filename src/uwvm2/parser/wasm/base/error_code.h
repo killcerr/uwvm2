@@ -85,6 +85,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         limit_type_illegal_flag,
         limit_type_invalid_min,
         limit_type_invalid_max,
+        global_type_cannot_find_valtype,
+        global_type_illegal_valtype,
+        global_type_cannot_find_mut,
+        global_type_illegal_mut
     };
 
     /// @brief Additional information provided by wasm error, no more than 8 bytes

@@ -86,6 +86,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                       wasm1_final_extern_type<Fs...>>;
         using table_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::table_type>;
+        using memory_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::memory_type>;
+        using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::global_type>;
 
         // binfmt ver1
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -112,6 +116,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     // import section
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_extern_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_table_type<wasm1>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_memory_type<wasm1>);
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features

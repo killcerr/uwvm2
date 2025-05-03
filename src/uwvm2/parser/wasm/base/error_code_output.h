@@ -8906,7 +8906,822 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                 }
                 return;
             }
-
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_cannot_find_valtype:
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                "uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                "[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                ") Cannot Find Valtype.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
+                                                                     "uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RED),
+                                                                     "[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     ") Cannot Find Valtype.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                L"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                L"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                L") Cannot Find Valtype.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
+                                                                     L"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RED),
+                                                                     L"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     L") Cannot Find Valtype.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u8") Cannot Find Valtype.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                                                     u8"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RED),
+                                                                     u8"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u8") Cannot Find Valtype.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u") Cannot Find Valtype.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
+                                                                     u"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RED),
+                                                                     u"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u") Cannot Find Valtype.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                U"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                U"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                U") Cannot Find Valtype.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
+                                                                     U"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RED),
+                                                                     U"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     U") Cannot Find Valtype.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
+                    return;
+                }
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_illegal_valtype:
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                "uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                "[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                ") Illegal Value Type In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
+                                                                     "uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RED),
+                                                                     "[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     ") Illegal Value Type In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                L"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                L"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                L") Illegal Value Type In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
+                                                                     L"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RED),
+                                                                     L"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     L") Illegal Value Type In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u8") Illegal Value Type In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                                                     u8"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RED),
+                                                                     u8"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u8") Illegal Value Type In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u") Illegal Value Type In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
+                                                                     u"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RED),
+                                                                     u"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u") Illegal Value Type In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                U"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                U"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                U") Illegal Value Type In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
+                                                                     U"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RED),
+                                                                     U"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     U") Illegal Value Type In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
+                    return;
+                }
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_cannot_find_mut:
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                "uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                "[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                ") Cannot Find Mut.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
+                                                                     "uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RED),
+                                                                     "[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     ") Cannot Find Mut.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                L"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                L"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                L") Cannot Find Mut.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
+                                                                     L"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RED),
+                                                                     L"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     L") Cannot Find Mut.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u8") Cannot Find Mut.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                                                     u8"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RED),
+                                                                     u8"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u8") Cannot Find Mut.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u") Cannot Find Mut.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
+                                                                     u"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RED),
+                                                                     u"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u") Cannot Find Mut.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                U"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                U"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                U") Cannot Find Mut.",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
+                                                                     U"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RED),
+                                                                     U"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     U") Cannot Find Mut.",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
+                    return;
+                }
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_illegal_mut:
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                "uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                "[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                ") Illegal Mut In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                "\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
+                                                                     "uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RED),
+                                                                     "[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     ") Illegal Mut In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                                     "\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                L"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                L"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                L") Illegal Mut In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                L"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
+                                                                     L"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RED),
+                                                                     L"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     L") Illegal Mut In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                                     L"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u8") Illegal Mut In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u8"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+                                                                     u8"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RED),
+                                                                     u8"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u8") Illegal Mut In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                                     u8"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                u"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                u"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                u") Illegal Mut In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                u"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
+                                                                     u"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RED),
+                                                                     u"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     u") Illegal Mut In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                                     u"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
+                    return;
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                    if constexpr(::std::is_base_of_v<::fast_io::basic_win32_io_observer<char_type>, ::std::remove_cvref_t<Stm>> ||
+                                 ::std::is_base_of_v<::fast_io::basic_nt_io_observer<char_type>, ::std::remove_cvref_t<Stm>>)
+                    {
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        {
+                            auto const stream_handle{stream.native_handle()};
+                            ::fast_io::operations::print_freestanding<false>(
+                                stream,
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL_AND_SET_WHITE(stream_handle)),
+                                U"uwvm: ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RED(stream_handle)),
+                                U"[error] ",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"(offset=",
+                                ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                U") Illegal Mut In Global: \"",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_CYAN(stream_handle)),
+                                ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_WHITE(stream_handle)),
+                                U"\".",
+                                ::fast_io::mnp::cond(enable_ansi, WASM_WIN32_COLOR_RST_ALL(stream_handle)));
+                            return;
+                        }
+                    }
+#endif
+                    ::fast_io::operations::print_freestanding<false>(stream,
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
+                                                                     U"uwvm: ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RED),
+                                                                     U"[error] ",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"(offset=",
+                                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+                                                                     U") Illegal Mut In Global: \"",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
+                                                                     ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                                     U"\".",
+                                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
+                    return;
+                }
+                return;
+            }
         }
     }
 

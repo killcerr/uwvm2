@@ -86,7 +86,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     struct table_type
     {
         limits_type limits{};
-        ::uwvm2::parser::wasm::standard::wasm1::type::value_type reftype{};
+        
+        inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte reftype{
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(0x70)};
 
         bool is_exported{};
     };

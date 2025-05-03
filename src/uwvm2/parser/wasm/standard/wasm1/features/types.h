@@ -69,6 +69,22 @@ import :feature_def;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 {
+    /// @brief      Value Types
+    /// @details    Value types are encoded by a single byte.
+    /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.1
+    inline constexpr bool is_valid_value_type(::uwvm2::parser::wasm::standard::wasm1::type::value_type vt) noexcept
+    {
+        switch(vt)
+        {
+            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i32: [[fallthrough]];
+            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i64: [[fallthrough]];
+            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f32: [[fallthrough]];
+            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64: return true;
+            default: return false;
+        }
+    }
+
     /// @brief      Limits
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
     /// @details    New feature
@@ -84,7 +100,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto curr{begin};
 
         // flag min ... (max ...)
-        // unsafe (could be the section_end)
+        // unsafe (could be the end)
         // ^^ curr
 
         if(curr == end) [[unlikely]]
@@ -95,7 +111,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 
         // [flag] min ... (max ...)
-        // [safe] unsafe (could be the section_end)
+        // [safe] unsafe (could be the end)
         // ^^ curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte flags{};
@@ -112,15 +128,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ++curr;
 
         // [flag] min ... max (end)
-        // [safe] unsafe (could be the section_end)
+        // [safe] unsafe (could be the end)
         //        ^^ curr
 
         {
             // [flag] min ... max (end)
-            // [safe] unsafe (could be the section_end)
+            // [safe] unsafe (could be the end)
             //        ^^ curr
 
             // scan min
+            // set present_max
             limit_r.present_max = false;
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_min{};
@@ -136,24 +153,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // [flag min ...] max (end)
-            // [    safe    ] unsafe (could be the section_end)
+            // [    safe    ] unsafe (could be the end)
             //       ^^ curr
 
+            // set min
             limit_r.min = n_min;
 
             curr = reinterpret_cast<::std::byte const*>(next_n_min);
             // [flag min ...] max (end)
-            // [    safe    ] unsafe (could be the section_end)
+            // [    safe    ] unsafe (could be the end)
             //                ^^ curr
         }
 
         if(flags == 1u)
         {
             // [flag min ...] max ... (end)
-            // [    safe    ] unsafe (could be the section_end)
+            // [    safe    ] unsafe (could be the end)
             //                ^^ curr
 
             // scan max
+            // set present_max
             limit_r.present_max = true;
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_max{};
@@ -169,15 +188,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // [flag min ... max ...] (end)
-            // [        safe        ] unsafe (could be the section_end)
+            // [        safe        ] unsafe (could be the end)
             //               ^^ curr
 
+            // set max
             limit_r.max = n_max;
 
             curr = reinterpret_cast<::std::byte const*>(next_n_max);
 
             // [flag min ... max ...] (end)
-            // [        safe        ] unsafe (could be the section_end)
+            // [        safe        ] unsafe (could be the end)
             //                        ^^ curr
         }
 
@@ -197,7 +217,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto curr{begin};
 
         // reftype limits ...
-        // unsafe (could be the section_end)
+        // unsafe (could be the end)
         // ^^ curr
 
         if(curr == end) [[unlikely]]
@@ -208,7 +228,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 
         // [reftype] limits ...
-        // [ safe  ] unsafe (could be the section_end)
+        // [ safe  ] unsafe (could be the end)
         // ^^ curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte elemtype{};
@@ -223,21 +243,131 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
+        // no necessary to set reftype in wasm1, always 0x70
+
         ++curr;
 
         // [reftype] limits ... (end)
-        // [  safe ] unsafe (could be the section_end)
+        // [  safe ] unsafe (could be the end)
         //           ^^ curr
 
+        // set limits
         curr = scan_limit_type(table_r.limits, curr, end, err);
 
         // [reftype limits ...] (end)
-        // [         safe     ] unsafe (could be the section_end)
+        // [         safe     ] unsafe (could be the end)
         //                      ^^ curr
 
         return curr;
     }
 
+    /// @brief      Memory Types
+    /// @details    Memory types classify linear memories and their size range.
+    /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.5
+    inline constexpr ::std::byte const* scan_memory_type(::uwvm2::parser::wasm::standard::wasm1::type::memory_type & memory_r,
+                                                         ::std::byte const* const begin,
+                                                         ::std::byte const* const end,
+                                                         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        // uncheck begin > end
+        auto curr{begin};
+
+        // limits ... (end)
+        // unsafe (could be the end)
+        // ^^ curr
+
+        // check in scan_limit_type
+
+        curr = scan_limit_type(memory_r.limits, curr, end, err);
+
+        // [limits ...] (end)
+        // [   safe   ] unsafe (could be the end)
+        //              ^^ curr
+
+        return curr;
+    }
+
+    /// @brief      Global Types
+    /// @details    Global types classify global variables, which hold a value and can either be mutable or immutable
+    /// @details    New feature
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.7
+    inline constexpr ::std::byte const* scan_global_type(::uwvm2::parser::wasm::standard::wasm1::type::global_type & global_r,
+                                                         ::std::byte const* const begin,
+                                                         ::std::byte const* const end,
+                                                         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        // uncheck begin > end
+        auto curr{begin};
+
+        // valtype ma (end)
+        // unsafe (could be the end)
+        // ^^ curr
+
+        if(curr == end) [[unlikely]]
+        {
+            err.err_curr = curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_cannot_find_valtype;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        // [valtype] ma (end)
+        // [  safe ] unsafe (could be the end)
+        // ^^ curr
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::value_type gvt;
+
+        ::fast_io::freestanding::my_memcpy(::std::addressof(gvt), curr, sizeof(gvt));
+
+        if(!is_valid_value_type(gvt)) [[unlikely]]
+        {
+            err.err_curr = curr;
+            err.err_selectable.u8 = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(gvt);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_illegal_valtype;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        global_r.type = gvt;
+
+        ++curr;
+
+        // [valtype] ma (end)
+        // [  safe ] unsafe (could be the end)
+        //           ^^ curr
+
+        if(curr == end) [[unlikely]]
+        {
+            err.err_curr = curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_cannot_find_mut;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        // [valtype ma] (end)
+        // [   safe   ] unsafe (could be the end)
+        //          ^^ curr
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte mut{};
+
+        ::fast_io::freestanding::my_memcpy(::std::addressof(mut), curr, sizeof(mut));
+
+        if(mut > 1) [[unlikely]]
+        {
+            err.err_curr = curr;
+            err.err_selectable.u8 = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(mut);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_type_illegal_mut;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        global_r.is_mutable = static_cast<bool>(mut);
+
+        ++curr;
+
+        // [valtype ma] (end)
+        // [   safe   ] unsafe (could be the end)
+        //              ^^ curr
+
+        return curr;
+    }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 #ifndef UWVM_MODULE
