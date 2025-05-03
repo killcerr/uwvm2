@@ -299,6 +299,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // ... count modulenamelen ... modulename ...
+            //           ^^ section_curr
+
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 module_namelen{};
             auto const [module_namelen_next, module_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
@@ -319,31 +322,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             auto const import_module_name_too_length_ptr{section_curr};
+            // ... count modulenamelen ... modulename ...
+            //           ^^ import_module_name_too_length_ptr
 
-            section_curr = reinterpret_cast<::std::byte const*>(module_namelen_next);  // never out of bounds
-            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
-            // Note that section_curr may be equal to section_end, checked in the subsequent parse_by_scan
+            section_curr = reinterpret_cast<::std::byte const*>(module_namelen_next);
+            // Note that section_curr may be equal to section_end
 
-            // ... count modulenamelen ?? ...
-            //                         ^^ section_curr
+            // ... count modulenamelen ... modulename ...
+            //                             ^^ section_curr
 
+            // check modulenamelen
+            if(static_cast<::std::size_t>(section_end - section_curr) < module_namelen) [[unlikely]]
+            {
+                err.err_curr = import_module_name_too_length_ptr;
+                err.err_selectable.u32 = module_namelen;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_module_name_too_length;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);            
+            }
+    
             using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
             // No access, security
             fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
 
-            section_curr += module_namelen;  // unsafe, need check
-            // ... count modulenamelen name ... externnamelen externname ... index
-            //                                  ^^ section_curr
+            section_curr += module_namelen;  // safe
+            // ... count modulenamelen ... modulename ... externnamelen ... externname ... index
+            //                                            ^^ section_curr
 
-            // check curr: externnamelen min = 0, minimum remaining 2 "... 00 index ..."
-            if(section_curr > section_end) [[unlikely]]
-            {
-                err.err_curr = import_module_name_too_length_ptr;
-                err.err_selectable.u32 = module_namelen;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_module_name_too_length;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
             // Note that section_curr may be equal to section_end, checked in the subsequent parse_by_scan
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 extern_namelen{};
@@ -366,25 +371,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             auto const import_extern_name_too_length_ptr{section_curr};
+            // ... count modulenamelen ... modulename ... externnamelen ... externname ... index
+            //                                            ^^ import_extern_name_too_length_ptr
 
-            section_curr = reinterpret_cast<::std::byte const*>(extern_namelen_next);  // never out of bounds
-            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+            section_curr = reinterpret_cast<::std::byte const*>(extern_namelen_next);  
+            // Note that section_curr may be equal to section_end
 
-            fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
+            // ... count externnamelen ... externname ...
+            //                             ^^ section_curr
 
-            section_curr += extern_namelen;  // unsafe, need check
-            // ... count modulenamelen name ... externnamelen externname ... index
-            //                                                               ^^ section_curr
-
-            if(section_curr > section_end) [[unlikely]]
+            // check externnamelen
+            if(static_cast<::std::size_t>(section_end - section_curr) < extern_namelen) [[unlikely]]
             {
                 err.err_curr = import_extern_name_too_length_ptr;
                 err.err_selectable.u32 = extern_namelen;
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_extern_name_too_length;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);        
             }
 
+            fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
+
+            section_curr += extern_namelen;  // safe
+            // ... count modulenamelen modulename ... externnamelen externname ... index
+            //                                                                     ^^ section_curr
+
             // Note that section_curr may be equal to section_end
+            
             if(section_curr == section_end) [[unlikely]]
             {
                 err.err_curr = section_curr;
