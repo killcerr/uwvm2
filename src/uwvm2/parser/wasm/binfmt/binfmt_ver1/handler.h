@@ -99,45 +99,74 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
         has_handle_binfmt_ver1_extensible_section_define<Ty, Fs...> && has_section_id_define<Ty>;
 
-    template <typename... Ty>
-    inline consteval void check_extensible_section_is_series() noexcept
+    namespace details
     {
-        ::std::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte> vec{};
-        [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-        { ((vec.push_back(Ty...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
-        ::std::ranges::sort(vec);
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte counter{0u};
-        for(auto i: vec)
+        template <typename... Sec>
+        inline consteval void check_extensible_section_is_series() noexcept
         {
+            ::std::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte> vec{};
+            [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            { ((vec.push_back(Sec...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Sec)>{});
+            ::std::ranges::sort(vec);
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte counter{0u};
+            for(auto i: vec)
+            {
 #if __cpp_contracts >= 202502L
-            contract_assert(i == counter++);
+                contract_assert(i == counter++);
 #else
-            if(i != counter++) { ::fast_io::fast_terminate(); }
+                if(i != counter++) { ::fast_io::fast_terminate(); }
 #endif
+            }
         }
-    }
 
-    template <typename... Ty>
-    inline consteval auto generate_section_name_table_max() noexcept
+        template <typename... Sec>
+        inline consteval ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte generate_section_max_id() noexcept
+        {
+            static_assert(sizeof...(Sec) != 0);
+            ::std::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte> vec{};
+            [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            { ((vec.push_back(Sec...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Sec)>{});
+            ::std::ranges::sort(vec);
+            auto const max{vec.back()};
+            return max;
+        }
+
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        inline consteval double generate_section_probability_from_Fs() noexcept
+        {
+            // for __builtin_expect_with_probability
+            ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
+            auto const& [... secs]{ret.sections};
+            constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_id{generate_section_max_id<::std::remove_cvref_t<decltype(secs)>...>()};
+            constexpr double max_id_probability{1.0 - 1.0 / static_cast<double>(max_id + 1)};
+            static_assert(0.0 <= max_id_probability && max_id_probability <= 1.1);
+            return max_id_probability;
+        }
+
+        template <typename... Sec>
+        inline consteval auto generate_section_name_table() noexcept
+        {
+            static_assert(sizeof...(Sec) != 0);
+
+            constexpr auto max{generate_section_max_id<Sec...>};
+            ::fast_io::array<::fast_io::u8string_view, max> res{};
+
+            [&res]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            { ((res[Sec...[I] ::section_id] = Sec...[I] ::section_name), ...); }(::std::make_index_sequence<sizeof...(Sec)>{});
+
+            return res;
+        }
+    }  // namespace details
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr double probability_from_Fs{details::generate_section_probability_from_Fs<Fs...>()};
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval void check_extensible_section_is_series_from_Fs() noexcept
     {
-        ::std::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte> vec{};
-        [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-        { ((vec.push_back(Ty...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
-        ::std::ranges::sort(vec);
-        auto const max{vec.back()};
-        return max;
-    }
-
-    template <typename... Ty>
-    inline consteval auto generate_section_name_table() noexcept
-    {
-        constexpr auto max{generate_section_name_table_max<Ty...>};
-        ::fast_io::array<::fast_io::u8string_view, max> res{};
-
-        [&res]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-        { ((res[Ty...[I] ::section_id] = Ty...[I] ::section_name), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
-
-        return res;
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
+        auto const& [... secs]{ret.sections};
+        check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
     }
 
     namespace details
@@ -225,7 +254,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
         // Avoid meaningless copies with references
         auto const& [... secs]{module_storage.sections};
-        check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
+        details::check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
 
         bool success{};
 
@@ -256,106 +285,170 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         ::uwvm2::parser::wasm::base::error_impl& err,
         ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
-        // Note that the pointer may have any two values, and since it will only subsequently check for not equal to rather than greater than, it is checked
-        // here in one go
-        if(module_begin > module_end) [[unlikely]]
+        if constexpr(sizeof...(Fs) == 0)
         {
-            err.err_curr = module_begin;
-            err.err_selectable.err_end = module_end;
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_begin_pointer;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            // If there is no feature then just return
+            return {};
         }
-
-        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
-
-        wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
-
-        ret.module_span.module_begin = module_begin;
-        ret.module_span.module_end = module_end;
-
-        ::std::byte const* module_curr{module_begin};
-
-        // 00 61 73 6D 01 00 00 00 01 7D ...
-        // ^^ module_curr
-
-        if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::uwvm2::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
+        else
         {
-            err.err_curr = module_curr;
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_wasm_file_format;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
+            // Note that the pointer may have any two values, and since it will only subsequently check for not equal to rather than greater than, it is checked
+            // here in one go
 
-        // uncheck binfmt version, user-selected, or auto-detect
-
-        module_curr += 8uz;  // safe (8uz)
-
-        // 00 61 73 6D 01 00 00 00 01 7D ...
-        //                         ^^ module_curr
-
-        // Note that module_curr may be equal to module_end
-        // Check here to see if there is a one-byte section_id
-        // same as static_cast<::std::size_t>(module_end - module_curr) < 1uz
-        if(module_curr == module_end) [[unlikely]]
-        {
-            err.err_curr = module_curr;
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::no_wasm_section_found;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
-
-        do {
-            // Each time loop, module_curr is less than module_end.
-
-            auto const sec_id_module_ptr{module_curr};  // for error
-
-            // get section type
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte sec_id{};
-            ::fast_io::freestanding::my_memcpy(::std::addressof(sec_id), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte));
-
-            // get section length
-            ++module_curr;  // safe (1uz)
-            // 00 61 73 6D 01 00 00 00 01 7D ...
-            //                            ^^ module_curr
-
-            // Note that module_curr may be equal to module_end
-            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 sec_len{};
-            auto const [sec_len_next, sec_len_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(module_curr),
-                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(module_end),
-                                                                            ::fast_io::mnp::leb128_get(sec_len))};
-            if(sec_len_err != ::fast_io::parse_code::ok) [[unlikely]]
+            if(module_begin > module_end) [[unlikely]]
             {
-                err.err_curr = module_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_section_length;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(sec_len_err);
-            }
-
-            // set curr to next
-            module_curr = reinterpret_cast<::std::byte const*>(sec_len_next);
-
-            // check length
-            if(static_cast<::std::size_t>(module_end - module_curr) < sec_len) [[unlikely]]
-            {
-                err.err_curr = module_curr;
-                err.err_selectable.u32 = sec_len;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_section_length;
+                err.err_curr = module_begin;
+                err.err_selectable.err_end = module_end;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_begin_pointer;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            auto const sec_end{module_curr + sec_len};
-            // Safe memory space from module_curr to sec_end
+            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
-            // Note that module_curr may be equal to sec_end (sec_len == 0), need check after call handle_all_binfmt_ver1_extensible_section
-            handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, fs_para, sec_id_module_ptr);
+            wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
 
-            module_curr = sec_end;
+            ret.module_span.module_begin = module_begin;
+            ret.module_span.module_end = module_end;
 
-            // No point in checking if dif, module_curr is less than module_end, after ++module_curr in the next round of loops possibly module_curr ==
-            // module_curr will be checked in ::fast_io::parse_by_scan and throw ::fast_io::parse_code::end_of_file
+            ::std::byte const* module_curr{module_begin};
+
+            // 00 61 73 6D 01 00 00 00 sec_id sec_len ...
+            // unsafe (module_end)
+            // ^^ module_curr
+
+            if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::uwvm2::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
+            {
+                err.err_curr = module_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_wasm_file_format;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [00 61 73 6D 01 00 00 00] sec_id sec_len ...
+            // [         safe          ] unsafe (module_end)
+            // ^^ module_curr
+
+            // uncheck binfmt version (module_curr + 4uz), user-selected, or auto-detect (in uwvm2/parser/wasm/binfmt/base/base.h)
+
+            module_curr += 8uz;  // safe (8uz)
+
+            // [00 61 73 6D 01 00 00 00] sec_id sec_len ...
+            // [         safe          ] unsafe (module_end)
+            //                           ^^ module_curr
+
+            // Note that module_curr may be equal to module_end
+            // Check here to see if there is a one-byte section_id
+            // same as static_cast<::std::size_t>(module_end - module_curr) < 1uz
+            if(module_curr == module_end) [[unlikely]]
+            {
+                err.err_curr = module_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::no_wasm_section_found;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [00 61 73 6D 01 00 00 00 sec_id] sec_len ...
+            // [         safe                 ] unsafe (module_end)
+            //                          ^^ module_curr
+
+            do {
+                // Each time loop, module_curr is less than module_end.
+
+                // [... sec_id] sec_len ...
+                // [   safe   ] unsafe (module_end)
+                //      ^^ module_curr
+
+                auto const sec_id_module_ptr{module_curr};  // for error
+                // [... sec_id] sec_len ...
+                // [   safe   ] unsafe (module_end)
+                //      ^^ sec_id_module_ptr
+
+                // get section type
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte sec_id{};
+                ::fast_io::freestanding::my_memcpy(::std::addressof(sec_id), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte));
+
+                // get section length
+                ++module_curr;
+
+                // [... sec_id] sec_len ... sec_begin ... sec_id (sec_end)
+                // [   safe   ] unsafe (module_end)
+                //              ^^ module_curr
+
+                // Note that module_curr may be equal to module_end
+                // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 sec_len{};
+                auto const [sec_len_next, sec_len_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(module_curr),
+                                                                                reinterpret_cast<char8_t_const_may_alias_ptr>(module_end),
+                                                                                ::fast_io::mnp::leb128_get(sec_len))};
+
+                if(sec_len_err != ::fast_io::parse_code::ok) [[unlikely]]
+                {
+                    err.err_curr = module_curr;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_section_length;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(sec_len_err);
+                }
+
+                // [... sec_id sec_len ...] sec_begin ... sec_id (sec_end)
+                // [       safe           ] unsafe (module_end)
+                //             ^^ module_curr
+
+                // set curr to next
+                module_curr = reinterpret_cast<::std::byte const*>(sec_len_next);
+
+                // [... sec_id sec_len ...] sec_begin ... sec_id (sec_end)
+                // [       safe           ] unsafe (module_end)
+                //                          ^^ module_curr
+
+                // check length
+                if(static_cast<::std::size_t>(module_end - module_curr) < sec_len) [[unlikely]]
+                {
+                    err.err_curr = module_curr;
+                    err.err_selectable.u32 = sec_len;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_section_length;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [                safe                ] unsafe (module_end)
+                //                         ^^ module_curr
+
+                auto const sec_end{module_curr + sec_len};
+                // Safe memory space from [module_curr, sec_end)
+                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [                safe                ] unsafe (module_end)
+                //                         ^^ module_curr
+                //                                        ^^ sec_len
+
+                // Note that module_curr may be equal to sec_end (sec_len == 0), need check after call handle_all_binfmt_ver1_extensible_section
+                handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, fs_para, sec_id_module_ptr);
+
+                module_curr = sec_end;
+
+                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [                safe                ] unsafe (module_end)
+                //                                        ^^ module_curr
+
+                // No point in checking if dif, module_curr is less than module_end, after ++module_curr in the next round of loops possibly module_curr ==
+                // module_curr will be checked in ::fast_io::parse_by_scan and throw ::fast_io::parse_code::end_of_file
+            }
+            while(
+#if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
+                __builtin_expect_with_probability(module_curr != module_end, true, probability_from_Fs<Fs...>)
+#else
+                module_curr != module_end
+#endif
+            );
+
+            // (module_curr != module_end):
+            // [... sec_id sec_len ... sec_begin ... sec_id] ...
+            // [                safe                       ] unsafe (module_end)
+            //                                       ^^ module_curr
+
+            // (module_curr == module_end):
+            // [... sec_id sec_len ... sec_begin ...] sec_end ...
+            // [                safe                ] unsafe (module_end)
+            //                                        ^^ module_curr
+
+            return ret;
         }
-        // check has next section
-        while(module_curr != module_end);
-
-        return ret;
     }
 }  // namespace uwvm2::parser::wasm::binfmt::ver1
 
