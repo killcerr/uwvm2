@@ -104,8 +104,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         auto section_curr{section_begin};
 
-        // ... | name_length ... name ... custombegin ... | section_end
-        //       ^^ section_curr
+        // [before_section ... ] | name_len ... name ... custom_begin ...
+        // [        safe       ] | unsafe (could be the section_end)
+        //                         ^^ section_curr
+
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 name_len{};
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
         auto const [next_name_len, err_name_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
@@ -119,9 +121,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_name_len);
         }
 
-        section_curr = reinterpret_cast<::std::byte const*>(next_name_len);  // safe
-        // ... | name_length ... name ... custombegin ... | section_end
+        // [before_section ... | name_len ...] name ... custom_begin ...
+        // [               safe              ] unsafe (could be the section_end)
         //                       ^^ section_curr
+
+        section_curr = reinterpret_cast<::std::byte const*>(next_name_len);
+        // [before_section ... | name_len ...] name ... custom_begin ...
+        // [               safe              ] unsafe (could be the section_end)
+        //                                     ^^ section_curr
 
         // check name length
         if(static_cast<::std::size_t>(section_end - section_curr) < name_len) [[unlikely]]
@@ -132,13 +139,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        // ... | name_length ... name ... custombegin ... | section_end
-        //                       ^^ section_curr
+        // [before_section ... | name_len ... name ...] custom_begin ...
+        // [               safe                       ] unsafe (could be the section_end)
+        //                                    ^^ section_curr
+
         cs.custom_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), name_len};
 
-        section_curr += name_len;  // safe
-        // ... | name_length ... name ... custombegin ... | section_end
-        //                                ^^ section_curr
+        section_curr += name_len;
+        // [before_section ... | name_len ... name ...] custom_begin ...
+        // [               safe                       ] unsafe (could be the section_end)
+        //                                              ^^ section_curr
 
         // Note that section_curr may be equal to section_end
         // Subsequently you need to check custom_begin with section_end

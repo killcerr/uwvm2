@@ -112,8 +112,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // Note that section_curr may be equal to section_end
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
-        // ... 60 ?? ?? ...
-        //        ^^ section_curr
+        // [... prefix] para_len ... para_begin ... res_len (para_end) ... res_begin ... prefix (res_end) ...
+        // [   safe   ] unsafe (could be the section_end)
+        //              ^^ section_curr
 
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
         using value_type_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> const*;
@@ -134,14 +135,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_para_len);
             }
 
+            // [... prefix para_len ...] para_begin ... res_len (para_end) ... res_begin ... prefix (res_end) ...
+            // [           safe        ] unsafe (could be the section_end)
+            //             ^^ section_curr
+
             section_curr = reinterpret_cast<::std::byte const*>(next_para_len);
             // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
-            // ... 60 length ... length ... ...
-            //               ^^ section_curr
-            // If it's a null return value, there's at least one more parameter, so add 1u
-            if(static_cast<::std::size_t>(section_end - section_curr) < para_len + static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u))
-                [[unlikely]]
+            // [... prefix para_len ...] para_begin ... res_len (para_end) ... res_begin ... prefix (res_end) ...
+            // [           safe        ] unsafe (could be the section_end)
+            //                           ^^ section_curr
+
+            if(static_cast<::std::size_t>(section_end - section_curr) < para_len) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = para_len;
@@ -149,11 +154,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // [... prefix para_len ... para_begin ...] res_len (para_end) ... res_begin ... prefix (res_end) ...
+            // [                 safe                 ] unsafe (could be the section_end)
+            //                          ^^ section_curr
+
             // set parameters
             ft.parameter.begin = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
             section_curr += para_len;
-            // ... 60 length ... length ... ...
-            //                   ^^ section_curr
+
+            // [... prefix para_len ... para_begin ...] res_len (para_end) ... res_begin ... prefix (res_end) ...
+            // [                 safe                 ] unsafe (could be the section_end)
+            //                                          ^^ section_curr
+            //                          ^^ ft.parameter.begin
+            //                                          ^^ ft.parameter.end
+
             ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check handler
@@ -174,6 +188,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // result
         {
+            // [... prefix para_len ... para_begin ...] res_len (para_end) ... res_begin ... prefix (res_end) ...
+            // [                 safe                 ] unsafe (could be the section_end)
+            //                                          ^^ section_curr
+
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 result_len{};
             auto const [next_result_len, err_result_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                   reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
@@ -185,11 +203,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_result_len);
             }
 
+            // [... prefix para_len ... para_begin ... res_len (para_end) ...] res_begin ... prefix (res_end) ...
+            // [                           safe                              ] unsafe (could be the section_end)
+            //                                         ^^ section_curr
+
             section_curr = reinterpret_cast<::std::byte const*>(next_result_len);
             // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
-            // ... 60 length ... length ... ...
-            //                          ^^ section_curr
+            // [... prefix para_len ... para_begin ... res_len (para_end) ...] res_begin ... prefix (res_end) ...
+            // [                           safe                              ] unsafe (could be the section_end)
+            //                                                                 ^^ section_curr
 
             /// @details    In the current version of WebAssembly, the length of the result type vector of a valid function type may be
             ///             at most 1. This restriction may be removed in future versions.
@@ -213,11 +236,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // [... prefix para_len ... para_begin ... res_len (para_end) ... res_begin ...] prefix (res_end) ...
+            // [                           safe                                            ] unsafe (could be the section_end)
+            //                                                                ^^ section_curr
+
             // set parameters
             ft.result.begin = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
             section_curr += result_len;
-            // ... 60 length ... length ... ...
-            //                              ^^ section_curr
+
+            // [... prefix para_len ... para_begin ... res_len (para_end) ... res_begin ...] prefix (res_end) ...
+            // [                           safe                                            ] unsafe (could be the section_end)
+            //                                                                               ^^ section_curr
+            //                                                                ^^ ft.result.begin
+            //                                                                               ^^ ft.result.end
+
             ft.result.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check results
@@ -255,13 +287,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         // Note that section_curr may be equal to section_end, which needs to be checked
 
-        // ... 60 ?? ?? ...
-        //        ^^ section_curr
+        // [... prefix] ...
+        // [   safe   ] unsafe (could be the section_end)
+        //              ^^ section_curr
 
         switch(prefix)
         {
             case ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix::functype:
             {
+                // Note that section_curr may be equal to section_end, which needs to be checked
                 return handle_type_prefix_functype(sec_adl, module_storage, section_curr, section_end, err, fs_para);
             }
             default:
@@ -312,6 +346,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         auto section_curr{section_begin};
 
+        // [before_section ... ] | type_count ... prefix ...
+        // [        safe       ] | unsafe (could be the section_end)
+        //                         ^^ section_curr
+
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_count{};
 
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
@@ -327,18 +365,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(type_count_err);
         }
 
+        // [before_section ... | type_count ...] prefix ...
+        // [             safe                  ] unsafe (could be the section_end)
+        //                       ^^ section_curr
+
         typesec.types.reserve(type_count);
 
         section_curr = reinterpret_cast<::std::byte const*>(type_count_next);  // never out of bounds
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
+        // [before_section ... | type_count ...] prefix ...
+        // [              safe                 ] unsafe (could be the section_end)
+        //                                       ^^ section_curr
+
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
 
         while(section_curr != section_end)
         {
+            // [... prefix] ...
+            // [   safe   ] unsafe (could be the section_end)
+            //      ^^ section_curr
+
             auto const prefix_module_ptr{section_curr};
-            // ... 60 ?? ?? ...
-            //     ^^ section_curr
+            // [... prefix] ...
+            // [   safe   ] unsafe (could be the section_end)
+            //      ^^ prefix_module_ptr
 
             ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix{};
 
@@ -348,8 +399,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // No sense check, never cross the line because (section_curr < section_end)
 
             ++section_curr;
-            // ... 60 ?? ?? ...
-            //        ^^ section_curr
+            // [... prefix] ...
+            // [   safe   ] unsafe (could be the section_end)
+            //              ^^ section_curr
 
             // Note that maybe (section_curr == section_end) now, follow-up needs to be checked (in define_type_prefix_handler)
 
@@ -368,6 +420,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // handle it
             section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr);
         }
+
+        // [... ] (end)
+        // [safe] unsafe (could be the section_end)
+        //        ^^ section_curr
 
         // check type counter match
         if(type_counter != type_count) [[unlikely]]

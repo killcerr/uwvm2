@@ -313,7 +313,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             ::std::byte const* module_curr{module_begin};
 
             // 00 61 73 6D 01 00 00 00 sec_id sec_len ...
-            // unsafe (module_end)
+            // unsafe (could be the module_end)
             // ^^ module_curr
 
             if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::uwvm2::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
@@ -324,7 +324,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             }
 
             // [00 61 73 6D 01 00 00 00] sec_id sec_len ...
-            // [         safe          ] unsafe (module_end)
+            // [         safe          ] unsafe (could be the module_end)
             // ^^ module_curr
 
             // uncheck binfmt version (module_curr + 4uz), user-selected, or auto-detect (in uwvm2/parser/wasm/binfmt/base/base.h)
@@ -332,7 +332,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             module_curr += 8uz;  // safe (8uz)
 
             // [00 61 73 6D 01 00 00 00] sec_id sec_len ...
-            // [         safe          ] unsafe (module_end)
+            // [         safe          ] unsafe (could be the module_end)
             //                           ^^ module_curr
 
             // Note that module_curr may be equal to module_end
@@ -346,19 +346,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             }
 
             // [00 61 73 6D 01 00 00 00 sec_id] sec_len ...
-            // [         safe                 ] unsafe (module_end)
+            // [         safe                 ] unsafe (could be the module_end)
             //                          ^^ module_curr
 
             do {
                 // Each time loop, module_curr is less than module_end.
 
                 // [... sec_id] sec_len ...
-                // [   safe   ] unsafe (module_end)
+                // [   safe   ] unsafe (could be the module_end)
                 //      ^^ module_curr
 
                 auto const sec_id_module_ptr{module_curr};  // for error
                 // [... sec_id] sec_len ...
-                // [   safe   ] unsafe (module_end)
+                // [   safe   ] unsafe (could be the module_end)
                 //      ^^ sec_id_module_ptr
 
                 // get section type
@@ -369,7 +369,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 ++module_curr;
 
                 // [... sec_id] sec_len ... sec_begin ... sec_id (sec_end)
-                // [   safe   ] unsafe (module_end)
+                // [   safe   ] unsafe (could be the module_end)
                 //              ^^ module_curr
 
                 // Note that module_curr may be equal to module_end
@@ -387,14 +387,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 }
 
                 // [... sec_id sec_len ...] sec_begin ... sec_id (sec_end)
-                // [       safe           ] unsafe (module_end)
+                // [       safe           ] unsafe (could be the module_end)
                 //             ^^ module_curr
 
                 // set curr to next
                 module_curr = reinterpret_cast<::std::byte const*>(sec_len_next);
 
                 // [... sec_id sec_len ...] sec_begin ... sec_id (sec_end)
-                // [       safe           ] unsafe (module_end)
+                // [       safe           ] unsafe (could be the module_end)
                 //                          ^^ module_curr
 
                 // check length
@@ -407,13 +407,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 }
 
                 // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
-                // [                safe                ] unsafe (module_end)
+                // [                safe                ] unsafe (could be the module_end)
                 //                         ^^ module_curr
 
                 auto const sec_end{module_curr + sec_len};
                 // Safe memory space from [module_curr, sec_end)
                 // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
-                // [                safe                ] unsafe (module_end)
+                // [                safe                ] unsafe (could be the module_end)
                 //                         ^^ module_curr
                 //                                        ^^ sec_len
 
@@ -423,7 +423,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 module_curr = sec_end;
 
                 // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
-                // [                safe                ] unsafe (module_end)
+                // [                safe                ] unsafe (could be the module_end)
                 //                                        ^^ module_curr
 
                 // No point in checking if dif, module_curr is less than module_end, after ++module_curr in the next round of loops possibly module_curr ==
@@ -439,12 +439,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
             // (module_curr != module_end):
             // [... sec_id sec_len ... sec_begin ... sec_id] ...
-            // [                safe                       ] unsafe (module_end)
+            // [                safe                       ] unsafe (could be the module_end)
             //                                       ^^ module_curr
 
             // (module_curr == module_end):
             // [... sec_id sec_len ... sec_begin ...] sec_end ...
-            // [                safe                ] unsafe (module_end)
+            // [                safe                ] unsafe (could be the module_end)
             //                                        ^^ module_curr
 
             return ret;
