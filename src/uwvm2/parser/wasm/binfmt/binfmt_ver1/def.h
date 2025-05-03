@@ -65,8 +65,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         ::uwvm2::parser::wasm::binfmt::module_span_t module_span{};
         ::fast_io::u8string_view module_name{};
 
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::section::custom_section> custom_sections{};
-
         ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> sections{};
         static_assert(::fast_io::is_tuple<::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...>>);  // check sections is tuple
     };

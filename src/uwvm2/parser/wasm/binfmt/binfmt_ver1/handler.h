@@ -37,7 +37,6 @@ import uwvm2.parser.wasm.standard.wasm1.section;
 import uwvm2.parser.wasm.binfmt.base;
 import :section;
 import :def;
-import :custom_section;
 #else
 // std
 # include <cstddef>
@@ -64,7 +63,6 @@ import :custom_section;
 # include <uwvm2/parser/wasm/binfmt/base/impl.h>
 # include "section.h"
 # include "def.h"
-# include "custom_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -108,7 +106,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         [&vec]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
         { ((vec.push_back(Ty...[I] ::section_id)), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
         ::std::ranges::sort(vec);
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte counter{1u};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte counter{0u};
         for(auto i: vec)
         {
 #if __cpp_contracts >= 202502L
@@ -232,23 +230,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         bool success{};
 
         // llvm can gen jump table here
-        if(section_id ==
-           static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(::uwvm2::parser::wasm::standard::wasm1::section::section_id::custom_sec))
-        {
-            ::uwvm2::parser::wasm::binfmt::ver1::handle_binfmt_ver1_custom_section(module_storage, section_begin, section_end, err, fs_para);
-            success = true;
-        }
-        else
-        {
-            details::handle_all_binfmt_ver1_extensible_section_impl<::std::remove_cvref_t<decltype(secs)>...>(success,
-                                                                                                              module_storage,
-                                                                                                              section_id,
-                                                                                                              section_begin,
-                                                                                                              section_end,
-                                                                                                              err,
-                                                                                                              fs_para,
-                                                                                                              sec_id_module_ptr);
-        }
+
+        details::handle_all_binfmt_ver1_extensible_section_impl<::std::remove_cvref_t<decltype(secs)>...>(success,
+                                                                                                          module_storage,
+                                                                                                          section_id,
+                                                                                                          section_begin,
+                                                                                                          section_end,
+                                                                                                          err,
+                                                                                                          fs_para,
+                                                                                                          sec_id_module_ptr);
 
         if(!success) [[unlikely]]
         {
@@ -312,8 +302,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        do
-        {
+        do {
             // Each time loop, module_curr is less than module_end.
 
             auto const sec_id_module_ptr{module_curr};  // for error

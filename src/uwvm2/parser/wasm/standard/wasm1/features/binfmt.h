@@ -33,6 +33,7 @@ import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :feature_def;
+import :custom_section;
 import :type_section;
 import :import_section;
 #else
@@ -56,6 +57,7 @@ import :import_section;
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
 # include "feature_def.h"
+# include "custom_section.h"
 # include "type_section.h"
 # include "import_section.h"
 #endif
@@ -87,7 +89,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // binfmt ver1
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        using binfmt_ver1_section_type = ::fast_io::tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
+        using binfmt_ver1_section_type = ::fast_io::tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>
                                                           /// @todo
                                                           >;

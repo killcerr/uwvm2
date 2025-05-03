@@ -27,7 +27,6 @@ module;
 export module uwvm2.parser.wasm.binfmt.binfmt_ver1;
 export import :section;
 export import :def;
-export import :custom_section;
 export import :handler;
 
 #ifndef UWVM_MODULE

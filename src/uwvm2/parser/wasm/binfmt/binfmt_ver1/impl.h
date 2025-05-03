@@ -27,6 +27,5 @@
 #ifndef UWVM_MODULE
 # include "section.h"
 # include "def.h"
-# include "custom_section.h"
 # include "handler.h"
 #endif

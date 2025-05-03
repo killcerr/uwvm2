@@ -22,11 +22,11 @@
 
 module;
 
-export module uwvm2.uwvm.wasm.feature:feature;
-
 // std
 # include <type_traits>
 # include <concepts>
+
+export module uwvm2.uwvm.wasm.feature:feature;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

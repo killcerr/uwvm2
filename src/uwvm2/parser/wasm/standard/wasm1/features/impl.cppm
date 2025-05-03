@@ -27,6 +27,7 @@ module;
 export module uwvm2.parser.wasm.standard.wasm1.features;
 export import :def;
 export import :feature_def;
+export import :custom_section;
 export import :type_section;
 export import :import_section;
 export import :binfmt;
