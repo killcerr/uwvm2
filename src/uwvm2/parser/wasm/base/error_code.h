@@ -78,7 +78,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         illegal_importdesc_prefix,
         invalid_type_index,
         illegal_type_index,
-        not_enough_space
+        not_enough_space,
+        table_type_cannot_find_element,
+        table_type_illegal_element,
+        limit_type_cannot_find_flag,
+        limit_type_illegal_flag,
+        limit_type_invalid_min,
+        limit_type_invalid_max,
     };
 
     /// @brief Additional information provided by wasm error, no more than 8 bytes

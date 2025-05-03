@@ -36,6 +36,7 @@ import uwvm2.parser.wasm.standard.wasm1.section;
 import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import :def;
+import :types;
 import :feature_def;
 import :type_section;
 #else
@@ -63,6 +64,7 @@ import :type_section;
 # include <uwvm2/parser/wasm/standard/wasm1/opcode/impl.h>
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
+# include "types.h"
 # include "feature_def.h"
 # include "type_section.h"
 #endif
@@ -152,7 +154,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_table_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        [[maybe_unused]] ::uwvm2::parser::wasm::standard::wasm1::type::table_type & table_r,  // [adl] can be replaced
+        ::uwvm2::parser::wasm::standard::wasm1::type::table_type & table_r,  // [adl] can be replaced
         [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
@@ -160,21 +162,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
         // Note that section_curr may be equal to section_end, which needs to be checked
-        // check here
-        if(static_cast<::std::size_t>(section_end - section_curr) < 1uz) [[unlikely]]
-        {
-            err.err_curr = section_curr;
-            err.err_selectable.err_end = section_end;
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::not_enough_space;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
-
-        // ... descindex value_type ...
-        //               ^^ section_curr
-
-        /// @todo
-
-        return section_curr;
+        return ::uwvm2::parser::wasm::standard::wasm1::features::scan_table_type(table_r, section_curr, section_end, err);
     }
 
     /// @brief Define function for wasm1 external_types
