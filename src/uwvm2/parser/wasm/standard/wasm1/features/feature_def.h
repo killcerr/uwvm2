@@ -126,7 +126,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const* function;
             ::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...> table;
             ::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...> memory;
-            ::uwvm2::parser::wasm::standard::wasm1::type::global_type global;  /// @todo
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> global;
         } storage;
 
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};

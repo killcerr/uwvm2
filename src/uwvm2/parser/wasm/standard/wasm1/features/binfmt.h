@@ -117,6 +117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_extern_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_table_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_memory_type<wasm1>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_global_type<wasm1>);
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
