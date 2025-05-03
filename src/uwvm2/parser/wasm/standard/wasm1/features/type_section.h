@@ -421,7 +421,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr);
         }
 
-        // [... ] (end)
+        // [... ] (section_end)
         // [safe] unsafe (could be the section_end)
         //        ^^ section_curr
 

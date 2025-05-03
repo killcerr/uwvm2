@@ -85,7 +85,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...>> imports{};
 
         inline static constexpr ::std::size_t importdesc_count{
-            static_cast<::std::size_t>(decltype(::uwvm2::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>{}.type)::external_type_end) + 1};
+            static_cast<::std::size_t>(decltype(::uwvm2::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>{}.type)::external_type_end) + 1uz};
         ::fast_io::array<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*>, importdesc_count> importdesc{};
     };
 
@@ -297,8 +297,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                                         ^^ section_curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 import_counter{};  // use for check
-        ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, import_section_storage_t<Fs...>::importdesc_count>
-            importdesc_counter{};  // use for reserve
+        constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
+        ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};  // use for reserve
+        // desc counter
 
         do {
             // Note that section_curr may be equal to section_end
@@ -448,8 +449,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             ::fast_io::freestanding::my_memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
 
-            // desc counter
-            constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
             // importdesc_count never > 256 (max=255+1), convert to unsigned
             if(static_cast<unsigned>(fit.imports.type) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]
             {
@@ -480,6 +479,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
         while(section_curr != section_end);
 
+        // [... ] (section_end)
+        // [safe] unsafe (could be the section_end)
+        //        ^^ section_curr
+
         // check import counter match
         if(import_counter != import_count) [[unlikely]]
         {
@@ -490,7 +493,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        /// @todo reserve and pushback
+        // reserve importsec_importdesc_curr, so can unchecked push_back
+        auto const importsec_importdesc_begin{importsec.importdesc.begin()};
+        auto importsec_importdesc_curr{importsec_importdesc_begin};
+        for(auto importdesc_curr{importdesc_counter.begin()}; importdesc_curr != importdesc_counter.end(); ++importdesc_curr)
+        {
+            importsec_importdesc_curr->reserve(*importdesc_curr);
+            ++importsec_importdesc_curr;
+        }
+
+        // Categorize each import type and then store the
+        // Since importsec.imports will be no subsequent expansion, the address of the it will always be fixed
+        for(auto const& imp_curr: importsec.imports)
+        {
+            auto const imp_curr_imports_type_wasm_byte{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(imp_curr.imports.type)};
+            // imp_curr_imports_type_wasm_byte have been previously checked and never cross the line
+#if __has_cpp_attribute(assume)
+            [[assume(static_cast<unsigned>(imp_curr_imports_type_wasm_byte) < static_cast<unsigned>(importdesc_count))]];
+#endif
+            importsec_importdesc_begin[imp_curr_imports_type_wasm_byte].push_back_unchecked(::std::addressof(imp_curr));
+        }
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
