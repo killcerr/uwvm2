@@ -99,7 +99,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // ^^ curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte flags{};
-        ::fast_io::freestanding::my_memecpy(::std::addressof(flags), curr, sizeof(flags));
+        ::fast_io::freestanding::my_memcpy(::std::addressof(flags), curr, sizeof(flags));
 
         if(flags != 0u && flags != 1u) [[unlikely]]
         {
@@ -212,7 +212,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // ^^ curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte elemtype{};
-        ::fast_io::freestanding::my_memecpy(::std::addressof(elemtype), curr, sizeof(elemtype));
+        ::fast_io::freestanding::my_memcpy(::std::addressof(elemtype), curr, sizeof(elemtype));
 
         // The element type elemtype must be funcref
         if(elemtype != 0x70) [[unlikely]]
