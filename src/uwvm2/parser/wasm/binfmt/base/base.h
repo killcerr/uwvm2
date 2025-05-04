@@ -59,7 +59,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
         ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
-        return ::fast_io::little_endian(temp);
+        static_assert(sizeof(temp) > 1);
+        // Size of temp greater than one requires small end-order conversion
+        temp = ::fast_io::little_endian(temp);
+        return temp;
     }
 
     /// @brief      detect wasm binfmt version

@@ -393,6 +393,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // set section_curr to next
             // No sense check, never cross the line because (section_curr < section_end)
 
+            static_assert(sizeof(prefix) == 1);
+            // Size equal to one does not need to do small end-order conversion
+
             ++section_curr;
             // [... prefix] ...
             // [   safe   ] unsafe (could be the section_end)
