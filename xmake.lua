@@ -182,8 +182,21 @@ function def_build()
 		end
 	)
 
-end
+	after_build(
+		function (target)
+			local enable_static_check = get_config("enable-static-check")
+			if enable_static_check then 
+				import("core.base.task")
+				task.run("project", {kind = "compile_commands", outputdir = "build"})
+				for _, filepath in ipairs(os.files("src/**.cpp", "src/**.cc", "test/**.cpp", "test/**.cc", "src/**.h", "test/**.h")) do
+					print("[clang-tidy] %s", filepath) 
+					os.execv("clang-tidy", {"-p", "build", "-header-filter=.*", filepath})
+				end
+			end
+		end
+	)
 
+end
 target("uwvm")
 	set_kind("binary")
 	def_build()

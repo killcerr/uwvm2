@@ -72,7 +72,7 @@ option("unwindlib", function()
         [[    default: Don't set the "unwindlib" option, use the default unwindlib of clang.]],
         [[    libgcc/libunwind/platform: Set the option "unwindlib" if rtlib is "compiler-rt".]],
         [[    force-libgcc/force-libunwind/force-platform: Always set the "unwindlib" option.]]
-        )
+    )
     set_default("default")
     set_values("default", "libgcc", "libunwind", "platform", "force-libgcc", "force-libunwind", "force-platform")
     add_deps("rtlib")
@@ -168,13 +168,13 @@ option("winmin", function()
         [[    default: Use the default compiler macro definition. In general, MinGW is 0x0A00, MSVC is not defined.]],
         [[    WS25: Windows Server 2025, -D_WIN32_WINNT=0x0A00]],
         [[    WIN11: Windows 11, -D_WIN32_WINNT=0x0A00]],
-        [[    WS22: Windows Server 2022, -D_WIN32_WINNT=0x0A00]],    
-        [[    WS19: Windows Server 2019, -D_WIN32_WINNT=0x0A00]],    
-        [[    WS16: Windows Server 2016, -D_WIN32_WINNT=0x0A00]],    
+        [[    WS22: Windows Server 2022, -D_WIN32_WINNT=0x0A00]],
+        [[    WS19: Windows Server 2019, -D_WIN32_WINNT=0x0A00]],
+        [[    WS16: Windows Server 2016, -D_WIN32_WINNT=0x0A00]],
         [[    WIN10: Windows 10, -D_WIN32_WINNT=0x0A00]],
-        [[    WS12R2: Windows Server 2012 R2, -D_WIN32_WINNT=0x0603]],    
+        [[    WS12R2: Windows Server 2012 R2, -D_WIN32_WINNT=0x0603]],
         [[    WINBLUE: Windows 8.1, -D_WIN32_WINNT=0x0603]],
-        [[    WS12: Windows Server 2012, -D_WIN32_WINNT=0x0602]],    
+        [[    WS12: Windows Server 2012, -D_WIN32_WINNT=0x0602]],
         [[    WIN8: Windows 8, -D_WIN32_WINNT=0x0602]],
         [[    WS08R2: Windows Server 2008 R2, -D_WIN32_WINNT=0x0601]],
         [[    WIN7: Windows 7, -D_WIN32_WINNT=0x0601]],
@@ -199,29 +199,29 @@ option("winmin", function()
     set_values
     (
         "default",
-        "WS25", 
-        "WIN11", 
-        "WS22", 
-        "WS19", 
-        "WS16", 
+        "WS25",
+        "WIN11",
+        "WS22",
+        "WS19",
+        "WS16",
         "WIN10",
-        "WS12R2", 
+        "WS12R2",
         "WINBLUE",
         "WS12",
-        "WIN8", 
-        "WS08R2", 
-        "WIN7",         
-        "WS08", 
-        "VISTA", 
-        "WS03SP1", 
+        "WIN8",
+        "WS08R2",
+        "WIN7",
+        "WS08",
+        "VISTA",
+        "WS03SP1",
         "WINXPSP2",
-        "WS03", 
-        "WINXP", 
+        "WS03",
+        "WINXP",
         "WS2K",
         "WIN2K",
-        "WINME", 
-        "WIN98", 
-        "WIN95", 
+        "WINME",
+        "WIN98",
+        "WIN95",
         "NT400",
         "NT351",
         "NT350",
@@ -247,6 +247,17 @@ option("fno-exceptions", function()
     (
         "The uwvm's wasi relies on the cpp exception. Turn off the cpp exception with this parameter so that it can be used in an environment where exceptions are forbidden. " ..
         "(This option causes the program to crash if some system calls fail, and it will be removed after herbception (P0709) enters the ios c++ standard)",
+        "default = false"
+    )
+    set_default(false)
+end)
+
+-- uwvm static check option
+
+option("enable-static-check", function()
+    set_description
+    (
+        "Enable static check.",
         "default = false"
     )
     set_default(false)
