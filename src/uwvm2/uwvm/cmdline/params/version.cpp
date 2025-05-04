@@ -68,8 +68,8 @@ namespace uwvm2::uwvm::cmdline::paras::details
     }
 
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type version_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                        ::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                        ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
+                                                                                         ::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                         ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
     {
         ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                 // logo

@@ -205,6 +205,8 @@ target("uwvm")
 	-- src
 	add_includedirs("src/")
 
+	add_headerfiles("src/**.h")
+
 	if enable_cxx_module then
 		-- utils
 		add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})

@@ -405,7 +405,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check has func
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
-            
+
             // check type count
             if(++type_counter > type_count) [[unlikely]]
             {
