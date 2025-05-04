@@ -52,32 +52,54 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
 
     inline constexpr bool is_wasm_file_unchecked(::std::byte const* module_curr) noexcept
     {
+        // [00 61 73 6D Version ...] (end)
+        // [           safe        ]
+        //  ^^ module_curr
         return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4uz) == 0;
     }
 
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
     {
+        // [00 61 73 6D Version ...] (end)
+        // [           safe        ] unsafe
+        //              ^^ module_curr
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
         ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
-        return ::fast_io::little_endian(temp);
+        static_assert(sizeof(temp) > 1);
+        // Size of temp greater than one requires small end-order conversion
+        temp = ::fast_io::little_endian(temp);
+        return temp;
     }
 
     /// @brief      detect wasm binfmt version
     /// @return     0 : error, other : binfmt version
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version(::std::byte const* const module_begin,
-                                                                                                ::std::byte const* const module_end) noexcept
+                                                                                                       ::std::byte const* const module_end) noexcept
     {
+        // Checking for invalid pointer parameters
+        if(module_begin > module_end) [[unlikely]] { return 0u; }
+
         ::std::byte const* module_curr{module_begin};
 
+        // 00 61 73 6D Version ... (end)
+        // unsafe
+        // ^^ module_curr
+
+        // Due to wasm magic and versioning, wasm must be greater than or equal to 8
         if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::uwvm2::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
         {
             return 0u;
         }
 
+        // [00 61 73 6D Version ...] (end)
+        // [           safe        ] unsafe
+        //  ^^ module_curr
+
         module_curr += 4uz;
 
-        // 00 61 73 6D 01 00 00 00 ...
-        //             ^^ module_curr
+        // [00 61 73 6D Version ...] (end)
+        // [           safe        ] unsafe
+        //              ^^ module_curr
 
         auto const binfmt_ver{detect_wasm_binfmt_version_unchecked(module_curr)};
 

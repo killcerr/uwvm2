@@ -110,19 +110,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* byte_end{};
     };
 
-    // func
-    inline constexpr bool is_valid_value_type(value_type type) noexcept
-    {
-        switch(type)
-        {
-            case value_type::i32: [[fallthrough]];
-            case value_type::i64: [[fallthrough]];
-            case value_type::f32: [[fallthrough]];
-            case value_type::f64: return true;
-            default: return false;
-        }
-    }
-
     template <::std::integral char_type>
     inline constexpr auto get_value_name(value_type valtype) noexcept
     {

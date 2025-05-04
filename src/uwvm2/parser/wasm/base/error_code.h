@@ -44,13 +44,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     enum class wasm_parse_error_code : ::std::uint_least32_t
     {
         ok = 0u,
+        illegal_begin_pointer,
         illegal_wasm_file_format,
         no_wasm_section_found,
         invalid_section_length,
         illegal_section_length,
-        no_enough_space,
+        not_enough_space_unmarked,
         illegal_section_id,
         invalid_custom_name_length,
+        illegal_custom_name_length,
         invalid_parameter_length,
         illegal_parameter_length,
         illegal_value_type,
@@ -72,9 +74,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_import_extern_name_length,
         import_extern_name_length_cannot_be_zero,
         import_extern_name_too_length,
+        import_missing_import_type,
         illegal_importdesc_prefix,
         invalid_type_index,
         illegal_type_index,
+        not_enough_space,
+        table_type_cannot_find_element,
+        table_type_illegal_element,
+        limit_type_cannot_find_flag,
+        limit_type_illegal_flag,
+        limit_type_invalid_min,
+        limit_type_invalid_max,
+        global_type_cannot_find_valtype,
+        global_type_illegal_valtype,
+        global_type_cannot_find_mut,
+        global_type_illegal_mut
     };
 
     /// @brief Additional information provided by wasm error, no more than 8 bytes

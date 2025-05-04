@@ -1,13 +1,15 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2 License (see LICENSE file).      *
  *************************************************************/
 
 /**
+ * @brief       WebAssembly Release 1.0 (2019-07-20)
+ * @details     antecedent dependency: null
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-09
+ * @date        2025-05-03
  * @copyright   APL-2 License
  */
 
@@ -23,10 +25,16 @@
 module;
 
 // std
-# include <type_traits>
-# include <concepts>
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <memory>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.uwvm.wasm.feature:feature;
+export module uwvm2.parser.wasm.standard.wasm1.features:types;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -35,4 +43,4 @@ export module uwvm2.uwvm.wasm.feature:feature;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "feature.h"
+#include "types.h"

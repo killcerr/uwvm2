@@ -87,6 +87,51 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         return splice_feature_parameter<Fs...>();
     }
 
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval void check_has_duplicate_feature_parameter() noexcept
+    {
+        // Check for duplicate Fs, wasm feature cannot be duplicated
+        []<::std::size_t... I1>(::std::index_sequence<I1...>) constexpr noexcept
+        {
+            ((
+                 []<::uwvm2::parser::wasm::concepts::wasm_feature F1>() constexpr noexcept
+                 {
+                     if constexpr(has_feature_parameter<F1>)
+                     {
+                         bool has{};
+                         [&has]<::std::size_t... I2>(::std::index_sequence<I2...>) constexpr noexcept
+                         {
+                             ((
+                                  [&has]<::uwvm2::parser::wasm::concepts::wasm_feature F2>() constexpr noexcept
+                                  {
+                                      if constexpr(has_feature_parameter<F2>)
+                                      {
+                                          if constexpr(::std::same_as<typename F1::parameter, typename F2::parameter>)
+                                          {
+#if __cpp_contracts >= 202502L
+                                              contract_assert(!has);
+#else
+                                              if(has) { ::fast_io::fast_terminate(); }
+#endif
+                                              has = true;  // itself
+                                          }
+                                      }
+                                  }.template operator()<Fs...[I2]>()),
+                              ...);
+                         }(::std::make_index_sequence<sizeof...(Fs)>{});
+                     }
+                 }.template operator()<Fs...[I1]>()),
+             ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool check_has_duplicate_feature_parameter_ret_true() noexcept
+    {
+        check_has_duplicate_feature_parameter<Fs...>();
+        return true;
+    }
+
     /// @brief      It must be the same as the previous definition (in root.h), so static_assert is used
     /// @details    feature_parameter_t<Fs...> is used to store those parameters used to control feature parsing, such as whether or not to start the parsing
     ///             function, and is passed as a constant reference.
@@ -95,17 +140,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     template <typename... Fs>
     struct feature_parameter_t
     {
-        static_assert((::uwvm2::parser::wasm::concepts::wasm_feature<Fs> && ...), "Fs is not wasm feature");  // check is wasm feature
-        using storage_t = splice_feature_parameter_t<Fs...>;                                           // ::fast_io::tuple
-        static_assert(::fast_io::is_tuple<storage_t>, "storage_t is not fast_io::tuple");                     // check is tuple
-
+        using storage_t = splice_feature_parameter_t<Fs...>;  // ::fast_io::tuple
         storage_t parameters{};
+
+        static_assert((::uwvm2::parser::wasm::concepts::wasm_feature<Fs> && ...), "Fs is not wasm feature");  // check is wasm feature
+        static_assert(::fast_io::is_tuple<storage_t>, "storage_t is not fast_io::tuple");                     // check is tuple
+        static_assert(check_has_duplicate_feature_parameter_ret_true<Fs...>());                               // check no duplicate
     };
 
     /// @brief get feature parameter type from wasm feature tuple
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline consteval auto get_feature_parameter_type_from_tuple(::fast_io::tuple<Fs...>) noexcept
     {
+        check_has_duplicate_feature_parameter<Fs...>();
         return feature_parameter_t<Fs...>{};
     }
 
@@ -113,6 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     template <::uwvm2::parser::wasm::concepts::wasm_feature Fc, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr auto&& get_curr_feature_parameter(feature_parameter_t<Fs...> & fs_para) noexcept
     {
+        check_has_duplicate_feature_parameter<Fs...>();
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
         return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
@@ -121,6 +169,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     template <::uwvm2::parser::wasm::concepts::wasm_feature Fc, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr auto&& get_curr_feature_parameter(feature_parameter_t<Fs...> const& fs_para) noexcept
     {
+        check_has_duplicate_feature_parameter<Fs...>();
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
         return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
@@ -129,6 +178,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     template <::uwvm2::parser::wasm::concepts::wasm_feature Fc, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr auto&& get_curr_feature_parameter(feature_parameter_t<Fs...> && fs_para) noexcept
     {
+        check_has_duplicate_feature_parameter<Fs...>();
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
         return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
@@ -137,6 +187,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     template <::uwvm2::parser::wasm::concepts::wasm_feature Fc, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr auto&& get_curr_feature_parameter(feature_parameter_t<Fs...> const&& fs_para) noexcept
     {
+        check_has_duplicate_feature_parameter<Fs...>();
         static_assert(has_feature_parameter<Fc> && (::std::same_as<Fs, Fc> || ...));  // Check if Fc has feature parameter and if it is one of the Fs
         using fc_para = typename Fc::parameter;
         return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);

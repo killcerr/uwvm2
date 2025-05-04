@@ -85,13 +85,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils
                                                                ::std::uint_least32_t state) noexcept
         {
             constexpr auto point{::fast_io::char_literal_v<u8'.', char_type>};
+            // [x ... '.' y ... '.' z ... '.' state ...] (end)
+            // [                 safe                  ] unsafe
+            // ^^ curr_pos
             char_type* curr_pos{::fast_io::pr_rsv_to_iterator_unchecked(iter, x)};
+            // [x ... '.' y ... '.' z ... '.' state ...] (end)
+            // [                 safe                  ] unsafe
+            //        ^^ curr_pos
             *curr_pos = point;
+            // [x ... '.' y ... '.' z ... '.' state ...] (end)
+            // [                 safe                  ] unsafe
+            //        ^^ curr_pos
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, y);
+            // [x ... '.' y ... '.' z ... '.' state ...] (end)
+            // [                 safe                  ] unsafe
+            //            ^^ ++curr_pos
+            //                  ^^ (ret) curr_pos
             *curr_pos = point;
+            // [x ... '.' y ... '.' z ... '.' state ...] (end)
+            // [                 safe                  ] unsafe
+            //                  ^^ curr_pos
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, z);
+            // [x ... '.' y ... '.' z ... '.' state ...] (end)
+            // [                 safe                  ] unsafe
+            //                      ^^ ++curr_pos
+            //                            ^^ (ret) curr_pos
             *curr_pos = point;
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, state);
+            // [x ... '.' y ... '.' z ... '.' state ...] (end)
+            // [                 safe                  ] unsafe
+            //                                ^^ ++curr_pos
+            //                                           ^^ (ret) curr_pos
             return curr_pos;
         }
     }  // namespace details

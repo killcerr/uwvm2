@@ -88,9 +88,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                ::std::byte const* section_curr,
                                                ::std::byte const* const section_end,
                                                ::uwvm2::parser::wasm::base::error_impl& err,
+                                               ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
                                                ::std::byte const* const prefix_module_ptr) {
         {
-            define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end, err, prefix_module_ptr)
+            define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr)
         } -> ::std::same_as<::std::byte const*>;
     };
 
@@ -109,9 +110,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                  ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                  ::std::byte const* section_curr,
                  ::std::byte const* const section_end,
-                 ::uwvm2::parser::wasm::base::error_impl& err) {
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
             {
-                define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err)
+                define_extern_prefix_imports_handler(sec_adl, fit.imports, module_storage, section_curr, section_end, err, fs_para)
             } -> ::std::same_as<::std::byte const*>;
         };
 
@@ -122,14 +124,58 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         union storage_t
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const* function;
-            ::uwvm2::parser::wasm::standard::wasm1::type::table_type table;    /// @todo
-            ::uwvm2::parser::wasm::standard::wasm1::type::memory_type memory;  /// @todo
-            ::uwvm2::parser::wasm::standard::wasm1::type::global_type global;  /// @todo
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...> table;
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...> memory;
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> global;
         } storage;
 
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};
     };
 
+    /// @brief Define functions for handle imports table
+    template <typename... Fs>
+    concept has_extern_imports_table_handler =
+        requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...>& fit_imports,
+                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+            {
+                extern_imports_table_handler(sec_adl, fit_imports.storage.table, module_storage, section_curr, section_end, err, fs_para)
+            } -> ::std::same_as<::std::byte const*>;
+        };
+
+    /// @brief Define functions for handle imports memory
+    template <typename... Fs>
+    concept has_extern_imports_memory_handler =
+        requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...>& fit_imports,
+                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+            {
+                extern_imports_memory_handler(sec_adl, fit_imports.storage.memory, module_storage, section_curr, section_end, err, fs_para)
+            } -> ::std::same_as<::std::byte const*>;
+        };
+
+    /// @brief Define functions for handle imports global
+    template <typename... Fs>
+    concept has_extern_imports_global_handler =
+        requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...>& fit_imports,
+                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+            {
+                extern_imports_global_handler(sec_adl, fit_imports.storage.global, module_storage, section_curr, section_end, err, fs_para)
+            } -> ::std::same_as<::std::byte const*>;
+        };
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 #ifndef UWVM_MODULE

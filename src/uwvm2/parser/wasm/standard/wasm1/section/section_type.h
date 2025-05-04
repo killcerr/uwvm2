@@ -218,6 +218,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::section
     };
 }  // namespace uwvm2::parser::wasm::standard::wasm1::section
 
+/// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>

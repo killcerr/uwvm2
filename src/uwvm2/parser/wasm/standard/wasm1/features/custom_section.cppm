@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2 License (see LICENSE file).      *
@@ -9,7 +9,7 @@
  * @details     antecedent dependency: null
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-19
+ * @date        2025-05-03
  * @copyright   APL-2 License
  */
 
@@ -30,13 +30,11 @@ module;
 #include <concepts>
 #include <type_traits>
 #include <utility>
-#include <vector>
-#include <algorithm>
 #include <memory>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.parser.wasm.binfmt.binfmt_ver1:custom_section;
+export module uwvm2.parser.wasm.standard.wasm1.features:custom_section;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -46,4 +44,3 @@ export module uwvm2.parser.wasm.binfmt.binfmt_ver1:custom_section;
 #endif
 
 #include "custom_section.h"
-

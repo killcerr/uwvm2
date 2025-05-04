@@ -48,6 +48,27 @@ import uwvm.wasm.storage;
 # include <uwvm2/uwvm/wasm/storage/impl.h>
 #endif
 
+struct Sec0
+{
+    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec0"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{0};
+
+    // Expand on Sec1 here
+};
+
+template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+inline constexpr void handle_binfmt_ver1_extensible_section_define(
+    ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec0>>,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+    [[maybe_unused]] ::std::byte const* section_begin,
+    [[maybe_unused]] ::std::byte const* section_end,
+    ::uwvm2::parser::wasm::base::error_impl&,
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
+    ::std::byte const* const)
+{
+    ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test0\n");
+}
+
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
@@ -76,7 +97,7 @@ struct Feature1
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    using binfmt_ver1_section_type = ::fast_io::tuple<Sec1<Fs...>>;
+    using binfmt_ver1_section_type = ::fast_io::tuple<Sec0, Sec1<Fs...>>;
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -151,8 +172,8 @@ root:                    wasm
 binfmt:           binfmt_ver1(binfmt1)
                  /             |        \.
 featurs:       Feature1     Feature2   Feature3
-                 |          /      \
-sections:      Sec1(ext) Sec2(ext) Sec3
+               /    \         /     \
+sections:   Sec0 Sec1(ext) Sec2(ext) Sec3
 */
 
 int main()
@@ -175,6 +196,15 @@ int main()
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
     ::uwvm2::parser::wasm::base::error_impl e{};
+
+    ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, u8"sec0:\n");
+    ::uwvm2::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1,
+                                                                                   0,
+                                                                                   nullptr,
+                                                                                   nullptr,
+                                                                                   e,
+                                                                                   wasm_binfmt1_feature_parameter,
+                                                                                   nullptr);
 
     ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, u8"sec1:\n");
     ::uwvm2::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1,

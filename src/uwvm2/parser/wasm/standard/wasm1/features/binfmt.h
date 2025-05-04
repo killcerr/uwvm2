@@ -33,6 +33,7 @@ import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :feature_def;
+import :custom_section;
 import :type_section;
 import :import_section;
 #else
@@ -56,6 +57,7 @@ import :import_section;
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
 # include "feature_def.h"
+# include "custom_section.h"
 # include "type_section.h"
 # include "import_section.h"
 #endif
@@ -74,25 +76,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // type section
         using value_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-                                                                              ::uwvm2::parser::wasm::standard::wasm1::type::value_type>;
+                                                                                     ::uwvm2::parser::wasm::standard::wasm1::type::value_type>;
         using type_prefix = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-                                                                               ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix>;
+                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix>;
 
         // import section (template)
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        using extern_type =
-            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement, wasm1_final_extern_type<Fs...>>;
+        using extern_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                      wasm1_final_extern_type<Fs...>>;
+        using table_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                     ::uwvm2::parser::wasm::standard::wasm1::type::table_type>;
+        using memory_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::memory_type>;
+        using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::global_type>;
 
         // binfmt ver1
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        using binfmt_ver1_section_type = ::fast_io::tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
+        using binfmt_ver1_section_type = ::fast_io::tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>
                                                           /// @todo
                                                           >;
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<wasm1>, ::fast_io::tuple<Fs...>) noexcept
+    inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<wasm1>,
+                                                                ::fast_io::tuple<Fs...>) noexcept
     {
         return ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>;
     }
@@ -105,6 +115,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix<wasm1>);
     // import section
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_extern_type<wasm1>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_table_type<wasm1>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_memory_type<wasm1>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_global_type<wasm1>);
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features

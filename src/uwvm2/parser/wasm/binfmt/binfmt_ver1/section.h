@@ -58,6 +58,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     template <typename Feature, typename... Fs>
     concept has_binfmt_ver1_section_define = ::fast_io::is_tuple<typename Feature::binfmt_ver1_section_type>;
 
+    /// @brief  Merge sections together with a tuple merger, supports template extensions.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Features>
     inline consteval auto splice_section_storage_structure() noexcept
     {

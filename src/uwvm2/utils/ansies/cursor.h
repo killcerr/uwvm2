@@ -69,6 +69,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
         inline constexpr char_type* crs_print_reserve_impl(char_type* iter, crs::cursor_variables cv, ::std::uint_least32_t f) noexcept
         {
             ::fast_io::freestanding::my_memcpy(iter, u8"\033[", 2uz);
+            // memory copy
             char_type* curr_pos{iter + 2uz};
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(curr_pos, f);
             *curr_pos = static_cast<char_type>(cv);

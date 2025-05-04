@@ -57,6 +57,11 @@ import :section;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
+    /// @brief      Structures are specialized to store wasm binfmt ver1's module
+    /// @details    module_span: The entire scope of the module, due to the 0-copy technique used by the interpreter, has to continuously open the file mapping
+    ///             module_name: The name of the module, the main module does not need to specify the name, using the path name, but the import module needs to
+    ///                          specify the name for the import
+    ///             sections:    Stores a tuple of all sections, which are merged together and can be extended by templates.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct wasm_binfmt_ver1_module_extensible_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
@@ -64,15 +69,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
         ::uwvm2::parser::wasm::binfmt::module_span_t module_span{};
         ::fast_io::u8string_view module_name{};
-
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::section::custom_section> custom_sections{};
-
         ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> sections{};
+
         static_assert(::fast_io::is_tuple<::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...>>);  // check sections is tuple
     };
 
 }  // namespace uwvm2::parser::wasm::binfmt::ver1
 
+/// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
