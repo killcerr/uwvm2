@@ -308,6 +308,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // unsafe (could be the module_end)
             // ^^ module_curr
 
+            // Short-circuit summation, safe
             if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::uwvm2::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
             {
                 err.err_curr = module_curr;
@@ -347,6 +348,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // unsafe (could be the module_end)
             // ^^ module_curr
 
+            // Short-circuit summation, safe
             if(static_cast<::std::size_t>(module_end - module_curr) < 8uz || !::uwvm2::parser::wasm::binfmt::is_wasm_file_unchecked(module_curr)) [[unlikely]]
             {
                 err.err_curr = module_curr;
