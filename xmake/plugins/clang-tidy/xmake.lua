@@ -40,4 +40,4 @@ task("clang-tidy")
         end
     end)
 
-    set_menu {usage = "xmake clang-tidy", description = "Run clang-tidy", options = {}} 
+    set_menu {usage = "xmake clang-tidy", description = "Run clang-tidy on all code.", options = {}} 
