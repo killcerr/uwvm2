@@ -3,20 +3,17 @@ task("static-check")
     set_category("plugin")
 
     on_run(function ()
-        import("lib.detect.find_tool")
         import("core.base.task")
         import("core.base.json")
-        import("core.base.process")
         import("core.base.scheduler")
-        local tool = find_tool("clang-tidy")
+        import("async.runjobs")
 		task.run("project", {kind = "compile_commands", outputdir = "build"})
-        files = {}
+        local files = {}
 		for _, v in ipairs(json.loadfile("build/compile_commands.json")) do 
             table.insert(files, v["file"])
         end
-        results = {}
-        coro = {}
-        for _, filepath in ipairs(files) do 
+        local results = {}
+        runjobs("clang-tidy",function (index) 
             function run(filepath) 
                 try
                 {
@@ -36,14 +33,11 @@ task("static-check")
                     }
                 }
             end
-            while scheduler:co_count() > 5 do
-            end
-            table.insert(coro, scheduler.co_start(run,filepath))
-        end
-        for _, co in ipairs(coro) do 
-            while not co==dead do
-            end
+            run(files[index])
+        end, {total = #files, comax = 8})
+        for filepath, content in pairs(results) do 
+            printf("[clang-tidy] %s\n%s\n", filepath, content)
         end
     end)
 
-    set_menu {usage = "xmake static-check [options]", description = "Static check", options = {}} 
+    set_menu {usage = "xmake static-check", description = "Static check", options = {}} 
