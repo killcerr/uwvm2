@@ -15,7 +15,6 @@ ImplementationFileExtensions:
 HeaderFilterRegex: ''
 ExcludeHeaderFilterRegex: ''
 FormatStyle:     none
-User:            fangjiaze
 CheckOptions:
   cert-arr39-c.WarnOnSizeOfCompareToConstant: 'false'
   cert-arr39-c.WarnOnSizeOfConstant: 'false'

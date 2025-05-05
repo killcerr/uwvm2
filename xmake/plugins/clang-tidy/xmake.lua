@@ -1,4 +1,4 @@
-task("static-check")
+task("clang-tidy")
 
     set_category("plugin")
 
@@ -40,4 +40,4 @@ task("static-check")
         end
     end)
 
-    set_menu {usage = "xmake static-check", description = "Static check", options = {}} 
+    set_menu {usage = "xmake clang-tidy", description = "Run clang-tidy on all code.", options = {}} 
