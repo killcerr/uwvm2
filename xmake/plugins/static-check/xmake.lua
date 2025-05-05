@@ -34,7 +34,7 @@ task("static-check")
                 }
             end
             run(files[index])
-        end, {total = #files, comax = 8})
+        end, {total = #files, comax = os.default_njob()})
         for filepath, content in pairs(results) do 
             printf("[clang-tidy] %s\n%s\n", filepath, content)
         end
