@@ -1,4 +1,4 @@
-task("static-check")
+task("clang-tidy")
 
     set_category("plugin")
 
