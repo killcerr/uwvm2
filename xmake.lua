@@ -14,6 +14,8 @@ set_allowedplats("windows", "mingw", "linux", "djgpp", "unix", "bsd", "freebsd",
 includes("xmake/impl.lua")
 includes("xmake/platform/impl.lua")
 
+add_plugindirs("xmake/plugins")
+
 set_defaultmode("releasedbg")
 set_allowedmodes(support_rules_table)
 
@@ -183,7 +185,6 @@ function def_build()
 	)
 
 end
-
 target("uwvm")
 	set_kind("binary")
 	def_build()
