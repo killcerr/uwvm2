@@ -252,13 +252,3 @@ option("fno-exceptions", function()
     set_default(false)
 end)
 
--- uwvm static check option
-
-option("enable-static-check", function()
-    set_description
-    (
-        "Enable static check.",
-        "default = false"
-    )
-    set_default(false)
-end)

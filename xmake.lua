@@ -14,6 +14,8 @@ set_allowedplats("windows", "mingw", "linux", "djgpp", "unix", "bsd", "freebsd",
 includes("xmake/impl.lua")
 includes("xmake/platform/impl.lua")
 
+add_plugindirs("xmake/plugins")
+
 set_defaultmode("releasedbg")
 set_allowedmodes(support_rules_table)
 
@@ -179,20 +181,6 @@ function def_build()
             	    function() return nil end -- 任何异常都捕获并返回 nil
             	}
         	}
-		end
-	)
-
-	after_build(
-		function (target)
-			local enable_static_check = get_config("enable-static-check")
-			if enable_static_check then 
-				import("core.base.task")
-				task.run("project", {kind = "compile_commands", outputdir = "build"})
-				for _, filepath in ipairs(os.files("src/**.cpp", "src/**.cc", "test/**.cpp", "test/**.cc", "src/**.h", "test/**.h")) do
-					print("[clang-tidy] %s", filepath) 
-					os.execv("clang-tidy", {"-p", "build", "-header-filter=.*", filepath})
-				end
-			end
 		end
 	)
 
