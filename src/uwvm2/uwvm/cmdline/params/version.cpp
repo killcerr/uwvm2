@@ -68,8 +68,8 @@ namespace uwvm2::uwvm::cmdline::paras::details
     }
 
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type version_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                        ::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                        ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
+                                                                                         ::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                         ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
     {
         ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                 // logo
@@ -242,6 +242,9 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 #elif defined(__x86_64__) || defined(_M_AMD64)
                                 u8"x86_64"
+# if defined(__APX_F__)
+                                u8" (APX)"
+# endif
 #elif defined(__i386__) || defined(_M_IX86)
 # if defined(__MINGW32__) || defined(_MSC_VER)
                                 u8"i686"
@@ -412,9 +415,6 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 # if defined(__AVX512VBMI__)
                                 u8"AVX512VBMI "
-# endif
-# if defined(__APX_F__)
-                                u8"APX "
 # endif
 #elif defined(__VECTOR4DOUBLE__) || defined(__VSX__) || (defined(__ALTIVEC__) || defined(__VEC__))
                                 u8"\nSIMD support: PPC SIMD"

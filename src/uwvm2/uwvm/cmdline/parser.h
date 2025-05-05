@@ -177,9 +177,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                         return parsing_return_val::returnm1;
                     }
 
-                    wasm_file_ppos = ::std::addressof(pr.emplace_back_unchecked(fast_io::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
-                                                                                nullptr,
-                                                                                ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg));  // wasm file
+                    wasm_file_ppos =
+                        ::std::addressof(pr.emplace_back_unchecked(fast_io::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
+                                                                   nullptr,
+                                                                   ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg));  // wasm file
 
                     for(++curr_argv; curr_argv != argv_end; ++curr_argv)
                     {
@@ -267,8 +268,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                         constexpr ::std::size_t shortest_path_stack_size{parameter_max_name_size + parameter_max_name_size * 4u / 10u + 1u};
 
                         // Calculate the shortest path distance
-                        if(auto const dp_res{
-                               ::uwvm2::utils::cmdline::shortest_path<shortest_path_stack_size>(curr_pr->str.data(), curr_pr->str.size(), j.str.data(), j.str.size())};
+                        if(auto const dp_res{::uwvm2::utils::cmdline::shortest_path<shortest_path_stack_size>(curr_pr->str.data(),
+                                                                                                              curr_pr->str.size(),
+                                                                                                              j.str.data(),
+                                                                                                              j.str.size())};
                            dp_res <= test_size)
                         {
                             f_test_str = j.str;
@@ -279,7 +282,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     if(f_test_str.empty())
                     {
                         // The most similar parameters were not found
-                        ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
+                        ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                            u8"\n");
                     }
                     else
                     {

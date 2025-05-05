@@ -84,7 +84,10 @@ namespace uwvm2::uwvm::cmdline::paras::details
         // Setting the argument is already taken
         currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
-        if(auto const currp1_str{currp1->str}; currp1_str == u8"bare") { ::uwvm2::uwvm::wasm::storage::execute_wasm_abi = ::uwvm2::uwvm::wasm::base::abi::bare; }
+        if(auto const currp1_str{currp1->str}; currp1_str == u8"bare")
+        {
+            ::uwvm2::uwvm::wasm::storage::execute_wasm_abi = ::uwvm2::uwvm::wasm::base::abi::bare;
+        }
         else if(currp1_str == u8"emscripten") { ::uwvm2::uwvm::wasm::storage::execute_wasm_abi = ::uwvm2::uwvm::wasm::base::abi::emscripten; }
         else if(currp1_str == u8"wasip1") { ::uwvm2::uwvm::wasm::storage::execute_wasm_abi = ::uwvm2::uwvm::wasm::base::abi::wasip1; }
         else if(currp1_str == u8"wasip2") { ::uwvm2::uwvm::wasm::storage::execute_wasm_abi = ::uwvm2::uwvm::wasm::base::abi::wasip2; }
