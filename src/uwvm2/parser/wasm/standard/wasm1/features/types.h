@@ -118,7 +118,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::freestanding::my_memcpy(::std::addressof(flags), curr, sizeof(flags));
 
         static_assert(sizeof(flags) == 1);
-        // Size equal to one does not need to do small end-order conversion
+        // Size equal to one does not need to do little-endian conversion
 
         if(flags != 0u && flags != 1u) [[unlikely]]
         {
@@ -238,7 +238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::freestanding::my_memcpy(::std::addressof(elemtype), curr, sizeof(elemtype));
 
         static_assert(sizeof(elemtype) == 1);
-        // Size equal to one does not need to do small end-order conversion
+        // Size equal to one does not need to do little-endian conversion
 
         // The element type elemtype must be funcref
         if(elemtype != 0x70) [[unlikely]]
@@ -326,7 +326,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::freestanding::my_memcpy(::std::addressof(gvt), curr, sizeof(gvt));
 
         static_assert(sizeof(gvt) == 1);
-        // Size equal to one does not need to do small end-order conversion
+        // Size equal to one does not need to do little-endian conversion
 
         if(!is_valid_value_type(gvt)) [[unlikely]]
         {
@@ -360,7 +360,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::freestanding::my_memcpy(::std::addressof(mut), curr, sizeof(mut));
 
         static_assert(sizeof(mut) == 1);
-        // Size equal to one does not need to do small end-order conversion
+        // Size equal to one does not need to do little-endian conversion
 
         if(mut > 1) [[unlikely]]
         {

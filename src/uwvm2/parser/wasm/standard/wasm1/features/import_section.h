@@ -474,7 +474,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::fast_io::freestanding::my_memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
 
             static_assert(sizeof(fit.imports.type) == 1);
-            // Size equal to one does not need to do small end-order conversion
+            // Size equal to one does not need to do little-endian conversion
 
             // importdesc_count never > 256 (max=255+1), convert to unsigned
             if(static_cast<unsigned>(fit.imports.type) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]

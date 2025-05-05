@@ -399,7 +399,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 ::fast_io::freestanding::my_memcpy(::std::addressof(sec_id), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte));
 
                 static_assert(sizeof(sec_id) == 1);
-                // Size equal to one does not need to do small end-order conversion
+                // Size equal to one does not need to do little-endian conversion
 
                 // get section length
                 ++module_curr;
