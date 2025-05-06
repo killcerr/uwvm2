@@ -27,6 +27,12 @@
 
 /// @brief std and windows.h macro
 
+#ifndef UWVM2_UTILS_MACRO_PUSH_MACROS_H
+# define UWVM2_UTILS_MACRO_PUSH_MACROS_H
+# include <cstdint>
+# include <climits>
+#endif
+
 #pragma push_macro("erase")
 #undef erase
 
