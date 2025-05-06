@@ -21,6 +21,7 @@
  ****************************************/
 
 #include <memory>
+#include <utility>
 
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>

@@ -26,6 +26,7 @@ module;
 #include <cstdint>
 #include <cstddef>
 #include <concepts>
+# include <utility>
 
 export module uwvm2.utils.ansies:win32_text_attr;
 

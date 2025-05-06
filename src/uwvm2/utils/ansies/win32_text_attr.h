@@ -31,6 +31,7 @@ import fast_io;
 #  include <cstdint>
 #  include <cstddef>
 #  include <concepts>
+# include <utility>
 // import
 #  include <fast_io.h>
 # endif
