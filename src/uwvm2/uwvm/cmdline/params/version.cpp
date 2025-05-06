@@ -54,24 +54,31 @@ import uwvm2.uwvm.utils.install_path;
 
 namespace uwvm2::uwvm::cmdline::paras::details
 {
-    template <::uwvm2::parser::wasm::concepts::has_feature_name F0, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
-    inline void version_print_wasm_feature_impl() noexcept
+    template <typename Stm, ::uwvm2::parser::wasm::concepts::has_feature_name F0, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
+    inline void version_print_wasm_feature_impl(Stm&& stm) noexcept
     {
-        ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"        ", F0::feature_name);
-        if constexpr(sizeof...(Fs) != 0) { version_print_wasm_feature_impl<Fs...>(); }
+        ::fast_io::io::perrln(::std::forward<Stm>(stm), u8"        ", F0::feature_name);
+        if constexpr(sizeof...(Fs) != 0) { version_print_wasm_feature_impl<Stm, Fs...>(::std::forward<Stm>(stm)); }
     }
 
-    template <::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
-    inline void version_print_wasm_feature_from_tuple(::fast_io::tuple<Fs...>) noexcept
+    template <typename Stm, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
+    inline void version_print_wasm_feature_from_tuple(Stm&& stm, ::fast_io::tuple<Fs...>) noexcept
     {
-        version_print_wasm_feature_impl<Fs...>();
+        version_print_wasm_feature_impl<Stm, Fs...>(::std::forward<Stm>(stm));
     }
 
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type version_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                          ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                          ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
     {
-        ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+        // No copies will be made here.
+        auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
+        // Add raii locks while unlocking operations
+        ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
+        // No copies will be made here.
+        auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
+
+        ::fast_io::io::perr(u8log_output_ul,
                                 // logo
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), 
                                 u8"\n",
@@ -617,9 +624,9 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"\n"
             );
         // wasm feature
-        version_print_wasm_feature_from_tuple(::uwvm2::uwvm::wasm::feature::all_features);
+        version_print_wasm_feature_from_tuple(u8log_output_ul, ::uwvm2::uwvm::wasm::feature::all_features);
         // end ln
-        ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output);
+        ::fast_io::io::perrln(u8log_output_ul);
 
         return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
     }

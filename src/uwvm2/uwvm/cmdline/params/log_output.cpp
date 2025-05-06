@@ -88,11 +88,8 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #if !defined(__AVR__) && !((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
     !(defined(__NEWLIB__) && !defined(__CYGWIN__))
         // win32 and posix
-        if(auto currp1_str{currp1->str}; currp1_str == u8"out")
-        {
-            ::uwvm2::uwvm::u8log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8out()};
-        }
-        else if(currp1_str == u8"err") { ::uwvm2::uwvm::u8log_output = ::fast_io::u8native_file{::fast_io::io_dup, ::fast_io::u8err()}; }
+        if(auto currp1_str{currp1->str}; currp1_str == u8"out") { ::uwvm2::uwvm::u8log_output.reopen(::fast_io::io_dup, ::fast_io::u8out()); }
+        else if(currp1_str == u8"err") { ::uwvm2::uwvm::u8log_output.reopen(::fast_io::io_dup, ::fast_io::u8err()); }
         else if(currp1_str == u8"file")
         {
             auto currp2{para_curr + 2};
@@ -129,7 +126,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 
             try
             {
-                ::uwvm2::uwvm::u8log_output = ::fast_io::u8native_file{currp2_str, ::fast_io::open_mode::out};
+                ::uwvm2::uwvm::u8log_output.reopen(currp2_str, ::fast_io::open_mode::out);
             }
             catch(::fast_io::error e)
             {
@@ -183,19 +180,19 @@ namespace uwvm2::uwvm::cmdline::paras::details
         if(auto const currp1_str{currp1->str}; currp1_str == u8"out")
         {
 # if defined(__AVR__)
-            ::uwvm2::uwvm::u8log_output = ::fast_io::u8c_stdout();
+            ::uwvm2::uwvm::u8log_output.reopen(::fast_io::u8c_stdout());
 # elif ((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__)) ||                                   \
      (defined(__NEWLIB__) && !defined(__CYGWIN__))
-            ::uwvm2::uwvm::u8log_output = ::fast_io::u8out();
+            ::uwvm2::uwvm::u8log_output.reopen(::fast_io::u8out());
 # endif
         }
         else if(currp1_str == u8"err")
         {
 # if defined(__AVR__)
-            ::uwvm2::uwvm::u8log_output = ::fast_io::u8c_stderr();
+            ::uwvm2::uwvm::u8log_output.reopen(::fast_io::u8c_stderr());
 # elif ((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__)) ||                                   \
      (defined(__NEWLIB__) && !defined(__CYGWIN__))
-            ::uwvm2::uwvm::u8log_output = ::fast_io::u8err();
+            ::uwvm2::uwvm::u8log_output.reopen(::fast_io::u8err());
 # endif
         }
         else
