@@ -84,7 +84,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         // No copies will be made here.
         auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
         // Add raii locks while unlocking operations
-        ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
+        ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
+            ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
         // No copies will be made here.
         auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
 
@@ -221,11 +222,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     // If a signed integer is required for a subsequent argument,
                     // marking one bit back as occupied_arg prevents the negative sign from being misidentified as an argument prefix.
 
-                    if(para->pretreatment) 
-                    { 
+                    if(para->pretreatment)
+                    {
                         // Unlock with function call
                         ::fast_io::operations::decay::unlock_stream_ref_decay_lock_guard u8log_output_ulg{u8log_output_lg};
-                        para->pretreatment(curr_argv, argv_end, pr); 
+                        para->pretreatment(curr_argv, argv_end, pr);
                     }
                 }
             }
@@ -295,9 +296,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     if(f_test_str.empty())
                     {
                         // The most similar parameters were not found
-                        ::fast_io::io::perr(u8log_output_ul,
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                            u8"\n");
+                        ::fast_io::io::perr(u8log_output_ul, ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL), u8"\n");
                     }
                     else
                     {
@@ -352,7 +351,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
                 if(auto const cb{curr_pr->para->handle}; cb != nullptr)
                 {
-                    ::uwvm2::utils::cmdline::parameter_return_type res; // No initialization necessary
+                    ::uwvm2::utils::cmdline::parameter_return_type res;  // No initialization necessary
 
                     {
                         // Unlock with function call

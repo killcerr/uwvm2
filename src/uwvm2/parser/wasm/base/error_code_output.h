@@ -82,18 +82,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Unknown Error.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -120,18 +120,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Unknown Error.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -158,18 +158,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Unknown Error.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -196,18 +196,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Unknown Error.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -234,18 +234,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Unknown Error.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -276,12 +276,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: [info] There are no errors.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -302,12 +302,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: [info] There are no errors.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -328,12 +328,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: [info] There are no errors.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -354,12 +354,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: [info] There are no errors.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -380,12 +380,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: [info] There are no errors.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -410,24 +410,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "Begin Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\" > End Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_selectable.err_end),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -461,21 +461,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
                         ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                         UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                          L"uwvm: ",
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                         UWVM_WIN32_TEXTATTR_RED,
                                                                          L"[error] ",
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                         UWVM_WIN32_TEXTATTR_WHITE,
                                                                          L"Begin Pointer \"",
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                         UWVM_WIN32_TEXTATTR_CYAN,
                                                                          ::fast_io::mnp::pointervw(errout.err.err_curr),
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                         UWVM_WIN32_TEXTATTR_WHITE,
                                                                          L"\" > End Pointer \"",
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                         UWVM_WIN32_TEXTATTR_CYAN,
                                                                          ::fast_io::mnp::pointervw(errout.err.err_selectable.err_end),
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                         UWVM_WIN32_TEXTATTR_WHITE,
                                                                          L"\".",
-                                                                         ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                         UWVM_WIN32_TEXTATTR_RST_ALL);
                         return;
                     }
 #endif
@@ -507,24 +507,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"Begin Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\" > End Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_selectable.err_end),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -557,24 +557,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"Begin Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\" > End Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_selectable.err_end),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -607,24 +607,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"Begin Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\" > End Pointer \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::pointervw(errout.err.err_selectable.err_end),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -660,18 +660,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal WebAssembly file format.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -698,18 +698,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal WebAssembly file format.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -736,18 +736,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal WebAssembly file format.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -774,18 +774,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal WebAssembly file format.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -812,18 +812,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal WebAssembly file format.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -854,18 +854,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") No WebAssembly sections found.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -892,18 +892,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") No WebAssembly sections found.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -930,18 +930,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") No WebAssembly sections found.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -968,18 +968,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") No WebAssembly sections found.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1006,18 +1006,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") No WebAssembly sections found.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1048,18 +1048,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Section Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1086,18 +1086,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Section Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1124,18 +1124,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Section Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1162,18 +1162,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Section Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1200,18 +1200,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Section Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1242,22 +1242,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Section Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1288,22 +1288,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Section Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1334,22 +1334,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Section Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1380,22 +1380,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Section Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1426,22 +1426,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Section Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1476,18 +1476,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Not enough space left.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1514,18 +1514,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Not enough space left.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1552,18 +1552,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Not enough space left.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1590,18 +1590,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Not enough space left.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1628,18 +1628,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Not enough space left.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1670,22 +1670,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Section ID: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1716,22 +1716,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Section ID: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1762,22 +1762,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Section ID: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1808,22 +1808,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Section ID: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1854,22 +1854,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Section ID: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1904,18 +1904,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Custom Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1942,18 +1942,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Custom Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -1980,18 +1980,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Custom Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2018,18 +2018,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Custom Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2056,18 +2056,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Custom Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2098,22 +2098,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Custom Name Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2144,22 +2144,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Custom Name Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2190,22 +2190,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Custom Name Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2236,22 +2236,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Custom Name Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2282,22 +2282,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Custom Name Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2332,18 +2332,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Parameter Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2370,18 +2370,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Parameter Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2408,18 +2408,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Parameter Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2446,18 +2446,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Parameter Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2484,18 +2484,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Parameter Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2527,22 +2527,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Parameter Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2573,22 +2573,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Parameter Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2619,22 +2619,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Parameter Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2665,22 +2665,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Parameter Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2711,22 +2711,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Parameter Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2761,22 +2761,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Value Type: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2807,22 +2807,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Value Type: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2853,22 +2853,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Value Type: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2899,22 +2899,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Value Type: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2945,22 +2945,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Value Type: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -2995,18 +2995,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Result Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3033,18 +3033,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Result Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3071,18 +3071,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Result Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3109,18 +3109,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Result Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3147,18 +3147,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Result Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3190,22 +3190,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Result Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3236,22 +3236,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Result Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3282,22 +3282,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Result Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3328,22 +3328,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Result Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3374,22 +3374,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Result Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3424,19 +3424,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                 "uwvm: ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                UWVM_WIN32_TEXTATTR_RED,
                                 "[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                UWVM_WIN32_TEXTATTR_WHITE,
                                 "(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 ") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3464,19 +3464,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                 L"uwvm: ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                UWVM_WIN32_TEXTATTR_RED,
                                 L"[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                UWVM_WIN32_TEXTATTR_WHITE,
                                 L"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 L") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3504,19 +3504,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                 u8"uwvm: ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                UWVM_WIN32_TEXTATTR_RED,
                                 u8"[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                UWVM_WIN32_TEXTATTR_WHITE,
                                 u8"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 u8") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3544,19 +3544,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                 u"uwvm: ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                UWVM_WIN32_TEXTATTR_RED,
                                 u"[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                UWVM_WIN32_TEXTATTR_WHITE,
                                 u"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 u") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3584,19 +3584,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                 U"uwvm: ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                UWVM_WIN32_TEXTATTR_RED,
                                 U"[error] ",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                UWVM_WIN32_TEXTATTR_WHITE,
                                 U"(offset=",
                                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                 U") In the WebAssembly Release 1.0 (2019-07-20), the length of the result type vector of a valid function type may be at most 1. This restriction may be removed in future versions.",
-                                ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3628,22 +3628,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Type Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3674,22 +3674,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Type Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3720,22 +3720,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Type Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3766,22 +3766,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Type Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3812,22 +3812,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Type Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3862,22 +3862,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Duplicate WebAssembly Section: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3908,22 +3908,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Duplicate WebAssembly Section: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -3954,22 +3954,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Duplicate WebAssembly Section: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4000,22 +4000,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Duplicate WebAssembly Section: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4046,22 +4046,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Duplicate WebAssembly Section: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4096,18 +4096,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Type Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4134,18 +4134,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Type Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4172,18 +4172,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Type Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4210,18 +4210,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Type Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4248,18 +4248,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Type Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4290,22 +4290,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") The number of types resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4336,22 +4336,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") The number of types resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4382,22 +4382,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") The number of types resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4428,22 +4428,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") The number of types resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4474,22 +4474,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") The number of types resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4524,26 +4524,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") The number of types resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4578,26 +4578,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") The number of types resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4632,26 +4632,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") The number of types resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4686,26 +4686,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") The number of types resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4740,26 +4740,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") The number of types resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4798,26 +4798,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") The \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\" section must appear before \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\" section.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4852,26 +4852,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") The \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\" section must appear before \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\" section.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4906,26 +4906,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") The \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\" section must appear before \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\" section.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -4960,26 +4960,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") The \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\" section must appear before \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\" section.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5014,26 +5014,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") The \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\" section must appear before \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u8arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\" section.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5072,18 +5072,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Import Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5110,18 +5110,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Import Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5148,18 +5148,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Import Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5186,18 +5186,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Import Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5224,18 +5224,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Import Count.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5266,22 +5266,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") The number of imports resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5312,22 +5312,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") The number of imports resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5358,22 +5358,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") The number of imports resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5404,22 +5404,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") The number of imports resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5450,22 +5450,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") The number of imports resolved exceeded the actual number: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5500,26 +5500,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") The number of imports resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5554,26 +5554,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") The number of imports resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5608,26 +5608,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") The number of imports resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5662,26 +5662,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") The number of imports resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5716,26 +5716,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") The number of imports resolved \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32arr[0],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\" does not match the actual number \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_LT_GREEN),
+                                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
                                                                              errout.err.err_selectable.u32arr[1],
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5774,18 +5774,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Module Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5812,18 +5812,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Module Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5850,18 +5850,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Module Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5888,18 +5888,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Module Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5926,18 +5926,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Module Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -5968,18 +5968,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Imported module name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6006,18 +6006,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Imported module name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6044,18 +6044,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Imported module name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6082,18 +6082,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Imported module name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6120,18 +6120,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Imported module name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6162,22 +6162,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Imported Module Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6208,22 +6208,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Imported Module Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6254,22 +6254,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Imported Module Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6300,22 +6300,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Imported Module Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6346,22 +6346,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Imported Module Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6396,18 +6396,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Imported Extern Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6434,18 +6434,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Imported Extern Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6472,18 +6472,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Imported Extern Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6510,18 +6510,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Imported Extern Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6548,18 +6548,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Imported Extern Name Length.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6590,18 +6590,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Imported extern name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6628,18 +6628,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Imported extern name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6666,18 +6666,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Imported extern name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6704,18 +6704,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Imported extern name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6742,18 +6742,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Imported extern name should not have strings of length 0.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6784,22 +6784,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Imported Extern Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6830,22 +6830,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Imported Extern Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6876,22 +6876,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Imported Extern Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6922,22 +6922,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Imported Extern Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -6968,22 +6968,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Imported Extern Name Too Length: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7018,18 +7018,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Cannot Find Import Type.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7056,18 +7056,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Cannot Find Import Type.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7094,18 +7094,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Cannot Find Import Type.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7132,18 +7132,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Cannot Find Import Type.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7170,18 +7170,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Cannot Find Import Type.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7212,22 +7212,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Importdesc Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7258,22 +7258,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Importdesc Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7304,22 +7304,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Importdesc Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7350,22 +7350,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Importdesc Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7396,22 +7396,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Importdesc Prefix: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7446,18 +7446,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Type Index.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7484,18 +7484,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Type Index.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7522,18 +7522,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Type Index.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7560,18 +7560,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Type Index.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7598,18 +7598,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Type Index.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7640,22 +7640,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Type Index: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7686,22 +7686,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Type Index: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7732,22 +7732,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Type Index: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7778,22 +7778,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Type Index: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7824,22 +7824,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Type Index: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              errout.err.err_selectable.u32,
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7874,22 +7874,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Not Enough Space, remaining: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7920,22 +7920,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Not Enough Space, remaining: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -7966,22 +7966,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Not Enough Space, remaining: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8012,22 +8012,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Not Enough Space, remaining: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8058,22 +8058,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Not Enough Space, remaining: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::addrvw(errout.err.err_selectable.err_end - errout.err.err_curr),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8108,18 +8108,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Cannot find element.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8146,18 +8146,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Cannot find element.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8184,18 +8184,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Cannot find element.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8222,18 +8222,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Cannot find element.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8260,18 +8260,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Cannot find element.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8303,22 +8303,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Element: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8349,22 +8349,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Element: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8395,22 +8395,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Element: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8441,22 +8441,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Element: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8487,22 +8487,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Element: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8537,18 +8537,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Cannot Find Flags.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8575,18 +8575,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Cannot Find Flags.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8613,18 +8613,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Cannot Find Flags.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8651,18 +8651,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Cannot Find Flags.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8689,18 +8689,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Cannot Find Flags.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8732,22 +8732,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Flag: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8778,22 +8778,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Flag: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8824,22 +8824,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Flag: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8870,22 +8870,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Flag: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8916,22 +8916,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Flag: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -8966,18 +8966,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Minimum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9004,18 +9004,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Minimum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9042,18 +9042,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Minimum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9080,18 +9080,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Minimum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9118,18 +9118,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Minimum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9160,18 +9160,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Invalid Maximum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9198,18 +9198,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Invalid Maximum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9236,18 +9236,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Invalid Maximum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9274,18 +9274,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Invalid Maximum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9312,18 +9312,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Invalid Maximum Limit.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9354,18 +9354,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Cannot Find Valtype.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9392,18 +9392,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Cannot Find Valtype.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9430,18 +9430,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Cannot Find Valtype.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9468,18 +9468,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Cannot Find Valtype.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9506,18 +9506,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Cannot Find Valtype.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9548,22 +9548,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Value Type In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9594,22 +9594,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Value Type In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9640,22 +9640,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Value Type In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9686,22 +9686,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Value Type In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9732,22 +9732,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Value Type In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9782,18 +9782,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Cannot Find Mut.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9820,18 +9820,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Cannot Find Mut.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9858,18 +9858,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Cannot Find Mut.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9896,18 +9896,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Cannot Find Mut.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9934,18 +9934,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Cannot Find Mut.",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -9976,22 +9976,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              "uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              "[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              ") Illegal Mut In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              "\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -10022,22 +10022,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              L"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              L"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              L") Illegal Mut In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              L"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -10068,22 +10068,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u8"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u8"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u8") Illegal Mut In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u8"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -10114,22 +10114,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              u"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              u"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              u") Illegal Mut In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              u"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }
@@ -10160,22 +10160,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
                                  ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>>)
                     {
-                        if(static_cast<bool>(errout.flag.win32_use_text_attr))
+                        if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                                              U"uwvm: ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RED),
+                                                                             UWVM_WIN32_TEXTATTR_RED,
                                                                              U"[error] ",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"(offset=",
                                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
                                                                              U") Illegal Mut In Global: \"",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_CYAN),
+                                                                             UWVM_WIN32_TEXTATTR_CYAN,
                                                                              ::fast_io::mnp::hex0x<true>(errout.err.err_selectable.u8),
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_WHITE),
+                                                                             UWVM_WIN32_TEXTATTR_WHITE,
                                                                              U"\".",
-                                                                             ::fast_io::mnp::cond(enable_ansi, UWVM_WIN32_TEXTATTR_RST_ALL));
+                                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
                             return;
                         }
                     }

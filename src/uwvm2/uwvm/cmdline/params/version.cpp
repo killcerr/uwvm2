@@ -75,7 +75,8 @@ namespace uwvm2::uwvm::cmdline::paras::details
         // No copies will be made here.
         auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
         // Add raii locks while unlocking operations
-        ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
+        ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
+            ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
         // No copies will be made here.
         auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
 
