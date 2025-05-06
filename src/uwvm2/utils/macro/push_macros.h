@@ -25,13 +25,10 @@
 
 // #pragma once
 
-/// @brief std and windows.h macro
+/// @brief This file defines those header files that can only be imported once in push_macro. h
+#include "push_macros_include_header_pragma_once.h"
 
-#ifndef UWVM2_UTILS_MACRO_PUSH_MACROS_H
-# define UWVM2_UTILS_MACRO_PUSH_MACROS_H
-# include <cstdint>
-# include <climits>
-#endif
+/// @brief std and windows.h macro
 
 #pragma push_macro("erase")
 #undef erase
