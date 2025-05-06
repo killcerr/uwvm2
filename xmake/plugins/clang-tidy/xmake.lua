@@ -20,9 +20,9 @@ task("clang-tidy")
                     function ()
                         local tmp = os.tmpfile()
                         os.execv("clang-tidy", {"-p", "build", "-header-filter=.*", filepath}, {stdout = tmp, stderr = tmp})
-                        scheduler.co_lock("static-check")
+                        scheduler.co_lock("clang-tidy")
                         results[filepath] = io.readfile(tmp)
-                        scheduler.co_unlock("static-check")
+                        scheduler.co_unlock("clang-tidy")
                         os.rm(tmp)
                     end,
                     catch
