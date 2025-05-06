@@ -215,7 +215,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
 # if defined(__linux__) && defined(__NR_madvise)
         // linux syscall
         ::fast_io::system_call<__NR_madvise, int>(addr, length, static_cast<int>(flag));
-# elif _POSIX_C_SOURCE >= 200112L
+# elif !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE >= 200112L
         // The madvise function first appeared in 4.4BSD.  The posix_madvise function
         // is part of IEEE 1003.1-2001 and was first implemented in Mac OS X 10.2.
 
