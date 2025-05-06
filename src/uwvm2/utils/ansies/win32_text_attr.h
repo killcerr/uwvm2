@@ -119,14 +119,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
         text_attr attr{};
     };
 
-    template <::std::integral char_type, typename s>
-    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, win32_text_attr>, s && stm, win32_text_attr attr) noexcept
+    template <::std::integral char_type, typename Stm>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, win32_text_attr>, Stm && stm, win32_text_attr attr) noexcept
     {
-        static_assert(::std::same_as<::std::remove_cvref_t<s>, ::fast_io::basic_nt_io_observer<char_type>> ||
-                      ::std::same_as<::std::remove_cvref_t<s>, ::fast_io::basic_zw_io_observer<char_type>> ||
-                      ::std::same_as<::std::remove_cvref_t<s>, ::fast_io::basic_win32_family_io_observer<::fast_io::win32_family::wide_nt, char_type>> ||
-                      ::std::same_as<::std::remove_cvref_t<s>, ::fast_io::basic_win32_family_io_observer<::fast_io::win32_family::ansi_9x, char_type>>);
-        ::fast_io::win32::SetConsoleTextAttribute(::std::forward<s>(stm).native_handle(), static_cast<::std::int_least32_t>(attr.attr));
+        static_assert(::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_nt_io_observer<char_type>> ||
+                      ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>> ||
+                      ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_win32_family_io_observer<::fast_io::win32_family::wide_nt, char_type>> ||
+                      ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_win32_family_io_observer<::fast_io::win32_family::ansi_9x, char_type>>);
+        ::fast_io::win32::SetConsoleTextAttribute(::std::forward<Stm>(stm).native_handle(), static_cast<::std::int_least32_t>(attr.attr));
     }
 }  // namespace uwvm2::utils::ansies
 
