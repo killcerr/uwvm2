@@ -29,7 +29,7 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/utils/ansies/ansi_push_macro.h>
-#include "wasm_code_color_push_macro.h"
+# include <uwvm2/utils/ansies/win32_text_attr_push_macro.h>
 
 export module uwvm2.parser.wasm.base:error_code_output;
 
