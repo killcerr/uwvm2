@@ -133,8 +133,66 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         functionsec.sec_span.sec_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_begin);
         functionsec.sec_span.sec_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_end);
 
-        /// @todo
-        ::fast_io::fast_terminate();
+        auto section_curr{section_begin};
+
+        // [before_section ... ] | func_count typeidx1 ...
+        // [        safe       ] | unsafe (could be the section_end)
+        //                         ^^ section_curr
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_count{};
+
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+        auto const [func_count_next, func_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                              reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                              ::fast_io::mnp::leb128_get(func_count))};
+
+        if(func_count_err != ::fast_io::parse_code::ok) [[unlikely]]
+        {
+            err.err_curr = section_curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_func_count;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(func_count_err);
+        }
+
+        // [before_section ... | func_count ...] prefix ...
+        // [             safe                  ] unsafe (could be the section_end)
+        //                       ^^ section_curr
+
+        functionsec.funcs.reserve(func_count);
+
+        section_curr = reinterpret_cast<::std::byte const*>(func_count_next);  // never out of bounds
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
+        // [before_section ... | func_count ...] prefix ...
+        // [              safe                 ] unsafe (could be the section_end)
+        //                                       ^^ section_curr
+
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
+
+        while(section_curr != section_end)
+        {
+            // Ensuring the existence of valid information
+
+            // [before_section ... | func_count ... prefix] ...
+            // [                   safe                   ] unsafe (could be the section_end)
+            //                                      ^^ section_curr
+
+            // check function counter
+            // Ensure content is available before counting (section_curr != section_end)
+            if(++func_counter > func_count) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = func_count;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            /// @todo
+            ::fast_io::fast_terminate();
+        }
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
