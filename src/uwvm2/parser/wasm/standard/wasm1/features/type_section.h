@@ -377,9 +377,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         while(section_curr != section_end)
         {
+            // Ensuring the existence of valid information
+
             // [... prefix] ...
             // [   safe   ] unsafe (could be the section_end)
             //      ^^ section_curr
+
+            // check type counter
+            // Ensure content is available before counting (section_curr != section_end)
+            if(++type_counter > type_count) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = type_count;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
 
             auto const prefix_module_ptr{section_curr};
             // [... prefix] ...
@@ -405,15 +417,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check has func
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
-
-            // check type count
-            if(++type_counter > type_count) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_selectable.u32 = type_count;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::type_section_resolved_exceeded_the_actual_number;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
 
             // handle it
             section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr);

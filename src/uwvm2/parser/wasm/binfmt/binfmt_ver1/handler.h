@@ -382,8 +382,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [         safe                 ] unsafe (could be the module_end)
             //                          ^^ module_curr
 
+            // First loop with module_curr != module_end, so can use do-while. 
+
             do {
-                // Each time loop, module_curr is less than module_end.
+                // existence of valid information
+
+                // Each time loop, module_curr is less than module_end. 
 
                 // [... sec_id] sec_len ...
                 // [   safe   ] unsafe (could be the module_end)

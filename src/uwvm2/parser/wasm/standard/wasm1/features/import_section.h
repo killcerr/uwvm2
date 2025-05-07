@@ -324,12 +324,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
         ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};  // use for reserve
         // desc counter
+        
+        while(section_curr != section_end)
+        {
+            // Ensuring the existence of valid information
 
-        do {
-            // Note that section_curr may be equal to section_end
-            // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+            // [...  module_namelen] ... module_name ... extern_namelen ... extern_name ... import_type extern_func ...
+            // [       safe        ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-            ::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> fit{};
+            // check import counter
+            // Ensure content is available before counting (section_curr != section_end)
             if(++import_counter > import_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
@@ -338,9 +343,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            // [... ] module_namelen ... module_name ... extern_namelen ... extern_name ... import_type extern_func ...
-            // [safe] unsafe (could be the section_end)
-            //        ^^ section_curr
+            // storage fit (need move)
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> fit{};
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 module_namelen{};
             auto const [module_namelen_next, module_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
@@ -504,7 +508,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             importsec.imports.push_back_unchecked(::std::move(fit));
         }
-        while(section_curr != section_end);
 
         // [... ] (section_end)
         // [safe] unsafe (could be the section_end)
