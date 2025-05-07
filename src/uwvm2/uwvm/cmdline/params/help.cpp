@@ -152,11 +152,29 @@ namespace uwvm2::uwvm::cmdline::paras::details
         // No copies will be made here.
         auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
 
-        auto currp1{para_curr + 1};
+        // [... curr] ...
+        // [  safe  ] unsafe (could be the module_end)
+        //      ^^ para_curr
+
+        auto currp1{para_curr + 1u};
+
+        // [... curr] ...
+        // [  safe  ] unsafe (could be the module_end)
+        //            ^^ currp1
 
         // Check for out-of-bounds and not-argument
         if(currp1 == para_end || currp1->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
+            // (currp1 == para_end):
+            // [... curr] (end) ...
+            // [  safe  ] unsafe (could be the module_end)
+            //            ^^ currp1
+
+            // (currp1->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg):
+            // [... curr para] ...
+            // [     safe    ] unsafe (could be the module_end)
+            //           ^^ currp1
+
             ::fast_io::io::perr(u8log_output_ul,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n");
@@ -198,6 +216,10 @@ namespace uwvm2::uwvm::cmdline::paras::details
 
             return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
         }
+
+        // [... curr arg1] ...
+        // [     safe     ] unsafe (could be the module_end)
+        //           ^^ currp1
 
         currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
