@@ -110,7 +110,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 
         if(currp1_str == u8"detect")
         {
-            ::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver = 0;
+            ::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u);
             return ::uwvm2::utils::cmdline::parameter_return_type::def;
         }
 
