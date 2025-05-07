@@ -40,6 +40,8 @@ import fast_io;
 #  define UWVM_MODULE_EXPORT
 # endif
 
+/// @brief In win7 to win95, cmd does not support ansi escape sequence
+
 UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
 {
     enum class text_attr : ::std::int_least32_t
