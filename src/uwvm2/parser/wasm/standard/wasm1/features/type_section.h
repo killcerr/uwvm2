@@ -116,7 +116,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
 
-        // For safety, add parentheses to indicate the scope
+        // Add scope space to prevent subsequent access to variables that should not be accessed
+        
         // parameter
         {
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 para_len{};
