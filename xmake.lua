@@ -228,7 +228,7 @@ target("uwvm")
 target_end()
 
 -- test unit
-for _, file in ipairs(os.files("test/non-platform-specific/**.cc")) do
+for _, file in ipairs(os.files("test/**.cc")) do
     local name = path.basename(file)
     target(name)
         set_kind("binary")

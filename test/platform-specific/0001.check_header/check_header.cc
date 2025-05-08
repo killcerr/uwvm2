@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2 License (see LICENSE file).      *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-03
+ * @date        2025-04-12
  * @copyright   APL-2 License
  */
 
@@ -20,25 +20,35 @@
  *                                      *
  ****************************************/
 
-#pragma once
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include <concepts>
+#include <memory>
 
-#ifdef UWVM_MODULE
-#else
-// std
-# include <cstdint>
-# include <cstddef>
-# include <type_traits>
-# include <concepts>
-# include <bit>
-// macro
-# include <uwvm2/parser/wasm/feature/feature_push_macro.h>
+#include <uwvm2/uwvm/crtmain/impl.h>
+
+int main()
+{
+    /// @brief Check if all headers are popped out
+
+#ifdef UWVM_DLLIMPORT
+    static_assert(false);
 #endif
 
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+#ifdef UWVM_WASM_SUPPORT_WASM1
+    static_assert(false);
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::proposal::custom_page_size::value_type {
-}  // namespace uwvm2::parser::wasm::proposal::custom_page_size::value_type
+#ifdef UWVM_AES_RST_ALL
+    static_assert(false);
+#endif
 
-# include <uwvm2/parser/wasm/feature/feature_pop_macro.h>
+#ifdef UWVM_COLOR_RST_ALL
+    static_assert(false);
+#endif
+
+#ifdef UWVM_WIN32_TEXTATTR_RST_ALL
+    static_assert(false);
+#endif
+}

@@ -47,3 +47,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::proposal::half_precision::valu
 #endif
 
 }  // namespace uwvm2::parser::wasm::proposal::half_precision::value_type
+
+# include <uwvm2/parser/wasm/feature/feature_pop_macro.h>

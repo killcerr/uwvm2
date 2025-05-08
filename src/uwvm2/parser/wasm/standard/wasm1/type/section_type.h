@@ -297,3 +297,5 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
         inline static constexpr bool value = true;
     };
 }  // namespace fast_io::freestanding
+
+# include <uwvm2/parser/wasm/feature/feature_pop_macro.h>
