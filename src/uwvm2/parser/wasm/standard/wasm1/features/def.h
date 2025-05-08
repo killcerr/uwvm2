@@ -327,9 +327,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct final_local_function_type
     {
-        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
-
         final_function_type<Fs...> const* func_type{};
+        
+        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
 
         bool is_exported{};
     };

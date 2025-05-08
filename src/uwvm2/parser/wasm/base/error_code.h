@@ -91,6 +91,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         global_type_illegal_mut,
         invalid_func_count,
         func_section_resolved_exceeded_the_actual_number,
+        func_section_resolved_not_match_the_actual_number,
     };
 
     /// @brief Additional information provided by wasm error, no more than 8 bytes

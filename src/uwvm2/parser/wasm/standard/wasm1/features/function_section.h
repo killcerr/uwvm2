@@ -87,15 +87,104 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>> funcs{};
     };
 
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* scan_function_section_nonsimd_impl(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
+    {
+        auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+        ::std::size_t const type_section_count{typesec.types.size()};
+
+        auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t<Fs...>>(module_storage.sections)};
+
+        // Since all subsequent ones are pushback_unchecked, the capacity will not grow, so end is used to denote the end of the buffer
+        auto const functionsec_funcs_end{functionsec.funcs.imp.end_ptr};
+
+        // assert before: (static_cast<::std::size_t>(functionsec_funcs_end - functionsec.funcs.cbegin()) == func_count);
+
+        // [before_section ... | func_count ...] typeidx1 ... typeidx2 ...
+        // [              safe                 ] unsafe (could be the section_end)
+        //                                       ^^ section_curr
+
+        while(section_curr != section_end)
+        {
+            // Ensuring the existence of valid information
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // check function counter
+            // Ensure content is available before counting (section_curr != section_end)
+            if(functionsec.funcs.cend() == functionsec_funcs_end) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = static_cast<::std::uint_least32_t>(static_cast<::std::size_t>(functionsec_funcs_end - functionsec.funcs.cbegin()));
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx{};
+
+            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+            auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                            ::fast_io::mnp::leb128_get(typeidx))};
+
+            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+            }
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // check: type_index should less than type_section_count
+            if(typeidx >= type_section_count) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = typeidx;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            functionsec.funcs.emplace_back_unchecked(typesec.types.cbegin() + typeidx);
+
+            section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //                     ^^ section_curr
+        }
+
+        // [before_section ... | func_count ... typeidx1 ... ...] (end)
+        // [                       safe                         ] unsafe (could be the section_end)
+        //                                                        ^^ section_curr
+
+        return section_curr;
+    }
+
     /// @brief Define the handler function for type_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t<Fs...>> sec_adl,
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
@@ -155,43 +244,40 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(func_count_err);
         }
 
-        // [before_section ... | func_count ...] prefix ...
+        // [before_section ... | func_count ...] typeidx1 ...
         // [             safe                  ] unsafe (could be the section_end)
         //                       ^^ section_curr
 
         functionsec.funcs.reserve(func_count);
 
+        // Since all subsequent ones are pushback_unchecked, the capacity will not grow, so end is used to denote the end of the buffer
+        auto const functionsec_funcs_end{functionsec.funcs.imp.end_ptr};
+
+        // Since the internal end is to be used later, check to see if it is the size of the counter
+        UWVM_ASSERT(static_cast<::std::size_t>(functionsec_funcs_end - functionsec.funcs.cbegin()) == func_count);
+
         section_curr = reinterpret_cast<::std::byte const*>(func_count_next);  // never out of bounds
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
-        // [before_section ... | func_count ...] prefix ...
+        // [before_section ... | func_count ...] typeidx1 ...
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
-        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+        // handle it
+        section_curr = scan_function_section_nonsimd_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para);
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
+        // [before_section ... | func_count ... typeidx1 ... ...] (end)
+        // [                       safe                         ] unsafe (could be the section_end)
+        //                                                        ^^ section_curr
 
-        while(section_curr != section_end)
+        // check function counter match
+        if(functionsec.funcs.cend() != functionsec_funcs_end) [[unlikely]]
         {
-            // Ensuring the existence of valid information
-
-            // [before_section ... | func_count ... prefix] ...
-            // [                   safe                   ] unsafe (could be the section_end)
-            //                                      ^^ section_curr
-
-            // check function counter
-            // Ensure content is available before counting (section_curr != section_end)
-            if(++func_counter > func_count) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_selectable.u32 = func_count;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
-
-            /// @todo
-            ::fast_io::fast_terminate();
+            err.err_curr = section_curr;
+            err.err_selectable.u32arr[0] = static_cast<::std::uint_least32_t>(functionsec.funcs.size());
+            err.err_selectable.u32arr[1] = func_count;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_not_match_the_actual_number;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features

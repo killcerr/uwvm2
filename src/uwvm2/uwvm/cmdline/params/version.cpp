@@ -550,6 +550,8 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"cloudlibc"
 #elif defined(__UCLIBC__)
                                 u8"uClibc"
+#elif defined(__OHOS__)
+                                u8"OpenHarmony"
 #elif defined(__CRTL_VER)
                                 u8"VMS"
 #elif defined(__LIBREL__)
