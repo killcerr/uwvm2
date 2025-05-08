@@ -23,5 +23,6 @@
 /// @brief This file defines those header files that can only be imported once in push_macro. h
 
 #pragma once
+
 #include <cstdint>
 #include <climits>
