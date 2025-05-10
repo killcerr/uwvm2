@@ -88,7 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr ::std::byte const* scan_function_section_nonsimd_impl(
+    inline constexpr ::std::byte const* scan_function_section_sequence_impl(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t<Fs...>> sec_adl,
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
@@ -264,7 +264,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                                       ^^ section_curr
 
         // handle it
-        section_curr = scan_function_section_nonsimd_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para);
+        section_curr = scan_function_section_sequence_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para);
 
         // [before_section ... | func_count ... typeidx1 ... ...] (end)
         // [                       safe                         ] unsafe (could be the section_end)
