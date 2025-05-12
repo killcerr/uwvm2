@@ -313,11 +313,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         importsec.imports.reserve(import_count);
 
-        // Since all subsequent ones are pushback_unchecked, the capacity will not grow, so end is used to denote the end of the buffer
-        auto const importsec_imports_end{importsec.imports.imp.end_ptr};
-
-        // Since the internal end is to be used later, check to see if it is the size of the counter
-        UWVM_ASSERT(static_cast<::std::size_t>(importsec_imports_end - importsec.imports.cbegin()) == import_count);
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 import_counter{};  // use for check
 
         section_curr = reinterpret_cast<::std::byte const*>(import_count_next);  // never out of bounds
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
@@ -340,7 +336,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check import counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(importsec.imports.cend() == importsec_imports_end) [[unlikely]]
+            if(++import_counter > import_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = import_count;
@@ -519,10 +515,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //        ^^ section_curr
 
         // check import counter match
-        if(importsec.imports.cend() != importsec_imports_end) [[unlikely]]
+        if(import_counter != import_count) [[unlikely]]
         {
             err.err_curr = section_curr;
-            err.err_selectable.u32arr[0] = static_cast<::std::uint_least32_t>(importsec.imports.size());
+            err.err_selectable.u32arr[0] = import_counter;
             err.err_selectable.u32arr[1] = import_count;
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_section_resolved_not_match_the_actual_number;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);

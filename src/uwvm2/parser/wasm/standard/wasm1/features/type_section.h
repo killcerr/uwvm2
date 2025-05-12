@@ -367,11 +367,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         typesec.types.reserve(type_count);
 
-        // Since all subsequent ones are pushback_unchecked, the capacity will not grow, so end is used to denote the end of the buffer
-        auto const typesec_types_end{typesec.types.imp.end_ptr};
-
-        // Since the internal end is to be used later, check to see if it is the size of the counter
-        UWVM_ASSERT(static_cast<::std::size_t>(typesec_types_end - typesec.types.cbegin()) == type_count);
+       ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{}; // use for check
 
         section_curr = reinterpret_cast<::std::byte const*>(type_count_next);  // never out of bounds
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
@@ -390,7 +386,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check type counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(typesec.types.cend() == typesec_types_end) [[unlikely]]
+            if(++type_counter > type_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = type_count;
@@ -432,10 +428,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //        ^^ section_curr
 
         // check type counter match
-        if(typesec.types.cend() != typesec_types_end) [[unlikely]]
+        if(type_counter != type_count) [[unlikely]]
         {
             err.err_curr = section_curr;
-            err.err_selectable.u32arr[0] = static_cast<::std::uint_least32_t>(typesec.types.size());
+            err.err_selectable.u32arr[0] = type_counter;
             err.err_selectable.u32arr[1] = type_count;
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::type_section_resolved_not_match_the_actual_number;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
