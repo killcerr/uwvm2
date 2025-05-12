@@ -102,6 +102,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         ::std::size_t const type_section_count{typesec.types.size()};
+        auto const typesec_types_cbegin{typesec.types.cbegin()};
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t<Fs...>>(module_storage.sections)};
 
@@ -159,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            functionsec.funcs.emplace_back_unchecked(typesec.types.cbegin() + typeidx);
+            functionsec.funcs.emplace_back_unchecked(typesec_types_cbegin + typeidx);
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
