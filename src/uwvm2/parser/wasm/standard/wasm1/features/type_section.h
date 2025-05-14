@@ -294,15 +294,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Note that section_curr may be equal to section_end, which needs to be checked
                 return handle_type_prefix_functype(sec_adl, module_storage, section_curr, section_end, err, fs_para);
             }
-            default:
-                [[unlikely]]
-                {
-                    err.err_curr = prefix_module_ptr;
-                    err.err_selectable.u8 =
-                        static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix);
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
+            [[unlikely]] default:
+            {
+                err.err_curr = prefix_module_ptr;
+                err.err_selectable.u8 =
+                    static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix);
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
         }
     }
 
@@ -376,7 +375,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
-        while(section_curr != section_end)
+        while(section_curr != section_end) [[likely]]
         {
             // Ensuring the existence of valid information
 

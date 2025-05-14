@@ -278,11 +278,20 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"Motorola 68k"
 #elif defined(__MIPS64__) || defined(__mips64__)
                                 u8"MIPS64"
+# if defined(__MIPSEL__) || defined(__MIPSEL) || defined(_MIPSEL)
+                                u8"EL"
+# endif
 # if defined(_MIPS_ARCH_MIPS64R2)
-                                u8"R2"
+                                u8" (R2)"
 # endif
 #elif defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH)
                                 u8"MIPS"
+# if defined(__MIPSEL__) || defined(__MIPSEL) || defined(_MIPSEL)
+                                u8"EL"
+# endif
+# if defined(_MIPS_ARCH_MIPS32R2)
+                                u8" (R2)"
+# endif
 #elif defined(__HPPA__)
                                 u8"HP/PA RISC"
 #elif defined(__riscv)
@@ -298,12 +307,12 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"PDP11"
 #elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)
                                 u8"PowerPC64"
-# if defined(_LITTLE_ENDIAN)
+# if defined(_LITTLE_ENDIAN) || defined(__LITTLE_ENDIAN__)
                                 u8"LE"
 # endif
 #elif defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)
                                 u8"PowerPC"
-# if defined(_LITTLE_ENDIAN)
+# if defined(_LITTLE_ENDIAN) || defined(__LITTLE_ENDIAN__)
                                 u8"LE"
 # endif
 # if defined(__SPE__)

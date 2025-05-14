@@ -326,7 +326,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};  // use for reserve
         // desc counter
 
-        while(section_curr != section_end)
+        while(section_curr != section_end) [[likely]]
         {
             // Ensuring the existence of valid information
 

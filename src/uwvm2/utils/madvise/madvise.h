@@ -192,8 +192,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
                     sizeof(::std::uint_least32_t));
                 break;
             }
-            default:
-                [[unlikely]] { break; }
+            [[unlikely]] default:
+            {
+                break;
+            }
         }
 # elif (!defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x0602) && !defined(_WIN32_WINDOWS)
         // win8
@@ -207,8 +209,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
                 ::fast_io::win32::PrefetchVirtualMemory(reinterpret_cast<void*>(static_cast<::std::ptrdiff_t>(-1)), 1uz, ::std::addressof(mre), 0);
                 break;
             }
-            default:
-                [[unlikely]] { break; }
+            [[unlikely]] default:
+            {
+                break;
+            }
         }
 # endif
 #elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !defined(_PICOLIBC__)

@@ -25,7 +25,7 @@
 #pragma once
 
 #if !(__cpp_structured_bindings >= 202411L)
-# error "UWVM requires at least C++26 standard compiler."
+# error "UWVM requires at least C++26 standard compiler. See https://en.cppreference.com/w/cpp/compiler_support/26#cpp_structured_bindings_202411L"
 #endif
 
 #ifdef UWVM_MODULE
@@ -382,12 +382,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [         safe                 ] unsafe (could be the module_end)
             //                          ^^ module_curr
 
-            // First loop with module_curr != module_end, so can use do-while. 
+            // First loop with module_curr != module_end, so can use do-while.
 
             do {
                 // existence of valid information
 
-                // Each time loop, module_curr is less than module_end. 
+                // Each time loop, module_curr is less than module_end.
 
                 // [... sec_id] sec_len ...
                 // [   safe   ] unsafe (could be the module_end)

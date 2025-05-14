@@ -96,6 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 #if 0 
         pr.clear();
 #endif
+
         pr.reserve(argc);
 
         // If argc is 0, prohibit running
