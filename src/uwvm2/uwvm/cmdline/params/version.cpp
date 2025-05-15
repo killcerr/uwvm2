@@ -565,8 +565,8 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"VMS"
 #elif defined(__LIBREL__)
                                 u8"z/OS"
-#elif defined(__AVR__) || defined(_PICOLIBC__)
-                                u8"AVR LIBC"
+#elif defined(__PICOLIBC__)
+                                u8"picolibc"
 #elif defined(__LLVM_LIBC__) || defined(__LLVM_LIBC_TYPES_FILE_H__)
                                 u8"LLVM LIBC "
 #elif defined(__MLIBC_O_CLOEXEC)
@@ -576,11 +576,11 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #elif defined(__NEED___isoc_va_list) || defined(__musl__)
                                 u8"MUSL"
 #elif defined(__serenity__)
-                                u8"serenity"
+                                u8"Serenity"
 #elif defined(__DJGPP__)
-                                u8"djgpp"
+                                u8"DJGPP"
 #elif defined(__BSD_VISIBLE) || (defined(__NEWLIB__) && !defined(__CUSTOM_FILE_IO__)) || defined(__MSDOS__)
-                                u8"unix"
+                                u8"UNIX"
 #else
                                 u8"Unknown"
 #endif
