@@ -352,12 +352,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                      ^^ section_curr
+                //                                      [   simd_vector_str  ]
 
                 using u8x16simd [[__gnu__::__vector_size__(16)]] = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
 
                 u8x16simd simd_vector_str;  // No initialization necessary
 
                 ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+
+                // It's already a little-endian.
 
                 auto const check_upper{simd_vector_str >= simd_vector_check};
 
@@ -386,8 +389,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ) [[unlikely]]
                 {
                     auto const section_curr_end{section_curr + 16u};
+
+                    // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead of '!='
+
                     while(section_curr < section_curr_end)
                     {
+                        // [ ... typeidx1] ... typeidx2 ...
+                        // [     safe    ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
                         if(++func_counter > func_count) [[unlikely]]
                         {
                             err.err_curr = section_curr;
@@ -411,6 +421,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
                         }
 
+                        // [ ... typeidx1 ...] typeidx2 ...
+                        // [      safe       ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
                         // There's a good chance there's an error here.
                         // Or there is a leb redundancy 0
                         if(typeidx >= type_section_count) [[unlikely]]
@@ -422,7 +436,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         }
 
                         section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                        // [ ... typeidx1 ...] typeidx2 ...
+                        // [      safe       ] unsafe (could be the section_end)
+                        //                     ^^ section_curr
                     }
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ... ...] typeidxN
+                    // [                        safe                                 ] unsafe (could be the section_end)
+                    //                                                                 ^^ section_curr
+                    //                                      [   simd_vector_str  ]...] (Depends on the size of section_curr in relation to section_curr_end)
                 }
                 else
                 {
@@ -443,6 +466,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     for(auto const i: arr) { functionsec.funcs.emplace_back_unchecked(typesec_types_cbegin + i); }
 
                     section_curr += 16uz;
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                             ^^ section_curr
                 }
             }
         }
