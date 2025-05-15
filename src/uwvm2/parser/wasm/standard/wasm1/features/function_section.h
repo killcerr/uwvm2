@@ -362,21 +362,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 auto const check_upper{simd_vector_str >= simd_vector_check};
 
                 using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = long long;
+                using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = unsigned;
                 using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
-                using c32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = unsigned;
                 using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = unsigned char;
+                using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = signed char;
 
                 if(
 # if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
                     !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
 # elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
                     __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
+# elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
+                    __builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
-                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<c8x16simd>(check_upper))
+                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)
-                    __builtin_neon_vmaxvq_u32(::std::bit_cast<c32x4simd>(check_upper))
+                    __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_upper))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)
-                    __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<c32x4simd>(check_upper))
+                    __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
                     __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))
 # endif
