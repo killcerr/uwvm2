@@ -370,6 +370,12 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__ARM_FEATURE_SVE2)
                                 u8"SVE2 "
 # endif
+# if defined(__ARM_FEATURE_SME)
+                                u8"SME "
+# endif
+# if defined(__ARM_FEATURE_SME2)
+                                u8"SME2 "
+# endif
 #elif (defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)) && defined(__MMX__)
                                 u8"\nSIMD support: "
 # if defined(__MMX__)

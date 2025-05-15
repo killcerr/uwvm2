@@ -394,8 +394,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     while(section_curr < section_curr_end)
                     {
-                        // [ ... typeidx1] ... typeidx2 ...
-                        // [     safe    ] unsafe (could be the section_end)
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1] ... (outer) ] typeidx2 ...
+                        // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                         //       ^^ section_curr
 
                         if(++func_counter > func_count) [[unlikely]]
@@ -421,8 +422,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
                         }
 
-                        // [ ... typeidx1 ...] typeidx2 ...
-                        // [      safe       ] unsafe (could be the section_end)
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
                         //       ^^ section_curr
 
                         // There's a good chance there's an error here.
@@ -437,18 +439,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
-                        // [ ... typeidx1 ...] typeidx2 ...
-                        // [      safe       ] unsafe (could be the section_end)
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] typeidx2 ...] ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
                         //                     ^^ section_curr
                     }
 
-                    // [before_section ... | func_count ... typeidx1 ... (15) ... ...] typeidxN
-                    // [                        safe                                 ] unsafe (could be the section_end)
-                    //                                                                 ^^ section_curr
-                    //                                      [   simd_vector_str  ]...] (Depends on the size of section_curr in relation to section_curr_end)
+                    // [before_section ... | func_count ... typeidx1 ... (15) ... ...  ] typeidxN
+                    // [                        safe                                   ] unsafe (could be the section_end)
+                    //                                                                   ^^ section_curr
+                    //                                      [   simd_vector_str  ] ... ] (Depends on the size of section_curr in relation to section_curr_end)
                 }
                 else
                 {
+                    // all are single bytes, so there are 16
                     func_counter += 16u;
 
                     // check counter
