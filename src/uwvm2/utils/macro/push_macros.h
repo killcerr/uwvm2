@@ -278,7 +278,7 @@
 #endif
 
 /// @brief        __has_builtin
-/// @details      Avoid using __has_builtin on unsupport compiler
+/// @details      __has_builtin is not provided by standard cpp, avoid using __has_builtin on unsupport compiler
 #pragma push_macro("UWVM_HAS_BUILTIN")
 #undef UWVM_HAS_BUILTIN
 #ifdef __has_builtin
@@ -362,8 +362,8 @@
 #endif
 
 /// @brief        MSVC may not support if consteval, so macros are used to select the appropriate version.
-/// @details      on gcc, clang: consteval
-///               on msvc: (__builtin_is_constant_evaluated())
+/// @details      on gcc, clang: !consteval
+///               on msvc: (!__builtin_is_constant_evaluated())
 #pragma push_macro("UWVM_IF_NOT_CONSTEVAL")
 #undef UWVM_IF_NOT_CONSTEVAL
 #if __cpp_if_consteval >= 202106L

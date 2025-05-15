@@ -24,24 +24,27 @@
 /// @details    Use `pop_macro` to avoid side effects on existing macros. Please use `pop_macro` in conjunction.
 
 // #pragma once
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
 
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_WHITE")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_CYAN")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_PURPLE")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_BLUE")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_YELLOW")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_GREEN")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_RED")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_DK_GRAY")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_GRAY")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_CYAN")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_PURPLE")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_BLUE")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_ORANGE")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_GREEN")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_RED")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_BLACK")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE")
-#pragma pop_macro("UWVM_WIN32_TEXTATTR_RST_ALL")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_WHITE")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_CYAN")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_PURPLE")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_BLUE")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_YELLOW")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_GREEN")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_LT_RED")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_DK_GRAY")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_GRAY")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_CYAN")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_PURPLE")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_BLUE")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_ORANGE")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_GREEN")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_RED")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_BLACK")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_RST_ALL")
 
-#include "ansi_pop_macro.h"
+# include "ansi_pop_macro.h"
+
+#endif
