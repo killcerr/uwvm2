@@ -32,8 +32,6 @@
 // std
 #  include <cstddef>
 #  include <cstdint>
-// macro
-#  include <uwvm2/utils/macro/push_macros.h>
 # endif
 
 # ifndef UWVM_MODULE_EXPORT
@@ -88,10 +86,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 
 # endif
 }  // namespace uwvm2::utils::intrinsics::arm
-
-# ifndef UWVM_MODULE
-// macro
-#  include <uwvm2/utils/macro/pop_macros.h>
-# endif
 
 #endif

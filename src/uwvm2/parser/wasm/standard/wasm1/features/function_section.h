@@ -182,7 +182,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief      Accelerated parsing of pure 1-byte typeidx via simd128
     /// @details    Support:
     ///
-    ///             (Little Endian), sizeof(::std::size_t) == 8uz, [[gnu::vector_size]]
+    ///             (Little Endian), sizeof(::std::size_t) == 8uz (UINT_LEAST32_MAX < SIZE_MAX), [[gnu::vector_size]]
     ///             x86_64-sse2, aarch64-neon, loongarch-SX, wasm-wasmsimd128
     ///
     ///             Due to wasm compact text and after actual testing, the number of functions to function type ratio is 50:1, and in most cases the typeidx of
@@ -649,22 +649,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 #endif
 
-#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX2__) || defined(__ARM_FEATURE_SVE) || defined(__loongarch_asx))
+#if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) && \
+    ((defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)) || (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)))
     /// @brief      Accelerated parsing of pure 1-byte typeidx via simd256
     /// @details    Support:
     ///
-    ///             (Little Endian)
-    ///             mask: x86_64-avx2, aarch64-sve, loongarch-ASX
+    ///             (Little Endian), sizeof(::std::size_t) == 8uz (UINT_LEAST32_MAX < SIZE_MAX), [[gnu::vector_size]]
+    ///             mask: x86_64-avx, loongarch-ASX
     ///
-    ///             Due to wasm compact text and after actual testing, the number of functions to function type ratio is 50:1, and in most cases the typeidx of
-    ///             commonly used types will be small, with 10,000 functions, almost 90% of the typeidx is single byte. So we only do optimization for
-    ///             single-byte simd, not for multi-byte simd, multi-byte relies on shuffle and need to check the table, for almost all single-byte performance
-    ///             may not be as good as sequential parsing.
+    ///             Due to wasm compact text and after actual testing, the number of functions to function type ratio is 50:1, and in most cases the typeidx
+    ///             of commonly used types will be small, with 10,000 functions, almost 90% of the typeidx is single byte. So we only do optimization for
+    ///             single-byte simd, not for multi-byte simd, multi-byte relies on shuffle and need to check the table, for almost all single-byte
+    ///             performance may not be as good as sequential parsing.
     ///
-    ///             Cyclic read 32 bytes, encountered greater than 127 then through the mask and crtz calculations are handed over to the sequence of processing
-    ///             16 bytes of the rest of the content. The content is divided into two 16-byte, the first 16-byte error loop the contents of the first 16
-    ///             bytes and then to the last 16 bytes to restart the cycle ahead of the cycle to read 32. the last 16 bytes will wait for the next cycle to
-    ///             read 32 automatically.
+    ///             Cyclic read 32 bytes, encountered greater than 127 then through the mask and crtz calculations are handed over to the sequence of
+    ///             processing 16 bytes of the rest of the content. The content is divided into two 16-byte, the first 16-byte error loop the contents of
+    ///             the first 16 bytes and then to the last 16 bytes to restart the cycle ahead of the cycle to read 32. the last 16 bytes will wait for the
+    ///             next cycle to read 32 automatically.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* scan_function_section_1b_simd256_impl(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t<Fs...>> sec_adl,
@@ -686,10 +687,500 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
-        while(static_cast<::std::size_t>(section_end - section_curr) < 32uz) [[likely]]
+        if(type_section_count < 128uz)
         {
-            /// @todo
-            ::fast_io::fast_terminate();
+            // No multibyte cases
+
+            using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
+            using c8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = char;
+            using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
+
+            static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
+
+            while(static_cast<::std::size_t>(section_end - section_curr) >= 32uz) [[likely]]
+            {
+                // [before_section ... | func_count ... typeidx1 ... (31) ...] ...
+                // [                        safe                             ] unsafe (could be the section_end)
+                //                                      ^^ section_curr
+                //                                      [   simd_vector_str  ]
+
+                u8x32simd simd_vector_str;  // No initialization necessary
+
+                ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
+
+                // It's already a little-endian.
+
+                auto const check_upper{simd_vector_str >= simd_vector_check};
+
+                if(
+# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
+                    !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(check_upper), ::std::bit_cast<i64x4simd>(check_upper))
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
+                    __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))
+# endif
+                        ) [[unlikely]]
+                {
+                    auto const section_curr_end{section_curr + 32u};
+
+                    // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead of '!='
+
+                    while(section_curr < section_curr_end)
+                    {
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1] ... (outer) ] typeidx2 ...
+                        // [     safe    ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        if(++func_counter > func_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = func_count;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx{};
+
+                        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                        auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                        reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                        ::fast_io::mnp::leb128_get(typeidx))};
+
+                        if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                        }
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        // There's a good chance there's an error here.
+                        // Or there is a leb redundancy 0
+                        if(typeidx >= type_section_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = typeidx;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] typeidx2 ...] ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //                     ^^ section_curr
+                    }
+
+                    // [before_section ... | func_count ... typeidx1 ... (31) ... ...  ] typeidxN
+                    // [                        safe                                   ] unsafe (could be the section_end)
+                    //                                                                   ^^ section_curr
+                    //                                      [   simd_vector_str  ] ... ] (Depends on the size of section_curr in relation to section_curr_end)
+                }
+                else
+                {
+                    // all are single bytes, so there are 32
+                    func_counter += 32u;
+
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = func_count;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    // write data
+                    constexpr u8x32simd all_zero{};
+                    auto const typesec_types_cbegin_u64{::std::bit_cast<::std::uint64_t>(typesec_types_cbegin)};
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         0,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         1,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         2,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         3,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         4,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         5,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         6,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         7,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         8,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         9,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         10,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         11,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         12,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         13,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         14,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         15,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         16,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         17,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         18,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         19,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         20,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         21,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         22,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         23,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         24,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         25,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         26,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         27,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    {
+                        auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                         all_zero,
+                                                                                         28,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         29,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         30,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         31,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32,
+                                                                                         32))};
+                        v0_u64x4 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+                    }
+
+                    section_curr += 32uz;
+
+                    // [before_section ... | func_count ... typeidx1 ... (31) ...] typeidx32
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                             ^^ section_curr
+                }
+            }
         }
 
         // Conventional methods
@@ -949,14 +1440,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
 
         section_curr = reinterpret_cast<::std::byte const*>(func_count_next);  // never out of bounds
-        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+// No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
-        // [before_section ... | func_count ...] typeidx1 ...
-        // [              safe                 ] unsafe (could be the section_end)
-        //                                       ^^ section_curr
+// [before_section ... | func_count ...] typeidx1 ...
+// [              safe                 ] unsafe (could be the section_end)
+//                                       ^^ section_curr
 
-        // handle it
-#if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                              \
+// handle it
+#if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) && \
+    ((defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)) || (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)))
+        section_curr = scan_function_section_1b_simd256_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+#elif UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                            \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) || (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)) ||            \
      (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)) ||                                                                   \
      (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)) || (defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)))

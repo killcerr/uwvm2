@@ -27,8 +27,6 @@ module;
 // std
 #include <cstddef>
 #include <cstdint>
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.utils.intrinsics:arm_sve;
 
