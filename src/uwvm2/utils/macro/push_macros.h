@@ -423,3 +423,13 @@
 #else
 # define UWVM_GNU_USED
 #endif
+
+/// @see          https://gcc.gnu.org/legacy-ml/gcc-patches/2005-07/msg01969.html
+/// @details      on gcc, clang: [[__gnu__::__nodebug__]]
+#pragma push_macro("UWVM_GNU_NODEBUG")
+#undef UWVM_GNU_NODEBUG
+#if __has_cpp_attribute(__gnu__::__nodebug__)
+# define UWVM_GNU_NODEBUG [[__gnu__::__nodebug__]]
+#else
+# define UWVM_GNU_NODEBUG
+#endif
