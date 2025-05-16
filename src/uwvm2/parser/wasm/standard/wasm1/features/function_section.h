@@ -175,14 +175,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return section_curr;
     }
 
-#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                             \
+#if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                              \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) || (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)) ||            \
      (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)) ||                                                                   \
      (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)) || (defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)))
     /// @brief      Accelerated parsing of pure 1-byte typeidx via simd128
     /// @details    Support:
     ///
-    ///             (Little Endian)
+    ///             (Little Endian), sizeof(::std::size_t) == 8uz, [[gnu::vector_size]]
     ///             x86_64-sse2, aarch64-neon, loongarch-SX, wasm-wasmsimd128
     ///
     ///             Due to wasm compact text and after actual testing, the number of functions to function type ratio is 50:1, and in most cases the typeidx of
@@ -344,6 +344,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // on SSE2, judge first then __builtin_ia32_pmovmskb128 to figure out if there are any zeros
             // on SSE4, use __builtin_ia32_ptestz128, optimized for all-0 judgments
 
+            using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+            using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+            using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+            static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
+
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
                 static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
 
@@ -354,8 +363,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                      ^^ section_curr
                 //                                      [   simd_vector_str  ]
 
-                using u8x16simd [[__gnu__::__vector_size__(16)]] = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
-
                 u8x16simd simd_vector_str;  // No initialization necessary
 
                 ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
@@ -363,12 +370,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // It's already a little-endian.
 
                 auto const check_upper{simd_vector_str >= simd_vector_check};
-
-                using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = long long;
-                using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = unsigned;
-                using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
-                using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = unsigned char;
-                using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = signed char;
 
                 if(
 # if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
@@ -465,9 +466,111 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
 
                     // write data
+# if UWVM_HAS_BUILTIN(__builtin_shufflevector) && (defined(__SSSE3__) || defined(__wasm_simd128__) || defined(__ARM_NEON) || defined(__loongarch_sx))
+
+                    constexpr u8x16simd all_zero{};
+                    auto const typesec_types_cbegin_u64{::std::bit_cast<::std::uint64_t>(typesec_types_cbegin)};
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 0, 16, 16, 16, 16, 16, 16, 16, 1, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 2, 16, 16, 16, 16, 16, 16, 16, 3, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 4, 16, 16, 16, 16, 16, 16, 16, 5, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 6, 16, 16, 16, 16, 16, 16, 16, 7, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 8, 16, 16, 16, 16, 16, 16, 16, 9, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 10, 16, 16, 16, 16, 16, 16, 16, 11, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 12, 16, 16, 16, 16, 16, 16, 16, 13, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+                    {
+                        auto v0_u64x2{::std::bit_cast<u64x2simd>(
+                            __builtin_shufflevector(simd_vector_str, all_zero, 14, 16, 16, 16, 16, 16, 16, 16, 15, 16, 16, 16, 16, 16, 16, 16))};
+                        v0_u64x2 += typesec_types_cbegin_u64;
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
+                        functionsec.funcs.emplace_back_unchecked(
+                            reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+                    }
+
+# else  // defined(__SSE2__) no shuffle
+
+                    // SSE2:
+                    // movd    eax, xmm0
+                    // movaps  XMMWORD PTR [rsp-24], xmm0
+                    // movzx   eax, al
+                    // movq    xmm0, rax
+                    // movzx   eax, BYTE PTR [rsp-23]
+                    // movq    xmm1, rax
+                    // punpcklqdq      xmm0, xmm1
+                    //
+                    // SSSE3:
+                    // pxor    xmm1, xmm1
+                    // punpcklbw       xmm0, xmm1
+                    // pshufb  xmm0, XMMWORD PTR .LC0[rip]
+
                     using u8x16arr = ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, 16uz>;
                     auto const arr{::std::bit_cast<u8x16arr>(simd_vector_str)};
                     for(auto const i: arr) { functionsec.funcs.emplace_back_unchecked(typesec_types_cbegin + i); }
+# endif
 
                     section_curr += 16uz;
 
@@ -853,7 +956,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                                       ^^ section_curr
 
         // handle it
-#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                             \
+#if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                              \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) || (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)) ||            \
      (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)) ||                                                                   \
      (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)) || (defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)))
