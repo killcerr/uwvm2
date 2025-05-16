@@ -135,7 +135,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //        ^^ curr
 
         // Add scope space to prevent subsequent access to variables that should not be accessed
-        
+
         {
             // [flag] min ... max (end)
             // [safe] unsafe (could be the end)

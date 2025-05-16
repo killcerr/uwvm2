@@ -366,7 +366,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         typesec.types.reserve(type_count);
 
-       ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{}; // use for check
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};  // use for check
 
         section_curr = reinterpret_cast<::std::byte const*>(type_count_next);  // never out of bounds
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)

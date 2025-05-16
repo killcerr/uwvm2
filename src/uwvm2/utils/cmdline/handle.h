@@ -476,7 +476,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         {
             // Because the char8_t size is always equal to ::std::byte
             static_assert(sizeof(char8_t) == sizeof(::std::byte));
-            
+
             auto const i{reinterpret_cast<::std::byte const*>(str.data())};
             crc32c.update(i, i + str.size());
         }
