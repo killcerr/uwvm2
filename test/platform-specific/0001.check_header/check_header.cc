@@ -33,22 +33,22 @@ int main()
     /// @brief Check if all headers are popped out
 
 #ifdef UWVM_DLLIMPORT
-    static_assert(false);
+# error "UWVM_DLLIMPORT existed"
 #endif
 
 #ifdef UWVM_WASM_SUPPORT_WASM1
-    static_assert(false);
+# error "UWVM_WASM_SUPPORT_WASM1 existed"
 #endif
 
 #ifdef UWVM_AES_RST_ALL
-    static_assert(false);
+# error "UWVM_AES_RST_ALL existed"
 #endif
 
 #ifdef UWVM_COLOR_RST_ALL
-    static_assert(false);
+# error "UWVM_COLOR_RST_ALL existed"
 #endif
 
 #ifdef UWVM_WIN32_TEXTATTR_RST_ALL
-    static_assert(false);
+# error "UWVM_WIN32_TEXTATTR_RST_ALL existed"
 #endif
 }

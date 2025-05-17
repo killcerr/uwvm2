@@ -420,6 +420,9 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__AVX512F__)
                                 u8"AVX512F "
 # endif
+# if defined(__AVX512CD__)
+                                u8"AVX512CD "
+# endif
 # if defined(__AVX512BW__)
                                 u8"AVX512BW "
 # endif
@@ -429,16 +432,38 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__AVX512DQ__)
                                 u8"AVX512DQ "
 # endif
-# if 0
-#  if defined(__AVX512BF16__)
-                                u8"AVX512BF16 "
-#  endif
-#  if defined(__AVX512FP16__)
-                                u8"AVX512FP16 "
-#  endif
-# endif
 # if defined(__AVX512VBMI__)
                                 u8"AVX512VBMI "
+# endif
+# if defined(__AVX512VBMI2__)
+                                u8"AVX512VBMI2 "
+# endif
+# if defined(__AVX512BITALG__)
+                                u8"AVX512BITALG "
+# endif
+# if defined(__AVX512IFMA__)
+                                u8"AVX512IFMA "
+# endif
+# if defined(__AVX512VNNI__)
+                                u8"AVX512VNNI "
+# endif
+# if defined(__AVX512FP16__)
+                                u8"AVX512FP16 "
+# endif
+# if defined(__AVX512BF16__)
+                                u8"AVX512BF16 "
+# endif
+# if defined(__AVX10_1__)
+                                u8"AVX10.1 "
+# endif
+# if defined(__AVX10_1_512__)
+                                u8"AVX10.1/512 "
+# endif
+# if defined(__AVX10_2__)
+                                u8"AVX10.2 "
+# endif
+# if defined(__AVX10_2_512__)
+                                u8"AVX10.2/512 "
 # endif
 #elif defined(__VECTOR4DOUBLE__) || defined(__VSX__) || (defined(__ALTIVEC__) || defined(__VEC__))
                                 u8"\nSIMD support: PPC SIMD"
