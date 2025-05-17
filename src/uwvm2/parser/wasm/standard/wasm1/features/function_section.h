@@ -1250,7 +1250,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #endif
 
 #if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) && \
-    (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512) || UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
+    (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
     /// @brief      Accelerated parsing of pure 1-byte typeidx via simd512
     /// @details    Support:
     ///
@@ -1320,25 +1320,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 auto const check_upper{simd_vector_str >= simd_vector_check};
 
                 if(
-# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512)  // Only supported by GCC
-                    // gcc:
-                    // vptestmb        k0, zmm0, zmm0
-                    // kortestq        k0, k0
-                    // setne   al
-                    !__builtin_ia32_ptestmb512(::std::bit_cast<c8x64simd>(check_upper), ::std::bit_cast<c8x64simd>(check_upper), UINT64_MAX)
-# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)
-                    // clang:
-                    // vptestmd        k0, zmm0, zmm0
-                    // kortestw        k0, k0
-                    // setne   al
-                    // vzeroupper
-                    //
-                    // gcc:
-                    // vpxor   xmm1, xmm1, xmm1
-                    // vpcmpb  k0, zmm0, zmm1, 4
-                    // kortestq        k0, k0
-                    // setne   al
-                    !__builtin_ia32_cmpb512_mask(::std::bit_cast<c8x64simd>(check_upper), c8x64simd{}, 0x4, UINT64_MAX)
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)
+                    __builtin_ia32_cmpb512_mask(::std::bit_cast<c8x64simd>(check_upper), c8x64simd{}, 0x00, UINT64_MAX)
 # endif
                         ) [[unlikely]]
                 {
@@ -2267,7 +2250,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
 // handle it
 #if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) && \
-    (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512) || UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
+    (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
         section_curr = scan_function_section_1b_simd512_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
 #elif UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                            \
     UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                                                                                               \
