@@ -1325,20 +1325,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // vptestmb        k0, zmm0, zmm0
                     // kortestq        k0, k0
                     // sete    al
-                    !__builtin_ia32_ptestmb512(::std::bit_cast<c8x64simd>(check_upper), ::std::bit_cast<c8x64simd>(check_upper), UINT64_MAX)
+                    __builtin_ia32_ptestmb512(::std::bit_cast<c8x64simd>(check_upper), ::std::bit_cast<c8x64simd>(check_upper), UINT64_MAX)
 # elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)
                     // clang:
                     // vptestmd        k0, zmm0, zmm0
                     // kortestw        k0, k0
-                    // sete    al
+                    // setne   al
                     // vzeroupper
                     //
                     // gcc:
                     // vpxor   xmm1, xmm1, xmm1
                     // vpcmpb  k0, zmm0, zmm1, 4
                     // kortestq        k0, k0
-                    // sete    al
-                    !__builtin_ia32_cmpb512_mask(::std::bit_cast<c8x64simd>(check_upper), c8x64simd{}, 0x04, UINT64_MAX)
+                    // setne   al
+                    __builtin_ia32_cmpb512_mask(::std::bit_cast<c8x64simd>(check_upper), c8x64simd{}, 0x04, UINT64_MAX)
 # endif
                         ) [[unlikely]]
                 {
