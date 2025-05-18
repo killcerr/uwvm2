@@ -42,6 +42,22 @@ import fast_io;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
 {
+    /// @brief (Q) Why the base type uses (u)int_leastN_t?
+    ///
+    /// @details (A) :
+    /// Here the use of (u)int_leastN_t is guaranteed to be greater than or equal to the specified number of bits and the closest of the optional types to the
+    /// specified number of bits. On platforms where some of the CHAR_BITs are not 8 (the standard specifies that the CHAR_BIT is greater than or equal to 8),
+    /// (u)int_leastN_t guarantees that a data type with a maximum of 8 bits and the closest of the optional types to 8 bits will be used, guaranteeing that
+    /// just enough will accommodate the required 8 bits, common to all platforms.
+    ///
+    /// (u)int_fastN_t is guaranteed to be the type that is greater than or equal to
+    /// 8 and most isa-friendly, e.g., on PDP11 int_fast8_t is a 16-bit type as is int_fast16_t, but int_least8_t is an 8-bit type. So (u)int_fastN_t may be an
+    /// arbitrary value, and care must be taken before using it, if there is a need for performance of some of the methods and there is a guarantee that the
+    /// potentially arbitrary bit types of (u)int_fastN_t can be handled correctly.
+    ///
+    /// (u)intN_t, on the other hand, is a type where the number of bits is exactly equal to the number of bits specified, and may not be provided on some
+    /// platforms where CHAR_BIT is greater than 8, so try to avoid using it within general-purpose code, and it can be used after qualifying the platform.
+
     /// @brief      Bytes
     /// @details    The simplest form of value are raw uninterpreted bytes. In the abstract syntax they are represented as hexadecimal
     ///             literals.
