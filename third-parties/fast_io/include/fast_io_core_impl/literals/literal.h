@@ -91,7 +91,10 @@ inline constexpr char_type char_literal_add(T offs) noexcept
 		[[assume(0 <= offs && offs < 10)]];
 	}
 #endif
-	using unsigned_char_type = ::std::make_unsigned_t<char_type>;
+    // The future cpp standard prohibits arithmetic between different char_types, but allows the same char_type to be arithmetic, so doing an integral_lifting
+    // and then calculating gives the same result as direct arithmetic
+
+    using unsigned_char_type = ::std::make_unsigned_t<char_type>;
     using unsigned_result_type = ::std::make_unsigned_t<
         ::std::remove_cvref_t<decltype(integral_lifting(arithmetic_char_literal_v<ch, char_type>) + integral_lifting(offs))>>;
 
