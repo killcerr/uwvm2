@@ -23,8 +23,8 @@
 module;
 
 // std
-# include <type_traits>
-# include <concepts>
+#include <type_traits>
+#include <concepts>
 
 export module uwvm2.uwvm.wasm.feature:feature;
 

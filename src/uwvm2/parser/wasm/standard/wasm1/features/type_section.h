@@ -378,7 +378,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
         }
-        
+
         typesec.types.reserve(static_cast<::std::size_t>(type_count));
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};  // use for check
