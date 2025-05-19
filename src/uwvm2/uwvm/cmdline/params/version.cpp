@@ -352,7 +352,17 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 #endif
 // SIMD
-#if defined(__wasm_simd128__)
+#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE)
+# if defined(_M_IX86_FP)
+#  if _M_IX86_FP == 2
+                                u8"\nSIMD support: MMX SSE SSE2"
+#  endif
+# elif defined(_M_AMD64)
+                                u8"\nSIMD support: MMX SSE SSE2"
+# elif defined(_M_ARM64)
+                                u8"\nSIMD support: NEON"
+# endif
+#elif defined(__wasm_simd128__)
                                 u8"\nSIMD support: WebAssembly SIMD 128"
 #elif defined(__loongarch__) && (defined(__loongarch_sx) || UWVM_HAS_BUILTIN(__builtin_loongarch_crc32c_b))
                                 u8"\nSIMD support: LoongSX "

@@ -175,6 +175,238 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return section_curr;
     }
 
+#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
+    /// @brief      Accelerated parsing of pure 1-byte typeidx via simd128 (MSVC)
+    /// @details    Support:
+    ///
+    ///             (Little Endian), sizeof(::std::size_t) == 8uz (UINT_LEAST32_MAX < SIZE_MAX), MSVC, ::fast_io::intrinsics::simd_vector
+    ///             x86_64-sse2, aarch64-neon
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* scan_function_section_1b_simd128_msvc_impl(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32& func_counter,
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count) UWVM_THROWS
+    {
+        static_assert(::fast_io::details::calculate_can_simd_vector_run_with_cpu_instruction(16uz));
+
+        auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+        auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
+        auto const typesec_types_cbegin{typesec.types.cbegin()};
+
+        auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t<Fs...>>(module_storage.sections)};
+
+        // [before_section ... | func_count ...] typeidx1 ... typeidx2 ...
+        // [              safe                 ] unsafe (could be the section_end)
+        //                                       ^^ section_curr
+
+        if(type_section_count < 128u)
+        {
+            // No multibyte cases
+            // on SSE2, judge first then __builtin_ia32_pmovmskb128 to figure out if there are any zeros
+
+            static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
+
+            using simd128_t = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
+
+            simd128_t const simd_vector_check_u8x16{simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check};
+
+            while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
+            {
+                // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
+                // [                        safe                             ] unsafe (could be the section_end)
+                //                                      ^^ section_curr
+                //                                      [   simd_vector_str  ]
+
+                simd128_t simd_vector_str;  // No initialization necessary
+
+                simd_vector_str.load(section_curr);
+
+                // It's already a little-endian.
+
+                auto const check_upper{simd_vector_str >= simd_vector_check_u8x16};
+
+                if(!is_all_zeros(check_upper)) [[unlikely]]
+                {
+                    auto const section_curr_end{section_curr + 16u};
+
+                    // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead of '!='
+
+                    while(section_curr < section_curr_end)
+                    {
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1] ... (outer) ] typeidx2 ...
+                        // [     safe    ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        if(++func_counter > func_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = func_count;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx{};
+
+                        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                        auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                        reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                        ::fast_io::mnp::leb128_get(typeidx))};
+
+                        if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                        }
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        // There's a good chance there's an error here.
+                        // Or there is a leb redundancy 0
+                        if(typeidx >= type_section_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = typeidx;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] typeidx2 ...] ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //                     ^^ section_curr
+                    }
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ... ...  ] typeidxN
+                    // [                        safe                                   ] unsafe (could be the section_end)
+                    //                                                                   ^^ section_curr
+                    //                                      [   simd_vector_str  ] ... ] (Depends on the size of section_curr in relation to section_curr_end)
+                }
+                else
+                {
+                    // all are single bytes, so there are 16
+                    func_counter += 16u;
+
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = func_count;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    // write data
+                    for(unsigned i{}; i != 16u; ++i) { functionsec.funcs.emplace_back_unchecked(typesec_types_cbegin + simd_vector_str[i]); }
+
+                    section_curr += 16uz;
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                             ^^ section_curr
+                }
+            }
+        }
+
+        // Conventional methods
+        while(section_curr != section_end) [[likely]]
+        {
+            // Ensuring the existence of valid information
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // check function counter
+            // Ensure content is available before counting (section_curr != section_end)
+            if(++func_counter > func_count) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = func_count;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx{};
+
+            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+            auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                            ::fast_io::mnp::leb128_get(typeidx))};
+
+            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+            }
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // check: type_index should less than type_section_count
+            if(typeidx >= type_section_count) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = typeidx;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            functionsec.funcs.emplace_back_unchecked(typesec_types_cbegin + typeidx);
+
+            section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //                     ^^ section_curr
+        }
+
+        // [before_section ... | func_count ... typeidx1 ... ...] (end)
+        // [                       safe                         ] unsafe (could be the section_end)
+        //                                                        ^^ section_curr
+
+        return section_curr;
+    }
+
+#endif
+
 #if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                              \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) || (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)) ||            \
      (defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)) ||                                                                   \
@@ -205,7 +437,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count) UWVM_THROWS
     {
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
-        ::std::size_t const type_section_count{typesec.types.size()};
+        auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
         auto const typesec_types_cbegin{typesec.types.cbegin()};
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t<Fs...>>(module_storage.sections)};
@@ -217,7 +449,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if 0 
         /// @deprecated Tested to appear multi-byte situations, simd128 has no advantage over regular
 
-        if(type_section_count >= 128uz)
+        if(type_section_count >= 128u)
         {
             using u8x16simd [[__gnu__::__vector_size__(16)]] = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
             using u8x16arr = ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, 16uz>;
@@ -338,7 +570,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 # endif
 
-        if(type_section_count < 128uz)
+        if(type_section_count < 128u)
         {
             // No multibyte cases
             // on SSE2, judge first then __builtin_ia32_pmovmskb128 to figure out if there are any zeros
@@ -676,7 +908,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count) UWVM_THROWS
     {
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
-        ::std::size_t const type_section_count{typesec.types.size()};
+        auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
         auto const typesec_types_cbegin{typesec.types.cbegin()};
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t<Fs...>>(module_storage.sections)};
@@ -685,7 +917,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
-        if(type_section_count < 128uz)
+        if(type_section_count < 128u)
         {
             // No multibyte cases
 
@@ -1279,7 +1511,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count) UWVM_THROWS
     {
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
-        ::std::size_t const type_section_count{typesec.types.size()};
+        auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
         auto const typesec_types_cbegin{typesec.types.cbegin()};
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t<Fs...>>(module_storage.sections)};
@@ -1288,7 +1520,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
-        if(type_section_count < 128uz)
+        if(type_section_count < 128u)
         {
             // No multibyte cases
 
@@ -1679,6 +1911,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         functionsec.funcs.emplace_back_unchecked(
                             reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
                     }
+
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -1764,6 +1997,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         functionsec.funcs.emplace_back_unchecked(
                             reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
                     }
+
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -1849,6 +2083,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         functionsec.funcs.emplace_back_unchecked(
                             reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
                     }
+
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -1934,6 +2169,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         functionsec.funcs.emplace_back_unchecked(
                             reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
                     }
+
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -2019,6 +2255,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         functionsec.funcs.emplace_back_unchecked(
                             reinterpret_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
                     }
+
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -2259,6 +2496,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
 
         section_curr = reinterpret_cast<::std::byte const*>(func_count_next);  // never out of bounds
+
 // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
 // [before_section ... | func_count ...] typeidx1 ...
@@ -2266,7 +2504,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 //                                       ^^ section_curr
 
 // handle it
-#if UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) && \
+#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
+        section_curr = scan_function_section_1b_simd128_msvc_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+#elif UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                            \
+    UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                                                                                               \
     (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512) || UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
         section_curr = scan_function_section_1b_simd512_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
 #elif UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                            \
