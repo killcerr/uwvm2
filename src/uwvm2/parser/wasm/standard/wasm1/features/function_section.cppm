@@ -32,6 +32,12 @@ module;
 #include <utility>
 #include <memory>
 #include <bit>
+#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && defined(_M_AMD64)
+# include <emmintrin.h>
+#endif
+#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && defined(_M_ARM64)
+# include <arm_neon.h>
+#endif
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 

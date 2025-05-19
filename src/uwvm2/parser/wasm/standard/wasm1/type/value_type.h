@@ -57,6 +57,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     ///
     /// (u)intN_t, on the other hand, is a type where the number of bits is exactly equal to the number of bits specified, and may not be provided on some
     /// platforms where CHAR_BIT is greater than 8, so try to avoid using it within general-purpose code, and it can be used after qualifying the platform.
+    ///
+    /// For integer types other than char, unsigned char, and signed char, (short, unsigned short, int, unsigned, long, unsigned long, long long, unsigned long
+    /// long). the standard does not specify the exact size.
+    /// e.g.
+    /// sizeof(signed char) == 1uz, sizeof(short) >= 2uz, sizeof(int) >= 2uz, sizeof(long) >= 4uz, sizeof(long long) >= 8uz
+    /// sizeof(signed char) < sizeof(short) <= sizeof(int) <= sizeof(long) <= sizeof(long long)
+    ///
+    /// The standard specifies that size_t must be large enough to represent the size of the largest single object that may exist in the system. However, there
+    /// is no hard constraint on the exact number of bits. So you need to judge when converting types to size_t.
+    /// e.g. sizeof(::std::size_t) >= 2uz
+    ///
+    /// The standard does not explicitly require sizeof(::std::ptrdiff_t) ≤ sizeof(::std::size_t), but the design goal of the two implicitly implies a common
+    /// relationship in actual implementations.
 
     /// @brief      Bytes
     /// @details    The simplest form of value are raw uninterpreted bytes. In the abstract syntax they are represented as hexadecimal

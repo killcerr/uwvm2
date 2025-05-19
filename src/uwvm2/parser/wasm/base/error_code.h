@@ -92,6 +92,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_func_count,
         func_section_resolved_exceeded_the_actual_number,
         func_section_resolved_not_match_the_actual_number,
+        size_exceeds_the_maximum_value_of_size_t
     };
 
     /// @brief Additional information provided by wasm error, no more than 8 bytes

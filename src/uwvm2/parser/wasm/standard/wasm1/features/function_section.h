@@ -48,6 +48,12 @@ import :type_section;
 # include <utility>
 # include <memory>
 # include <bit>
+# if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && defined(_M_AMD64)
+#  include <emmintrin.h>
+# endif
+# if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && defined(_M_ARM64)
+#  include <arm_neon.h>
+# endif
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -2491,19 +2497,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [             safe                  ] unsafe (could be the section_end)
         //                       ^^ section_curr
 
-        functionsec.funcs.reserve(func_count);
+        // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+        if constexpr(size_t_max < wasm_u32_max)
+        {
+            // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            if(func_count > size_t_max) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u64 = static_cast<::std::uint_least64_t>(func_count);
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+        }
+
+        functionsec.funcs.reserve(static_cast<::std::size_t>(func_count));
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
 
         section_curr = reinterpret_cast<::std::byte const*>(func_count_next);  // never out of bounds
 
-// No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
-// [before_section ... | func_count ...] typeidx1 ...
-// [              safe                 ] unsafe (could be the section_end)
-//                                       ^^ section_curr
+        // [before_section ... | func_count ...] typeidx1 ...
+        // [              safe                 ] unsafe (could be the section_end)
+        //                                       ^^ section_curr
 
-// handle it
+        // handle it
 #if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         section_curr = scan_function_section_1b_simd128_msvc_impl(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
 #elif UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                            \

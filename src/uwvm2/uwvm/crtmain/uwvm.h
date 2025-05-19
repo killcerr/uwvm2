@@ -26,9 +26,11 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm2.uwvm.crtmain.global;
+import uwvm2.uwvm.io;
+import uwvm2.utils.ansies;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.run;
+import uwvm2.uwvm.crtmain.global;
 #else
 // std
 # include <cstdint>
@@ -38,9 +40,11 @@ import uwvm2.uwvm.run;
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
-# include "global/impl.h"
+# include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/run/impl.h>
+# include "global/impl.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -90,6 +94,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
         auto const argc_uz{u8_cmdline.argc};
         auto const argv_u8{u8_cmdline.argv.data()};
 #else
+        // The size_t of some platforms is smaller than int, in these platforms you need to do a size check before conversion
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto int_max{::std::numeric_limits<int>::max()};
+        if constexpr(size_t_max < int_max)
+        {
+            // The size_t of current platforms is smaller than int, in these platforms you need to do a size check before conversion
+            if(argc > size_t_max) [[unlikely]]
+            {
+                ::fast_io::io::perr(u8log_output_ul,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"argc \"",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    argc,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"\" exceeds the maximum value of size_t :\"",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    size_t_max,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"\".",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    u8"\n\n");
+                return -1;  // invalid parameter
+            }
+        }
         auto const argc_uz{static_cast<::std::size_t>(argc)};
         using char8_t_const_ptr_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const* const*;
         auto const argv_u8{reinterpret_cast<char8_t_const_ptr_const_may_alias_ptr>(argv)};
