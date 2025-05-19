@@ -99,8 +99,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
         pr.reserve(argc);
 
-        // If argc is 0, prohibit running
-        if(argc == 0) [[unlikely]]
+        // If argc is 0uz, prohibit running
+        if(!argc) [[unlikely]]
         {
             ::fast_io::io::perr(u8log_output_ul,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
@@ -113,6 +113,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                                 u8"\n\n");
             return parsing_return_val::returnm1;
         }
+
+        // argv_end > argv_begin
 
         auto curr_argv{argv};
 
@@ -234,15 +236,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             else { pr.emplace_back_unchecked(argv_str, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg); }
         }
 
-        //   "--run" (end)         "wasm file name"
-        // wasm_file_ppos - 1       wasm_file_ppos
-        auto const end_pos{wasm_file_ppos ? wasm_file_ppos - 1 : pr.end()};
+        // ...   "--run" (end)         "wasm file name" ...
+        // ... wasm_file_ppos - 1u      wasm_file_ppos  ...
+        auto const end_pos{wasm_file_ppos ? wasm_file_ppos - 1u : pr.end()};
 
         // Checking for wrong parameters vs. duplicates
         {
             bool shouldreturn{};
 
-            for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
+            for(auto curr_pr{pr.begin() + 1u}; curr_pr != end_pos; ++curr_pr)
             {
                 if(curr_pr->type == ::uwvm2::utils::cmdline::parameter_parsing_results_type::invalid_parameter) [[unlikely]]
                 {
@@ -264,11 +266,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
                     // Assumed size facilitates multiplicative optimization
 #if __has_cpp_attribute(assume)
-                    constexpr ::std::size_t smax{::std::numeric_limits<::std::size_t>::max() / 4u};
+                    constexpr ::std::size_t smax{::std::numeric_limits<::std::size_t>::max() / 4uz};
                     [[assume(str_size < smax)]];
 #endif
                     // First time variance requirement within 40%
-                    ::std::size_t const test_size{str_size * 4u / 10u};
+                    ::std::size_t const test_size{str_size * 4uz / 10uz};
                     ::std::size_t f_test_size{test_size};
 
                     for(auto const& j: ::uwvm2::uwvm::cmdline::parameter_lookup_table)
@@ -280,7 +282,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                         }
 
                         // Maximum stack size that will hit
-                        constexpr ::std::size_t shortest_path_stack_size{parameter_max_name_size + parameter_max_name_size * 4u / 10u + 1u};
+                        constexpr ::std::size_t shortest_path_stack_size{parameter_max_name_size + parameter_max_name_size * 4uz / 10uz + 1uz};
+
+                        // Addition may overflow, need to check size
+                        static_assert(shortest_path_stack_size > parameter_max_name_size, "addition overflow");
 
                         // Calculate the shortest path distance
                         if(auto const dp_res{::uwvm2::utils::cmdline::shortest_path<shortest_path_stack_size>(curr_pr->str.data(),
@@ -342,7 +347,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             bool needexit{};
             bool needterminal{};
 
-            for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
+            for(auto curr_pr{pr.begin() + 1u}; curr_pr != end_pos; ++curr_pr)
             {
                 if(curr_pr->para == nullptr)
                 {
@@ -382,7 +387,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
             bool shouldreturn{};
 
-            for(auto curr_pr{pr.begin() + 1}; curr_pr != end_pos; ++curr_pr)
+            for(auto curr_pr{pr.begin() + 1u}; curr_pr != end_pos; ++curr_pr)
             {
                 if(curr_pr->type == ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
                 {

@@ -134,10 +134,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         nt_code_cvt_argv_storage res{};
 
         // on win32 platforms, sizeof(size_t) always >= sizeof(int). No judgment required.
+        static_assert(::std::numeric_limits<::std::size_t>::max() >= ::std::numeric_limits<int>::max());
 
         res.argc = static_cast<::std::size_t>(u16_cmdline_argc);
 
-        res.argv.reserve(res.argc + 1uz);  // add 1uz to storage latest nullptr
+        res.argv.reserve(res.argc);
 
         ::fast_io::u8ostring_ref_fast_io u8_storage_ref{::std::addressof(res.parameter_sequence)};
 
@@ -151,8 +152,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         {
             curr_res_argv = res_ps_cbegin + ::std::bit_cast<::std::size_t>(curr_res_argv);
         }
-
-        res.argv.push_back_unchecked(nullptr);
 
         return res;
     }
