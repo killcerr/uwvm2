@@ -588,7 +588,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // what the pointer is pointing to.
                     auto const typesec_types_cbegin_u64{::std::bit_cast<::std::uint64_t>(typesec_types_cbegin)};
 
-                    constexpr auto typesec_types_size{sizeof(*typesec_types_cbegin)};
+                    constexpr auto typesec_types_size{sizeof(::std::iter_value_t<decltype(typesec_types_cbegin)>)};
 
                     {
                         auto v0_u64x2{::std::bit_cast<u64x2simd>(
@@ -934,7 +934,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // what the pointer is pointing to.
                     auto const typesec_types_cbegin_u64{::std::bit_cast<::std::uint64_t>(typesec_types_cbegin)};
 
-                    constexpr auto typesec_types_size{sizeof(*typesec_types_cbegin)};
+                    constexpr auto typesec_types_size{sizeof(::std::iter_value_t<decltype(typesec_types_cbegin)>)};
 
                     {
                         auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
@@ -1565,7 +1565,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // what the pointer is pointing to.
                     auto const typesec_types_cbegin_u64{::std::bit_cast<::std::uint64_t>(typesec_types_cbegin)};
 
-                    constexpr auto typesec_types_size{sizeof(*typesec_types_cbegin)};
+                    constexpr auto typesec_types_size{sizeof(::std::iter_value_t<decltype(typesec_types_cbegin)>)};
 
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
