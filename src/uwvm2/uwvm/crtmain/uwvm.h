@@ -71,14 +71,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
 
 #if !((defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS))  // NOT WINNT
 
-    /// @brief      uwvm c++ main function (posix)
+    /// @brief      uwvm c++ main function (nont winnt)
     /// @details    Handles initialization of all global variables. Only non-raii global variables, or constexpr raii global variables, are allowed, rtti global
     ///             variables and constinit raii global variables are forbidden.
     /// @param      argc Argument Count
     /// @param      argv Argument Vector
     /// @return     exit value
     /// @see        main()
-    inline int uwvm_main_posix(int argc, char** argv) noexcept
+    inline int uwvm_main_non_winnt(int argc, char** argv) noexcept
     {
         // Automatically get the correct timezone data
         ::uwvm2::uwvm::global::tz_set_s tz_set_ele{};

@@ -46,7 +46,7 @@ UWVM_GNU_USED int main(
 )
 {
 #if !((defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS))  // NOT WINNT
-    return ::uwvm2::uwvm::uwvm_main_posix(argc, argv);
+    return ::uwvm2::uwvm::uwvm_main_non_winnt(argc, argv);
 #else
     return ::uwvm2::uwvm::uwvm_main_winnt();
 #endif
