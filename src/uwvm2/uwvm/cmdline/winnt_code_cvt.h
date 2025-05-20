@@ -144,13 +144,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
         for(auto curr_argv{u16_cmdline_argv}; curr_argv != u16_cmdline_argv + res.argc; ++curr_argv)
         {
+            // bit_cast into pointer staging, no addition or subtraction dependency
             res.argv.push_back_unchecked(::std::bit_cast<char8_t const*>(res.parameter_sequence.size()));
             ::fast_io::operations::print_freestanding<false>(u8_storage_ref, ::fast_io::mnp::code_cvt_os_c_str(*curr_argv), u8"\0");
         }
 
         for(auto const res_ps_cbegin{res.parameter_sequence.cbegin()}; auto& curr_res_argv: res.argv)
         {
-            curr_res_argv = res_ps_cbegin + ::std::bit_cast<::std::size_t>(curr_res_argv);
+            // bit_cast back to size_t arithmetic with no additive or subtractive dependencies in the meantime
+            auto const curr_res_argv_res_parameter_sequence_size{::std::bit_cast<::std::size_t>(curr_res_argv)};
+            curr_res_argv = res_ps_cbegin + curr_res_argv_res_parameter_sequence_size;
         }
 
         return res;
