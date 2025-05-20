@@ -150,16 +150,27 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8" |\n ----------------------------------------- \n\n",                        
                                 // uwvm
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"Ultimate WebAssembly Virtual Machine\n",
-        // Debug Mode
-#ifdef _DEBUG
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
-                                u8"(Debug Mode)\n",
-#endif
+                                u8"Ultimate WebAssembly Virtual Machine",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                // mode
+                                u8"\nMode: "
+#if defined(UWVM_MODE_RELEASE)
+                                u8"Release "
+#elif defined(UWVM_MODE_RELEASEDBG)
+                                u8"Releasedbg "
+#elif defined(UWVM_MODE_MINSIZEREL)
+                                u8"Minsizerel "
+#elif defined(UWVM_MODE_DEBUG)
+                                u8"Debug "
+#else
+                                u8"Unknown "
+#endif
+#if defined(UWVM_MODULE)
+                                u8"(CXX-Module) "
+#endif
                                 // Copyright
-                                u8"Copyright (c) 2025-present UlteSoft. All rights reserved.  "
-        // Install Path
+                                u8"\nCopyright (c) 2025-present UlteSoft. All rights reserved.  "
+                                // Install Path
 #if defined(UWVM_SUPPORT_INSTALL_PATH)
                                 u8"\nInstall Path: ",
                                 ::uwvm2::uwvm::utils::install_path::install_path.path_name,
@@ -206,7 +217,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #else
                                 u8"Unknown C++ compiler"
 #endif
-                // std Lib
+                                // std Lib
                                 u8"\nC++ STD Library: "
 #if defined(_LIBCPP_VERSION)
                                 u8"LLVM libc++ ",
@@ -223,7 +234,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"Unknown C++ standard library",
 #endif
 
-                // architecture
+                                // architecture
                                 u8"\nArchitecture: "
 #if defined(__wasm__)
                                 u8"WASM"
@@ -351,16 +362,20 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #  endif
 # endif
 #endif
-// SIMD
+                                // ISA, SIMD
 #if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE)
-# if defined(_M_IX86_FP)
-#  if _M_IX86_FP == 2
-                                u8"\nISA support: MMX SSE SSE2"
-#  endif
-# elif defined(_M_AMD64)
-                                u8"\nISA support: MMX SSE SSE2"
+# if defined(_M_AMD64)
+                                u8"\nISA support: CRC32 MMX SSE SSE2 "
 # elif defined(_M_ARM64)
-                                u8"\nISA support: NEON"
+                                u8"\nISA support: "
+#  if defined(USE_SOFT_INTRINSICS)
+                                u8"CRC32 "
+#  endif
+                                u8"NEON "
+# elif defined(_M_IX86_FP)
+#  if _M_IX86_FP == 2
+                                u8"\nISA support: CRC32 MMX SSE SSE2 "
+#  endif
 # endif
 #elif defined(__wasm_simd128__)
                                 u8"\nISA support: WebAssembly SIMD 128"
@@ -369,11 +384,18 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__loongarch_asx)
                                 u8"LoongASX "
 # endif
-#elif defined(__ARM_NEON) || ((defined(_MSC_VER) && !defined(__clang__)) && defined(_M_ARM64) && !defined(_KERNEL_MODE))
+#elif (defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)) &&                                              \
+    (defined(__ARM_NEON) || defined(__ARM_FEATURE_CRC32)) 
                                 /*
                                  * https://arm-software.github.io/acle/main/acle.html
                                  */
-                                u8"\nISA support: NEON "
+                                u8"\nISA support: "
+# if defined(__ARM_FEATURE_CRC32)
+                                u8"CRC32 "
+# endif
+# if defined(__ARM_NEON)
+                                u8"NEON "
+# endif
 # if defined(__ARM_FEATURE_SVE)
                                 u8"SVE "
 # endif
@@ -387,8 +409,11 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"SME2 "
 # endif
 #elif (defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)) &&                                                                   \
-    (defined(__MMX__) || defined(__FMA__) || defined(__BMI__) || defined(__PRFCHW__))
+    (defined(__MMX__) || defined(__FMA__) || defined(__BMI__) || defined(__PRFCHW__) || defined(__CRC32__))
                                 u8"\nISA support: "
+# if defined(__CRC32__)
+                                u8"CRC32 "
+# endif
 # if defined(__FMA__)
                                 u8"FMA "
 # endif
@@ -605,7 +630,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #elif defined(__UCLIBC__)
                                 u8"uClibc"
 #elif defined(__OHOS__)
-                                u8"OpenHarmony"
+                                u8"Open Harmony"
 #elif defined(__CRTL_VER)
                                 u8"VMS"
 #elif defined(__LIBREL__)
