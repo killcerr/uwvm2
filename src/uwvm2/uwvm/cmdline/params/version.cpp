@@ -690,9 +690,6 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"\n"
                                 // Feature
                                 u8"Feature:\n"
-                                u8"    HWcrc32c: ",
-                                ::fast_io::mnp::boolalpha(::fast_io::details::support_hardware_crc32c),
-                                u8"\n"
                                 u8"    CMDLHash: "
                                 u8"HT=",
                                 ::uwvm2::uwvm::cmdline::hash_table_size.hash_table_size,
