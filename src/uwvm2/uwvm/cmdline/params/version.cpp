@@ -355,17 +355,17 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE)
 # if defined(_M_IX86_FP)
 #  if _M_IX86_FP == 2
-                                u8"\nSIMD support: MMX SSE SSE2"
+                                u8"\nISA support: MMX SSE SSE2"
 #  endif
 # elif defined(_M_AMD64)
-                                u8"\nSIMD support: MMX SSE SSE2"
+                                u8"\nISA support: MMX SSE SSE2"
 # elif defined(_M_ARM64)
-                                u8"\nSIMD support: NEON"
+                                u8"\nISA support: NEON"
 # endif
 #elif defined(__wasm_simd128__)
-                                u8"\nSIMD support: WebAssembly SIMD 128"
+                                u8"\nISA support: WebAssembly SIMD 128"
 #elif defined(__loongarch__) && (defined(__loongarch_sx) || UWVM_HAS_BUILTIN(__builtin_loongarch_crc32c_b))
-                                u8"\nSIMD support: LoongSX "
+                                u8"\nISA support: LoongSX "
 # if defined(__loongarch_asx)
                                 u8"LoongASX "
 # endif
@@ -373,7 +373,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 /*
                                  * https://arm-software.github.io/acle/main/acle.html
                                  */
-                                u8"\nSIMD support: NEON "
+                                u8"\nISA support: NEON "
 # if defined(__ARM_FEATURE_SVE)
                                 u8"SVE "
 # endif
@@ -386,8 +386,21 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__ARM_FEATURE_SME2)
                                 u8"SME2 "
 # endif
-#elif (defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)) && defined(__MMX__)
-                                u8"\nSIMD support: "
+#elif (defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)) &&                                                                   \
+    (defined(__MMX__) || defined(__FMA__) || defined(__BMI__) || defined(__PRFCHW__))
+                                u8"\nISA support: "
+# if defined(__FMA__)
+                                u8"FMA "
+# endif
+# if defined(__BMI__)
+                                u8"BMI "
+# endif
+# if defined(__BMI2__)
+                                u8"BMI2 "
+# endif
+# if defined(__PRFCHW__)
+                                u8"PRFCHW "
+# endif
 # if defined(__MMX__)
                                 u8"MMX "
 # endif
@@ -408,15 +421,6 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 # if defined(__SSE4_2__)
                                 u8"SSE4.2 "
-# endif
-# if defined(__FMA__)
-                                u8"FMA "
-# endif
-# if defined(__BMI__)
-                                u8"BMI "
-# endif
-# if defined(__BMI2__)
-                                u8"BMI2 "
 # endif
 # if defined(__AVX__)
                                 u8"AVX "
@@ -476,7 +480,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"AVX10.2/512 "
 # endif
 #elif defined(__VECTOR4DOUBLE__) || defined(__VSX__) || (defined(__ALTIVEC__) || defined(__VEC__))
-                                u8"\nSIMD support: PPC SIMD"
+                                u8"\nISA support: PPC SIMD"
 #endif
 
                                 // OS
