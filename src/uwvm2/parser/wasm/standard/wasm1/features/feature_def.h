@@ -203,7 +203,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const* end{};
     };
 
-    template <typename ...Ty>
+    template <typename... Ty>
     inline consteval ::std::size_t get_union_size() noexcept
     {
         ::std::size_t max_size{};
@@ -220,15 +220,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                            ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>,
                            ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>>()};
 
-        union vectypeidx_minimize_storage_u
+        union vectypeidx_minimize_storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
             typeidx_u8_view_t typeidx_u8_view;
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8> typeidx_u8_vector;
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16> typeidx_u16_vector;
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> typeidx_u32_vector;
 
-            // Full occupancy is used to initialize the union
-            [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u] = {};
+            // Full occupancy is used to initialize the union, set the union to all zero.
+            [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u]{};
+
+            // destructor of 'vectypeidx_minimize_storage_u' is implicitly deleted because variant field 'typeidx_u8_vector' has a non-trivial destructor
+            inline constexpr ~vectypeidx_minimize_storage_u() {}
         };
 
         static_assert(sizeof(vectypeidx_minimize_storage_u) == sizeof_vectypeidx_minimize_storage_u,
@@ -237,7 +240,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         vectypeidx_minimize_storage_u storage{};
         vectypeidx_minimize_storage_mode mode{};
 
-        inline constexpr vectypeidx_minimize_storage_t() noexcept = default;
+        inline constexpr vectypeidx_minimize_storage_t() noexcept = default; // all-zero
 
         inline constexpr vectypeidx_minimize_storage_t(vectypeidx_minimize_storage_t const& other) noexcept : mode{other.mode}
         {
@@ -249,6 +252,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
+                    // trivial
                     this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
                     break;
                 }
@@ -294,29 +298,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
-                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
-                    other.storage.typeidx_u8_view = {};
+                    // trivial
+                    this->storage.typeidx_u8_view = ::std::move(other.storage.typeidx_u8_view);
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
-                    this->storage.typeidx_u8_vector = ::std::move(other.storage.typeidx_u8_vector);
-                    UWVM_ASSERT(other.storage.typeidx_u8_vector.imp.begin_ptr == nullptr && other.storage.typeidx_u8_vector.imp.curr_ptr == nullptr &&
-                                other.storage.typeidx_u8_vector.imp.end_ptr == nullptr);
+                    // move constructor, placement new
+                    ::new(::std::addressof(this->storage.typeidx_u8_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>{
+                        ::std::move(other.storage.typeidx_u8_vector)};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
-                    this->storage.typeidx_u16_vector = ::std::move(other.storage.typeidx_u16_vector);
-                    UWVM_ASSERT(other.storage.typeidx_u16_vector.imp.begin_ptr == nullptr && other.storage.typeidx_u16_vector.imp.curr_ptr == nullptr &&
-                                other.storage.typeidx_u16_vector.imp.end_ptr == nullptr);
+                    // move constructor, placement new
+                    ::new(::std::addressof(this->storage.typeidx_u16_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>{
+                        ::std::move(other.storage.typeidx_u16_vector)};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
-                    this->storage.typeidx_u32_vector = ::std::move(other.storage.typeidx_u32_vector);
-                    UWVM_ASSERT(other.storage.typeidx_u32_vector.imp.begin_ptr == nullptr && other.storage.typeidx_u32_vector.imp.curr_ptr == nullptr &&
-                                other.storage.typeidx_u32_vector.imp.end_ptr == nullptr);
+                    // move constructor, placement new
+                    ::new(::std::addressof(this->storage.typeidx_u32_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>{
+                        ::std::move(other.storage.typeidx_u32_vector)};
                     break;
                 }
                 [[unlikely]] default:
@@ -389,29 +393,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
-                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
-                    other.storage.typeidx_u8_view = {};
+                    this->storage.typeidx_u8_view = ::std::move(other.storage.typeidx_u8_view);
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
                     this->storage.typeidx_u8_vector = ::std::move(other.storage.typeidx_u8_vector);
-                    UWVM_ASSERT(other.storage.typeidx_u8_vector.imp.begin_ptr == nullptr && other.storage.typeidx_u8_vector.imp.curr_ptr == nullptr &&
-                                other.storage.typeidx_u8_vector.imp.end_ptr == nullptr);
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
                     this->storage.typeidx_u16_vector = ::std::move(other.storage.typeidx_u16_vector);
-                    UWVM_ASSERT(other.storage.typeidx_u16_vector.imp.begin_ptr == nullptr && other.storage.typeidx_u16_vector.imp.curr_ptr == nullptr &&
-                                other.storage.typeidx_u16_vector.imp.end_ptr == nullptr);
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
                     this->storage.typeidx_u32_vector = ::std::move(other.storage.typeidx_u32_vector);
-                    UWVM_ASSERT(other.storage.typeidx_u32_vector.imp.begin_ptr == nullptr && other.storage.typeidx_u32_vector.imp.curr_ptr == nullptr &&
-                                other.storage.typeidx_u32_vector.imp.end_ptr == nullptr);
                     break;
                 }
                 [[unlikely]] default:
@@ -441,25 +438,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
                     this->storage.typeidx_u8_vector.clear_destroy();
-                    UWVM_ASSERT(this->storage.typeidx_u8_vector.imp.begin_ptr == nullptr && this->storage.typeidx_u8_vector.imp.curr_ptr == nullptr &&
-                                this->storage.typeidx_u8_vector.imp.end_ptr == nullptr);
-
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
                     this->storage.typeidx_u16_vector.clear_destroy();
-                    UWVM_ASSERT(this->storage.typeidx_u16_vector.imp.begin_ptr == nullptr && this->storage.typeidx_u16_vector.imp.curr_ptr == nullptr &&
-                                this->storage.typeidx_u16_vector.imp.end_ptr == nullptr);
-
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
                     this->storage.typeidx_u32_vector.clear_destroy();
-                    UWVM_ASSERT(this->storage.typeidx_u32_vector.imp.begin_ptr == nullptr && this->storage.typeidx_u32_vector.imp.curr_ptr == nullptr &&
-                                this->storage.typeidx_u32_vector.imp.end_ptr == nullptr);
-
                     break;
                 }
                 [[unlikely]] default:
