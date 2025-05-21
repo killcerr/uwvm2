@@ -203,8 +203,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const* end{};
     };
 
+    template <typename ...Ty>
+    inline consteval ::std::size_t get_union_size() noexcept
+    {
+        ::std::size_t max_size{};
+        [&max_size]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        { ((max_size = ::std::max(max_size, sizeof(Ty...[I]))), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
+        return max_size;
+    }
+
     struct vectypeidx_minimize_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
+        inline static constexpr ::std::size_t sizeof_vectypeidx_minimize_storage_u{
+            get_union_size<typeidx_u8_view_t,
+                           ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>,
+                           ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>,
+                           ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>>()};
+
         union vectypeidx_minimize_storage_u
         {
             typeidx_u8_view_t typeidx_u8_view;
@@ -212,27 +227,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16> typeidx_u16_vector;
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> typeidx_u32_vector;
 
-            // Lifecycle is fully managed by vectypeidx_minimize_storage_t
-            inline constexpr vectypeidx_minimize_storage_u() noexcept {}
-
-            inline constexpr vectypeidx_minimize_storage_u(vectypeidx_minimize_storage_u const&) noexcept {}
-
-            inline constexpr vectypeidx_minimize_storage_u(vectypeidx_minimize_storage_u&&) noexcept {}
-
-            inline constexpr vectypeidx_minimize_storage_u& operator= (vectypeidx_minimize_storage_u const&) noexcept { return *this; }
-
-            inline constexpr vectypeidx_minimize_storage_u& operator= (vectypeidx_minimize_storage_u&&) noexcept { return *this; }
-
-            inline constexpr ~vectypeidx_minimize_storage_u() {}
+            // Full occupancy is used to initialize the union
+            [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u] = {};
         };
+
+        static_assert(sizeof(vectypeidx_minimize_storage_u) == sizeof_vectypeidx_minimize_storage_u,
+                      "sizeof_vectypeidx_minimize_storage_u not equal to sizeof_vectypeidx_minimize_storage_u");
 
         vectypeidx_minimize_storage_u storage{};
         vectypeidx_minimize_storage_mode mode{};
 
-        inline constexpr vectypeidx_minimize_storage_t() noexcept
-        {
-            if UWVM_IF_NOT_CONSTEVAL { ::fast_io::freestanding::my_memset(::std::addressof(this->storage), 0, sizeof(vectypeidx_minimize_storage_u)); }
-        }
+        inline constexpr vectypeidx_minimize_storage_t() noexcept = default;
 
         inline constexpr vectypeidx_minimize_storage_t(vectypeidx_minimize_storage_t const& other) noexcept : mode{other.mode}
         {
