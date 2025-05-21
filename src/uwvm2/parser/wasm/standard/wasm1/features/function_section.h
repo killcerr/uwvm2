@@ -29,6 +29,7 @@ import fast_io;
 # ifdef UWVM_TIMER
 import uwvm2.utils.debug;
 # endif
+import uwvm2.utils.intrinsics;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
@@ -64,6 +65,7 @@ import :type_section;
 # ifdef UWVM_TIMER
 #  include <uwvm2/utils/debug/impl.h>
 # endif
+# include <uwvm2/utils/intrinsics/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -94,7 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>> funcs{};
 
         // export section
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...> const*> exported_funcs{};
+        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...> const*> exportdesc_funcs{};
 
         // custom section: data
         ::fast_io::vector<::fast_io::u8string_view> custom_func_names_data{};
@@ -245,6 +247,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                     simd_vector_check,
                                                     simd_vector_check};
 
+            // Prefetching for the first cycle
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(section_curr));
+
             while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
                 // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
@@ -347,6 +360,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // Prefetch for Next Loop
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
             }
         }
 
@@ -476,6 +494,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
                 static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
 
+            // Prefetching for the first cycle
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(section_curr));
+
             while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
                 // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
@@ -596,15 +625,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     constexpr auto typesec_types_size{sizeof(::std::iter_value_t<decltype(typesec_types_cbegin)>)};
 
+                    // Check if two pointers can be written at the same time
+                    static_assert(2uz * sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>) == sizeof(u64x2simd));
+
                     {
                         auto v0_u64x2{::std::bit_cast<u64x2simd>(
                             __builtin_shufflevector(simd_vector_str, all_zero, 0, 16, 16, 16, 16, 16, 16, 16, 1, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
                     {
@@ -612,10 +643,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_shufflevector(simd_vector_str, all_zero, 2, 16, 16, 16, 16, 16, 16, 16, 3, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
                     {
@@ -623,10 +653,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_shufflevector(simd_vector_str, all_zero, 4, 16, 16, 16, 16, 16, 16, 16, 5, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
                     {
@@ -634,10 +663,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_shufflevector(simd_vector_str, all_zero, 6, 16, 16, 16, 16, 16, 16, 16, 7, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
                     {
@@ -645,10 +673,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_shufflevector(simd_vector_str, all_zero, 8, 16, 16, 16, 16, 16, 16, 16, 9, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
                     {
@@ -656,10 +683,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_shufflevector(simd_vector_str, all_zero, 10, 16, 16, 16, 16, 16, 16, 16, 11, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
                     {
@@ -667,10 +693,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_shufflevector(simd_vector_str, all_zero, 12, 16, 16, 16, 16, 16, 16, 16, 13, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
                     {
@@ -678,10 +703,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_shufflevector(simd_vector_str, all_zero, 14, 16, 16, 16, 16, 16, 16, 16, 15, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x2[1]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec.funcs.imp.curr_ptr += 2u;
                     }
 
 # else  // defined(__SSE2__) no shuffle
@@ -709,6 +733,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // Prefetch for Next Loop
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
             }
         }
 
@@ -834,6 +863,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
                 static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
 
+            // Prefetching for the first cycle
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 128u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 192u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(section_curr));
+
             while(static_cast<::std::size_t>(section_end - section_curr) >= 32uz) [[likely]]
             {
                 // [before_section ... | func_count ... typeidx1 ... (31) ...] ...
@@ -942,6 +988,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     constexpr auto typesec_types_size{sizeof(::std::iter_value_t<decltype(typesec_types_cbegin)>)};
 
+                    // Check if four pointers can be written at the same time
+                    static_assert(4uz * sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>) == sizeof(u64x4simd));
+
                     {
                         auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -979,14 +1028,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     {
@@ -1026,14 +1070,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     {
@@ -1073,14 +1112,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     {
@@ -1120,14 +1154,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     {
@@ -1167,14 +1196,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     {
@@ -1214,14 +1238,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     {
@@ -1261,14 +1280,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     {
@@ -1308,14 +1322,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          32))};
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x4[3]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec.funcs.imp.curr_ptr += 4u;
                     }
 
                     section_curr += 32uz;
@@ -1324,6 +1333,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // Prefetch for Next Loop
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 128u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 192u);
             }
         }
 
@@ -1450,6 +1470,35 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
                 static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
 
+            // Prefetching for the first cycle
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 128u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 192u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 256u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 320u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 384u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 448u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(section_curr));
+
             while(static_cast<::std::size_t>(section_end - section_curr) >= 64uz) [[likely]]
             {
                 // [before_section ... | func_count ... typeidx1 ... (63) ...] ...
@@ -1573,6 +1622,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     constexpr auto typesec_types_size{sizeof(::std::iter_value_t<decltype(typesec_types_cbegin)>)};
 
+                    // Check if eight pointers can be written at the same time
+                    static_assert(8uz * sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>) == sizeof(u64x8simd));
+
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -1642,22 +1694,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     {
@@ -1729,22 +1768,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     {
@@ -1816,22 +1842,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     {
@@ -1903,22 +1916,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     {
@@ -1990,22 +1990,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     {
@@ -2077,22 +2064,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     {
@@ -2164,22 +2138,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     {
@@ -2251,22 +2212,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                          64))};
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[0]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[1]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[2]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[3]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[4]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[5]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[6]));
-                        functionsec.funcs.emplace_back_unchecked(
-                            ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const*>(v0_u64x8[7]));
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec.funcs.imp.curr_ptr += 8u;
                     }
 
                     section_curr += 64uz;
@@ -2275,6 +2223,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // Prefetch for Next Loop
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 128u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 192u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 256u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 320u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 384u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 448u);
             }
         }
 

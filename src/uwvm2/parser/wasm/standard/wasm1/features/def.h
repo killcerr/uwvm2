@@ -321,7 +321,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using final_global_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_global_type<Fs>())...>;
 
-    /// @brief final_local_function_type
+    /// @brief      final_local_function_type
+    /// @details    Storing pointers instead of u32 doubles the memory on 64-bit platforms, and then the index * size is pre-calculated by simd. on 32-bit
+    ///             platforms, the memory footprint is the same. On all platforms, calculating the index * size at the same time as the parse reduces the time
+    ///             required for subsequent index * size calculations.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct final_local_function_type
     {

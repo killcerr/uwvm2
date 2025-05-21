@@ -42,6 +42,20 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
 {
+    enum class pfc_mode
+    {
+        read = 0,
+        write = 1
+    };
+
+    enum class pfc_level
+    {
+        nta = 0,
+        L3 = 1,
+        L2 = 2,
+        L1 = 3
+    };
+
     /// @brief      Direct conversion to cpu prefetch instructions
     /// @details    write: write or read sensitive
     ///             level == 0 -> nta (Non-Temporal Access)
@@ -50,14 +64,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
     ///             level == 3 -> L1, L2, L3
     /// @param      address address to be prefetched
     /// @see        __builtin_prefetch and _mm_prefetch
-    template <bool write = false, int level = 3>
-        requires (0 <= level && level <= 3)
+    template <pfc_mode prefetch_write = pfc_mode::write, pfc_level prefetch_level = pfc_level::nta>
+        requires ((0 <= static_cast<int>(prefetch_write) && static_cast<int>(prefetch_write) <= 1) &&
+                  (0 <= static_cast<int>(prefetch_level) && static_cast<int>(prefetch_level) <= 3))
     UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL UWVM_GNU_NODEBUG inline void prefetch(void const* address) noexcept
     {
 #if UWVM_HAS_BUILTIN(__builtin_prefetch)
-        __builtin_prefetch(address, static_cast<int>(write), level);
+        __builtin_prefetch(address, static_cast<int>(prefetch_write), static_cast<int>(prefetch_level));
 #else
-        ::_mm_prefetch(reinterpret_cast<char const*>(address), static_cast<int>(write) << 2 | level);
+        ::_mm_prefetch(reinterpret_cast<char const*>(address), static_cast<int>(prefetch_write) << 2u | static_cast<int>(prefetch_level));
 #endif
     }
 
