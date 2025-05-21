@@ -98,7 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // export section
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...> const*> exportdesc_funcs{};
 
-        // custom section: data
+        // custom section: name data
         ::fast_io::vector<::fast_io::u8string_view> custom_func_names_data{};
     };
 
@@ -255,7 +255,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                 reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
                 reinterpret_cast<::std::byte const*>(section_curr));
 
             while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
@@ -362,6 +362,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Prefetch for Next Loop
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
@@ -502,7 +505,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                 reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
                 reinterpret_cast<::std::byte const*>(section_curr));
 
             while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
@@ -737,6 +740,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Prefetch for Next Loop
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
             }
         }
@@ -877,7 +883,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                 reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 192u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
                 reinterpret_cast<::std::byte const*>(section_curr));
 
             while(static_cast<::std::size_t>(section_end - section_curr) >= 32uz) [[likely]]
@@ -1337,6 +1343,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Prefetch for Next Loop
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
@@ -1496,7 +1505,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                 reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 448u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
                 reinterpret_cast<::std::byte const*>(section_curr));
 
             while(static_cast<::std::size_t>(section_end - section_curr) >= 64uz) [[likely]]
@@ -2225,6 +2234,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Prefetch for Next Loop
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr) + 64u);
