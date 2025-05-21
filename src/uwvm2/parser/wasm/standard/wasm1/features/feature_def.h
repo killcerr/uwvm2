@@ -47,6 +47,7 @@ import :def;
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
+# include <fast_io_dsal/vector.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -178,26 +179,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         };
 
     // function_section
-    static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
-                  ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
-                  ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>> &&
-                  ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>> &&
-                  ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>> &&
-                  ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>>);
+    static_assert(
+        ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
+            ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
+            ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>> &&
+            ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>> &&
+            ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>> &&
+            ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>>,
+        "::fast_io::vector is not trivially_copyable_or_relocatable or zero_default_constructible");
 
     enum class vectypeidx_minimize_storage_mode : unsigned
     {
-        u8_begin = 0u,
+        u8_begin,
         u8_vector,
         u16_vector,
         u32_vector
+    };
+
+    struct typeidx_u8_view_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const* begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const* end{};
     };
 
     struct vectypeidx_minimize_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         union vectypeidx_minimize_storage_u
         {
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const* typeidx_u8_begin;
+            typeidx_u8_view_t typeidx_u8_view;
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8> typeidx_u8_vector;
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16> typeidx_u16_vector;
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> typeidx_u32_vector;
@@ -221,7 +230,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline constexpr vectypeidx_minimize_storage_t() noexcept
         {
-            ::fast_io::freestanding::my_memset(::std::addressof(this->storage), 0, sizeof(vectypeidx_minimize_storage_u));
+            if UWVM_IF_NOT_CONSTEVAL { ::fast_io::freestanding::my_memset(::std::addressof(this->storage), 0, sizeof(vectypeidx_minimize_storage_u)); }
+            else
+            {
+                switch(this->mode)
+                {
+                    case vectypeidx_minimize_storage_mode::u8_begin:
+                    {
+                        this->storage.typeidx_u8_view = {};
+                        break;
+                    }
+                    case vectypeidx_minimize_storage_mode::u8_vector:
+                    {
+                        this->storage.typeidx_u8_vector = {};
+                        break;
+                    }
+                    case vectypeidx_minimize_storage_mode::u16_vector:
+                    {
+                        this->storage.typeidx_u16_vector = {};
+                        break;
+                    }
+                    case vectypeidx_minimize_storage_mode::u32_vector:
+                    {
+                        this->storage.typeidx_u32_vector = {};
+                        break;
+                    }
+                    [[unlikely]] default:
+                    {
+                        ::fast_io::fast_terminate();
+                    }
+                }
+            }
         }
 
         inline constexpr vectypeidx_minimize_storage_t(vectypeidx_minimize_storage_t const& other) noexcept : mode{other.mode}
@@ -230,23 +269,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 case vectypeidx_minimize_storage_mode::u8_begin:
                 {
-                    this->storage.typeidx_u8_begin = other.storage.typeidx_u8_begin;
+                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
+                    // copy constructor, placement new
                     ::new(::std::addressof(this->storage.typeidx_u8_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>{
                         other.storage.typeidx_u8_vector};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
+                    // copy constructor, placement new
                     ::new(::std::addressof(this->storage.typeidx_u16_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>{
                         other.storage.typeidx_u16_vector};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
+                    // copy constructor, placement new
                     ::new(::std::addressof(this->storage.typeidx_u32_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>{
                         other.storage.typeidx_u32_vector};
                     break;
@@ -268,8 +310,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 case vectypeidx_minimize_storage_mode::u8_begin:
                 {
-                    this->storage.typeidx_u8_begin = other.storage.typeidx_u8_begin;
-                    ::fast_io::freestanding::my_memset(::std::addressof(other.storage), 0, sizeof(vectypeidx_minimize_storage_u));
+                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
+                    if UWVM_IF_NOT_CONSTEVAL { ::fast_io::freestanding::my_memset(::std::addressof(other.storage), 0, sizeof(vectypeidx_minimize_storage_u)); }
+                    else { other.storage.typeidx_u8_view = typeidx_u8_view_t{}; }
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
@@ -312,7 +355,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 case vectypeidx_minimize_storage_mode::u8_begin:
                 {
-                    this->storage.typeidx_u8_begin = other.storage.typeidx_u8_begin;
+                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
@@ -355,8 +398,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 case vectypeidx_minimize_storage_mode::u8_begin:
                 {
-                    this->storage.typeidx_u8_begin = other.storage.typeidx_u8_begin;
-                    ::fast_io::freestanding::my_memset(::std::addressof(other.storage), 0, sizeof(vectypeidx_minimize_storage_u));
+                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
+                    if UWVM_IF_NOT_CONSTEVAL { ::fast_io::freestanding::my_memset(::std::addressof(other.storage), 0, sizeof(vectypeidx_minimize_storage_u)); }
+                    else { other.storage.typeidx_u8_view = typeidx_u8_view_t{}; }
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
@@ -397,7 +441,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 case vectypeidx_minimize_storage_mode::u8_begin:
                 {
-                    ::fast_io::freestanding::my_memset(::std::addressof(this->storage), 0, sizeof(vectypeidx_minimize_storage_u));
+                    if UWVM_IF_NOT_CONSTEVAL { ::fast_io::freestanding::my_memset(::std::addressof(this->storage), 0, sizeof(vectypeidx_minimize_storage_u)); }
+                    else { this->storage.typeidx_u8_view = typeidx_u8_view_t{}; }
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
@@ -439,7 +484,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 case vectypeidx_minimize_storage_mode::u8_begin:
                 {
-                    ::fast_io::freestanding::my_memset(::std::addressof(this->storage), 0, sizeof(vectypeidx_minimize_storage_u));
+                    if UWVM_IF_NOT_CONSTEVAL { ::fast_io::freestanding::my_memset(::std::addressof(this->storage), 0, sizeof(vectypeidx_minimize_storage_u)); }
+                    else { this->storage.typeidx_u8_view = typeidx_u8_view_t{}; }
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
