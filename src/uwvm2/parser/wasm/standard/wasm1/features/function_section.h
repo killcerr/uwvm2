@@ -361,7 +361,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //                                                             ^^ section_curr
                 }
 
-                // Prefetch for Next Loop
+// Prefetch for Next Loop
+# if 0  // No need to prefetch, already in L1
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
+                    reinterpret_cast<::std::byte const*>(section_curr));
+# endif
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
@@ -631,14 +636,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // Check if two pointers can be written at the same time
                     static_assert(2uz * sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>) == sizeof(u64x2simd));
 
+                    // storage functionsec.funcs.imp.curr_ptr, facilitate the compiler to optimize into registers
+                    auto functionsec_funcs_imp_curr_ptr_temp{functionsec.funcs.imp.curr_ptr};
+
                     {
                         auto v0_u64x2{::std::bit_cast<u64x2simd>(
                             __builtin_shufflevector(simd_vector_str, all_zero, 0, 16, 16, 16, 16, 16, 16, 16, 1, 16, 16, 16, 16, 16, 16, 16))};
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
                     {
@@ -647,8 +655,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
                     {
@@ -657,8 +665,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
                     {
@@ -667,8 +675,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
                     {
@@ -677,8 +685,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
                     {
@@ -687,8 +695,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
                     {
@@ -697,8 +705,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
                     {
@@ -707,10 +715,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x2 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x2 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
-                        functionsec.funcs.imp.curr_ptr += 2u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x2), sizeof(u64x2simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 2u;
                     }
 
+                    functionsec.funcs.imp.curr_ptr = functionsec_funcs_imp_curr_ptr_temp;
 # else  // defined(__SSE2__) no shuffle
 
                     // SSE2:
@@ -737,7 +746,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //                                                             ^^ section_curr
                 }
 
-                // Prefetch for Next Loop
+// Prefetch for Next Loop
+# if 0  // No need to prefetch, already in L1
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
+                    reinterpret_cast<::std::byte const*>(section_curr));
+# endif
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
@@ -997,6 +1011,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // Check if four pointers can be written at the same time
                     static_assert(4uz * sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>) == sizeof(u64x4simd));
 
+                    // storage functionsec.funcs.imp.curr_ptr, facilitate the compiler to optimize into registers
+                    auto functionsec_funcs_imp_curr_ptr_temp{functionsec.funcs.imp.curr_ptr};
+
                     {
                         auto v0_u64x4{::std::bit_cast<u64x4simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -1035,8 +1052,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
 
                     {
@@ -1077,8 +1094,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
 
                     {
@@ -1119,8 +1136,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
 
                     {
@@ -1161,8 +1178,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
 
                     {
@@ -1203,8 +1220,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
 
                     {
@@ -1245,8 +1262,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
 
                     {
@@ -1287,8 +1304,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
 
                     {
@@ -1329,9 +1346,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x4 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x4 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
-                        functionsec.funcs.imp.curr_ptr += 4u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x4), sizeof(u64x4simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 4u;
                     }
+
+                    functionsec.funcs.imp.curr_ptr = functionsec_funcs_imp_curr_ptr_temp;
 
                     section_curr += 32uz;
 
@@ -1341,6 +1360,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Prefetch for Next Loop
+# if 0  // No need to prefetch, already in L1
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
+                    reinterpret_cast<::std::byte const*>(section_curr));
+# endif
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
@@ -1634,6 +1658,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // Check if eight pointers can be written at the same time
                     static_assert(8uz * sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>) == sizeof(u64x8simd));
 
+                    // storage functionsec.funcs.imp.curr_ptr, facilitate the compiler to optimize into registers
+                    auto functionsec_funcs_imp_curr_ptr_temp{functionsec.funcs.imp.curr_ptr};
+
                     {
                         auto v0_u64x8{::std::bit_cast<u64x8simd>(__builtin_shufflevector(simd_vector_str,
                                                                                          all_zero,
@@ -1704,8 +1731,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
 
                     {
@@ -1778,8 +1805,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
 
                     {
@@ -1852,8 +1879,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
 
                     {
@@ -1926,8 +1953,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
 
                     {
@@ -2000,8 +2027,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
 
                     {
@@ -2074,8 +2101,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
 
                     {
@@ -2148,8 +2175,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
 
                     {
@@ -2222,9 +2249,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         v0_u64x8 *= typesec_types_size;  //  To simulate addition of pointers, multiply by the size of the member the pointer is pointing to
                         v0_u64x8 += typesec_types_cbegin_u64;
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.imp.curr_ptr, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
-                        functionsec.funcs.imp.curr_ptr += 8u;
+                        ::fast_io::freestanding::my_memcpy(functionsec_funcs_imp_curr_ptr_temp, ::std::addressof(v0_u64x8), sizeof(u64x8simd));
+                        functionsec_funcs_imp_curr_ptr_temp += 8u;
                     }
+
+                    functionsec.funcs.imp.curr_ptr = functionsec_funcs_imp_curr_ptr_temp;
 
                     section_curr += 64uz;
 
@@ -2233,7 +2262,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //                                                             ^^ section_curr
                 }
 
-                // Prefetch for Next Loop
+// Prefetch for Next Loop
+# if 0  // No need to prefetch, already in L1
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L1>(
+                    reinterpret_cast<::std::byte const*>(section_curr));
+# endif
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
                     reinterpret_cast<::std::byte const*>(functionsec.funcs.imp.curr_ptr));
