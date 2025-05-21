@@ -100,6 +100,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @brief      Maximum typeidx in [2^14, 2^16)
     /// @details    Storing a typeidx takes up 2 bytes, typeidx corresponding uleb128 varies from 1-3 bytes, linear read/write, no simd optimization
+    ///             Sequential scanning, correctly handling all cases of uleb128 u32, allowing up to 5 bytes.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* scan_function_section_impl_u16_3b(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t> sec_adl,
@@ -194,6 +195,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @brief      Maximum typeidx in [2^16, 2^32)
     /// @details    Storing a typeidx takes up 4 bytes, typeidx corresponding uleb128 varies from 1-5 bytes, linear read/write, no simd optimization
+    ///             Sequential scanning, correctly handling all cases of uleb128 u32, allowing up to 5 bytes.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* scan_function_section_impl_u32_5b(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t> sec_adl,
@@ -389,7 +391,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         if(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(128u))
         {
             // storage: 1 byte
-            // vectypeidx: almost always 1 byte.
+            // vectypeidx: almost always 1 byte, may be redundant zeros (up to 5 byte)
             ::fast_io::fast_terminate();  /// @todo
 #if 0
             section_curr = scan_function_section_impl_u8_1b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
@@ -398,7 +400,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         else if(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(256u))
         {
             // storage: 1 byte
-            // vectypeidx: 1 byte - 2 byte
+            // vectypeidx: most 1 byte - 2 byte, may be redundant zeros (up to 5 byte)
             ::fast_io::fast_terminate();  /// @todo
 #if 0
             section_curr = scan_function_section_impl_u8_2b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
@@ -407,7 +409,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         else if(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16384u))
         {
             // storage: 2 byte
-            // vectypeidx: 1 byte - 2 byte
+            // vectypeidx: most 1 byte - 2 byte, may be redundant zeros (up to 5 byte)
             ::fast_io::fast_terminate();  /// @todo
 #if 0
             section_curr = scan_function_section_impl_u16_2b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
@@ -416,13 +418,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         else if(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(65536u))
         {
             // storage: 2 byte
-            // vectypeidx: 1 byte - 3 byte
+            // vectypeidx uleb128: most: 1 byte - 3 byte, may be redundant zeros (up to 5 byte)
             section_curr = scan_function_section_impl_u16_3b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
         }
         else
         {
             // storage: 4 byte
-            // vectypeidx: 1 byte - 5 byte
+            // vectypeidx uleb128: most: 1 byte - 5 byte
             section_curr = scan_function_section_impl_u32_5b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
         }
 
