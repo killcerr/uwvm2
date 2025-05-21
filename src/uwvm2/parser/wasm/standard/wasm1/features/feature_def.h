@@ -240,7 +240,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         vectypeidx_minimize_storage_u storage{};
         vectypeidx_minimize_storage_mode mode{};
 
-        inline constexpr vectypeidx_minimize_storage_t() noexcept = default; // all-zero
+        inline constexpr vectypeidx_minimize_storage_t() noexcept = default;  // all-zero
 
         inline constexpr vectypeidx_minimize_storage_t(vectypeidx_minimize_storage_t const& other) noexcept : mode{other.mode}
         {
@@ -486,6 +486,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     this->storage.typeidx_u32_vector.clear();
                     break;
+                }
+                [[unlikely]] default:
+                {
+                    ::fast_io::fast_terminate();
+                }
+            }
+        }
+
+        inline constexpr ::std::size_t size() noexcept
+        {
+            switch(this->mode)
+            {
+                case vectypeidx_minimize_storage_mode::null:
+                {
+                    return 0;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    return static_cast<::std::size_t>(this->storage.typeidx_u8_view.end - this->storage.typeidx_u8_view.begin);
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    return this->storage.typeidx_u8_vector.size();
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    return this->storage.typeidx_u16_vector.size();
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    return this->storage.typeidx_u32_vector.size();
                 }
                 [[unlikely]] default:
                 {
