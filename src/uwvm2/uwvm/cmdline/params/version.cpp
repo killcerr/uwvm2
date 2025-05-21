@@ -307,12 +307,16 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"HP/PA RISC"
 #elif defined(__riscv)
                                 u8"RISC-V"
-# if defined(__riscv_xlen) && __riscv_xlen == 64
+# if defined(__riscv_xlen) 
+#  if __riscv_xlen == 64
                                 u8" 64"
+#  endif
 # endif
 #elif defined(__370__) || defined(__THW_370__)
                                 u8"System/370"
-#elif defined(__s390__) || defined(__s390x__)
+#elif defined(__s390x__)
+                                u8"System/390 Extended"
+#elif defined(__s390__)
                                 u8"System/390"
 #elif defined(__pdp11)
                                 u8"PDP11"

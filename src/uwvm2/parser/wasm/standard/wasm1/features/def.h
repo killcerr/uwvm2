@@ -240,8 +240,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         static_assert(is_valid_final_extern_type_t<Fs...>);
 
-        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
-
         ::fast_io::u8string_view module_name{};
         ::fast_io::u8string_view extern_name{};
 
@@ -328,10 +326,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     struct final_local_function_type
     {
         final_function_type<Fs...> const* func_type{};
-
-        ::fast_io::u8string_view custom_name{};  // The name used for the data segment
-
-        bool is_exported{};
     };
 
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features

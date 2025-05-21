@@ -92,6 +92,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>> funcs{};
+
+        // export section
+        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...> const*> exported_funcs{};
+
+        // custom section: data
+        ::fast_io::vector<::fast_io::u8string_view> custom_func_names_data{};
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
