@@ -293,25 +293,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             // storage: 1 byte
             // vectypeidx: almost always 1 byte.
-            // section_curr = scan_function_section_impl_1b_1b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            ::fast_io::fast_terminate();  /// @todo
+#if 0
+            section_curr = scan_function_section_impl_1b_1b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+#endif
         }
         else if(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(256u))
         {
             // storage: 1 byte
             // vectypeidx: 1 byte - 2 byte
-            // section_curr = scan_function_section_impl_1b_2b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            ::fast_io::fast_terminate();  /// @todo
+#if 0
+            section_curr = scan_function_section_impl_1b_2b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+#endif
         }
         else if(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16384u))
         {
             // storage: 2 byte
             // vectypeidx: 1 byte - 2 byte
-            // section_curr = scan_function_section_impl_2b_2b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            ::fast_io::fast_terminate();  /// @todo
+#if 0
+            section_curr = scan_function_section_impl_2b_2b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+#endif
         }
         else if(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(65536u))
         {
             // storage: 2 byte
             // vectypeidx: 1 byte - 3 byte
-            // section_curr = scan_function_section_impl_2b_3b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            ::fast_io::fast_terminate();  /// @todo
+#if 0
+            section_curr = scan_function_section_impl_2b_3b(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+#endif
         }
         else
         {
