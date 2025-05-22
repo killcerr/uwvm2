@@ -246,7 +246,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             switch(this->mode)
             {
-                case vectypeidx_minimize_storage_mode::null:
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
                     break;
                 }
@@ -292,7 +292,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // move data
             switch(this->mode)
             {
-                case vectypeidx_minimize_storage_mode::null:
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
                     break;
                 }
@@ -340,7 +340,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             switch(this->mode)
             {
-                case vectypeidx_minimize_storage_mode::null:
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
                     break;
                 }
@@ -387,7 +387,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             switch(this->mode)
             {
-                case vectypeidx_minimize_storage_mode::null:
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
                     break;
                 }
@@ -426,7 +426,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             switch(this->mode)
             {
-                case vectypeidx_minimize_storage_mode::null:
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
                     break;
                 }
@@ -463,7 +463,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             switch(this->mode)
             {
-                case vectypeidx_minimize_storage_mode::null:
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
                     break;
                 }
@@ -498,7 +498,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             switch(this->mode)
             {
-                case vectypeidx_minimize_storage_mode::null:
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
                     return 0;
                 }
@@ -523,6 +523,45 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::fast_terminate();
                 }
             }
+        }
+
+        inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 index_unchecked(::std::size_t sz) noexcept
+        {
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    return static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(-1);
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    return static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(this->storage.typeidx_u8_view.begin[sz]);
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    return static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(this->storage.typeidx_u8_vector.index_unchecked(sz));
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    return static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(this->storage.typeidx_u16_vector.index_unchecked(sz));
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    return this->storage.typeidx_u32_vector.index_unchecked(sz);
+                }
+                [[unlikely]] default:
+                {
+                    ::fast_io::fast_terminate();
+                }
+            }
+        }
+
+        inline constexpr void change_mode(vectypeidx_minimize_storage_mode mode) noexcept
+        {
+            // chang mode need destroy first 
+            clear_destroy();
+            this->mode = mode;
+            // Because the fast_io vector is constructed with all zeros, there is no need to do any constructor operations
         }
     };
 

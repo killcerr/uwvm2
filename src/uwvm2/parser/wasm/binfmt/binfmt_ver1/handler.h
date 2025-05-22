@@ -414,7 +414,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
                 // Note that module_curr may be equal to module_end
                 // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
-                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 sec_len{};
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 sec_len; // No initialization necessary
                 auto const [sec_len_next, sec_len_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(module_curr),
                                                                                 reinterpret_cast<char8_t_const_may_alias_ptr>(module_end),
                                                                                 ::fast_io::mnp::leb128_get(sec_len))};
