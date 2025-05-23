@@ -142,7 +142,7 @@ function mingw_target()
         end
     elseif 
         opt_name == "WS03" or
-        opt_name == "WINXPX64"
+        opt_name == "WINXP64"
             then
         add_defines("_WIN32_WINNT=0x0502")
         add_defines("WINVER=0x0502")

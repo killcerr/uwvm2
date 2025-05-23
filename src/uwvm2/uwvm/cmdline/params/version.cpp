@@ -541,7 +541,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #  elif _WIN32_WINNT >= 0x0600
                                 u8"Windows NT 6.0 (WS08, VISTA)"
 #  elif _WIN32_WINNT >= 0x0502
-                                u8"Windows NT 5.2 (WS03, WINXPX64)"
+                                u8"Windows NT 5.2 (WS03, WINXP64)"
 #  elif _WIN32_WINNT >= 0x0501
                                 u8"Windows NT 5.1 (WINXP)"
 #  elif _WIN32_WINNT >= 0x0500
