@@ -31,7 +31,8 @@ import fast_io;
 # include <concepts>
 # include <memory>
 // sys
-# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&              \
+     !defined(__wasm__)
 #  include <sys/mman.h>
 # endif
 // import
@@ -44,7 +45,8 @@ import fast_io;
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
 {
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
+#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
+    !defined(__wasm__)
     namespace details::posix
     {
 # if defined(__DARWIN_C_LEVEL)
@@ -57,7 +59,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
 
     enum class madvise_flag
     {
-#if defined(_WIN32) || !((!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !defined(_PICOLIBC__))
+#if defined(_WIN32) ||                                                                                                                                         \
+    !((!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !defined(_PICOLIBC__) && !defined(__wasm__))
         normal,
         random,
         sequential,
@@ -215,7 +218,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
             }
         }
 # endif
-#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !defined(_PICOLIBC__)
+#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !defined(_PICOLIBC__) && !defined(__wasm__)
 # if defined(__linux__) && defined(__NR_madvise)
         // linux syscall
         ::fast_io::system_call<__NR_madvise, int>(addr, length, static_cast<int>(flag));

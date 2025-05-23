@@ -31,3 +31,4 @@ Supports over 100 triplet platforms, including DOS series, POSIX series, Windows
 * Linux (aka. unknown-linux-unknown). See [linux.md](documents/how-to-build/linux.md)
 * Darwin (aka. unknown-apple-darwin). See [darwin.md](documents/how-to-build/darwin.md)
 * FreeBSD (aka. unknown-freebsd(Version)). See [freebsd.md](documents/how-to-build/freebsd.md)
+* WASM-WASI (aka. [wasm32|wasm64]-[wasip1|wasip2]-(threads)). See [freebsd.md](documents/how-to-build/wasm-wasi.md)
