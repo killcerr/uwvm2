@@ -93,9 +93,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
         ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_t funcs{};
-
-        // custom section: name data
-        ::fast_io::vector<::fast_io::u8string_view> custom_func_names_data{};
     };
 
     /// @brief      Convert view to vec
@@ -125,6 +122,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // The size comparison between u32 and size_t has already been checked
         functionsec.funcs.storage.typeidx_u8_vector.reserve(static_cast<::std::size_t>(func_count));
+
+        static_assert(sizeof(::std::byte) == sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
 
         // Copy the situation that has been processed correctly
         ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, section_curr - func_counter, func_counter);
