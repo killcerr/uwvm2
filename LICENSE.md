@@ -20,7 +20,7 @@ A machine-readable identifier structured as `<architecture>[-vendor][-system][-e
 #### **Format Rules**:  
 - The Triplet must uniquely identify the Hosted Platform's execution environment.  
 - Omitted fields shall be replaced with empty segments, but the hierarchical structure must retain at least `<architecture>-system` (e.g., `armv7-linux-android` or `x86_64-unknown-freebsd`).  
-- System distributors must document Triplet construction rules in machine-readable manifests (RFC 8949 CBOR format).  
+- System distributors must document Triplet construction rules in machine-readable manifests.  
 
 #### **Examples**:  
 - `x86_64-pc-windows-msvc` (Full specification)  
