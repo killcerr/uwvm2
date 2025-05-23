@@ -500,13 +500,13 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"AVX10.1 "
 # endif
 # if defined(__AVX10_1_512__)
-                                u8"AVX10.1/512 "
+                                u8"AVX10.1-512 "
 # endif
 # if defined(__AVX10_2__)
                                 u8"AVX10.2 "
 # endif
 # if defined(__AVX10_2_512__)
-                                u8"AVX10.2/512 "
+                                u8"AVX10.2-512 "
 # endif
 #elif defined(__VECTOR4DOUBLE__) || defined(__VSX__) || (defined(__ALTIVEC__) || defined(__VEC__))
                                 u8"\nISA support: PPC SIMD"
@@ -572,11 +572,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #elif defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
                                 u8"Linux"
 #elif defined(__APPLE__) && defined(__MACH__)
-# if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
-                                u8"iOS"
-# else
                                 u8"Mac OS"
-# endif
 #elif defined(__DragonFly__)
                                 u8"DragonFlyBSD"
 #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
