@@ -8,7 +8,7 @@
         <img src="https://img.shields.io/github/actions/workflow/status/UlteSoft/uwvm2/ci.yml?branch=master" alt="github-ci" />
     </a>
     <a href="LICENSE.md">
-        <img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" , alt="License" />
+        <img src="https://img.shields.io/badge/License-ASHP%201.0-green.svg" , alt="License" />
     </a>
     <a href="https://en.cppreference.com">
         <img src="https://img.shields.io/badge/language-c++26-blue.svg" ,alt="cppreference" />
