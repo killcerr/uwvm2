@@ -541,9 +541,9 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #  elif _WIN32_WINNT >= 0x0600
                                 u8"Windows NT 6.0 (WS08, VISTA)"
 #  elif _WIN32_WINNT >= 0x0502
-                                u8"Windows NT 5.2 (WINXPX64)"
+                                u8"Windows NT 5.2 (WS03, WINXPX64)"
 #  elif _WIN32_WINNT >= 0x0501
-                                u8"Windows NT 5.1 (WS03, WINXP)"
+                                u8"Windows NT 5.1 (WINXP)"
 #  elif _WIN32_WINNT >= 0x0500
                                 u8"Windows NT 5.0 (WS2K, WIN2K)"
 #  endif
@@ -568,7 +568,6 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 #elif defined(__MSDOS__)
                                 u8"Microsoft Dos"
-
 #elif defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
                                 u8"Linux"
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -616,7 +615,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"MSVCRT"
 #elif (defined(_MSC_VER) || defined(_UCRT)) && !defined(__WINE__) && !defined(__CYGWIN__) && !defined(__BIONIC__)
                                 u8"UCRT"
-#elif defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+#elif defined(__DARWIN_C_LEVEL)
                                 u8"Darwin"
 #elif defined(__GLIBC__)
                                 u8"GNU LIBC ",
