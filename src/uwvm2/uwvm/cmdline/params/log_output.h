@@ -62,7 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::paras
         .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
         .usage{
 #if !defined(__AVR__) && !((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
-    !(defined(__NEWLIB__) && !defined(__CYGWIN__))
+    !(defined(__NEWLIB__) && !defined(__CYGWIN__)) && !defined(_PICOLIBC__) && !defined(__wasm__)
             u8"[out|err|file <file>]"
 #else
             u8"[out|err]"

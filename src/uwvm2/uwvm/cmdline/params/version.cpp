@@ -689,6 +689,10 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"\n"
                                 // Feature
                                 u8"Feature:\n"
+#if !(defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE))
+                                u8"    Error Direct Crash Mode"
+#endif
+                                u8"\n"
                                 u8"    CMDLHash: "
                                 u8"HT=",
                                 ::uwvm2::uwvm::cmdline::hash_table_size.hash_table_size,
