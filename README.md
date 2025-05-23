@@ -28,6 +28,6 @@ Supports over 100 triplet platforms, including DOS series, POSIX series, Windows
 ## How to build
 * Windows (aka. unknown-windows-msvc). See [windows.md](documents/how-to-build/windows.md)
 * MinGW (aka. unknown-windows-gnu, unknown-w64-mingw32). See [mingw.md](documents/how-to-build/mingw.md)
-* linux (aka. unknown-linux-unknown). See [linux.md](documents/how-to-build/linux.md)
+* Linux (aka. unknown-linux-unknown). See [linux.md](documents/how-to-build/linux.md)
 * Darwin (aka. unknown-apple-darwin). See [darwin.md](documents/how-to-build/darwin.md)
 * FreeBSD (aka. unknown-freebsd(Version)). See [freebsd.md](documents/how-to-build/freebsd.md)
