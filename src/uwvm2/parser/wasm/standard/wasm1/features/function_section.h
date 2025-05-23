@@ -240,6 +240,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         /// (Little Endian), sizeof(::std::size_t) == 8uz (UINT_LEAST32_MAX < SIZE_MAX), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
+        /// @todo need check
 
         static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
@@ -311,6 +312,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif UINT_LEAST32_MAX < SIZE_MAX && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE)
         /// (Little Endian) Variable Length
         /// mask: aarch64-sve
+        /// @todo need check
 
         static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
@@ -404,9 +406,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             section_curr += last_load_predicate_size;
 
-            // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size) ...] (end)
-            // [                        safe                                                   ] unsafe (could be the section_end)
-            //                                                                                   ^^ section_curr
+            // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size - 1) ...] (end)
+            // [                        safe                                                       ] unsafe (could be the section_end)
+            //                                                                                       ^^ section_curr
         }
 
 #elif UINT_LEAST32_MAX < SIZE_MAX && __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                            \
@@ -414,6 +416,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512) || UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
         /// (Little Endian)
         /// mask: x86_64-avx512vbmi
+        /// @todo need check
 
         using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
         using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
@@ -528,7 +531,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
                 !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(check_upper), ::std::bit_cast<i64x4simd>(check_upper))
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
-                __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))
+                __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))  /// @todo need check
 # endif
                     ) [[unlikely]]
             {
@@ -597,15 +600,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
                 __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
-                !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))
+                !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))  /// @todo need check
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
-                __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))
+                __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))  /// @todo need check
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                  // Only supported by clang
                 __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_upper))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
                 __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))
+                __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
 # endif
                     ) [[unlikely]]
             {
