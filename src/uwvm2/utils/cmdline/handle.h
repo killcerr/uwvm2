@@ -233,7 +233,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 default: return false;
             }
         }
-        else { return true; }
+        else
+        {
+            return true;
+        }
     }
 
     /// @brief this function expand all parameter raw name and it alias name and check whether they are valid
@@ -502,18 +505,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                     // If the above scenario is defined, there will never be a hit here.
                     ::fast_io::unreachable();
                 }
-                else [[unlikely]] { return nullptr; }
+                else [[unlikely]]
+                {
+                    return nullptr;
+                }
             }
             else
             {
                 if(str == htval.str) [[likely]] { return htval.para; }
-                else [[unlikely]] { return nullptr; }
+                else [[unlikely]]
+                {
+                    return nullptr;
+                }
             }
         }
         else
         {
             if(str == htval.str) [[likely]] { return htval.para; }
-            else [[unlikely]] { return nullptr; }
+            else [[unlikely]]
+            {
+                return nullptr;
+            }
         }
     }
 

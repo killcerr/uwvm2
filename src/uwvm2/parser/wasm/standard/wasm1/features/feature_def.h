@@ -558,7 +558,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline constexpr void change_mode(vectypeidx_minimize_storage_mode mode) noexcept
         {
-            // chang mode need destroy first 
+            // chang mode need destroy first
             clear_destroy();
             this->mode = mode;
             // Because the fast_io vector is constructed with all zeros, there is no need to do any constructor operations

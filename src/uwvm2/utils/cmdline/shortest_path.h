@@ -67,7 +67,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         else
         {
             if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[y_length + 1uz]; }
-            else { d = Alloc::allocate(y_length + 1uz); }
+            else
+            {
+                d = Alloc::allocate(y_length + 1uz);
+            }
         }
 
         for(::std::size_t j{}; j <= y_length; j++) { d[j] = j; }
@@ -96,7 +99,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         if constexpr(!Stack_Len)
         {
             if UWVM_IF_CONSTEVAL { ::delete[] d; }
-            else { Alloc::deallocate_n(d, y_length + 1uz); }
+            else
+            {
+                Alloc::deallocate_n(d, y_length + 1uz);
+            }
         }
 
         return ret;

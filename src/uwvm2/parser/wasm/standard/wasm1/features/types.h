@@ -145,7 +145,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // set present_max
             limit_r.present_max = false;
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_min; // No initialization necessary
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_min;  // No initialization necessary
             auto const [next_n_min, err_n_min]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
                                                                         reinterpret_cast<char8_t_const_may_alias_ptr>(end),
                                                                         ::fast_io::mnp::leb128_get(n_min))};
@@ -180,7 +180,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // set present_max
             limit_r.present_max = true;
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_max; // No initialization necessary
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_max;  // No initialization necessary
             auto const [next_n_max, err_n_max]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
                                                                         reinterpret_cast<char8_t_const_may_alias_ptr>(end),
                                                                         ::fast_io::mnp::leb128_get(n_max))};

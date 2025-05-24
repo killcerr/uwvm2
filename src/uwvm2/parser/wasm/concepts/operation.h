@@ -476,7 +476,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
                                      is_repeatable = true;
                                      return replacement_structure_followup_impl<T, replacement, Args...>(repeating);
                                  }
-                                 else { return type_wrapper<void>{}; }
+                                 else
+                                 {
+                                     return type_wrapper<void>{};
+                                 }
                              }.template operator()<Args...[I]>()),  // This is an overloaded comma expression
                          ...)
                     };
@@ -486,7 +489,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
                         // last one
                         return type_wrapper<Superseded>{};
                     }
-                    else { return ret; }
+                    else
+                    {
+                        return ret;
+                    }
                 }(::std::make_index_sequence<sizeof...(Args)>{});
             }
 

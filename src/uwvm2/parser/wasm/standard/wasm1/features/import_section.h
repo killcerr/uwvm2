@@ -112,7 +112,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
         // get type index
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_index; // No initialization necessary
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_index;  // No initialization necessary
         auto const [type_index_next, type_index_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                               reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                               ::fast_io::mnp::leb128_get(type_index))};
@@ -292,7 +292,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [        safe       ] | unsafe (could be the section_end)
         //                         ^^ section_curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 import_count; // No initialization necessary
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 import_count;  // No initialization necessary
 
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
@@ -362,7 +362,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // storage fit (need move)
             ::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> fit{};
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 module_namelen; // No initialization necessary
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 module_namelen;  // No initialization necessary
             auto const [module_namelen_next, module_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                                           ::fast_io::mnp::leb128_get(module_namelen))};
@@ -423,7 +423,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // Note that section_curr may be equal to section_end, checked in the subsequent parse_by_scan
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 extern_namelen; // No initialization necessary
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 extern_namelen;  // No initialization necessary
             auto const [extern_namelen_next, extern_namelen_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                                           ::fast_io::mnp::leb128_get(extern_namelen))};

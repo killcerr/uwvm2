@@ -86,7 +86,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline consteval auto get_value_type() noexcept
     {
         if constexpr(has_value_type<FeatureType>) { return typename FeatureType::value_type{}; }
-        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -133,7 +136,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline consteval auto get_type_prefix() noexcept
     {
         if constexpr(has_type_prefix<FeatureType>) { return typename FeatureType::type_prefix{}; }
-        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -170,7 +176,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                             constexpr bool tallow{FsCurr::allow_multi_result_vector};
                                                                             return tallow;
                                                                         }
-                                                                        else { return false; }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
                                                                     }.template operator()<Fs...[I]>()) ||
                     ...);
         }(::std::make_index_sequence<sizeof...(Fs)>{});
@@ -221,7 +230,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline consteval auto get_extern_type() noexcept
     {
         if constexpr(has_extern_type<FeatureType>) { return typename FeatureType::template extern_type<Fs...>{}; }
-        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -265,7 +277,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline consteval auto get_table_type() noexcept
     {
         if constexpr(has_table_type<FeatureType>) { return typename FeatureType::table_type{}; }
-        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -290,7 +305,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline consteval auto get_memory_type() noexcept
     {
         if constexpr(has_memory_type<FeatureType>) { return typename FeatureType::memory_type{}; }
-        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -315,7 +333,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline consteval auto get_global_type() noexcept
     {
         if constexpr(has_global_type<FeatureType>) { return typename FeatureType::global_type{}; }
-        else { return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>

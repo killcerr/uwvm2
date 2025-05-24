@@ -114,7 +114,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
             return ::uwvm2::utils::cmdline::parameter_return_type::def;
         }
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version; // No initialization necessary
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version;  // No initialization necessary
         auto const [next, err]{::fast_io::parse_by_scan(currp1_str.cbegin(), currp1_str.cend(), binfmt_version)};
 
         // parse u32 error

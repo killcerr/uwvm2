@@ -120,7 +120,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // parameter
         {
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 para_len; // No initialization necessary
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 para_len;  // No initialization necessary
             auto const [next_para_len, err_para_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                               reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                               ::fast_io::mnp::leb128_get(para_len))};
@@ -188,7 +188,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [                 safe                 ] unsafe (could be the section_end)
             //                                          ^^ section_curr
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 result_len; // No initialization necessary
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 result_len;  // No initialization necessary
             auto const [next_result_len, err_result_len]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                   reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                                   ::fast_io::mnp::leb128_get(result_len))};
@@ -345,7 +345,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [        safe       ] | unsafe (could be the section_end)
         //                         ^^ section_curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_count; // No initialization necessary
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_count;  // No initialization necessary
 
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 

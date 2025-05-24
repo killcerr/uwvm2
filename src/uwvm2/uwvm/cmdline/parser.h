@@ -217,7 +217,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                             pr.emplace_back_unchecked(argv_str, para, ::uwvm2::utils::cmdline::parameter_parsing_results_type::parameter);
                         }
                     }
-                    else { pr.emplace_back_unchecked(argv_str, para, ::uwvm2::utils::cmdline::parameter_parsing_results_type::parameter); }
+                    else
+                    {
+                        pr.emplace_back_unchecked(argv_str, para, ::uwvm2::utils::cmdline::parameter_parsing_results_type::parameter);
+                    }
 
                     // The preprocessor that calls this function
                     // Preprocessing is used to jump directly to the backmarked section.
@@ -233,7 +236,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     }
                 }
             }
-            else { pr.emplace_back_unchecked(argv_str, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg); }
+            else
+            {
+                pr.emplace_back_unchecked(argv_str, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg);
+            }
         }
 
         // ...   "--run" (end)         "wasm file name" ...

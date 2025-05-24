@@ -134,22 +134,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             if constexpr(Varint <= 8)
             {
                 if constexpr(Unsigned) { return wasm_u8{}; }
-                else { return wasm_i8{}; }
+                else
+                {
+                    return wasm_i8{};
+                }
             }
             else if constexpr(Varint <= 16)
             {
                 if constexpr(Unsigned) { return wasm_u16{}; }
-                else { return wasm_i16{}; }
+                else
+                {
+                    return wasm_i16{};
+                }
             }
             else if constexpr(Varint <= 32)
             {
                 if constexpr(Unsigned) { return wasm_u32{}; }
-                else { return wasm_i32{}; }
+                else
+                {
+                    return wasm_i32{};
+                }
             }
             else if constexpr(Varint <= 64)
             {
                 if constexpr(Unsigned) { return wasm_u64{}; }
-                else { return wasm_i64{}; }
+                else
+                {
+                    return wasm_i64{};
+                }
             }
         }
 
@@ -167,22 +179,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             if constexpr(StorageSize <= 1)
             {
                 if constexpr(Unsigned) { return wasm_u8{}; }
-                else { return wasm_i8{}; }
+                else
+                {
+                    return wasm_i8{};
+                }
             }
             else if constexpr(StorageSize <= 3)
             {
                 if constexpr(Unsigned) { return wasm_u16{}; }
-                else { return wasm_i16{}; }
+                else
+                {
+                    return wasm_i16{};
+                }
             }
             else if constexpr(StorageSize <= 5)
             {
                 if constexpr(Unsigned) { return wasm_u32{}; }
-                else { return wasm_i32{}; }
+                else
+                {
+                    return wasm_i32{};
+                }
             }
             else if constexpr(StorageSize <= 10)
             {
                 if constexpr(Unsigned) { return wasm_u64{}; }
-                else { return wasm_i64{}; }
+                else
+                {
+                    return wasm_i64{};
+                }
             }
         }
     }  // namespace details
