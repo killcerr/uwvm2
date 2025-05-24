@@ -309,6 +309,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
         }
+
 #elif defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE)
         /// (Little Endian) Variable Length
         /// mask: aarch64-sve
@@ -376,14 +377,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // Generate quantifiers for final tail processing
         svbool_t load_predicate;  // No initialization necessary
-        
-        if constexpr (sizeof(::std::byte const*) == sizeof(::std::uint64_t))
+
+        if constexpr(sizeof(::std::byte const*) == sizeof(::std::uint64_t))
         {
-            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr), ::std::bit_cast<::std::uint64_t>(section_end));
+            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
+                                                                                   ::std::bit_cast<::std::uint64_t>(section_end));
         }
         else
         {
-           load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr), ::std::bit_cast<::std::uint32_t>(section_end));
+            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
+                                                                                   ::std::bit_cast<::std::uint32_t>(section_end));
         }
 
         // sve safely loads memory via predicates

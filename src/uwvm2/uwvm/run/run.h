@@ -41,6 +41,7 @@ import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.storage;
 import uwvm2.uwvm.wasm.feature;
 import uwvm2.uwvm.wasm.custom;
+import :retval;
 #else
 // std
 # include <cstddef>
@@ -68,6 +69,7 @@ import uwvm2.uwvm.wasm.custom;
 # include <uwvm2/uwvm/wasm/storage/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 # include <uwvm2/uwvm/wasm/custom/impl.h>
+# include "retval.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -91,7 +93,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" for more information.\n\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
-            return -2;  // The specified file is not available or cannot be opened
+            return static_cast<int>(::uwvm2::uwvm::run::retval::load_error);
         }
 
         // storage module name
@@ -127,7 +129,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 u8"\n"
 # endif
             );
-            return -2;  // The specified file is not available or cannot be opened
+            return static_cast<int>(::uwvm2::uwvm::run::retval::load_error);
         }
 #endif
 
@@ -172,7 +174,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                     u8"\n\n");
 #endif
-                return -3;  // wasm parsing error
+                return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error);  // wasm parsing error
             }
             case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u):
             {
@@ -228,7 +230,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                 u8"\n\n");
                         }
 # endif
-                        return -3;  // wasm parsing error
+                        return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error);
                     }
 #endif
                     // handle custom
@@ -236,10 +238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         ::uwvm2::uwvm::wasm::custom::handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
                                                                                    ::uwvm2::uwvm::wasm::custom::custom_handle_funcs)};
                     // 0: success, others: fault
-                    if(custom_res) [[unlikely]]
-                    {
-                        return -4;  // custom handling error
-                    }
+                    if(custom_res) [[unlikely]] { return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error); }
                 }
 
                 /// @todo handle import modules
@@ -275,7 +274,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
-                return -3;  // wasm parsing error
+                return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error);
             }
         }
 
@@ -290,7 +289,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             default: ::fast_io::unreachable();
         }
 
-        return 0;
+        return static_cast<int>(::uwvm2::uwvm::run::retval::ok);
     }
 }  // namespace uwvm2::uwvm::run
 

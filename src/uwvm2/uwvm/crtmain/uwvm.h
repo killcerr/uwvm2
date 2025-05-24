@@ -61,8 +61,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
         switch(::uwvm2::uwvm::cmdline::parsing(argc, argv))
         {
             case ::uwvm2::uwvm::cmdline::parsing_return_val::def: break;
-            case ::uwvm2::uwvm::cmdline::parsing_return_val::return0: return 0;
-            case ::uwvm2::uwvm::cmdline::parsing_return_val::returnm1: return -1;  // Invalid parameters
+            case ::uwvm2::uwvm::cmdline::parsing_return_val::return0: return static_cast<int>(::uwvm2::uwvm::run::retval::ok);
+            case ::uwvm2::uwvm::cmdline::parsing_return_val::returnm1: return static_cast<int>(::uwvm2::uwvm::run::retval::parameter_error);
             default: ::fast_io::unreachable();
         }
 
@@ -108,7 +108,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
                                     u8"\".",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
-                return -1;  // invalid parameter
+                return static_cast<int>(::uwvm2::uwvm::run::retval::parameter_error);
             }
         }
 

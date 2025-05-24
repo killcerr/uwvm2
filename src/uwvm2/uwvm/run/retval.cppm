@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-05-24
  * @copyright   ASHP-1.0 License
  */
 
@@ -20,9 +20,19 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstdint>
+#include <cstddef>
+
+export module uwvm2.uwvm.run:retval;
 
 #ifndef UWVM_MODULE
-# include "retval.h"
-# include "run.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "retval.h"
