@@ -51,51 +51,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svptrue_b8)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline svbool_t svptrue_b8() noexcept;
+    extern svbool_t svptrue_b8() noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svdup_n_u8)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline svuint8_t svdup_n_u8(::std::uint8_t) noexcept;
+    extern svuint8_t svdup_n_u8(::std::uint8_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svptest_any)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline bool svptest_any(svbool_t, svbool_t) noexcept;
+    extern bool svptest_any(svbool_t, svbool_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svwhilelt_b8_u64)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline svbool_t svwhilelt_b8_u64(::std::uint64_t, ::std::uint64_t) noexcept;
+    extern svbool_t svwhilelt_b8_u64(::std::uint64_t, ::std::uint64_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svwhilelt_b8_u32)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline svbool_t svwhilelt_b8_u32(::std::uint32_t, ::std::uint32_t) noexcept;
+    extern svbool_t svwhilelt_b8_u32(::std::uint32_t, ::std::uint32_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svld1_u8)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline svuint8_t svld1_u8(svbool_t, ::std::uint8_t const *) noexcept;
+    extern svuint8_t svld1_u8(svbool_t, ::std::uint8_t const *) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svcmpge_n_u8)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline svbool_t svcmpge_n_u8(svbool_t, svuint8_t, ::std::uint8_t) noexcept;
+    extern svbool_t svcmpge_n_u8(svbool_t, svuint8_t, ::std::uint8_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svcntp_b8)]]
     [[__gnu__::__always_inline__]]
-    [[__gnu__::__artificial__]]
     [[__gnu__::__nodebug__]]
-    inline ::std::uint64_t svcntp_b8(svbool_t, svbool_t);
+    extern ::std::uint64_t svcntp_b8(svbool_t, svbool_t);
 
     // clang-format on
 
