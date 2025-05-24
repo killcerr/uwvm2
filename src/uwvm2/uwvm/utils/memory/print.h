@@ -62,10 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::memory
         auto err_curr{mem.err_curr};
         auto err_end{mem.err_end};
 
-        if (err_begin > err_end || err_curr < err_begin || err_curr > err_end) [[unlikely]]
-        {
-            return;
-        }
+        if(err_begin > err_end || err_curr < err_begin || err_curr > err_end) [[unlikely]] { return; }
 
         bool print_front_ext{};
         bool print_end_ext{};

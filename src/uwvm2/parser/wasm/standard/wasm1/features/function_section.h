@@ -310,43 +310,112 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
-#elif defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE)
+#elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME))
         /// (Little Endian) Variable Length
         /// mask: aarch64-sve
         /// @todo need check
 
-        static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
-
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
-
-        auto const all_one_predicate_reg{::uwvm2::utils::intrinsics::arm_sve::svptrue_b8()};
-        auto const svc_sz{::uwvm2::utils::intrinsics::arm_sve::svcntb()};
-
-        while(static_cast<::std::size_t>(section_end - section_curr) >= svc_sz) [[likely]]
+        // Support for certain cpu's that don't have SVE but have SME like apple m4
+        [&]
+# if defined(__ARM_FEATURE_SME) && !defined(__ARM_FEATURE_SVE)
+            __arm_locally_streaming
+# endif
+            () constexpr noexcept -> void
         {
-            // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] ...
+            static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
+
+            auto const all_one_predicate_reg{::uwvm2::utils::intrinsics::arm_sve::svptrue_b8()};
+            auto const svc_sz{::uwvm2::utils::intrinsics::arm_sve::svcntb()};
+
+            while(static_cast<::std::size_t>(section_end - section_curr) >= svc_sz) [[likely]]
+            {
+                // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] ...
+                // [                        safe                                     ] unsafe (could be the section_end)
+                //                                      ^^ section_curr
+                //                                      [       simd_vector_str      ]
+
+                using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
+
+                // The entire sve can be loaded
+                auto const simd_vector_str{
+                    ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(all_one_predicate_reg, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
+
+                auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(all_one_predicate_reg, simd_vector_str, simd_vector_check)};
+
+                if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(all_one_predicate_reg, check_upper)) [[unlikely]]
+                {
+                    return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                }
+                else
+                {
+                    // all are single bytes, so there are 64
+                    // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
+                    func_counter += svc_sz;
+
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = func_count;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    section_curr += svc_sz;
+
+                    // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] typeidx64
+                    // [                        safe                                     ] unsafe (could be the section_end)
+                    //                                                                     ^^ section_curr
+                }
+            }
+
+            // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] typeidx64 ... (?) ... ] (end)
+            // [                        safe                                                             ] unsafe (could be the section_end)
+            //                                                                     ^^ section_curr
+            //
+            // Or maybe:
+            //
+            // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] (end)
             // [                        safe                                     ] unsafe (could be the section_end)
-            //                                      ^^ section_curr
-            //                                      [       simd_vector_str      ]
+            //                                                                     ^^ section_curr
 
-            using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
+            // Generate quantifiers for final tail processing
+            svbool_t load_predicate;  // No initialization necessary
 
-            // The entire sve can be loaded
+            if constexpr(sizeof(::std::byte const*) == sizeof(::std::uint64_t))
+            {
+                load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
+                                                                                       ::std::bit_cast<::std::uint64_t>(section_end));
+            }
+            else
+            {
+                load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
+                                                                                       ::std::bit_cast<::std::uint32_t>(section_end));
+            }
+
+            // sve safely loads memory via predicates
             auto const simd_vector_str{
-                ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(all_one_predicate_reg, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
+                ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(load_predicate, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
 
-            auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(all_one_predicate_reg, simd_vector_str, simd_vector_check)};
+            auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(load_predicate, simd_vector_str, simd_vector_check)};
 
-            if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(all_one_predicate_reg, check_upper)) [[unlikely]]
+            if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(load_predicate, check_upper)) [[unlikely]]
             {
                 return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
             else
             {
+                using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
+
+                auto const last_load_predicate_size{static_cast<::std::size_t>(reinterpret_cast<uint8_t_const_may_alias_ptr>(section_end) -
+                                                                               reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
+
                 // all are single bytes, so there are 64
                 // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                func_counter += svc_sz;
+                func_counter += last_load_predicate_size;
 
                 // check counter
                 if(func_counter > func_count) [[unlikely]]
@@ -357,70 +426,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
 
-                section_curr += svc_sz;
+                section_curr += last_load_predicate_size;
 
-                // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] typeidx64
-                // [                        safe                                     ] unsafe (could be the section_end)
-                //                                                                     ^^ section_curr
+                // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size - 1) ...] (end)
+                // [                        safe                                                       ] unsafe (could be the section_end)
+                //                                                                                       ^^ section_curr
             }
         }
-
-        // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] typeidx64 ... (?) ... ] (end)
-        // [                        safe                                                             ] unsafe (could be the section_end)
-        //                                                                     ^^ section_curr
-        //
-        // Or maybe:
-        //
-        // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] (end)
-        // [                        safe                                     ] unsafe (could be the section_end)
-        //                                                                     ^^ section_curr
-
-        // Generate quantifiers for final tail processing
-        svbool_t load_predicate;  // No initialization necessary
-
-        if constexpr(sizeof(::std::byte const*) == sizeof(::std::uint64_t))
-        {
-            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
-                                                                                   ::std::bit_cast<::std::uint64_t>(section_end));
-        }
-        else
-        {
-            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
-                                                                                   ::std::bit_cast<::std::uint32_t>(section_end));
-        }
-
-        // sve safely loads memory via predicates
-        auto const simd_vector_str{::uwvm2::utils::intrinsics::arm_sve::svld1_u8(load_predicate, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
-
-        auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(load_predicate, simd_vector_str, simd_vector_check)};
-
-        if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(load_predicate, check_upper)) [[unlikely]]
-        {
-            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
-        }
-        else
-        {
-            auto const last_load_predicate_size{::uwvm2::utils::intrinsics::arm_sve::svcntp_b8(all_one_predicate_reg, load_predicate)};
-
-            // all are single bytes, so there are 64
-            // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-            func_counter += last_load_predicate_size;
-
-            // check counter
-            if(func_counter > func_count) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_selectable.u32 = func_count;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
-
-            section_curr += last_load_predicate_size;
-
-            // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size - 1) ...] (end)
-            // [                        safe                                                       ] unsafe (could be the section_end)
-            //                                                                                       ^^ section_curr
-        }
+        ();
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
     (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512) || UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
@@ -648,7 +661,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #endif
 
 #if ((defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))) ||                                      \
-    !(defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE))
+    !(defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME)))
         // non-simd or simd (non-sve) tail-treatment
         // msvc, non-sve, default
         // arm-sve no tail treatment required
