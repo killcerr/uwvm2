@@ -396,7 +396,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #  endif
 # endif
 #elif defined(__wasm_simd128__)
-                                u8"\nISA support: WebAssembly SIMD 128"
+                                u8"\nISA support: SIMD128"
 #elif defined(__loongarch__) && (defined(__loongarch_sx) || UWVM_HAS_BUILTIN(__builtin_loongarch_crc32c_b))
                                 u8"\nISA support: LoongSX "
 # if defined(__loongarch_asx)
@@ -704,7 +704,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 // Feature
                                 u8"Feature:\n"
 #if !(defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE))
-                                u8"    Error Direct Crash Mode"
+                                u8"    Error Direct Crash Mode (fno-exceptions)"
 #endif
                                 u8"\n"
                                 u8"    CMDLHash: "
