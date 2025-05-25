@@ -35,6 +35,8 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
+    /// @brief      main return value
+    /// @details    retval should be [0, 126) to support various platforms
     enum retval
     {
         ok = 0,
