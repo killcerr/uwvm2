@@ -313,12 +313,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME))
         /// (Little Endian) Variable Length
         /// mask: aarch64-sve
-        /// @todo need check
 
         // Lambda is an external function call, and error handling needs to be carried out in current function
         bool need_change_u8_1b_view_to_vec{};
 
-        // Support for certain cpu's that don't have SVE but have SME like apple m4
+        // Support for certain cpu's that don't have SVE but have SME like Apple M4
+        //
+        // However, for this type of cpu (e.g. Apple M4), the sme module is separated from the cpu, resulting in very high latency when using it, 
+        // so llvm for Apple M4 march=native will not start armv8a+sme, but rather use it as armv8a
+        //
+        // Here you just need to leave it to llvm's judgment, if the sme unit is done inside the cpu, 
+        // then llvm's march=native will turn on by itself.
         [&]
 # if defined(__ARM_FEATURE_SME) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
