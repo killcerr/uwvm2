@@ -319,8 +319,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // Support for certain cpu's that don't have SVE but have SME like Apple M4
         //
-        // However, for this type of cpu (e.g. Apple M4), the sme module is separated from the cpu, resulting in very high latency when using it, 
-        // so llvm for Apple M4 march=native will not start armv8a+sme, but rather use it as armv8a
+        // However, for this type of cpu (e.g. Apple M4), the sme module is separated from the cpu, 
+        // resulting in very high latency when using it (on Apple M4, SME (SVE stream mode) 15x slower than NEON), 
+        // so llvm for Apple M4 march=native will not start armv8a+sme, but rather use it as armv8a.
         //
         // Here you just need to leave it to llvm's judgment, if the sme unit is done inside the cpu, 
         // then llvm's march=native will turn on by itself.
