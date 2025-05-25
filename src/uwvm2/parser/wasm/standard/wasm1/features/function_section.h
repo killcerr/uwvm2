@@ -315,7 +315,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// mask: aarch64-sve
         /// @todo need check
 
-        // Lambda is an external function call, and error handling needs to be carried out in this function
+        // Lambda is an external function call, and error handling needs to be carried out in current function
         bool need_change_u8_1b_view_to_vec{};
 
         // Support for certain cpu's that don't have SVE but have SME like apple m4
@@ -387,18 +387,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                                                     ^^ section_curr
 
             // Generate quantifiers for final tail processing
-            svbool_t load_predicate;  // No initialization necessary
+            ::uwvm2::utils::intrinsics::arm_sve::svbool_t load_predicate;  // No initialization necessary
 
-            if constexpr(sizeof(::std::byte const*) == sizeof(::std::uint64_t))
-            {
-                load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
-                                                                                       ::std::bit_cast<::std::uint64_t>(section_end));
-            }
-            else
-            {
-                load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
-                                                                                       ::std::bit_cast<::std::uint32_t>(section_end));
-            }
+# if SIZE_MAX <= UINT32_MAX
+            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
+                                                                                   ::std::bit_cast<::std::uint32_t>(section_end));
+# else
+            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
+                                                                                   ::std::bit_cast<::std::uint64_t>(section_end));
+# endif
+
+            using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
 
             // sve safely loads memory via predicates
             auto const simd_vector_str{

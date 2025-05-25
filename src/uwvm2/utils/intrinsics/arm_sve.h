@@ -24,7 +24,7 @@
 
 #pragma once
 
-#if defined(__ARM_FEATURE_SVE)
+#if defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME)
 
 # ifdef UWVM_MODULE
 // no import
@@ -88,6 +88,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
     [[__gnu__::__always_inline__]]
     [[__gnu__::__nodebug__]]
     extern ::std::uint64_t svcntp_b8(svbool_t, svbool_t);
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svcntp_b8)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern ::std::uint64_t svcntb() noexcept;
 
     // clang-format on
 
