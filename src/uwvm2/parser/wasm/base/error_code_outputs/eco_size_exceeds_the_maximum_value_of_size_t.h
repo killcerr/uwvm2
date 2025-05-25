@@ -20,6 +20,8 @@
  *                                      *
  ****************************************/
 
+// Without pragma once, this header file will be included in a specific code segment
+
 constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
 
 if constexpr(::std::same_as<char_type, char>)

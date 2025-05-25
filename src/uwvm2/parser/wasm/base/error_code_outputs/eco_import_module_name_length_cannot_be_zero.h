@@ -20,6 +20,8 @@
  *                                      *
  ****************************************/
 
+// Without pragma once, this header file will be included in a specific code segment
+
 if constexpr(::std::same_as<char_type, char>)
 {
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
