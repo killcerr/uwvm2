@@ -323,7 +323,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if defined(__ARM_FEATURE_SME) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
 # endif
-            () constexpr noexcept -> void
+            () constexpr UWVM_THROWS -> void
         {
             static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
