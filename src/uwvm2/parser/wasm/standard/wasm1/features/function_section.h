@@ -310,7 +310,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
-#elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME))
+#elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (!defined(UWVM_DISABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)))
         /// (Little Endian) Variable Length
         /// mask: aarch64-sve
 
@@ -319,14 +319,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // Support for certain cpu's that don't have SVE but have SME like Apple M4
         //
-        // However, for this type of cpu (e.g. Apple M4), the sme module is separated from the cpu, 
-        // resulting in very high latency when using it (on Apple M4, SME (SVE stream mode) 15x slower than NEON), 
+        // However, for this type of cpu (e.g. Apple M4), the sme module is separated from the cpu,
+        // resulting in very high latency when using it (on Apple M4, SME (SVE stream mode) 15x slower than NEON),
         // so llvm for Apple M4 march=native will not start armv8a+sme, but rather use it as armv8a.
         //
-        // Here you just need to leave it to llvm's judgment, if the sme unit is done inside the cpu, 
+        // Here you just need to leave it to llvm's judgment, if the sme unit is done inside the cpu,
         // then llvm's march=native will turn on by itself.
+        //
+        // Or you can use UWVM_DISABLE_SME_SVE_STREAM_MODE to disable it
+        
         [&]
-# if defined(__ARM_FEATURE_SME) && !defined(__ARM_FEATURE_SVE)
+# if (!defined(UWVM_DISABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
 # endif
             () constexpr UWVM_THROWS -> void
@@ -339,46 +342,111 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const all_one_predicate_reg{::uwvm2::utils::intrinsics::arm_sve::svptrue_b8()};
             auto const svc_sz{::uwvm2::utils::intrinsics::arm_sve::svcntb()};
 
-            while(static_cast<::std::size_t>(section_end - section_curr) >= svc_sz) [[likely]]
+# if defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))
+            // When the cpu supports the vector length of sve to be the same as the vector length of neon, since the computations are all on the basic side and
+            // read 16 bytes at a time, sve needs to additionally process predicates, resulting in lower throughput, so here it switches back to using neon
+
+            if(svc_sz == 16u) 
             {
-                // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] ...
-                // [                        safe                                     ] unsafe (could be the section_end)
-                //                                      ^^ section_curr
-                //                                      [       simd_vector_str      ]
+                using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+                using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+                using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+                using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+                using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+                using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
 
-                using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
-
-                // The entire sve can be loaded
-                auto const simd_vector_str{
-                    ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(all_one_predicate_reg, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
-
-                auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(all_one_predicate_reg, simd_vector_str, simd_vector_check)};
-
-                if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(all_one_predicate_reg, check_upper)) [[unlikely]]
+                while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
                 {
-                    need_change_u8_1b_view_to_vec = true;
-                    return;
-                }
-                else
-                {
-                    // all are single bytes, so there are 64
-                    // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                    func_counter += svc_sz;
+                    // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                      ^^ section_curr
+                    //                                      [   simd_vector_str  ]
 
-                    // check counter
-                    if(func_counter > func_count) [[unlikely]]
+                    u8x16simd simd_vector_str;  // No initialization necessary
+
+                    ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+
+                    // It's already a little-endian.
+
+                    auto const check_upper{simd_vector_str >= simd_vector_check};
+
+                    if(
+# if if UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                 // Only supported by clang
+                        __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_upper))
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
+                        __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
+# endif
+                            ) [[unlikely]]
                     {
-                        err.err_curr = section_curr;
-                        err.err_selectable.u32 = func_count;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        need_change_u8_1b_view_to_vec = true;
+                        return;                    
                     }
+                    else
+                    {
+                        // all are single bytes, so there are 16
+                        func_counter += 16u;
 
-                    section_curr += svc_sz;
+                        // check counter
+                        if(func_counter > func_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = func_count;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
 
-                    // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] typeidx64
+                        section_curr += 16uz;
+
+                        // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
+                        // [                        safe                             ] unsafe (could be the section_end)
+                        //                                                             ^^ section_curr
+                    }
+                }
+            }
+            else
+# endif
+            {
+                while(static_cast<::std::size_t>(section_end - section_curr) >= svc_sz) [[likely]]
+                {
+                    // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] ...
                     // [                        safe                                     ] unsafe (could be the section_end)
-                    //                                                                     ^^ section_curr
+                    //                                      ^^ section_curr
+                    //                                      [       simd_vector_str      ]
+
+                    using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
+
+                    // The entire sve can be loaded
+                    auto const simd_vector_str{
+                        ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(all_one_predicate_reg, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
+
+                    auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(all_one_predicate_reg, simd_vector_str, simd_vector_check)};
+
+                    if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(all_one_predicate_reg, check_upper)) [[unlikely]]
+                    {
+                        need_change_u8_1b_view_to_vec = true;
+                        return;
+                    }
+                    else
+                    {
+                        // all are single bytes, so there are 64
+                        // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
+                        func_counter += svc_sz;
+
+                        // check counter
+                        if(func_counter > func_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = func_count;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        section_curr += svc_sz;
+
+                        // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] typeidx64
+                        // [                        safe                                     ] unsafe (could be the section_end)
+                        //                                                                     ^^ section_curr
+                    }
                 }
             }
 
@@ -676,7 +744,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #endif
 
 #if ((defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))) ||                                      \
-    !(defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME)))
+    !(defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (!defined(UWVM_DISABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME))))
         // non-simd or simd (non-sve) tail-treatment
         // msvc, non-sve, default
         // arm-sve no tail treatment required
