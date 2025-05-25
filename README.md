@@ -13,6 +13,9 @@
     <a href="https://en.cppreference.com">
         <img src="https://img.shields.io/badge/language-c++26-blue.svg", alt="cppreference" />
     </a>
+    <a href="https://deepwiki.com/UlteSoft/uwvm2">
+        <img src="https://deepwiki.com/badge.svg", alt="Ask DeepWiki">
+    </a>
 </div>
 
 ## Introduce
