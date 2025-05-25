@@ -346,7 +346,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // When the cpu supports the vector length of sve to be the same as the vector length of neon, since the computations are all on the basic side and
             // read 16 bytes at a time, sve needs to additionally process predicates, resulting in lower throughput, so here it switches back to using neon
 
-            if(svc_sz == 16u) 
+            if(svc_sz == 16u)
             {
                 using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
                 using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
@@ -371,15 +371,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     auto const check_upper{simd_vector_str >= simd_vector_check};
 
                     if(
-# if UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                    // Only supported by clang
+#  if UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                    // Only supported by clang
                         __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_upper))
-# elif UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
+#  elif UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
                         __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
-# endif
+#  endif
                             ) [[unlikely]]
                     {
                         need_change_u8_1b_view_to_vec = true;
-                        return;                    
+                        return;
                     }
                     else
                     {
