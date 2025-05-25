@@ -327,7 +327,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // then llvm's march=native will turn on by itself.
         //
         // Or you can use UWVM_DISABLE_SME_SVE_STREAM_MODE to disable it
-        
+
         [&]
 # if (!defined(UWVM_DISABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
@@ -371,7 +371,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     auto const check_upper{simd_vector_str >= simd_vector_check};
 
                     if(
-# if if UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                 // Only supported by clang
+# if UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                    // Only supported by clang
                         __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_upper))
 # elif UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
                         __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
