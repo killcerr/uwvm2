@@ -310,7 +310,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
-#elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (!defined(UWVM_DISABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)))
+#elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)))
         /// (Little Endian) Variable Length
         /// mask: aarch64-sve
 
@@ -326,10 +326,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // Here you just need to leave it to llvm's judgment, if the sme unit is done inside the cpu,
         // then llvm's march=native will turn on by itself.
         //
-        // Or you can use UWVM_DISABLE_SME_SVE_STREAM_MODE to disable it
+        // You can use macro UWVM_ENABLE_SME_SVE_STREAM_MODE to enable SVE stream mode in SME in the above cpu (e.g. Apple M4).
 
         [&]
-# if (!defined(UWVM_DISABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
+# if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
 # endif
             () constexpr UWVM_THROWS -> void
@@ -744,7 +744,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #endif
 
 #if ((defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))) ||                                      \
-    !(defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (!defined(UWVM_DISABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME))))
+    !(defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME))))
         // non-simd or simd (non-sve) tail-treatment
         // msvc, non-sve, default
         // arm-sve no tail treatment required
