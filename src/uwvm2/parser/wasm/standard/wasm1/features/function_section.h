@@ -1380,11 +1380,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     if(!check_table_index)
                     {
+                        // All correct, can change state: func_counter, section_curr
+
                         // The first 8 bits are single byte typeidx is writable at once.
 
                         check_mask_curr >>= 8u;
 
-                        // check func_counter
+                        // check func_counter before write
                         func_counter += 8u;
 
                         // check counter
@@ -1434,6 +1436,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
                         // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter the tail processing
+                        // Cannot change state until error checking: func_counter, section_curr
                         if(func_counter + 8u > func_count) [[unlikely]]
                         {
                             // Near the end, jump directly out of the simd section and hand it over to the tail.
@@ -1466,12 +1469,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             continue;
                         }
 
+                        // Remove the second round of processing for the next round of calculations
                         check_mask_curr >>= curr_table_processed_byte;
-
-                        // check func_counter
-                        func_counter += curr_table_processed_simd;
-
-                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
 
                         //  [... curr ... (7) ... curr_next ... (7) ...]
                         //  [                 safe                     ] unsafe (could be the section_end)
@@ -1514,10 +1513,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             //                                                             ^^ section_curr + 16uz
 
                             // If not yet processed in the first round, it can be processed up to 16
+                            // Ensure that there are no modifications to the state: func_counter, section_curr
                             error_handler(16uz);
                             // Start the next round straight away
                             continue;
                         }
+
+                        // All correct, can change state: func_counter, section_curr
+
+                        // check func_counter before write
+                        func_counter += curr_table_processed_simd;
+
+                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
 
                         // Since typeidx can write to a u8, reduce u16x8 to u8x8
 
@@ -1571,6 +1578,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //  [ safe  ... ] unsafe (Left over from above, length unknown, can't be used)
                     //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
+                    // Cannot change state until error checking: func_counter, section_curr
                     if(func_counter + 8u > func_count) [[unlikely]]
                     {
                         // Near the end, jump directly out of the simd section and hand it over to the tail.
@@ -1597,17 +1605,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                                                                   ^^^ ^^^ section_curr + 8uz
 
                         // Second round can only handle 16 - first round max 8 = 8
+                        // Ensure that there are no modifications to the state: func_counter, section_curr
                         error_handler(8uz);
                         // Start the next round straight away
                         continue;
                     }
 
                     // last round no necessary to check_mask_curr >>= curr_table_processed_byte;
-
-                    // check func_counter
-                    func_counter += curr_table_processed_simd;
-
-                    // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
 
                     // shuffle and write
                     constexpr u8x16simd zero_vector{};
@@ -1649,6 +1653,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         continue;
                     }
 
+                    // All correct, can change state: func_counter, section_curr
+
+                    // check func_counter before write
+                    func_counter += curr_table_processed_simd;
+
+                    // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
+
                     // Since typeidx can write to a u8, reduce u16x8 to u8x8
 
                     // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
@@ -1686,6 +1697,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             else
             {
+                // All correct, can change state: func_counter, section_curr
+
                 // all are single bytes, so there are 16
                 func_counter += 16u;
 
