@@ -1239,9 +1239,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
         /// x86_64-ssse3, loongarch-SX, wasm-wasmsimd128
 
+        // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
+        // needs to be localized.
+
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
+                               // Need to ensure that section_curr to section_curr + n is memory safe
+                               // Processing uses section_curr_end to guarantee entry into the loop for inspection.
+                               // Also use section_end to ensure that the scanning of the last leb128 is handled correctly, both memory safe.
+
                                auto const section_curr_end{section_curr + n};
+
+                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+                               //       ^^ section_curr
 
                                // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
                                // of '!='
@@ -1351,14 +1362,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # endif
             )
             {
-                // Since each function_count calculation is less than or equal to the size of a write 8, you can only judge the maximum value of 16 at one time to ensure memory safety.
-                if (func_counter + 16u > func_count) [[unlikely]]
-                {
-                    // Processing to 16 to ensure safety
-                    error_handler(16uz);
-                    continue;
-                }
-
                 ::std::uint16_t const simd_vector_check{static_cast<::std::uint16_t>(type_section_count)};
 
                 auto check_mask_curr{check_mask};  // uleb128 mask
@@ -1399,16 +1402,46 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
 
+                        //  [... curr ... (7) ... curr_next ... (7) ...]
+                        //  [                 safe                     ] unsafe (could be the section_end)
+                        //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //      [    needwrite   ]
+
                         ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
                                                            ::std::addressof(needwrite_u8x8x2v0),
                                                            sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
 
+                        //  [... curr_last ... (7) ... curr ... (7) ...]
+                        //  [                  safe                    ] unsafe (could be the section_end)
+                        //                             ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+
                         section_curr += 8u;
+
+                        // [before_section ... | func_count ... typeidx1 ... (7) ... typeidxc ... (7) ...] ...
+                        // [                                safe                                         ] unsafe (could be the section_end)
+                        //                                                           ^^ section_curr
+                        //                                      [                simd_vector_str         ]
                     }
                     else
                     {
+                        //  [...] curr ...
+                        //  [sf ] unsafe (could be the section_end)
+                        //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+
+                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter the tail processing
+                        if(func_counter + 8u > func_count) [[unlikely]]
+                        {
+                            // Near the end, jump directly out of the simd section and hand it over to the tail.
+                            break;
+                        }
+
+                        //  [... curr ... (7) ...]
+                        //  [        safe        ] unsafe (could be the section_end)
+                        //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
+
                         auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
                         auto const curr_table_shuffle_mask{curr_table.shuffle_mask};
                         auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
@@ -1419,6 +1452,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // When the number of consecutive bits is greater than 2, switch back to the normal processing method
                         if(!curr_table_processed_simd) [[unlikely]]
                         {
+                            // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
+                            // [                        safe                             ] unsafe (could be the section_end)
+                            //                                      ^^ section_curr
+                            //                                                             ^^ section_curr + 16uz
+
                             // If not yet processed in the first round, it can be processed up to 16
                             error_handler(16uz);
                             // Start the next round straight away
@@ -1430,14 +1468,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // check func_counter
                         func_counter += curr_table_processed_simd;
 
-                        // check counter
-                        if(func_counter > func_count) [[unlikely]]
-                        {
-                            err.err_curr = section_curr;
-                            err.err_selectable.u32 = func_count;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                        }
+                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
+
+                        //  [... curr ... (7) ... curr_next ... (7) ...]
+                        //  [                 safe                     ] unsafe (could be the section_end)
+                        //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //      [    needwrite   ]
+                        //      [    ctps  ]  ...]
 
                         // shuffle and write
                         constexpr u8x16simd zero_vector{};
@@ -1468,6 +1505,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # endif
                                 ) [[unlikely]]
                         {
+                            // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
+                            // [                        safe                             ] unsafe (could be the section_end)
+                            //                                      ^^ section_curr
+                            //                                                             ^^ section_curr + 16uz
+
                             // If not yet processed in the first round, it can be processed up to 16
                             error_handler(16uz);
                             // Start the next round straight away
@@ -1485,13 +1527,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
 
+                        //  [... curr ... (7) ... curr_next ... (7) ...]
+                        //  [                 safe                     ] unsafe (could be the section_end)
+                        //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //      [    needwrite   ]
+
                         ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
                                                            ::std::addressof(needwrite_u8x8x2v0),
                                                            sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
 
+                        //  [... curr ... (7) ... curr_next ... (7) ...]
+                        //  [                 safe                     ] unsafe (could be the section_end)
+                        //                    ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        // Or: (Security boundaries for writes are checked)
+                        //                        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //      [    needwrite   ]
+
                         section_curr += curr_table_processed_byte;
+
+                        // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
+                        // [                        safe                                        ] unsafe (could be the section_end)
+                        //                                                   ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
+                        //                                      [   simd_vector_str             ]
                     }
                 }
 
@@ -1502,15 +1561,38 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // If check_mask_curr is 0, then jump out to avoid wasting time
                     if(!check_table_index) { continue; }
 
+                    // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter the tail processing
+
+                    //  [...] curr ... (curr + 8u)
+                    //  [sf ] unsafe (could be the section_end)
+                    //  [ safe  ... ] unsafe (Left over from above, length unknown, can't be used)
+                    //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+
+                    if(func_counter + 8u > func_count) [[unlikely]]
+                    {
+                        // Near the end, jump directly out of the simd section and hand it over to the tail.
+                        break;
+                    }
+
+                    //  [... curr ... (7) ...]
+                    //  [        safe        ] unsafe (could be the section_end)
+                    //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
+
                     auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
                     // Since it's the second round, the data has to be moved back  the number of bytes processed in the first round
-                    auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};  
-                    auto const curr_table_processed_simd{curr_table.processed_simd};   // size of handled u32
-                    auto const curr_table_processed_byte{curr_table.processed_byte};   // size of handled uleb128
+                    auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};
+                    auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
+                    auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
 
                     // When the number of consecutive bits is greater than 2, switch back to the normal processing method
                     if(!curr_table_processed_simd) [[unlikely]]
                     {
+                        // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
+                        // [                        safe                                        ] unsafe (could be the section_end)
+                        //                                                   ^^^ ^^^ section_curr (indeterminate location)
+                        //                                                                   ^^^ ^^^ section_curr + 8uz
+
                         // Second round can only handle 16 - first round max 8 = 8
                         error_handler(8uz);
                         // Start the next round straight away
@@ -1522,14 +1604,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // check func_counter
                     func_counter += curr_table_processed_simd;
 
-                    // check counter
-                    if(func_counter > func_count) [[unlikely]]
-                    {
-                        err.err_curr = section_curr;
-                        err.err_selectable.u32 = func_count;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                    }
+                    // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
 
                     // shuffle and write
                     constexpr u8x16simd zero_vector{};
@@ -1560,6 +1635,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # endif
                             ) [[unlikely]]
                     {
+                        // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
+                        // [                        safe                                        ] unsafe (could be the section_end)
+                        //                                                   ^^^^^^^ section_curr (indeterminate location)
+                        //                                                                   ^^^^^^^ section_curr + 8uz
+
                         // Second round can only handle 16 - first round max 8 = 8
                         error_handler(8uz);
                         // Start the next round straight away
@@ -1577,13 +1657,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
 
+                    //  [... curr_old ... (7) ... curr ... (7) ... ]
+                    //  [                 safe                     ] unsafe (could be the section_end)
+                    //                            ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    //                            [    needwrite   ]
+
                     ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
                                                        ::std::addressof(needwrite_u8x8x2v0),
                                                        sizeof(u8x8simd));
 
                     functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
 
+                    //  [... curr_old ... (7) ... curr ... (7) ... ]
+                    //  [                 safe                     ] unsafe (could be the section_end)
+                    //                                               ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    //                            [    needwrite   ]
+
                     section_curr += curr_table_processed_byte;
+
+                    // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
+                    // [                        safe                                        ] unsafe (could be the section_end)
+                    //                                                                   ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
+                    //                                      [   simd_vector_str             ]
                 }
             }
             else
