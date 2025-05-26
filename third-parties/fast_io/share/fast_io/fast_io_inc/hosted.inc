@@ -113,7 +113,11 @@ using ::fast_io::posix_stdout;
 using ::fast_io::posix_stderr;
 
 #if(defined(_WIN32) || defined(__CYGWIN__)) || ((!defined(_WIN32) || defined(__WINE__)) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__))))
-    using ::fast_io::native_dll_file;
+using ::fast_io::native_dll_file;
+#endif
+
+#if defined(__linux__)
+using ::fast_io::system_call;
 #endif
 
 using ::fast_io::posix_clock_id;

@@ -3,6 +3,9 @@ export namespace fast_io
 namespace freestanding
 {
 
+using ::fast_io::freestanding::is_zero_default_constructible_v;
+using ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v;
+
 using ::fast_io::freestanding::is_trivially_copyable_or_relocatable;
 using ::fast_io::freestanding::is_zero_default_constructible;
 

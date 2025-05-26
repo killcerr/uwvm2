@@ -1232,6 +1232,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
+        /// @todo simd 256
+        /// @todo loongarch simd need test
+
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
     (((defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)) && (defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128))) ||            \
      (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__lsx_vshuf_b) && UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)))
