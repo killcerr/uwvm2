@@ -1363,6 +1363,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 auto check_mask_curr{check_mask};  // uleb128 mask
 
+                // Record the number of bytes processed in the first round
+                ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
+
                 // 1 round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
@@ -1410,6 +1413,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         auto const curr_table_shuffle_mask{curr_table.shuffle_mask};
                         auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
+
+                        first_round_handle_bytes = static_cast<::std::uint8_t>(curr_table_processed_byte);
 
                         // When the number of consecutive bits is greater than 2, switch back to the normal processing method
                         if(!curr_table_processed_simd) [[unlikely]]
@@ -1498,7 +1503,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     if(!check_table_index) { continue; }
 
                     auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
-                    auto const curr_table_shuffle_mask{curr_table.shuffle_mask + 8u};  // Since it's the second round, the data has to be moved back 8
+                    // Since it's the second round, the data has to be moved back  the number of bytes processed in the first round
+                    auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};  
                     auto const curr_table_processed_simd{curr_table.processed_simd};   // size of handled u32
                     auto const curr_table_processed_byte{curr_table.processed_byte};   // size of handled uleb128
 
