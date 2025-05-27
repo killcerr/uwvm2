@@ -375,6 +375,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_upper))
 #  elif UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
                         __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
+#  else
+#   error "missing instructions"
 #  endif
                             ) [[unlikely]]
                     {
@@ -463,12 +465,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // Generate quantifiers for final tail processing
             ::uwvm2::utils::intrinsics::arm_sve::svbool_t load_predicate;  // No initialization necessary
 
-# if SIZE_MAX <= UINT32_MAX
+# if SIZE_MAX > UINT32_MAX
+            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
+                                                                                   ::std::bit_cast<::std::uint64_t>(section_end));
+# elif SIZE_MAX > UINT16_MAX
             load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
                                                                                    ::std::bit_cast<::std::uint32_t>(section_end));
 # else
-            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
-                                                                                   ::std::bit_cast<::std::uint64_t>(section_end));
+#  error "missing instructions"
 # endif
 
             using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
@@ -573,6 +577,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // kortestq        k0, k0
                 // setne   al
                 __builtin_ia32_cmpb512_mask(::std::bit_cast<c8x64simd>(check_upper), c8x64simd{}, 0x04, UINT64_MAX)
+# else
+#  error "missing instructions"
 # endif
                     ) [[unlikely]]
             {
@@ -639,6 +645,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(check_upper), ::std::bit_cast<i64x4simd>(check_upper))
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
                 __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))  /// @todo need check
+# else
+#  error "missing instructions"
 # endif
                     ) [[unlikely]]
             {
@@ -717,6 +725,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
                 __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
+# else
+#  error "missing instructions"
 # endif
                     ) [[unlikely]]
             {
@@ -830,8 +840,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
-    (((defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)) && (defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128))) ||            \
-     (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__lsx_vshuf_b) && UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)))
+    (((defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128) && UWVM_HAS_BUILTIN(__builtin_ia32_palignr128)) &&                                     \
+      (defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128))) ||                                                                                  \
+     (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b) && UWVM_HAS_BUILTIN(__builtin_lsx_vsrli_b) &&                                         \
+      UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)))
 
     // shuffle simd128, need mask_u16 and shuffle
 
@@ -1236,11 +1248,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// @todo loongarch simd need test
 
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
-    (((defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)) && (defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128))) ||            \
-     (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__lsx_vshuf_b) && UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)))
+    (((defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128) && UWVM_HAS_BUILTIN(__builtin_ia32_palignr128)) &&                                     \
+      (defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128))) ||                                                                                  \
+     (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b) && UWVM_HAS_BUILTIN(__builtin_lsx_vsrli_b) &&                                         \
+      UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)))
 
         /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
-        /// x86_64-ssse3, loongarch-SX, wasm-wasmsimd128
+        /// x86_64-ssse3, loongarch-SX
 
         // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
         // needs to be localized.
@@ -1351,11 +1365,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // When the highest bit of each byte is pop, then mask out 1
             auto const check_mask{
 # if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(simd_vector_str))
+                static_cast<unsigned>(__builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(simd_vector_str)))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)
                 ::std::bit_cast<::fast_io::array<unsigned, 4uz>>(__builtin_lsx_vmskltz_b(::std::bit_cast<i8x16simd>(simd_vector_str))).front_unchecked()
+# else
+#  error "missing instructions"
 # endif
             };
+
+            // Since mask 16-bit stuff, it can be assumed that mask is less than 2^16
+# if __has_cpp_attribute(assume)
+            [[assume(check_mask < 1u << 16u)]];
+# endif
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
@@ -1405,6 +1426,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(simd_vector_str)};
 
+                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+                        // [   needwrite_u8x8x2v0  ]
+
                         auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
 
                         //  [... curr ... (7) ... curr_next ... (7) ...]
@@ -1435,8 +1459,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //  [sf ] unsafe (could be the section_end)
                         //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
-                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter the tail processing
-                        // Cannot change state until error checking: func_counter, section_curr
+                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter
+                        // the tail processing Cannot change state until error checking: func_counter, section_curr
                         if(func_counter + 8u > func_count) [[unlikely]]
                         {
                             // Near the end, jump directly out of the simd section and hand it over to the tail.
@@ -1485,8 +1509,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
 # if defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)
                         mask_res = ::std::bit_cast<u16x8simd>(__builtin_ia32_pshufb128(simd_vector_str, curr_table_shuffle_mask));
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__lsx_vshuf_b)
-                        mask_res = ::std::bit_cast<u16x8simd>(__lsx_vshuf_b(simd_vector_str, zero_vector, curr_table_shuffle_mask));
+# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
+                        mask_res = ::std::bit_cast<u16x8simd>(__builtin_lsx_vshuf_b(simd_vector_str, simd_vector_str, curr_table_shuffle_mask));
+# else
+#  error "missing instructions"
 # endif
 
                         // The leb128 that has been merged into u16x8 is finalized to get the value corresponding to u16
@@ -1504,6 +1530,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
                             __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
+# else
+#  error "missing instructions"
 # endif
                                 ) [[unlikely]]
                         {
@@ -1568,131 +1596,223 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
-                    // If check_mask_curr is 0, then jump out to avoid wasting time
-                    if(!check_table_index) { continue; }
+                    // There are only 7 and 8 and 0 in the table, where the 0 have been handled out of the error,
+                    // and if a non-7 or non-8 is encountered, there is a problem with the surface
 
-                    // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter the tail processing
+                    // When first_round_handle_bytes is 7, check_table_index is always greater than 0，
+                    // Because the highest bit of the first 8 bits is pop, 0bxxxx'xxxx'1xxx'xxxxu >> 7u == 0bxxxx'xxx1
 
-                    //  [...] curr ... (curr + 8u)
-                    //  [sf ] unsafe (could be the section_end)
-                    //  [ safe  ... ] unsafe (Left over from above, length unknown, can't be used)
-                    //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+# if __has_cpp_attribute(assume)
+                    [[assume((first_round_handle_bytes == static_cast<::std::uint8_t>(7u) && check_table_index != 0u) ||
+                             first_round_handle_bytes == static_cast<::std::uint8_t>(8u))]];
+# endif
 
-                    // Cannot change state until error checking: func_counter, section_curr
-                    if(func_counter + 8u > func_count) [[unlikely]]
+                    if(!check_table_index)
                     {
-                        // Near the end, jump directly out of the simd section and hand it over to the tail.
-                        break;
+                        // It's the last round, but since it's already established, it's better to calculate it directly.
+
+                        // All correct, can change state: func_counter, section_curr
+
+                        // The first 8 bits are single byte typeidx is writable at once.
+
+                        // last round no necessary to check_mask_curr >>= 8u;
+
+                        // check func_counter before write
+                        func_counter += 8u;
+
+                        // check counter
+                        if(func_counter > func_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = func_count;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // Since everything is less than 128, there is no need to check the typeidx.
+
+                        // Requires a vector right shift to implement
+
+                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+                        // [       last write      ]
+                        //                      ^^^^^^ curr (begin + first_round_handle_bytes)
+                        //                      [      need write       ]..]
+
+                        // When first_round_handle_bytes is 7, check_table_index is always greater than 0，
+                        // Because the highest bit of the first 8 bits is pop
+
+                        UWVM_ASSERT(first_round_handle_bytes == static_cast<::std::uint8_t>(8u));
+
+                        // Here the shuffle simulation element is kept shifted right by 8 bits to facilitate subsequent expansion,
+                        // while the subsequent taking of the first address has been shown to be optimized by the llvm into a single instruction
+
+                        u8x16simd simd_vector_str_need_shf{
+                            __builtin_shufflevector(simd_vector_str, simd_vector_str, 8, 9, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1)};
+
+                        // write 8 byte
+                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
+
+                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(simd_vector_str_need_shf)};
+
+                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+                        // [       last write      ]
+                        //                      ^^^^^^ curr (begin + first_round_handle_bytes)
+                        //                      [      need write       ]..]
+
+                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
+
+                        //  [... curr_old ... (7) ... curr ... (7) ...] ...
+                        //  [                 safe                    ] unsafe (could be the section_end)
+                        //                        ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //                       [    needwrite   ]...]
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                                           ::std::addressof(needwrite_u8x8x2v0),
+                                                           sizeof(u8x8simd));
+
+                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
+
+                        //  [... curr_last ... (7) ... curr ... (7) ...] ...
+                        //  [                  safe                    ] unsafe (could be the section_end)
+                        //                                           ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+
+                        section_curr += 8u;
+
+                        // [before_section ... | func_count ... typeidx1 ... (7) ... typeidxc ... (7) ...] ...
+                        // [                                safe                                         ] unsafe (could be the section_end)
+                        //                                                                             ^^^^^^ section_curr
+                        //                                      [                simd_vector_str         ]
                     }
-
-                    //  [... curr ... (7) ...]
-                    //  [        safe        ] unsafe (could be the section_end)
-                    //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                    //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
-
-                    auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
-                    // Since it's the second round, the data has to be moved back  the number of bytes processed in the first round
-                    auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};
-                    auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
-                    auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
-
-                    // When the number of consecutive bits is greater than 2, switch back to the normal processing method
-                    if(!curr_table_processed_simd) [[unlikely]]
+                    else
                     {
-                        // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
-                        // [                        safe                                        ] unsafe (could be the section_end)
-                        //                                                   ^^^ ^^^ section_curr (indeterminate location)
-                        //                                                                   ^^^ ^^^ section_curr + 8uz
+                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter
+                        // the tail processing
 
-                        // Second round can only handle 16 - first round max 8 = 8
-                        // Ensure that there are no modifications to the state: func_counter, section_curr
-                        error_handler(8uz);
-                        // Start the next round straight away
-                        continue;
-                    }
+                        //  [...] curr ... (curr + 8u)
+                        //  [sf ] unsafe (could be the section_end)
+                        //  [ safe  ... ] unsafe (Left over from above, length unknown, can't be used)
+                        //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
-                    // last round no necessary to check_mask_curr >>= curr_table_processed_byte;
+                        // Cannot change state until error checking: func_counter, section_curr
+                        if(func_counter + 8u > func_count) [[unlikely]]
+                        {
+                            // Near the end, jump directly out of the simd section and hand it over to the tail.
+                            break;
+                        }
 
-                    // shuffle and write
-                    constexpr u8x16simd zero_vector{};
+                        //  [... curr ... (7) ...]
+                        //  [        safe        ] unsafe (could be the section_end)
+                        //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
 
-                    u16x8simd mask_res;
+                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
+                        // Since it's the second round, the data has to be moved back  the number of bytes processed in the first round
+                        auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};
+                        auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
+                        auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
+
+                        // When the number of consecutive bits is greater than 2, switch back to the normal processing method
+                        if(!curr_table_processed_simd) [[unlikely]]
+                        {
+                            // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
+                            // [                        safe                                        ] unsafe (could be the section_end)
+                            //                                                   ^^^ ^^^ section_curr (indeterminate location)
+                            //                                                                   ^^^ ^^^ section_curr + 8uz
+
+                            // Second round can only handle 16 - first round max 8 = 8
+                            // Ensure that there are no modifications to the state: func_counter, section_curr
+                            error_handler(8uz);
+                            // Start the next round straight away
+                            continue;
+                        }
+
+                        // last round no necessary to check_mask_curr >>= curr_table_processed_byte;
+
+                        // shuffle and write
+                        constexpr u8x16simd zero_vector{};
+
+                        u16x8simd mask_res;
 
 # if defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)
-                    mask_res = ::std::bit_cast<u16x8simd>(__builtin_ia32_pshufb128(simd_vector_str, curr_table_shuffle_mask));
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__lsx_vshuf_b)
-                    mask_res = ::std::bit_cast<u16x8simd>(__lsx_vshuf_b(simd_vector_str, zero_vector, curr_table_shuffle_mask));
+                        mask_res = ::std::bit_cast<u16x8simd>(__builtin_ia32_pshufb128(simd_vector_str, curr_table_shuffle_mask));
+# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
+                        mask_res = ::std::bit_cast<u16x8simd>(__builtin_lsx_vshuf_b(simd_vector_str, simd_vector_str, curr_table_shuffle_mask));
+# else
+#  error "missing instructions"
 # endif
 
-                    // The leb128 that has been merged into u16x8 is finalized to get the value corresponding to u16
+                        // The leb128 that has been merged into u16x8 is finalized to get the value corresponding to u16
 
-                    auto const res{(mask_res & static_cast<::std::uint16_t>(0x7Fu)) | ((mask_res & static_cast<::std::uint16_t>(0x7F00u)) >> 1u)};
+                        auto const res{(mask_res & static_cast<::std::uint16_t>(0x7Fu)) | ((mask_res & static_cast<::std::uint16_t>(0x7F00u)) >> 1u)};
 
-                    // The data out of shuffle is 16-bit [0, 2^14) and may be greater than or equal to typeidx, which needs to be checked.
+                        // The data out of shuffle is 16-bit [0, 2^14) and may be greater than or equal to typeidx, which needs to be checked.
 
-                    auto const check_upper{res >= simd_vector_check};
+                        auto const check_upper{res >= simd_vector_check};
 
-                    if(
+                        if(
 # if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                        !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
+                            !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
 # elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                        __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
+                            __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                        __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
+                            __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
+# else
+#  error "missing instructions"
 # endif
-                            ) [[unlikely]]
-                    {
+                                ) [[unlikely]]
+                        {
+                            // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
+                            // [                        safe                                        ] unsafe (could be the section_end)
+                            //                                                   ^^^^^^^ section_curr (indeterminate location)
+                            //                                                                   ^^^^^^^ section_curr + 8uz
+
+                            // Second round can only handle 16 - first round max 8 = 8
+                            error_handler(8uz);
+                            // Start the next round straight away
+                            continue;
+                        }
+
+                        // All correct, can change state: func_counter, section_curr
+
+                        // check func_counter before write
+                        func_counter += curr_table_processed_simd;
+
+                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
+
+                        // Since typeidx can write to a u8, reduce u16x8 to u8x8
+
+                        // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
+                        auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(
+                            __builtin_shufflevector(::std::bit_cast<u8x16simd>(res), zero_vector, 0, 2, 4, 6, 8, 10, 12, 14, -1, -1, -1, -1, -1, -1, -1, -1))};
+
+                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
+                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
+
+                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
+
+                        //  [... curr_old ... (7) ... curr ... (7) ... ]
+                        //  [                 safe                     ] unsafe (could be the section_end)
+                        //                            ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //                            [    needwrite   ]
+
+                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                                           ::std::addressof(needwrite_u8x8x2v0),
+                                                           sizeof(u8x8simd));
+
+                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
+
+                        //  [... curr_old ... (7) ... curr ... (7) ... ]
+                        //  [                 safe                     ] unsafe (could be the section_end)
+                        //                                               ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                        //                            [    needwrite   ]
+
+                        section_curr += curr_table_processed_byte;
+
                         // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
                         // [                        safe                                        ] unsafe (could be the section_end)
-                        //                                                   ^^^^^^^ section_curr (indeterminate location)
-                        //                                                                   ^^^^^^^ section_curr + 8uz
-
-                        // Second round can only handle 16 - first round max 8 = 8
-                        error_handler(8uz);
-                        // Start the next round straight away
-                        continue;
+                        //                                                                   ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
+                        //                                      [   simd_vector_str             ]
                     }
-
-                    // All correct, can change state: func_counter, section_curr
-
-                    // check func_counter before write
-                    func_counter += curr_table_processed_simd;
-
-                    // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
-
-                    // Since typeidx can write to a u8, reduce u16x8 to u8x8
-
-                    // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
-                    auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(
-                        __builtin_shufflevector(::std::bit_cast<u8x16simd>(res), zero_vector, 0, 2, 4, 6, 8, 10, 12, 14, -1, -1, -1, -1, -1, -1, -1, -1))};
-
-                    using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-                    auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
-
-                    auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
-
-                    //  [... curr_old ... (7) ... curr ... (7) ... ]
-                    //  [                 safe                     ] unsafe (could be the section_end)
-                    //                            ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                    //                            [    needwrite   ]
-
-                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                       ::std::addressof(needwrite_u8x8x2v0),
-                                                       sizeof(u8x8simd));
-
-                    functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
-
-                    //  [... curr_old ... (7) ... curr ... (7) ... ]
-                    //  [                 safe                     ] unsafe (could be the section_end)
-                    //                                               ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                    //                            [    needwrite   ]
-
-                    section_curr += curr_table_processed_byte;
-
-                    // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
-                    // [                        safe                                        ] unsafe (could be the section_end)
-                    //                                                                   ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
-                    //                                      [   simd_vector_str             ]
                 }
             }
             else
@@ -1733,6 +1853,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
      (defined(__wasm_simd128__) && (UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16) || UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16))))
         /// (Little Endian), [[gnu::vector_size]], no mask-u16, simd128
         ///  x86_64-sse2, aarch64-neon, wasm-simd128 (Since the wasm simd128 shuffle requirement is immediate, it cannot be used.)
+        ///  Since the arm neon does not have a move mask, the shuffle algorithm cannot be used.
 
         using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
         using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
@@ -1770,6 +1891,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_highest_bit))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
                 __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_highest_bit))
+# else
+#  error "missing instructions"
 # endif
             };
 
