@@ -26,7 +26,7 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-# ifdef UWVM_TIMER
+# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
 import uwvm2.utils.debug;
 # endif
 import uwvm2.utils.intrinsics;
@@ -62,7 +62,7 @@ import :type_section;
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
-# ifdef UWVM_TIMER
+# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
 #  include <uwvm2/utils/debug/impl.h>
 # endif
 # include <uwvm2/utils/intrinsics/impl.h>
@@ -5594,18 +5594,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Since simd handles so much, you have to do a content check again in the usual way in debug mode
     ///             Crashes straight away when something goes wrong
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void check_function_section(
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t> sec_adl,
-        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-        ::std::byte const* const section_begin,
-        ::std::byte const* const section_end) noexcept
+    inline constexpr void check_function_section([[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t> sec_adl,
+                                                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+                                                 ::std::byte const* const section_begin,
+                                                 ::std::byte const* const section_end) noexcept
     {
         // Note that section_begin may be equal to section_end
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
         // get function_section_storage_t from storages
         auto const& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
-
 
         // check has typesec
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
@@ -5625,15 +5623,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                               reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                               ::fast_io::mnp::leb128_get(func_count))};
 
-        if(func_count_err != ::fast_io::parse_code::ok) [[unlikely]]
-        {
-            ::fast_io::fast_terminate();
-        }
+        if(func_count_err != ::fast_io::parse_code::ok) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
         // [before_section ... | func_count ...] typeidx1 ...
         // [             safe                  ] unsafe (could be the section_end)
         //                       ^^ section_curr
-
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
 
@@ -5660,10 +5654,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(++func_counter > func_count) [[unlikely]]
-            {
-                ::fast_io::fast_terminate();
-            }
+            if(++func_counter > func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             // [ ... typeidx1] ... typeidx2 ...
             // [     safe    ] unsafe (could be the section_end)
@@ -5677,25 +5668,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                             reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                             ::fast_io::mnp::leb128_get(typeidx))};
 
-            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
-            {
-                ::fast_io::fast_terminate();
-            }
+            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             // [ ... typeidx1 ...] typeidx2 ...
             // [      safe       ] unsafe (could be the section_end)
             //       ^^ section_curr
 
             // check: type_index should less than type_section_count
-            if(typeidx >= type_section_count) [[unlikely]]
-            {
-                ::fast_io::fast_terminate();
-            }
+            if(typeidx >= type_section_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
-            if (typeidx != functionsec.funcs.index_unchecked(index)) [[unlikely]]
-            {
-                ::fast_io::fast_terminate();
-            }
+            if(typeidx != functionsec.funcs.index_unchecked(index)) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -5709,7 +5691,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [before_section ... | func_count ... typeidx1 ... ...] (end)
         // [                       safe                         ] unsafe (could be the section_end)
         //                                                        ^^ section_curr
-
     }
 #endif
 
@@ -5857,12 +5838,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_not_match_the_actual_number;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
-        
+
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
         // Since simd handles so much, you have to do a content check again in the usual way in debug mode
         check_function_section(sec_adl, module_storage, section_begin, section_end);
 #endif
-
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 

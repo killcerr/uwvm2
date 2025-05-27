@@ -502,7 +502,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // Because the fast_io vector is constructed with all zeros, there is no need to do any constructor operations
         }
 
-        inline constexpr ::std::size_t size() const noexcept 
+        inline constexpr ::std::size_t size() const noexcept
         {
             switch(this->mode)
             {
@@ -533,7 +533,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
-        inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 index_unchecked(::std::size_t sz) const noexcept 
+        inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 index_unchecked(::std::size_t sz) const noexcept
         {
             switch(this->mode)
             {

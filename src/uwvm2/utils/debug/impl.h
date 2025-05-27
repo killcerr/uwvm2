@@ -24,4 +24,5 @@
 
 #ifndef UWVM_MODULE
 # include "timer.h"
+# include "bug_report.h"
 #endif
