@@ -28,6 +28,24 @@ using ::fast_io::nt_stdin;
 using ::fast_io::nt_stdout;
 using ::fast_io::nt_stderr;
 
+using ::fast_io::basic_zw_io_observer;
+using ::fast_io::basic_zw_file;
+
+using ::fast_io::zw_io_observer;
+using ::fast_io::zw_file;
+using ::fast_io::wzw_io_observer;
+using ::fast_io::wzw_file;
+using ::fast_io::u8zw_io_observer;
+using ::fast_io::u8zw_file;
+using ::fast_io::u16zw_io_observer;
+using ::fast_io::u16zw_file;
+using ::fast_io::u32zw_io_observer;
+using ::fast_io::u32zw_file;
+
+using ::fast_io::zw_stdin;
+using ::fast_io::zw_stdout;
+using ::fast_io::zw_stderr;
+
 using ::fast_io::basic_win32_family_io_observer;
 using ::fast_io::basic_win32_family_file;
 
@@ -95,7 +113,11 @@ using ::fast_io::posix_stdout;
 using ::fast_io::posix_stderr;
 
 #if(defined(_WIN32) || defined(__CYGWIN__)) || ((!defined(_WIN32) || defined(__WINE__)) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__))))
-    using ::fast_io::native_dll_file;
+using ::fast_io::native_dll_file;
+#endif
+
+#if defined(__linux__)
+using ::fast_io::system_call;
 #endif
 
 using ::fast_io::posix_clock_id;
