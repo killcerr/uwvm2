@@ -1863,6 +1863,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 auto const first_second_round_handled_bytes{static_cast<unsigned>(first_round_handle_bytes + second_round_handle_bytes)};
 
+                // Since the channel of the simd shuffle is 128, you need to move the back through the built-in constant shuffle (the channel is the same length as the vector) to the front in advance.
+
                 u8x16simd third_fourth_round_simd_u8x16;
 
                 switch(first_second_round_handled_bytes)
@@ -2025,6 +2027,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
+                        // check second_round_handle_byte
+                        UWVM_ASSERT(second_round_handle_bytes == static_cast<::std::uint8_t>(8u));
+
                         // Since everything is less than 128, there is no need to check the typeidx.
 
                         // write 8 byte
@@ -2132,8 +2137,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(
 # if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
                             !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
-# elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                            __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
                             __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
 # else
