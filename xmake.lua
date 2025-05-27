@@ -71,6 +71,11 @@ function def_build()
 		add_defines("UWVM_USE_LLVM_JIT")
 	end
 
+    local detailed_debug_check = get_config("detailed-debug-check")
+	if is_mode("debug") and detailed_debug_check then
+		add_defines("UWVM_ENABLE_DETAILED_DEBUG_CHECK")
+	end
+
     if is_plat("windows") then
         windows_target()
     elseif is_plat("mingw") then

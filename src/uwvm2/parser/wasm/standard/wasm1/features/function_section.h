@@ -5589,6 +5589,130 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return section_curr;
     }
 
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+    /// @brief      check_function_section
+    /// @details    Since simd handles so much, you have to do a content check again in the usual way in debug mode
+    ///             Crashes straight away when something goes wrong
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void check_function_section(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t> sec_adl,
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* const section_begin,
+        ::std::byte const* const section_end) noexcept
+    {
+        // Note that section_begin may be equal to section_end
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
+        // get function_section_storage_t from storages
+        auto const& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
+
+
+        // check has typesec
+        auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+
+        auto section_curr{section_begin};
+
+        // [before_section ... ] | func_count typeidx1 ...
+        // [        safe       ] | unsafe (could be the section_end)
+        //                         ^^ section_curr
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_count;  // No initialization necessary
+
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+        auto const [func_count_next, func_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                              reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                              ::fast_io::mnp::leb128_get(func_count))};
+
+        if(func_count_err != ::fast_io::parse_code::ok) [[unlikely]]
+        {
+            ::fast_io::fast_terminate();
+        }
+
+        // [before_section ... | func_count ...] typeidx1 ...
+        // [             safe                  ] unsafe (could be the section_end)
+        //                       ^^ section_curr
+
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
+
+        section_curr = reinterpret_cast<::std::byte const*>(func_count_next);  // never out of bounds
+
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
+        // [before_section ... | func_count ...] typeidx1 ...
+        // [              safe                 ] unsafe (could be the section_end)
+        //                                       ^^ section_curr
+
+        // handle it
+        auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
+
+        ::std::size_t index{};
+
+        while(section_curr != section_end) [[likely]]
+        {
+            // Ensuring the existence of valid information
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // check function counter
+            // Ensure content is available before counting (section_curr != section_end)
+            if(++func_counter > func_count) [[unlikely]]
+            {
+                ::fast_io::fast_terminate();
+            }
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+
+            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+            auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                            ::fast_io::mnp::leb128_get(typeidx))};
+
+            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+                ::fast_io::fast_terminate();
+            }
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // check: type_index should less than type_section_count
+            if(typeidx >= type_section_count) [[unlikely]]
+            {
+                ::fast_io::fast_terminate();
+            }
+
+            if (typeidx != functionsec.funcs.index_unchecked(index)) [[unlikely]]
+            {
+                ::fast_io::fast_terminate();
+            }
+
+            section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //                     ^^ section_curr
+
+            ++index;
+        }
+
+        // [before_section ... | func_count ... typeidx1 ... ...] (end)
+        // [                       safe                         ] unsafe (could be the section_end)
+        //                                                        ^^ section_curr
+
+    }
+#endif
+
     /// @brief Define the handler function for type_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(
@@ -5733,6 +5857,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_not_match_the_actual_number;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
+        
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        // Since simd handles so much, you have to do a content check again in the usual way in debug mode
+        check_function_section(sec_adl, module_storage, section_begin, section_end);
+#endif
+
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 

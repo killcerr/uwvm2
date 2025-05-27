@@ -707,6 +707,9 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"\n"
                                 // Feature
                                 u8"Feature:\n"
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                u8"    Detailed Debug Check Mode \n"
+#endif
 #if !(defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE))
                                 u8"    Error Direct Crash Mode (fno-exceptions)\n"
 #endif

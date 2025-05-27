@@ -159,6 +159,15 @@ option("enable-jit", function()
     set_values("none", "default", "llvm")
 end)
 
+option("detailed-debug-check", function()
+    set_description
+    (
+        "Initiates a more detailed debug checking mode in debug mode",
+        "default = true"
+    )
+    set_default(true)
+end)
+
 -- WINDOWS
 
 option("winmin", function()
