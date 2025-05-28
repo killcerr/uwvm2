@@ -1245,6 +1245,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [before_section ... | func_count ...] typeidx1 ... typeidx2 ...
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
+            
+        /// @todo support AVX512: 2x faster than AVX2
+        /// @todo support SVE2: svtbl 
 
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
         ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||         \
@@ -1364,8 +1367,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
 
             // It's already a little-endian.
-
+            
             // When the highest bit of each byte is pop, then mask out 1
+
             auto const check_mask{
 # if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)
                 static_cast<unsigned>(__builtin_ia32_pmovmskb256(::std::bit_cast<c8x32simd>(simd_vector_str)))
@@ -1393,7 +1397,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -1608,7 +1612,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::std::uint8_t second_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -1997,7 +2001,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the third round
                 ::std::uint8_t third_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 3 round
+                // 3rd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -2218,7 +2222,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 4 round
+                // 4th rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -2651,7 +2655,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -2865,7 +2869,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -3391,6 +3395,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // This algorithm is the same as the one for scan_function_section_impl_u8_2b, just make sure to scale u8 to u16 on writes.
 
+        /// @todo support AVX512: 2x faster than AVX2
+        /// @todo support SVE2: svtbl 
+
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
         ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||         \
     ((defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)) && (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)))
@@ -3538,7 +3545,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -3726,7 +3733,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::std::uint8_t second_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4064,7 +4071,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the third round
                 ::std::uint8_t third_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 3 round
+                // 3rd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4255,7 +4262,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 4 round
+                // 4th rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4720,7 +4727,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4908,7 +4915,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
