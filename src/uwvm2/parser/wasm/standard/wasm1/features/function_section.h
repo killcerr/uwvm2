@@ -421,6 +421,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     auto const simd_vector_str{
                         ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(all_one_predicate_reg, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
 
+                    // check simd_vector_str >= simd_vector_check
                     auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(all_one_predicate_reg, simd_vector_str, simd_vector_check)};
 
                     if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(all_one_predicate_reg, check_upper)) [[unlikely]]
@@ -471,8 +472,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)))
         /// (Little Endian)
-        /// mask: x86_64-avx512vbmi
-        /// @todo need check
+        /// x86_64-avx512bw
 
         using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
         using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
@@ -511,6 +511,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // It's already a little-endian.
 
+            // simd_vector_str >= simd_vector_check_u8x64simd
             ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(simd_vector_str, simd_vector_check_u8x64simd, 0x05, UINT64_MAX)};
 
             if(mask) [[unlikely]]
@@ -798,7 +799,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(load_predicate, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
 
             // check: simd_vector_str >= simd_vector_check
-
             auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(load_predicate, simd_vector_str, simd_vector_check)};
 
             if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(load_predicate, check_upper)) [[unlikely]]
@@ -843,8 +843,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask) && UWVM_HAS_BUILTIN(__builtin_ia32_loaddquqi512_mask)))
-
         // avx512bw
+        
         {
             ::std::uint64_t load_mask{UINT64_MAX};
 
@@ -866,6 +866,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const need_check{::std::bit_cast<u8x64simd>(
                 __builtin_ia32_loaddquqi512_mask(reinterpret_cast<loaddquqi512_para_const_may_alias_ptr>(section_curr), c8x64simd{}, load_mask))};
 
+            // need_check >= simd_vector_check_u8x64simd
             ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(need_check, simd_vector_check_u8x64simd, 0x05, load_mask)};
 
             if(mask) [[unlikely]]
