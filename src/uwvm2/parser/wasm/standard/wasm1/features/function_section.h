@@ -844,7 +844,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask) && UWVM_HAS_BUILTIN(__builtin_ia32_loaddquqi512_mask)))
         // avx512bw
-        
+
         {
             ::std::uint64_t load_mask{UINT64_MAX};
 
@@ -2017,7 +2017,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     case 14u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          14,
                                                                          15,
@@ -2050,13 +2050,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 15u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          15,
                                                                          16,
@@ -2089,13 +2089,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 16u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          16,
                                                                          17,
@@ -2128,7 +2128,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
@@ -4087,7 +4087,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     case 14u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          14,
                                                                          15,
@@ -4120,13 +4120,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 15u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          15,
                                                                          16,
@@ -4159,13 +4159,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 16u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          16,
                                                                          17,
@@ -4198,7 +4198,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
