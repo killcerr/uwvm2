@@ -421,6 +421,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     auto const simd_vector_str{
                         ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(all_one_predicate_reg, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
 
+                    // check simd_vector_str >= simd_vector_check
                     auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(all_one_predicate_reg, simd_vector_str, simd_vector_check)};
 
                     if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(all_one_predicate_reg, check_upper)) [[unlikely]]
@@ -461,61 +462,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [before_section ... | func_count ... typeidx1 ... (svc_sz - 1) ...] (end)
             // [                        safe                                     ] unsafe (could be the section_end)
             //                                                                     ^^ section_curr
-
-            // Generate quantifiers for final tail processing
-            ::uwvm2::utils::intrinsics::arm_sve::svbool_t load_predicate;  // No initialization necessary
-
-# if SIZE_MAX > UINT32_MAX
-            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
-                                                                                   ::std::bit_cast<::std::uint64_t>(section_end));
-# elif SIZE_MAX > UINT16_MAX
-            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
-                                                                                   ::std::bit_cast<::std::uint32_t>(section_end));
-# else
-#  error "missing instructions"
-# endif
-
-            using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
-
-            // sve safely loads memory via predicates
-            auto const simd_vector_str{
-                ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(load_predicate, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
-
-            // check: simd_vector_str >= simd_vector_check
-
-            auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(load_predicate, simd_vector_str, simd_vector_check)};
-
-            if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(load_predicate, check_upper)) [[unlikely]]
-            {
-                need_change_u8_1b_view_to_vec = true;
-                return;
-            }
-            else
-            {
-                using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
-
-                auto const last_load_predicate_size{static_cast<::std::size_t>(reinterpret_cast<uint8_t_const_may_alias_ptr>(section_end) -
-                                                                               reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
-
-                // all are single bytes, so there are 64
-                // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                func_counter += last_load_predicate_size;
-
-                // check counter
-                if(func_counter > func_count) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.u32 = func_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-
-                section_curr += last_load_predicate_size;
-
-                // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size - 1) ...] (end)
-                // [                        safe                                                       ] unsafe (could be the section_end)
-                //                                                                                       ^^ section_curr
-            }
         }
         ();
 
@@ -524,11 +470,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
         }
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
-    (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512) || UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)))
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)))
         /// (Little Endian)
-        /// mask: x86_64-avx512vbmi
-        /// @todo need check
+        /// x86_64-avx512bw
 
         using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
         using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
@@ -541,6 +485,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
+
+        u8x64simd const simd_vector_check_u8x64simd{
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+            simd_vector_check};
 
         while(static_cast<::std::size_t>(section_end - section_curr) >= 64uz) [[likely]]
         {
@@ -555,32 +511,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // It's already a little-endian.
 
-            auto const check_upper{simd_vector_str >= simd_vector_check};
+            // simd_vector_str >= simd_vector_check_u8x64simd
+            ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(simd_vector_str, simd_vector_check_u8x64simd, 0x05, UINT64_MAX)};
 
-            if(
-# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512)  // Only supported by GCC
-                // gcc:
-                // vptestmb        k0, zmm0, zmm0
-                // kortestq        k0, k0
-                // sete    al
-                __builtin_ia32_ptestmb512(::std::bit_cast<c8x64simd>(check_upper), ::std::bit_cast<c8x64simd>(check_upper), UINT64_MAX)
-# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)
-                // clang:
-                // vptestmd        k0, zmm0, zmm0
-                // kortestw        k0, k0
-                // setne   al
-                // vzeroupper
-                //
-                // gcc:
-                // vpxor   xmm1, xmm1, xmm1
-                // vpcmpb  k0, zmm0, zmm1, 4
-                // kortestq        k0, k0
-                // setne   al
-                __builtin_ia32_cmpb512_mask(::std::bit_cast<c8x64simd>(check_upper), c8x64simd{}, 0x04, UINT64_MAX)
-# else
-#  error "missing instructions"
-# endif
-                    ) [[unlikely]]
+            if(mask) [[unlikely]]
             {
                 // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
                 return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
@@ -608,7 +542,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)) || (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)))
         /// (Little Endian), [[gnu::vector_size]]
         /// mask: x86_64-avx, loongarch-ASX
@@ -756,10 +690,215 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 #endif
 
-#if ((defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))) ||                                      \
-    !(defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME))))
+        // tail handling
+
+#if ((defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64)))
+        // msvc, avoid macro-contamination
+
+        while(section_curr != section_end) [[likely]]
+        {
+            // Ensuring the existence of valid information
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // This needs to be judged first before setting the value, to ensure that the special case call view_to_vec can get the correct function_counter
+            // Need to stash func_counter_this_round_end because special cases are not yet handled
+            auto const func_counter_this_round_end{func_counter + 1u};
+
+            // check function counter
+            // Ensure content is available before counting (section_curr != section_end)
+            if(func_counter_this_round_end > func_count) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = func_count;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [ ... typeidx1] ... typeidx2 ...
+            // [     safe    ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+
+            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+            auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                            ::fast_io::mnp::leb128_get(typeidx))};
+
+            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+            }
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // check: type_index should less than type_section_count
+            if(typeidx >= type_section_count) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = typeidx;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // Check for the presence of redundant 0, (check single byte)
+            if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
+            {
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            }
+
+            // The state of func_counter can be changed
+
+            section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+            // [ ... typeidx1 ...] typeidx2 ...
+            // [      safe       ] unsafe (could be the section_end)
+            //                     ^^ section_curr
+
+            // Processed and returned to stock. Special cases processed.
+            func_counter = func_counter_this_round_end;
+        }
+
+#elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)))
+        // sve, sme (sve stream mode)
+
+        [&]
+# if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
+            __arm_locally_streaming
+# endif
+            () constexpr UWVM_THROWS -> void
+        {
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
+
+            // Generate quantifiers for final tail processing
+            ::uwvm2::utils::intrinsics::arm_sve::svbool_t load_predicate;  // No initialization necessary
+
+# if SIZE_MAX > UINT32_MAX
+            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u64(::std::bit_cast<::std::uint64_t>(section_curr),
+                                                                                   ::std::bit_cast<::std::uint64_t>(section_end));
+# elif SIZE_MAX > UINT16_MAX
+            load_predicate = ::uwvm2::utils::intrinsics::arm_sve::svwhilelt_b8_u32(::std::bit_cast<::std::uint32_t>(section_curr),
+                                                                                   ::std::bit_cast<::std::uint32_t>(section_end));
+# else
+#  error "missing instructions"
+# endif
+
+            using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
+
+            // sve safely loads memory via predicates
+            auto const simd_vector_str{
+                ::uwvm2::utils::intrinsics::arm_sve::svld1_u8(load_predicate, reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
+
+            // check: simd_vector_str >= simd_vector_check
+            auto const check_upper{::uwvm2::utils::intrinsics::arm_sve::svcmpge_n_u8(load_predicate, simd_vector_str, simd_vector_check)};
+
+            if(::uwvm2::utils::intrinsics::arm_sve::svptest_any(load_predicate, check_upper)) [[unlikely]]
+            {
+                // Lambda is an external function call, and error handling needs to be carried out in current function
+                need_change_u8_1b_view_to_vec = true;
+                return;
+            }
+            else
+            {
+                using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
+
+                auto const last_load_predicate_size{static_cast<::std::size_t>(reinterpret_cast<uint8_t_const_may_alias_ptr>(section_end) -
+                                                                               reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
+
+                // all are single bytes, so there are 64
+                // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
+                func_counter += last_load_predicate_size;
+
+                // check counter
+                if(func_counter > func_count) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u32 = func_count;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                section_curr += last_load_predicate_size;
+
+                // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size - 1) ...] (end)
+                // [                        safe                                                       ] unsafe (could be the section_end)
+                //                                                                                       ^^ section_curr
+            }
+        }
+        ();
+
+        if(need_change_u8_1b_view_to_vec) [[unlikely]]
+        {
+            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+        }
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
+    (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask) && UWVM_HAS_BUILTIN(__builtin_ia32_loaddquqi512_mask)))
+        // avx512bw
+
+        {
+            ::std::uint64_t load_mask{UINT64_MAX};
+
+            using uint8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint8_t const*;
+
+            auto const last_load_predicate_size{static_cast<::std::size_t>(reinterpret_cast<uint8_t_const_may_alias_ptr>(section_end) -
+                                                                           reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
+
+            load_mask >>= (64uz - last_load_predicate_size);
+
+            using loaddquqi512_para_const_may_alias_ptr UWVM_GNU_MAY_ALIAS =
+# if defined(__clang__)
+                c8x64simd const*
+# else
+                char const*
+# endif
+                ;
+
+            auto const need_check{::std::bit_cast<u8x64simd>(
+                __builtin_ia32_loaddquqi512_mask(reinterpret_cast<loaddquqi512_para_const_may_alias_ptr>(section_curr), c8x64simd{}, load_mask))};
+
+            // need_check >= simd_vector_check_u8x64simd
+            ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(need_check, simd_vector_check_u8x64simd, 0x05, load_mask)};
+
+            if(mask) [[unlikely]]
+            {
+                // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            }
+            else
+            {
+                // all are single bytes, so there are 'last_load_predicate_size'
+                // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
+                func_counter += last_load_predicate_size;
+
+                // check counter
+                if(func_counter > func_count) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u32 = func_count;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                section_curr += last_load_predicate_size;
+
+                // [before_section ... | func_count ... typeidx1 ... (6last_load_predicate_size - 1) ...] (section_end)
+                // [                        safe                                                        ] unsafe (could be the section_end)
+                //                                                                                        ^^ section_curr
+            }
+        }
+#else
         // non-simd or simd (non-sve) tail-treatment
-        // msvc, non-sve, default
+        // non-sve, default
         // arm-sve no tail treatment required
 
         while(section_curr != section_end) [[likely]]
@@ -821,6 +960,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
+
+            // The state of func_counter can be changed
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -1246,6 +1387,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
+        /// @todo support AVX512: 2x faster than AVX2
+        /// @todo support SVE2: svtbl
+
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
         ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||         \
     ((defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)) && (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)))
@@ -1366,6 +1510,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // It's already a little-endian.
 
             // When the highest bit of each byte is pop, then mask out 1
+
             auto const check_mask{
 # if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)
                 static_cast<unsigned>(__builtin_ia32_pmovmskb256(::std::bit_cast<c8x32simd>(simd_vector_str)))
@@ -1393,7 +1538,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -1608,7 +1753,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::std::uint8_t second_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -1872,7 +2017,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     case 14u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          14,
                                                                          15,
@@ -1905,13 +2050,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 15u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          15,
                                                                          16,
@@ -1944,13 +2089,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 16u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          16,
                                                                          17,
@@ -1983,7 +2128,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
@@ -1997,7 +2142,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the third round
                 ::std::uint8_t third_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 3 round
+                // 3rd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -2218,7 +2363,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 4 round
+                // 4th rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -2651,7 +2796,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -2865,7 +3010,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -3391,6 +3536,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // This algorithm is the same as the one for scan_function_section_impl_u8_2b, just make sure to scale u8 to u16 on writes.
 
+        /// @todo support AVX512: 2x faster than AVX2
+        /// @todo support SVE2: svtbl
+
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
         ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||         \
     ((defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)) && (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)))
@@ -3538,7 +3686,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -3726,7 +3874,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::std::uint8_t second_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -3939,7 +4087,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     case 14u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          14,
                                                                          15,
@@ -3972,13 +4120,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 15u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          15,
                                                                          16,
@@ -4011,13 +4159,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
                     case 16u:
                     {
-                        auto const shuffle_u8x32(__builtin_shufflevector(simd_vector_str,
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
                                                                          16,
                                                                          17,
@@ -4050,7 +4198,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1,
-                                                                         -1));
+                                                                         -1)};
                         third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
                         break;
                     }
@@ -4064,7 +4212,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the third round
                 ::std::uint8_t third_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 3 round
+                // 3rd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4255,7 +4403,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 4 round
+                // 4th rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4720,7 +4868,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1 round
+                // 1st rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4908,7 +5056,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 2 round
+                // 2nd rount
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
