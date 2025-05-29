@@ -775,6 +775,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # endif
             () constexpr UWVM_THROWS -> void
         {
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
+
             // Generate quantifiers for final tail processing
             ::uwvm2::utils::intrinsics::arm_sve::svbool_t load_predicate;  // No initialization necessary
 
