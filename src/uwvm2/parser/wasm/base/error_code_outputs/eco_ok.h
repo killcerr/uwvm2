@@ -36,7 +36,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              "uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             "[info] "
+                                                             "[info] ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              "There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -68,7 +68,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              L"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             L"[info] "
+                                                             L"[info] ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              L"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -100,7 +100,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              u8"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             u8"[info] "
+                                                             u8"[info] ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u8"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -133,7 +133,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              u"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             u"[info] "
+                                                             u"[info] ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -166,7 +166,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              U"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             U"[info] "
+                                                             U"[info] ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              U"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);

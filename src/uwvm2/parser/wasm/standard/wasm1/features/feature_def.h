@@ -26,6 +26,9 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+import uwvm2.utils.debug;
+# endif
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
@@ -48,6 +51,9 @@ import :def;
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
 # include <fast_io_dsal/vector.h>
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+#  include <uwvm2/utils/debug/impl.h>
+# endif
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -279,7 +285,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
         }
@@ -325,7 +334,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
         }
@@ -366,7 +378,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
 
@@ -413,7 +428,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
 
@@ -452,7 +470,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
 
@@ -489,7 +510,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
         }
@@ -528,7 +552,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
         }
@@ -559,7 +586,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-                    ::fast_io::fast_terminate();
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
                 }
             }
         }
