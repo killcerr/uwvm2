@@ -49,11 +49,13 @@ import :type_section;
 # include <utility>
 # include <memory>
 # include <bit>
-# if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && defined(_M_AMD64)
-#  include <emmintrin.h>  // MSVC x86_64-SSE2
-# endif
-# if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && defined(_M_ARM64)
-#  include <arm_neon.h>  // MSVC aarch64-NEON
+# if defined(_MSC_VER) && !defined(__clang__)
+#  if !defined(_KERNEL_MODE) && defined(_M_AMD64)
+#   include <emmintrin.h>  // MSVC x86_64-SSE2
+#  endif
+#  if !defined(_KERNEL_MODE) && defined(_M_ARM64)
+#   include <arm_neon.h>  // MSVC aarch64-NEON
+#  endif
 # endif
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
@@ -237,10 +239,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using wasm_u8_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const*;
         functionsec.funcs.storage.typeidx_u8_view.begin = reinterpret_cast<wasm_u8_const_may_alias_ptr>(section_curr);
 
-#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
+#if defined(_MSC_VER) && !defined(__clang__)
+        /// MSVC
+
+# if !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
-        /// @todo need check
 
         static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
@@ -309,6 +313,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
         }
+# endif
 
 #elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)))
         /// (Little Endian) Variable Length
@@ -692,7 +697,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // tail handling
 
-#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE)
+#if defined(_MSC_VER) && !defined(__clang__)
         // MSVC, x86_64, i386, aarch64, arm, arm64ec, ...
         // msvc, avoid macro-contamination
 
@@ -854,7 +859,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const last_load_predicate_size{static_cast<::std::size_t>(reinterpret_cast<uint8_t_const_may_alias_ptr>(section_end) -
                                                                            reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
 
-            load_mask >>= (64uz - last_load_predicate_size);
+            load_mask >>= 64uz - last_load_predicate_size;
 
             using loaddquqi512_para_const_may_alias_ptr UWVM_GNU_MAY_ALIAS =
 # if defined(__clang__)
@@ -1391,7 +1396,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// @todo support AVX512vbmi2: 2x faster than AVX2
         /// @todo support SVE2: svtbl
 
-#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
+#if defined(_MSC_VER) && !defined(__clang__)
+        /// MSVC
+
+# if !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
         /// @todo need check
@@ -1404,21 +1412,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
 
         constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check};
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check};
 
         while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
         {
@@ -1530,8 +1538,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
         }
-        
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
+# endif
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
         ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||         \
     ((defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)) && (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)))
         /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
@@ -3579,7 +3588,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// @todo support AVX512vbmi2
         /// @todo support sve2
 
-#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE)
+#if defined(_MSC_VER) && !defined(__clang__)
         // MSVC, x86_64, i386, aarch64, arm, arm64ec, ...
         // msvc, avoid macro-contamination
 
@@ -3756,7 +3765,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// @todo support AVX512vbmi2: 2x faster than AVX2
         /// @todo support SVE2: svtbl
 
-#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
+#if defined(_MSC_VER) && !defined(__clang__)
+        /// MSVC
+
+# if !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
         /// @todo need check
@@ -3770,21 +3782,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using u16x8simd = ::fast_io::intrinsics::simd_vector<::std::uint16_t, 8uz>;
 
         constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check};
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check};
 
         while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
         {
@@ -3889,15 +3901,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // write data
                 auto functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp{functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr};
 
-                u8x16simd const u8x16v0{
-                    simd_vector_str[0], 0,
-                    simd_vector_str[1], 0,
-                    simd_vector_str[2], 0,
-                    simd_vector_str[3], 0,
-                    simd_vector_str[4], 0,
-                    simd_vector_str[5], 0,
-                    simd_vector_str[6], 0,
-                    simd_vector_str[7], 0};
+                u8x16simd const u8x16v0{simd_vector_str[0],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[1],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[2],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[3],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[4],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[5],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[6],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[7],
+                                        static_cast<::std::uint8_t>(0u)};
 
                 auto const u16x8v0{::std::bit_cast<u16x8simd>(u8x16v0)};
 
@@ -3905,15 +3924,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
-                u8x16simd const u8x16v1{
-                    simd_vector_str[8], 0,
-                    simd_vector_str[9], 0,
-                    simd_vector_str[10], 0,
-                    simd_vector_str[11], 0,
-                    simd_vector_str[12], 0,
-                    simd_vector_str[13], 0,
-                    simd_vector_str[14], 0,
-                    simd_vector_str[15], 0};
+                u8x16simd const u8x16v1{simd_vector_str[8],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[9],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[10],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[11],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[12],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[13],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[14],
+                                        static_cast<::std::uint8_t>(0u),
+                                        simd_vector_str[15],
+                                        static_cast<::std::uint8_t>(0u)};
 
                 auto const u16x8v1{::std::bit_cast<u16x8simd>(u8x16v1)};
 
@@ -3930,8 +3956,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
         }
+# endif
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
         ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||         \
     ((defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)) && (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)))
         /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
@@ -5866,10 +5893,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// @todo support AVX512vbmi2
         /// @todo support sve2
 
-#if (defined(_MSC_VER) && !defined(__clang__)) && !defined(_KERNEL_MODE)
+#if defined(_MSC_VER) && !defined(__clang__)
         // MSVC, x86_64, i386, aarch64, arm, arm64ec, ...
         // msvc, avoid macro-contamination
-                
+
         while(section_curr != section_end) [[likely]]
         {
             // Ensuring the existence of valid information
