@@ -1,4 +1,4 @@
-set_xmakever("2.9.0")
+set_xmakever("2.9.8")
 
 set_project("uwvm")
 
@@ -185,7 +185,9 @@ function def_build()
  				end,
 				catch  
 				{
-            	    function() return nil end -- 任何异常都捕获并返回 nil
+            	    function() 
+						return nil 
+					end
             	}
         	}
 		end

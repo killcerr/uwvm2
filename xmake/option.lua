@@ -72,7 +72,7 @@ option("unwindlib", function()
         [[    default: Don't set the "unwindlib" option, use the default unwindlib of clang.]],
         [[    libgcc/libunwind/platform: Set the option "unwindlib" if rtlib is "compiler-rt".]],
         [[    force-libgcc/force-libunwind/force-platform: Always set the "unwindlib" option.]]
-        )
+    )
     set_default("default")
     set_values("default", "libgcc", "libunwind", "platform", "force-libgcc", "force-libunwind", "force-platform")
     add_deps("rtlib")
