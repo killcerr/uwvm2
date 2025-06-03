@@ -1402,7 +1402,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
-        /// @todo need check
 
         static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
@@ -3771,7 +3770,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
-        /// @todo need check
 
         static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
