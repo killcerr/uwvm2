@@ -34,7 +34,11 @@ if constexpr(::std::same_as<char_type, char>)
         {
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
-                                                             "uwvm: [info] There are no errors.",
+                                                             "uwvm: ",
+                                                             UWVM_WIN32_TEXTATTR_YELLOW,
+                                                             "[info] ",
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             "There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -42,7 +46,11 @@ if constexpr(::std::same_as<char_type, char>)
 #endif
     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
-                                                     "uwvm: [info] There are no errors.",
+                                                     "uwvm: ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_YELLOW),
+                                                     "[info] ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                     "There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
     return;
 }
@@ -58,7 +66,11 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
         {
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
-                                                             L"uwvm: [info] There are no errors.",
+                                                             L"uwvm: ",
+                                                             UWVM_WIN32_TEXTATTR_YELLOW,
+                                                             L"[info] ",
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             L"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -66,7 +78,11 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
 #endif
     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
-                                                     L"uwvm: [info] There are no errors.",
+                                                     L"uwvm: ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_YELLOW),
+                                                     L"[info] ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                     L"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
 }
@@ -82,7 +98,11 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         {
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
-                                                             u8"uwvm: [info] There are no errors.",
+                                                             u8"uwvm: ",
+                                                             UWVM_WIN32_TEXTATTR_YELLOW,
+                                                             u8"[info] ",
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             u8"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -90,8 +110,13 @@ else if constexpr(::std::same_as<char_type, char8_t>)
 #endif
     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                                     u8"uwvm: [info] There are no errors.",
+                                                     u8"uwvm: ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_YELLOW),
+                                                     u8"[info] ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                     u8"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
+
     return;
 }
 else if constexpr(::std::same_as<char_type, char16_t>)
@@ -106,7 +131,11 @@ else if constexpr(::std::same_as<char_type, char16_t>)
         {
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
-                                                             u"uwvm: [info] There are no errors.",
+                                                             u"uwvm: ",
+                                                             UWVM_WIN32_TEXTATTR_YELLOW,
+                                                             u"[info] ",
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             u"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -114,8 +143,13 @@ else if constexpr(::std::same_as<char_type, char16_t>)
 #endif
     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
-                                                     u"uwvm: [info] There are no errors.",
+                                                     u"uwvm: ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_YELLOW),
+                                                     u"[info] ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                     u"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
+
     return;
 }
 else if constexpr(::std::same_as<char_type, char32_t>)
@@ -130,7 +164,11 @@ else if constexpr(::std::same_as<char_type, char32_t>)
         {
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
-                                                             U"uwvm: [info] There are no errors.",
+                                                             U"uwvm: ",
+                                                             UWVM_WIN32_TEXTATTR_YELLOW,
+                                                             U"[info] ",
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             U"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -138,7 +176,12 @@ else if constexpr(::std::same_as<char_type, char32_t>)
 #endif
     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
-                                                     U"uwvm: [info] There are no errors.",
+                                                     U"uwvm: ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_YELLOW),
+                                                     U"[info] ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                     U"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
+
     return;
 }

@@ -59,20 +59,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
         ::fast_io::io::panic(::fast_io::u8err(),
                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                              u8"uwvm: ",
-                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
-                             u8"[debug] ",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                             u8"[fatal] ",
                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                              u8"There is a problem with the uwvm implementation: \n",
                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                              loc,
                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                             u8"\n\nPlease submit a bug report in the issue at (https://github.com/UlteSoft/uwvm2).\n",
+                             u8"\n\nuwvm: ",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                             u8"[info] ",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                             u8"Please submit a bug report with version information (\"",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                             u8"uwvm --version",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                             u8"\") and the configuration information (\"",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                             u8"xmake config -v",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                             u8"\") in the issue at (",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                             u8"https://github.com/UlteSoft/uwvm2",
+                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                             u8").\n",
                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-        ::fast_io::io::panic(::fast_io::u8err(),
-                             u8"uwvm: [debug] There is a problem with the uwvm implementation: \n",
-                             loc,
-                             u8"\n\nPlease submit a bug report in the issue at (https://github.com/UlteSoft/uwvm2).\n");
+        ::fast_io::io::panic(
+            ::fast_io::u8err(),
+            u8"uwvm: [fatal] There is a problem with the uwvm implementation: \n",
+            loc,
+            u8"\n\nuwvm: [info] Please submit a bug report with version information (\"uwvm --version\") and the configuration information (\"xmake config -v\") in the issue at (https://github.com/UlteSoft/uwvm2).\n");
 #endif
     }
 }  // namespace uwvm2::utils::debug
