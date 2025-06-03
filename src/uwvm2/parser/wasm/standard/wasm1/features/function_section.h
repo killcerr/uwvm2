@@ -3902,7 +3902,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
-                simd128_t const u16x8v0{
+                simd128_t const u16x8v1{
                     simd_vector_str[8], 0,
                     simd_vector_str[9], 0,
                     simd_vector_str[10], 0,
@@ -3912,7 +3912,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     simd_vector_str[14], 0,
                     simd_vector_str[15], 0};
 
-                u16x8v0.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
+                u16x8v1.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
