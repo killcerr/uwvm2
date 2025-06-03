@@ -44,6 +44,7 @@ import :def;
 # include <type_traits>
 # include <utility>
 # include <memory>
+# include <algorithm>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
