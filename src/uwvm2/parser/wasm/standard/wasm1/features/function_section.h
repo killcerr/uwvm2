@@ -248,9 +248,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
 
         // use fast_io simd on msvc
-        using simd128_t = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
+        using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
 
-        simd128_t const simd_vector_check_u8x16{simd_vector_check,
+        u8x16simd const simd_vector_check_u8x16{simd_vector_check,
                                                 simd_vector_check,
                                                 simd_vector_check,
                                                 simd_vector_check,
@@ -274,7 +274,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      ^^ section_curr
             //                                      [   simd_vector_str  ]
 
-            simd128_t simd_vector_str;  // No initialization necessary
+            u8x16simd simd_vector_str;  // No initialization necessary
 
             simd_vector_str.load(section_curr);
 
@@ -1401,9 +1401,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         constexpr auto simd_vector_check{static_cast<::std::uint8_t>(127u)};
 
         // use fast_io simd on msvc
-        using simd128_t = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
+        using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
 
-        constexpr simd128_t simd_vector_check_u8x16{simd_vector_check,
+        constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
                                                 simd_vector_check,
                                                 simd_vector_check,
                                                 simd_vector_check,
@@ -1427,7 +1427,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      ^^ section_curr
             //                                      [   simd_vector_str  ]
 
-            simd128_t simd_vector_str;  // No initialization necessary
+            u8x16simd simd_vector_str;  // No initialization necessary
 
             simd_vector_str.load(section_curr);
 
@@ -3766,9 +3766,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         constexpr auto simd_vector_check{static_cast<::std::uint8_t>(127u)};
 
         // use fast_io simd on msvc
-        using simd128_t = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
+        using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
+        using u16x8simd = ::fast_io::intrinsics::simd_vector<::std::uint16_t, 8uz>;
 
-        constexpr simd128_t simd_vector_check_u8x16{simd_vector_check,
+        constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
                                                 simd_vector_check,
                                                 simd_vector_check,
                                                 simd_vector_check,
@@ -3792,7 +3793,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      ^^ section_curr
             //                                      [   simd_vector_str  ]
 
-            simd128_t simd_vector_str;  // No initialization necessary
+            u8x16simd simd_vector_str;  // No initialization necessary
 
             simd_vector_str.load(section_curr);
 
@@ -3888,7 +3889,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // write data
                 auto functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp{functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr};
 
-                simd128_t const u16x8v0{
+                u8x16simd const u8x16v0{
                     simd_vector_str[0], 0,
                     simd_vector_str[1], 0,
                     simd_vector_str[2], 0,
@@ -3898,11 +3899,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     simd_vector_str[6], 0,
                     simd_vector_str[7], 0};
 
+                auto const u16x8v0{::std::bit_cast<u16x8simd>(u8x16v0)};
+
                 u16x8v0.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
-                simd128_t const u16x8v1{
+                u8x16simd const u8x16v1{
                     simd_vector_str[8], 0,
                     simd_vector_str[9], 0,
                     simd_vector_str[10], 0,
@@ -3911,6 +3914,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     simd_vector_str[13], 0,
                     simd_vector_str[14], 0,
                     simd_vector_str[15], 0};
+
+                auto const u16x8v1{::std::bit_cast<u16x8simd>(u8x16v1)};
 
                 u16x8v1.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
 
