@@ -1643,8 +1643,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
-        // No prefetching of table entries is required, ensuring no contamination of the cache
-
         while(static_cast<::std::size_t>(section_end - section_curr) >= 32uz) [[likely]]
         {
             // [before_section ... | func_count ... typeidx1 ... (31) ...] ...
@@ -1672,7 +1670,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
-                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 3.0)
+                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 4.0)
 # else
                 check_mask
 # endif
@@ -1682,129 +1680,176 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 auto check_mask_curr{check_mask};  // uleb128 mask
 
-                u8x16simd const first_second_round_simd_u8x16{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(simd_vector_str).front_unchecked()};
-
                 // Record the number of bytes processed in the first round
-                ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
+                unsigned first_and_second_round_handle_bytes{};
 
-                // 1st rount
+                // 1st and 2nd round
                 {
-                    unsigned const check_table_index{check_mask_curr & 0xFFu};
+                    unsigned const check_table_index_1st{check_mask_curr & 0xFFu};
 
-                    // If check_mask_curr is 0, write directly
+                    // according to the information in the table, when the eighth bit is 1, then the processing length is 7
+                    bool const first_round_is_seven{static_cast<bool>(check_table_index_1st & 0x80u)};
 
-                    if(!check_table_index)
+                    check_mask_curr >>= 8u - static_cast<unsigned>(first_round_is_seven);
+
+                    first_and_second_round_handle_bytes += static_cast<unsigned>(first_round_is_seven);
+
+                    unsigned const check_table_index_2nd{check_mask_curr & 0xFFu};
+
+                    // according to the information in the table, when the eighth bit is 1, then the processing length is 7
+                    bool const second_round_is_seven{static_cast<bool>(check_table_index_2nd & 0x80u)};
+
+                    check_mask_curr >>= 8u - static_cast<unsigned>(second_round_is_seven);
+
+                    first_and_second_round_handle_bytes += static_cast<unsigned>(second_round_is_seven);
+
+                    // When there are few operations, 2-branch prediction may seem inferior to one operation + one branch prediction
+                    // For parsing random data that may be encountered, it is more efficient to use bitwise operations than to add branches using logical
+                    // operators.
+
+                    if(check_table_index_1st | check_table_index_2nd)
                     {
-                        // All correct, can change state: func_counter, section_curr
+                        // There are non-zero terms in 1st and 2nd, so it's straightforward to construct a 256 (128 * 2) shuffle.
 
-                        // The first 8 bits are single byte typeidx is writable at once.
-
-                        check_mask_curr >>= 8u;
-
-                        // check func_counter before write
-                        func_counter += 8u;
-
-                        // check counter
-                        if(func_counter > func_count) [[unlikely]]
-                        {
-                            err.err_curr = section_curr;
-                            err.err_selectable.u32 = func_count;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                        }
-
-                        // Since everything is less than 128, there is no need to check the typeidx.
-
-                        // write 8 byte
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-
-                        //  [... curr ... (7) ... curr_next ... (23) ...]
-                        //  [                 safe                      ] unsafe (could be the section_end)
-                        //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [    needwrite   ]
-
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(first_second_round_simd_u8x16)};
-
-                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-                        // [   needwrite_u8x8x2v0  ]
-
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
-
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
-
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
-
-                        //  [... curr_last ... (7) ... curr ... (23) ...]
-                        //  [                  safe                     ] unsafe (could be the section_end)
-                        //                             ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-
-                        section_curr += 8u;
-
-                        // [before_section ... | func_count ... typeidx1 ... (7) ... typeidxc ... (23) ...] ...
-                        // [                                safe                                          ] unsafe (could be the section_end)
-                        //                                                           ^^ section_curr
-                        //                                      [                simd_vector_str          ]
-                    }
-                    else
-                    {
                         //  [...] curr ...
                         //  [sf ] unsafe (could be the section_end)
                         //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
-                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter
+                        // The write size is 16 bits, but the valid data may be less than 16 bits, directly check the maximum value, more than that, then enter
                         // the tail processing Cannot change state until error checking: func_counter, section_curr
-                        if(func_counter + 8u > func_count) [[unlikely]]
+                        if(func_counter + 16u > func_count) [[unlikely]]
                         {
                             // Near the end, jump directly out of the simd section and hand it over to the tail.
                             break;
                         }
 
-                        //  [... curr ... (7) ...]
-                        //  [        safe        ] unsafe (could be the section_end)
+                        //  [... curr ... (15) ...]
+                        //  [        safe         ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
+                        //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
-                        auto const curr_table_shuffle_mask{curr_table.shuffle_mask};
-                        auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
-                        auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
+                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(check_table_index_1st)};
+                        auto const curr_table_shuffle_mask_1st{curr_table_1st.shuffle_mask};
+                        auto const curr_table_processed_simd_1st{curr_table_1st.processed_simd};  // size of handled u32
+                        auto const curr_table_processed_byte_1st{curr_table_1st.processed_byte};  // size of handled uleb128
 
-                        first_round_handle_bytes = static_cast<::std::uint8_t>(curr_table_processed_byte);
+                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(check_table_index_2nd)};
+                        auto const curr_table_shuffle_mask_2nd{curr_table_2nd.shuffle_mask};
+                        auto const curr_table_processed_simd_2nd{curr_table_2nd.processed_simd};  // size of handled u32
+                        auto const curr_table_processed_byte_2nd{curr_table_2nd.processed_byte};  // size of handled uleb128
 
                         // When the number of consecutive bits is greater than 2, switch back to the normal processing method
-                        if(!curr_table_processed_simd) [[unlikely]]
+                        // Error handling is almost never encountered, using logical operators to increase short-circuit evaluation, with branch prediction
+                        // always faster than bitwise operations
+
+                        if(!curr_table_processed_simd_1st || !curr_table_processed_simd_2nd) [[unlikely]]
                         {
                             // [before_section ... | func_count ... typeidx1 ... (31) ...] ...
                             // [                        safe                             ] unsafe (could be the section_end)
                             //                                      ^^ section_curr
-                            //                                                             ^^ section_curr + 16uz
+                            //                                                             ^^ section_curr + 32uz
 
-                            // If not yet processed in the first round, it can be processed up to 32
+                            // it can be processed up to 32
                             error_handler(32uz);
+
                             // Start the next round straight away
                             continue;
                         }
 
-                        // Remove the second round of processing for the next round of calculations
-                        check_mask_curr >>= curr_table_processed_byte;
-
-                        //  [... curr ... (7) ... curr_next ... (23) ...]
-                        //  [                 safe                      ] unsafe (could be the section_end)
+                        //  [... curr ... (15) ...]
+                        //  [        safe         ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [    needwrite   ]
-                        //      [    ctps  ]  ...]
+                        //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
-                        // shuffle (first 16 byte) and write
+                        // shuffle and write
 
-                        u16x8simd mask_res;
+                        ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
+                        u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
-# if defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)
-                        mask_res = ::std::bit_cast<u16x8simd>(__builtin_ia32_pshufb128(first_second_round_simd_u8x16, curr_table_shuffle_mask));
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
-                        mask_res = ::std::bit_cast<u16x8simd>(
-                            __builtin_lsx_vshuf_b(first_second_round_simd_u8x16, first_second_round_simd_u8x16, curr_table_shuffle_mask));
+                        u8x32simd simd_vector_str_shuffle;
+
+                        if(curr_table_processed_byte_1st == 7u)
+                        {
+                            simd_vector_str_shuffle = __builtin_shufflevector(simd_vector_str,
+                                                                              simd_vector_str,
+                                                                              0,
+                                                                              1,
+                                                                              2,
+                                                                              3,
+                                                                              4,
+                                                                              5,
+                                                                              6,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              7,
+                                                                              8,
+                                                                              9,
+                                                                              10,
+                                                                              11,
+                                                                              12,
+                                                                              13,
+                                                                              14,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1);
+                        }
+                        else
+                        {
+                            simd_vector_str_shuffle = __builtin_shufflevector(simd_vector_str,
+                                                                              simd_vector_str,
+                                                                              0,
+                                                                              1,
+                                                                              2,
+                                                                              3,
+                                                                              4,
+                                                                              5,
+                                                                              6,
+                                                                              7,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              8,
+                                                                              9,
+                                                                              10,
+                                                                              11,
+                                                                              12,
+                                                                              13,
+                                                                              14,
+                                                                              15,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1);
+                        }
+
+                        u16x16simd mask_res;
+
+# if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)
+                        mask_res = ::std::bit_cast<u16x16simd>(__builtin_ia32_pshufb256(simd_vector_str_shuffle, mask_tableu8x32));
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b)
+                        mask_res = ::std::bit_cast<u16x16simd>(
+                            __builtin_lasx_xvshuf_b(simd_vector_str_shuffle, simd_vector_str_shuffle, mask_tableu8x32));  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
@@ -1818,10 +1863,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         auto const check_upper{res >= simd_vector_check};
 
                         if(
-# if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                            !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                            __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
+# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
+                            !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(check_upper), ::std::bit_cast<i64x4simd>(check_upper))
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
+                            __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
@@ -1832,101 +1877,264 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             //                                      ^^ section_curr
                             //                                                             ^^ section_curr + 32uz
 
-                            // If not yet processed in the first round, it can be processed up to 32
-                            // Ensure that there are no modifications to the state: func_counter, section_curr
+                            // it can be processed up to 32
                             error_handler(32uz);
+
                             // Start the next round straight away
                             continue;
                         }
 
                         // All correct, can change state: func_counter, section_curr
 
-                        // check func_counter before write
-                        func_counter += curr_table_processed_simd;
+                        auto const curr_table_processed_simd_sum{curr_table_processed_simd_1st + curr_table_processed_simd_2nd};
+                        auto const curr_table_processed_byte_sum{curr_table_processed_byte_1st + curr_table_processed_byte_2nd};
 
-                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
+                        func_counter += curr_table_processed_simd_sum;
 
-                        // Since typeidx can write to a u8, reduce u16x8 to u8x8
+                        // There is no need to check function_counter, because curr_table_processed_simd_sum is always less than or equal to 16u.
 
-                        // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
-                        auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(__builtin_shufflevector(::std::bit_cast<u8x16simd>(res),
-                                                                                                      ::std::bit_cast<u8x16simd>(res),
-                                                                                                      0,
-                                                                                                      2,
-                                                                                                      4,
-                                                                                                      6,
-                                                                                                      8,
-                                                                                                      10,
-                                                                                                      12,
-                                                                                                      14,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1))};
+                        // Since typeidx can write to a u8, reduce u16x16 to u8x16
 
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
+                        u8x32simd needwrite_u8x32;
 
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
+                        switch(curr_table_processed_simd_1st)
+                        {
+                            case 4u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 5u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 6u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          10,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 7u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          10,
+                                                                          12,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 8u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          10,
+                                                                          12,
+                                                                          14,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            default:
+                            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+# endif
+                                ::fast_io::unreachable();
+                            }
+                        }
 
-                        //  [... curr ... (7) ... curr_next ... (23) ...]
-                        //  [                 safe                      ] unsafe (could be the section_end)
+                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(needwrite_u8x32)};
+
+                        auto const needwrite_u8x16x2v0{needwrite_u8x16x2.front_unchecked()};
+
+                        //  [... curr ... (15) ... curr_next ... (15) ...]
+                        //  [                 safe                       ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
                         ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                                                           ::std::addressof(needwrite_u8x16x2v0),
+                                                           sizeof(u8x16simd));
 
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
+                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
-                        //  [... curr ... (7) ... curr_next ... (23) ...]
-                        //  [                 safe                      ] unsafe (could be the section_end)
+                        //  [... curr ... (15) ... curr_next ... (15) ...]
+                        //  [                 safe                       ] unsafe (could be the section_end)
                         //                    ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         // Or: (Security boundaries for writes are checked)
                         //                        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        section_curr += curr_table_processed_byte;
+                        section_curr += curr_table_processed_byte_sum;
 
-                        // [before_section ... | func_count ... typeidx1 ... (7) ... ... (23) ...] ...
-                        // [                        safe                                         ] unsafe (could be the section_end)
+                        // [before_section ... | func_count ... typeidx1 ... (15) ... ... (15) ...] ...
+                        // [                        safe                                          ] unsafe (could be the section_end)
                         //                                                   ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
-                        //                                      [   simd_vector_str              ]
+                        //                                      [   simd_vector_str               ]
                     }
-                }
-
-                ::std::uint8_t second_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
-
-                // 2nd rount
-                {
-                    unsigned const check_table_index{check_mask_curr & 0xFFu};
-
-                    // There are only 7 and 8 and 0 in the table, where the 0 have been handled out of the error,
-                    // and if a non-7 or non-8 is encountered, there is a problem with the surface
-
-                    // When first_round_handle_bytes is 7, check_table_index is always greater than 0，
-                    // Because the highest bit of the first 8 bits is pop, 0bxxxx'xxxx'1xxx'xxxxu >> 7u == 0bxxxx'xxx1
-
-# if __has_cpp_attribute(assume)
-                    [[assume((first_round_handle_bytes == static_cast<::std::uint8_t>(7u) && check_table_index != 0u) ||
-                             first_round_handle_bytes == static_cast<::std::uint8_t>(8u))]];
-# endif
-
-                    if(!check_table_index)
+                    else
                     {
-                        // All correct, can change state: func_counter, section_curr
-
-                        // The first 8 bits are single byte typeidx is writable at once.
-
-                        check_mask_curr >>= 8u;
+                        // If check_table_index_1st or check_table_index_2nd is 0, write directly
 
                         // check func_counter before write
-                        func_counter += 8u;
+                        // The check is all done and the status can be changed, if it is less than the value written, then something is wrong.
+
+                        func_counter += 16u;
 
                         // check counter
                         if(func_counter > func_count) [[unlikely]]
@@ -1939,310 +2147,45 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         // Since everything is less than 128, there is no need to check the typeidx.
 
-                        // Requires a vector right shift to implement
+                        // write 16 byte
+                        using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+
+                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(simd_vector_str)};
 
                         //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-                        // [       last write      ]
-                        //                      ^^^^^^ curr (begin + first_round_handle_bytes)
-                        //                      [      need write       ]..]
+                        // [                 needwrite_u16x8x2v0           ]
 
-                        // When first_round_handle_bytes is 7, check_table_index is always greater than 0，
-                        // Because the highest bit of the first 8 bits is pop, 0b...'xxxx'xxxx'1xxx'xxxxu >> 7u == 0b...'xxxx'xxx1
+                        auto const needwrite_u8x16x2v0{needwrite_u8x16x2.front_unchecked()};
 
-                        UWVM_ASSERT(first_round_handle_bytes == static_cast<::std::uint8_t>(8u));
-
-                        // Here the shuffle simulation element is kept shifted right by 8 bits to facilitate subsequent expansion,
-                        // while the subsequent taking of the first address has been shown to be optimized by the llvm into a single instruction
-
-                        u8x16simd simd_vector_str_need_shf{__builtin_shufflevector(first_second_round_simd_u8x16,
-                                                                                   first_second_round_simd_u8x16,
-                                                                                   8,
-                                                                                   9,
-                                                                                   10,
-                                                                                   11,
-                                                                                   12,
-                                                                                   13,
-                                                                                   14,
-                                                                                   15,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1)};
-
-                        // write 8 byte
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(simd_vector_str_need_shf)};
-
-                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-                        // [       last write      ]
-                        //                      ^^^^^^ curr (begin + first_round_handle_bytes)
-                        //                      [      need write       ]..]
-
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
-
-                        //  [... curr_old ... (7) ... curr ... (23) ...] ...
-                        //  [                 safe                     ] unsafe (could be the section_end)
-                        //                        ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //                       [    needwrite   ]...]
-
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
-
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
-
-                        //  [... curr_last ... (7) ... curr ... (23) ...] ...
-                        //  [                  safe                     ] unsafe (could be the section_end)
-                        //                                           ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-
-                        section_curr += 8u;
-
-                        // [before_section ... | func_count ... typeidx1 ... (7) ... typeidxc ... (23) ...] ...
-                        // [                                safe                                          ] unsafe (could be the section_end)
-                        //                                                                              ^^^^^^ section_curr
-                        //                                      [                simd_vector_str          ]
-                    }
-                    else
-                    {
-                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter
-                        // the tail processing
-
-                        //  [...] curr ... (curr + 8u)
-                        //  [sf ] unsafe (could be the section_end)
-                        //  [ safe  ... ] unsafe (Left over from above, length unknown, can't be used)
-                        //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-
-                        // Cannot change state until error checking: func_counter, section_curr
-                        if(func_counter + 8u > func_count) [[unlikely]]
-                        {
-                            // Near the end, jump directly out of the simd section and hand it over to the tail.
-                            break;
-                        }
-
-                        //  [... curr ... (7) ...]
-                        //  [        safe        ] unsafe (could be the section_end)
+                        //  [... curr ... (15) ... curr_next ... (15) ...]
+                        //  [                 safe                       ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
-
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
-                        // Since it's the second round, the data has to be moved back  the number of bytes processed in the first round
-                        auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};
-                        auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
-                        auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
-
-                        second_round_handle_bytes = static_cast<::std::uint8_t>(curr_table_processed_byte);
-
-                        // When the number of consecutive bits is greater than 2, switch back to the normal processing method
-                        if(!curr_table_processed_simd) [[unlikely]]
-                        {
-                            // [before_section ... | func_count ... typeidx1 ... (7) ... ... (23) ...] ...
-                            // [                        safe                                         ] unsafe (could be the section_end)
-                            //                                                   ^^^ ^^^ section_curr (indeterminate location)
-                            //                                                                    ^^^ ^^^ section_curr + 8uz
-
-                            // Second round can only handle 32 - first round max 8 = 24
-                            // Ensure that there are no modifications to the state: func_counter, section_curr
-                            error_handler(24uz);
-                            // Start the next round straight away
-                            continue;
-                        }
-
-                        check_mask_curr >>= curr_table_processed_byte;
-
-                        // shuffle and write
-
-                        u16x8simd mask_res;
-
-# if defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)
-                        mask_res = ::std::bit_cast<u16x8simd>(__builtin_ia32_pshufb128(first_second_round_simd_u8x16, curr_table_shuffle_mask));
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
-                        mask_res = ::std::bit_cast<u16x8simd>(
-                            __builtin_lsx_vshuf_b(first_second_round_simd_u8x16, first_second_round_simd_u8x16, curr_table_shuffle_mask));
-# else
-#  error "missing instructions"
-# endif
-
-                        // The leb128 that has been merged into u16x8 is finalized to get the value corresponding to u16
-
-                        auto const res{(mask_res & static_cast<::std::uint16_t>(0x7Fu)) | ((mask_res & static_cast<::std::uint16_t>(0x7F00u)) >> 1u)};
-
-                        // The data out of shuffle is 16-bit [0, 2^14) and may be greater than or equal to typeidx, which needs to be checked.
-
-                        auto const check_upper{res >= simd_vector_check};
-
-                        if(
-# if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                            !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                            __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
-# else
-#  error "missing instructions"
-# endif
-                                ) [[unlikely]]
-                        {
-                            // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
-                            // [                        safe                                        ] unsafe (could be the section_end)
-                            //                                                   ^^^^^^^ section_curr (indeterminate location)
-                            //                                                                   ^^^^^^^ section_curr + 8uz
-
-                            // Second round can only handle 32 - first round max 8 = 24
-                            error_handler(24uz);
-                            // Start the next round straight away
-                            continue;
-                        }
-
-                        // All correct, can change state: func_counter, section_curr
-
-                        // check func_counter before write
-                        func_counter += curr_table_processed_simd;
-
-                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
-
-                        // Since typeidx can write to a u8, reduce u16x8 to u8x8
-
-                        // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
-                        auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(__builtin_shufflevector(::std::bit_cast<u8x16simd>(res),
-                                                                                                      ::std::bit_cast<u8x16simd>(res),
-                                                                                                      0,
-                                                                                                      2,
-                                                                                                      4,
-                                                                                                      6,
-                                                                                                      8,
-                                                                                                      10,
-                                                                                                      12,
-                                                                                                      14,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1))};
-
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
-
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
-
-                        //  [... curr_old ... (7) ... curr ... (7) ... ]
-                        //  [                 safe                     ] unsafe (could be the section_end)
-                        //                            ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //                            [    needwrite   ]
+                        //      [    needwrite    ]
 
                         ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                                                           ::std::addressof(needwrite_u8x16x2v0),
+                                                           sizeof(u8x16simd));
 
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
+                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16u;
 
-                        //  [... curr_old ... (7) ... curr ... (7) ... ]
-                        //  [                 safe                     ] unsafe (could be the section_end)
-                        //                                               ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //                            [    needwrite   ]
+                        //  [... curr_last ... (15) ... curr ... (15) ...]
+                        //  [                  safe                      ] unsafe (could be the section_end)
+                        //                              ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
-                        section_curr += curr_table_processed_byte;
+                        section_curr += 16u;
 
-                        // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
-                        // [                        safe                                        ] unsafe (could be the section_end)
-                        //                                                                   ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
-                        //                                      [   simd_vector_str             ]
+                        // [before_section ... | func_count ... typeidx1 ... (15) ... typeidxc ... (15) ...] ...
+                        // [                                safe                                           ] unsafe (could be the section_end)
+                        //                                                            ^^ section_curr
+                        //                                      [                simd_vector_str           ]
                     }
                 }
 
-                auto const first_second_round_handled_bytes{static_cast<unsigned>(first_round_handle_bytes + second_round_handle_bytes)};
+                u8x32simd third_fourth_round_simd_u8x32;
 
-                // Since the channel of the simd shuffle is 128, you need to move the back through the built-in constant shuffle (the channel is the same length
-                // as the vector) to the front in advance.
-
-                u8x16simd third_fourth_round_simd_u8x16;
-
-                switch(first_second_round_handled_bytes)
+                switch(first_and_second_round_handle_bytes)
                 {
-                    case 14u:
-                    {
-                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
-                                                                         simd_vector_str,
-                                                                         14,
-                                                                         15,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
-                        third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
-                        break;
-                    }
-                    case 15u:
-                    {
-                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
-                                                                         simd_vector_str,
-                                                                         15,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         30,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
-                        third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
-                        break;
-                    }
-                    case 16u:
+                    case 0u:  // handle 16u
                     {
                         auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
@@ -2278,145 +2221,263 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                          -1,
                                                                          -1,
                                                                          -1)};
-                        third_fourth_round_simd_u8x16 = ::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(shuffle_u8x32).front_unchecked();
+                        third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
+                        break;
+                    }
+                    case 1u:  // handle 15u
+                    {
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
+                                                                         simd_vector_str,
+                                                                         15,
+                                                                         16,
+                                                                         17,
+                                                                         18,
+                                                                         19,
+                                                                         20,
+                                                                         21,
+                                                                         22,
+                                                                         23,
+                                                                         24,
+                                                                         25,
+                                                                         26,
+                                                                         27,
+                                                                         28,
+                                                                         29,
+                                                                         30,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1)};
+                        third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
+                        break;
+                    }
+                    case 2u:  // handle 14u
+                    {
+                        auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
+                                                                         simd_vector_str,
+                                                                         14,
+                                                                         15,
+                                                                         16,
+                                                                         17,
+                                                                         18,
+                                                                         19,
+                                                                         20,
+                                                                         21,
+                                                                         22,
+                                                                         23,
+                                                                         24,
+                                                                         25,
+                                                                         26,
+                                                                         27,
+                                                                         28,
+                                                                         29,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1,
+                                                                         -1)};
+                        third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
                     default:
                     {
-                        UWVM_ASSERT(false);
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+# endif
                         ::fast_io::unreachable();
                     }
                 }
 
-                // Record the number of bytes processed in the third round
-                ::std::uint8_t third_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
-
-                // 3rd rount
+                // 3rd and 4th round
                 {
-                    unsigned const check_table_index{check_mask_curr & 0xFFu};
+                    unsigned const check_table_index_1st{check_mask_curr & 0xFFu};
 
-                    // If check_mask_curr is 0, write directly
+                    // according to the information in the table, when the eighth bit is 1, then the processing length is 7
+                    bool const first_round_is_seven{static_cast<bool>(check_table_index_1st & 0x80u)};
 
-# if __has_cpp_attribute(assume)
-                    [[assume((second_round_handle_bytes == static_cast<::std::uint8_t>(7u) && check_table_index != 0u) ||
-                             second_round_handle_bytes == static_cast<::std::uint8_t>(8u))]];
+                    check_mask_curr >>= 8u - static_cast<unsigned>(first_round_is_seven);
+
+                    unsigned const check_table_index_2nd{check_mask_curr & 0xFFu};
+
+                    // according to the information in the table, when the eighth bit is 1, then the processing length is 7
+
+                    // check_mask_curr to be useless and no further calculations are needed.
+# if 0
+                    bool const second_round_is_seven{static_cast<bool>(check_table_index_2nd & 0x80u)};
+
+                    check_mask_curr >>= 8u - static_cast<unsigned>(second_round_is_seven);
 # endif
 
-                    if(!check_table_index)
+                    // When there are few operations, 2-branch prediction may seem inferior to one operation + one branch prediction
+                    // For parsing random data that may be encountered, it is more efficient to use bitwise operations than to add branches using logical
+                    // operators.
+
+                    if(check_table_index_1st | check_table_index_2nd)
                     {
-                        // All correct, can change state: func_counter, section_curr
+                        // There are non-zero terms in 1st and 2nd, so it's straightforward to construct a 256 (128 * 2) shuffle.
 
-                        // The first 8 bits are single byte typeidx is writable at once.
-
-                        check_mask_curr >>= 8u;
-
-                        // check func_counter before write
-                        func_counter += 8u;
-
-                        // check counter
-                        if(func_counter > func_count) [[unlikely]]
-                        {
-                            err.err_curr = section_curr;
-                            err.err_selectable.u32 = func_count;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                        }
-
-                        // check second_round_handle_byte
-                        UWVM_ASSERT(second_round_handle_bytes == static_cast<::std::uint8_t>(8u));
-
-                        // Since everything is less than 128, there is no need to check the typeidx.
-
-                        // write 8 byte
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(third_fourth_round_simd_u8x16)};
-
-                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-                        // [   needwrite_u8x8x2v0  ]
-
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
-
-                        //  [... curr ... (7) ... curr_next ... (>=7) ...]
-                        //  [                 safe                       ] unsafe (could be the section_end)
-                        //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [    needwrite   ]
-
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
-
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
-
-                        //  [... curr_last ... (7) ... curr ... (>=7) ...]
-                        //  [                  safe                      ] unsafe (could be the section_end)
-                        //                             ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-
-                        section_curr += 8u;
-
-                        // [before_section ... | func_count ... typeidx1 ... (7) ... typeidxc ... (>=7) ...] ...
-                        // [                                safe                                           ] unsafe (could be the section_end)
-                        //                                                           ^^ section_curr
-                        //                                      [                simd_vector_str           ]
-                    }
-                    else
-                    {
                         //  [...] curr ...
                         //  [sf ] unsafe (could be the section_end)
                         //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
-                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter
+                        // The write size is 16 bits, but the valid data may be less than 16 bits, directly check the maximum value, more than that, then enter
                         // the tail processing Cannot change state until error checking: func_counter, section_curr
-                        if(func_counter + 8u > func_count) [[unlikely]]
+                        if(func_counter + 16u > func_count) [[unlikely]]
                         {
                             // Near the end, jump directly out of the simd section and hand it over to the tail.
                             break;
                         }
 
-                        //  [... curr ... (7) ...]
-                        //  [        safe        ] unsafe (could be the section_end)
+                        //  [... curr ... (15) ...]
+                        //  [        safe         ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
+                        //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
-                        auto const curr_table_shuffle_mask{curr_table.shuffle_mask};
-                        auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
-                        auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
+                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(check_table_index_1st)};
+                        auto const curr_table_shuffle_mask_1st{curr_table_1st.shuffle_mask};
+                        auto const curr_table_processed_simd_1st{curr_table_1st.processed_simd};  // size of handled u32
+                        auto const curr_table_processed_byte_1st{curr_table_1st.processed_byte};  // size of handled uleb128
 
-                        third_round_handle_bytes = static_cast<::std::uint8_t>(curr_table_processed_byte);
+                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(check_table_index_2nd)};
+                        auto const curr_table_shuffle_mask_2nd{curr_table_2nd.shuffle_mask};
+                        auto const curr_table_processed_simd_2nd{curr_table_2nd.processed_simd};  // size of handled u32
+                        auto const curr_table_processed_byte_2nd{curr_table_2nd.processed_byte};  // size of handled uleb128
 
                         // When the number of consecutive bits is greater than 2, switch back to the normal processing method
-                        if(!curr_table_processed_simd) [[unlikely]]
-                        {
-                            // [before_section ... | func_count ... typeidx1 ... (>=15) ...] ...
-                            // [                        safe                               ] unsafe (could be the section_end)
-                            //                                      ^^ section_curr
-                            //                                                               ^^ section_curr + 16uz
+                        // Error handling is almost never encountered, using logical operators to increase short-circuit evaluation, with branch prediction
+                        // always faster than bitwise operations
 
-                            // it can be processed up to 32 - 8(max) * 2 == 16
+                        if(!curr_table_processed_simd_1st || !curr_table_processed_simd_2nd) [[unlikely]]
+                        {
+                            // [before_section ... | func_count ... typeidx1 ... (31) ...] ...
+                            // [                        safe                             ] unsafe (could be the section_end)
+                            //                                      ^^ section_curr
+                            //                                                             ^^ section_curr + 32uz
+
+                            // it can be processed up to 32 - 16 == 16
                             error_handler(16uz);
+
                             // Start the next round straight away
                             continue;
                         }
 
-                        // Remove the second round of processing for the next round of calculations
-                        check_mask_curr >>= curr_table_processed_byte;
-
-                        //  [... curr ... (7) ... curr_next ... (>=7) ...]
-                        //  [                 safe                       ] unsafe (could be the section_end)
+                        //  [... curr ... (15) ...]
+                        //  [        safe         ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [    needwrite   ]
-                        //      [    ctps  ]  ...]
+                        //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
                         // shuffle and write
 
-                        u16x8simd mask_res;
+                        ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
+                        u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
-# if defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)
-                        mask_res = ::std::bit_cast<u16x8simd>(__builtin_ia32_pshufb128(third_fourth_round_simd_u8x16, curr_table_shuffle_mask));
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
-                        mask_res = ::std::bit_cast<u16x8simd>(
-                            __builtin_lsx_vshuf_b(third_fourth_round_simd_u8x16, third_fourth_round_simd_u8x16, curr_table_shuffle_mask));
+                        u8x32simd simd_vector_str_shuffle;
+
+                        if(curr_table_processed_byte_1st == 7u)
+                        {
+                            simd_vector_str_shuffle = __builtin_shufflevector(third_fourth_round_simd_u8x32,
+                                                                              third_fourth_round_simd_u8x32,
+                                                                              0,
+                                                                              1,
+                                                                              2,
+                                                                              3,
+                                                                              4,
+                                                                              5,
+                                                                              6,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              7,
+                                                                              8,
+                                                                              9,
+                                                                              10,
+                                                                              11,
+                                                                              12,
+                                                                              13,
+                                                                              14,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1);
+                        }
+                        else
+                        {
+                            simd_vector_str_shuffle = __builtin_shufflevector(third_fourth_round_simd_u8x32,
+                                                                              third_fourth_round_simd_u8x32,
+                                                                              0,
+                                                                              1,
+                                                                              2,
+                                                                              3,
+                                                                              4,
+                                                                              5,
+                                                                              6,
+                                                                              7,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              8,
+                                                                              9,
+                                                                              10,
+                                                                              11,
+                                                                              12,
+                                                                              13,
+                                                                              14,
+                                                                              15,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1,
+                                                                              -1);
+                        }
+
+                        u16x16simd mask_res;
+
+# if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)
+                        mask_res = ::std::bit_cast<u16x16simd>(__builtin_ia32_pshufb256(simd_vector_str_shuffle, mask_tableu8x32));
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b)
+                        mask_res = ::std::bit_cast<u16x16simd>(
+                            __builtin_lasx_xvshuf_b(simd_vector_str_shuffle, simd_vector_str_shuffle, mask_tableu8x32));  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
@@ -2430,115 +2491,278 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         auto const check_upper{res >= simd_vector_check};
 
                         if(
-# if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                            !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                            __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
+# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
+                            !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(check_upper), ::std::bit_cast<i64x4simd>(check_upper))
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
+                            __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
                                 ) [[unlikely]]
                         {
-                            // [before_section ... | func_count ... typeidx1 ... (>=15) ...] ...
-                            // [                        safe                               ] unsafe (could be the section_end)
+                            // [before_section ... | func_count ... typeidx1 ... (31) ...] ...
+                            // [                        safe                             ] unsafe (could be the section_end)
                             //                                      ^^ section_curr
-                            //                                                               ^^ section_curr + 16uz
+                            //                                                             ^^ section_curr + 32uz
 
-                            // it can be processed up to 32 - 8(max) * 2 == 16
-                            // Ensure that there are no modifications to the state: func_counter, section_curr
+                            // it can be processed up to 32 - 16 == 16
                             error_handler(16uz);
+
                             // Start the next round straight away
                             continue;
                         }
 
                         // All correct, can change state: func_counter, section_curr
 
-                        // check func_counter before write
-                        func_counter += curr_table_processed_simd;
+                        auto const curr_table_processed_simd_sum{curr_table_processed_simd_1st + curr_table_processed_simd_2nd};
+                        auto const curr_table_processed_byte_sum{curr_table_processed_byte_1st + curr_table_processed_byte_2nd};
 
-                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
+                        func_counter += curr_table_processed_simd_sum;
 
-                        // Since typeidx can write to a u8, reduce u16x8 to u8x8
+                        // There is no need to check function_counter, because curr_table_processed_simd_sum is always less than or equal to 16u.
 
-                        // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
-                        auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(__builtin_shufflevector(::std::bit_cast<u8x16simd>(res),
-                                                                                                      ::std::bit_cast<u8x16simd>(res),
-                                                                                                      0,
-                                                                                                      2,
-                                                                                                      4,
-                                                                                                      6,
-                                                                                                      8,
-                                                                                                      10,
-                                                                                                      12,
-                                                                                                      14,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1))};
+                        // Since typeidx can write to a u8, reduce u16x16 to u8x16
 
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
+                        u8x32simd needwrite_u8x32;
 
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
+                        switch(curr_table_processed_simd_1st)
+                        {
+                            case 4u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 5u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 6u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          10,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 7u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          10,
+                                                                          12,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            case 8u:
+                            {
+                                needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
+                                                                          ::std::bit_cast<u8x32simd>(res),
+                                                                          0,
+                                                                          2,
+                                                                          4,
+                                                                          6,
+                                                                          8,
+                                                                          10,
+                                                                          12,
+                                                                          14,
+                                                                          16,
+                                                                          18,
+                                                                          20,
+                                                                          22,
+                                                                          24,
+                                                                          26,
+                                                                          28,
+                                                                          30,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1,
+                                                                          -1);
+                                break;
+                            }
+                            default:
+                            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+# endif
+                                ::fast_io::unreachable();
+                            }
+                        }
 
-                        //  [... curr ... (7) ... curr_next ... (>=7) ...]
+                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(needwrite_u8x32)};
+
+                        auto const needwrite_u8x16x2v0{needwrite_u8x16x2.front_unchecked()};
+
+                        //  [... curr ... (15) ... curr_next ... (15) ...]
                         //  [                 safe                       ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
                         ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                                                           ::std::addressof(needwrite_u8x16x2v0),
+                                                           sizeof(u8x16simd));
 
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
+                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
-                        //  [... curr ... (7) ... curr_next ... (>=7) ...]
+                        //  [... curr ... (15) ... curr_next ... (15) ...]
                         //  [                 safe                       ] unsafe (could be the section_end)
                         //                    ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         // Or: (Security boundaries for writes are checked)
                         //                        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        section_curr += curr_table_processed_byte;
+                        section_curr += curr_table_processed_byte_sum;
 
-                        // [before_section ... | func_count ... typeidx1 ... (<=15) ... ... (7) ... ... (7) ...] ...
-                        // [                        safe                                                       ] unsafe (could be the section_end)
-                        //                                                          ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
-                        //                                      [                  simd_vector_str             ]
+                        // [before_section ... | func_count ... typeidx1 ... (15) ... ... (15) ...] ...
+                        // [                        safe                                          ] unsafe (could be the section_end)
+                        //                                                   ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
+                        //                                      [   simd_vector_str               ]
                     }
-                }
-
-                // 4th rount
-                {
-                    unsigned const check_table_index{check_mask_curr & 0xFFu};
-
-                    // There are only 7 and 8 and 0 in the table, where the 0 have been handled out of the error,
-                    // and if a non-7 or non-8 is encountered, there is a problem with the surface
-
-                    // When third_round_handle_bytes is 7, check_table_index is always greater than 0，
-                    // Because the highest bit of the first 8 bits is pop, 0bxxxx'xxxx'1xxx'xxxxu >> 7u == 0bxxxx'xxx1
-
-# if __has_cpp_attribute(assume)
-                    [[assume((third_round_handle_bytes == static_cast<::std::uint8_t>(7u) && check_table_index != 0u) ||
-                             third_round_handle_bytes == static_cast<::std::uint8_t>(8u))]];
-# endif
-
-                    if(!check_table_index)
+                    else
                     {
-                        // It's the last round, but since it's already established, it's better to calculate it directly.
-
-                        // All correct, can change state: func_counter, section_curr
-
-                        // The first 8 bits are single byte typeidx is writable at once.
-
-                        // last round no necessary to check_mask_curr >>= 8u;
+                        // If check_table_index_1st or check_table_index_2nd is 0, write directly
 
                         // check func_counter before write
-                        func_counter += 8u;
+                        // The check is all done and the status can be changed, if it is less than the value written, then something is wrong.
+
+                        func_counter += 16u;
 
                         // check counter
                         if(func_counter > func_count) [[unlikely]]
@@ -2551,219 +2775,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         // Since everything is less than 128, there is no need to check the typeidx.
 
-                        // Requires a vector right shift to implement
+                        // write 16 byte
+                        using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
 
-                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-                        // [       last write      ]
-                        //                      ^^^^^^ curr (begin + third_round_handle_bytes)
-                        //                      [      need write       ]..]
+                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(third_fourth_round_simd_u8x32)};
 
-                        // When third_round_handle_bytes is 7, check_table_index is always greater than 0，
-                        // Because the highest bit of the first 8 bits is pop, 0bxxxx'xxxx'1xxx'xxxxu >> 7u == 0bxxxx'xxx1
+                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+                        // [                 needwrite_u16x8x2v0           ]
 
-                        UWVM_ASSERT(third_round_handle_bytes == static_cast<::std::uint8_t>(8u));
+                        auto const needwrite_u8x16x2v0{needwrite_u8x16x2.front_unchecked()};
 
-                        // Here the shuffle simulation element is kept shifted right by 8 bits to facilitate subsequent expansion,
-                        // while the subsequent taking of the first address has been shown to be optimized by the llvm into a single instruction
-
-                        u8x16simd simd_vector_str_need_shf{__builtin_shufflevector(third_fourth_round_simd_u8x16,
-                                                                                   third_fourth_round_simd_u8x16,
-                                                                                   8,
-                                                                                   9,
-                                                                                   10,
-                                                                                   11,
-                                                                                   12,
-                                                                                   13,
-                                                                                   14,
-                                                                                   15,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1,
-                                                                                   -1)};
-
-                        // write 8 byte
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(simd_vector_str_need_shf)};
-
-                        //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-                        // [       last write      ]
-                        //                      ^^^^^^ curr (begin + first_round_handle_bytes)
-                        //                      [      need write       ]..]
-
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
-
-                        //  [... curr_old ... (<=15) ... curr ... (7) ...] ...
+                        //  [... curr ... (15) ... curr_next ... (15) ...]
                         //  [                 safe                       ] unsafe (could be the section_end)
-                        //                           ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //                          [    needwrite   ]...]
-
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
-
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
-
-                        //  [... curr_last ... (<=15) ... curr ... (7) ...] ...
-                        //  [                  safe                       ] unsafe (could be the section_end)
-                        //                                              ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-
-                        section_curr += 8u;
-
-                        // [before_section ... | func_count ... typeidx1 ... (<=23) ... typeidxc ... (7) ...] ...
-                        // [                                safe                                            ] unsafe (could be the section_end)
-                        //                                                                                ^^^^^^ section_curr
-                        //                                      [                simd_vector_str            ]
-                    }
-                    else
-                    {
-                        // The write size is 8 bits, but the valid data may be less than 8 bits, directly check the maximum value, more than that, then enter
-                        // the tail processing
-
-                        //  [...] curr ... (curr + 8u)
-                        //  [sf ] unsafe (could be the section_end)
-                        //  [ safe  ... ] unsafe (Left over from above, length unknown, can't be used)
-                        //        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-
-                        // Cannot change state until error checking: func_counter, section_curr
-                        if(func_counter + 8u > func_count) [[unlikely]]
-                        {
-                            // Near the end, jump directly out of the simd section and hand it over to the tail.
-                            break;
-                        }
-
-                        //  [... curr ... (7) ...]
-                        //  [        safe        ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
-
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
-                        // Since it's the second round, the data has to be moved back  the number of bytes processed in the third round
-                        auto const curr_table_shuffle_mask{curr_table.shuffle_mask + third_round_handle_bytes};
-                        auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
-                        auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
-
-                        // When the number of consecutive bits is greater than 2, switch back to the normal processing method
-                        if(!curr_table_processed_simd) [[unlikely]]
-                        {
-                            // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
-                            // [                        safe                                        ] unsafe (could be the section_end)
-                            //                                                   ^^^ ^^^ section_curr (indeterminate location)
-                            //                                                                   ^^^ ^^^ section_curr + 8uz
-
-                            // fourth round can only handle 32 - 8 * 3 == 8
-                            // Ensure that there are no modifications to the state: func_counter, section_curr
-                            error_handler(8uz);
-                            // Start the next round straight away
-                            continue;
-                        }
-
-                        // last round no necessary to check_mask_curr >>= curr_table_processed_byte;
-
-                        // shuffle and write
-
-                        u16x8simd mask_res;
-
-# if defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128)
-                        mask_res = ::std::bit_cast<u16x8simd>(__builtin_ia32_pshufb128(third_fourth_round_simd_u8x16, curr_table_shuffle_mask));
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
-                        mask_res = ::std::bit_cast<u16x8simd>(
-                            __builtin_lsx_vshuf_b(third_fourth_round_simd_u8x16, third_fourth_round_simd_u8x16, curr_table_shuffle_mask));
-# else
-#  error "missing instructions"
-# endif
-
-                        // The leb128 that has been merged into u16x8 is finalized to get the value corresponding to u16
-
-                        auto const res{(mask_res & static_cast<::std::uint16_t>(0x7Fu)) | ((mask_res & static_cast<::std::uint16_t>(0x7F00u)) >> 1u)};
-
-                        // The data out of shuffle is 16-bit [0, 2^14) and may be greater than or equal to typeidx, which needs to be checked.
-
-                        auto const check_upper{res >= simd_vector_check};
-
-                        if(
-# if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                            !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
-# elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                            __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
-# elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                            __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
-# else
-#  error "missing instructions"
-# endif
-                                ) [[unlikely]]
-                        {
-                            // [before_section ... | func_count ... typeidx1 ... (7) ... ... (7) ...] ...
-                            // [                        safe                                        ] unsafe (could be the section_end)
-                            //                                                   ^^^^^^^ section_curr (indeterminate location)
-                            //                                                                   ^^^^^^^ section_curr + 8uz
-
-                            // fourth round can only handle 32 - 8 * 3 == 8
-                            error_handler(8uz);
-                            // Start the next round straight away
-                            continue;
-                        }
-
-                        // All correct, can change state: func_counter, section_curr
-
-                        // check func_counter before write
-                        func_counter += curr_table_processed_simd;
-
-                        // There is no need to check function_counter, because curr_table_processed_simd is always less than or equal to 8u.
-
-                        // Since typeidx can write to a u8, reduce u16x8 to u8x8
-
-                        // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
-                        auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(__builtin_shufflevector(::std::bit_cast<u8x16simd>(res),
-                                                                                                      ::std::bit_cast<u8x16simd>(res),
-                                                                                                      0,
-                                                                                                      2,
-                                                                                                      4,
-                                                                                                      6,
-                                                                                                      8,
-                                                                                                      10,
-                                                                                                      12,
-                                                                                                      14,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1))};
-
-                        using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
-
-                        auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
-
-                        //  [... curr_old ... (<=23) ... curr ... (7) ... ]
-                        //  [                 safe                        ] unsafe (could be the section_end)
-                        //                               ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //                               [    needwrite   ]
+                        //      [    needwrite    ]
 
                         ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                                                           ::std::addressof(needwrite_u8x16x2v0),
+                                                           sizeof(u8x16simd));
 
-                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
+                        functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16u;
 
-                        //  [... curr_old ... (<=23) ... curr ... (7) ... ]
-                        //  [                 safe                        ] unsafe (could be the section_end)
-                        //                                                  ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                        //                               [    needwrite   ]
+                        //  [... curr_last ... (15) ... curr ... (15) ...]
+                        //  [                  safe                      ] unsafe (could be the section_end)
+                        //                              ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
 
-                        section_curr += curr_table_processed_byte;
+                        section_curr += 16u;
 
-                        // [before_section ... | func_count ... typeidx1 ... (<=23) ... ... (7) ...] ...
-                        // [                        safe                                           ] unsafe (could be the section_end)
-                        //                                                                      ^^^^^^^ section_curr (curr_table_processed_byte <= 8)
-                        //                                      [   simd_vector_str                ]
+                        // [before_section ... | func_count ... typeidx1 ... (15) ... typeidxc ... (15) ...] ...
+                        // [                                safe                                           ] unsafe (could be the section_end)
+                        //                                                            ^^ section_curr
+                        //                                      [                simd_vector_str           ]
                     }
                 }
             }
@@ -2799,6 +2841,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
         }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
     (((defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128) && UWVM_HAS_BUILTIN(__builtin_ia32_palignr128)) &&                                     \
       (defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128))) ||                                                                                  \
@@ -2932,7 +2975,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
-                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 3.0)
+                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 4.0)
 # else
                 check_mask
 # endif
@@ -2945,7 +2988,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1st rount
+                // 1st round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -3159,7 +3202,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 2nd rount
+                // 2nd round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -3480,7 +3523,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
-                __builtin_expect_with_probability(static_cast<bool>(has_pop_highest_bit), true, 1.0 / 3.0)
+                __builtin_expect_with_probability(static_cast<bool>(has_pop_highest_bit), true, 1.0 / 4.0)
 # else
                 has_pop_highest_bit
 # endif
@@ -4088,7 +4131,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
-                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 3.0)
+                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 4.0)
 # else
                 check_mask
 # endif
@@ -4103,7 +4146,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1st rount
+                // 1st round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4291,7 +4334,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::std::uint8_t second_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 2nd rount
+                // 2nd round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4629,7 +4672,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the third round
                 ::std::uint8_t third_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 3rd rount
+                // 3rd round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -4820,7 +4863,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 4th rount
+                // 4th round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -5272,7 +5315,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
-                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 3.0)
+                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 4.0)
 # else
                 check_mask
 # endif
@@ -5285,7 +5328,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Record the number of bytes processed in the first round
                 ::std::uint8_t first_round_handle_bytes{static_cast<::std::uint8_t>(8u)};
 
-                // 1st rount
+                // 1st round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -5473,7 +5516,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
                 }
 
-                // 2nd rount
+                // 2nd round
                 {
                     unsigned const check_table_index{check_mask_curr & 0xFFu};
 
@@ -5770,7 +5813,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
-                __builtin_expect_with_probability(static_cast<bool>(has_pop_highest_bit), true, 1.0 / 3.0)
+                __builtin_expect_with_probability(static_cast<bool>(has_pop_highest_bit), true, 1.0 / 4.0)
 # else
                 has_pop_highest_bit
 # endif
