@@ -575,6 +575,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
 
+            /// @note The sse4 version of scan_function_section_impl_uN_Xb is about 6% faster than avx (mundane read+judge+ptest) on Windows because the kernel
+            ///       mapping in the Windows kernel's ntoskrnl.exe uses the `movups xmm` instruction for out-of-page interrupts (The reason is that the kernel
+            ///       mapping in the Windows kernel ntoskrnl.exe will use the `movups xmm` instruction for out-of-page interrupts (ntoskrnl didn't do the avx
+            ///       adaptation, and used the vex version), which leads to the state switching of the ymm mixed with this kind of instruction and wastes dozens
+            ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
+            ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
+            ///       the ntoskrnl ( This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+
             // It's already a little-endian.
 
             auto const check_upper{simd_vector_str >= simd_vector_check};
@@ -1540,12 +1548,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # endif
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
-        ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||         \
-    ((defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)) && (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)))
+        ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)) &&                                  \
+         (defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256))) ||                                                                                  \
+    (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b) &&                                   \
+     UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v))
         /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
         /// x86_64-avx3, loongarch-LSX
         // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
         // needs to be localized.
+
+        /// @note The sse4 version of scan_function_section_impl_uN_Xb is about 6% faster than avx (mundane read+judge+ptest) on Windows because the kernel
+        ///       mapping in the Windows kernel's ntoskrnl.exe uses the `movups xmm` instruction for out-of-page interrupts (The reason is that the kernel
+        ///       mapping in the Windows kernel ntoskrnl.exe will use the `movups xmm` instruction for out-of-page interrupts (ntoskrnl didn't do the avx
+        ///       adaptation, and used the vex version), which leads to the state switching of the ymm mixed with this kind of instruction and wastes dozens
+        ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
+        ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
+        ///       the ntoskrnl ( This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
@@ -2325,11 +2343,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // according to the information in the table, when the eighth bit is 1, then the processing length is 7
 
                     // check_mask_curr to be useless and no further calculations are needed.
-# if 0
-                    bool const second_round_is_seven{static_cast<bool>(check_table_index_2nd & 0x80u)};
-
-                    check_mask_curr >>= 8u - static_cast<unsigned>(second_round_is_seven);
-# endif
 
                     // When there are few operations, 2-branch prediction may seem inferior to one operation + one branch prediction
                     // For parsing random data that may be encountered, it is more efficient to use bitwise operations than to add branches using logical
