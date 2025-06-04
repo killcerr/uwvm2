@@ -246,71 +246,74 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
 
-        static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
-
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
-
-        // use fast_io simd on msvc
-        using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
-
-        u8x16simd const simd_vector_check_u8x16{simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check,
-                                                simd_vector_check};
-
-        while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
+        if constexpr(::std::endian::native == ::std::endian::little)
         {
-            // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
-            // [                        safe                             ] unsafe (could be the section_end)
-            //                                      ^^ section_curr
-            //                                      [   simd_vector_str  ]
+            static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
-            u8x16simd simd_vector_str;  // No initialization necessary
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const simd_vector_check{
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
 
-            simd_vector_str.load(section_curr);
+            // use fast_io simd on msvc
+            using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
 
-            // It's already a little-endian.
+            u8x16simd const simd_vector_check_u8x16{simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check,
+                                                    simd_vector_check};
 
-            auto const check_upper{simd_vector_str >= simd_vector_check_u8x16};
-
-            if(!is_all_zeros(check_upper)) [[unlikely]]
+            while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
-                // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
-            }
-            else
-            {
-                // all are single bytes, so there are 16
-                // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                func_counter += 16u;
-
-                // check counter
-                if(func_counter > func_count) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.u32 = func_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-
-                section_curr += 16uz;
-
-                // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
+                // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
                 // [                        safe                             ] unsafe (could be the section_end)
-                //                                                             ^^ section_curr
+                //                                      ^^ section_curr
+                //                                      [   simd_vector_str  ]
+
+                u8x16simd simd_vector_str;  // No initialization necessary
+
+                simd_vector_str.load(section_curr);
+
+                // It's already a little-endian.
+
+                auto const check_upper{simd_vector_str >= simd_vector_check_u8x16};
+
+                if(!is_all_zeros(check_upper)) [[unlikely]]
+                {
+                    // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
+                    return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                }
+                else
+                {
+                    // all are single bytes, so there are 16
+                    // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
+                    func_counter += 16u;
+
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = func_count;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    section_curr += 16uz;
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                             ^^ section_curr
+                }
             }
         }
 # endif
@@ -1411,59 +1414,121 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
 
-        static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
-
-        constexpr auto simd_vector_check{static_cast<::std::uint8_t>(127u)};
-
-        // use fast_io simd on msvc
-        using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
-
-        constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check};
-
-        while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
+        if constexpr(::std::endian::native == ::std::endian::little)
         {
-            // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
-            // [                        safe                             ] unsafe (could be the section_end)
-            //                                      ^^ section_curr
-            //                                      [   simd_vector_str  ]
+            static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
-            u8x16simd simd_vector_str;  // No initialization necessary
+            constexpr auto simd_vector_check{static_cast<::std::uint8_t>(127u)};
 
-            simd_vector_str.load(section_curr);
+            // use fast_io simd on msvc
+            using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
 
-            // It's already a little-endian.
+            constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check};
 
-            auto const check_highest_bit{simd_vector_str > simd_vector_check_u8x16};
-
-            if(!is_all_zeros(check_highest_bit))
+            while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
-                auto const section_curr_end{section_curr + 16u};
+                // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
+                // [                        safe                             ] unsafe (could be the section_end)
+                //                                      ^^ section_curr
+                //                                      [   simd_vector_str  ]
 
-                // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead of '!='
+                u8x16simd simd_vector_str;  // No initialization necessary
 
-                while(section_curr < section_curr_end)
+                simd_vector_str.load(section_curr);
+
+                // It's already a little-endian.
+
+                auto const check_highest_bit{simd_vector_str > simd_vector_check_u8x16};
+
+                if(!is_all_zeros(check_highest_bit))
                 {
-                    // The outer boundary is unknown and needs to be rechecked
-                    // [ ... typeidx1] ... (outer) ] typeidx2 ...
-                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
-                    //       ^^ section_curr
+                    auto const section_curr_end{section_curr + 16u};
 
-                    if(++func_counter > func_count) [[unlikely]]
+                    // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead of '!='
+
+                    while(section_curr < section_curr_end)
+                    {
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1] ... (outer) ] typeidx2 ...
+                        // [     safe    ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        if(++func_counter > func_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = func_count;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+
+                        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                        auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                        reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                        ::fast_io::mnp::leb128_get(typeidx))};
+
+                        if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                        }
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        // There's a good chance there's an error here.
+                        // Or there is a leb redundancy 0
+                        if(typeidx >= type_section_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = typeidx;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
+                            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+                        section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] typeidx2 ...] ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //                     ^^ section_curr
+                    }
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ... ...  ] typeidxN
+                    // [                        safe                                   ] unsafe (could be the section_end)
+                    //                                                                   ^^ section_curr
+                    //                                      [   simd_vector_str  ] ... ] (Depends on the size of section_curr in relation to section_curr_end)
+                }
+                else
+                {
+                    // all are single bytes, so there are 16
+                    func_counter += 16u;
+
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
                     {
                         err.err_curr = section_curr;
                         err.err_selectable.u32 = func_count;
@@ -1471,78 +1536,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
 
-                    ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+                    // Since everything is less than 128, there is no need to check the typeidx.
 
-                    using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+                    // write data
+                    simd_vector_str.store(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr);
 
-                    auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
-                                                                                    ::fast_io::mnp::leb128_get(typeidx))};
+                    functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16uz;
 
-                    if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
-                    {
-                        err.err_curr = section_curr;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
-                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
-                    }
+                    section_curr += 16uz;
 
-                    // The outer boundary is unknown and needs to be rechecked
-                    // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
-                    // [      safe       ] ... (outer) ] unsafe (could be the section_end)
-                    //       ^^ section_curr
-
-                    // There's a good chance there's an error here.
-                    // Or there is a leb redundancy 0
-                    if(typeidx >= type_section_count) [[unlikely]]
-                    {
-                        err.err_curr = section_curr;
-                        err.err_selectable.u32 = typeidx;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
-                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                    }
-
-                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
-                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
-
-                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
-
-                    // The outer boundary is unknown and needs to be rechecked
-                    // [ ... typeidx1 ...] typeidx2 ...] ...
-                    // [      safe       ] ... (outer) ] unsafe (could be the section_end)
-                    //                     ^^ section_curr
+                    // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                             ^^ section_curr
                 }
-
-                // [before_section ... | func_count ... typeidx1 ... (15) ... ...  ] typeidxN
-                // [                        safe                                   ] unsafe (could be the section_end)
-                //                                                                   ^^ section_curr
-                //                                      [   simd_vector_str  ] ... ] (Depends on the size of section_curr in relation to section_curr_end)
-            }
-            else
-            {
-                // all are single bytes, so there are 16
-                func_counter += 16u;
-
-                // check counter
-                if(func_counter > func_count) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.u32 = func_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-
-                // Since everything is less than 128, there is no need to check the typeidx.
-
-                // write data
-                simd_vector_str.store(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr);
-
-                functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16uz;
-
-                section_curr += 16uz;
-
-                // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
-                // [                        safe                             ] unsafe (could be the section_end)
-                //                                                             ^^ section_curr
             }
         }
 # endif
@@ -3826,61 +3832,124 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if !defined(_KERNEL_MODE) && (defined(_M_AMD64) || defined(_M_ARM64))
         /// (Little Endian), MSVC, ::fast_io::intrinsics::simd_vector
         /// x86_64-sse2, aarch64-neon
-
-        static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
-
-        constexpr auto simd_vector_check{static_cast<::std::uint8_t>(127u)};
-
-        // use fast_io simd on msvc
-        using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
-        using u16x8simd = ::fast_io::intrinsics::simd_vector<::std::uint16_t, 8uz>;
-
-        constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check};
-
-        while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
+        if constexpr(::std::endian::native == ::std::endian::little)
         {
-            // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
-            // [                        safe                             ] unsafe (could be the section_end)
-            //                                      ^^ section_curr
-            //                                      [   simd_vector_str  ]
+            static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
 
-            u8x16simd simd_vector_str;  // No initialization necessary
+            constexpr auto simd_vector_check{static_cast<::std::uint8_t>(127u)};
 
-            simd_vector_str.load(section_curr);
+            // use fast_io simd on msvc
+            using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
+            using u16x8simd = ::fast_io::intrinsics::simd_vector<::std::uint16_t, 8uz>;
 
-            // It's already a little-endian.
+            constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check,
+                                                        simd_vector_check};
 
-            auto const check_highest_bit{simd_vector_str > simd_vector_check_u8x16};
-
-            if(!is_all_zeros(check_highest_bit))
+            while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
-                auto const section_curr_end{section_curr + 16u};
+                // [before_section ... | func_count ... typeidx1 ... (15) ...] ...
+                // [                        safe                             ] unsafe (could be the section_end)
+                //                                      ^^ section_curr
+                //                                      [   simd_vector_str  ]
 
-                // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead of '!='
+                u8x16simd simd_vector_str;  // No initialization necessary
 
-                while(section_curr < section_curr_end)
+                simd_vector_str.load(section_curr);
+
+                // It's already a little-endian.
+
+                auto const check_highest_bit{simd_vector_str > simd_vector_check_u8x16};
+
+                if(!is_all_zeros(check_highest_bit))
                 {
-                    // The outer boundary is unknown and needs to be rechecked
-                    // [ ... typeidx1] ... (outer) ] typeidx2 ...
-                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
-                    //       ^^ section_curr
+                    auto const section_curr_end{section_curr + 16u};
 
-                    if(++func_counter > func_count) [[unlikely]]
+                    // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead of '!='
+
+                    while(section_curr < section_curr_end)
+                    {
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1] ... (outer) ] typeidx2 ...
+                        // [     safe    ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        if(++func_counter > func_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = func_count;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+
+                        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                        auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                        reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                        ::fast_io::mnp::leb128_get(typeidx))};
+
+                        if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                        }
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //       ^^ section_curr
+
+                        // There's a good chance there's an error here.
+                        // Or there is a leb redundancy 0
+                        if(typeidx >= type_section_count) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = typeidx;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
+                            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
+
+                        section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                        // The outer boundary is unknown and needs to be rechecked
+                        // [ ... typeidx1 ...] typeidx2 ...] ...
+                        // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                        //                     ^^ section_curr
+                    }
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ... ...  ] typeidxN
+                    // [                        safe                                   ] unsafe (could be the section_end)
+                    //                                                                   ^^ section_curr
+                    //                                      [   simd_vector_str  ] ... ] (Depends on the size of section_curr in relation to section_curr_end)
+                }
+                else
+                {
+                    // All correct, can change state: func_counter, section_curr
+
+                    // all are single bytes, so there are 16
+                    func_counter += 16u;
+
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
                     {
                         err.err_curr = section_curr;
                         err.err_selectable.u32 = func_count;
@@ -3888,126 +3957,65 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
 
-                    ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+                    // Since everything is less than 128, there is no need to check the typeidx.
 
-                    using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+                    // write data
+                    auto functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp{functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr};
 
-                    auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
-                                                                                    ::fast_io::mnp::leb128_get(typeidx))};
+                    u8x16simd const u8x16v0{simd_vector_str[0],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[1],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[2],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[3],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[4],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[5],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[6],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[7],
+                                            static_cast<::std::uint8_t>(0u)};
 
-                    if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
-                    {
-                        err.err_curr = section_curr;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
-                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
-                    }
+                    auto const u16x8v0{::std::bit_cast<u16x8simd>(u8x16v0)};
 
-                    // The outer boundary is unknown and needs to be rechecked
-                    // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
-                    // [      safe       ] ... (outer) ] unsafe (could be the section_end)
-                    //       ^^ section_curr
+                    u16x8v0.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
 
-                    // There's a good chance there's an error here.
-                    // Or there is a leb redundancy 0
-                    if(typeidx >= type_section_count) [[unlikely]]
-                    {
-                        err.err_curr = section_curr;
-                        err.err_selectable.u32 = typeidx;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
-                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                    }
+                    functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
-                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
-                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
+                    u8x16simd const u8x16v1{simd_vector_str[8],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[9],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[10],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[11],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[12],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[13],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[14],
+                                            static_cast<::std::uint8_t>(0u),
+                                            simd_vector_str[15],
+                                            static_cast<::std::uint8_t>(0u)};
 
-                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+                    auto const u16x8v1{::std::bit_cast<u16x8simd>(u8x16v1)};
 
-                    // The outer boundary is unknown and needs to be rechecked
-                    // [ ... typeidx1 ...] typeidx2 ...] ...
-                    // [      safe       ] ... (outer) ] unsafe (could be the section_end)
-                    //                     ^^ section_curr
+                    u16x8v1.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
+
+                    functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
+
+                    functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr = functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp;
+
+                    section_curr += 16uz;
+
+                    // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                             ^^ section_curr
                 }
-
-                // [before_section ... | func_count ... typeidx1 ... (15) ... ...  ] typeidxN
-                // [                        safe                                   ] unsafe (could be the section_end)
-                //                                                                   ^^ section_curr
-                //                                      [   simd_vector_str  ] ... ] (Depends on the size of section_curr in relation to section_curr_end)
-            }
-            else
-            {
-                // All correct, can change state: func_counter, section_curr
-
-                // all are single bytes, so there are 16
-                func_counter += 16u;
-
-                // check counter
-                if(func_counter > func_count) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.u32 = func_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-
-                // Since everything is less than 128, there is no need to check the typeidx.
-
-                // write data
-                auto functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp{functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr};
-
-                u8x16simd const u8x16v0{simd_vector_str[0],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[1],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[2],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[3],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[4],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[5],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[6],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[7],
-                                        static_cast<::std::uint8_t>(0u)};
-
-                auto const u16x8v0{::std::bit_cast<u16x8simd>(u8x16v0)};
-
-                u16x8v0.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
-
-                functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
-
-                u8x16simd const u8x16v1{simd_vector_str[8],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[9],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[10],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[11],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[12],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[13],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[14],
-                                        static_cast<::std::uint8_t>(0u),
-                                        simd_vector_str[15],
-                                        static_cast<::std::uint8_t>(0u)};
-
-                auto const u16x8v1{::std::bit_cast<u16x8simd>(u8x16v1)};
-
-                u16x8v1.store(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp);
-
-                functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
-
-                functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr = functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp;
-
-                section_curr += 16uz;
-
-                // [before_section ... | func_count ... typeidx1 ... (15) ...] typeidx16
-                // [                        safe                             ] unsafe (could be the section_end)
-                //                                                             ^^ section_curr
             }
         }
 # endif
