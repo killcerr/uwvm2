@@ -337,6 +337,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // You can use macro UWVM_ENABLE_SME_SVE_STREAM_MODE to enable SVE stream mode in SME in the above cpu (e.g. Apple M4).
 
         [&]
+            UWVM_ALWAYS_INLINE
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
 # endif
@@ -788,6 +789,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // sve, sme (sve stream mode)
 
         [&]
+            UWVM_ALWAYS_INLINE
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
 # endif
@@ -1559,7 +1561,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
          (defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256))) ||                                                                                  \
     (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b) &&                                   \
      UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v))
-        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
+        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd256
         /// x86_64-avx2, loongarch-LSX
         // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
         // needs to be localized.
@@ -1788,6 +1790,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         // shuffle and write
 
+                        // avx2 since shuffle is in channels of 128, just splice directly
                         ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
                         u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
@@ -4026,7 +4029,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
          (defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256))) ||                                                                                  \
     (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b) &&                                   \
      UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v))
-        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
+        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd256
         /// x86_64-avx2, loongarch-LSX
         // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
         // needs to be localized.
