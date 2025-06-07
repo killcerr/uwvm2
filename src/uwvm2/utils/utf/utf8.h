@@ -72,6 +72,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
     template <bool zero_illegal>
     inline constexpr ::uwvm2::utils::utf::u8result check_legal_utf8_rfc3629_unchecked(char8_t const* const str_begin, char8_t const* const str_end) noexcept
     {
+        ::fast_io::fast_terminate(); /// @todo unfinished
+
         constexpr unsigned char_bit{static_cast<unsigned>(CHAR_BIT)};
         constexpr bool char_bit_is_8{char_bit == 8u};
         constexpr bool is_little_endian{::std::endian::native == ::std::endian::little};
