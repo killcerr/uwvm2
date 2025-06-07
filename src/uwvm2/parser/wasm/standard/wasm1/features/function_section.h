@@ -336,9 +336,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //
         // You can use macro UWVM_ENABLE_SME_SVE_STREAM_MODE to enable SVE stream mode in SME in the above cpu (e.g. Apple M4).
 
-        [&] UWVM_ALWAYS_INLINE
+        [&]
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
+# else
+            UWVM_ALWAYS_INLINE
 # endif
             () constexpr UWVM_THROWS -> void
         {
@@ -789,9 +791,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)))
         // sve, sme (sve stream mode)
 
-        [&] UWVM_ALWAYS_INLINE
+        [&]
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
+# else
+            UWVM_ALWAYS_INLINE
 # endif
             () constexpr UWVM_THROWS -> void
         {
