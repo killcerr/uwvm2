@@ -2590,6 +2590,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     need_shu_write_u8x32x2.index_unchecked(0) = need_write_u8x32x2v0;
 
+                    check_mask_curr >>= 32u;
+
                     processed_byte_counter = 32u;
                     processed_simd_counter = 32u;
                 }
@@ -3469,6 +3471,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
 
                     need_shu_write_u8x32x2.index_unchecked(1) = need_write_u8x32x2v0;
+
+                    check_mask_curr >>= 32u;
 
                     processed_byte_counter = 32u;
                     processed_simd_counter = 32u;
