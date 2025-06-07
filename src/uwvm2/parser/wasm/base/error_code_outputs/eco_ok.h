@@ -36,7 +36,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              "uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             "[info] ",
+                                                             "[info]  ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              "There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -48,7 +48,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
                                                      "uwvm: ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_YELLOW),
-                                                     "[info] ",
+                                                     "[info]  ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                      "There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
@@ -68,7 +68,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              L"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             L"[info] ",
+                                                             L"[info]  ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              L"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -80,7 +80,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
                                                      L"uwvm: ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_YELLOW),
-                                                     L"[info] ",
+                                                     L"[info]  ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                      L"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
@@ -100,7 +100,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              u8"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             u8"[info] ",
+                                                             u8"[info]  ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u8"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -112,7 +112,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
                                                      u8"uwvm: ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_YELLOW),
-                                                     u8"[info] ",
+                                                     u8"[info]  ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                      u8"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
@@ -133,7 +133,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              u"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             u"[info] ",
+                                                             u"[info]  ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -145,7 +145,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
                                                      u"uwvm: ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_YELLOW),
-                                                     u"[info] ",
+                                                     u"[info]  ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                      u"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
@@ -166,7 +166,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                              UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
                                                              U"uwvm: ",
                                                              UWVM_WIN32_TEXTATTR_YELLOW,
-                                                             U"[info] ",
+                                                             U"[info]  ",
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              U"There are no errors.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -178,7 +178,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
                                                      U"uwvm: ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_YELLOW),
-                                                     U"[info] ",
+                                                     U"[info]  ",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                      U"There are no errors.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
