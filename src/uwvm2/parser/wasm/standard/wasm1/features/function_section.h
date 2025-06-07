@@ -336,8 +336,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //
         // You can use macro UWVM_ENABLE_SME_SVE_STREAM_MODE to enable SVE stream mode in SME in the above cpu (e.g. Apple M4).
 
-        [&]
-            UWVM_ALWAYS_INLINE
+        [&] UWVM_ALWAYS_INLINE
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
 # endif
@@ -351,9 +350,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const all_one_predicate_reg{::uwvm2::utils::intrinsics::arm_sve::svptrue_b8()};
             auto const svc_sz{::uwvm2::utils::intrinsics::arm_sve::svcntb()};
 
-# if defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))
+# if (defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))) && !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
             // When the cpu supports the vector length of sve to be the same as the vector length of neon, since the computations are all on the basic side and
             // read 16 bytes at a time, sve needs to additionally process predicates, resulting in lower throughput, so here it switches back to using neon
+
+            // arm neon does not mix with sme's sve stream mode
 
             if(svc_sz == 16u)
             {
@@ -788,8 +789,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif defined(__LITTLE_ENDIAN__) && (defined(__ARM_FEATURE_SVE) || (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)))
         // sve, sme (sve stream mode)
 
-        [&]
-            UWVM_ALWAYS_INLINE
+        [&] UWVM_ALWAYS_INLINE
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
 # endif
