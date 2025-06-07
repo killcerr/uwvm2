@@ -1717,14 +1717,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::fast_io::array<u8x32simd, 2uz> need_shu_write_u8x32x2;  // No initialization necessary
 
-                u8x64simd mask_table;  // No initialization necessary
-
                 unsigned processed_simd_counter{};
                 unsigned processed_byte_counter{};
 
                 // 1st
+                if(check_mask_curr & 0xFFFF'FFFFu)
                 {
                     bool need_handle_error{};
+
+                    u8x64simd mask_table;  // No initialization necessary
 
                     for(unsigned i{}; i != 4u; ++i)
                     {
@@ -2436,15 +2437,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         continue;
                     }
 
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)
+                    constexpr u8x64simd u8x64simd_128{0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u};
+
+                    ::std::uint64_t const mask_table_u8x64simd_lt128_mask{
+                        __builtin_ia32_ucmpb512_mask(::std::bit_cast<u8x64simd>(mask_table), u8x64simd_128, 0x01, UINT64_MAX)};
+# else
+#  error "missing instructions"
+# endif
+
                     auto const mask_res{
 # if defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512_mask)
-                        ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(mask_table),
-                                                                                     ::std::bit_cast<c8x64simd>(simd_vector_str),
+                        ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(simd_vector_str),
+                                                                                     ::std::bit_cast<c8x64simd>(mask_table),
                                                                                      c8x64simd{},
-                                                                                     UINT64_MAX))
-# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512)
-                        ::std::bit_cast<u16x32simd>(
-                            __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)))
+                                                                                     mask_table_u8x64simd_lt128_mask))
+# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512)
+                        ::std::bit_cast<u16x32simd>(__builtin_ia32_selectb_512(
+                            mask_table_u8x64simd_lt128_mask,
+                            __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)),
+                            c8x64simd{}))
 # else
 #  error "missing instructions"
 # endif
@@ -2566,6 +2582,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     need_shu_write_u8x32x2.index_unchecked(0) = need_write_u8x32x2v0;
                 }
+                else
+                {
+                    auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(simd_vector_str)};
+
+                    auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
+
+                    need_shu_write_u8x32x2.index_unchecked(0) = need_write_u8x32x2v0;
+
+                    processed_byte_counter = 32u;
+                    processed_simd_counter = 32u;
+                }
 
                 auto const processed_simd_counter_1st{processed_simd_counter};
                 auto const processed_byte_counter_1st{processed_byte_counter};
@@ -2574,8 +2601,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 processed_byte_counter = 0u;
 
                 // 2nd
+                if(check_mask_curr & 0xFFFF'FFFFu)
                 {
                     bool need_handle_error{};
+
+                    u8x64simd mask_table;  // No initialization necessary
 
                     for(unsigned i{}; i != 4u; ++i)
                     {
@@ -3287,15 +3317,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         continue;
                     }
 
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)
+                    constexpr u8x64simd u8x64simd_128{0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u,
+                                                      0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u, 0x80u};
+
+                    ::std::uint64_t const mask_table_u8x64simd_lt128_mask{
+                        __builtin_ia32_ucmpb512_mask(::std::bit_cast<u8x64simd>(mask_table), u8x64simd_128, 0x01, UINT64_MAX)};
+# else
+#  error "missing instructions"
+# endif
+
                     auto const mask_res{
 # if defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512_mask)
-                        ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(mask_table),
-                                                                                     ::std::bit_cast<c8x64simd>(simd_vector_str),
+                        ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(simd_vector_str),
+                                                                                     ::std::bit_cast<c8x64simd>(mask_table),
                                                                                      c8x64simd{},
-                                                                                     UINT64_MAX))
-# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512)
-                        ::std::bit_cast<u16x32simd>(
-                            __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)))
+                                                                                     mask_table_u8x64simd_lt128_mask))
+# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512)
+                        ::std::bit_cast<u16x32simd>(__builtin_ia32_selectb_512(
+                            mask_table_u8x64simd_lt128_mask,
+                            __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)),
+                            c8x64simd{}))
 # else
 #  error "missing instructions"
 # endif
@@ -3416,6 +3461,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
 
                     need_shu_write_u8x32x2.index_unchecked(1) = need_write_u8x32x2v0;
+                }
+                else
+                {
+                    auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(simd_vector_str)};
+
+                    auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
+
+                    need_shu_write_u8x32x2.index_unchecked(1) = need_write_u8x32x2v0;
+
+                    processed_byte_counter = 32u;
+                    processed_simd_counter = 32u;
                 }
 
                 auto const processed_simd_counter_sum{processed_simd_counter + processed_simd_counter_1st};
