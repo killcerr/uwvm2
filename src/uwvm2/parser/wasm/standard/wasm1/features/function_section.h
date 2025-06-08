@@ -1574,12 +1574,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_cannot_be_processed{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -1629,6 +1633,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_cannot_be_processed = false;
+                                   }
+# endif
+
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
                                    // The outer boundary is unknown and needs to be rechecked
@@ -1637,11 +1648,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
                            }};
 
         using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
@@ -2086,12 +2101,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_cannot_be_processed{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -2141,6 +2160,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_cannot_be_processed = false;
+                                   }
+# endif
+
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
                                    // The outer boundary is unknown and needs to be rechecked
@@ -2149,11 +2175,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
                            }};
 
         using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
@@ -3389,12 +3420,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_cannot_be_processed{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -3444,6 +3479,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_cannot_be_processed = false;
+                                   }
+# endif
+
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
                                    // The outer boundary is unknown and needs to be rechecked
@@ -3452,11 +3494,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
                            }};
 
         using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
@@ -4554,12 +4601,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_cannot_be_processed{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -4609,6 +4660,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_cannot_be_processed = false;
+                                   }
+# endif
+
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
                                    // The outer boundary is unknown and needs to be rechecked
@@ -4617,11 +4675,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
                            }};
 
         using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
@@ -5793,12 +5856,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_cannot_be_processed{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -5848,6 +5915,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_cannot_be_processed = false;
+                                   }
+# endif
+
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
                                    // The outer boundary is unknown and needs to be rechecked
@@ -5856,11 +5930,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
                            }};
 
         using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
