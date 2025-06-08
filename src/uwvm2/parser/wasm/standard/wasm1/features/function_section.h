@@ -1720,20 +1720,44 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::std::uint64_t check_mask_curr{check_mask};
 
-                {
-                    ::std::uint32_t const check_mask_curr_1st{static_cast<::std::uint32_t>(check_mask_curr)};
-                    
-                    bool const first_round_is_31{static_cast<bool>(check_mask_curr_1st & static_cast<::std::uint32_t>(0x8000'0000u))};
-                    unsigned const first_round{32u - static_cast<unsigned>(first_round_is_31)};
-                    unsigned const handled_simd{32u - (static_cast<unsigned>(::std::popcount(check_mask_curr_1st)) - static_cast<unsigned>(first_round_is_31))};
+                ::std::uint32_t const check_mask_curr_1st{static_cast<::std::uint32_t>(check_mask_curr)};
 
-                    // check_mask_curr_1st : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
+                if (!check_mask_curr_1st)
+                {
+                    check_mask_curr >>= 32u;
+                                        
+                    auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(simd_vector_str)};
+
+                    auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
+
+                    func_counter += 32u;
+
+                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(need_write_u8x32x2v0), sizeof(u8x32simd));
+
+                    functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 32u;
+
+                    section_curr += 32u;
+
+                    simd_vector_str = __builtin_shufflevector(simd_vector_str,simd_vector_str,
+                        32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
+                        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
+                    );
+                }
+
+                {
+                    ::std::uint32_t const check_mask_curr_2nd{static_cast<::std::uint32_t>(check_mask_curr)};
+                    
+                    bool const first_round_is_31{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
+                    unsigned const first_round{32u - static_cast<unsigned>(first_round_is_31)};
+                    unsigned const handled_simd{32u - (static_cast<unsigned>(::std::popcount(check_mask_curr_2nd)) - static_cast<unsigned>(first_round_is_31))};
+
+                    // check_mask_curr_2nd : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
                     // convert
                     // conversion_res_2:     ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
 
                     constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
 
-                    constexpr u16x32 conversion_table_1
+                    constexpr u16x32simd conversion_table_1
                     {
                         0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,
                         0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,
@@ -1741,12 +1765,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u
                     };
                     
-                    u16x32 conversion_res_1;
+                    u16x32simd conversion_res_1;
 
                     #if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512) // Clang
-                    conversion_res_1=__builtin_ia32_selectb_512(check_mask_curr_1st, conversion_table_1, u16x32{});
+                    conversion_res_1=__builtin_ia32_selectb_512(check_mask_curr_2nd, conversion_table_1, u16x32simd{});
                     #elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_movdquqi512_mask) // GCC
-                    conversion_res_1=__builtin_ia32_movdquqi512_mask(conversion_table_1, u16x32{}, check_mask_curr_1st);
+                    conversion_res_1=__builtin_ia32_movdquqi512_mask(conversion_table_1, u16x32simd{}, check_mask_curr_2nd);
                     #else
                     #error "missing instructions"
                     #endif
