@@ -1006,8 +1006,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                                \
-    (                         \
-     ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||            \
+    (((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)) && (defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128))) ||            \
      ((defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)) && (defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b))) ||    \
      ((defined(__SSSE3__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb128) && UWVM_HAS_BUILTIN(__builtin_ia32_palignr128)) &&                                     \
       (defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128))) ||                                                                                  \
@@ -1565,7 +1564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
     (defined(__AVX512VBMI__) && defined(__AVX512VBMI2__) && defined(__AVX512BW__) && defined(__AVX512F__))
         /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd512
-        /// x86_64-avx512vbmi2 /// @todo need test
+        /// x86_64-avx512vbmi2
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
@@ -1710,7 +1709,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Check for leb over 2 bytes
-                if (check_mask & (check_mask << 1u)) [[unlikely]]
+                if(check_mask & (check_mask << 1u)) [[unlikely]]
                 {
                     error_handler(64u);
                     continue;
@@ -1722,93 +1721,176 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 ::std::uint32_t const check_mask_curr_1st{static_cast<::std::uint32_t>(check_mask_curr)};
 
-                if (!check_mask_curr_1st)
+                // Write 32 directly when the current 32 are all zeros
+                if(!check_mask_curr_1st)
                 {
                     check_mask_curr >>= 32u;
-                                        
+
                     auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(simd_vector_str)};
 
                     auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
 
                     func_counter += 32u;
 
-                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(need_write_u8x32x2v0), sizeof(u8x32simd));
+                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                                       ::std::addressof(need_write_u8x32x2v0),
+                                                       sizeof(u8x32simd));
 
                     functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 32u;
 
                     section_curr += 32u;
 
-                    simd_vector_str = __builtin_shufflevector(simd_vector_str,simd_vector_str,
-                        32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
-                        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
-                    );
+                    simd_vector_str = __builtin_shufflevector(simd_vector_str,
+                                                              simd_vector_str,
+                                                              32,
+                                                              33,
+                                                              34,
+                                                              35,
+                                                              36,
+                                                              37,
+                                                              38,
+                                                              39,
+                                                              40,
+                                                              41,
+                                                              42,
+                                                              43,
+                                                              44,
+                                                              45,
+                                                              46,
+                                                              47,
+                                                              48,
+                                                              49,
+                                                              50,
+                                                              51,
+                                                              52,
+                                                              53,
+                                                              54,
+                                                              55,
+                                                              56,
+                                                              57,
+                                                              58,
+                                                              59,
+                                                              60,
+                                                              61,
+                                                              62,
+                                                              63,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1);
                 }
+
+                // 2nd
 
                 {
                     ::std::uint32_t const check_mask_curr_2nd{static_cast<::std::uint32_t>(check_mask_curr)};
-                    
+
                     bool const first_round_is_31{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
                     unsigned const first_round{32u - static_cast<unsigned>(first_round_is_31)};
-                    unsigned const handled_simd{32u - (static_cast<unsigned>(::std::popcount(check_mask_curr_2nd)) - static_cast<unsigned>(first_round_is_31))};
-
-                    // check_mask_curr_2nd : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
-                    // convert
-                    // conversion_res_2:     ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
+                    unsigned const handled_simd{32u - static_cast<unsigned>(::std::popcount(check_mask_curr_2nd))};
 
                     constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
 
-                    constexpr u16x32simd conversion_table_1
+                    constexpr u16x32simd conversion_table_1{0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
+                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
+                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u};
+
+                    ::std::uint32_t check_mask_curr_2nd_curtailment{};
+
+                    // Avoiding the effects of the highest invalid bit
+
+                    for(::std::uint32_t check_mask_curr_2nd_tmp{check_mask_curr_2nd & static_cast<::std::uint32_t>(0x7FFF'FFFFu)}; check_mask_curr_2nd_tmp;)
                     {
-                        0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,
-                        0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,
-                        0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,
-                        0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u,0xFF00u
-                    };
-                    
+                        auto const crtz{::std::countr_zero(check_mask_curr_2nd_tmp)};
+
+                        auto const sizeFF{crtz + 1u};
+
+                        auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
+                        check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
+
+                        check_mask_curr_2nd_tmp &= ~FF;
+                        check_mask_curr_2nd_tmp >>= 1u;
+                    }
+
+                    // check_mask_curr_2nd_curtailment : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
+                    // convert to:
+                    // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
+
                     u16x32simd conversion_res_1;
 
-                    #if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512) // Clang
-                    conversion_res_1=__builtin_ia32_selectb_512(check_mask_curr_2nd, conversion_table_1, u16x32simd{});
-                    #elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_movdquqi512_mask) // GCC
-                    conversion_res_1=__builtin_ia32_movdquqi512_mask(conversion_table_1, u16x32simd{}, check_mask_curr_2nd);
-                    #else
-                    #error "missing instructions"
-                    #endif
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_selectw_512)         // Clang
+                    conversion_res_1 = __builtin_ia32_selectw_512(check_mask_curr_2nd_curtailment, conversion_table_1, u16x32simd{});
+# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_movdquhi512_mask)  // GCC
+                    conversion_res_1 = __builtin_ia32_movdquhi512_mask(conversion_table_1, u16x32simd{}, check_mask_curr_2nd_curtailment);
+# else
+#  error "missing instructions"
+# endif
 
                     ::std::uint64_t conversion_res_2;
 # if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cvtb2mask512)
-                conversion_res_2 = static_cast<::std::uint64_t>(__builtin_ia32_cvtb2mask512(::std::bit_cast<c8x64simd>(conversion_res_1)));
+                    conversion_res_2 = static_cast<::std::uint64_t>(__builtin_ia32_cvtb2mask512(::std::bit_cast<c8x64simd>(conversion_res_1)));
 # else
 #  error "missing instructions"
 # endif
 
                     conversion_res_2 |= mask;
-                    
-                    constexpr u8x64simd conversion_table_2
-                    {
-                        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
-                    };
+
+                    // check_mask_curr_2nd_curtailment : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
+                    // convert to:
+                    // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
+
+                    constexpr u8x64simd conversion_table_2{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+                                                           22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+                                                           44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
 
                     u8x64simd mask_table;
 
 # if defined(__AVX512VBMI2__) && UWVM_HAS_BUILTIN(__builtin_ia32_expandqi512_mask)
                     mask_table = __builtin_ia32_expandqi512_mask(conversion_table_2, u8x64simd{}, conversion_res_2);
-#else
+# else
 #  error "missing instructions"
-#endif
+# endif
 
                     u16x32simd mask_res;
 
-# if defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512_mask) // GCC
-                    mask_res= ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(simd_vector_str),
-                                                                                     ::std::bit_cast<c8x64simd>(mask_table),
-                                                                                     c8x64simd{},
-                                                                                     conversion_res_2));
-# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512) // clang
-                    mask_res=   ::std::bit_cast<u16x32simd>(__builtin_ia32_selectb_512(
-                            conversion_res_2,
-                            __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)),
-                            c8x64simd{}));
+# if defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512_mask)                                               // GCC
+                    mask_res = ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(simd_vector_str),
+                                                                                            ::std::bit_cast<c8x64simd>(mask_table),
+                                                                                            c8x64simd{},
+                                                                                            conversion_res_2));
+# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512)  // clang
+                    mask_res = ::std::bit_cast<u16x32simd>(__builtin_ia32_selectb_512(
+                        conversion_res_2,
+                        __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)),
+                        c8x64simd{}));
 # else
 #  error "missing instructions"
 # endif
@@ -1816,28 +1898,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     // The data out of shuffle is 16-bit [0, 2^14) and may be greater than or equal to typeidx, which needs to be checked.
 
-                    auto const check_upper{res >= simd_vector_check};
+                    ::std::uint32_t const gen_mask{(static_cast<::std::uint32_t>(1u) << handled_simd) - 1u};
+
+                    u16x32simd const simd_vector_check_u16x32{
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                    };
 
                     if(
-# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestmb512)  // Only supported by GCC
-                        // gcc:
-                        // vptestmb        k0, zmm0, zmm0
-                        // kortestq        k0, k0
-                        // sete    al
-                        __builtin_ia32_ptestmb512(::std::bit_cast<c8x64simd>(check_upper), ::std::bit_cast<c8x64simd>(check_upper), UINT64_MAX)
-# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpb512_mask)
-                        // clang:
-                        // vptestmd        k0, zmm0, zmm0
-                        // kortestw        k0, k0
-                        // setne   al
-                        // vzeroupper
-                        //
-                        // gcc:
-                        // vpxor   xmm1, xmm1, xmm1
-                        // vpcmpb  k0, zmm0, zmm1, 4
-                        // kortestq        k0, k0
-                        // setne   al
-                        __builtin_ia32_cmpb512_mask(::std::bit_cast<c8x64simd>(check_upper), c8x64simd{}, 0x04, UINT64_MAX)
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpw512_mask)
+                        __builtin_ia32_cmpw512_mask(res, simd_vector_check_u16x32, 0x05, gen_mask)
 # else
 #  error "missing instructions"
 # endif
@@ -1849,7 +1922,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                                                             ^^ section_curr + 64uz
 
                         // it can be processed up to 64
-                        error_handler(64uz);
+                        error_handler(32uz);
 
                         // Start the next round straight away
                         continue;
@@ -1926,31 +1999,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
 
-                func_counter += handled_simd;
+                    func_counter += handled_simd;
 
-                //  [... curr ... (63) ...]
-                //  [      safe           ] unsafe (could be the section_end)
-                //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                //      [    needwrite   ]
+                    //  [... curr ... (63) ...]
+                    //  [      safe           ] unsafe (could be the section_end)
+                    //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    //      [    needwrite   ]
 
-                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(need_write_u8x32x2v0), sizeof(u8x32simd));
+                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                                       ::std::addressof(need_write_u8x32x2v0),
+                                                       sizeof(u8x32simd));
 
-                functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += handled_simd;
+                    functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += handled_simd;
 
-                //  [... curr ... (63) ...]
-                //  [          safe       ] unsafe (could be the section_end)
-                //                    ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                // Or: (Security boundaries for writes are checked)
-                //                        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
-                //      [    needwrite   ]
+                    //  [... curr ... (63) ...]
+                    //  [          safe       ] unsafe (could be the section_end)
+                    //                    ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    // Or: (Security boundaries for writes are checked)
+                    //                        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    //      [    needwrite   ]
 
-                section_curr += first_round;
+                    section_curr += first_round;
 
-                // [before_section ... | func_count ... typeidx1 ... (63) ...] ...
-                // [                        safe                             ] unsafe (could be the section_end)
-                //                                                   ^^^^^^^ section_curr (processed_byte_counter_sum <= 64)
-                //                                      [   simd_vector_str  ]
-
+                    // [before_section ... | func_count ... typeidx1 ... (63) ...] ...
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                   ^^^^^^^ section_curr (processed_byte_counter_sum <= 64)
+                    //                                      [   simd_vector_str  ]
                 }
             }
             else
