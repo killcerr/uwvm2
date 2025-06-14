@@ -163,7 +163,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
         // Preventing the wasm32-wasi-uwvm stack from being too small and causing an overflow requires limiting the size of the contents of each print
         ::fast_io::io::perr(u8log_output_ul,
                                 // uwvm
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE),
                                 u8"Ultimate WebAssembly Virtual Machine",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 // mode
@@ -180,7 +180,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"Unknown "
 #endif
 #if defined(UWVM_MODULE)
-                                u8"(CXX-Module) "
+                                u8"(CXX-Module Build) "
 #endif
                                 // Copyright
                                 u8"\nCopyright (c) 2025-present UlteSoft. All rights reserved.  "
