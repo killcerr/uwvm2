@@ -71,7 +71,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     inline constexpr binfmt_version_t<Version> binfmt_version{};
 
     /// @brief      Determine if there is a feature name
-    /// @see        test\non-platform-specific\0001.parser\0001.concept\feature_name.cc
+    /// @see        test\0001.parser\0001.concept\feature_name.cc
     /// @details    Whether the type is provided with a feature name or not, this is a mandatory option.
     ///
     ///             example:
@@ -106,7 +106,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         module_stroate_t (*)(::std::byte const*, ::std::byte const*, ::uwvm2::parser::wasm::base::error_impl&, feature_parameter_t<Fs...> const&) UWVM_THROWS;
 
     /// @brief      Define the version number of the required wasm file binary format tagging
-    /// @see        test\non-platform-specific\0001.parser\0001.concept\binfmt.cc
+    /// @see        test\0001.parser\0001.concept\binfmt.cc
     /// @details    Changing the binfmt version requires a new binfmt version parsing policy, as the entire parsing behavior tree will be replaced with the
     ///             binfmt version. Version must be greater than 0.
     ///

@@ -206,7 +206,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             static_assert(has_section_id_and_handle_binfmt_ver1_extensible_section_define<SecCurr, Fs...>);
 
             /// @details    This can be optimized to jump tables, which is fine under llvm, not gcc or msvc.
-            /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section_test_jmp_table.cc
+            /// @see        test\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section_test_jmp_table.cc
 
             if(section_id == SecCurr::section_id)
             {
@@ -239,7 +239,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
     /// @brief      handle all binfmt ver1 extensible section
     /// @throws     ::fast_io::error
-    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
+    /// @see        test\0001.parser\0002.binfmt1\handle_all_binfmt_ver1_extensible_section.cc
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_all_binfmt_ver1_extensible_section(::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
                                                                         module_storage,

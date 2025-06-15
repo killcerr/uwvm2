@@ -74,7 +74,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///                 using value_type = type_replacer<root_of_replacement, value_type>;
     ///             };
     ///             ```
-    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
+    /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FeatureType>
     concept has_value_type = requires {
         typename FeatureType::value_type;
@@ -124,7 +124,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///                 using type_prefix = type_replacer<root_of_replacement, type_prefix>;
     ///             };
     ///             ```
-    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
+    /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FeatureType>
     concept has_type_prefix = requires {
         typename FeatureType::type_prefix;
@@ -158,7 +158,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             };
     ///             ```
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
-    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
+    /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FsCurr>
     concept has_allow_multi_result_vector = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_result_vector)>, bool>; };
 

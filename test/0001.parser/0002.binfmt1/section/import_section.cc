@@ -6,7 +6,6 @@
 
 /**
  * @author      MacroModel
- * @details     This example is used to test whether a jump table can be generated instead of a continuous if judgment
  * @version     2.0.0
  * @date        2025-06-15
  * @copyright   ASHP-1.0 License
