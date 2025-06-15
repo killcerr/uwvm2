@@ -37,6 +37,15 @@ jobs:
       - name: Native (AVX2 + BMI(2) + PRFCHW) Unit tests
         run: xmake test -vD
 
+      - name: MMX Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mno-sse"
+      - name: MMX Build
+        run: xmake b -rv
+      - name: MMX Check UWVM version
+        run: xmake run uwvm --version
+      - name: MMX Unit tests
+        run: xmake test -vD
+
       - name: SSE Configure
         run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mno-sse2"
       - name: SSE Build
@@ -81,6 +90,25 @@ jobs:
         run: xmake run uwvm --version
       - name: AVX + BMI(2) + PRFCHW Unit tests
         run: xmake test -vD
+
+      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Configure
+      #   run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mavx512bw -mbmi -mbmi2 -mprfchw"
+      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Build
+      #   run: xmake b -rv
+      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Check UWVM version
+      #   run: xmake run uwvm --version
+      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Unit tests
+      #   run: xmake test -vD
+
+      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Configure
+      #   run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mavx512vbmi -mavx512vbmi2 -mbmi -mbmi2 -mprfchw"
+      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Build
+      #   run: xmake b -rv
+      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Check UWVM version
+      #   run: xmake run uwvm --version
+      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Unit tests
+      #   run: xmake test -vD
+
   # ---------------------------------------------------------------------------
   x86_64-windows-gnu:
     if: ${{ !always() }} # Remove it once update to LLVM21
@@ -115,6 +143,7 @@ jobs:
         run: xmake run uwvm --version
       - name: Unit tests
         run: xmake test -vD
+
   # ---------------------------------------------------------------------------
   x86_64-freebsd14:
     if: ${{ !always() }} # Remove it once support "202411L: Structured bindings can introduce a pack"
