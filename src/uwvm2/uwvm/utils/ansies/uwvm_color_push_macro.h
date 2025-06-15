@@ -50,7 +50,7 @@
 #pragma push_macro("UWVM_COLOR_RST_ALL_AND_SET_PURPLE")
 #undef UWVM_COLOR_RST_ALL_AND_SET_PURPLE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_RST_ALL_AND_SET_PURPLE                                                                                                                      \
+# define UWVM_COLOR_RST_ALL_AND_SET_PURPLE                                                                                                                     \
      ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b, UWVM_AES_RST_ALL UWVM_AES_PURPLE, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE)
 #else
 # define UWVM_COLOR_RST_ALL_AND_SET_PURPLE UWVM_AES_RST_ALL UWVM_AES_PURPLE
@@ -214,7 +214,7 @@
 #pragma push_macro("UWVM_COLOR_W_RST_ALL_AND_SET_PURPLE")
 #undef UWVM_COLOR_W_RST_ALL_AND_SET_PURPLE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_W_RST_ALL_AND_SET_PURPLE                                                                                                                    \
+# define UWVM_COLOR_W_RST_ALL_AND_SET_PURPLE                                                                                                                   \
      ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b, UWVM_AES_W_RST_ALL UWVM_AES_W_PURPLE, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE)
 #else
 # define UWVM_COLOR_W_RST_ALL_AND_SET_PURPLE UWVM_AES_W_RST_ALL UWVM_AES_W_PURPLE
@@ -378,8 +378,10 @@
 #pragma push_macro("UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE")
 #undef UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE                                                                                                                   \
-     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b, UWVM_AES_U8_RST_ALL UWVM_AES_U8_PURPLE, UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE)
+# define UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE                                                                                                                  \
+     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b,                                                                                  \
+                          UWVM_AES_U8_RST_ALL UWVM_AES_U8_PURPLE,                                                                                              \
+                          UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE)
 #else
 # define UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE UWVM_AES_U8_RST_ALL UWVM_AES_U8_PURPLE
 #endif
@@ -544,9 +546,9 @@
 #pragma push_macro("UWVM_COLOR_U16_RST_ALL_AND_SET_PURPLE")
 #undef UWVM_COLOR_U16_RST_ALL_AND_SET_PURPLE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U16_RST_ALL_AND_SET_PURPLE                                                                                                                  \
+# define UWVM_COLOR_U16_RST_ALL_AND_SET_PURPLE                                                                                                                 \
      ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b,                                                                                  \
-                          UWVM_AES_U16_RST_ALL UWVM_AES_U16_PURPLE,                                                                                             \
+                          UWVM_AES_U16_RST_ALL UWVM_AES_U16_PURPLE,                                                                                            \
                           UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE)
 #else
 # define UWVM_COLOR_U16_RST_ALL_AND_SET_PURPLE UWVM_AES_U16_RST_ALL UWVM_AES_U16_PURPLE
@@ -713,9 +715,9 @@
 #pragma push_macro("UWVM_COLOR_U32_RST_ALL_AND_SET_PURPLE")
 #undef UWVM_COLOR_U32_RST_ALL_AND_SET_PURPLE
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-# define UWVM_COLOR_U32_RST_ALL_AND_SET_PURPLE                                                                                                                  \
+# define UWVM_COLOR_U32_RST_ALL_AND_SET_PURPLE                                                                                                                 \
      ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b,                                                                                  \
-                          UWVM_AES_U32_RST_ALL UWVM_AES_U32_PURPLE,                                                                                             \
+                          UWVM_AES_U32_RST_ALL UWVM_AES_U32_PURPLE,                                                                                            \
                           UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE)
 #else
 # define UWVM_COLOR_U32_RST_ALL_AND_SET_PURPLE UWVM_AES_U32_RST_ALL UWVM_AES_U32_PURPLE
