@@ -31,6 +31,7 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm.standard.wasm1.section;
 import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
+import uwvm2.parser.wasm.text_format;
 #else
 // std
 # include <cstddef>
@@ -50,6 +51,7 @@ import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/opcode/impl.h>
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include <uwvm2/parser/wasm/text_format/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -341,6 +343,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using final_global_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_global_type<Fs>())...>;
+
+    /// @brief      has import/export text format
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr text_format import_export_text_format{text_format::utf8_rfc3629_with_zero_illegal};
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_import_export_text_format = requires {
+        requires ::std::same_as<::std::remove_cvref_t<decltype(FeatureType::import_export_text_format)>, ::uwvm2::parser::wasm::text_format::text_format>;
+    };
+
+    template <typename FeatureType>
+    inline consteval ::uwvm2::parser::wasm::text_format::text_format get_import_export_text_format() noexcept
+    {
+        if constexpr(has_import_export_text_format<FeatureType>) { return FeatureType::import_export_text_format; }
+        else
+        {
+            return ::uwvm2::parser::wasm::text_format::text_format{};
+        }
+    }
+
+    /////////////////////////////
+    //     Function Section    //
+    /////////////////////////////
 
     /// @brief      final_local_function_type
     /// @details    Storing pointers instead of u32 doubles the memory on 64-bit platforms, and then the index * size is pre-calculated by simd. on 32-bit
