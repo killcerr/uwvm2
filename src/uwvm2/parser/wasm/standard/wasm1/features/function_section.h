@@ -135,6 +135,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [     safe     ] unsafe (could be the section_end)
         //                  ^^ section_curr
 
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        bool correct_sequence_cannot_be_processed{true};
+#endif
+
         while(section_curr != section_end) [[likely]]
         {
             // Ensuring the existence of valid information
@@ -187,6 +191,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
+            {
+                correct_sequence_cannot_be_processed = false;
+            }
+#endif
+
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
             // [ ... typeidx1 ...] typeidx2 ...
@@ -197,6 +208,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [before_section ... | func_count ... typeidx1 ... ...] (end)
         // [                       safe                         ] unsafe (could be the section_end)
         //                                                        ^^ section_curr
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
 
         return section_curr;
     }
