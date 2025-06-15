@@ -110,6 +110,32 @@ jobs:
       #   run: xmake test -vD
 
   # ---------------------------------------------------------------------------
+  x86_64_apx-linux-gnu:
+    if: ${{ !always() }}
+    name: x86_64_apx-linux-gnu (ubuntu-24.04)
+    runs-on: ubuntu-24.04 # noble
+    strategy:
+      matrix:
+        mode: ["debug"]
+        policies: ["build.sanitizer.address"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
+          sudo add-apt-repository ppa:xmake-io/xmake
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
+          sudo apt-get install clang clang-tools lld xmake
+      - name: Native (APX) Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mapxf -mbmi -mbmi2 -mprfchw"
+      - name: Native (APX) Build
+        run: xmake b -rv
+      - name: Native (APX) Check UWVM version
+        run: xmake run uwvm --version
+      - name: Native (APX) Unit tests
+        run: xmake test -vD
+
+  # ---------------------------------------------------------------------------
   x86_64-windows-gnu:
     if: ${{ !always() }} # Remove it once update to LLVM21
     name: x86_64-windows-gnu (MINGW ${{ matrix.env.name }})
