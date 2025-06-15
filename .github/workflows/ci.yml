@@ -12,8 +12,8 @@ on:
 
 jobs:
   # ---------------------------------------------------------------------------
-  ubuntu:
-    name: Ubuntu
+  x86_64-linux-gnu:
+    name: x86_64-linux-gnu (ubuntu-24.04)
     runs-on: ubuntu-24.04 # noble
     strategy:
       matrix:
@@ -27,18 +27,64 @@ jobs:
           sudo add-apt-repository ppa:xmake-io/xmake
           sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
           sudo apt-get install clang clang-tools lld xmake
-      - name: Configure
+
+      - name: Native (AVX2 + BMI(2) + PRFCHW) Configure
         run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
-      - name: Build
-        run: xmake b -v
-      - name: Check UWVM version
+      - name: Native (AVX2 + BMI(2) + PRFCHW) Build
+        run: xmake b -rv
+      - name: Native (AVX2 + BMI(2) + PRFCHW) Check UWVM version
         run: xmake run uwvm --version
-      - name: Unit tests
+      - name: Native (AVX2 + BMI(2) + PRFCHW) Unit tests
+        run: xmake test -vD
+
+      - name: SSE Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mno-sse2"
+      - name: SSE Build
+        run: xmake b -rv
+      - name: SSE Check UWVM version
+        run: xmake run uwvm --version
+      - name: SSE Unit tests
+        run: xmake test -vD
+
+      - name: SSE2 Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none
+      - name: SSE2 Build
+        run: xmake b -rv
+      - name: SSE2 Check UWVM version
+        run: xmake run uwvm --version
+      - name: SSE2 Unit tests
+        run: xmake test -vD
+
+      - name: SSSE3 Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mssse3"
+      - name: SSSE3 Build
+        run: xmake b -rv
+      - name: SSSE3 Check UWVM version
+        run: xmake run uwvm --version
+      - name: SSSE3 Unit tests
+        run: xmake test -vD
+
+      - name: SSE4.x + BMI(2) + PRFCHW Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-msse4 -mbmi -mbmi2 -mprfchw"
+      - name: SSE4.x + BMI(2) + PRFCHW Build
+        run: xmake b -rv
+      - name: SSE4.x + BMI(2) + PRFCHW Check UWVM version
+        run: xmake run uwvm --version
+      - name: SSE4.x + BMI(2) + PRFCHW Unit tests
+        run: xmake test -vD
+
+      - name: AVX + BMI(2) + PRFCHW Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mavx -mbmi -mbmi2 -mprfchw"
+      - name: AVX + BMI(2) + PRFCHW Build
+        run: xmake b -rv
+      - name: AVX + BMI(2) + PRFCHW Check UWVM version
+        run: xmake run uwvm --version
+      - name: AVX + BMI(2) + PRFCHW Unit tests
         run: xmake test -vD
   # ---------------------------------------------------------------------------
-  msys2:
+  x86_64-windows-gnu:
     if: ${{ !always() }} # Remove it once update to LLVM21
-    name: MINGW ${{ matrix.env.name }}
+    name: x86_64-windows-gnu (MINGW ${{ matrix.env.name }})
     runs-on: windows-latest
     strategy:
       matrix:
@@ -64,15 +110,15 @@ jobs:
       - name: Configure
         run: xmake f -p mingw --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
       - name: Build
-        run: xmake b -v
+        run: xmake b -rv
       - name: Check UWVM version
         run: xmake run uwvm --version
       - name: Unit tests
         run: xmake test -vD
   # ---------------------------------------------------------------------------
-  freebsd:
+  x86_64-freebsd14:
     if: ${{ !always() }} # Remove it once support "202411L: Structured bindings can introduce a pack"
-    name: FreeBSD
+    name: x86_64-freebsd14
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -87,6 +133,6 @@ jobs:
           run: |
             sudo pkg install -y llvm-devel xmake-io
             xmake f -m debug --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
-            xmake b -v
+            xmake b -rv
             xmake run uwvm --version
             xmake test -vD
