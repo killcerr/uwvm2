@@ -103,6 +103,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline constexpr ::std::byte const* change_u8_1b_view_to_vec(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t> sec_adl,
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* const section_leb_begin,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
@@ -128,7 +129,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         static_assert(sizeof(::std::byte) == sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
 
         // Copy the situation that has been processed correctly
-        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, section_curr - func_counter, func_counter);
+        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, section_leb_begin, func_counter);
         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += func_counter;
 
         // [typeidxbef ...] typeidx1 ... typeidx2 ...
@@ -250,6 +251,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // used directly to u8 view to avoid copying
         functionsec.funcs.mode = ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_mode::u8_view;
 
+        // storage section_leb_begin
+        ::std::byte const* const section_leb_begin{section_curr};
+
         // set view begin
         using wasm_u8_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const*;
         functionsec.funcs.storage.typeidx_u8_view.begin = reinterpret_cast<wasm_u8_const_may_alias_ptr>(section_curr);
@@ -306,7 +310,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 if(!is_all_zeros(check_upper)) [[unlikely]]
                 {
                     // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                    return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                    return change_u8_1b_view_to_vec(sec_adl,
+                                                    module_storage,
+                                                    section_leb_begin,
+                                                    section_curr,
+                                                    section_end,
+                                                    err,
+                                                    fs_para,
+                                                    func_counter,
+                                                    func_count);
                 }
                 else
                 {
@@ -495,7 +507,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         if(need_change_u8_1b_view_to_vec) [[unlikely]]
         {
-            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)))
@@ -545,7 +557,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             if(mask) [[unlikely]]
             {
                 // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
             else
             {
@@ -621,7 +633,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ) [[unlikely]]
             {
                 // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
             else
             {
@@ -701,7 +713,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ) [[unlikely]]
             {
                 // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
             else
             {
@@ -789,7 +801,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // Check for the presence of redundant 0, (check single byte)
             if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
             {
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
 
             // The state of func_counter can be changed
@@ -877,7 +889,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         if(need_change_u8_1b_view_to_vec) [[unlikely]]
         {
-            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -915,7 +927,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 if(mask) [[unlikely]]
                 {
                     // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                    return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                    return change_u8_1b_view_to_vec(sec_adl,
+                                                    module_storage,
+                                                    section_leb_begin,
+                                                    section_curr,
+                                                    section_end,
+                                                    err,
+                                                    fs_para,
+                                                    func_counter,
+                                                    func_count);
                 }
                 else
                 {
@@ -1003,7 +1023,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // Check for the presence of redundant 0, (check single byte)
             if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
             {
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
 
             // The state of func_counter can be changed
