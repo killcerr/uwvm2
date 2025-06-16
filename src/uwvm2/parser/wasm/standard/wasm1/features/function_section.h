@@ -892,47 +892,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const last_load_predicate_size{static_cast<::std::size_t>(reinterpret_cast<uint8_t_const_may_alias_ptr>(section_end) -
                                                                            reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
 
-            load_mask >>= 64uz - last_load_predicate_size;
+            if(last_load_predicate_size)
+            {
+                load_mask >>= 64uz - last_load_predicate_size;
 
-            using loaddquqi512_para_const_may_alias_ptr UWVM_GNU_MAY_ALIAS =
+                using loaddquqi512_para_const_may_alias_ptr UWVM_GNU_MAY_ALIAS =
 # if defined(__clang__)
-                c8x64simd const*
+                    c8x64simd const*
 # else
-                char const*
+                    char const*
 # endif
-                ;
+                    ;
 
-            auto const need_check{::std::bit_cast<u8x64simd>(
-                __builtin_ia32_loaddquqi512_mask(reinterpret_cast<loaddquqi512_para_const_may_alias_ptr>(section_curr), c8x64simd{}, load_mask))};
+                auto const need_check{::std::bit_cast<u8x64simd>(
+                    __builtin_ia32_loaddquqi512_mask(reinterpret_cast<loaddquqi512_para_const_may_alias_ptr>(section_curr), c8x64simd{}, load_mask))};
 
-            // need_check >= simd_vector_check_u8x64simd
-            ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(need_check, simd_vector_check_u8x64simd, 0x05, load_mask)};
+                // need_check >= simd_vector_check_u8x64simd
+                ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(need_check, simd_vector_check_u8x64simd, 0x05, load_mask)};
 
-            if(mask) [[unlikely]]
-            {
-                // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
-            }
-            else
-            {
-                // all are single bytes, so there are 'last_load_predicate_size'
-                // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                func_counter += last_load_predicate_size;
-
-                // check counter
-                if(func_counter > func_count) [[unlikely]]
+                if(mask) [[unlikely]]
                 {
-                    err.err_curr = section_curr;
-                    err.err_selectable.u32 = func_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
+                    return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
                 }
+                else
+                {
+                    // all are single bytes, so there are 'last_load_predicate_size'
+                    // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
+                    func_counter += last_load_predicate_size;
 
-                section_curr += last_load_predicate_size;
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = func_count;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
 
-                // [before_section ... | func_count ... typeidx1 ... (6last_load_predicate_size - 1) ...] (section_end)
-                // [                        safe                                                        ] unsafe (could be the section_end)
-                //                                                                                        ^^ section_curr
+                    section_curr += last_load_predicate_size;
+
+                    // [before_section ... | func_count ... typeidx1 ... (6last_load_predicate_size - 1) ...] (section_end)
+                    // [                        safe                                                        ] unsafe (could be the section_end)
+                    //                                                                                        ^^ section_curr
+                }
             }
         }
 
