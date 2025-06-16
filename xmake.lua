@@ -255,7 +255,7 @@ for _, file in ipairs(os.files("test/**.cc")) do
 		end
 
 		-- uwvm test
-		add_defines("UWVM_TEST")
+		add_defines("UWVM_TEST=2")
 
 		-- src
 		add_includedirs("src/")

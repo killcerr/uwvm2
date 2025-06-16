@@ -894,6 +894,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(last_load_predicate_size)
             {
+                // avoids ub: u64max >> 64u
+
                 load_mask >>= 64uz - last_load_predicate_size;
 
                 using loaddquqi512_para_const_may_alias_ptr UWVM_GNU_MAY_ALIAS =
