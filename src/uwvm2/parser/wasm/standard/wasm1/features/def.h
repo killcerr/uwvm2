@@ -373,6 +373,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         inline static constexpr ::uwvm2::parser::wasm::text_format::text_format type{TFWapper};
     };
 
+    /// @brief      can check import/export text format
+    /// @details
+    ///             ```cpp
+    ///             void check_import_export_text_format(text_format_wapper<FeatureType::import_export_text_format>,
+    ///                                                  ::std::byte const* begin,
+    ///                                                  ::std::byte const* end,
+    ///                                                  ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    ///             {
+    ///                 // to do ...
+    ///             }
+    ///             ```
     template <typename FeatureType>
     concept can_check_import_export_text_format = requires(text_format_wapper<FeatureType::import_export_text_format> adl,
                                                            ::std::byte const* begin,

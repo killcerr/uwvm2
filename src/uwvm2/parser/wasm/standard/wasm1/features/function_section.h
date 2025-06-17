@@ -906,7 +906,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(last_load_predicate_size)
             {
-                // avoids ub: u64max >> 64u
+                // avoids ub: "u64max >> 64u", last_load_predicate_size > 0u && last_load_predicate_size < 64u
 
                 load_mask >>= 64uz - last_load_predicate_size;
 
@@ -1763,6 +1763,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Check for leb over 2 bytes
+
                 // check_mask is a mask that checks the highest bit (eighth bit) of each byte. If there is a 2-byte uleb there will be a 1 and a 0. When there
                 // are two consecutive 1's it means that it must represent unprocessable by the u16. Here a single 1 in the highest bit of the check_mask cannot
                 // tell if there are more one's to follow, and is handed over to the next round of processing by the subsequent first_round_processes_31bit.
@@ -1889,9 +1890,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     for(::std::uint32_t check_mask_curr_2nd_tmp{check_mask_curr_2nd & static_cast<::std::uint32_t>(0x7FFF'FFFFu)}; check_mask_curr_2nd_tmp;)
                     {
-                        auto const crtz{::std::countr_zero(check_mask_curr_2nd_tmp)};
+                        auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
 
-                        auto const sizeFF{crtz + 1u};
+                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
+                        // No mods needed on x86, but preventing cxx language ub
+                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+
+                        auto const sizeFF{(crtz + 1u) % 32u};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
@@ -4785,6 +4790,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Check for leb over 2 bytes
+
                 // check_mask is a mask that checks the highest bit (eighth bit) of each byte. If there is a 2-byte uleb there will be a 1 and a 0. When there
                 // are two consecutive 1's it means that it must represent unprocessable by the u16. Here a single 1 in the highest bit of the check_mask cannot
                 // tell if there are more one's to follow, and is handed over to the next round of processing by the subsequent first_round_processes_31bit.
@@ -4974,9 +4980,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     for(::std::uint32_t check_mask_curr_2nd_tmp{check_mask_curr_2nd & static_cast<::std::uint32_t>(0x7FFF'FFFFu)}; check_mask_curr_2nd_tmp;)
                     {
-                        auto const crtz{::std::countr_zero(check_mask_curr_2nd_tmp)};
+                        auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
 
-                        auto const sizeFF{crtz + 1u};
+                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
+                        // No mods needed on x86, but preventing cxx language ub
+                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+
+                        auto const sizeFF{(crtz + 1u) % 32u};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
