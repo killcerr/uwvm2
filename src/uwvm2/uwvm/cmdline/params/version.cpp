@@ -295,10 +295,13 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"E2K"
 #elif defined(__IA64__) || defined(_M_IA64)
                                 u8"Intel Itanium 64"
-#elif defined(__loongarch64__)
-                                u8"LoongArch64"
 #elif defined(__loongarch__)
-                                u8"LoongArch"
+# if defined(__loongarch64)
+                                u8"LoongArch64"
+# else
+                                u8"LoongArch32"
+# endif
+                                // loongarch no big-endian mode
 #elif defined(__m68k__) || defined(__mc68000__)
                                 u8"Motorola 68k"
 #elif defined(__MIPS64__) || defined(__mips64__)

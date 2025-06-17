@@ -2075,7 +2075,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                     //      [    needwrite   ]
 
-                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time,
                     // and it's perfectly safe to do so here without any additional checks
 
                     ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
@@ -5106,7 +5106,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                     //      [    needwrite   ]
 
-                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time,
                     // and it's perfectly safe to do so here without any additional checks
 
                     ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
