@@ -49,6 +49,7 @@ import :type_section;
 # include <utility>
 # include <memory>
 # include <bit>
+# include <numeric>
 # if defined(_MSC_VER) && !defined(__clang__)
 #  if !defined(_KERNEL_MODE) && defined(_M_AMD64)
 #   include <emmintrin.h>  // MSVC x86_64-SSE2
@@ -103,6 +104,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline constexpr ::std::byte const* change_u8_1b_view_to_vec(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<function_section_storage_t> sec_adl,
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* const section_leb_begin,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
@@ -128,12 +130,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         static_assert(sizeof(::std::byte) == sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
 
         // Copy the situation that has been processed correctly
-        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, section_curr - func_counter, func_counter);
+        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, section_leb_begin, func_counter);
         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += func_counter;
 
         // [typeidxbef ...] typeidx1 ... typeidx2 ...
         // [     safe     ] unsafe (could be the section_end)
         //                  ^^ section_curr
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        bool correct_sequence_right_taken_for_wrong{true};
+#endif
 
         while(section_curr != section_end) [[likely]]
         {
@@ -185,7 +191,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
+            {
+                correct_sequence_right_taken_for_wrong = false;
+            }
+#endif
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -197,6 +211,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [before_section ... | func_count ... typeidx1 ... ...] (end)
         // [                       safe                         ] unsafe (could be the section_end)
         //                                                        ^^ section_curr
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
 
         return section_curr;
     }
@@ -234,6 +252,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // used directly to u8 view to avoid copying
         functionsec.funcs.mode = ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_mode::u8_view;
+
+        // storage section_leb_begin
+        ::std::byte const* const section_leb_begin{section_curr};
 
         // set view begin
         using wasm_u8_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const*;
@@ -291,7 +312,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 if(!is_all_zeros(check_upper)) [[unlikely]]
                 {
                     // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                    return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                    return change_u8_1b_view_to_vec(sec_adl,
+                                                    module_storage,
+                                                    section_leb_begin,
+                                                    section_curr,
+                                                    section_end,
+                                                    err,
+                                                    fs_para,
+                                                    func_counter,
+                                                    func_count);
                 }
                 else
                 {
@@ -339,6 +368,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         [&]
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
+# else
+            UWVM_ALWAYS_INLINE
 # endif
             () constexpr UWVM_THROWS -> void
         {
@@ -350,9 +381,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const all_one_predicate_reg{::uwvm2::utils::intrinsics::arm_sve::svptrue_b8()};
             auto const svc_sz{::uwvm2::utils::intrinsics::arm_sve::svcntb()};
 
-# if defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))
+# if (defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))) &&                  \
+     !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
             // When the cpu supports the vector length of sve to be the same as the vector length of neon, since the computations are all on the basic side and
             // read 16 bytes at a time, sve needs to additionally process predicates, resulting in lower throughput, so here it switches back to using neon
+
+            // arm neon does not mix with sme's sve stream mode
 
             if(svc_sz == 16u)
             {
@@ -475,7 +509,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         if(need_change_u8_1b_view_to_vec) [[unlikely]]
         {
-            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512BW__) && (UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)))
@@ -525,7 +559,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             if(mask) [[unlikely]]
             {
                 // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
             else
             {
@@ -601,7 +635,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ) [[unlikely]]
             {
                 // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
             else
             {
@@ -681,7 +715,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ) [[unlikely]]
             {
                 // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
             else
             {
@@ -769,7 +803,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // Check for the presence of redundant 0, (check single byte)
             if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
             {
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
 
             // The state of func_counter can be changed
@@ -790,6 +824,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         [&]
 # if (defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)
             __arm_locally_streaming
+# else
+            UWVM_ALWAYS_INLINE
 # endif
             () constexpr UWVM_THROWS -> void
         {
@@ -855,7 +891,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         if(need_change_u8_1b_view_to_vec) [[unlikely]]
         {
-            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+            return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -870,50 +906,63 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const last_load_predicate_size{static_cast<::std::size_t>(reinterpret_cast<uint8_t_const_may_alias_ptr>(section_end) -
                                                                            reinterpret_cast<uint8_t_const_may_alias_ptr>(section_curr))};
 
-            load_mask >>= 64uz - last_load_predicate_size;
+            if(last_load_predicate_size)
+            {
+                // avoids ub: "u64max >> 64u", last_load_predicate_size > 0u && last_load_predicate_size < 64u
 
-            using loaddquqi512_para_const_may_alias_ptr UWVM_GNU_MAY_ALIAS =
+                load_mask >>= 64uz - last_load_predicate_size;
+
+                using loaddquqi512_para_const_may_alias_ptr UWVM_GNU_MAY_ALIAS =
 # if defined(__clang__)
-                c8x64simd const*
+                    c8x64simd const*
 # else
-                char const*
+                    char const*
 # endif
-                ;
+                    ;
 
-            auto const need_check{::std::bit_cast<u8x64simd>(
-                __builtin_ia32_loaddquqi512_mask(reinterpret_cast<loaddquqi512_para_const_may_alias_ptr>(section_curr), c8x64simd{}, load_mask))};
+                auto const need_check{::std::bit_cast<u8x64simd>(
+                    __builtin_ia32_loaddquqi512_mask(reinterpret_cast<loaddquqi512_para_const_may_alias_ptr>(section_curr), c8x64simd{}, load_mask))};
 
-            // need_check >= simd_vector_check_u8x64simd
-            ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(need_check, simd_vector_check_u8x64simd, 0x05, load_mask)};
+                // need_check >= simd_vector_check_u8x64simd
+                ::std::uint64_t const mask{__builtin_ia32_ucmpb512_mask(need_check, simd_vector_check_u8x64simd, 0x05, load_mask)};
 
-            if(mask) [[unlikely]]
-            {
-                // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
-            }
-            else
-            {
-                // all are single bytes, so there are 'last_load_predicate_size'
-                // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                func_counter += last_load_predicate_size;
-
-                // check counter
-                if(func_counter > func_count) [[unlikely]]
+                if(mask) [[unlikely]]
                 {
-                    err.err_curr = section_curr;
-                    err.err_selectable.u32 = func_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    // There are special cases greater than typeidx, which may be legal redundancy 0 or illegal data, all converted to vec to determine.
+                    return change_u8_1b_view_to_vec(sec_adl,
+                                                    module_storage,
+                                                    section_leb_begin,
+                                                    section_curr,
+                                                    section_end,
+                                                    err,
+                                                    fs_para,
+                                                    func_counter,
+                                                    func_count);
                 }
+                else
+                {
+                    // all are single bytes, so there are 'last_load_predicate_size'
+                    // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
+                    func_counter += last_load_predicate_size;
 
-                section_curr += last_load_predicate_size;
+                    // check counter
+                    if(func_counter > func_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = func_count;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
 
-                // [before_section ... | func_count ... typeidx1 ... (6last_load_predicate_size - 1) ...] (section_end)
-                // [                        safe                                                        ] unsafe (could be the section_end)
-                //                                                                                        ^^ section_curr
+                    section_curr += last_load_predicate_size;
+
+                    // [before_section ... | func_count ... typeidx1 ... (6last_load_predicate_size - 1) ...] (section_end)
+                    // [                        safe                                                        ] unsafe (could be the section_end)
+                    //                                                                                        ^^ section_curr
+                }
             }
         }
-        
+
 #else
         // non-simd or simd (non-sve) tail-treatment
         // non-sve, default
@@ -976,7 +1025,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // Check for the presence of redundant 0, (check single byte)
             if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
             {
-                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_curr, section_end, err, fs_para, func_counter, func_count);
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
             }
 
             // The state of func_counter can be changed
@@ -1405,7 +1454,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [              safe                 ] unsafe (could be the section_end)
         //                                       ^^ section_curr
 
-        /// @todo support AVX512vbmi2: 2x faster than AVX2
         /// @todo support SVE2: svtbl
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -1507,6 +1555,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
+                        // write data, func_counter has been checked and is ready to be written.
                         functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
@@ -1555,22 +1604,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # endif
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
-        ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)) &&                                  \
-         (defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256))) ||                                                                                  \
-    (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b) &&                                   \
-     UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v))
-        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
-        /// x86_64-avx2, loongarch-LSX
-        // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
-        // needs to be localized.
-
-        /// @note The sse4 version of scan_function_section_impl_uN_Xb is about 6% faster than avx (mundane read+judge+ptest) on Windows because the kernel
-        ///       mapping in the Windows kernel's ntoskrnl.exe uses the `movups xmm` instruction for out-of-page interrupts (The reason is that the kernel
-        ///       mapping in the Windows kernel ntoskrnl.exe will use the `movups xmm` instruction for out-of-page interrupts (ntoskrnl didn't do the avx
-        ///       adaptation, and used the vex version), which leads to the state switching of the ymm mixed with this kind of instruction and wastes dozens
-        ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
-        ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
-        ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+    (defined(__AVX512VBMI__) && defined(__AVX512VBMI2__) && defined(__AVX512BW__) && defined(__AVX512F__))
+        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd512
+        /// x86_64-avx512vbmi2
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
@@ -1580,12 +1616,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_right_taken_for_wrong{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -1632,8 +1672,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_right_taken_for_wrong = false;
+                                   }
+# endif
 
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -1643,11 +1691,561 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+                           }};
+
+        using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x15simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint32_t;
+        using u16x32simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint16_t;
+        using c8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = char;
+        using u8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int8_t;
+
+        using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
+        using u16x16simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint16_t;
+        using c8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = char;
+        using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
+
+        using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+        using u16x8simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint16_t;
+        using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+        using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+        static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
+
+        while(static_cast<::std::size_t>(section_end - section_curr) >= 64uz) [[likely]]
+        {
+
+            // [before_section ... | func_count ... typeidx1 ... (63) ...] ...
+            // [                        safe                             ] unsafe (could be the section_end)
+            //                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]
+
+            u8x64simd simd_vector_str;  // No initialization necessary
+
+            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
+
+            // It's already a little-endian.
+
+            // When the highest bit of each byte is pop, then mask out 1
+
+            ::std::uint64_t const check_mask{
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cvtb2mask512)
+                static_cast<::std::uint64_t>(__builtin_ia32_cvtb2mask512(::std::bit_cast<c8x64simd>(simd_vector_str)))
+# else
+#  error "missing instructions"
+# endif
+            };
+
+            if(
+# if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
+                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 4.0)
+# else
+                check_mask
+# endif
+            )
+            {
+                if(func_counter + 64u > func_count) [[unlikely]]
+                {
+                    // Near the end, jump directly out of the simd section and hand it over to the tail.
+                    break;
+                }
+
+                // Check for leb over 2 bytes
+
+                // check_mask is a mask that checks the highest bit (eighth bit) of each byte. If there is a 2-byte uleb there will be a 1 and a 0. When there
+                // are two consecutive 1's it means that it must represent unprocessable by the u16. Here a single 1 in the highest bit of the check_mask cannot
+                // tell if there are more one's to follow, and is handed over to the next round of processing by the subsequent first_round_processes_31bit.
+
+                if(check_mask & (check_mask << 1u)) [[unlikely]]
+                {
+                    error_handler(64u);
+                    continue;
+                }
+
+                ::std::uint16_t const simd_vector_check{static_cast<::std::uint16_t>(type_section_count)};
+
+                ::std::uint64_t check_mask_curr{check_mask};
+
+                ::std::uint32_t const check_mask_curr_1st{static_cast<::std::uint32_t>(check_mask_curr)};
+
+                // Write 32 directly when the current 32 are all zeros
+                if(!check_mask_curr_1st)
+                {
+                    check_mask_curr >>= 32u;
+
+                    auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(simd_vector_str)};
+
+                    auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
+
+                    func_counter += 32u;
+
+                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                                       ::std::addressof(need_write_u8x32x2v0),
+                                                       sizeof(u8x32simd));
+
+                    functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 32u;
+
+                    section_curr += 32u;
+
+                    // Convert the acquired 32 bits for next use.
+
+                    simd_vector_str = __builtin_shufflevector(simd_vector_str,
+                                                              simd_vector_str,
+                                                              32,
+                                                              33,
+                                                              34,
+                                                              35,
+                                                              36,
+                                                              37,
+                                                              38,
+                                                              39,
+                                                              40,
+                                                              41,
+                                                              42,
+                                                              43,
+                                                              44,
+                                                              45,
+                                                              46,
+                                                              47,
+                                                              48,
+                                                              49,
+                                                              50,
+                                                              51,
+                                                              52,
+                                                              53,
+                                                              54,
+                                                              55,
+                                                              56,
+                                                              57,
+                                                              58,
+                                                              59,
+                                                              60,
+                                                              61,
+                                                              62,
+                                                              63,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1);
+                }
+
+                // 2nd
+
+                {
+                    ::std::uint32_t const check_mask_curr_2nd{static_cast<::std::uint32_t>(check_mask_curr)};
+
+                    bool const first_round_processes_31bit{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
+                    unsigned const first_round{32u - static_cast<unsigned>(first_round_processes_31bit)};
+                    unsigned const handled_simd{32u - static_cast<unsigned>(::std::popcount(check_mask_curr_2nd))};
+
+                    constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
+
+                    constexpr u16x32simd conversion_table_1{0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
+                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
+                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u};
+
+                    ::std::uint32_t check_mask_curr_2nd_curtailment{};
+
+                    // Avoiding the effects of the highest invalid bit
+
+                    for(::std::uint32_t check_mask_curr_2nd_tmp{check_mask_curr_2nd & static_cast<::std::uint32_t>(0x7FFF'FFFFu)}; check_mask_curr_2nd_tmp;)
+                    {
+                        auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
+
+                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
+                        // No mods needed on x86, but preventing cxx language ub
+                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+
+                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
+
+                        auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
+                        check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
+
+                        check_mask_curr_2nd_tmp &= ~FF;
+                        check_mask_curr_2nd_tmp >>= 1u;
+                    }
+
+                    // check_mask_curr_2nd_curtailment : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
+                    // convert to:
+                    // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
+
+                    u16x32simd conversion_res_1;
+
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_selectw_512)         // Clang
+                    conversion_res_1 = __builtin_ia32_selectw_512(check_mask_curr_2nd_curtailment, conversion_table_1, u16x32simd{});
+# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_movdquhi512_mask)  // GCC
+                    conversion_res_1 = __builtin_ia32_movdquhi512_mask(conversion_table_1, u16x32simd{}, check_mask_curr_2nd_curtailment);
+# else
+#  error "missing instructions"
+# endif
+
+                    ::std::uint64_t conversion_res_2;
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cvtb2mask512)
+                    conversion_res_2 = static_cast<::std::uint64_t>(__builtin_ia32_cvtb2mask512(::std::bit_cast<c8x64simd>(conversion_res_1)));
+# else
+#  error "missing instructions"
+# endif
+
+                    conversion_res_2 |= mask;
+
+                    // check_mask_curr_2nd_curtailment : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
+                    // convert to:
+                    // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
+
+                    constexpr u8x64simd conversion_table_2{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+                                                           22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+                                                           44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
+
+                    u8x64simd mask_table;
+
+# if defined(__AVX512VBMI2__) && UWVM_HAS_BUILTIN(__builtin_ia32_expandqi512_mask)
+                    mask_table = __builtin_ia32_expandqi512_mask(conversion_table_2, u8x64simd{}, conversion_res_2);
+# else
+#  error "missing instructions"
+# endif
+
+                    u16x32simd mask_res;
+
+# if defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512_mask)                                               // GCC
+                    mask_res = ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(simd_vector_str),
+                                                                                            ::std::bit_cast<c8x64simd>(mask_table),
+                                                                                            c8x64simd{},
+                                                                                            conversion_res_2));
+# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512)  // clang
+                    mask_res = ::std::bit_cast<u16x32simd>(__builtin_ia32_selectb_512(
+                        conversion_res_2,
+                        __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)),
+                        c8x64simd{}));
+# else
+#  error "missing instructions"
+# endif
+                    auto const res{(mask_res & static_cast<::std::uint16_t>(0x7Fu)) | ((mask_res & static_cast<::std::uint16_t>(0x7F00u)) >> 1u)};
+
+                    // The data out of shuffle is 16-bit [0, 2^14) and may be greater than or equal to typeidx, which needs to be checked.
+
+                    ::std::uint32_t const gen_mask{(static_cast<::std::uint32_t>(1u) << handled_simd) - 1u};
+
+                    u16x32simd const simd_vector_check_u16x32{
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                    };
+
+                    if(
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpw512_mask)
+                        __builtin_ia32_cmpw512_mask(res, simd_vector_check_u16x32, 0x05, gen_mask)
+# else
+#  error "missing instructions"
+# endif
+                            ) [[unlikely]]
+                    {
+                        // [before_section ... | func_count ... (32, 0) ... typeidx1 ... (63 - (32, 0)) ...] ...
+                        // [                        safe                                                   ] unsafe (could be the section_end)
+                        //                                                  ^^ section_curr
+                        //                                                                              ^^^^^^^ section_curr + 32uz
+
+                        // it can be processed up to 32
+                        error_handler(32uz);
+
+                        // Start the next round straight away
+                        continue;
+                    }
+
+                    auto const need_write{__builtin_shufflevector(::std::bit_cast<u8x64simd>(res),
+                                                                  ::std::bit_cast<u8x64simd>(res),
+                                                                  0,
+                                                                  2,
+                                                                  4,
+                                                                  6,
+                                                                  8,
+                                                                  10,
+                                                                  12,
+                                                                  14,
+                                                                  16,
+                                                                  18,
+                                                                  20,
+                                                                  22,
+                                                                  24,
+                                                                  26,
+                                                                  28,
+                                                                  30,
+                                                                  32,
+                                                                  34,
+                                                                  36,
+                                                                  38,
+                                                                  40,
+                                                                  42,
+                                                                  44,
+                                                                  46,
+                                                                  48,
+                                                                  50,
+                                                                  52,
+                                                                  54,
+                                                                  56,
+                                                                  58,
+                                                                  60,
+                                                                  62,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1,
+                                                                  -1)};
+
+                    auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(need_write)};
+
+                    auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
+
+                    func_counter += handled_simd;
+
+                    //  [... curr ... (63) ...]
+                    //  [      safe           ] unsafe (could be the section_end)
+                    //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    //      [    needwrite   ]
+
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // and it's perfectly safe to do so here without any additional checks
+
+                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                                       ::std::addressof(need_write_u8x32x2v0),
+                                                       sizeof(u8x32simd));
+
+                    functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += handled_simd;
+
+                    //  [... curr ... (63) ...]
+                    //  [          safe       ] unsafe (could be the section_end)
+                    //                    ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    // Or: (Security boundaries for writes are checked)
+                    //                        ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
+                    //      [    needwrite   ]
+
+                    section_curr += first_round;
+
+                    // [before_section ... | func_count ... typeidx1 ... (63) ...] ...
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                   ^^^^^^^ section_curr (processed_byte_counter_sum <= 64)
+                    //                                      [   simd_vector_str  ]
+                }
+            }
+            else
+            {
+                // All correct, can change state: func_counter, section_curr
+
+                // all are single bytes, so there are 64
+                func_counter += 64u;
+
+                // check counter
+                if(func_counter > func_count) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u32 = func_count;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                // Since everything is less than 128, there is no need to check the typeidx.
+
+                // write data, func_counter has been checked and is ready to be written.
+                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                                   ::std::addressof(simd_vector_str),
+                                                   sizeof(u8x64simd));
+
+                functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 64uz;
+
+                section_curr += 64uz;
+
+                // [before_section ... | func_count ... typeidx1 ... (63) ...] typeidx64
+                // [                        safe                             ] unsafe (could be the section_end)
+                //                                                             ^^ section_curr
+            }
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr));
+        }
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
+        ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)) &&                                  \
+         (defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256))) ||                                                                                  \
+    (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b) &&                                   \
+     UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v))
+        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd256
+        /// x86_64-avx2, loongarch-LSX
+        // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
+        // needs to be localized.
+
+        /// @note The sse4 version of scan_function_section_impl_uN_Xb is about 6% faster than avx (mundane read+judge+ptest) on Windows because the kernel
+        ///       mapping in the Windows kernel's ntoskrnl.exe uses the `movups xmm` instruction for out-of-page interrupts (The reason is that the kernel
+        ///       mapping in the Windows kernel ntoskrnl.exe will use the `movups xmm` instruction for out-of-page interrupts (ntoskrnl didn't do the avx
+        ///       adaptation, and used the vex version), which leads to the state switching of the ymm mixed with this kind of instruction and wastes dozens
+        ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
+        ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
+        ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+
+        auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
+                           {
+                               // Need to ensure that section_curr to section_curr + n is memory safe
+                               // Processing uses section_curr_end to guarantee entry into the loop for inspection.
+                               // Also use section_end to ensure that the scanning of the last leb128 is handled correctly, both memory safe.
+
+                               auto const section_curr_end{section_curr + n};
+
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_right_taken_for_wrong{true};
+# endif
+
+                               while(section_curr < section_curr_end)
+                               {
+                                   // The outer boundary is unknown and needs to be rechecked
+                                   // [ ... typeidx1] ... (outer) ] typeidx2 ...
+                                   // [     safe    ] ... (outer) ] unsafe (could be the section_end)
+                                   //       ^^ section_curr
+
+                                   if(++func_counter > func_count) [[unlikely]]
+                                   {
+                                       err.err_curr = section_curr;
+                                       err.err_selectable.u32 = func_count;
+                                       err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                                       ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                                   }
+
+                                   ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+
+                                   using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                                   auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                                   reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                                   ::fast_io::mnp::leb128_get(typeidx))};
+
+                                   if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                                   {
+                                       err.err_curr = section_curr;
+                                       err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                                       ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                                   }
+
+                                   // The outer boundary is unknown and needs to be rechecked
+                                   // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
+                                   // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                                   //       ^^ section_curr
+
+                                   // There's a good chance there's an error here.
+                                   // Or there is a leb redundancy 0
+                                   if(typeidx >= type_section_count) [[unlikely]]
+                                   {
+                                       err.err_curr = section_curr;
+                                       err.err_selectable.u32 = typeidx;
+                                       err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                                       ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                                   }
+
+                                   // write data, func_counter has been checked and is ready to be written.
+                                   functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
+                                       static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_right_taken_for_wrong = false;
+                                   }
+# endif
+
+                                   section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                                   // The outer boundary is unknown and needs to be rechecked
+                                   // [ ... typeidx1 ...] typeidx2 ...] ...
+                                   // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                                   //                     ^^ section_curr
+                               }
+
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
                            }};
 
         using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
@@ -1788,6 +2386,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         // shuffle and write
 
+                        // avx2 since shuffle is in channels of 128, just splice directly
                         ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
                         u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
@@ -2882,12 +3481,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_right_taken_for_wrong{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -2934,8 +3537,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_right_taken_for_wrong = false;
+                                   }
+# endif
 
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -2945,11 +3556,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
                            }};
 
         using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
@@ -3276,7 +3891,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // Here the shuffle simulation element is kept shifted right by 8 bits to facilitate subsequent expansion,
                         // while the subsequent taking of the first address has been shown to be optimized by the llvm into a single instruction
 
-                        u8x16simd simd_vector_str_need_shf{
+                        u8x16simd const simd_vector_str_need_shf{
                             __builtin_shufflevector(simd_vector_str, simd_vector_str, 8, 9, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1)};
 
                         // write 8 byte
@@ -3598,6 +4213,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
 
+                    // write data, func_counter has been checked and is ready to be written.
                     functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                         static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
@@ -3704,6 +4320,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -3770,6 +4387,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -3824,7 +4442,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // This algorithm is the same as the one for scan_function_section_impl_u8_2b, just make sure to scale u8 to u16 on writes.
 
-        /// @todo support AVX512vbmi2: 2x faster than AVX2
+        /// @todo support AVX512vbmi2
         /// @todo support SVE2: svtbl
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -3926,6 +4544,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
+                        // write data, func_counter has been checked and is ready to be written.
                         functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
@@ -4022,22 +4641,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # endif
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
-        ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)) &&                                  \
-         (defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256))) ||                                                                                  \
-    (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b) &&                                   \
-     UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v))
-        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd128
-        /// x86_64-avx2, loongarch-LSX
-        // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
-        // needs to be localized.
-
-        /// @note The sse4 version of scan_function_section_impl_uN_Xb is about 6% faster than avx (mundane read+judge+ptest) on Windows because the kernel
-        ///       mapping in the Windows kernel's ntoskrnl.exe uses the `movups xmm` instruction for out-of-page interrupts (The reason is that the kernel
-        ///       mapping in the Windows kernel ntoskrnl.exe will use the `movups xmm` instruction for out-of-page interrupts (ntoskrnl didn't do the avx
-        ///       adaptation, and used the vex version), which leads to the state switching of the ymm mixed with this kind of instruction and wastes dozens
-        ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
-        ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
-        ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+    (defined(__AVX512VBMI__) && defined(__AVX512VBMI2__) && defined(__AVX512BW__) && defined(__AVX512F__))
+        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd512
+        /// x86_64-avx512vbmi2
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
@@ -4047,12 +4653,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_right_taken_for_wrong{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -4099,8 +4709,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_right_taken_for_wrong = false;
+                                   }
+# endif
 
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -4110,11 +4728,696 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+                           }};
+
+        using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x15simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint32_t;
+        using u16x32simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint16_t;
+        using c8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = char;
+        using u8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int8_t;
+
+        using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
+        using u16x16simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint16_t;
+        using c8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = char;
+        using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
+
+        using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+        using u16x8simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint16_t;
+        using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+        using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+        static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte, ::std::uint8_t>);
+
+        while(static_cast<::std::size_t>(section_end - section_curr) >= 64uz) [[likely]]
+        {
+
+            // [before_section ... | func_count ... typeidx1 ... (63) ...] ...
+            // [                        safe                             ] unsafe (could be the section_end)
+            //                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]
+
+            u8x64simd simd_vector_str;  // No initialization necessary
+
+            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
+
+            // It's already a little-endian.
+
+            // When the highest bit of each byte is pop, then mask out 1
+
+            ::std::uint64_t const check_mask{
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cvtb2mask512)
+                static_cast<::std::uint64_t>(__builtin_ia32_cvtb2mask512(::std::bit_cast<c8x64simd>(simd_vector_str)))
+# else
+#  error "missing instructions"
+# endif
+            };
+
+            if(
+# if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
+                __builtin_expect_with_probability(static_cast<bool>(check_mask), true, 1.0 / 4.0)
+# else
+                check_mask
+# endif
+            )
+            {
+                if(func_counter + 64u > func_count) [[unlikely]]
+                {
+                    // Near the end, jump directly out of the simd section and hand it over to the tail.
+                    break;
+                }
+
+                // Check for leb over 2 bytes
+
+                // check_mask is a mask that checks the highest bit (eighth bit) of each byte. If there is a 2-byte uleb there will be a 1 and a 0. When there
+                // are two consecutive 1's it means that it must represent unprocessable by the u16. Here a single 1 in the highest bit of the check_mask cannot
+                // tell if there are more one's to follow, and is handed over to the next round of processing by the subsequent first_round_processes_31bit.
+
+                if(check_mask & (check_mask << 1u)) [[unlikely]]
+                {
+                    error_handler(64u);
+                    continue;
+                }
+
+                ::std::uint16_t const simd_vector_check{static_cast<::std::uint16_t>(type_section_count)};
+
+                ::std::uint64_t check_mask_curr{check_mask};
+
+                ::std::uint32_t const check_mask_curr_1st{static_cast<::std::uint32_t>(check_mask_curr)};
+
+                // Write 32 directly when the current 32 are all zeros
+                if(!check_mask_curr_1st)
+                {
+                    check_mask_curr >>= 32u;
+
+                    auto const need_write_u16x32{::std::bit_cast<u16x32simd>(__builtin_shufflevector(simd_vector_str,
+                                                                                                     u8x64simd{},
+                                                                                                     0,
+                                                                                                     64,
+                                                                                                     1,
+                                                                                                     64,
+                                                                                                     2,
+                                                                                                     64,
+                                                                                                     3,
+                                                                                                     64,
+                                                                                                     4,
+                                                                                                     64,
+                                                                                                     5,
+                                                                                                     64,
+                                                                                                     6,
+                                                                                                     64,
+                                                                                                     7,
+                                                                                                     64,
+                                                                                                     8,
+                                                                                                     64,
+                                                                                                     9,
+                                                                                                     64,
+                                                                                                     10,
+                                                                                                     64,
+                                                                                                     11,
+                                                                                                     64,
+                                                                                                     12,
+                                                                                                     64,
+                                                                                                     13,
+                                                                                                     64,
+                                                                                                     14,
+                                                                                                     64,
+                                                                                                     15,
+                                                                                                     64,
+                                                                                                     16,
+                                                                                                     64,
+                                                                                                     17,
+                                                                                                     64,
+                                                                                                     18,
+                                                                                                     64,
+                                                                                                     19,
+                                                                                                     64,
+                                                                                                     20,
+                                                                                                     64,
+                                                                                                     21,
+                                                                                                     64,
+                                                                                                     22,
+                                                                                                     64,
+                                                                                                     23,
+                                                                                                     64,
+                                                                                                     24,
+                                                                                                     64,
+                                                                                                     25,
+                                                                                                     64,
+                                                                                                     26,
+                                                                                                     64,
+                                                                                                     27,
+                                                                                                     64,
+                                                                                                     28,
+                                                                                                     64,
+                                                                                                     29,
+                                                                                                     64,
+                                                                                                     30,
+                                                                                                     64,
+                                                                                                     31,
+                                                                                                     64))};
+
+                    func_counter += 32u;
+
+                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
+                                                       ::std::addressof(need_write_u16x32),
+                                                       sizeof(u16x32simd));
+
+                    functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 32u;
+
+                    section_curr += 32u;
+
+                    // Convert the acquired 32 bits for next use.
+
+                    simd_vector_str = __builtin_shufflevector(simd_vector_str,
+                                                              simd_vector_str,
+                                                              32,
+                                                              33,
+                                                              34,
+                                                              35,
+                                                              36,
+                                                              37,
+                                                              38,
+                                                              39,
+                                                              40,
+                                                              41,
+                                                              42,
+                                                              43,
+                                                              44,
+                                                              45,
+                                                              46,
+                                                              47,
+                                                              48,
+                                                              49,
+                                                              50,
+                                                              51,
+                                                              52,
+                                                              53,
+                                                              54,
+                                                              55,
+                                                              56,
+                                                              57,
+                                                              58,
+                                                              59,
+                                                              60,
+                                                              61,
+                                                              62,
+                                                              63,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1,
+                                                              -1);
+                }
+
+                // 2nd
+
+                {
+                    ::std::uint32_t const check_mask_curr_2nd{static_cast<::std::uint32_t>(check_mask_curr)};
+
+                    bool const first_round_processes_31bit{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
+                    unsigned const first_round{32u - static_cast<unsigned>(first_round_processes_31bit)};
+                    unsigned const handled_simd{32u - static_cast<unsigned>(::std::popcount(check_mask_curr_2nd))};
+
+                    constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
+
+                    constexpr u16x32simd conversion_table_1{0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
+                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
+                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u};
+
+                    ::std::uint32_t check_mask_curr_2nd_curtailment{};
+
+                    // Avoiding the effects of the highest invalid bit
+
+                    for(::std::uint32_t check_mask_curr_2nd_tmp{check_mask_curr_2nd & static_cast<::std::uint32_t>(0x7FFF'FFFFu)}; check_mask_curr_2nd_tmp;)
+                    {
+                        auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
+
+                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
+                        // No mods needed on x86, but preventing cxx language ub
+                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+
+                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
+
+                        auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
+                        check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
+
+                        check_mask_curr_2nd_tmp &= ~FF;
+                        check_mask_curr_2nd_tmp >>= 1u;
+                    }
+
+                    // check_mask_curr_2nd_curtailment : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
+                    // convert to:
+                    // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
+
+                    u16x32simd conversion_res_1;
+
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_selectw_512)         // Clang
+                    conversion_res_1 = __builtin_ia32_selectw_512(check_mask_curr_2nd_curtailment, conversion_table_1, u16x32simd{});
+# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_movdquhi512_mask)  // GCC
+                    conversion_res_1 = __builtin_ia32_movdquhi512_mask(conversion_table_1, u16x32simd{}, check_mask_curr_2nd_curtailment);
+# else
+#  error "missing instructions"
+# endif
+
+                    ::std::uint64_t conversion_res_2;
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cvtb2mask512)
+                    conversion_res_2 = static_cast<::std::uint64_t>(__builtin_ia32_cvtb2mask512(::std::bit_cast<c8x64simd>(conversion_res_1)));
+# else
+#  error "missing instructions"
+# endif
+
+                    conversion_res_2 |= mask;
+
+                    // check_mask_curr_2nd_curtailment : ..., 0b,     1b,     0b,     0b,     0b,     1b,     0b
+                    // convert to:
+                    // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
+
+                    constexpr u8x64simd conversion_table_2{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+                                                           22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+                                                           44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
+
+                    u8x64simd mask_table;
+
+# if defined(__AVX512VBMI2__) && UWVM_HAS_BUILTIN(__builtin_ia32_expandqi512_mask)
+                    mask_table = __builtin_ia32_expandqi512_mask(conversion_table_2, u8x64simd{}, conversion_res_2);
+# else
+#  error "missing instructions"
+# endif
+
+                    u16x32simd mask_res;
+
+# if defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512_mask)                                               // GCC
+                    mask_res = ::std::bit_cast<u16x32simd>(__builtin_ia32_permvarqi512_mask(::std::bit_cast<c8x64simd>(simd_vector_str),
+                                                                                            ::std::bit_cast<c8x64simd>(mask_table),
+                                                                                            c8x64simd{},
+                                                                                            conversion_res_2));
+# elif defined(__AVX512VBMI__) && UWVM_HAS_BUILTIN(__builtin_ia32_permvarqi512) && UWVM_HAS_BUILTIN(__builtin_ia32_selectb_512)  // clang
+                    mask_res = ::std::bit_cast<u16x32simd>(__builtin_ia32_selectb_512(
+                        conversion_res_2,
+                        __builtin_ia32_permvarqi512(::std::bit_cast<c8x64simd>(simd_vector_str), ::std::bit_cast<c8x64simd>(mask_table)),
+                        c8x64simd{}));
+# else
+#  error "missing instructions"
+# endif
+                    auto const res{(mask_res & static_cast<::std::uint16_t>(0x7Fu)) | ((mask_res & static_cast<::std::uint16_t>(0x7F00u)) >> 1u)};
+
+                    // The data out of shuffle is 16-bit [0, 2^14) and may be greater than or equal to typeidx, which needs to be checked.
+
+                    ::std::uint32_t const gen_mask{(static_cast<::std::uint32_t>(1u) << handled_simd) - 1u};
+
+                    u16x32simd const simd_vector_check_u16x32{
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                    };
+
+                    if(
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_cmpw512_mask)
+                        __builtin_ia32_cmpw512_mask(res, simd_vector_check_u16x32, 0x05, gen_mask)
+# else
+#  error "missing instructions"
+# endif
+                            ) [[unlikely]]
+                    {
+                        // [before_section ... | func_count ... (32, 0) ... typeidx1 ... (63 - (32, 0)) ...] ...
+                        // [                        safe                                                   ] unsafe (could be the section_end)
+                        //                                                  ^^ section_curr
+                        //                                                                              ^^^^^^^ section_curr + 32uz
+
+                        // it can be processed up to 32
+                        error_handler(32uz);
+
+                        // Start the next round straight away
+                        continue;
+                    }
+
+                    auto const need_write_u16x32{::std::bit_cast<u16x32simd>(res)};
+
+                    func_counter += handled_simd;
+
+                    //  [... curr ... (63) ...]
+                    //  [      safe           ] unsafe (could be the section_end)
+                    //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
+                    //      [    needwrite   ]
+
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // and it's perfectly safe to do so here without any additional checks
+
+                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
+                                                       ::std::addressof(need_write_u16x32),
+                                                       sizeof(u16x32simd));
+
+                    functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += handled_simd;
+
+                    //  [... curr ... (63) ...]
+                    //  [          safe       ] unsafe (could be the section_end)
+                    //                    ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
+                    // Or: (Security boundaries for writes are checked)
+                    //                        ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
+                    //      [    needwrite   ]
+
+                    section_curr += first_round;
+
+                    // [before_section ... | func_count ... typeidx1 ... (63) ...] ...
+                    // [                        safe                             ] unsafe (could be the section_end)
+                    //                                                   ^^^^^^^ section_curr (processed_byte_counter_sum <= 64)
+                    //                                      [   simd_vector_str  ]
+                }
+            }
+            else
+            {
+                // All correct, can change state: func_counter, section_curr
+
+                // all are single bytes, so there are 64
+                func_counter += 64u;
+
+                // check counter
+                if(func_counter > func_count) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u32 = func_count;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                // Since everything is less than 128, there is no need to check the typeidx.
+
+                using u16x64multisimd2x512 [[__gnu__::__vector_size__(128)]] [[maybe_unused]] = ::std::uint16_t;
+                using u8x128multisimd2x512 [[__gnu__::__vector_size__(128)]] [[maybe_unused]] = ::std::uint8_t;
+
+                ::fast_io::array<u8x64simd, 2uz> const need_write_u8x64x2{simd_vector_str};
+
+                auto const need_write_u8x128{::std::bit_cast<u8x128multisimd2x512>(need_write_u8x64x2)};
+
+                auto const need_write_u16x64{::std::bit_cast<u16x64multisimd2x512>(__builtin_shufflevector(need_write_u8x128,
+                                                                                                           u8x128multisimd2x512{},
+                                                                                                           0,
+                                                                                                           128,
+                                                                                                           1,
+                                                                                                           128,
+                                                                                                           2,
+                                                                                                           128,
+                                                                                                           3,
+                                                                                                           128,
+                                                                                                           4,
+                                                                                                           128,
+                                                                                                           5,
+                                                                                                           128,
+                                                                                                           6,
+                                                                                                           128,
+                                                                                                           7,
+                                                                                                           128,
+                                                                                                           8,
+                                                                                                           128,
+                                                                                                           9,
+                                                                                                           128,
+                                                                                                           10,
+                                                                                                           128,
+                                                                                                           11,
+                                                                                                           128,
+                                                                                                           12,
+                                                                                                           128,
+                                                                                                           13,
+                                                                                                           128,
+                                                                                                           14,
+                                                                                                           128,
+                                                                                                           15,
+                                                                                                           128,
+                                                                                                           16,
+                                                                                                           128,
+                                                                                                           17,
+                                                                                                           128,
+                                                                                                           18,
+                                                                                                           128,
+                                                                                                           19,
+                                                                                                           128,
+                                                                                                           20,
+                                                                                                           128,
+                                                                                                           21,
+                                                                                                           128,
+                                                                                                           22,
+                                                                                                           128,
+                                                                                                           23,
+                                                                                                           128,
+                                                                                                           24,
+                                                                                                           128,
+                                                                                                           25,
+                                                                                                           128,
+                                                                                                           26,
+                                                                                                           128,
+                                                                                                           27,
+                                                                                                           128,
+                                                                                                           28,
+                                                                                                           128,
+                                                                                                           29,
+                                                                                                           128,
+                                                                                                           30,
+                                                                                                           128,
+                                                                                                           31,
+                                                                                                           128,
+                                                                                                           32,
+                                                                                                           128,
+                                                                                                           33,
+                                                                                                           128,
+                                                                                                           34,
+                                                                                                           128,
+                                                                                                           35,
+                                                                                                           128,
+                                                                                                           36,
+                                                                                                           128,
+                                                                                                           37,
+                                                                                                           128,
+                                                                                                           38,
+                                                                                                           128,
+                                                                                                           39,
+                                                                                                           128,
+                                                                                                           40,
+                                                                                                           128,
+                                                                                                           41,
+                                                                                                           128,
+                                                                                                           42,
+                                                                                                           128,
+                                                                                                           43,
+                                                                                                           128,
+                                                                                                           44,
+                                                                                                           128,
+                                                                                                           45,
+                                                                                                           128,
+                                                                                                           46,
+                                                                                                           128,
+                                                                                                           47,
+                                                                                                           128,
+                                                                                                           48,
+                                                                                                           128,
+                                                                                                           49,
+                                                                                                           128,
+                                                                                                           50,
+                                                                                                           128,
+                                                                                                           51,
+                                                                                                           128,
+                                                                                                           52,
+                                                                                                           128,
+                                                                                                           53,
+                                                                                                           128,
+                                                                                                           54,
+                                                                                                           128,
+                                                                                                           55,
+                                                                                                           128,
+                                                                                                           56,
+                                                                                                           128,
+                                                                                                           57,
+                                                                                                           128,
+                                                                                                           58,
+                                                                                                           128,
+                                                                                                           59,
+                                                                                                           128,
+                                                                                                           60,
+                                                                                                           128,
+                                                                                                           61,
+                                                                                                           128,
+                                                                                                           62,
+                                                                                                           128,
+                                                                                                           63,
+                                                                                                           128))};
+
+                // write data
+                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
+                                                   ::std::addressof(need_write_u16x64),
+                                                   sizeof(u16x64multisimd2x512));
+
+                functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 64uz;
+
+                section_curr += 64uz;
+
+                // [before_section ... | func_count ... typeidx1 ... (63) ...] typeidx64
+                // [                        safe                             ] unsafe (could be the section_end)
+                //                                                             ^^ section_curr
+            }
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr));
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u);
+        }
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
+        ((defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)) &&                                  \
+         (defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256))) ||                                                                                  \
+    (defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b) &&                                   \
+     UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v))
+        /// (Little Endian), [[gnu::vector_size]], has mask-u16, can shuffle, simd256
+        /// x86_64-avx2, loongarch-LSX
+        // This error handle is provided when simd is unable to handle the error, including when it encounters a memory boundary, or when there is an error that
+        // needs to be localized.
+
+        /// @note The sse4 version of scan_function_section_impl_uN_Xb is about 6% faster than avx (mundane read+judge+ptest) on Windows because the kernel
+        ///       mapping in the Windows kernel's ntoskrnl.exe uses the `movups xmm` instruction for out-of-page interrupts (The reason is that the kernel
+        ///       mapping in the Windows kernel ntoskrnl.exe will use the `movups xmm` instruction for out-of-page interrupts (ntoskrnl didn't do the avx
+        ///       adaptation, and used the vex version), which leads to the state switching of the ymm mixed with this kind of instruction and wastes dozens
+        ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
+        ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
+        ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+
+        auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
+                           {
+                               // Need to ensure that section_curr to section_curr + n is memory safe
+                               // Processing uses section_curr_end to guarantee entry into the loop for inspection.
+                               // Also use section_end to ensure that the scanning of the last leb128 is handled correctly, both memory safe.
+
+                               auto const section_curr_end{section_curr + n};
+
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_right_taken_for_wrong{true};
+# endif
+
+                               while(section_curr < section_curr_end)
+                               {
+                                   // The outer boundary is unknown and needs to be rechecked
+                                   // [ ... typeidx1] ... (outer) ] typeidx2 ...
+                                   // [     safe    ] ... (outer) ] unsafe (could be the section_end)
+                                   //       ^^ section_curr
+
+                                   if(++func_counter > func_count) [[unlikely]]
+                                   {
+                                       err.err_curr = section_curr;
+                                       err.err_selectable.u32 = func_count;
+                                       err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                                       ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                                   }
+
+                                   ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+
+                                   using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                                   auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                                   reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                                   ::fast_io::mnp::leb128_get(typeidx))};
+
+                                   if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                                   {
+                                       err.err_curr = section_curr;
+                                       err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                                       ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                                   }
+
+                                   // The outer boundary is unknown and needs to be rechecked
+                                   // [ ... typeidx1 ...] ... (outer) ] typeidx2 ...
+                                   // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                                   //       ^^ section_curr
+
+                                   // There's a good chance there's an error here.
+                                   // Or there is a leb redundancy 0
+                                   if(typeidx >= type_section_count) [[unlikely]]
+                                   {
+                                       err.err_curr = section_curr;
+                                       err.err_selectable.u32 = typeidx;
+                                       err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                                       ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                                   }
+
+                                   // write data, func_counter has been checked and is ready to be written.
+                                   functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
+                                       static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_right_taken_for_wrong = false;
+                                   }
+# endif
+
+                                   section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                                   // The outer boundary is unknown and needs to be rechecked
+                                   // [ ... typeidx1 ...] typeidx2 ...] ...
+                                   // [      safe       ] ... (outer) ] unsafe (could be the section_end)
+                                   //                     ^^ section_curr
+                               }
+
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]  ...   ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
                            }};
 
         using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
@@ -5286,12 +6589,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                                auto const section_curr_end{section_curr + n};
 
-                               // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
-                               // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
-                               //       ^^ section_curr
+            // [ ... typeidx1 ... ] (section_curr_end) ... (outer) ]
+            // [     safe     ... ]                    ... (outer) ] unsafe (could be the section_end)
+            //       ^^ section_curr
 
-                               // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
-                               // of '!='
+            // Since parse_by_scan uses section_end, it is possible that section_curr will be greater than section_curr_end, use '<' instead
+            // of '!='
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               bool correct_sequence_right_taken_for_wrong{true};
+# endif
 
                                while(section_curr < section_curr_end)
                                {
@@ -5338,8 +6645,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                   if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
+                                   {
+                                       correct_sequence_right_taken_for_wrong = false;
+                                   }
+# endif
 
                                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -5349,11 +6664,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    //                     ^^ section_curr
                                }
 
-                               // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
-                               // [                        safe                                      ] unsafe (could be the section_end)
-                               //                                                                      ^^ section_curr
-                               //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
-                               //                                      section_curr_end)
+            // [before_section ... | func_count ... typeidx1 ... (n - 1) ... ...  ] typeidxN
+            // [                        safe                                      ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
+            //                                      [   simd_vector_str  ]   ...  ] (Depends on the size of section_curr in relation to
+            //                                      section_curr_end)
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
                            }};
 
         using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
@@ -5952,6 +7271,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
 
+                    // write data, func_counter has been checked and is ready to be written.
                     functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                         static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
@@ -6072,6 +7392,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -6138,6 +7459,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -6242,6 +7564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -6343,6 +7666,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u32_vector.emplace_back_unchecked(typeidx);
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);

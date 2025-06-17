@@ -5,11 +5,9 @@
  *************************************************************/
 
 /**
- * @brief       WebAssembly Release 1.0 (2019-07-20)
- * @details     antecedent dependency: null
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-05-07
+ * @date        2025-06-15
  * @copyright   ASHP-1.0 License
  */
 
@@ -24,27 +22,8 @@
 
 module;
 
-// std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
-#include <bit>
-#include <numeric>
-#if defined(_MSC_VER) && !defined(__clang__)
-# if !defined(_KERNEL_MODE) && defined(_M_AMD64)
-#  include <emmintrin.h>  // MSVC x86_64-SSE2
-# endif
-# if !defined(_KERNEL_MODE) && defined(_M_ARM64)
-#  include <arm_neon.h>  // MSVC aarch64-NEON
-# endif
-#endif
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-
-export module uwvm2.parser.wasm.standard.wasm1.features:function_section;
+export module uwvm2.parser.wasm.text_format;
+export import :base;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -53,4 +32,4 @@ export module uwvm2.parser.wasm.standard.wasm1.features:function_section;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "function_section.h"
+#include "impl.h"

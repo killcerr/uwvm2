@@ -433,3 +433,18 @@
 #else
 # define UWVM_GNU_NODEBUG
 #endif
+
+/// @details gnu's musttail does not require that the function must have the same prototype as the original function
+///          clang is stricter than gnu, so clang's musttail attribute is not compatible with gnu's musttail.
+///          Instead gnu is semantically compatible with clang's semantics, but gnu isn't intended to be compatible with clang's attribute, so clang is judged
+///          in advance. Platforms that do not support musttail add a warning to indicate that the optimization must be turned on.
+#pragma push_macro("UWVM_MUSTTAIL")
+#undef UWVM_MUSTTAIL
+#if __has_cpp_attribute(clang::musttail)
+# define UWVM_MUSTTAIL [[clang::musttail]]
+#elif __has_cpp_attribute(__gnu__::__musttail__)
+# define UWVM_MUSTTAIL [[__gnu__::__musttail__]]
+#else
+# define UWVM_MUSTTAIL
+# warning "Please turn on optimization to ensure that tail calls are generated correctly, otherwise stack overflow behavior may occur."
+#endif

@@ -31,6 +31,7 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm.standard.wasm1.section;
 import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
+import uwvm2.parser.wasm.text_format;
 #else
 // std
 # include <cstddef>
@@ -50,6 +51,7 @@ import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/opcode/impl.h>
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include <uwvm2/parser/wasm/text_format/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -74,7 +76,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///                 using value_type = type_replacer<root_of_replacement, value_type>;
     ///             };
     ///             ```
-    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
+    /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FeatureType>
     concept has_value_type = requires {
         typename FeatureType::value_type;
@@ -124,7 +126,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///                 using type_prefix = type_replacer<root_of_replacement, type_prefix>;
     ///             };
     ///             ```
-    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
+    /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FeatureType>
     concept has_type_prefix = requires {
         typename FeatureType::type_prefix;
@@ -158,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             };
     ///             ```
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
-    /// @see        test\non-platform-specific\0001.parser\0002.binfmt1\section\type_section.cc
+    /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
     template <typename FsCurr>
     concept has_allow_multi_result_vector = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_result_vector)>, bool>; };
 
@@ -341,6 +343,58 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using final_global_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_global_type<Fs>())...>;
+
+    /// @brief      has import/export text format
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr text_format import_export_text_format{text_format::utf8_rfc3629_with_zero_illegal};
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_import_export_text_format = requires {
+        requires ::std::same_as<::std::remove_cvref_t<decltype(FeatureType::import_export_text_format)>, ::uwvm2::parser::wasm::text_format::text_format>;
+    };
+
+    template <typename FeatureType>
+    inline consteval ::uwvm2::parser::wasm::text_format::text_format get_import_export_text_format() noexcept
+    {
+        if constexpr(has_import_export_text_format<FeatureType>) { return FeatureType::import_export_text_format; }
+        else
+        {
+            return ::uwvm2::parser::wasm::text_format::text_format{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::text_format::text_format TFWapper>
+    struct text_format_wapper
+    {
+        inline static constexpr ::uwvm2::parser::wasm::text_format::text_format type{TFWapper};
+    };
+
+    /// @brief      can check import/export text format
+    /// @details
+    ///             ```cpp
+    ///             void check_import_export_text_format(text_format_wapper<FeatureType::import_export_text_format>,
+    ///                                                  ::std::byte const* begin,
+    ///                                                  ::std::byte const* end,
+    ///                                                  ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    ///             {
+    ///                 // to do ...
+    ///             }
+    ///             ```
+    template <typename FeatureType>
+    concept can_check_import_export_text_format = requires(text_format_wapper<FeatureType::import_export_text_format> adl,
+                                                           ::std::byte const* begin,
+                                                           ::std::byte const* end,
+                                                           ::uwvm2::parser::wasm::base::error_impl& err) {
+        { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
+    };
+
+    /////////////////////////////
+    //     Function Section    //
+    /////////////////////////////
 
     /// @brief      final_local_function_type
     /// @details    Storing pointers instead of u32 doubles the memory on 64-bit platforms, and then the index * size is pre-calculated by simd. on 32-bit

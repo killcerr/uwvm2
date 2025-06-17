@@ -27,8 +27,8 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import parser.wasm.concepts;
-import parser.wasm.standard.wasm1.type;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.standard.wasm1.type;
 #else
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
@@ -38,16 +38,16 @@ import parser.wasm.standard.wasm1.type;
 
 struct feature1
 {
-    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    inline static constexpr ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::uwvm2::parser::wasm::concepts::has_wasm_binfmt_version<feature1>);
+static_assert(::uwvm2::parser::wasm::concepts::has_feature_name<feature1>);
 
 struct feature2
 {
-    ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    ::fast_io::u8string_view feature_name{u8"<name>"};
 };
 
-static_assert(::uwvm2::parser::wasm::concepts::has_wasm_binfmt_version<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
+static_assert(::uwvm2::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:
 
 int main() {}

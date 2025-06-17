@@ -415,6 +415,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // No access, security
             fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
 
+            /// @todo utf8 check
+
             section_curr += module_namelen;  // safe
 
             // [...  module_namelen ... module_name ...] extern_namelen ... extern_name ... import_type extern_func ...
@@ -473,6 +475,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
 
+            /// @todo utf8 check
+
             section_curr += extern_namelen;  // safe
             // [...  module_namelen ... module_name ... extern_namelen ... extern_name ...] import_type extern_func ...
             // [                                safe                                      ] unsafe (could be the section_end)
@@ -508,6 +512,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // use for reserve
             ++importdesc_counter.index_unchecked(
                 static_cast<::std::size_t>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
+
+            /// @todo check duplicate (set)
 
             ++section_curr;
 

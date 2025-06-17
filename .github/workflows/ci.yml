@@ -12,8 +12,46 @@ on:
 
 jobs:
   # ---------------------------------------------------------------------------
-  ubuntu:
-    name: Ubuntu
+  x86_64-linux-gnu:
+    name: x86_64-linux-gnu (ubuntu-24.04)
+    runs-on: ubuntu-24.04 # noble
+    strategy:
+      matrix:
+        mode: ["debug"]
+        policies: ["build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined"]
+        cxx_flags: 
+          [
+            "\"\"", # SSE2
+            "\"-msse3\"", # SSE2 SSE3
+            "\"-mssse3\"", # SSE2 SSE3 SSSE3
+            "\"-msse4 -mbmi -mbmi2\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 BMI BMI2
+            "\"-mavx -mbmi -mbmi2 -mprfchw\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX BMI BMI2
+            "\"-mavx2 -mbmi -mbmi2 -mprfchw\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 BMI BMI2
+            # "\"-mavx512bw -mbmi -mbmi2 -mprfchw\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW BMI BMI2
+            # "\"-mavx512vbmi -mavx512vbmi2 -mbmi -mbmi2 -mprfchw\"" # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW AVX512VBMI AVX512VBMI2 BMI BMI2
+          ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
+          sudo add-apt-repository ppa:xmake-io/xmake
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
+          sudo apt-get install clang clang-tools lld xmake
+
+      - name: Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags=${{ matrix.cxx_flags }}
+      - name: Build
+        run: xmake b -rv
+      - name: Check UWVM version
+        run: xmake run uwvm --version
+      - name: Unit tests
+        run: xmake test -vD
+
+  # ---------------------------------------------------------------------------
+  x86_64_apx-linux-gnu:
+    if: ${{ !always() }}
+    name: x86_64_apx-linux-gnu (ubuntu-24.04)
     runs-on: ubuntu-24.04 # noble
     strategy:
       matrix:
@@ -27,18 +65,19 @@ jobs:
           sudo add-apt-repository ppa:xmake-io/xmake
           sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
           sudo apt-get install clang clang-tools lld xmake
-      - name: Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
-      - name: Build
-        run: xmake b -v
-      - name: Check UWVM version
+      - name: Native (APX) Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mapxf -mbmi -mbmi2 -mprfchw"
+      - name: Native (APX) Build
+        run: xmake b -rv
+      - name: Native (APX) Check UWVM version
         run: xmake run uwvm --version
-      - name: Unit tests
+      - name: Native (APX) Unit tests
         run: xmake test -vD
+
   # ---------------------------------------------------------------------------
-  msys2:
+  x86_64-windows-gnu:
     if: ${{ !always() }} # Remove it once update to LLVM21
-    name: MINGW ${{ matrix.env.name }}
+    name: x86_64-windows-gnu (MINGW ${{ matrix.env.name }})
     runs-on: windows-latest
     strategy:
       matrix:
@@ -64,15 +103,16 @@ jobs:
       - name: Configure
         run: xmake f -p mingw --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
       - name: Build
-        run: xmake b -v
+        run: xmake b -rv
       - name: Check UWVM version
         run: xmake run uwvm --version
       - name: Unit tests
         run: xmake test -vD
+
   # ---------------------------------------------------------------------------
-  freebsd:
+  x86_64-freebsd14:
     if: ${{ !always() }} # Remove it once support "202411L: Structured bindings can introduce a pack"
-    name: FreeBSD
+    name: x86_64-freebsd14
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -87,6 +127,6 @@ jobs:
           run: |
             sudo pkg install -y llvm-devel xmake-io
             xmake f -m debug --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
-            xmake b -v
+            xmake b -rv
             xmake run uwvm --version
             xmake test -vD

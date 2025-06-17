@@ -70,7 +70,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         /// @details    Version numbers can be repeated
         ///             Each version number must have a corresponding handler function
         ///             Handling functions cannot be duplicated
-        /// @see        test\non-platform-specific\0001.parser\0001.concept\binfmt_strategy.cc
+        /// @see        test\0001.parser\0001.concept\binfmt_strategy.cc
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
         inline consteval void check_has_duplicate_binfmt_handler() noexcept
         {
@@ -298,7 +298,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         }
 
         /// @brief      Get the handler function for the corresponding version of binfmt from a series of features
-        /// @see        test\non-platform-specific\0001.parser\0001.concept\get_handler_funcp.cc
+        /// @see        test\0001.parser\0001.concept\get_handler_funcp.cc
         template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
         inline consteval auto get_binfmt_handler_func_p() noexcept
         {

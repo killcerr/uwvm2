@@ -51,7 +51,7 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
     /// @brief  The method that will get the extensible section type
-    /// @see    test\non-platform-specific\0001.parser\0001.concept\splice_section_storage_structure.cc
+    /// @see    test\0001.parser\0001.concept\splice_section_storage_structure.cc
     template <typename Feature, typename... Fs>
     concept has_binfmt_ver1_extensible_section_define = ::fast_io::is_tuple<typename Feature::template binfmt_ver1_section_type<Fs...>>;
 

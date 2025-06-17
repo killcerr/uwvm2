@@ -45,6 +45,7 @@
 #pragma pop_macro("UWVM_COLOR_U32_GREEN")
 #pragma pop_macro("UWVM_COLOR_U32_RED")
 #pragma pop_macro("UWVM_COLOR_U32_BLACK")
+#pragma pop_macro("UWVM_COLOR_U32_RST_ALL_AND_SET_PURPLE")
 #pragma pop_macro("UWVM_COLOR_U32_RST_ALL_AND_SET_WHITE")
 #pragma pop_macro("UWVM_COLOR_U32_RST_ALL")
 
@@ -68,6 +69,7 @@
 #pragma pop_macro("UWVM_COLOR_U16_GREEN")
 #pragma pop_macro("UWVM_COLOR_U16_RED")
 #pragma pop_macro("UWVM_COLOR_U16_BLACK")
+#pragma pop_macro("UWVM_COLOR_U16_RST_ALL_AND_SET_PURPLE")
 #pragma pop_macro("UWVM_COLOR_U16_RST_ALL_AND_SET_WHITE")
 #pragma pop_macro("UWVM_COLOR_U16_RST_ALL")
 
@@ -91,6 +93,7 @@
 #pragma pop_macro("UWVM_COLOR_U8_GREEN")
 #pragma pop_macro("UWVM_COLOR_U8_RED")
 #pragma pop_macro("UWVM_COLOR_U8_BLACK")
+#pragma pop_macro("UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE")
 #pragma pop_macro("UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE")
 #pragma pop_macro("UWVM_COLOR_U8_RST_ALL")
 
@@ -114,6 +117,7 @@
 #pragma pop_macro("UWVM_COLOR_W_GREEN")
 #pragma pop_macro("UWVM_COLOR_W_RED")
 #pragma pop_macro("UWVM_COLOR_W_BLACK")
+#pragma pop_macro("UWVM_COLOR_W_RST_ALL_AND_SET_PURPLE")
 #pragma pop_macro("UWVM_COLOR_W_RST_ALL_AND_SET_WHITE")
 #pragma pop_macro("UWVM_COLOR_W_RST_ALL")
 
@@ -137,6 +141,7 @@
 #pragma pop_macro("UWVM_COLOR_GREEN")
 #pragma pop_macro("UWVM_COLOR_RED")
 #pragma pop_macro("UWVM_COLOR_BLACK")
+#pragma pop_macro("UWVM_COLOR_RST_ALL_AND_SET_PURPLE")
 #pragma pop_macro("UWVM_COLOR_RST_ALL_AND_SET_WHITE")
 #pragma pop_macro("UWVM_COLOR_RST_ALL")
 

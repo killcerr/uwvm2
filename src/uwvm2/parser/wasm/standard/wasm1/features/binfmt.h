@@ -31,6 +31,7 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm.standard.wasm1.section;
 import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
+import uwvm2.parser.wasm.text_format;
 import :def;
 import :feature_def;
 import :custom_section;
@@ -56,6 +57,7 @@ import :function_section;
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/opcode/impl.h>
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
+# include <uwvm2/parser/wasm/text_format/impl.h>
 # include "def.h"
 # include "feature_def.h"
 # include "custom_section.h"
@@ -92,6 +94,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::type::memory_type>;
         using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::type::global_type>;
+        inline static constexpr ::uwvm2::parser::wasm::text_format::text_format import_export_text_format{
+            ::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal};
 
         // binfmt ver1
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -121,6 +125,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_table_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_memory_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_global_type<wasm1>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_import_export_text_format<wasm1>);
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
