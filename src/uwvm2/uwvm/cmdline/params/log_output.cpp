@@ -53,7 +53,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
         // [  safe  ] unsafe (could be the module_end)
         //      ^^ para_curr
 
-        auto currp1{para_curr + 1};
+        auto currp1{para_curr + 1u};
 
         // [... curr] ...
         // [  safe  ] unsafe (could be the module_end)
