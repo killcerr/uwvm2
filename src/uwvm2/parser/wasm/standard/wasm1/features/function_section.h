@@ -191,6 +191,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
@@ -1554,6 +1555,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
+                        // write data, func_counter has been checked and is ready to be written.
                         functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
@@ -1670,6 +1672,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
@@ -2072,6 +2075,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                     //      [    needwrite   ]
 
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // and it's perfectly safe to do so here without any additional checks
+
                     ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
                                                        ::std::addressof(need_write_u8x32x2v0),
                                                        sizeof(u8x32simd));
@@ -2111,7 +2117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 // Since everything is less than 128, there is no need to check the typeidx.
 
-                // write data
+                // write data, func_counter has been checked and is ready to be written.
                 ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
                                                    ::std::addressof(simd_vector_str),
                                                    sizeof(u8x64simd));
@@ -2212,6 +2218,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
@@ -3530,6 +3537,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
@@ -4205,6 +4213,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
 
+                    // write data, func_counter has been checked and is ready to be written.
                     functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
                         static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
@@ -4311,6 +4320,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -4377,6 +4387,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -4533,6 +4544,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
+                        // write data, func_counter has been checked and is ready to be written.
                         functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
@@ -4697,6 +4709,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
@@ -5093,6 +5106,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                     //      [    needwrite   ]
 
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // and it's perfectly safe to do so here without any additional checks
+
                     ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
                                                        ::std::addressof(need_write_u16x32),
                                                        sizeof(u16x32simd));
@@ -5374,6 +5390,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
@@ -6628,6 +6645,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                                    }
 
+                                   // write data, func_counter has been checked and is ready to be written.
                                    functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
@@ -7253,6 +7271,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
 
+                    // write data, func_counter has been checked and is ready to be written.
                     functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(
                         static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
@@ -7373,6 +7392,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -7439,6 +7459,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -7543,6 +7564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u16_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>(typeidx));
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
@@ -7644,6 +7666,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
+            // write data, func_counter has been checked and is ready to be written.
             functionsec.funcs.storage.typeidx_u32_vector.emplace_back_unchecked(typeidx);
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
