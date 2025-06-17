@@ -439,7 +439,45 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             return *this;
         }
 
-        inline constexpr ~vectypeidx_minimize_storage_t() { clear_destroy(); }
+        inline constexpr ~vectypeidx_minimize_storage_t()
+        {
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    this->storage.typeidx_u8_view = {};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u8_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u16_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u32_vector));
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
+                }
+            }
+
+            this->mode = {};
+        }
 
         inline constexpr void clear_destroy() noexcept
         {
@@ -456,16 +494,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
+                    // clear_destroy equivalent to destructuring
                     this->storage.typeidx_u8_vector.clear_destroy();
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
+                    // clear_destroy equivalent to destructuring
                     this->storage.typeidx_u16_vector.clear_destroy();
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
+                    // clear_destroy equivalent to destructuring
                     this->storage.typeidx_u32_vector.clear_destroy();
                     break;
                 }

@@ -130,7 +130,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         static_assert(sizeof(::std::byte) == sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
 
         // Copy the situation that has been processed correctly
-        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, section_leb_begin, func_counter);
+        // The func_counter is exactly the right size
+        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                                           section_leb_begin,
+                                           func_counter * sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
+
         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += func_counter;
 
         // [typeidxbef ...] typeidx1 ... typeidx2 ...

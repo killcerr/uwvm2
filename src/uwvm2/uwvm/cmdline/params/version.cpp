@@ -301,7 +301,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # else
                                 u8"LoongArch32"
 # endif
-                                // loongarch no big-endian mode
+        // loongarch no big-endian mode
 #elif defined(__m68k__) || defined(__mc68000__)
                                 u8"Motorola 68k"
 #elif defined(__MIPS64__) || defined(__mips64__)

@@ -41,7 +41,7 @@
 
 # pragma push_macro("UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE")
 # undef UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE
-# define UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE                                                                                                             \
+# define UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE                                                                                                            \
      ::uwvm2::utils::ansies::win32_text_attr { ::uwvm2::utils::ansies::text_attr::foreground_purple }
 
 # pragma push_macro("UWVM_WIN32_TEXTATTR_BLACK")
