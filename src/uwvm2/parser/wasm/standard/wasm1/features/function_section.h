@@ -1897,7 +1897,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // No mods needed on x86, but preventing cxx language ub
                         // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
 
-                        auto const sizeFF{(crtz + 1u) % ::std::numeric_limits<unsigned>::digits};
+                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
@@ -4987,7 +4987,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // No mods needed on x86, but preventing cxx language ub
                         // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
 
-                        auto const sizeFF{(crtz + 1u) % ::std::numeric_limits<unsigned>::digits};
+                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
