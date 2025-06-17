@@ -19,6 +19,17 @@ jobs:
       matrix:
         mode: ["debug"]
         policies: ["build.sanitizer.address"]
+        cxx_flags: 
+          [
+            "", # SSE2
+            "-msse3", # SSE2 SSE3
+            "-mssse3", # SSE2 SSE3 SSSE3
+            "-msse4 -mbmi -mbmi2", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 BMI BMI2
+            "-mavx -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX BMI BMI2
+            "-mavx2 -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 BMI BMI2
+            # "-mavx512bw -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW BMI BMI2
+            # "-mavx512vbmi -mavx512vbmi2 -mbmi -mbmi2 -mprfchw" # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW AVX512VBMI AVX512VBMI2 BMI BMI2
+          ]
     steps:
       - uses: actions/checkout@v4
       - name: Setup
@@ -28,86 +39,14 @@ jobs:
           sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
           sudo apt-get install clang clang-tools lld xmake
 
-      - name: Native (AVX2 + BMI(2) + PRFCHW) Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
-      - name: Native (AVX2 + BMI(2) + PRFCHW) Build
+      - name: Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags=${{ matrix.cxx_flags }}
+      - name: Build
         run: xmake b -rv
-      - name: Native (AVX2 + BMI(2) + PRFCHW) Check UWVM version
+      - name: Check UWVM version
         run: xmake run uwvm --version
-      - name: Native (AVX2 + BMI(2) + PRFCHW) Unit tests
+      - name: Unit tests
         run: xmake test -vD
-
-      # - name: MMX Configure
-      #   run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mno-sse"
-      # - name: MMX Build
-      #   run: xmake b -rv
-      # - name: MMX Check UWVM version
-      #   run: xmake run uwvm --version
-      # - name: MMX Unit tests
-      #   run: xmake test -vD
-
-      # - name: SSE Configure
-      #   run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mno-sse2"
-      # - name: SSE Build
-      #   run: xmake b -rv
-      # - name: SSE Check UWVM version
-      #   run: xmake run uwvm --version
-      # - name: SSE Unit tests
-      #   run: xmake test -vD
-
-      - name: SSE2 Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none
-      - name: SSE2 Build
-        run: xmake b -rv
-      - name: SSE2 Check UWVM version
-        run: xmake run uwvm --version
-      - name: SSE2 Unit tests
-        run: xmake test -vD
-
-      - name: SSSE3 Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mssse3"
-      - name: SSSE3 Build
-        run: xmake b -rv
-      - name: SSSE3 Check UWVM version
-        run: xmake run uwvm --version
-      - name: SSSE3 Unit tests
-        run: xmake test -vD
-
-      - name: SSE4.x + BMI(2) + PRFCHW Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-msse4 -mbmi -mbmi2 -mprfchw"
-      - name: SSE4.x + BMI(2) + PRFCHW Build
-        run: xmake b -rv
-      - name: SSE4.x + BMI(2) + PRFCHW Check UWVM version
-        run: xmake run uwvm --version
-      - name: SSE4.x + BMI(2) + PRFCHW Unit tests
-        run: xmake test -vD
-
-      - name: AVX + BMI(2) + PRFCHW Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mavx -mbmi -mbmi2 -mprfchw"
-      - name: AVX + BMI(2) + PRFCHW Build
-        run: xmake b -rv
-      - name: AVX + BMI(2) + PRFCHW Check UWVM version
-        run: xmake run uwvm --version
-      - name: AVX + BMI(2) + PRFCHW Unit tests
-        run: xmake test -vD
-
-      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Configure
-      #   run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mavx512bw -mbmi -mbmi2 -mprfchw"
-      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Build
-      #   run: xmake b -rv
-      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Check UWVM version
-      #   run: xmake run uwvm --version
-      # - name: AVX512BW (AVX512F) + BMI(2) + PRFCHW Unit tests
-      #   run: xmake test -vD
-
-      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Configure
-      #   run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mavx512vbmi -mavx512vbmi2 -mbmi -mbmi2 -mprfchw"
-      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Build
-      #   run: xmake b -rv
-      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Check UWVM version
-      #   run: xmake run uwvm --version
-      # - name: AVX512VBVMI(2) (AVX512BW AVX512F) + BMI(2) + PRFCHW Unit tests
-      #   run: xmake test -vD
 
   # ---------------------------------------------------------------------------
   x86_64_apx-linux-gnu:
