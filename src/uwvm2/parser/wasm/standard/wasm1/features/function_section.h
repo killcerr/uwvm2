@@ -137,7 +137,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                  ^^ section_curr
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-        bool correct_sequence_cannot_be_processed{true};
+        bool correct_sequence_right_taken_for_wrong{true};
 #endif
 
         while(section_curr != section_end) [[likely]]
@@ -195,7 +195,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
             if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 1uz) [[unlikely]]
             {
-                correct_sequence_cannot_be_processed = false;
+                correct_sequence_right_taken_for_wrong = false;
             }
 #endif
 
@@ -211,7 +211,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                                                        ^^ section_curr
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-        if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 #endif
 
         return section_curr;
@@ -1621,7 +1621,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               bool correct_sequence_cannot_be_processed{true};
+                               bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
                                while(section_curr < section_curr_end)
@@ -1675,7 +1675,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                    if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
                                    {
-                                       correct_sequence_cannot_be_processed = false;
+                                       correct_sequence_right_taken_for_wrong = false;
                                    }
 # endif
 
@@ -1694,7 +1694,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      section_curr_end)
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 # endif
                            }};
 
@@ -1763,6 +1763,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Check for leb over 2 bytes
+                // check_mask is a mask that checks the highest bit (eighth bit) of each byte. If there is a 2-byte uleb there will be a 1 and a 0. When there
+                // are two consecutive 1's it means that it must represent unprocessable by the u16. Here a single 1 in the highest bit of the check_mask cannot
+                // tell if there are more one's to follow, and is handed over to the next round of processing by the subsequent first_round_processes_31bit.
+
                 if(check_mask & (check_mask << 1u)) [[unlikely]]
                 {
                     error_handler(64u);
@@ -1869,8 +1873,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     ::std::uint32_t const check_mask_curr_2nd{static_cast<::std::uint32_t>(check_mask_curr)};
 
-                    bool const first_round_is_31{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
-                    unsigned const first_round{32u - static_cast<unsigned>(first_round_is_31)};
+                    bool const first_round_processes_31bit{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
+                    unsigned const first_round{32u - static_cast<unsigned>(first_round_processes_31bit)};
                     unsigned const handled_simd{32u - static_cast<unsigned>(::std::popcount(check_mask_curr_2nd))};
 
                     constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
@@ -2154,7 +2158,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               bool correct_sequence_cannot_be_processed{true};
+                               bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
                                while(section_curr < section_curr_end)
@@ -2208,7 +2212,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                    if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
                                    {
-                                       correct_sequence_cannot_be_processed = false;
+                                       correct_sequence_right_taken_for_wrong = false;
                                    }
 # endif
 
@@ -2227,7 +2231,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      section_curr_end)
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 # endif
                            }};
 
@@ -3472,7 +3476,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               bool correct_sequence_cannot_be_processed{true};
+                               bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
                                while(section_curr < section_curr_end)
@@ -3526,7 +3530,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                    if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
                                    {
-                                       correct_sequence_cannot_be_processed = false;
+                                       correct_sequence_right_taken_for_wrong = false;
                                    }
 # endif
 
@@ -3545,7 +3549,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      section_curr_end)
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 # endif
                            }};
 
@@ -4639,7 +4643,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               bool correct_sequence_cannot_be_processed{true};
+                               bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
                                while(section_curr < section_curr_end)
@@ -4693,7 +4697,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                    if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
                                    {
-                                       correct_sequence_cannot_be_processed = false;
+                                       correct_sequence_right_taken_for_wrong = false;
                                    }
 # endif
 
@@ -4712,7 +4716,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      section_curr_end)
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 # endif
                            }};
 
@@ -4781,6 +4785,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
 
                 // Check for leb over 2 bytes
+                // check_mask is a mask that checks the highest bit (eighth bit) of each byte. If there is a 2-byte uleb there will be a 1 and a 0. When there
+                // are two consecutive 1's it means that it must represent unprocessable by the u16. Here a single 1 in the highest bit of the check_mask cannot
+                // tell if there are more one's to follow, and is handed over to the next round of processing by the subsequent first_round_processes_31bit.
+
                 if(check_mask & (check_mask << 1u)) [[unlikely]]
                 {
                     error_handler(64u);
@@ -4950,8 +4958,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     ::std::uint32_t const check_mask_curr_2nd{static_cast<::std::uint32_t>(check_mask_curr)};
 
-                    bool const first_round_is_31{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
-                    unsigned const first_round{32u - static_cast<unsigned>(first_round_is_31)};
+                    bool const first_round_processes_31bit{static_cast<bool>(check_mask_curr_2nd & static_cast<::std::uint32_t>(0x8000'0000u))};
+                    unsigned const first_round{32u - static_cast<unsigned>(first_round_processes_31bit)};
                     unsigned const handled_simd{32u - static_cast<unsigned>(::std::popcount(check_mask_curr_2nd))};
 
                     constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
@@ -5307,7 +5315,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               bool correct_sequence_cannot_be_processed{true};
+                               bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
                                while(section_curr < section_curr_end)
@@ -5361,7 +5369,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                    if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
                                    {
-                                       correct_sequence_cannot_be_processed = false;
+                                       correct_sequence_right_taken_for_wrong = false;
                                    }
 # endif
 
@@ -5380,7 +5388,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      section_curr_end)
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 # endif
                            }};
 
@@ -6561,7 +6569,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               bool correct_sequence_cannot_be_processed{true};
+                               bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
                                while(section_curr < section_curr_end)
@@ -6615,7 +6623,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                    if(static_cast<::std::size_t>(reinterpret_cast<::std::byte const*>(typeidx_next) - section_curr) > 2uz) [[unlikely]]
                                    {
-                                       correct_sequence_cannot_be_processed = false;
+                                       correct_sequence_right_taken_for_wrong = false;
                                    }
 # endif
 
@@ -6634,7 +6642,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                      section_curr_end)
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                               if(correct_sequence_cannot_be_processed) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+                               if(correct_sequence_right_taken_for_wrong) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 # endif
                            }};
 
