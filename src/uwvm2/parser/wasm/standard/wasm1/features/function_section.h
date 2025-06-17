@@ -49,6 +49,7 @@ import :type_section;
 # include <utility>
 # include <memory>
 # include <bit>
+# include <numeric>
 # if defined(_MSC_VER) && !defined(__clang__)
 #  if !defined(_KERNEL_MODE) && defined(_M_AMD64)
 #   include <emmintrin.h>  // MSVC x86_64-SSE2
@@ -1896,7 +1897,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // No mods needed on x86, but preventing cxx language ub
                         // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
 
-                        auto const sizeFF{(crtz + 1u) % 32u};
+                        auto const sizeFF{(crtz + 1u) % ::std::numeric_limits<unsigned>::digits};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
@@ -4986,7 +4987,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // No mods needed on x86, but preventing cxx language ub
                         // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
 
-                        auto const sizeFF{(crtz + 1u) % 32u};
+                        auto const sizeFF{(crtz + 1u) % ::std::numeric_limits<unsigned>::digits};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
