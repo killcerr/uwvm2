@@ -176,7 +176,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                     u8"[info] ",
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                    u8" wasm-parser: ",
+                    u8" Parser Memory Indication: ",
                     ::uwvm2::uwvm::utils::memory::print_memory{reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                                                reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                                                reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend())},
@@ -230,7 +230,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                                 u8"[info] ",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                                u8" wasm-parser: ",
+                                                u8" Parser Memory Indication: ",
                                                 ::uwvm2::uwvm::utils::memory::print_memory{
                                                     reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                                     execute_wasm_binfmt_ver1_storage_wasm_err.err_curr,
@@ -275,7 +275,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     u8"[info] ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8" wasm-parser: ",
+                                    u8" Parser Memory Indication: ",
                                     ::uwvm2::uwvm::utils::memory::print_memory{
                                         reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                         reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()) + 4uz,
