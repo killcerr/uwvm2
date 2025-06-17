@@ -50,6 +50,10 @@ import uwvm.wasm.storage;
 # include <uwvm2/uwvm/wasm/storage/impl.h>
 #endif
 
+#if !defined(__cpp_exceptions)
+# error "please enable cpp_exception first to run this fuzzer"
+#endif
+
 namespace test
 {
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>

@@ -46,19 +46,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 {
     enum class utf8_specification : unsigned
     {
-        rfc3629,
-        rfc3629_and_zero_illegal
+        utf8_rfc3629,
+        utf8_rfc3629_and_zero_illegal
     };
 
     inline constexpr char32_t get_max_excessive_codepoint(utf8_specification u8spe) noexcept
     {
         switch(u8spe)
         {
-            case utf8_specification::rfc3629:
+            case utf8_specification::utf8_rfc3629:
             {
                 [[fallthrough]];
             }
-            case utf8_specification::rfc3629_and_zero_illegal:
+            case utf8_specification::utf8_rfc3629_and_zero_illegal:
             {
                 return static_cast<char32_t>(0x10FFFFu);
             }
@@ -72,8 +72,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
     template <bool zero_illegal>
     inline constexpr ::uwvm2::utils::utf::u8result check_legal_utf8_rfc3629_unchecked(char8_t const* const str_begin, char8_t const* const str_end) noexcept
     {
-        ::fast_io::fast_terminate();  /// @todo unfinished
-
         constexpr unsigned char_bit{static_cast<unsigned>(CHAR_BIT)};
         constexpr bool char_bit_is_8{char_bit == 8u};
         constexpr bool is_little_endian{::std::endian::native == ::std::endian::little};
@@ -87,165 +85,167 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             // However, on platforms where CHAR_BIT is equal to 8, LEAST must have the same size as the N value.
 
 #if SIZE_MAX > UINT_LEAST32_MAX
-            while(static_cast<::std::size_t>(str_end - str_curr) >= 8uz)
+            auto str_curr{ str_begin };
+            while (static_cast<::std::size_t>(str_end - str_curr) >= 4uz)
             {
-                ::std::uint_least64_t need_check;
+                ::std::uint_least32_t need_check;
 
-                ::fast_io::freestanding::my_memcpy(::std::addressof(need_check), str_curr, sizeof(::std::uint_least64_t));
+                ::fast_io::freestanding::my_memcpy(::std::addressof(need_check), str_curr, sizeof(::std::uint_least32_t));
 
                 // It's already a little_endian.
 
-                auto const has_utf8_mask{need_check & static_cast<::std::uint_least64_t>(0x8080'8080'8080'8080u)};
-
-                if(has_utf8_mask)
+                if (true)
                 {
-                    auto const rz{static_cast<unsigned>(::std::countr_zero(has_utf8_mask))};
-                    auto const ascii_size{rz / 8u};  // Get the number of preceding ascii characters
-                    auto const utf8_length{static_cast<unsigned>(::std::countl_one(need_check << (64u - (ascii_size + 1u) * 8u)))};  // Get the length of utf8
+                    auto const ascii_size{ 0 };  // Get the number of preceding ascii characters
 
-                    if(utf8_length > 4u) [[unlikely]] { return {::uwvm2::utils::utf::utf_error_code::long_header_bits, str_curr}; }
-                    else if(utf8_length == 1u) [[unlikely]] { return {::uwvm2::utils::utf::utf_error_code::too_long_sequence, str_curr}; }
+                    str_curr += ascii_size;
 
-# if __has_cpp_attribute(assume)
-                    [[assume(utf8_length != 0u)]];
-# endif
+                    ::std::uint_least32_t const utf8{ static_cast<::std::uint_least32_t> (need_check) };
 
-                    if(ascii_size + utf8_length > 8u)
+                    if ((utf8 & 0b11100000) == 0b11000000)
                     {
-                        // The round of calculations that can't be accommodated under a reread.
-                        str_curr += ascii_size;
-
-                        if(static_cast<::std::size_t>(str_end - str_curr) < 4uz) [[unlikely]] { break; }
-
-                        ::std::uint_least32_t utf8;
-                        ::fast_io::freestanding::my_memcpy(::std::addressof(utf8), str_curr, sizeof(::std::uint_least32_t));
-
                         // Check if it is a utf8 sequence
-                        auto utf8_mask_C0C0C000{utf8 & static_cast<::std::uint_least32_t>(0xC0C0'C000u)};
+                        auto utf8_mask_C0C0C000{ utf8 & static_cast<::std::uint_least32_t>(0x0000'C000u) };
 
-                        auto const utf8_need_chean{(4u - utf8_length) * 8u};
-                        utf8_mask_C0C0C000 <<= utf8_need_chean;
-                        utf8_mask_C0C0C000 >>= utf8_need_chean;
+                        auto constexpr utf8_need_chean{ 16u };
 
-                        auto checker{static_cast<::std::uint_least32_t>(0x8080'8000u)};
-                        checker <<= utf8_need_chean;
-                        checker >>= utf8_need_chean;
+                        auto checker{ static_cast<::std::uint_least32_t>(0x0000'8000u) };
 
-                        if(utf8_mask_C0C0C000 != checker) [[unlikely]] { return {::uwvm2::utils::utf::utf_error_code::too_short_sequence, str_curr}; }
+                        if (utf8_mask_C0C0C000 != checker) [[unlikely]] { return false; }
 
-                        ::std::uint_least32_t utf8_clean{utf8};
+                        ::std::uint_least32_t utf8_clean{ utf8 };
                         utf8_clean <<= utf8_need_chean;
                         utf8_clean >>= utf8_need_chean;
 
-                        ::std::uint_least32_t utf8_b0{utf8_clean};
-                        auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                        ::std::uint_least32_t utf8_b0{ utf8_clean };
+                        auto utf8_b0_shu1{ 8u - (2u + 1u) };
                         utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
-                        utf8_b0 <<= (utf8_length - 1u) * 6u;
+                        utf8_b0 <<= (2u - 1u) * 6u;
 
-                        ::std::uint_least32_t utf8_b1{utf8_clean};
+                        ::std::uint_least32_t utf8_b1{ utf8_clean };
                         utf8_b1 >>= 8u;
                         utf8_b1 &= 0x3Fu;
-                        utf8_b1 <<= (utf8_length - 2u) * 6u;
+                        utf8_b1 <<= (2u - 2u) * 6u;
 
-                        ::std::uint_least32_t utf8_b2{utf8_clean};
+                        char32_t const utf8_c{ static_cast<char32_t>(utf8_b0 | utf8_b1) };
+
+                        auto constexpr test_overlong{ 2u - 2u };
+                        auto constexpr test_overlong_pc{ (test_overlong + 1u) >> 1u };
+
+                        auto constexpr test_overlong_low_bound{ 1u << (6u * test_overlong + (8u - 2u + (1u - test_overlong_pc))) };
+                        if (utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                        {
+                            return false;
+                        }
+
+                        str_curr += 2u;
+                        continue;
+                    }
+                    else if ((utf8 & 0b11110000) == 0b11100000)
+                    {
+                        // Check if it is a utf8 sequence
+                        auto utf8_mask_C0C0C000{ utf8 & static_cast<::std::uint_least32_t>(0x00C0'C000u) };
+
+                        auto constexpr utf8_need_chean{ 8u };
+
+                        auto checker{ static_cast<::std::uint_least32_t>(0x0080'8000u) };
+
+                        if (utf8_mask_C0C0C000 != checker) [[unlikely]] { return false; }
+
+                        ::std::uint_least32_t utf8_clean{ utf8 };
+                        utf8_clean <<= utf8_need_chean;
+                        utf8_clean >>= utf8_need_chean;
+
+                        ::std::uint_least32_t utf8_b0{ utf8_clean };
+                        auto utf8_b0_shu1{ 8u - (3u + 1u) };
+                        utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                        utf8_b0 <<= (3u - 1u) * 6u;
+
+                        ::std::uint_least32_t utf8_b1{ utf8_clean };
+                        utf8_b1 >>= 8u;
+                        utf8_b1 &= 0x3Fu;
+                        utf8_b1 <<= (3u - 2u) * 6u;
+
+                        ::std::uint_least32_t utf8_b2{ utf8_clean };
                         utf8_b2 >>= 16u;
                         utf8_b2 &= 0x3Fu;
-                        utf8_b2 <<= (utf8_length - 3u) * 6u;
+                        utf8_b2 <<= (3u - 3u) * 6u;
 
-                        ::std::uint_least32_t utf8_b3{utf8_clean};
-                        utf8_b3 >>= 24u;
-                        utf8_b3 &= 0x3Fu;
-                        utf8_b3 <<= (utf8_length - 4u) * 6u;
+                        char32_t const utf8_c{ static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2) };
 
-                        char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2 | utf8_b3)};
+                        auto constexpr test_overlong{ 3u - 2u };
+                        auto constexpr test_overlong_pc{ (test_overlong + 1u) >> 1u };
 
-                        if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
+                        auto constexpr test_overlong_low_bound{ 1u << (6u * test_overlong + (8u - 3u + (1u - test_overlong_pc))) };
+                        if (utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
-                            return {::uwvm2::utils::utf::utf_error_code::excessive_codepoint, str_curr};
+                            return false;
                         }
 
-                        auto const test_overlong{utf8_length - 2u};
-                        auto const test_overlong_pc{(test_overlong + 1u) >> 1u};
-
-                        auto const test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
-                        if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                        if (static_cast<char32_t>(0xD7FFu) < utf8_c && utf8_c < static_cast<char32_t>(0xE000u)) [[unlikely]]
                         {
-                            return {::uwvm2::utils::utf::utf_error_code::overlong_encoding, str_curr};
+                            return false;
                         }
 
-                        if(static_cast<char32_t>(0xD7FFu) < utf8_c && utf8_c < static_cast<char32_t>(0xE000u)) [[unlikely]]
+                        str_curr += 3u;
+                        continue;
+
+                    }
+                    else if ((utf8 & 0b11111000) == 0b11110000)
+                    {
+                        // Check if it is a utf8 sequence
+                        auto utf8_mask_C0C0C000{ utf8 & static_cast<::std::uint_least32_t>(0xC0C0'C000u) };
+
+                        auto constexpr utf8_need_chean{ 8u };
+
+                        auto checker{ static_cast<::std::uint_least32_t>(0x8080'8000u) };
+
+                        if (utf8_mask_C0C0C000 != checker) [[unlikely]] { return false; }
+
+                        ::std::uint_least32_t utf8_clean{ utf8 };
+                        utf8_clean <<= utf8_need_chean;
+                        utf8_clean >>= utf8_need_chean;
+
+                        ::std::uint_least32_t utf8_b0{ utf8_clean };
+                        auto utf8_b0_shu1{ 8u - (4u + 1u) };
+                        utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                        utf8_b0 <<= (4u - 1u) * 6u;
+
+                        ::std::uint_least32_t utf8_b1{ utf8_clean };
+                        utf8_b1 >>= 8u;
+                        utf8_b1 &= 0x3Fu;
+                        utf8_b1 <<= (4u - 2u) * 6u;
+
+                        ::std::uint_least32_t utf8_b2{ utf8_clean };
+                        utf8_b2 >>= 16u;
+                        utf8_b2 &= 0x3Fu;
+                        utf8_b2 <<= (4u - 3u) * 6u;
+
+                        ::std::uint_least32_t utf8_b3{ utf8_clean };
+                        utf8_b2 >>= 24u;
+                        utf8_b2 &= 0x3Fu;
+                        utf8_b2 <<= (4u - 4u) * 6u;
+
+                        char32_t const utf8_c{ static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2 | utf8_b3) };
+
+                        auto constexpr test_overlong{ 4u - 2u };
+                        auto constexpr test_overlong_pc{ (test_overlong + 1u) >> 1u };
+
+                        auto constexpr test_overlong_low_bound{ 1u << (6u * test_overlong + (8u - 4u + (1u - test_overlong_pc))) };
+                        if (utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
-                            return {::uwvm2::utils::utf::utf_error_code::illegal_surrogate, str_curr};
+                            return false;
                         }
 
-                        str_curr += utf8_length;
+                        str_curr += 4u;
+                        continue;
+
                     }
                     else
                     {
-                        str_curr += ascii_size;
-
-                        ::std::uint_least32_t const utf8{static_cast<::std::uint_least32_t>(need_check >> (ascii_size * 8u))};
-
-                        // Check if it is a utf8 sequence
-                        auto utf8_mask_C0C0C000{utf8 & static_cast<::std::uint_least32_t>(0xC0C0'C000u)};
-
-                        auto const utf8_need_chean{(4u - utf8_length) * 8u};
-                        utf8_mask_C0C0C000 <<= utf8_need_chean;
-                        utf8_mask_C0C0C000 >>= utf8_need_chean;
-
-                        auto checker{static_cast<::std::uint_least32_t>(0x8080'8000u)};
-                        checker <<= utf8_need_chean;
-                        checker >>= utf8_need_chean;
-
-                        if(utf8_mask_C0C0C000 != checker) [[unlikely]] { return {::uwvm2::utils::utf::utf_error_code::too_short_sequence, str_curr}; }
-
-                        ::std::uint_least32_t utf8_clean{utf8};
-                        utf8_clean <<= utf8_need_chean;
-                        utf8_clean >>= utf8_need_chean;
-
-                        ::std::uint_least32_t utf8_b0{utf8_clean};
-                        auto utf8_b0_shu1{8u - (utf8_length + 1u)};
-                        utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
-                        utf8_b0 <<= (utf8_length - 1u) * 6u;
-
-                        ::std::uint_least32_t utf8_b1{utf8_clean};
-                        utf8_b1 >>= 8u;
-                        utf8_b1 &= 0x3Fu;
-                        utf8_b1 <<= (utf8_length - 2u) * 6u;
-
-                        ::std::uint_least32_t utf8_b2{utf8_clean};
-                        utf8_b2 >>= 16u;
-                        utf8_b2 &= 0x3Fu;
-                        utf8_b2 <<= (utf8_length - 3u) * 6u;
-
-                        ::std::uint_least32_t utf8_b3{utf8_clean};
-                        utf8_b3 >>= 24u;
-                        utf8_b3 &= 0x3Fu;
-                        utf8_b3 <<= (utf8_length - 4u) * 6u;
-
-                        char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2 | utf8_b3)};
-
-                        if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
-                        {
-                            return {::uwvm2::utils::utf::utf_error_code::excessive_codepoint, str_curr};
-                        }
-
-                        auto const test_overlong{utf8_length - 2u};
-                        auto const test_overlong_pc{(test_overlong + 1u) >> 1u};
-
-                        auto const test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
-                        if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
-                        {
-                            return {::uwvm2::utils::utf::utf_error_code::overlong_encoding, str_curr};
-                        }
-
-                        if(static_cast<char32_t>(0xD7FFu) < utf8_c && utf8_c < static_cast<char32_t>(0xE000u)) [[unlikely]]
-                        {
-                            return {::uwvm2::utils::utf::utf_error_code::illegal_surrogate, str_curr};
-                        }
-
-                        str_curr += utf8_length;
+                        return false;
                     }
+
                 }
                 else
                 {
@@ -253,32 +253,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     str_curr += 8u;
                 }
             }
-
+    return true;
+        }
 #endif
 
-            // tail handler
-#if SIZE_MAX > UINT_LEAST32_MAX
+        // tail handling
 
-#else
 
-#endif
-        }
-        else
-        {
-            // big_endian. pdp_endian and CHAR_BIT != 8
-        }
     }
 
     template <utf8_specification spec>
-        requires (static_cast<unsigned>(spec) <= static_cast<unsigned>(utf8_specification::rfc3629_and_zero_illegal))
+        requires (static_cast<unsigned>(spec) <= static_cast<unsigned>(utf8_specification::utf8_rfc3629_and_zero_illegal))
     inline constexpr ::uwvm2::utils::utf::u8result check_legal_utf8_unchecked(char8_t const* const str_begin, char8_t const* const str_end) noexcept
     {
-        if constexpr(spec == utf8_specification::rfc3629) { return check_legal_utf8_rfc3629_unchecked<false>(str_begin, str_end); }
-        else if constexpr(spec == utf8_specification::rfc3629_and_zero_illegal) { return check_legal_utf8_rfc3629_unchecked<true>(str_begin, str_end); }
+        if constexpr(spec == utf8_specification::utf8_rfc3629) { return check_legal_utf8_rfc3629_unchecked<false>(str_begin, str_end); }
+        else if constexpr(spec == utf8_specification::utf8_rfc3629_and_zero_illegal) { return check_legal_utf8_rfc3629_unchecked<true>(str_begin, str_end); }
     }
 
     template <utf8_specification spec>
-        requires (static_cast<unsigned>(spec) <= static_cast<unsigned>(utf8_specification::rfc3629_and_zero_illegal))
+        requires (static_cast<unsigned>(spec) <= static_cast<unsigned>(utf8_specification::utf8_rfc3629_and_zero_illegal))
     inline constexpr ::uwvm2::utils::utf::u8result check_legal_utf8(char8_t const* const str_begin, char8_t const* const str_end) noexcept
     {
         if(str_begin > str_end) [[unlikely]] { ::fast_io::fast_terminate(); }

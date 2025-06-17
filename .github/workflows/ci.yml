@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         mode: ["debug"]
-        policies: ["build.sanitizer.address"]
+        policies: ["build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined"]
         cxx_flags: 
           [
             "", # SSE2
