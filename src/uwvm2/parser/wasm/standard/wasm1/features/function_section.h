@@ -624,7 +624,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
             ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
             ///
-            ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
+            ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot, 
             ///       while the simd processing part of the time decreases)
 
             // It's already a little-endian.
@@ -1903,11 +1903,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
 
-                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
-                        // No mods needed on x86, but preventing cxx language ub
-                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+                        // check_mask_curr_2nd_tmp != 0, check_mask_curr_2nd_tmp & 0x8000'0000 == 0
+                        // check_mask_curr_2nd_tmp max == 0b01..., crtz max == 30u
+                        // crtz < 31u, crtz + 1u < 32u, never cause ub
 
-                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
+                        auto const sizeFF{crtz + 1u};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
@@ -2161,7 +2161,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
         ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
         ///
-        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
+        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot, 
         ///       while the simd processing part of the time decreases)
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
@@ -5006,11 +5006,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
 
-                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
-                        // No mods needed on x86, but preventing cxx language ub
-                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+                        // check_mask_curr_2nd_tmp != 0, check_mask_curr_2nd_tmp & 0x8000'0000 == 0
+                        // check_mask_curr_2nd_tmp max == 0b01..., crtz max == 30u
+                        // crtz < 31u, crtz + 1u < 32u, never cause ub
 
-                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
+                        auto const sizeFF{crtz + 1u};
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
@@ -5336,9 +5336,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
         ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
         ///
-        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
+        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot, 
         ///       while the simd processing part of the time decreases)
-
+        
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
                                // Need to ensure that section_curr to section_curr + n is memory safe
