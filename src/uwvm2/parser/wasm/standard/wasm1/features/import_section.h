@@ -47,6 +47,7 @@ import :type_section;
 # include <type_traits>
 # include <utility>
 # include <memory>
+# include <set>  /// @todo use fast_io::set instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -341,6 +342,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};  // use for reserve
         // desc counter
 
+        ::fast_io::array<::std::set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker> /* @todo use fast_io::set instead */, importdesc_count>
+            duplicate_name_checker{}; // use for check duplicate name
+
         while(section_curr != section_end) [[likely]]
         {
             // Ensuring the existence of valid information
@@ -497,7 +501,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             ::fast_io::freestanding::my_memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
 
-            static_assert(sizeof(fit.imports.type) == 1);
+            static_assert(sizeof(fit.imports.type) == 1uz);
             // Size equal to one does not need to do little-endian conversion
 
             // importdesc_count never > 256 (max=255+1), convert to unsigned
@@ -510,10 +514,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // use for reserve
-            ++importdesc_counter.index_unchecked(
-                static_cast<::std::size_t>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
+            // 0: func
+            // 1: table
+            // 2: mem
+            // 3: global
+            
+            auto const fit_import_type{static_cast<::std::size_t>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type))};
 
-            /// @todo check duplicate (set)
+            // counter
+            ++importdesc_counter.index_unchecked(fit_import_type);
+
+            // check duplicate name
+            auto& curr_name_set{duplicate_name_checker.index_unchecked(fit_import_type)};
+
+            ::uwvm2::parser::wasm::standard::wasm1::features::name_checker const curr_name_check{fit.module_name, fit.extern_name};
+
+            if(curr_name_set.contains(curr_name_check)) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.duplic_imports_or_exports.module_name = fit.module_name;
+                err.err_selectable.duplic_imports_or_exports.extern_name = fit.extern_name;
+                err.err_selectable.duplic_imports_or_exports.type = fit_import_type;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            curr_name_set.insert(curr_name_check);  // std::set never throw (Disregarding new failures)
 
             ++section_curr;
 

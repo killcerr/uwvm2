@@ -57,9 +57,26 @@ int main()
         ::fast_io::u16obuf_file u16cf{u8"error_code_test_u16c.log"};
         ::fast_io::u32obuf_file u32f{u8"error_code_test_u32c.log"};
         ::uwvm2::parser::wasm::base::error_output_t errout;
-        errout.err.err_selectable.u64 = 0xcdcdcdcdcdcdcdcd;
-        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t) + 1u; ++i)
+
+        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type) + 1u; ++i)
         {
+            // Specialization of the addressing section
+            switch (static_cast<::uwvm2::parser::wasm::base::wasm_parse_error_code>(i))
+            {
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type:
+                {
+                    errout.err.err_selectable.duplic_imports_or_exports.module_name = u8"module_name";
+                    errout.err.err_selectable.duplic_imports_or_exports.extern_name = u8"extern_name";
+                    errout.err.err_selectable.duplic_imports_or_exports.type = 0u; // func
+                    break;
+                }
+                default:
+                {                
+                    errout.err.err_selectable.u64 = 0xcdcdcdcdcdcdcdcd;
+                    break;
+                }
+            }
+
             errout.err.err_code = static_cast<::uwvm2::parser::wasm::base::wasm_parse_error_code>(i);
             ::fast_io::io::perrln(cf, errout);
             ::fast_io::io::perrln(wcf, errout);

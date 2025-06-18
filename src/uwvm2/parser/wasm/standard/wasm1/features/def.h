@@ -40,6 +40,7 @@ import uwvm2.parser.wasm.text_format;
 # include <type_traits>
 # include <utility>
 # include <memory>
+# include <compare>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -391,6 +392,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                            ::uwvm2::parser::wasm::base::error_impl& err) {
         { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
     };
+
+    struct name_checker
+    {
+        ::fast_io::u8string_view module_name{};
+        ::fast_io::u8string_view extern_name{};
+    };
+
+    inline constexpr bool operator== (name_checker const& n1, name_checker const& n2) noexcept
+    {
+        return n1.module_name == n2.module_name && n1.extern_name == n2.extern_name;
+    }
+
+    inline constexpr ::std::strong_ordering operator<=> (name_checker const& n1, name_checker const& n2) noexcept
+    {
+        ::std::strong_ordering const module_name_check{n1.module_name <=> n2.module_name};
+
+        if(module_name_check != ::std::strong_ordering::equal) { return module_name_check; }
+
+        return n1.extern_name <=> n2.extern_name;
+    }
 
     /////////////////////////////
     //     Function Section    //

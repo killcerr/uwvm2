@@ -624,7 +624,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
             ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
             ///
-            ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot, 
+            ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
             ///       while the simd processing part of the time decreases)
 
             // It's already a little-endian.
@@ -2161,7 +2161,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
         ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
         ///
-        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot, 
+        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
         ///       while the simd processing part of the time decreases)
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
@@ -5336,9 +5336,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
         ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
         ///
-        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot, 
+        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
         ///       while the simd processing part of the time decreases)
-        
+
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
                                // Need to ensure that section_curr to section_curr + n is memory safe
