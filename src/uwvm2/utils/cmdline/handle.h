@@ -166,6 +166,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         wasm,
     };
 
+    /// @brief EBCDIC not supported
+    static_assert((!::fast_io::details::is_ebcdic<char>), "EBCDIC not supported");
+
     /// @brief User-defined parameters and handlers
     /// @brief Command line arguments will be encoded in ascii and will not be specialized for encodings such as ebcdic.
     struct parameter
