@@ -31,7 +31,7 @@ import uwvm2.utils.cmdline;
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-// improt
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/cmdline/impl.h>

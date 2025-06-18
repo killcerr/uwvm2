@@ -280,6 +280,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 // The first character of the parameter must be '-'
                 ::fast_io::fast_terminate();
             }
+
             if(i.str.size() == 1uz)
             {
                 // "-" is invalid
@@ -298,6 +299,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 }
 #endif
             }
+            
             check = i.str;  // check duplicate
         }
         return res;
