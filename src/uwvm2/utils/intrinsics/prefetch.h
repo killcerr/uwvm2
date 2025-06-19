@@ -79,13 +79,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
     {
         if constexpr(curr_prefetch_mode == pfc_mode::instruction)
         {
-#if UWVM_HAS_BUILTIN(__builtin_arm_prefetch)
+#if UWVM_HAS_BUILTIN(__builtin_arm_prefetch)  // Only Clang
             if constexpr(prefetch_level == pfc_level::nta) { __builtin_arm_prefetch(address, 0, 0, 1, 0); }
             else
             {
                 __builtin_arm_prefetch(address, 0, 3 - static_cast<int>(prefetch_level), static_cast<int>(retention_policy), 0);
             }
-#elif UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi)
+#elif UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi)  // Clang + GCC
             // llvm: have prefetchit0 and prefetchit1 instructions which map to _MM_HINT_T0(3) and _MM_HINT_T1(2).
             //       Other arguments are not supported.
             // GCC:  instruction prefetch applies when in 64-bit mode with RIP-relative addressing and option '-mprefetchi';
@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
         }
         else
         {
-#if UWVM_HAS_BUILTIN(__builtin_arm_prefetch)
+#if UWVM_HAS_BUILTIN(__builtin_arm_prefetch)  // Only Clang
             if constexpr(prefetch_level == pfc_level::nta) { __builtin_arm_prefetch(address, static_cast<int>(curr_prefetch_mode), 0, 1, 1); }
             else
             {
@@ -106,9 +106,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
                                        static_cast<int>(retention_policy),
                                        1);
             }
-#elif UWVM_HAS_BUILTIN(__builtin_prefetch)
+#elif UWVM_HAS_BUILTIN(__builtin_prefetch)  // Clang + GCC
             __builtin_prefetch(address, static_cast<int>(curr_prefetch_mode), static_cast<int>(prefetch_level));
-#else
+#else                                       // MSVC
             ::_mm_prefetch(reinterpret_cast<char const*>(address), (static_cast<int>(curr_prefetch_mode) << 2u) | static_cast<int>(prefetch_level));
 #endif
         }
