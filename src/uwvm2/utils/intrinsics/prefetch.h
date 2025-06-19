@@ -53,8 +53,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
     {
         nta = 0,
         L3 = 1,
-        L2 = 2,  // prfchi == 0
-        L1 = 3   // prfchi == 1
+        L2 = 2,
+        L1 = 3
     };
 
     /// @brief      Direct conversion to cpu prefetch instructions
@@ -73,14 +73,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
         if constexpr(curr_prefetch_mode == pfc_mode::instruction)
         {
 #if UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi) && 0 /// @todo not supported yet, see https://github.com/llvm/llvm-project/issues/144857
-            constexpr int prfchim{static_cast<int>(curr_prefetch_mode) < 2 ? 0 : static_cast<int>(curr_prefetch_mode) - 2};
-            __builtin_ia32_prefetchi(address, prfchim);
-#else
-# if UWVM_HAS_BUILTIN(__builtin_prefetch)
-            __builtin_prefetch(address, 0, static_cast<int>(prefetch_level));
-# else
-            ::_mm_prefetch(reinterpret_cast<char const*>(address), static_cast<int>(prefetch_level));
-# endif
+            __builtin_ia32_prefetchi(address, static_cast<int>(curr_prefetch_mode));
 #endif
         }
         else
