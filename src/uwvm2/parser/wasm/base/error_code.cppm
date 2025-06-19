@@ -25,6 +25,7 @@ module;
 // std
 #include <cstddef>
 #include <cstdint>
+#include <stdfloat>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 

@@ -104,7 +104,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
 #ifdef __STDCPP_FLOAT32_T__
     using wasm_f32 = ::std::float32_t;  // IEEE 754-2008
 #else
-    using wasm_f32 = float;
+    using wasm_f32 = float;  // The C++ Standard doesn't specify it. Gotta check.
 #endif
 
     static_assert(::std::numeric_limits<wasm_f32>::is_iec559 && ::std::numeric_limits<wasm_f32>::digits == 24 && 
@@ -114,7 +114,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
 #ifdef __STDCPP_FLOAT64_T__
     using wasm_f64 = ::std::float64_t;  // IEEE 754-2008
 #else
-    using wasm_f64 = double;
+    using wasm_f64 = double;  // The C++ Standard doesn't specify it. Gotta check.
 #endif
 
     static_assert(::std::numeric_limits<wasm_f64>::is_iec559 && ::std::numeric_limits<wasm_f64>::digits == 53 &&
