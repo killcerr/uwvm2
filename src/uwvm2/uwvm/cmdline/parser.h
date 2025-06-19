@@ -273,7 +273,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     // Assumed size facilitates multiplicative optimization
                     constexpr ::std::size_t smax{::std::numeric_limits<::std::size_t>::max() / 4uz};
                     [[assume(str_size < smax)]];
-                    
+
                     // First time variance requirement within 40%
                     ::std::size_t const test_size{str_size * 4uz / 10uz};
                     ::std::size_t f_test_size{test_size};

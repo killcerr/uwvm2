@@ -299,7 +299,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 }
 #endif
             }
-            
+
             check = i.str;  // check duplicate
         }
         return res;

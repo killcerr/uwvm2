@@ -280,10 +280,14 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8" (APX)"
 # endif
 #elif defined(__i386__) || defined(_M_IX86)
-# if defined(__MINGW32__) || defined(_MSC_VER)
+# if defined(_MSC_VER)
                                 u8"i686"
-# elif defined(__DJGPP__)
+# elif defined(__i686__)
+                                u8"i686"
+# elif defined(__i586__)
                                 u8"i586"
+# elif defined(__i486__)
+                                u8"i486"
 # else
                                 u8"i386"
 # endif
@@ -400,7 +404,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 #elif defined(__wasm_simd128__)
                                 u8"\nISA support: SIMD128"
-#elif defined(__loongarch__) && (defined(__loongarch_sx) || UWVM_HAS_BUILTIN(__builtin_loongarch_crc32c_b))
+#elif defined(__loongarch__) && defined(__loongarch_sx)
                                 u8"\nISA support: LoongSX "
 # if defined(__loongarch_asx)
                                 u8"LoongASX "
@@ -448,8 +452,20 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__BMI2__)
                                 u8"BMI2 "
 # endif
+        // 'POPCNT' instruction is a subset of sse4
 # if defined(__PRFCHW__)
                                 u8"PRFCHW "
+# endif
+# if 0  // uwvm don't need these instructions
+#  if defined(__RDSEED__)
+                                u8"RDSEED "
+#  endif
+#  if defined(__RDRND__)
+                                u8"RDRND "
+#  endif
+# endif
+# if defined(__RTM__)
+                                u8"RTM "
 # endif
 # if defined(__MMX__)
                                 u8"MMX "
@@ -516,6 +532,27 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 # if defined(__AVX512BF16__)
                                 u8"AVX512BF16 "
+# endif
+# if defined(__AVX512VPOPCNTDQ__)
+                                u8"AVX512VPOPCNTDQ "
+# endif
+# if defined(__AVX512VP2INTERSECT__)
+                                u8"AVX512VP2INTERSECT "
+# endif
+# if defined(__AVXIFMA__)
+                                u8"AVXIFMA "
+# endif
+# if defined(__AVXNECONVERT__)
+                                u8"AVXNECONVERT "
+# endif
+# if defined(__AVXVNNIINT16__)
+                                u8"AVXVNNIINT16 "
+# endif
+# if defined(__AVXVNNIINT8__)
+                                u8"AVXVNNIINT8 "
+# endif
+# if defined(__AVXVNNI__)
+                                u8"AVXVNNI "
 # endif
 # if defined(__AVX10_1__)
                                 u8"AVX10.1 "

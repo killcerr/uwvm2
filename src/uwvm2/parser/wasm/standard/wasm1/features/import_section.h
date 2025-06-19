@@ -343,7 +343,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // desc counter
 
         ::fast_io::array<::std::set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker> /* @todo use fast_io::set instead */, importdesc_count>
-            duplicate_name_checker{}; // use for check duplicate name
+            duplicate_name_checker{};  // use for check duplicate name
 
         while(section_curr != section_end) [[likely]]
         {

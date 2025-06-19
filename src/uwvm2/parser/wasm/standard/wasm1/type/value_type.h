@@ -107,8 +107,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     using wasm_f32 = float;  // The C++ Standard doesn't specify it. Gotta check.
 #endif
 
-    static_assert(::std::numeric_limits<wasm_f32>::is_iec559 && ::std::numeric_limits<wasm_f32>::digits == 24 && 
-                      ::std::numeric_limits<wasm_f32>::max_exponent == 128 && ::std::numeric_limits<wasm_f32>::min_exponent == -125, 
+    static_assert(::std::numeric_limits<wasm_f32>::is_iec559 && ::std::numeric_limits<wasm_f32>::digits == 24 &&
+                      ::std::numeric_limits<wasm_f32>::max_exponent == 128 && ::std::numeric_limits<wasm_f32>::min_exponent == -125,
                   "wasm_f32 ain't of the IEC 559/IEEE 754 floating-point types");
 
 #ifdef __STDCPP_FLOAT64_T__
@@ -118,7 +118,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
 #endif
 
     static_assert(::std::numeric_limits<wasm_f64>::is_iec559 && ::std::numeric_limits<wasm_f64>::digits == 53 &&
-                      ::std::numeric_limits<wasm_f64>::max_exponent == 1024 && ::std::numeric_limits<wasm_f64>::min_exponent == -1021, 
+                      ::std::numeric_limits<wasm_f64>::max_exponent == 1024 && ::std::numeric_limits<wasm_f64>::min_exponent == -1021,
                   "wasm_f64 ain't of the IEC 559/IEEE 754 floating-point types");
 
     /// @brief      wasm base instruction, using a byte composition, instruction or extension instruction.
