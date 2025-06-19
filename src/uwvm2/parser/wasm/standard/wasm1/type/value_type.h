@@ -30,6 +30,7 @@ import fast_io;
 # include <cstddef>
 # include <concepts>
 # include <bit>
+# include <stdfloat>
 // macro
 # include <uwvm2/parser/wasm/feature/feature_push_macro.h>
 // import
@@ -101,16 +102,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.2.3
 #ifdef __STDCPP_FLOAT32_T__
-    using wasm_f32 = _Float32;  // IEEE 754-2008
+    using wasm_f32 = ::std::float32_t;  // IEEE 754-2008
 #else
     using wasm_f32 = float;
 #endif
 
+    static_assert(::std::numeric_limits<wasm_f32>::is_iec559, "wasm_f32 ain't of the IEC 559/IEEE 754 floating-point types");
+
 #ifdef __STDCPP_FLOAT64_T__
-    using wasm_f64 = _Float64;  // IEEE 754-2008
+    using wasm_f64 = ::std::float64_t;  // IEEE 754-2008
 #else
     using wasm_f64 = double;
 #endif
+
+    static_assert(::std::numeric_limits<wasm_f64>::is_iec559, "wasm_f64 ain't of the IEC 559/IEEE 754 floating-point types");
 
     /// @brief      wasm base instruction, using a byte composition, instruction or extension instruction.
     /// @details    New feature
