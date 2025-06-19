@@ -72,8 +72,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
     {
         if constexpr(curr_prefetch_mode == pfc_mode::instruction)
         {
-#if UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi) && 0 /// @todo not supported yet, see https://github.com/llvm/llvm-project/issues/144857
-            __builtin_ia32_prefetchi(address, static_cast<int>(curr_prefetch_mode));
+#if UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi)
+            // llvm: have prefetchit0 and prefetchit1 instructions which map to _MM_HINT_T0(3) and _MM_HINT_T1(2).
+            //       Other arguments are not supported.
+            // GCC:  instruction prefetch applies when in 64-bit mode with RIP-relative addressing and option '-mprefetchi';
+            //       they stay NOPs otherwise
+            static_assert(static_cast<int>(prefetch_level) == 2 || static_cast<int>(prefetch_level) == 3);
+            __builtin_ia32_prefetchi(address, static_cast<int>(prefetch_level));
 #endif
         }
         else

@@ -456,7 +456,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__PRFCHW__)
                                 u8"PRFCHW "
 # endif
-# if defined(__PREFETCHI__) && 0 /// @todo not supported yet, see https://github.com/llvm/llvm-project/issues/144857
+# if defined(__PREFETCHI__)
                                 u8"PREFETCHI "
 # endif
 # if 0  // uwvm don't need these instructions
