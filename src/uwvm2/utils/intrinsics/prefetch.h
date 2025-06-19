@@ -57,6 +57,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
         L1 = 3
     };
 
+    enum class ret_policy
+    {
+        keep = 0,
+        strm = 1,
+    };
+
     /// @brief      Direct conversion to cpu prefetch instructions
     /// @details    write: write or read sensitive
     ///             level == 0 -> nta (Non-Temporal Access)
@@ -65,28 +71,45 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
     ///             level == 3 -> L1, L2, L3
     /// @param      address address to be prefetched
     /// @see        __builtin_prefetch and _mm_prefetch
-    template <pfc_mode curr_prefetch_mode = pfc_mode::write, pfc_level prefetch_level = pfc_level::nta>
+    template <pfc_mode curr_prefetch_mode = pfc_mode::write, pfc_level prefetch_level = pfc_level::nta, ret_policy retention_policy = ret_policy::keep>
         requires ((0 <= static_cast<int>(curr_prefetch_mode) && static_cast<int>(curr_prefetch_mode) < 3) &&
-                  (0 <= static_cast<int>(prefetch_level) && static_cast<int>(prefetch_level) < 4))
+                  (0 <= static_cast<int>(prefetch_level) && static_cast<int>(prefetch_level) < 4) &&
+                  (0 <= static_cast<int>(retention_policy) && static_cast<int>(retention_policy) < 2))
     UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL UWVM_GNU_NODEBUG inline void prefetch(void const* address) noexcept
     {
         if constexpr(curr_prefetch_mode == pfc_mode::instruction)
         {
-#if UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi)
+#if UWVM_HAS_BUILTIN(__builtin_arm_prefetch)
+            if constexpr(prefetch_level == pfc_level::nta) { __builtin_arm_prefetch(address, 0, 0, 1, 0); }
+            else
+            {
+                __builtin_arm_prefetch(address, 0, 3 - static_cast<int>(prefetch_level), static_cast<int>(retention_policy), 0);
+            }
+#elif UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi)
             // llvm: have prefetchit0 and prefetchit1 instructions which map to _MM_HINT_T0(3) and _MM_HINT_T1(2).
             //       Other arguments are not supported.
             // GCC:  instruction prefetch applies when in 64-bit mode with RIP-relative addressing and option '-mprefetchi';
             //       they stay NOPs otherwise
-            static_assert(static_cast<int>(prefetch_level) == 2 || static_cast<int>(prefetch_level) == 3);
-            __builtin_ia32_prefetchi(address, static_cast<int>(prefetch_level));
+            constexpr int actual_prefetch_level{static_cast<int>(prefetch_level) < 2 ? 2 : static_cast<int>(prefetch_level)};
+            __builtin_ia32_prefetchi(address, static_cast<int>(actual_prefetch_level));
 #endif
         }
         else
         {
-#if UWVM_HAS_BUILTIN(__builtin_prefetch)
+#if UWVM_HAS_BUILTIN(__builtin_arm_prefetch)
+            if constexpr(prefetch_level == pfc_level::nta) { __builtin_arm_prefetch(address, static_cast<int>(curr_prefetch_mode), 0, 1, 1); }
+            else
+            {
+                __builtin_arm_prefetch(address,
+                                       static_cast<int>(curr_prefetch_mode),
+                                       3 - static_cast<int>(prefetch_level),
+                                       static_cast<int>(retention_policy),
+                                       1);
+            }
+#elif UWVM_HAS_BUILTIN(__builtin_prefetch)
             __builtin_prefetch(address, static_cast<int>(curr_prefetch_mode), static_cast<int>(prefetch_level));
 #else
-            ::_mm_prefetch(reinterpret_cast<char const*>(address), static_cast<int>(curr_prefetch_mode) << 2u | static_cast<int>(prefetch_level));
+            ::_mm_prefetch(reinterpret_cast<char const*>(address), (static_cast<int>(curr_prefetch_mode) << 2u) | static_cast<int>(prefetch_level));
 #endif
         }
     }
