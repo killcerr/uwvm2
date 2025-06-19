@@ -343,6 +343,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // After testing, 6 are the fastest
+
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                    reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
             }
         }
 # endif
@@ -447,10 +454,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
 
 #  if !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
+
+                    // After testing, 6 are the fastest
+
                     ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                                     ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                                     ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
 #  endif
                 }
             }
@@ -501,10 +511,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
 
 # if !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
+
+                    // After testing, 8 are the fastest
+
                     ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                                     ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                                     ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
 # endif
                 }
             }
@@ -597,6 +610,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 8 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
@@ -680,10 +695,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 8 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -765,10 +782,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 6 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
         }
 #endif
 
@@ -1630,6 +1649,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // After testing, 4 and 3 are the fastest
+
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                    reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 3u);
             }
         }
 # endif
@@ -2164,10 +2194,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 12 and 8 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 12u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
@@ -3500,10 +3532,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 6 and 4 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
@@ -4152,14 +4187,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 4 and 3 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 2u);
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 3u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -4315,14 +4352,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 4 and 3 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
-                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 2u);
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 3u);
         }
 #endif
 
@@ -4698,6 +4737,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // After testing, 2 and 3 are the fastest
+
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                    reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 3u);
             }
         }
 # endif
@@ -5368,8 +5418,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
                 reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
+
             // Write up to 64 * 2, so prefetch 64 * 12 and 64 * 13.
             // Tested to be 3% faster than 64 * 8 and 64 * 9.
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
@@ -6639,6 +6691,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // Each write is prefetched one write at a time within a full cache line.
+
+            // After testing, 4 and 6 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
@@ -7241,6 +7296,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 2 and 3 are the fastest
+
             // Each write is prefetched one write at a time within a full cache line.
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
@@ -7421,6 +7478,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // Each write is prefetched one write at a time within a full cache line.
+
+            // After testing, 2 and 3 are the fastest
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
@@ -7428,7 +7488,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 2u);
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 3u);
         }
 #endif
 
