@@ -445,6 +445,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [                        safe                             ] unsafe (could be the section_end)
                         //                                                             ^^ section_curr
                     }
+
+#  if !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
+                    ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+#  endif
                 }
             }
             else
@@ -492,6 +499,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [                        safe                                     ] unsafe (could be the section_end)
                         //                                                                     ^^ section_curr
                     }
+
+# if !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
+                    ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+# endif
                 }
             }
 
@@ -582,6 +596,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -660,6 +679,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -740,6 +764,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
         }
 #endif
 
@@ -2135,9 +2164,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr));
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 8u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -3466,6 +3500,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 4u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -4109,7 +4151,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 2u);
         }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) ||                                                                                    \
      (defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))) ||                  \
@@ -4262,6 +4314,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 2u);
         }
 #endif
 
@@ -5303,12 +5364,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr));
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 8u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u);
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * (8u + 1u));
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -6570,9 +6637,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // Each write is prefetched one write at a time within a full cache line.
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr));
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 4u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * (4u + 1u));
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -7165,6 +7241,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // Each write is prefetched one write at a time within a full cache line.
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 2u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * (2u + 1u));
         }
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) ||                                                                                    \
@@ -7333,6 +7423,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // Each write is prefetched one write at a time within a full cache line.
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 2u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * (2u + 1u));
         }
 #endif
 
