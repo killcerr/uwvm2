@@ -5368,15 +5368,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
                 reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
-            // Maximum 128 per write, cache line length 64, prefetching required twice
+            // Write up to 64 * 2, so prefetch 64 * 12 and 64 * 13.
+            // Tested to be 3% faster than 64 * 8 and 64 * 9.
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 8u);
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 12u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * (8u + 1u));
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * (12u + 1u));
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -6642,10 +6643,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
                 reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+            // Write up to 32 * 2, so prefetch 64 * 6.
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 4u);
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 6u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -7244,10 +7246,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
                 reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+            // Write up to 16 * 2, so prefetch 64 * 3.
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
                                                             ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 2u);
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 3u);
         }
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) ||                                                                                    \
