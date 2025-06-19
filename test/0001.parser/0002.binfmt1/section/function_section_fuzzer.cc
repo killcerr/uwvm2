@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <type_traits>
 #include <concepts>
 #include <memory>
@@ -140,6 +141,54 @@ namespace test
         // [                       safe                         ] unsafe (could be the section_end)
         //                                                        ^^ section_curr
     }
+
+    struct memory_safety_checker_allocator
+    {
+        char* ptr{};
+        ::std::size_t n{};
+
+        inline memory_safety_checker_allocator(char const* begin, char const* end) noexcept
+        {
+            if (begin > end) [[unlikely]]
+            {
+                ::fast_io::fast_terminate();
+            }
+            else if (begin == end) [[unlikely]]
+            {
+                return;
+            }
+
+            n = static_cast<::std::size_t>(end - begin);
+            ptr = reinterpret_cast<char*>(::std::malloc(n));
+
+            ::fast_io::freestanding::my_memcpy(ptr, begin, n * sizeof(char));
+        }
+
+        inline memory_safety_checker_allocator(memory_safety_checker_allocator const&) noexcept = delete;
+        inline memory_safety_checker_allocator(memory_safety_checker_allocator &&) noexcept = delete;
+        inline memory_safety_checker_allocator& operator=(memory_safety_checker_allocator const&) noexcept = delete;
+        inline memory_safety_checker_allocator& operator=(memory_safety_checker_allocator &&) noexcept = delete;
+
+        inline ~memory_safety_checker_allocator() noexcept
+        {
+            if (ptr) [[likely]]
+            {
+                ::std::free(ptr);
+                ptr = nullptr;
+            }
+            n = 0uz;
+        }
+
+        inline constexpr char const* cbegin() const noexcept
+        {
+            return ptr;
+        }
+
+        inline constexpr char const* cend() const noexcept
+        {
+            return ptr + n;
+        }
+    };
 }
 
 int main()
@@ -186,13 +235,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -206,8 +258,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -245,13 +297,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -265,8 +320,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -303,13 +358,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -323,8 +381,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -375,13 +433,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -395,8 +456,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -447,13 +508,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -467,8 +531,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -519,13 +583,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -539,8 +606,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -591,13 +658,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -611,8 +681,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -668,13 +738,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -688,8 +761,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -745,13 +818,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -765,8 +841,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -827,13 +903,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -847,8 +926,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -909,13 +988,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -929,8 +1011,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -991,13 +1073,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -1011,8 +1096,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -1070,13 +1155,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -1090,8 +1178,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -1149,13 +1237,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -1169,8 +1260,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -1228,13 +1319,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -1248,8 +1342,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -1321,13 +1415,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -1341,8 +1438,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -1414,13 +1511,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -1434,8 +1534,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
@@ -1507,13 +1607,16 @@ int main()
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
+        // Verifying Memory Safety (need asan)
+        ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
+        
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
                 {}, 
                 func_counter, 
@@ -1527,8 +1630,8 @@ int main()
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
                 strg, 
-                reinterpret_cast<::std::byte const*>(buf_ov.cbegin()), 
-                reinterpret_cast<::std::byte const*>(buf_ov.cend()),
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
         catch(::fast_io::error)
