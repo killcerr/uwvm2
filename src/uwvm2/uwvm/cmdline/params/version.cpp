@@ -341,6 +341,10 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"System/390"
 #elif defined(__pdp11)
                                 u8"PDP11"
+#elif defined(__pdp10)
+                                u8"PDP10"
+#elif defined(__pdp7)
+                                u8"PDP7"
 #elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)
                                 u8"PowerPC64"
 # if defined(_LITTLE_ENDIAN) || defined(__LITTLE_ENDIAN__)
