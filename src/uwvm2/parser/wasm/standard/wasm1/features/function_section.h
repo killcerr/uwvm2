@@ -346,9 +346,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 // After testing, 6 are the fastest
 
+                // View mode, have to make reservations
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
-                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
                     reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
             }
         }
@@ -457,9 +458,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     // After testing, 6 are the fastest
 
+                    // View mode, have to make reservations
                     ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
-                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
                         reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
 #  endif
                 }
@@ -514,9 +516,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     // After testing, 8 are the fastest
 
+                    // View mode, have to make reservations
                     ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
-                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
                         reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
 # endif
                 }
@@ -612,9 +615,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // After testing, 8 are the fastest
 
+            // View mode, have to make reservations
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
-                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
                 reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
         }
 
@@ -697,9 +701,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // After testing, 8 are the fastest
 
+            // View mode, have to make reservations
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
-                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
                 reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
         }
 
@@ -784,9 +789,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // After testing, 6 are the fastest
 
+            // View mode, have to make reservations
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
-                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
                 reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
         }
 #endif
