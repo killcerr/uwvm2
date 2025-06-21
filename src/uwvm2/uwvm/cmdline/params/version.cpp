@@ -276,9 +276,6 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 #elif defined(__x86_64__) || defined(_M_AMD64)
                                 u8"x86_64"
-# if defined(__APX_F__)
-                                u8" (APX)"
-# endif
 #elif defined(__i386__) || defined(_M_IX86)
 # if defined(_MSC_VER)
                                 u8"i686"
@@ -572,6 +569,9 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 # if defined(__AVX10_2_512__)
                                 u8"AVX10.2-512 "
+# endif
+# if defined(__APX_F__)
+                                u8"APX "
 # endif
 #elif defined(__VECTOR4DOUBLE__) || defined(__VSX__) || (defined(__ALTIVEC__) || defined(__VEC__))
                                 u8"\nISA support: PPC SIMD"
