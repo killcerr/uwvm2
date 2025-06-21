@@ -98,6 +98,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_t funcs{};
     };
 
+    /// @brief  Supported SIMD instruction sets: (Algorithm by MacroModel)
+    ///             x86/x64 architectures:
+    ///                 * SSE2: 128-bit vector processing, 16 bytes at a time
+    ///                 * SSSE3: Enhanced byte reordering
+    ///                 * SSE4: Optimized vector test instructions
+    ///                 * AVX: 256-bit vector processing, 32 bytes at a time
+    ///                 * AVX2: Enhanced 256-bit integer operations
+    ///                 * AVX512BW: 512-bit vector processing, 64 bytes at a time
+    ///                 * AVX512VBMI + AVX512VBMI2: Advanced byte reordering and substitution for the most complex variable-length integer parsing
+    ///             ARM Architecture:
+    ///                 * NEON: 128-bit vector processing
+    ///                 * SVE: Variable-length vector expansion, supports dynamic vector lengths
+    ///                 * SME SVE Stream Mode: SVE Stream Mode in Matrix Expansion (not recommended for CPUs such as the Apple M4 because of high latency)
+    ///             Other architectures:
+    ///                 * LoongArch LASX: 256-bit vector processing
+    ///                 * LoongArch LSX: 128-bit vector processing
+    ///                 * WebAssembly SIMD128: 128-bit WebAssembly SIMD instructions
+
     /// @brief      Convert view to vec
     /// @param      func_counter The correct u8 size has been processed
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
