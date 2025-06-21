@@ -29,6 +29,7 @@ module;
 #include <concepts>
 #include <memory>
 #include <bit>
+#include <limits>
 
 export module uwvm2.utils.utf:utf8;
 

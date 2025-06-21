@@ -413,7 +413,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [   safe   ] unsafe (could be the section_end)
             //      ^^ prefix_module_ptr
 
-            ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix{};
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix;
 
             // no necessary to check, because (section_curr != section_end)
             ::fast_io::freestanding::my_memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));

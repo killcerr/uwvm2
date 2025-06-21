@@ -43,18 +43,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
     enum class utf_error_code : unsigned
     {
         success = 0u,
+
         long_header_bits,
         too_short_sequence,
         too_long_sequence,
         overlong_encoding,
         excessive_codepoint,
-        illegal_surrogate
+        illegal_surrogate,
+
+        contains_empty_characters
     };
 
     template <::std::integral char_type>
     struct result_base
     {
-        char_type const* pos {}
+        char_type const* pos{};
         utf_error_code err{};
     };
 

@@ -114,7 +114,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [safe] unsafe (could be the end)
         // ^^ curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte flags{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte flags;
         ::fast_io::freestanding::my_memcpy(::std::addressof(flags), curr, sizeof(flags));
 
         static_assert(sizeof(flags) == 1uz);
@@ -236,7 +236,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [ safe  ] unsafe (could be the end)
         // ^^ curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte elemtype{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte elemtype;
         ::fast_io::freestanding::my_memcpy(::std::addressof(elemtype), curr, sizeof(elemtype));
 
         static_assert(sizeof(elemtype) == 1uz);
@@ -357,7 +357,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [   safe   ] unsafe (could be the end)
         //          ^^ curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte mut{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte mut;
 
         ::fast_io::freestanding::my_memcpy(::std::addressof(mut), curr, sizeof(mut));
 

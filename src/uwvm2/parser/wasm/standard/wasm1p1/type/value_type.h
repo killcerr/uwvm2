@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
             constexpr auto space{::fast_io::char_literal_v<u8' ', char_type>};
             constexpr auto comma{::fast_io::char_literal_v<u8',', char_type>};
 
-            auto const v128_i8x16_arr = ::std::bit_cast<::fast_io::array<::std::uint_least8_t, 16u>>(v128_val);
+            auto const v128_i8x16_arr{::std::bit_cast<::fast_io::array<::std::uint_least8_t, 16u>>(v128_val)};
             auto const v128_i8x16{v128_i8x16_arr.cbegin()};
             char_type* curr_pos{iter};
 
@@ -104,6 +104,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
             ++curr_pos;
 
             // No need to think about the little-endian or the big-endian
+            // Simd only has size-end-ordering problems for its internal elements, but simd sequences have no such problems with arrays.
 
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(curr_pos, ::fast_io::mnp::hexupper<false, true>(v128_i8x16[0]));
             *curr_pos = comma;
@@ -184,7 +185,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
 
             *curr_pos = ::fast_io::char_literal_v<u8']', char_type>;
             ++curr_pos;
-            
+
             return curr_pos;
         }
     }  // namespace details

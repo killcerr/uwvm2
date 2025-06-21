@@ -67,7 +67,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         // [           safe        ] unsafe
         //              ^^ module_curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp;
         ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
         static_assert(sizeof(temp) > 1);
         // Size of temp greater than one requires little-endian conversion
