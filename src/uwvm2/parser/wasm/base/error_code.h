@@ -95,7 +95,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         func_section_resolved_exceeded_the_actual_number,
         func_section_resolved_not_match_the_actual_number,
         size_exceeds_the_maximum_value_of_size_t,
-        duplicate_imports_of_the_same_import_type
+        duplicate_imports_of_the_same_import_type,
+        invalid_utf8_sequence
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type

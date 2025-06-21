@@ -350,49 +350,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             ```cpp
     ///             struct F
     ///             {
-    ///                 inline static constexpr text_format import_export_text_format{text_format::utf8_rfc3629_with_zero_illegal};
+    ///                 using import_export_text_format = type_replacer<root_of_replacement, text_format_wapper<text_format::xxx>>;
     ///             };
     ///             ```
-    template <typename FeatureType>
-    concept has_import_export_text_format = requires {
-        requires ::std::same_as<::std::remove_cvref_t<decltype(FeatureType::import_export_text_format)>, ::uwvm2::parser::wasm::text_format::text_format>;
-    };
-
-    template <typename FeatureType>
-    inline consteval ::uwvm2::parser::wasm::text_format::text_format get_import_export_text_format() noexcept
-    {
-        if constexpr(has_import_export_text_format<FeatureType>) { return FeatureType::import_export_text_format; }
-        else
-        {
-            return ::uwvm2::parser::wasm::text_format::text_format{};
-        }
-    }
-
     template <::uwvm2::parser::wasm::text_format::text_format TFWapper>
     struct text_format_wapper
     {
         inline static constexpr ::uwvm2::parser::wasm::text_format::text_format type{TFWapper};
     };
 
-    /// @brief      can check import/export text format
-    /// @details
-    ///             ```cpp
-    ///             void check_import_export_text_format(text_format_wapper<FeatureType::import_export_text_format>,
-    ///                                                  ::std::byte const* begin,
-    ///                                                  ::std::byte const* end,
-    ///                                                  ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
-    ///             {
-    ///                 // to do ...
-    ///             }
-    ///             ```
     template <typename FeatureType>
-    concept can_check_import_export_text_format = requires(text_format_wapper<FeatureType::import_export_text_format> adl,
-                                                           ::std::byte const* begin,
-                                                           ::std::byte const* end,
-                                                           ::uwvm2::parser::wasm::base::error_impl& err) {
-        { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
+    concept has_import_export_text_format = requires {
+        typename FeatureType::import_export_text_format;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::import_export_text_format>;
     };
 
+    template <typename FeatureType>
+    inline consteval auto get_import_export_text_format() noexcept
+    {
+        if constexpr(has_import_export_text_format<FeatureType>) { return typename FeatureType::import_export_text_format{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_import_export_text_format_wapper =
+        ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_import_export_text_format<Fs>())...>;
+
+    /// @brief name checker
     struct name_checker
     {
         ::fast_io::u8string_view module_name{};

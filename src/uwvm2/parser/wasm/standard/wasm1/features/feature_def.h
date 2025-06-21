@@ -185,6 +185,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             } -> ::std::same_as<::std::byte const*>;
         };
 
+    /// @brief Define functions for checking imports and exports name
+    template <typename... Fs>
+    concept can_check_import_export_text_format = requires(::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...> adl,
+                                                           ::std::byte const* begin,
+                                                           ::std::byte const* end,
+                                                           ::uwvm2::parser::wasm::base::error_impl& err) {
+        { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
+    };
+
     // function_section
     static_assert(
         ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&

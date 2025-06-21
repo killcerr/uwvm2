@@ -299,13 +299,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                         str_curr += utf8_length;
                     }
-                    else if((utf_8 & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u)) [[unlikely]]
-                    {
-                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
-                    }
                     else [[unlikely]]
                     {
-                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                        if((utf_8 & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u))
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
+                        }
+                        else
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                        }
                     }
 
                     // continue;

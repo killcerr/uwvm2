@@ -25,6 +25,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.utils.ansies;
+import uwvm2.utils.utf;
 # if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
 import uwvm2.utils.debug;
 # endif
@@ -44,6 +45,7 @@ import :error_code;
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/ansies/impl.h>
+# include <uwvm2/utils/utf/impl.h>
 # if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
 #  include <uwvm2/utils/debug/impl.h>
 # endif
@@ -336,6 +338,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type:
             {
 #include "error_code_outputs/eco_duplicate_imports_of_the_same_import_type.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence:
+            {
+#include "error_code_outputs/eco_invalid_utf8_sequence.h"
                 return;
             }
         }

@@ -29,6 +29,7 @@ import fast_io;
 # ifdef UWVM_TIMER
 import uwvm2.utils.debug;
 # endif
+import uwvm2.utils.utf;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
@@ -58,6 +59,7 @@ import :type_section;
 # ifdef UWVM_TIMER
 #  include <uwvm2/utils/debug/impl.h>
 # endif
+# include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -238,6 +240,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return section_curr;
     }
 
+    /// @brief Define a function for wasm1 to check for utf8 sequences.
+    inline constexpr void check_import_export_text_format(
+        ::uwvm2::parser::wasm::standard::wasm1::features::text_format_wapper<
+            ::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be replaced
+        ::std::byte const* begin,
+        ::std::byte const* end,
+        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        auto const [utf8pos, utf8err]{::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
+            reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
+            reinterpret_cast<char8_t_const_may_alias_ptr>(end))};
+
+        if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+        {
+            err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
+            err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+    }
+
     /// @brief Define the handler function for type_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(
@@ -347,6 +372,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         while(section_curr != section_end) [[likely]]
         {
+            // get final utf8-checker
+            using curr_final_import_export_text_format_wapper = ::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...>;
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::can_check_import_export_text_format<Fs...>);
+
             // Ensuring the existence of valid information
 
             // [...  module_namelen] ... module_name ... extern_namelen ... extern_name ... import_type extern_func ...
@@ -419,7 +448,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // No access, security
             fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
 
-            /// @todo utf8 check
+            // check utf8
+            check_import_export_text_format(curr_final_import_export_text_format_wapper{},
+                                            reinterpret_cast<::std::byte const*>(fit.module_name.cbegin()),
+                                            reinterpret_cast<::std::byte const*>(fit.module_name.cend()),
+                                            err);
 
             section_curr += module_namelen;  // safe
 
@@ -479,7 +512,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
 
-            /// @todo utf8 check
+            // check utf8
+            check_import_export_text_format(curr_final_import_export_text_format_wapper{},
+                                            reinterpret_cast<::std::byte const*>(fit.extern_name.cbegin()),
+                                            reinterpret_cast<::std::byte const*>(fit.extern_name.cend()),
+                                            err);
 
             section_curr += extern_namelen;  // safe
             // [...  module_namelen ... module_name ... extern_namelen ... extern_name ...] import_type extern_func ...

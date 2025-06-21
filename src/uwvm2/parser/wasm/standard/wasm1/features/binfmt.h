@@ -94,8 +94,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::type::memory_type>;
         using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::type::global_type>;
-        inline static constexpr ::uwvm2::parser::wasm::text_format::text_format import_export_text_format{
-            ::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal};
+        using import_export_text_format =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::text_format_wapper<
+                                                                          ::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
 
         // binfmt ver1
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
