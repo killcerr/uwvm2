@@ -26,6 +26,10 @@
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
+#if defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
+# include <linux/version.h>
+#endif
+
 #ifdef UWVM_MODULE
 import fast_io;
 import fast_io_crypto;
@@ -641,7 +645,15 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #elif defined(__MSDOS__)
                                 u8"Microsoft Dos"
 #elif defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
-                                u8"Linux"
+                                u8"Linux "
+# if defined(LINUX_VERSION_CODE)
+                                ,
+                                static_cast<::std::make_unsigned_t<decltype(LINUX_VERSION_CODE)>>(LINUX_VERSION_CODE) >> 16u,
+                                u8".",
+                                (static_cast<::std::make_unsigned_t<decltype(LINUX_VERSION_CODE)>>(LINUX_VERSION_CODE) >> 8u) & 0xFFu,
+                                u8".",
+                                static_cast<::std::make_unsigned_t<decltype(LINUX_VERSION_CODE)>>(LINUX_VERSION_CODE) & 0xFFu,
+# endif
 #elif defined(__APPLE__) && defined(__MACH__)
                                 u8"Mac OS"
 #elif defined(__DragonFly__)
@@ -731,32 +743,32 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #endif
                                 u8"\nAllocator: "
 #if defined(FAST_IO_USE_CUSTOM_GLOBAL_ALLOCATOR)
-                                u8"custom global"
+                                u8"Custom Allocator"
 #elif defined(FAST_IO_USE_MIMALLOC)
                                 u8"mimalloc"
 #elif (defined(__linux__) && defined(__KERNEL__)) || defined(FAST_IO_USE_LINUX_KERNEL_ALLOCATOR)
-                                u8"linux kmalloc"
+                                u8"Linux kmalloc"
 #elif ((__STDC_HOSTED__ == 1 && (!defined(_GLIBCXX_HOSTED) || _GLIBCXX_HOSTED == 1) && !defined(_LIBCPP_FREESTANDING)) ||                                      \
        defined(FAST_IO_ENABLE_HOSTED_FEATURES))
 # if defined(_WIN32) && !defined(__CYGWIN__) && !defined(__WINE__) && !defined(FAST_IO_USE_C_MALLOC)
 #  if defined(_DEBUG) && defined(_MSC_VER)
-                                u8"wincrt malloc dbg"
+                                u8"WinCRT malloc DBG"
 #  else
 #   if defined(_WIN32_WINDOWS)
-                                u8"win32 heapalloc"
+                                u8"Win32 Heapalloc"
 #   else
-                                u8"nt rtlallocateheap"
+                                u8"NT Rtlallocateheap"
 #   endif
 #  endif
 # else
 #  if defined(_DEBUG) && defined(_MSC_VER)
-                                u8"wincrt malloc dbg"
+                                u8"WinCRT malloc DBG"
 #  else
-                                u8"c malloc"
+                                u8"C's malloc"
 #  endif
 # endif
 #else
-                                u8"custom global"
+                                u8"Custom Allocator"
 #endif
                                 u8"\n"
                                 // Feature
