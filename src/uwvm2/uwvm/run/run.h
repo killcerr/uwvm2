@@ -207,7 +207,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend()),
                             execute_wasm_binfmt_ver1_storage_wasm_err,
-                            ::uwvm2::uwvm::wasm::storage::global_wasm_binfmt_ver1_paramaters);
+                            ::uwvm2::uwvm::wasm::storage::global_wasm_binfmt_ver1_parameters);
                     }
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     catch(::fast_io::error e)

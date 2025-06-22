@@ -55,7 +55,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 
     // WASM Module Binfmt 1
     inline ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_feature_parameter_storage_t
-        global_wasm_binfmt_ver1_paramaters{};  // [global] No global variable dependencies from other translation units
+        global_wasm_binfmt_ver1_parameters{};  // [global] No global variable dependencies from other translation units
 
     inline ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t
         execute_wasm_binfmt_ver1_storage{};  // [global] No global variable dependencies from other translation units

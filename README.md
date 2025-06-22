@@ -15,7 +15,7 @@
     </a>
 </div>
 
-## Introduce
+## Introduction
 Ultimate WebAssembly Virtual Machine (Version 2), the abbreviation is uwvm2.
 
 ## Features

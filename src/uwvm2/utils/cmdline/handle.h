@@ -218,7 +218,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     }
 
     /// @brief judge whether parameter has invalid char
-    inline constexpr bool is_invalid_paramater_char(char8_t c) noexcept
+    inline constexpr bool is_invalid_parameter_char(char8_t c) noexcept
     {
         if(c >= 0x21 && c <= 0x7E)
         {
@@ -290,9 +290,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             for(auto c: i.str)
             {
 #if __cpp_contracts >= 202502L
-                contract_assert(!is_invalid_paramater_char(c));
+                contract_assert(!is_invalid_parameter_char(c));
 #else
-                if(is_invalid_paramater_char(c))
+                if(is_invalid_parameter_char(c))
                 {
                     // invalid parameter character
                     ::fast_io::fast_terminate();
