@@ -573,8 +573,15 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__APX_F__)
                                 u8"APX "
 # endif
-#elif defined(__VECTOR4DOUBLE__) || defined(__VSX__) || (defined(__ALTIVEC__) || defined(__VEC__))
-                                u8"\nISA support: PPC SIMD"
+#elif ((defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)) ||                                                         \
+       (defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC))) &&                                                                \
+    (defined(__ALTIVEC__) || defined(__VEC__))
+                                u8"\nISA support: ALTIVEC "
+# if defined(__VSX__)
+                                u8"VSX "
+# endif
+#elif defined(__riscv) && defined(__riscv_vector)
+                                u8"\nISA support: RVV "
 #endif
 
                                 // OS
