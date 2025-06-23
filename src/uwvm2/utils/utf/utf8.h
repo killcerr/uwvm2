@@ -82,7 +82,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
         auto str_curr{str_begin};
 
-#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__SSE2__) || defined(__wasm_simd128__))
+#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512VBMI__) || defined(__AVX512VBMI2__)) & 0
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX2__) || defined(__loongarch_asx)) & 0
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__SSSE3__) || defined(__ARM_NEON) || defined(__loongarch_sx)) & 0
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__SSE2__) || defined(__wasm_simd128__))
 
         using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
         using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
@@ -103,9 +109,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 # if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
                     __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(need_check))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
-                    !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))
+                    !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~need_check))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
-                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))
+                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(need_check))
 # else
 #  error "missing instructions"
 # endif
@@ -123,11 +129,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                         bool const check_has_zero{static_cast<bool>(
 # if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                            __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(need_check))
+                            __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(has_zero))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
-                            !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))
+                            !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~has_zero))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
-                            __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))
+                            __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(has_zero))
 # else
 #  error "missing instructions"
 # endif
@@ -150,12 +156,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 }
             }
 
-            auto const str_curr_val{*str_curr};
-            while(str_curr_val < static_cast<char8_t>(0b1000'0000u))
+            while(*str_curr < static_cast<char8_t>(0b1000'0000u))
             {
                 if constexpr(zero_illegal)
                 {
-                    if(str_curr_val == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
+                    if(*str_curr == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
                 }
 
                 if(++str_curr == str_end) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::success}; }
@@ -301,6 +306,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
                     }
 
+                    if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint};
+                    }
+
                     str_curr += utf8_length;
                 }
                 else [[unlikely]]
@@ -323,8 +333,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                 while(str_curr != str_end)
                 {
-                    auto const str_curr_val{*str_curr};
-
+                    auto str_curr_val{*str_curr};
+                    
                     if(str_curr_val < static_cast<char8_t>(0b1000'0000u))
                     {
                         if constexpr(zero_illegal)
@@ -484,6 +494,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
                         }
 
+                        if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint};
+                        }
+
                         str_curr += utf8_length;
                     }
                     else
@@ -521,7 +536,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                     ::fast_io::freestanding::my_memcpy(::std::addressof(need_check2), str_curr + sizeof(::std::uint_least64_t), sizeof(::std::uint_least64_t));
 
-                    ::std::uint_least64_t const check_has_non_ascii{(need_check1 | need_check1) & static_cast<::std::uint_least64_t>(0x8080'8080'8080'8080u)};
+                    ::std::uint_least64_t const check_has_non_ascii{(need_check1 | need_check2) & static_cast<::std::uint_least64_t>(0x8080'8080'8080'8080u)};
 
                     if(!check_has_non_ascii)
                     {
@@ -559,12 +574,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     }
                 }
 
-                auto const str_curr_val{*str_curr};
-                while(str_curr_val < static_cast<char8_t>(0b1000'0000u))
+                while(*str_curr < static_cast<char8_t>(0b1000'0000u))
                 {
                     if constexpr(zero_illegal)
                     {
-                        if(str_curr_val == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
+                        if(*str_curr == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
                     }
 
                     if(++str_curr == str_end) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::success}; }
@@ -708,6 +722,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                        }
+
+                        if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint};
                         }
 
                         str_curr += utf8_length;
@@ -893,6 +912,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                 return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
                             }
 
+                            if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
+                            {
+                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint};
+                            }
+
                             str_curr += utf8_length;
                         }
                         else
@@ -1071,6 +1095,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                    }
+
+                    if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint};
                     }
 
                     str_curr += utf8_length;
