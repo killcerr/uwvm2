@@ -242,6 +242,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             }
         }
 
+        // wasm_file_ppos - 1u is always valid and not memory safe
         // ...   "--run" (end)         "wasm file name" ...
         // ... wasm_file_ppos - 1u      wasm_file_ppos  ...
         auto const end_pos{wasm_file_ppos ? wasm_file_ppos - 1u : pr.end()};
