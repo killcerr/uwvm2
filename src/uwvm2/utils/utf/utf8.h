@@ -82,8 +82,421 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
         auto str_curr{str_begin};
 
-#if 0
-        // simd
+#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__SSE2__) || defined(__wasm_simd128__))
+
+        using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+        using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+        using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+        for(;;)
+        {
+            if(static_cast<::std::size_t>(str_end - str_curr) >= sizeof(u8x16simd)) [[likely]]
+            {
+                u8x16simd need_check;
+
+                ::fast_io::freestanding::my_memcpy(::std::addressof(need_check), str_curr, sizeof(u8x16simd));
+
+                bool const check_has_non_ascii{static_cast<bool>(
+# if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
+                    __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(need_check))
+# elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
+                    !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))
+# elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
+                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))
+# else
+#  error "missing instructions"
+# endif
+                        )};
+
+                if(!check_has_non_ascii)
+                {
+                    // all ascii
+
+                    if constexpr(zero_illegal)
+                    {
+                        constexpr auto u8_zero{static_cast<::std::uint8_t>(0u)};
+
+                        auto const has_zero{need_check == u8_zero};
+
+                        bool const check_has_zero{static_cast<bool>(
+# if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
+                            __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(need_check))
+# elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
+                            !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))
+# elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
+                            __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))
+# else
+#  error "missing instructions"
+# endif
+                                )};
+
+                        if(check_has_zero) [[unlikely]]
+                        {
+                            // Get the exact error address
+                            for(auto const str_curr_end{str_curr + sizeof(u8x16simd)}; str_curr != str_curr_end; ++str_curr)
+                            {
+                                if(*str_curr == u8'\0') { break; }
+                            }
+
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters};
+                        }
+                    }
+
+                    str_curr += sizeof(u8x16simd);
+                    continue;
+                }
+            }
+
+            auto const str_curr_val{*str_curr};
+            while(str_curr_val < static_cast<char8_t>(0b1000'0000u))
+            {
+                if constexpr(zero_illegal)
+                {
+                    if(str_curr_val == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
+                }
+
+                if(++str_curr == str_end) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::success}; }
+            }
+
+            if(static_cast<::std::size_t>(str_end - str_curr) >= sizeof(::std::uint_least32_t)) [[likely]]
+            {
+                ::std::uint_least32_t utf_8;
+
+                ::fast_io::freestanding::my_memcpy(::std::addressof(utf_8), str_curr, sizeof(::std::uint_least32_t));
+
+                if((utf_8 & static_cast<::std::uint_least32_t>(0b1110'0000u)) == static_cast<::std::uint_least32_t>(0b1100'0000u))
+                {
+                    // Check if it is a utf_8 sequence
+                    auto utf8_mask_C0C0C000{utf_8 & static_cast<::std::uint_least32_t>(0x0000'C000u)};
+
+                    constexpr auto utf8_need_chean{16u};
+                    constexpr auto utf8_length{2u};
+
+                    constexpr auto checker{static_cast<::std::uint_least32_t>(0x0000'8000u)};
+
+                    if(utf8_mask_C0C0C000 != checker) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence}; }
+
+                    ::std::uint_least32_t utf8_clean{utf_8};
+                    // Automatic optimization into `and`
+                    utf8_clean <<= utf8_need_chean;
+                    utf8_clean >>= utf8_need_chean;
+
+                    ::std::uint_least32_t utf8_b0{utf8_clean};
+                    constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                    utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                    utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                    ::std::uint_least32_t utf8_b1{utf8_clean};
+                    utf8_b1 >>= 8u;
+                    utf8_b1 &= 0x3Fu;
+                    utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                    char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1)};
+
+                    constexpr auto test_overlong{utf8_length - 2u};
+                    constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                    constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                    }
+
+                    str_curr += utf8_length;
+                }
+                else if((utf_8 & static_cast<::std::uint_least32_t>(0b1111'0000u)) == static_cast<::std::uint_least32_t>(0b1110'0000u))
+                {
+                    // Check if it is a utf_8 sequence
+                    auto utf8_mask_C0C0C000{utf_8 & static_cast<::std::uint_least32_t>(0x00C0'C000u)};
+
+                    constexpr auto utf8_need_chean{8u};
+                    constexpr auto utf8_length{3u};
+
+                    constexpr auto checker{static_cast<::std::uint_least32_t>(0x0080'8000u)};
+
+                    if(utf8_mask_C0C0C000 != checker) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence}; }
+
+                    ::std::uint_least32_t utf8_clean{utf_8};
+                    // Automatic optimization into `and`
+                    utf8_clean <<= utf8_need_chean;
+                    utf8_clean >>= utf8_need_chean;
+
+                    ::std::uint_least32_t utf8_b0{utf8_clean};
+                    constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                    utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                    utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                    ::std::uint_least32_t utf8_b1{utf8_clean};
+                    utf8_b1 >>= 8u;
+                    utf8_b1 &= 0x3Fu;
+                    utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                    ::std::uint_least32_t utf8_b2{utf8_clean};
+                    utf8_b2 >>= 16u;
+                    utf8_b2 &= 0x3Fu;
+                    utf8_b2 <<= (utf8_length - 3u) * 6u;
+
+                    char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2)};
+
+                    constexpr auto test_overlong{utf8_length - 2u};
+                    constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                    constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                    }
+
+                    if(static_cast<char32_t>(0xD7FFu) < utf8_c && utf8_c < static_cast<char32_t>(0xE000u)) [[unlikely]]
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::illegal_surrogate};
+                    }
+
+                    str_curr += utf8_length;
+                }
+                else if((utf_8 & static_cast<::std::uint_least32_t>(0b1111'1000u)) == static_cast<::std::uint_least32_t>(0b1111'0000u))
+                {
+                    // Check if it is a utf_8 sequence
+                    auto utf8_mask_C0C0C000{utf_8 & static_cast<::std::uint_least32_t>(0xC0C0'C000u)};
+
+                    constexpr auto utf8_length{4u};
+
+                    constexpr auto checker{static_cast<::std::uint_least32_t>(0x8080'8000u)};
+
+                    if(utf8_mask_C0C0C000 != checker) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence}; }
+
+                    ::std::uint_least32_t utf8_clean{utf_8};  // utf8_need_chean == 0u
+
+                    ::std::uint_least32_t utf8_b0{utf8_clean};
+                    constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                    utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                    utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                    ::std::uint_least32_t utf8_b1{utf8_clean};
+                    utf8_b1 >>= 8u;
+                    utf8_b1 &= 0x3Fu;
+                    utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                    ::std::uint_least32_t utf8_b2{utf8_clean};
+                    utf8_b2 >>= 16u;
+                    utf8_b2 &= 0x3Fu;
+                    utf8_b2 <<= (utf8_length - 3u) * 6u;
+
+                    ::std::uint_least32_t utf8_b3{utf8_clean};
+                    utf8_b3 >>= 24u;
+                    utf8_b3 &= 0x3Fu;
+                    utf8_b3 <<= (utf8_length - 4u) * 6u;
+
+                    char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2 | utf8_b3)};
+
+                    constexpr auto test_overlong{utf8_length - 2u};
+                    constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                    constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                    }
+
+                    str_curr += utf8_length;
+                }
+                else [[unlikely]]
+                {
+                    if((utf_8 & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u))
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
+                    }
+                    else
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                    }
+                }
+
+                // continue;
+            }
+            else
+            {
+                // byte-by-byte processing
+
+                while(str_curr != str_end)
+                {
+                    auto const str_curr_val{*str_curr};
+
+                    if(str_curr_val < static_cast<char8_t>(0b1000'0000u))
+                    {
+                        if constexpr(zero_illegal)
+                        {
+                            if(str_curr_val == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
+                        }
+
+                        ++str_curr;
+                    }
+                    else if((str_curr_val & static_cast<char8_t>(0b1110'0000u)) == static_cast<char8_t>(0b1100'0000u))
+                    {
+                        if(static_cast<::std::size_t>(str_end - str_curr) < 2uz) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        auto const str_curr_p1_val{*(str_curr + 1u)};
+
+                        if((str_curr_p1_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        constexpr auto utf8_length{2u};
+
+                        ::std::uint_least32_t utf8_b0{static_cast<::std::uint_least32_t>(str_curr_val)};
+                        constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                        utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                        utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                        ::std::uint_least32_t utf8_b1{static_cast<::std::uint_least32_t>(str_curr_p1_val)};
+                        utf8_b1 &= 0x3Fu;
+                        utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                        char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1)};
+
+                        constexpr auto test_overlong{utf8_length - 2u};
+                        constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                        constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                        }
+
+                        str_curr += utf8_length;
+                    }
+                    else if((str_curr_val & static_cast<char8_t>(0b1111'0000u)) == static_cast<char8_t>(0b1110'0000u))
+                    {
+                        if(static_cast<::std::size_t>(str_end - str_curr) < 3uz) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        auto const str_curr_p1_val{*(str_curr + 1u)};
+
+                        if((str_curr_p1_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        auto const str_curr_p2_val{*(str_curr + 2u)};
+
+                        if((str_curr_p2_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        constexpr auto utf8_length{3u};
+
+                        ::std::uint_least32_t utf8_b0{static_cast<::std::uint_least32_t>(str_curr_val)};
+                        constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                        utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                        utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                        ::std::uint_least32_t utf8_b1{static_cast<::std::uint_least32_t>(str_curr_p1_val)};
+                        utf8_b1 &= 0x3Fu;
+                        utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                        ::std::uint_least32_t utf8_b2{static_cast<::std::uint_least32_t>(str_curr_p2_val)};
+                        utf8_b2 &= 0x3Fu;
+                        utf8_b2 <<= (utf8_length - 3u) * 6u;
+
+                        char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2)};
+
+                        constexpr auto test_overlong{utf8_length - 2u};
+                        constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                        constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                        }
+
+                        if(static_cast<char32_t>(0xD7FFu) < utf8_c && utf8_c < static_cast<char32_t>(0xE000u)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::illegal_surrogate};
+                        }
+
+                        str_curr += utf8_length;
+                    }
+                    else if((str_curr_val & static_cast<char8_t>(0b1111'1000u)) == static_cast<char8_t>(0b1111'0000u))
+                    {
+                        if(static_cast<::std::size_t>(str_end - str_curr) < 4uz) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        auto const str_curr_p1_val{*(str_curr + 1u)};
+
+                        if((str_curr_p1_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        auto const str_curr_p2_val{*(str_curr + 2u)};
+
+                        if((str_curr_p2_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        auto const str_curr_p3_val{*(str_curr + 3u)};
+
+                        if((str_curr_p3_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                        }
+
+                        constexpr auto utf8_length{4u};
+
+                        ::std::uint_least32_t utf8_b0{static_cast<::std::uint_least32_t>(str_curr_val)};
+                        constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                        utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                        utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                        ::std::uint_least32_t utf8_b1{static_cast<::std::uint_least32_t>(str_curr_p1_val)};
+                        utf8_b1 &= 0x3Fu;
+                        utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                        ::std::uint_least32_t utf8_b2{static_cast<::std::uint_least32_t>(str_curr_p2_val)};
+                        utf8_b2 &= 0x3Fu;
+                        utf8_b2 <<= (utf8_length - 3u) * 6u;
+
+                        ::std::uint_least32_t utf8_b3{static_cast<::std::uint_least32_t>(str_curr_p3_val)};
+                        utf8_b3 &= 0x3Fu;
+                        utf8_b3 <<= (utf8_length - 4u) * 6u;
+
+                        char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2 | utf8_b3)};
+
+                        constexpr auto test_overlong{utf8_length - 2u};
+                        constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                        constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                        }
+
+                        str_curr += utf8_length;
+                    }
+                    else
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                    }
+                }
+
+                // jump out of a loop
+                break;
+            }
+        }
+
 #else
         // scalar algorithm
 
