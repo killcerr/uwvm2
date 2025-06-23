@@ -587,4 +587,5 @@ int main(int argc, char**)
 */
 
 // macro
+#pragma pop_macro("GNU_NOINLINE")
 #include <uwvm2/utils/macro/pop_macros.h>

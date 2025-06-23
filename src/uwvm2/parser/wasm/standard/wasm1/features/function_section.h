@@ -158,6 +158,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                  ^^ section_curr
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        // Used to check if correct content is recognized as an error.
         bool correct_sequence_right_taken_for_wrong{true};
 #endif
 
@@ -1705,6 +1706,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -2263,6 +2265,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -3593,6 +3596,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -4793,6 +4797,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -5489,6 +5494,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -6753,6 +6759,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 

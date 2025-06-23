@@ -64,7 +64,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
             // Multiple copies of one char will not exceed the boundary, and the efficiency will become higher.
             ::fast_io::freestanding::my_memcpy(iter, u8"\033[38;2;\0", 8uz);
             // memory copy
-            char_type* curr_pos{iter + 7uz};
+            char_type* curr_pos{iter + 7uz};  // 7uz: Replace the written '\0'
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(curr_pos, r);
             *curr_pos = static_cast<char_type>(u8';');
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, g);

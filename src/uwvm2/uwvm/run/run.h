@@ -26,7 +26,7 @@
 import fast_io;
 import uwvm2.uwvm.io;
 import uwvm2.utils.ansies;
-# ifdef UWVM_TIMER
+# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
 import uwvm2.utils.debug;
 # endif
 import uwvm2.utils.madvise;
@@ -54,7 +54,7 @@ import :retval;
 # include <fast_io.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
-# ifdef UWVM_TIMER
+# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
 #  include <uwvm2/utils/debug/impl.h>
 # endif
 # include <uwvm2/utils/madvise/impl.h>
@@ -174,9 +174,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                     u8"\nuwvm: ",
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                    u8"[info] ",
+                    u8"[info]  ",
                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                    u8" Parser Memory Indication: ",
+                    u8"Parser Memory Indication: ",
                     ::uwvm2::uwvm::utils::memory::print_memory{reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                                                reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                                                reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend())},
@@ -210,39 +210,47 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                             ::uwvm2::uwvm::wasm::storage::global_wasm_binfmt_ver1_parameters);
                     }
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
-                    catch(::fast_io::error e)
+                    catch(::fast_io::error)
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        if(execute_wasm_binfmt_ver1_storage_wasm_err.err_code != ::uwvm2::parser::wasm::base::wasm_parse_error_code::ok) [[likely]]
+
+                        // catch fast_io::error (wasm parser error)
+#  if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        if(execute_wasm_binfmt_ver1_storage_wasm_err.err_code == ::uwvm2::parser::wasm::base::wasm_parse_error_code::ok) [[unlikely]]
                         {
-                            // print error
-                            ::uwvm2::parser::wasm::base::error_output_t errout;
-                            errout.module_begin = reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin());
-                            errout.err = execute_wasm_binfmt_ver1_storage_wasm_err;
-                            errout.flag.enable_ansi = static_cast<::std::uint_least8_t>(::uwvm2::uwvm::utils::ansies::put_color);
-#  if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-                            errout.flag.win32_use_text_attr = static_cast<::std::uint_least8_t>(!::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b);
-#  endif
-                            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
-                                                errout,
-                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                                u8"\nuwvm: ",
-                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                                u8"[info] ",
-                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                                u8" Parser Memory Indication: ",
-                                                ::uwvm2::uwvm::utils::memory::print_memory{
-                                                    reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
-                                                    execute_wasm_binfmt_ver1_storage_wasm_err.err_curr,
-                                                    reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend())},
-                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
-                                                u8"\n\n");
+                            // The `ok` exception was thrown. It's a bug in the program.
+                            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
                         }
+#  endif
+
+                        // print error
+                        ::uwvm2::parser::wasm::base::error_output_t errout;
+                        errout.module_begin = reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin());
+                        errout.err = execute_wasm_binfmt_ver1_storage_wasm_err;
+                        errout.flag.enable_ansi = static_cast<::std::uint_least8_t>(::uwvm2::uwvm::utils::ansies::put_color);
+#  if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                        errout.flag.win32_use_text_attr = static_cast<::std::uint_least8_t>(!::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b);
+#  endif
+                        ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                            errout,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\nuwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            u8"[info]  ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Parser Memory Indication: ",
+                                            ::uwvm2::uwvm::utils::memory::print_memory{
+                                                reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
+                                                execute_wasm_binfmt_ver1_storage_wasm_err.err_curr,
+                                                reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cend())},
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                            u8"\n\n");
+
 # endif
                         return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error);
                     }
 #endif
-                    // handle custom
+                    // handle custom section
                     auto const custom_res{
                         ::uwvm2::uwvm::wasm::custom::handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
                                                                                    ::uwvm2::uwvm::wasm::custom::custom_handle_funcs)};
@@ -273,9 +281,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\nuwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                    u8"[info] ",
+                                    u8"[info]  ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8" Parser Memory Indication: ",
+                                    u8"Parser Memory Indication: ",
                                     ::uwvm2::uwvm::utils::memory::print_memory{
                                         reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()),
                                         reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm_file.cbegin()) + 4uz,
