@@ -139,7 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             auto const& [... secs]{ret.sections};
             constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_id{generate_section_max_id<::std::remove_cvref_t<decltype(secs)>...>()};
             constexpr double max_id_probability{1.0 - 1.0 / static_cast<double>(max_id + 1)};
-            static_assert(0.0 <= max_id_probability && max_id_probability <= 1.1);
+            static_assert(0.0 <= max_id_probability && max_id_probability <= 1.0);
             return max_id_probability;
         }
 
@@ -149,7 +149,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             static_assert(sizeof...(Sec) != 0);
 
             constexpr auto max{generate_section_max_id<Sec...>};
-            ::fast_io::array<::fast_io::u8string_view, max> res{};
+            ::fast_io::array<::fast_io::u8string_view, max + 1u> res{};
 
             [&res]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             { ((res[Sec...[I] ::section_id] = Sec...[I] ::section_name), ...); }(::std::make_index_sequence<sizeof...(Sec)>{});

@@ -1029,9 +1029,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     section_curr += last_load_predicate_size;
 
-                    // [before_section ... | func_count ... typeidx1 ... (6last_load_predicate_size - 1) ...] (section_end)
-                    // [                        safe                                                        ] unsafe (could be the section_end)
-                    //                                                                                        ^^ section_curr
+                    // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size - 1) ...] (section_end)
+                    // [                        safe                                                       ] unsafe (could be the section_end)
+                    //                                                                                       ^^ section_curr
                 }
             }
         }
