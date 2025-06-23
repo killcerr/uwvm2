@@ -303,7 +303,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 /// @todo objdump
                 break;
             }
-            [[unlikely]] default: 
+            [[unlikely]] default:
             {
                 ::fast_io::unreachable();
             }

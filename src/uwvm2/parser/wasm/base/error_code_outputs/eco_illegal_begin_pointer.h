@@ -81,21 +81,21 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
         if(static_cast<bool>(errout.flag.win32_use_text_attr) && enable_ansi)
         {
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                            UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
-                                                            L"uwvm: ",
-                                                            UWVM_WIN32_TEXTATTR_RED,
-                                                            L"[error] ",
-                                                            UWVM_WIN32_TEXTATTR_WHITE,
-                                                            L"Begin Pointer \"",
-                                                            UWVM_WIN32_TEXTATTR_CYAN,
-                                                            ::fast_io::mnp::pointervw(errout.err.err_curr),
-                                                            UWVM_WIN32_TEXTATTR_WHITE,
-                                                            L"\" > End Pointer \"",
-                                                            UWVM_WIN32_TEXTATTR_CYAN,
-                                                            ::fast_io::mnp::pointervw(errout.err.err_selectable.err_end),
-                                                            UWVM_WIN32_TEXTATTR_WHITE,
-                                                            L"\".",
-                                                            UWVM_WIN32_TEXTATTR_RST_ALL);
+                                                             UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE,
+                                                             L"uwvm: ",
+                                                             UWVM_WIN32_TEXTATTR_RED,
+                                                             L"[error] ",
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             L"Begin Pointer \"",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             ::fast_io::mnp::pointervw(errout.err.err_curr),
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             L"\" > End Pointer \"",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             ::fast_io::mnp::pointervw(errout.err.err_selectable.err_end),
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             L"\".",
+                                                             UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
     }

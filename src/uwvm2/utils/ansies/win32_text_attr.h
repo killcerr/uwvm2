@@ -23,6 +23,7 @@
 #pragma once
 
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+// Enabled only under win95 to win7
 
 # ifdef UWVM_MODULE
 import fast_io;
@@ -129,8 +130,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
                       ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_zw_io_observer<char_type>> ||
                       ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_win32_family_io_observer<::fast_io::win32_family::wide_nt, char_type>> ||
                       ::std::same_as<::std::remove_cvref_t<Stm>, ::fast_io::basic_win32_family_io_observer<::fast_io::win32_family::ansi_9x, char_type>>);
-        // There is no need to check the win32 return value, as it is just an attempt to modify the attribute.
-        ::fast_io::win32::SetConsoleTextAttribute(::std::forward<Stm>(stm).native_handle(), static_cast<::std::int_least32_t>(attr.attr));
+
+        // Check if it's console, if it's console then try to modify it.
+
+        ::std::uint_least32_t dwMode;  // No initialization required
+        void* handle{::std::forward<Stm>(stm).native_handle()};
+
+        if(::fast_io::win32::GetConsoleMode(handle, ::std::addressof(dwMode))) [[likely]]
+        {
+            // Successfully acquired mode, it's a console handle
+            ::fast_io::win32::SetConsoleTextAttribute(handle, static_cast<::std::int_least32_t>(attr.attr));
+            // No need to check for error codes, can't output here, guaranteed not to affect output
+        }
     }
 }  // namespace uwvm2::utils::ansies
 

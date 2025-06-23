@@ -27,14 +27,19 @@
 
 # ifdef UWVM_MODULE
 import fast_io;
+import uwvm2.uwvm.utils.ansies;
+import uwvm2.uwvm.io;
 # else
 // std
 #  include <cstdint>
 #  include <memory>
 // macro
 #  include <uwvm2/utils/macro/push_macros.h>
+#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 #  include <fast_io.h>
+#  include <uwvm2/uwvm/utils/ansies/impl.h>
+#  include <uwvm2/uwvm/io/impl.h>
 # endif
 
 # ifndef UWVM_MODULE_EXPORT
@@ -52,20 +57,105 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::global
 
         UWVM_GNU_COLD inline enable_win32_ansi() noexcept
         {
-            ::std::uint_least32_t out_omode{};
-            ::std::uint_least32_t err_omode{};
+            set_out();
+            set_err();
+        }
+
+        inline void set_out() noexcept
+        {
+            ::std::uint_least32_t out_omode;  // No initialization required
+
             void* out_handle{::fast_io::win32::GetStdHandle(::fast_io::win32_stdout_number)};
+            if(out_handle == nullptr) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"enable_virtual_terminal_processing: GetStdHandle stdout failed.\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return;
+            }
+
+            if(!::fast_io::win32::GetConsoleMode(out_handle, ::std::addressof(out_omode))) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"enable_virtual_terminal_processing: GetConsoleMode stdout failed.\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return;
+            }
+
+            if(!::fast_io::win32::SetConsoleMode(out_handle, out_omode | enable_virtual_terminal_processing)) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"enable_virtual_terminal_processing: SetConsoleMode stdout failed.\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return;
+            }
+        }
+
+        inline void set_err() noexcept
+        {
+            ::std::uint_least32_t err_omode;  // No initialization required
+
             void* err_handle{::fast_io::win32::GetStdHandle(::fast_io::win32_stderr_number)};
-            ::fast_io::win32::GetConsoleMode(out_handle, ::std::addressof(out_omode));
-            ::fast_io::win32::GetConsoleMode(err_handle, ::std::addressof(err_omode));
-            ::fast_io::win32::SetConsoleMode(out_handle, out_omode | enable_virtual_terminal_processing);
-            ::fast_io::win32::SetConsoleMode(err_handle, err_omode | enable_virtual_terminal_processing);
+            if(err_handle == nullptr) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"enable_virtual_terminal_processing: GetStdHandle stderr failed.\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return;
+            }
+
+            if(!::fast_io::win32::GetConsoleMode(err_handle, ::std::addressof(err_omode))) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"enable_virtual_terminal_processing: GetConsoleMode stderr failed.\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return;
+            }
+
+            if(!::fast_io::win32::SetConsoleMode(err_handle, err_omode | enable_virtual_terminal_processing)) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"enable_virtual_terminal_processing: SetConsoleMode stderr failed.\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return;
+            }
         }
     };
 }  // namespace uwvm2::uwvm::global
 
 # ifndef UWVM_MODULE
 // macro
+#  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 #  include <uwvm2/utils/macro/pop_macros.h>
 # endif
 #endif
