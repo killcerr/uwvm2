@@ -71,7 +71,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
         autosync,
         nocore,
         core,
-        project
+        protect
 #else
 # ifdef MADV_NORMAL
         normal = MADV_NORMAL
@@ -134,9 +134,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
 # endif
         ,
 # ifdef MADV_PROTECT
-        project = MADV_PROTECT
+        protect = MADV_PROTECT
 # else
-        project = -1
+        protect = -1
 # endif
 #endif
     };
@@ -231,4 +231,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
 # endif
 #endif
     }
-}  // namespace uwvm2::utils::ansies
+}  // namespace uwvm2::utils::madvise

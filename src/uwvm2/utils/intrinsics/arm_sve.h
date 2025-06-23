@@ -5,8 +5,6 @@
  *************************************************************/
 
 /**
- * @file        prefetch.cppm
- * @brief       cpu prefetch instruction
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-05-16
@@ -107,6 +105,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 #  pragma GCC aarch64 "arm_sve.h"
 
 # endif
-}  // namespace uwvm2::utils::intrinsics::arm
+}  // namespace uwvm2::utils::intrinsics::arm_sve
 
 #endif

@@ -73,10 +73,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
     template <bool zero_illegal>
     inline constexpr ::uwvm2::utils::utf::u8result check_legal_utf8_rfc3629_unchecked(char8_t const* const str_begin, char8_t const* const str_end) noexcept
     {
-        constexpr unsigned char_bit{static_cast<unsigned>(CHAR_BIT)};
-        constexpr bool char_bit_is_8{char_bit == 8u};
-        constexpr bool is_little_endian{::std::endian::native == ::std::endian::little};
-
         // Since most of the import/export and wasi used within wasm are ascii, the utf8 path is less efficient.
         // sse4, avx2, avx512vbmi, neon, lsx, lasx using the same algorithm as simdutf, see https://github.com/simdutf/simdutf
 
@@ -306,10 +302,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
                     }
 
-                    if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
-                    {
-                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint};
-                    }
+                    if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint}; }
 
                     str_curr += utf8_length;
                 }
@@ -334,7 +327,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 while(str_curr != str_end)
                 {
                     auto str_curr_val{*str_curr};
-                    
+
                     if(str_curr_val < static_cast<char8_t>(0b1000'0000u))
                     {
                         if constexpr(zero_illegal)
@@ -514,6 +507,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
 #else
         // scalar algorithm
+
+        constexpr unsigned char_bit{static_cast<unsigned>(CHAR_BIT)};
+        constexpr bool char_bit_is_8{char_bit == 8u};
+        constexpr bool is_little_endian{::std::endian::native == ::std::endian::little};
 
         if constexpr(is_little_endian && char_bit_is_8 && ::std::same_as<::std::size_t, ::std::uint_least64_t> &&
                      static_cast<unsigned>(::std::numeric_limits<::std::uint_least64_t>::digits) == 64u)
@@ -936,6 +933,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
             while(str_curr != str_end)
             {
+                // [xx] xx xx ... (end)
+                // [  ] unsafe (could be the section_end)
+                //  ^^ section_curr
+
                 auto const str_curr_val{*str_curr};
 
                 if(str_curr_val < static_cast<char8_t>(0b1000'0000u))
@@ -1097,10 +1098,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
                     }
 
-                    if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]]
-                    {
-                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint};
-                    }
+                    if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint}; }
 
                     str_curr += utf8_length;
                 }

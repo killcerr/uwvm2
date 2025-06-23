@@ -69,10 +69,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         returnm1  // Instructs the main function to return -1
     };
 
-    // globals
-    inline ::fast_io::vector<::uwvm2::utils::cmdline::parameter_parsing_results> parsing_result{};
-    inline char8_t const* argv0_dir{};
-    inline ::uwvm2::utils::cmdline::parameter_parsing_results* wasm_file_ppos{};
+    // globals: There is no data contention because command line parsing is always done when the main thread is created.
+    inline ::fast_io::vector<::uwvm2::utils::cmdline::parameter_parsing_results> parsing_result{};  // [global]
+    inline char8_t const* argv0_dir{};                                                              // [global]
+    inline ::uwvm2::utils::cmdline::parameter_parsing_results* wasm_file_ppos{};                    // [global]
 
     /// @brief parsing cmdline
     inline constexpr parsing_return_val parsing(::std::size_t argc, char8_t const* const* argv) noexcept
@@ -288,6 +288,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
                         // Maximum stack size that will hit
                         constexpr ::std::size_t shortest_path_stack_size{parameter_max_name_size + parameter_max_name_size * 4uz / 10uz + 1uz};
+
+                        // shortest_path_stack_size is larger than the maximum test size to ensure that there is no stack overflow.
 
                         // Addition may overflow, need to check size
                         static_assert(shortest_path_stack_size > parameter_max_name_size, "addition overflow");

@@ -371,6 +371,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             if(!c) { return {hash_size, extra_size, real_max_conflict_size}; }
         }
         // The conflict size has not been able to stay within the maximum conflict size, try changing the initial seed.
+        // The consteval function reports an error if the memory is not properly freed.
         ::fast_io::fast_terminate();
     }
 
@@ -406,6 +407,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> res{};
 
         ::fast_io::crc32c_context crc32c{};
+
+        // Note: conflictplace is always 1 greater than its offset, because it prevents subsequent lookups that are equal to 0 (the first element) from being
+        // judged as having no content, leading to parsing failures.
         ::std::size_t conflictplace{1uz};
 
         for(auto const& j: ord)
@@ -424,7 +428,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                     if(!res.ht.index_unchecked(val).str.empty())
                     {
                         // Write a conflict table backward.
-                        for(auto& i: res.ct.index_unchecked(res.ht.index_unchecked(val).str.size() - 1).ctmem)
+
+                        // str.n (str.size()) records the number of conflicts, not the last position of the conflict table,
+                        // if you need to get the last position, you need to subtract one.
+
+                        for(auto& i: res.ct.index_unchecked(res.ht.index_unchecked(val).str.size() - 1uz).ctmem)
                         {
                             // Find an opening.
                             if(i.para == nullptr)
@@ -444,12 +452,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 }
                 else
                 {
-                    // Move the data to the conflict table
+                    // When a hash conflict occurs, move the original data to the conflict table.
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().para = res.ht.index_unchecked(val).para;
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().str = res.ht.index_unchecked(val).str;
+
+                    // Marking hash tables as having conflicting patterns
                     res.ht.index_unchecked(val).para = nullptr;         // Mark this as no available
                     res.ht.index_unchecked(val).str.ptr = nullptr;      // Mark this as no available
                     res.ht.index_unchecked(val).str.n = conflictplace;  // Conflict Table Location
+                    // Note: conflictplace is always 1 greater than its offset, because it prevents subsequent lookups that are equal to 0 (the first element)
+                    // from being judged as having no content, leading to parsing failures.
+
+                    // Setting the current content
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).para = j.para;
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).str = j.str;
                     ++conflictplace;
@@ -500,7 +514,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 if(!htval.str.empty()) [[likely]]
                 {
                     // Get Conflict Table
-                    auto const& ct{ght.ct.index_unchecked(htval.str.size() - 1).ctmem};
+                    // htval.str.size() is created at compile time and is always greater than or equal to 1
+                    // Note: htval.str.size() is always 1 greater than its offset
+                    // index == htval.str.size() - 1uz
+                    auto const& ct{ght.ct.index_unchecked(htval.str.size() - 1uz).ctmem};
+
                     // Conflict table is always the last one is nullptr, here no longer judge cend, improve speed
                     for(auto curr_conflict{ct.cbegin()};; ++curr_conflict)
                     {
