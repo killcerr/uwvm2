@@ -45,8 +45,8 @@ namespace uwvm2::uwvm::cmdline::paras::details
 {
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type
         debug_test_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_begin,
-                      [[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
-                      [[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
+                            [[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
+                            [[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
         // Write the test here
 

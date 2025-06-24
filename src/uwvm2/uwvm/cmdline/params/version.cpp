@@ -197,7 +197,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"\nVersion: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 ::uwvm2::uwvm::custom::uwvm_version,
-                                // flags
+        // flags
 #if defined(UWVM_VERSION_DEV)
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
                                 u8" [dev]",

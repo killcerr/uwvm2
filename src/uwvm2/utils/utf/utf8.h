@@ -200,7 +200,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     constexpr auto test_overlong{utf8_length - 2u};
                     constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                           << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                     if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -245,7 +246,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     constexpr auto test_overlong{utf8_length - 2u};
                     constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                           << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                     if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -296,7 +298,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     constexpr auto test_overlong{utf8_length - 2u};
                     constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                           << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                     if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -367,7 +370,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         constexpr auto test_overlong{utf8_length - 2u};
                         constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                               << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                         if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -416,7 +420,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         constexpr auto test_overlong{utf8_length - 2u};
                         constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                               << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                         if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -481,7 +486,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         constexpr auto test_overlong{utf8_length - 2u};
                         constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                               << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                         if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -620,7 +626,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         constexpr auto test_overlong{utf8_length - 2u};
                         constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                               << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                         if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -665,7 +672,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         constexpr auto test_overlong{utf8_length - 2u};
                         constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                               << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                         if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -716,7 +724,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         constexpr auto test_overlong{utf8_length - 2u};
                         constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                        constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                               << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                         if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                         {
                             return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -790,7 +799,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                             constexpr auto test_overlong{utf8_length - 2u};
                             constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                            constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                            constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                                   << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                             if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                             {
                                 return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -839,7 +849,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                             constexpr auto test_overlong{utf8_length - 2u};
                             constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                            constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                            constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                                   << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                             if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                             {
                                 return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -904,7 +915,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                             constexpr auto test_overlong{utf8_length - 2u};
                             constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                            constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                            constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                                   << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                             if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                             {
                                 return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -979,7 +991,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     constexpr auto test_overlong{utf8_length - 2u};
                     constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                           << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                     if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -1028,7 +1041,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     constexpr auto test_overlong{utf8_length - 2u};
                     constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                           << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                     if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -1093,7 +1107,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     constexpr auto test_overlong{utf8_length - 2u};
                     constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u) << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                    constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                           << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                     if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};

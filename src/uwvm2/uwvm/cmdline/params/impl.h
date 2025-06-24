@@ -30,7 +30,6 @@
 # include "wasm_abi.h"
 # include "wasm_binfmt.h"
 # include "log_output.h"
-# include "debug_config.h"
 
 # ifdef _DEBUG
 #  include "debug_test.h"
