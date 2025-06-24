@@ -161,6 +161,11 @@ namespace test
             n = static_cast<::std::size_t>(end - begin);
             ptr = reinterpret_cast<char*>(::std::malloc(n));
 
+            if (ptr == nullptr) [[unlikely]]
+            {
+                ::fast_io::fast_terminate();
+            }
+
             ::fast_io::freestanding::my_memcpy(ptr, begin, n * sizeof(char));
         }
 
@@ -422,6 +427,7 @@ int main()
             else
             {
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -497,6 +503,7 @@ int main()
             else
             {
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -572,6 +579,7 @@ int main()
             else
             {
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -892,6 +900,7 @@ int main()
 
             if(!(error_rate_eng(eng) < error_rate))
             {
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -977,6 +986,7 @@ int main()
 
             if(!(error_rate_eng(eng) < error_rate))
             {
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -1062,6 +1072,7 @@ int main()
 
             if(!(error_rate_eng(eng) < error_rate))
             {
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -1143,6 +1154,7 @@ int main()
 
                 for (unsigned k{}; k != 6u; ++k)
                 {
+                    // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
                     ::fast_io::io::print(buf_ov, "\0");
                 }
@@ -1225,6 +1237,7 @@ int main()
 
                 for (unsigned k{}; k != 6u; ++k)
                 {
+                    // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
                     ::fast_io::io::print(buf_ov, "\0");
                 }
@@ -1307,6 +1320,7 @@ int main()
 
                 for (unsigned k{}; k != 6u; ++k)
                 {
+                    // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
                     ::fast_io::io::print(buf_ov, "\0");
                 }
@@ -1393,6 +1407,7 @@ int main()
 
             if(!(error_rate_eng(eng) < error_rate))
             {
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -1403,6 +1418,7 @@ int main()
 
                 for (unsigned k{}; k != 6u; ++k)
                 {
+                    // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
                     ::fast_io::io::print(buf_ov, "\0");
                 }
@@ -1489,6 +1505,7 @@ int main()
 
             if(!(error_rate_eng(eng) < error_rate))
             {
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -1499,6 +1516,7 @@ int main()
 
                 for (unsigned k{}; k != 6u; ++k)
                 {
+                    // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
                     ::fast_io::io::print(buf_ov, "\0");
                 }
@@ -1585,6 +1603,7 @@ int main()
 
             if(!(error_rate_eng(eng) < error_rate))
             {
+                // The former has been exported and is memory safe.
                 *(buf_ov.curr_ptr - 1u) |= 0x80;
                 ::fast_io::io::print(buf_ov, "\0");
             }
@@ -1595,6 +1614,7 @@ int main()
 
                 for (unsigned k{}; k != 6u; ++k)
                 {
+                    // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
                     ::fast_io::io::print(buf_ov, "\0");
                 }
