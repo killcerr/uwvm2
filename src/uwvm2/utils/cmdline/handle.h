@@ -131,7 +131,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                     auto const dealloc_size{static_cast<::std::size_t>(this->end - this->begin)};
                     Alloc::deallocate_n(this->begin, dealloc_size);
                 }
+                this->begin = nullptr;
             }
+            this->end = nullptr;
         }
     };
 #endif
