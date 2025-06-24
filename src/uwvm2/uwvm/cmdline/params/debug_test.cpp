@@ -41,7 +41,7 @@ import uwvm2.uwvm.io;
 #  include <uwvm2/uwvm/io/impl.h>
 # endif
 
-namespace uwvm2::uwvm::cmdline::paras::details
+namespace uwvm2::uwvm::cmdline::params::details
 {
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type
         debug_test_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_begin,
@@ -54,7 +54,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
         return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
     }
 
-}  // namespace uwvm2::uwvm::cmdline::paras::details
+}  // namespace uwvm2::uwvm::cmdline::params::details
 
 // macro
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>

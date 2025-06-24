@@ -57,7 +57,7 @@ import uwvm2.uwvm.utils.install_path;
 # include <uwvm2/uwvm/utils/install_path/impl.h>
 #endif
 
-namespace uwvm2::uwvm::cmdline::paras::details
+namespace uwvm2::uwvm::cmdline::params::details
 {
     template <typename Stm>
     inline void logo_u8print_not_rst_impl(Stm&& stm) noexcept
@@ -818,7 +818,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
         return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
     }
 
-}  // namespace uwvm2::uwvm::cmdline::paras::details
+}  // namespace uwvm2::uwvm::cmdline::params::details
 
 // macro
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>

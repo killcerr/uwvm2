@@ -147,7 +147,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             {
                 // this is a parameter
                 // Special treatment for run
-                constexpr auto run_para{::std::addressof(::uwvm2::uwvm::cmdline::paras::run)};
+                constexpr auto run_para{::std::addressof(::uwvm2::uwvm::cmdline::params::run)};
 
                 // find hash table
                 auto const para{::uwvm2::utils::cmdline::find_from_hash_table(ht, argv_str)};

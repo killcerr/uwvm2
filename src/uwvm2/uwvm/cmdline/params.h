@@ -42,20 +42,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
     namespace details
     {
         inline constexpr ::uwvm2::utils::cmdline::parameter const* parameter_unsort[]{
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::version),
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::run),
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::help),
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::mode),
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::wasm_abi),
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::wasm_binfmt),
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::u8log_output),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::version),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::run),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::help),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::mode),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_abi),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_binfmt),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::u8log_output),
 
 #ifdef _DEBUG
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::debug_test),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::debug_test),
 #endif
 
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::log_win32_use_ansi),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_win32_use_ansi),
 #endif
         };
     }  // namespace details
