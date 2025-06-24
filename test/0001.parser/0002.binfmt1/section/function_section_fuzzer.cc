@@ -1032,8 +1032,8 @@ int main()
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(8u) << 7u, 
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(14u) << 7u) - 1u};
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u, 
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
