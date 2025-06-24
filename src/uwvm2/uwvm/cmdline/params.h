@@ -49,9 +49,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             ::std::addressof(::uwvm2::uwvm::cmdline::paras::wasm_abi),
             ::std::addressof(::uwvm2::uwvm::cmdline::paras::wasm_binfmt),
             ::std::addressof(::uwvm2::uwvm::cmdline::paras::u8log_output),
-
+            ::std::addressof(::uwvm2::uwvm::cmdline::paras::debug_config),
+            
 #ifdef _DEBUG
-            ::std::addressof(::uwvm2::uwvm::cmdline::paras::test),
+            ::std::addressof(::uwvm2::uwvm::cmdline::paras::debug_test),
 #endif
 
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))

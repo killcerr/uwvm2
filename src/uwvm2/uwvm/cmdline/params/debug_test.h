@@ -47,8 +47,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::paras
 {
     namespace details
     {
-        inline bool test_is_exist{};
-        extern "C++" ::uwvm2::utils::cmdline::parameter_return_type test_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
+        inline bool debug_test_is_exist{};
+        extern "C++" ::uwvm2::utils::cmdline::parameter_return_type debug_test_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                   ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                   ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
 
@@ -58,10 +58,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::paras
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wbraced-scalar-init"
 # endif
-    inline constexpr ::uwvm2::utils::cmdline::parameter test{.name{u8"--test"},
-                                                             .describe{u8"Debug Test."},
-                                                             .handle{::std::addressof(details::test_callback)},
-                                                             .is_exist{::std::addressof(details::test_is_exist)}};
+    inline constexpr ::uwvm2::utils::cmdline::parameter debug_test{.name{u8"--debug-test"},
+                                                             .describe{u8"Custom Debug Test (Only exists in debug mode)."},
+                                                             .handle{::std::addressof(details::debug_test_callback)},
+                                                             .is_exist{::std::addressof(details::debug_test_is_exist)},
+                                                             .cate{::uwvm2::utils::cmdline::categorization::debug}};
 # if defined(__clang__)
 #  pragma clang diagnostic pop
 # endif

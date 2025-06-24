@@ -23,12 +23,12 @@
 #include <memory>
 #include <utility>
 
-#include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-
 #if defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
 # include <linux/version.h>
 #endif
+
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
 #ifdef UWVM_MODULE
 import fast_io;
@@ -197,6 +197,24 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"\nVersion: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 ::uwvm2::uwvm::custom::uwvm_version,
+                                // flags
+#if defined(UWVM_VERSION_DEV)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [dev]",
+#elif defined(UWVM_VERSION_ALPHA)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [alpha]",
+#elif defined(UWVM_VERSION_BETA)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [beta]",
+#elif defined(UWVM_VERSION_RELEASE_CANDIDATE)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [rc]",
+#elif defined(UWVM_VERSION_STABLE_RELEASE)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [sr]",
+#endif
+                                // git commit data
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
 #if defined(UWVM_GIT_COMMIT_DATA)
                                 u8" (",

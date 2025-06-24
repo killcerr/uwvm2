@@ -30,9 +30,10 @@ export import :mode;
 export import :wasm_abi;
 export import :wasm_binfmt;
 export import :log_output;
+export import :debug_config;
 
 #ifdef _DEBUG
-export import :test;
+export import :debug_test;
 #endif
 
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))

@@ -506,7 +506,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
         }
 
 #else
-        // scalar algorithm
 
         constexpr unsigned char_bit{static_cast<unsigned>(CHAR_BIT)};
         constexpr bool char_bit_is_8{char_bit == 8u};
@@ -515,6 +514,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
         if constexpr(is_little_endian && char_bit_is_8 && ::std::same_as<::std::size_t, ::std::uint_least64_t> &&
                      static_cast<unsigned>(::std::numeric_limits<::std::uint_least64_t>::digits) == 64u)
         {
+            // SWAR algorithm
+
             // Avoid using (u)intN_t in non-macro-qualified environments, as it may not be provided, use (u)int_leastN_t and determine its digits to determine
             // if it is the same type as the expected (u)intN_t
 

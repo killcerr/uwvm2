@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-06-24
  * @copyright   ASHP-1.0 License
  */
 
@@ -20,24 +20,20 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+#include <memory>
+
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+
+export module uwvm2.uwvm.cmdline.params:debug_config;
 
 #ifndef UWVM_MODULE
-# include "version.h"
-# include "run.h"
-# include "help.h"
-# include "mode.h"
-# include "wasm_abi.h"
-# include "wasm_binfmt.h"
-# include "log_output.h"
-# include "debug_config.h"
-
-# ifdef _DEBUG
-#  include "debug_test.h"
-# endif
-
-# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-#  include "log_win32_use_ansi.h"
-# endif
-
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "debug_config.h"
