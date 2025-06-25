@@ -486,8 +486,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::unreachable();
                 }
             }
-
-            this->mode = {};
         }
 
         inline constexpr void clear_destroy() noexcept
