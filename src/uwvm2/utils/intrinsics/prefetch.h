@@ -24,15 +24,11 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-// no import
-#else
-// std
+// platfrom
 /// @brief      Including intrin.h in the absence of __builtin_prefetch
 # if !UWVM_HAS_BUILTIN(__builtin_prefetch)
 #  include <intrin.h>
 # endif
-#endif
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 

@@ -27,7 +27,7 @@ module;
 #include <cstddef>
 #include <concepts>
 #include <memory>
-// sys
+// platform
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&              \
      !defined(__wasm__)
 # include <sys/mman.h>

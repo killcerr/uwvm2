@@ -24,7 +24,7 @@
 
 module;
 
-// std
+// platfrom
 /// @brief      Including intrin.h in the absence of __builtin_prefetch
 #if !UWVM_HAS_BUILTIN(__builtin_prefetch)
 # include <intrin.h>

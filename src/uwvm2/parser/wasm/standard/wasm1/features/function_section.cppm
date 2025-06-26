@@ -33,6 +33,7 @@ module;
 #include <memory>
 #include <bit>
 #include <numeric>
+// platform
 #if defined(_MSC_VER) && !defined(__clang__)
 # if !defined(_KERNEL_MODE) && defined(_M_AMD64)
 #  include <emmintrin.h>  // MSVC x86_64-SSE2
