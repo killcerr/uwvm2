@@ -31,6 +31,7 @@ import fast_io;
 # include <concepts>
 # include <bit>
 # include <stdfloat>
+# include <limits>
 // macro
 # include <uwvm2/parser/wasm/feature/feature_push_macro.h>
 // import

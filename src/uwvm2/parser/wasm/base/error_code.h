@@ -29,6 +29,7 @@ import fast_io;
 # include <cstddef>
 # include <cstdint>
 # include <stdfloat>
+# include <limits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import

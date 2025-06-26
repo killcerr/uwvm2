@@ -51,10 +51,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         ::std::byte const* module_end{};
     };
 
+    /// @details    Assumed safe range: [module_curr, module_curr + 4)
+    /// @note       Before using the unchecked function, make sure that the safe part of the assume has been checked.
     inline constexpr bool is_wasm_file_unchecked(::std::byte const* module_curr) noexcept
     {
-        /// @note Before using the unchecked function, make sure that the safe part of the assume has been checked.
-
         // [00 61 73 6D  ] Version ... (end)
         // [safe (assume)]
         //  ^^ module_curr
@@ -62,9 +62,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4uz * sizeof(char8_t)) == 0;
     }
 
+    /// @details    Assumed safe range: [module_curr - 4, module_curr + 4)
+    /// @note       Before using the unchecked function, make sure that the safe part of the assume has been checked.
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
     {
-        /// @note Before using the unchecked function, make sure that the safe part of the assume has been checked.
 
 #if CHAR_BIT == 8
         // [00 61 73 6D Version ...] (end)
@@ -86,7 +87,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
 
-        // simulation little endian
+        // simulate little endian
         // [??? ??? ??? ??? ?00 ?01 ?02 ?03 ...] (end)
         // [             safe (assume)         ] unsafe
         //              ^^ module_curr - 1u: minus 1u is assumed to be legitimate
@@ -106,14 +107,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
             temp <<= 8u;
             temp |= c_val;
         }
-        
+
         return temp;
 
 #endif
     }
 
     /// @brief      detect wasm binfmt version
-    /// @return     0 : error, other : binfmt version
+    /// @return     0: error, other: binfmt version
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version(::std::byte const* const module_begin,
                                                                                                        ::std::byte const* const module_end) noexcept
     {

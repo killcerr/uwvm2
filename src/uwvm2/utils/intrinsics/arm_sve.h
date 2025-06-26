@@ -85,7 +85,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svcntp_b8)]]
     [[__gnu__::__always_inline__]]
     [[__gnu__::__nodebug__]]
-    extern ::std::uint64_t svcntp_b8(svbool_t, svbool_t);
+    extern ::std::uint64_t svcntp_b8(svbool_t, svbool_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svcntb)]]
     [[__gnu__::__always_inline__]]
