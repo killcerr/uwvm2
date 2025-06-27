@@ -73,6 +73,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// The standard does not explicitly require sizeof(::std::ptrdiff_t) ≤ sizeof(::std::size_t), but the design goal of the two implicitly implies a common
     /// relationship in actual implementations.
 
+    // On systems with CHAR_BIT == 128, uint_least8_t, uint_least16_t, uint_least32_t, and uint_least64_t can be the same 128-bit type, which is allowed by the standard and is the logical implementation. However, this can lead to conceptual errors at this point, so it needs to be avoided.
+    static_assert(!::std::same_as<::std::uint_least8_t, ::std::uint_least16_t> && 
+                  !::std::same_as<::std::uint_least8_t, ::std::uint_least32_t> &&
+                  !::std::same_as<::std::uint_least8_t, ::std::uint_least64_t> &&
+                  !::std::same_as<::std::uint_least16_t, ::std::uint_least32_t> &&
+                  !::std::same_as<::std::uint_least16_t, ::std::uint_least64_t> &&
+                  !::std::same_as<::std::uint_least32_t, ::std::uint_least64_t>);
+
     /// @brief      Bytes
     /// @details    The simplest form of value are raw uninterpreted bytes. In the abstract syntax they are represented as hexadecimal
     ///             literals.

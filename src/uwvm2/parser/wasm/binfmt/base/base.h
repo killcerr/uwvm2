@@ -80,6 +80,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
 
 #else
         // CHAR_BIT > 8
+        
         // assuming:
         // [?00 ?61 ?73 ?6D Version ...] (end)
         // [           safe (assume)   ] unsafe
