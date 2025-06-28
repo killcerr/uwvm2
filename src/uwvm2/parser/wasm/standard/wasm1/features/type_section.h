@@ -427,6 +427,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             static_assert(sizeof(prefix) == 1uz);
             // Size equal to one does not need to do little-endian conversion
 
+            // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+            prefix = static_cast<decltype(prefix)>(static_cast<::std::uint_least8_t>(prefix) & 0xFFu);
+#endif
+
             ++section_curr;
             // [... prefix] ...
             // [   safe   ] unsafe (could be the section_end)

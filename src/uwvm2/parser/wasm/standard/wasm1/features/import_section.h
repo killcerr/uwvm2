@@ -455,6 +455,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // No access, security
             fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
 
+            // For platforms with CHAR_BIT greater than 8, the view here does not need to do any non-zero checking of non-low 8 bits within a single byte,
+            // because a standards-compliant UTF-8 decoder must only care about the low 8 bits of each byte when verifying or decoding a byte sequence.
+
             // check utf8
             check_import_export_text_format(curr_final_import_export_text_format_wapper{},
                                             reinterpret_cast<::std::byte const*>(fit.module_name.cbegin()),
@@ -519,6 +522,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
 
+            // For platforms with CHAR_BIT greater than 8, the view here does not need to do any non-zero checking of non-low 8 bits within a single byte,
+            // because a standards-compliant UTF-8 decoder must only care about the low 8 bits of each byte when verifying or decoding a byte sequence.
+
             // check utf8
             check_import_export_text_format(curr_final_import_export_text_format_wapper{},
                                             reinterpret_cast<::std::byte const*>(fit.extern_name.cbegin()),
@@ -547,6 +553,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             static_assert(sizeof(fit.imports.type) == 1uz);
             // Size equal to one does not need to do little-endian conversion
+
+            // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+            fit.imports.type = static_cast<decltype(fit.imports.type)>(static_cast<::std::uint_least8_t>(fit.imports.type) & 0xFFu);
+#endif
 
             // importdesc_count never > 256 (max=255+1), convert to unsigned
             if(static_cast<unsigned>(fit.imports.type) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]

@@ -42,6 +42,7 @@ import :def;
 # include <cstddef>
 # include <cstdint>
 # include <cstring>
+# include <climits>
 # include <concepts>
 # include <type_traits>
 # include <utility>
@@ -403,6 +404,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 // get section type
                 ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte sec_id;
                 ::std::memcpy(::std::addressof(sec_id), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte));
+
+                // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+                sec_id = static_cast<decltype(sec_id)>(static_cast<::std::uint_least8_t>(sec_id) & 0xFFu);
+#endif
 
                 static_assert(sizeof(sec_id) == 1uz);
                 // Size equal to one does not need to do little-endian conversion

@@ -124,6 +124,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         static_assert(sizeof(flags) == 1uz);
         // Size equal to one does not need to do little-endian conversion
 
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        flags = static_cast<decltype(flags)>(static_cast<::std::uint_least8_t>(flags) & 0xFFu);
+#endif
+
         if(flags != 0u && flags != 1u) [[unlikely]]
         {
             err.err_curr = curr;
@@ -247,6 +252,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         static_assert(sizeof(elemtype) == 1uz);
         // Size equal to one does not need to do little-endian conversion
 
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        elemtype = static_cast<decltype(elemtype)>(static_cast<::std::uint_least8_t>(elemtype) & 0xFFu);
+#endif
+
         // The element type elemtype must be funcref
         if(elemtype != 0x70) [[unlikely]]
         {
@@ -336,6 +346,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         static_assert(sizeof(gvt) == 1uz);
         // Size equal to one does not need to do little-endian conversion
 
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        gvt = static_cast<decltype(gvt)>(static_cast<::std::uint_least8_t>(gvt) & 0xFFu);
+#endif
+
         if(!is_valid_value_type(gvt)) [[unlikely]]
         {
             err.err_curr = curr;
@@ -369,6 +384,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         static_assert(sizeof(mut) == 1uz);
         // Size equal to one does not need to do little-endian conversion
+
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        mut = static_cast<decltype(mut)>(static_cast<::std::uint_least8_t>(mut) & 0xFFu);
+#endif
 
         if(mut > 1) [[unlikely]]
         {

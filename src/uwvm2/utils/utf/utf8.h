@@ -944,6 +944,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
         else
         {
             // byte-by-byte processing
+            // Compatible with platforms where CHAR_BIT is greater than 8, because it is guaranteed that only a meaningful portion of each byte operation is
+            // fetched
 
             while(str_curr != str_end)
             {
@@ -953,8 +955,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                 auto const str_curr_val{*str_curr};
 
+                // Subsequent judgment is required for < static_cast<char8_t>(0b1000'0000u), so for platforms where CHAR_BIT is not equal to 8 the high bit
+                // needs to be cleared.
+                if constexpr(!char_bit_is_8) { str_curr_val &= 0xFFu; }
+
                 if(str_curr_val < static_cast<char8_t>(0b1000'0000u))
                 {
+                    // ??0xxxxxxx
+
                     if constexpr(zero_illegal)
                     {
                         if(str_curr_val == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
@@ -964,6 +972,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 }
                 else if((str_curr_val & static_cast<char8_t>(0b1110'0000u)) == static_cast<char8_t>(0b1100'0000u))
                 {
+                    // ??110xxxxx ??10xxxxxx
+
                     if(static_cast<::std::size_t>(str_end - str_curr) < 2uz) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
@@ -1003,6 +1013,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 }
                 else if((str_curr_val & static_cast<char8_t>(0b1111'0000u)) == static_cast<char8_t>(0b1110'0000u))
                 {
+                    // ??1110xxxx ??10xxxxxx ??10xxxxxx
+
                     if(static_cast<::std::size_t>(str_end - str_curr) < 3uz) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
@@ -1058,6 +1070,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 }
                 else if((str_curr_val & static_cast<char8_t>(0b1111'1000u)) == static_cast<char8_t>(0b1111'0000u))
                 {
+                    // ??11110xxx ??10xxxxxx ??10xxxxxx ??10xxxxxx
+
                     if(static_cast<::std::size_t>(str_end - str_curr) < 4uz) [[unlikely]]
                     {
                         return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
