@@ -156,6 +156,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_table_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -171,6 +172,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_memory_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -186,6 +188,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_global_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -201,6 +204,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief Define function for wasm1 external_types
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_extern_prefix_imports_handler(
         ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -243,6 +247,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief Define a function for wasm1 to check for utf8 sequences.
+    /// @note  ADL for distribution to the correct handler function
     inline constexpr void check_import_export_text_format(
         ::uwvm2::parser::wasm::standard::wasm1::features::text_format_wapper<
             ::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be replaced

@@ -86,6 +86,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     };
 
     /// @brief Define functions for value_type against wasm1 for checking value_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr bool define_check_value_type(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
@@ -272,6 +273,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief Define type_prefix for wasm1 Functions for checking type_prefix
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_type_prefix_handler(
         ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
