@@ -150,8 +150,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // Copy the situation that has been processed correctly
         // The func_counter is exactly the right size
         ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                           section_leb_begin,
-                                           func_counter * sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
+                      section_leb_begin,
+                      func_counter * sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
 
         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += func_counter;
 
@@ -1880,9 +1880,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     func_counter += 32u;
 
-                    ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u8x32x2v0),
-                                                       sizeof(u8x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(need_write_u8x32x2v0), sizeof(u8x32simd));
 
                     functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 32u;
 
@@ -2165,9 +2163,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // The above func_counter check checks for a maximum of 64 data to be processed at a time,
                     // and it's perfectly safe to do so here without any additional checks
 
-                    ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u8x32x2v0),
-                                                       sizeof(u8x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(need_write_u8x32x2v0), sizeof(u8x32simd));
 
                     functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += handled_simd;
 
@@ -2205,9 +2201,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data, func_counter has been checked and is ready to be written.
-                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x64simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x64simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 64uz;
 
@@ -2829,9 +2823,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -2884,9 +2876,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16u;
 
@@ -3452,9 +3442,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -3507,9 +3495,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16u;
 
@@ -3545,9 +3531,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data
-                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x32simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x32simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 32uz;
 
@@ -3774,9 +3758,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
 
@@ -3923,9 +3905,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
 
@@ -4017,9 +3997,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                        ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //                       [    needwrite   ]...]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
 
@@ -4161,9 +4139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                            ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //                            [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
 
@@ -4200,9 +4176,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data
-                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x16simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x16simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16uz;
 
@@ -4365,9 +4339,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data
-                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x16simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x16simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16uz;
 
@@ -5034,9 +5006,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     func_counter += 32u;
 
-                    ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u16x32),
-                                                       sizeof(u16x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(need_write_u16x32), sizeof(u16x32simd));
 
                     functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 32u;
 
@@ -5250,9 +5220,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // The above func_counter check checks for a maximum of 64 data to be processed at a time,
                     // and it's perfectly safe to do so here without any additional checks
 
-                    ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u16x32),
-                                                       sizeof(u16x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(need_write_u16x32), sizeof(u16x32simd));
 
                     functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += handled_simd;
 
@@ -5428,9 +5396,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                                            128))};
 
                 // write data
-                ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                   ::std::addressof(need_write_u16x64),
-                                                   sizeof(u16x64multisimd2x512));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(need_write_u16x64), sizeof(u16x64multisimd2x512));
 
                 functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 64uz;
 
@@ -5956,9 +5922,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -6038,9 +6002,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 16u;
 
@@ -6505,9 +6467,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -6587,9 +6547,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 16u;
 
@@ -6662,9 +6620,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                               15,
                                                                                               32))};
 
-                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp,
-                                                   ::std::addressof(u16x16v0),
-                                                   sizeof(u16x16simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x16v0), sizeof(u16x16simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 16uz;
 
@@ -6703,9 +6659,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                               31,
                                                                                               32))};
 
-                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp,
-                                                   ::std::addressof(u16x16v1),
-                                                   sizeof(u16x16simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x16v1), sizeof(u16x16simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 16uz;
 
@@ -6936,9 +6890,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x8),
-                                                           sizeof(u16x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x8), sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 8u;
 
@@ -7060,9 +7012,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x8),
-                                                           sizeof(u16x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x8), sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd;
 
@@ -7143,8 +7093,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                       [    needwrite   ]...]
 
                         ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(simd_vector_str_need_write),
-                                                           sizeof(u16x8simd));
+                                      ::std::addressof(simd_vector_str_need_write),
+                                      sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 8u;
 
@@ -7261,9 +7211,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                            ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //                            [    needwrite   ]
 
-                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x8),
-                                                           sizeof(u16x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x8), sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd;
 

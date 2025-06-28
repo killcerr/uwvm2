@@ -74,7 +74,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Value types are encoded by a single byte.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.1
-    inline constexpr bool is_valid_value_type(::uwvm2::parser::wasm::standard::wasm1::type::value_type vt) noexcept
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr bool is_valid_value_type(::uwvm2::parser::wasm::standard::wasm1::type::value_type vt  // [adl]
+                                              ) noexcept
     {
         switch(vt)
         {
@@ -90,7 +92,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
-    inline constexpr ::std::byte const* scan_limit_type(::uwvm2::parser::wasm::standard::wasm1::type::limits_type & limit_r,
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr ::std::byte const* scan_limit_type(::uwvm2::parser::wasm::standard::wasm1::type::limits_type & limit_r,  // [adl]
                                                         ::std::byte const* const begin,
                                                         ::std::byte const* const end,
                                                         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -214,7 +217,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Memory types classify linear memories and their size range.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.6
-    inline constexpr ::std::byte const* scan_table_type(::uwvm2::parser::wasm::standard::wasm1::type::table_type & table_r,
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr ::std::byte const* scan_table_type(::uwvm2::parser::wasm::standard::wasm1::type::table_type & table_r,  // [adl]
                                                         ::std::byte const* const begin,
                                                         ::std::byte const* const end,
                                                         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -274,7 +278,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Memory types classify linear memories and their size range.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.5
-    inline constexpr ::std::byte const* scan_memory_type(::uwvm2::parser::wasm::standard::wasm1::type::memory_type & memory_r,
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr ::std::byte const* scan_memory_type(::uwvm2::parser::wasm::standard::wasm1::type::memory_type & memory_r,  // [adl]
                                                          ::std::byte const* const begin,
                                                          ::std::byte const* const end,
                                                          ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS

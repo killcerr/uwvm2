@@ -99,11 +99,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
 
         // 1st: module_curr + 3u
         // 2nd: module_curr + 2u
-        // 3rd: module_curr + 1u 
+        // 3rd: module_curr + 1u
         // 4th: module_curr
         // 5th: (break) module_curr - 1u
 
-        for (auto c{module_curr + 3u}; c != module_curr - 1u; --c)
+        for(auto c{module_curr + 3u}; c != module_curr - 1u; --c)
         {
             auto const c_val{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(*c) & 0xFFu};
 

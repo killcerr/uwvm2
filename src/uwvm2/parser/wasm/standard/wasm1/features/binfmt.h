@@ -111,7 +111,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @note ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<wasm1>, // [adl]
+    inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<wasm1>,  // [adl]
                                                                 ::fast_io::tuple<Fs...>) noexcept
     {
         return ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>;
