@@ -41,6 +41,7 @@ import :feature_def;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <type_traits>
 # include <utility>
@@ -115,7 +116,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // ^^ curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte flags;
-        ::fast_io::freestanding::my_memcpy(::std::addressof(flags), curr, sizeof(flags));
+        ::std::memcpy(::std::addressof(flags), curr, sizeof(flags));
 
         static_assert(sizeof(flags) == 1uz);
         // Size equal to one does not need to do little-endian conversion
@@ -237,7 +238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // ^^ curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte elemtype;
-        ::fast_io::freestanding::my_memcpy(::std::addressof(elemtype), curr, sizeof(elemtype));
+        ::std::memcpy(::std::addressof(elemtype), curr, sizeof(elemtype));
 
         static_assert(sizeof(elemtype) == 1uz);
         // Size equal to one does not need to do little-endian conversion
@@ -325,7 +326,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::type::value_type gvt;
 
-        ::fast_io::freestanding::my_memcpy(::std::addressof(gvt), curr, sizeof(gvt));
+        ::std::memcpy(::std::addressof(gvt), curr, sizeof(gvt));
 
         static_assert(sizeof(gvt) == 1uz);
         // Size equal to one does not need to do little-endian conversion
@@ -359,7 +360,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte mut;
 
-        ::fast_io::freestanding::my_memcpy(::std::addressof(mut), curr, sizeof(mut));
+        ::std::memcpy(::std::addressof(mut), curr, sizeof(mut));
 
         static_assert(sizeof(mut) == 1uz);
         // Size equal to one does not need to do little-endian conversion

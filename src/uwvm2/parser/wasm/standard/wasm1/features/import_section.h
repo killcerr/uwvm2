@@ -44,6 +44,7 @@ import :type_section;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <type_traits>
 # include <utility>
@@ -537,7 +538,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [                                   safe                                               ] unsafe (could be the section_end)
             //                                                                             ^^ section_curr
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
+            ::std::memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
 
             static_assert(sizeof(fit.imports.type) == 1uz);
             // Size equal to one does not need to do little-endian conversion

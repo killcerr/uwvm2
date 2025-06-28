@@ -32,6 +32,7 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 # include <cstdint>
 # include <cstddef>
 # include <climits>
+# include <cstring>
 # include <type_traits>
 # include <memory>
 // import
@@ -59,7 +60,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         // [safe (assume)]
         //  ^^ module_curr
 
-        return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4uz * sizeof(char8_t)) == 0;
+        return ::std::memcmp(module_curr, u8"\0asm", 4uz * sizeof(char8_t)) == 0;
     }
 
     /// @details    Assumed safe range: [module_curr - 4, module_curr + 4)
@@ -73,14 +74,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         //              ^^ module_curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp;
-        ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
+        ::std::memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
         // Size of temp greater than one requires little-endian conversion
+        // supported: big-endian, little-endian, pdp-endian
         temp = ::fast_io::little_endian(temp);
         return temp;
 
 #else
-        // CHAR_BIT > 8
-        
+        // CHAR_BIT > 8: The number of bits per byte is greater than 8, when only the lower eight bits of information are valid.
+
         // assuming:
         // [?00 ?61 ?73 ?6D Version ...] (end)
         // [           safe (assume)   ] unsafe

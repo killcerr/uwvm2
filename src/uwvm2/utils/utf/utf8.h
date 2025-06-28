@@ -30,6 +30,7 @@ import :base;
 # include <cstdint>
 # include <cstddef>
 # include <climits>
+# include <cstring>
 # include <concepts>
 # include <memory>
 # include <bit>
@@ -99,7 +100,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             {
                 u8x16simd need_check;
 
-                ::fast_io::freestanding::my_memcpy(::std::addressof(need_check), str_curr, sizeof(u8x16simd));
+                ::std::memcpy(::std::addressof(need_check), str_curr, sizeof(u8x16simd));
 
                 bool const check_has_non_ascii{static_cast<bool>(
 # if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
@@ -166,7 +167,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             {
                 ::std::uint_least32_t utf_8;
 
-                ::fast_io::freestanding::my_memcpy(::std::addressof(utf_8), str_curr, sizeof(::std::uint_least32_t));
+                ::std::memcpy(::std::addressof(utf_8), str_curr, sizeof(::std::uint_least32_t));
 
                 if((utf_8 & static_cast<::std::uint_least32_t>(0b1110'0000u)) == static_cast<::std::uint_least32_t>(0b1100'0000u))
                 {
@@ -534,11 +535,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 {
                     ::std::uint_least64_t need_check1;
 
-                    ::fast_io::freestanding::my_memcpy(::std::addressof(need_check1), str_curr, sizeof(::std::uint_least64_t));
+                    ::std::memcpy(::std::addressof(need_check1), str_curr, sizeof(::std::uint_least64_t));
 
                     ::std::uint_least64_t need_check2;
 
-                    ::fast_io::freestanding::my_memcpy(::std::addressof(need_check2), str_curr + sizeof(::std::uint_least64_t), sizeof(::std::uint_least64_t));
+                    ::std::memcpy(::std::addressof(need_check2), str_curr + sizeof(::std::uint_least64_t), sizeof(::std::uint_least64_t));
 
                     ::std::uint_least64_t const check_has_non_ascii{(need_check1 | need_check2) & static_cast<::std::uint_least64_t>(0x8080'8080'8080'8080u)};
 
@@ -592,7 +593,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 {
                     ::std::uint_least32_t utf_8;
 
-                    ::fast_io::freestanding::my_memcpy(::std::addressof(utf_8), str_curr, sizeof(::std::uint_least32_t));
+                    ::std::memcpy(::std::addressof(utf_8), str_curr, sizeof(::std::uint_least32_t));
 
                     if((utf_8 & static_cast<::std::uint_least32_t>(0b1110'0000u)) == static_cast<::std::uint_least32_t>(0b1100'0000u))
                     {

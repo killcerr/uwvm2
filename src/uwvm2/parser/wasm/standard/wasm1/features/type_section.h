@@ -42,6 +42,7 @@ import :types;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <type_traits>
 # include <utility>
@@ -417,7 +418,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix;
 
             // no necessary to check, because (section_curr != section_end)
-            ::fast_io::freestanding::my_memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));
+            ::std::memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));
             // set section_curr to next
             // No sense check, never cross the line because (section_curr < section_end)
 
