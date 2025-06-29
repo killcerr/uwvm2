@@ -39,7 +39,9 @@ if constexpr(::std::same_as<char_type, char>)
                 UWVM_WIN32_TEXTATTR_RED,
                 "[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
-                "Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+                "(offset=",
+                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                ") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char>(
                     static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
@@ -57,7 +59,9 @@ if constexpr(::std::same_as<char_type, char>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RED),
         "[error] ",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
-        "Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+        "(offset=",
+        ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+        ") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_YELLOW),
         ::uwvm2::utils::utf::get_utf_error_descripten<char>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
@@ -82,7 +86,9 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                 UWVM_WIN32_TEXTATTR_RED,
                 L"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
-                L"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+                L"(offset=",
+                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                L") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(
                     static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
@@ -93,19 +99,22 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
         }
     }
 #endif
-    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
-                                                     L"uwvm: ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RED),
-                                                     L"[error] ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
-                                                     L"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_YELLOW),
-                                                     ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(
-                                                         static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
-                                                     L"\".",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
+    ::fast_io::operations::print_freestanding<false>(
+        ::std::forward<Stm>(stream),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL UWVM_AES_W_WHITE),
+        L"uwvm: ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RED),
+        L"[error] ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+        L"(offset=",
+        ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+        L") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_YELLOW),
+        ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(
+            static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+        L"\".",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
 }
 else if constexpr(::std::same_as<char_type, char8_t>)
@@ -125,7 +134,9 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 UWVM_WIN32_TEXTATTR_RED,
                 u8"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
-                u8"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+                u8"(offset=",
+                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                u8") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(
                     static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
@@ -136,19 +147,22 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         }
     }
 #endif
-    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
-                                                     u8"uwvm: ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RED),
-                                                     u8"[error] ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
-                                                     u8"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_YELLOW),
-                                                     ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(
-                                                         static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
-                                                     u8"\".",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
+    ::fast_io::operations::print_freestanding<false>(
+        ::std::forward<Stm>(stream),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL UWVM_AES_U8_WHITE),
+        u8"uwvm: ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RED),
+        u8"[error] ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+        u8"(offset=",
+        ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+        u8") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_YELLOW),
+        ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(
+            static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+        u8"\".",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
     return;
 }
 else if constexpr(::std::same_as<char_type, char16_t>)
@@ -168,7 +182,9 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                 UWVM_WIN32_TEXTATTR_RED,
                 u"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
-                u"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+                u"(offset=",
+                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                u") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(
                     static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
@@ -179,19 +195,22 @@ else if constexpr(::std::same_as<char_type, char16_t>)
         }
     }
 #endif
-    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
-                                                     u"uwvm: ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RED),
-                                                     u"[error] ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
-                                                     u"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_YELLOW),
-                                                     ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(
-                                                         static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
-                                                     u"\".",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
+    ::fast_io::operations::print_freestanding<false>(
+        ::std::forward<Stm>(stream),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL UWVM_AES_U16_WHITE),
+        u"uwvm: ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RED),
+        u"[error] ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+        u"(offset=",
+        ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+        u") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_YELLOW),
+        ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(
+            static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+        u"\".",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
     return;
 }
 else if constexpr(::std::same_as<char_type, char32_t>)
@@ -211,7 +230,9 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                 UWVM_WIN32_TEXTATTR_RED,
                 U"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
-                U"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+                U"(offset=",
+                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                U") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(
                     static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
@@ -222,18 +243,21 @@ else if constexpr(::std::same_as<char_type, char32_t>)
         }
     }
 #endif
-    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
-                                                     U"uwvm: ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RED),
-                                                     U"[error] ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
-                                                     U"Module Name Is Invalid UTF-8 Sequence. Reason: \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_YELLOW),
-                                                     ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(
-                                                         static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
-                                                     U"\".",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
+    ::fast_io::operations::print_freestanding<false>(
+        ::std::forward<Stm>(stream),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL UWVM_AES_U32_WHITE),
+        U"uwvm: ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RED),
+        U"[error] ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+        U"(offset=",
+        ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+        U") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_YELLOW),
+        ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(
+            static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.error_module_name.type)),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+        U"\".",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
     return;
 }

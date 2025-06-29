@@ -115,6 +115,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 #ifdef UWVM_TIMER
             ::uwvm2::utils::debug::timer parsing_timer{u8"file loader"};
 #endif
+            // On platforms where CHAR_BIT is greater than 8, there is no need to clear the utf-8 non-low 8 bits here
             ::uwvm2::uwvm::wasm::storage::execute_wasm_file = ::fast_io::native_file_loader{module_file_name};
         }
 #ifdef __cpp_exceptions
