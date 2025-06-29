@@ -29,6 +29,7 @@ export import :help;
 export import :mode;
 export import :wasm_abi;
 export import :wasm_binfmt;
+export import :wasm_set_main_module_name;
 export import :log_output;
 
 #ifdef _DEBUG

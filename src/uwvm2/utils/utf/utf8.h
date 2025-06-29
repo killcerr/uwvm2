@@ -955,8 +955,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                 auto const str_curr_val{*str_curr};
 
+                // A standards-compliant UTF-8 decoder must only care about the low 8 bits of each byte when verifying or decoding a byte sequence.
+
                 // Subsequent judgment is required for < static_cast<char8_t>(0b1000'0000u), so for platforms where CHAR_BIT is not equal to 8 the high bit
                 // needs to be cleared.
+
                 if constexpr(!char_bit_is_8) { str_curr_val &= 0xFFu; }
 
                 if(str_curr_val < static_cast<char8_t>(0b1000'0000u))

@@ -33,6 +33,7 @@ import uwvm2.uwvm.wasm.feature;
 #else
 // import
 # include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
@@ -59,5 +60,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 
     inline ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t
         execute_wasm_binfmt_ver1_storage{};  // [global] No global variable dependencies from other translation units
+
+    inline ::fast_io::u8string_view rename_module_name{};  // [global] No global variable dependencies from other translation units
 
 }  // namespace uwvm2::uwvm::wasm::storage

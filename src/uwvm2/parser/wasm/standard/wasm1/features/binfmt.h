@@ -78,6 +78,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         inline static constexpr ::fast_io::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
+        // binfmt1
+        using module_name_text_format = ::uwvm2::parser::wasm::concepts::operation::type_replacer<
+            ::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+            ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
+
         // type section
         using value_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::value_type>;
@@ -94,10 +99,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::type::memory_type>;
         using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::type::global_type>;
-        using import_export_text_format =
-            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::text_format_wapper<
-                                                                          ::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
+        using import_export_text_format = ::uwvm2::parser::wasm::concepts::operation::type_replacer<
+            ::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+            ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
 
         // binfmt ver1
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -120,6 +124,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     // feature
     static_assert(::uwvm2::parser::wasm::concepts::wasm_feature<wasm1>);
     static_assert(::uwvm2::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<wasm1>);
+    // binfmt1
+    static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_module_name_text_format<wasm1>);
     // type section
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_value_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix<wasm1>);

@@ -24,6 +24,8 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import uwvm2.utils.utf;
+import uwvm2.parser.wasm.text_format;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.standard.wasm1.type;
 #else
@@ -38,6 +40,8 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/utf/impl.h>
+# include <uwvm2/parser/wasm/text_format/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 #endif
@@ -69,6 +73,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
     template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 Version>
     inline constexpr binfmt_version_t<Version> binfmt_version{};
+
+    /// @brief Used to wrap the code into a type
+    template <::uwvm2::parser::wasm::text_format::text_format TFWapper>
+    struct text_format_wapper
+    {
+        inline static constexpr ::uwvm2::parser::wasm::text_format::text_format type{TFWapper};
+    };
 
     /// @brief      Determine if there is a feature name
     /// @see        test\0001.parser\0001.concept\feature_name.cc
@@ -102,8 +113,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
     /// @brief      binfmt handle version func
     template <typename module_storage_t, has_feature_name... Fs>
-    using binfmt_handle_version_func_p_type =
-        module_storage_t (*)(::std::byte const*, ::std::byte const*, ::uwvm2::parser::wasm::base::error_impl&, feature_parameter_t<Fs...> const&) UWVM_THROWS;
+    using binfmt_handle_version_func_p_type = module_storage_t (*)(::fast_io::u8string_view,
+                                                                   ::std::byte const*,
+                                                                   ::std::byte const*,
+                                                                   ::uwvm2::parser::wasm::base::error_impl&,
+                                                                   feature_parameter_t<Fs...> const&) UWVM_THROWS;
 
     /// @brief      Define the version number of the required wasm file binary format tagging
     /// @see        test\0001.parser\0001.concept\binfmt.cc

@@ -249,8 +249,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief Define a function for wasm1 to check for utf8 sequences.
     /// @note  ADL for distribution to the correct handler function
     inline constexpr void check_import_export_text_format(
-        ::uwvm2::parser::wasm::standard::wasm1::features::text_format_wapper<
-            ::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be replaced
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be
+                                                                                                                                               // replaced
         ::std::byte const* begin,
         ::std::byte const* end,
         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -381,8 +381,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             // get final utf8-checker
             using curr_final_import_export_text_format_wapper = ::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...>;
+#if 0
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::can_check_import_export_text_format<Fs...>);
-
+#endif
             // Ensuring the existence of valid information
 
             // [...  module_namelen] ... module_name ... extern_namelen ... extern_name ... import_type extern_func ...

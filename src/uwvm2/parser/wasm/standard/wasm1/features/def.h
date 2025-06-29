@@ -353,12 +353,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///                 using import_export_text_format = type_replacer<root_of_replacement, text_format_wapper<text_format::xxx>>;
     ///             };
     ///             ```
-    template <::uwvm2::parser::wasm::text_format::text_format TFWapper>
-    struct text_format_wapper
-    {
-        inline static constexpr ::uwvm2::parser::wasm::text_format::text_format type{TFWapper};
-    };
-
     template <typename FeatureType>
     concept has_import_export_text_format = requires {
         typename FeatureType::import_export_text_format;

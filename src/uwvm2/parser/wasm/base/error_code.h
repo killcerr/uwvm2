@@ -97,7 +97,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         func_section_resolved_not_match_the_actual_number,
         size_exceeds_the_maximum_value_of_size_t,
         duplicate_imports_of_the_same_import_type,
-        invalid_utf8_sequence
+        invalid_utf8_sequence,
+        module_name_is_invalid_utf8_sequence
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type
@@ -106,6 +107,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::fast_io::u8string_view module_name;
         ::fast_io::u8string_view extern_name;
         ::std::uint_least8_t type;
+    };
+
+    /// @brief Used to set the output of module_name errors
+    struct module_name_err_t
+    {
+        ::fast_io::u8string_view module_name;
+        ::std::uint_least32_t type;
     };
 
     /// @brief define IEEE 754 F32 and F64
@@ -131,6 +139,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     union err_selectable_t
     {
         duplicate_imports_or_exports_t duplic_imports_or_exports;
+
+        module_name_err_t error_module_name;
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;
