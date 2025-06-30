@@ -953,7 +953,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 // [  ] unsafe (could be the section_end)
                 //  ^^ section_curr
 
-                auto const str_curr_val{*str_curr};
+                auto str_curr_val{*str_curr};
 
                 // A standards-compliant UTF-8 decoder must only care about the low 8 bits of each byte when verifying or decoding a byte sequence.
 
