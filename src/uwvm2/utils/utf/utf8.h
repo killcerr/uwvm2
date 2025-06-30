@@ -79,11 +79,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
         auto str_curr{str_begin};
 
-#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512VBMI__) || defined(__AVX512VBMI2__)) & 0
+#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512VBMI__) || defined(__AVX512VBMI2__)) && 0
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX2__) || defined(__loongarch_asx)) & 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX2__) || defined(__loongarch_asx)) && 0
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__SSSE3__) || defined(__ARM_NEON) || defined(__loongarch_sx)) & 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__SSSE3__) || defined(__ARM_NEON) || defined(__loongarch_sx)) && 0
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__SSE2__) || defined(__wasm_simd128__))
 

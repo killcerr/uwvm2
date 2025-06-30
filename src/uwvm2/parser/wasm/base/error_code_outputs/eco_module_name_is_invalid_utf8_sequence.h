@@ -40,7 +40,8 @@ if constexpr(::std::same_as<char_type, char>)
                 "[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
                 "(offset=",
-                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                ::fast_io::mnp::addrvw(errout.err.err_curr -
+                                       reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
                 ") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char>(
@@ -87,7 +88,8 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                 L"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
                 L"(offset=",
-                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                ::fast_io::mnp::addrvw(errout.err.err_curr -
+                                       reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
                 L") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(
@@ -135,7 +137,8 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 u8"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8"(offset=",
-                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                ::fast_io::mnp::addrvw(errout.err.err_curr -
+                                       reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
                 u8") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(
@@ -183,7 +186,8 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                 u"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u"(offset=",
-                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                ::fast_io::mnp::addrvw(errout.err.err_curr -
+                                       reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
                 u") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(
@@ -231,7 +235,8 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                 U"[error] ",
                 UWVM_WIN32_TEXTATTR_WHITE,
                 U"(offset=",
-                ::fast_io::mnp::addrvw(errout.err.err_curr - reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
+                ::fast_io::mnp::addrvw(errout.err.err_curr -
+                                       reinterpret_cast<::std::byte const*>(errout.err.err_selectable.error_module_name.module_name.cbegin())),
                 U") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
                 ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(
