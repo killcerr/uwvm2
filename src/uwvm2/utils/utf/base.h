@@ -32,6 +32,7 @@ import fast_io;
 # include <memory>
 // import
 # include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -215,27 +216,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 if constexpr(::std::same_as<char_type2, char>)
                 {
                     return {
-                        "Illegal proxy entry error. The decoded character cannot be in the U+D800.... .DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
+                        "Illegal proxy entry error. The decoded character cannot be in the U+D800...DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
                 }
                 else if constexpr(::std::same_as<char_type2, wchar_t>)
                 {
                     return {
-                        L"Illegal proxy entry error. The decoded character cannot be in the U+D800.... .DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
+                        L"Illegal proxy entry error. The decoded character cannot be in the U+D800...DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
                 }
                 else if constexpr(::std::same_as<char_type2, char8_t>)
                 {
                     return {
-                        u8"Illegal proxy entry error. The decoded character cannot be in the U+D800.... .DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
+                        u8"Illegal proxy entry error. The decoded character cannot be in the U+D800...DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
                 }
                 else if constexpr(::std::same_as<char_type2, char16_t>)
                 {
                     return {
-                        u"Illegal proxy entry error. The decoded character cannot be in the U+D800.... .DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
+                        u"Illegal proxy entry error. The decoded character cannot be in the U+D800...DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
                 }
                 else if constexpr(::std::same_as<char_type2, char32_t>)
                 {
                     return {
-                        U"Illegal proxy entry error. The decoded character cannot be in the U+D800.... .DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
+                        U"Illegal proxy entry error. The decoded character cannot be in the U+D800...DFFF range (UTF-8 or UTF-32), or the high proxy term must follow the low proxy term, and the low proxy term must be preceded by the high proxy term (UTF-16)"};
                 }
             }
             case utf_error_code::contains_empty_characters:

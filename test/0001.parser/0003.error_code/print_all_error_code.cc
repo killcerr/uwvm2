@@ -58,23 +58,25 @@ int main()
         ::fast_io::u32obuf_file u32f{u8"error_code_test_u32c.log"};
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
-        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence) + 1u; ++i)
+        for(::std::uint_least32_t i{};
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence) + 1u;
+            ++i)
         {
             // Specialization of the addressing section
-            switch (static_cast<::uwvm2::parser::wasm::base::wasm_parse_error_code>(i))
+            switch(static_cast<::uwvm2::parser::wasm::base::wasm_parse_error_code>(i))
             {
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type:
                 {
                     errout.err.err_selectable.duplic_imports_or_exports.module_name = u8"module_name";
                     errout.err.err_selectable.duplic_imports_or_exports.extern_name = u8"extern_name";
-                    errout.err.err_selectable.duplic_imports_or_exports.type = 0u; // func
+                    errout.err.err_selectable.duplic_imports_or_exports.type = 0u;  // func
                     break;
                 }
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence:
                 {
                     errout.err.err_selectable.u32 = 0x00;
                     break;
-                }                
+                }
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence:
                 {
                     errout.err.err_selectable.error_module_name.module_name = u8"test";
@@ -82,7 +84,7 @@ int main()
                     break;
                 }
                 default:
-                {                
+                {
                     errout.err.err_selectable.u64 = 0xcdcdcdcdcdcdcdcd;
                     break;
                 }

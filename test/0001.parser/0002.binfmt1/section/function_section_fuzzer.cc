@@ -62,8 +62,9 @@ import uwvm.wasm.storage;
 namespace test
 {
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void check_function_section([[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t> sec_adl,
-                                                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+    inline constexpr void check_function_section([[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<
+                                                     ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t> sec_adl,
+                                                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                                                  ::std::byte const* const section_begin,
                                                  ::std::byte const* const section_end,
                                                  ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count) noexcept
@@ -72,10 +73,13 @@ namespace test
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
         // get function_section_storage_t from storages
-        auto const& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>(module_storage.sections)};
+        auto const& functionsec{
+            ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>(
+                module_storage.sections)};
 
         // check has typesec
-        auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>>(module_storage.sections)};
+        auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>>(module_storage.sections)};
 
         auto section_curr{section_begin};
 
@@ -84,7 +88,6 @@ namespace test
         //                         ^^ section_curr
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check
-
 
         // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
 
@@ -153,34 +156,25 @@ namespace test
 
         inline memory_safety_checker_allocator(char const* begin, char const* end) noexcept
         {
-            if (begin > end) [[unlikely]]
-            {
-                ::fast_io::fast_terminate();
-            }
-            else if (begin == end) [[unlikely]]
-            {
-                return;
-            }
+            if(begin > end) [[unlikely]] { ::fast_io::fast_terminate(); }
+            else if(begin == end) [[unlikely]] { return; }
 
             n = static_cast<::std::size_t>(end - begin);
             ptr = reinterpret_cast<char*>(::std::malloc(n));
 
-            if (ptr == nullptr) [[unlikely]]
-            {
-                ::fast_io::fast_terminate();
-            }
+            if(ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
 
             ::fast_io::freestanding::my_memcpy(ptr, begin, n * sizeof(char));
         }
 
         inline memory_safety_checker_allocator(memory_safety_checker_allocator const&) noexcept = delete;
-        inline memory_safety_checker_allocator(memory_safety_checker_allocator &&) noexcept = delete;
-        inline memory_safety_checker_allocator& operator=(memory_safety_checker_allocator const&) noexcept = delete;
-        inline memory_safety_checker_allocator& operator=(memory_safety_checker_allocator &&) noexcept = delete;
+        inline memory_safety_checker_allocator(memory_safety_checker_allocator&&) noexcept = delete;
+        inline memory_safety_checker_allocator& operator= (memory_safety_checker_allocator const&) noexcept = delete;
+        inline memory_safety_checker_allocator& operator= (memory_safety_checker_allocator&&) noexcept = delete;
 
         inline ~memory_safety_checker_allocator() noexcept
         {
-            if (ptr) [[likely]]
+            if(ptr) [[likely]]
             {
                 ::std::free(ptr);
                 ptr = nullptr;
@@ -188,27 +182,25 @@ namespace test
             n = 0uz;
         }
 
-        inline constexpr char const* cbegin() const noexcept
-        {
-            return ptr;
-        }
+        inline constexpr char const* cbegin() const noexcept { return ptr; }
 
-        inline constexpr char const* cend() const noexcept
-        {
-            return ptr + n;
-        }
+        inline constexpr char const* cend() const noexcept { return ptr + n; }
     };
-}
+}  // namespace test
 
 int main()
 {
     [[maybe_unused]] ::fast_io::ibuf_white_hole_engine eng;
     [[maybe_unused]] ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> func_count_eng{8u, 1024u};
-    
-    [[maybe_unused]] constexpr auto u8_1b_errval{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u)};
-    [[maybe_unused]] constexpr auto u8_2b_errval{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u)};
-    [[maybe_unused]] constexpr auto u16_2b_errval{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u)};
-    [[maybe_unused]] constexpr auto u16_3b_errval{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 16u)};
+
+    [[maybe_unused]] constexpr auto u8_1b_errval{
+        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u)};
+    [[maybe_unused]] constexpr auto u8_2b_errval{
+        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u)};
+    [[maybe_unused]] constexpr auto u16_2b_errval{
+        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u)};
+    [[maybe_unused]] constexpr auto u16_3b_errval{
+        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 16u)};
     // u32_5b no error value
 
     [[maybe_unused]] ::std::uniform_int_distribution<unsigned> error_rate_eng{0u, 99u};
@@ -216,30 +208,31 @@ int main()
     // u163b and u325b use conventional algorithms that do not need to be checked
 
     // all correct u81b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
-            0u, 
+            0u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_1b{0u, max_u81b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u8_1b(eng)};
             ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
@@ -251,23 +244,20 @@ int main()
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -278,7 +268,7 @@ int main()
     }
 
     // all correct u82b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
@@ -288,20 +278,21 @@ int main()
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_2b{0u, max_u82b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u8_2b(eng)};
             ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
@@ -313,23 +304,20 @@ int main()
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -340,57 +328,55 @@ int main()
     }
 
     // all correct u162b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u16_2b{0u, max_u162b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u16_2b(eng)};
             ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -401,33 +387,30 @@ int main()
     }
 
     // all correct with redundancies u81b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
-        
+
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
-            0u, 
+            0u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_1b{0u, max_u81b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u8_1b(eng)};
 
-            if(error_rate_eng(eng) < error_rate)
-            {
-                ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
-            }
+            if(error_rate_eng(eng) < error_rate) { ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr)); }
             else
             {
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
@@ -438,35 +421,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -477,33 +458,30 @@ int main()
     }
 
     // all correct with redundancies u82b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
-        
+
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_2b{0u, max_u82b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u8_2b(eng)};
 
-            if(error_rate_eng(eng) < error_rate)
-            {
-                ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
-            }
+            if(error_rate_eng(eng) < error_rate) { ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr)); }
             else
             {
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
@@ -514,35 +492,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -553,33 +529,30 @@ int main()
     }
 
     // all correct with redundancies u162b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
-        
+
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u16_2b{0u, max_u162b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u16_2b(eng)};
 
-            if(error_rate_eng(eng) < error_rate)
-            {
-                ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
-            }
+            if(error_rate_eng(eng) < error_rate) { ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr)); }
             else
             {
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
@@ -590,35 +563,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -629,71 +600,69 @@ int main()
     }
 
     // too large u81b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
-        
+
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
-            0u, 
+            0u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_1b{0u, max_u81b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u8_1b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u8_1b_errval));
             }
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -702,78 +671,73 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too large u82b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
-        
+
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_2b{0u, max_u82b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u8_2b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u8_2b_errval));
             }
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -782,78 +746,73 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too large u162b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
-        
+
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u16_2b{0u, max_u162b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u16_2b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u16_2b_errval));
             }
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -862,43 +821,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too large and error u81b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
-            0u, 
+            0u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_1b{0u, max_u81b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u8_1b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u8_1b_errval));
             }
 
@@ -911,35 +867,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -948,43 +902,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too large and error u82b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_2b{0u, max_u82b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u8_2b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u8_2b_errval));
             }
 
@@ -997,35 +948,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1034,43 +983,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too large and error u162b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u16_2b{0u, max_u162b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u16_2b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u16_2b_errval));
             }
 
@@ -1083,35 +1029,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1120,43 +1064,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too long u81b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
-            0u, 
+            0u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_1b{0u, max_u81b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u8_1b(eng)};
             ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
 
-            if (!(error_rate_eng(eng) < error_rate))
-            {            
-                has_catch = false; // Prevents no illegal values from being generated
+            if(!(error_rate_eng(eng) < error_rate))
+            {
+                has_catch = false;  // Prevents no illegal values from being generated
 
-                for (unsigned k{}; k != 6u; ++k)
+                for(unsigned k{}; k != 6u; ++k)
                 {
                     // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
@@ -1166,35 +1107,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1203,43 +1142,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too long u82b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_2b{0u, max_u82b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u8_2b(eng)};
             ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
 
-            if (!(error_rate_eng(eng) < error_rate))
-            {            
-                has_catch = false; // Prevents no illegal values from being generated
+            if(!(error_rate_eng(eng) < error_rate))
+            {
+                has_catch = false;  // Prevents no illegal values from being generated
 
-                for (unsigned k{}; k != 6u; ++k)
+                for(unsigned k{}; k != 6u; ++k)
                 {
                     // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
@@ -1249,35 +1185,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1286,43 +1220,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // too long u162b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u16_2b{0u, max_u162b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             auto const curr{curr_range_u16_2b(eng)};
             ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
 
-            if (!(error_rate_eng(eng) < error_rate))
-            {            
-                has_catch = false; // Prevents no illegal values from being generated
+            if(!(error_rate_eng(eng) < error_rate))
+            {
+                has_catch = false;  // Prevents no illegal values from being generated
 
-                for (unsigned k{}; k != 6u; ++k)
+                for(unsigned k{}; k != 6u; ++k)
                 {
                     // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
@@ -1332,35 +1263,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1369,43 +1298,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // hybird u81b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
-            0u, 
+            0u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_1b{0u, max_u81b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u8_1b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u8_1b_errval));
             }
 
@@ -1416,11 +1342,11 @@ int main()
                 ::fast_io::io::print(buf_ov, "\0");
             }
 
-            if (!(error_rate_eng(eng) < error_rate))
-            {            
-                has_catch = false; // Prevents no illegal values from being generated
+            if(!(error_rate_eng(eng) < error_rate))
+            {
+                has_catch = false;  // Prevents no illegal values from being generated
 
-                for (unsigned k{}; k != 6u; ++k)
+                for(unsigned k{}; k != 6u; ++k)
                 {
                     // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
@@ -1430,35 +1356,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_1b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1467,43 +1391,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // hybird u82b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u8_2b{0u, max_u82b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u8_2b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u8_2b_errval));
             }
 
@@ -1514,11 +1435,11 @@ int main()
                 ::fast_io::io::print(buf_ov, "\0");
             }
 
-            if (!(error_rate_eng(eng) < error_rate))
-            {            
-                has_catch = false; // Prevents no illegal values from being generated
+            if(!(error_rate_eng(eng) < error_rate))
+            {
+                has_catch = false;  // Prevents no illegal values from being generated
 
-                for (unsigned k{}; k != 6u; ++k)
+                for(unsigned k{}; k != 6u; ++k)
                 {
                     // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
@@ -1528,35 +1449,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u8_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1565,43 +1484,40 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 
     // hybird u162b
-    for (unsigned i{}; i != 10'000u; ++i)
+    for(unsigned i{}; i != 10'000u; ++i)
     {
         auto const error_rate{i % 100u};
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
-            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u, 
+            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
             (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u16_2b{0u, max_u162b_in_curr_round};
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};        
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 const func_count{func_count_eng(eng)};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};
 
-        char buf[16384]; // 8 * 1024 max
+        char buf[16384];  // 8 * 1024 max
         ::fast_io::obuffer_view buf_ov{buf, buf + sizeof(buf)};
 
         bool has_catch{true};
 
-        for (::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
+        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 j{}; j != func_count; ++j)
         {
             if(error_rate_eng(eng) < error_rate)
-            {            
+            {
                 auto const curr{curr_range_u16_2b(eng)};
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(curr));
             }
             else
             {
-                has_catch = false; // Prevents no illegal values from being generated
+                has_catch = false;  // Prevents no illegal values from being generated
                 ::fast_io::io::print(buf_ov, ::fast_io::mnp::leb128_put(u16_2b_errval));
             }
 
@@ -1612,11 +1528,11 @@ int main()
                 ::fast_io::io::print(buf_ov, "\0");
             }
 
-            if (!(error_rate_eng(eng) < error_rate))
-            {            
-                has_catch = false; // Prevents no illegal values from being generated
+            if(!(error_rate_eng(eng) < error_rate))
+            {
+                has_catch = false;  // Prevents no illegal values from being generated
 
-                for (unsigned k{}; k != 6u; ++k)
+                for(unsigned k{}; k != 6u; ++k)
                 {
                     // The former has been exported and is memory safe.
                     *(buf_ov.curr_ptr - 1u) |= 0x80;
@@ -1626,35 +1542,33 @@ int main()
         }
 
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1> strg{};
-        auto &typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>>(strg.sections)};
         typesec.types.resize(static_cast<::std::size_t>(typeidxmax));
 
         ::uwvm2::parser::wasm::base::error_impl e{};
 
         // Verifying Memory Safety (need asan)
         ::test::memory_safety_checker_allocator memory_safety_checker{buf_ov.cbegin(), buf_ov.cend()};
-        
+
         try
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::scan_function_section_impl_u16_2b<::uwvm2::parser::wasm::standard::wasm1::features::wasm1>(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 e,
-                {}, 
-                func_counter, 
+                {},
+                func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
-                strg, 
-                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()), 
+                strg,
+                reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
                 reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()),
                 func_count);
         }
@@ -1663,12 +1577,9 @@ int main()
             has_catch = true;
         }
 
-        if (!has_catch)
-        {
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
+        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
     }
 }
 
 // macro
-# include <uwvm2/utils/macro/pop_macros.h>
+#include <uwvm2/utils/macro/pop_macros.h>

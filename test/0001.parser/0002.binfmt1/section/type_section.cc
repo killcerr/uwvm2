@@ -112,6 +112,5 @@ int main()
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2, F3>() == true);
 }
 
-
 // macro
-# include <uwvm2/utils/macro/pop_macros.h>
+#include <uwvm2/utils/macro/pop_macros.h>

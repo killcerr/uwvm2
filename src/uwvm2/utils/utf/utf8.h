@@ -843,11 +843,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
                 }
 
+                if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint}; }
+
                 str_curr += utf8_length;
             }
             else
             {
-                return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                if((str_curr_val & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u))
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
+                }
+                else
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                }
             }
         }
 
@@ -1569,11 +1578,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
                 }
 
+                if(utf8_c > static_cast<char32_t>(0x10FFFFu)) [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::excessive_codepoint}; }
+
                 str_curr += utf8_length;
             }
             else
             {
-                return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                if((str_curr_val & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u))
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
+                }
+                else
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                }
             }
         }
 
@@ -1999,7 +2017,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     }
                     else
                     {
-                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                        if((str_curr_val & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u))
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
+                        }
+                        else
+                        {
+                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                        }
                     }
                 }
 
@@ -2429,7 +2454,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         }
                         else
                         {
-                            return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                            if((str_curr_val & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u))
+                            {
+                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
+                            }
+                            else
+                            {
+                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                            }
                         }
                     }
 
@@ -2635,7 +2667,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 }
                 else
                 {
-                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                    if((str_curr_val & static_cast<::std::uint_least32_t>(0b1100'0000u)) == static_cast<::std::uint_least32_t>(0b1000'0000u))
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_long_sequence};
+                    }
+                    else
+                    {
+                        return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+                    }
                 }
             }
         }
