@@ -31,6 +31,8 @@ module;
 #include <memory>
 #include <bit>
 #include <limits>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.utils.utf:utf8;
 

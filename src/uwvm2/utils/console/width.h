@@ -31,8 +31,8 @@ import fast_io;
 # include <cstring>
 # include <concepts>
 // platform
-# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&             \
-    !defined(__wasm__)
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&              \
+     !defined(__wasm__)
 #  include <sys/ioctl.h>
 # endif
 // import
@@ -52,9 +52,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::console
         if(hStdout == nullptr) [[unlikely]] { return 0uz; }
 
         ::fast_io::win32::console_screen_buffer_info csbi;
-        if(::fast_io::win32::GetConsoleScreenBufferInfo(hStdout, ::std::addressof(csbi))) [[likely]] 
-        { 
-            return static_cast<::std::size_t>(csbi.Window.Right - csbi.Window.Left); 
+        if(::fast_io::win32::GetConsoleScreenBufferInfo(hStdout, ::std::addressof(csbi))) [[likely]]
+        {
+            return static_cast<::std::size_t>(csbi.Window.Right - csbi.Window.Left);
         }
 
         return 0uz;
