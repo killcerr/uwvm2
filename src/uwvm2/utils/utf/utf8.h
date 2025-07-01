@@ -85,7 +85,773 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX512VBMI__) || defined(__AVX512VBMI2__)) && 0
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX2__) || defined(__loongarch_asx)) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && (defined(__AVX2__) || defined(__loongarch_asx))
+        // Same algorithm as simdutf
+
+        using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
+        using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
+        using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
+        using u16x16simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint16_t;
+        using c8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = char;
+        using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
+        using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
+
+        constexpr auto check_special_cases{
+            [] UWVM_ALWAYS_INLINE(u8x32simd const input, u8x32simd const prev1) constexpr noexcept -> u8x32simd
+            {
+                constexpr ::std::uint8_t too_short{1u << 0u};
+                // 11??'???? 0???'????
+                // 11??'???? 11??'????
+                constexpr ::std::uint8_t too_long{1u << 1u};
+                // 0???'???? 10??'????
+                constexpr ::std::uint8_t overlong_3{1u << 2u};
+                // 1110'0000 100?'????
+                constexpr ::std::uint8_t surrogate{1u << 4u};
+                // 1110'1101 101?'????
+                constexpr ::std::uint8_t overlong_2{1u << 5u};
+                // 1100'000? 10??'????
+                constexpr ::std::uint8_t two_conts{1u << 7u};
+                // 10??'???? 10??'????
+                constexpr ::std::uint8_t too_large{1u << 3u};
+                // 1111'0100 1001'????
+                // 1111'0100 101?'????
+                // 1111'0101 1001'????
+                // 1111'0101 101?'????
+                // 1111'011? 1001'????
+                // 1111'011? 101?'????
+                // 1111'1??? 1001'????
+                // 1111'1??? 101?'????
+                constexpr ::std::uint8_t too_large_1000{1u << 6u};
+                // 1111'0101 1000'????
+                // 1111'011? 1000'????
+                // 1111'1??? 1000'????
+                constexpr ::std::uint8_t overlong_4{1u << 6u};
+                // 1111'0000 1000'????
+                [[maybe_unused]] constexpr ::std::uint8_t forbidden{0xFFu};
+
+                constexpr u8x32simd lookup_b1h{// 0 - 15
+                                               // 0???'???? ????'???? <ASCII in byte 1>
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               // 10??'???? ????'???? <continuation in byte 1>
+                                               two_conts,
+                                               two_conts,
+                                               two_conts,
+                                               two_conts,
+                                               // 1100'???? ????'???? <two byte lead in byte 1>
+                                               too_short | overlong_2,
+                                               // 1101'???? ????'???? <two byte lead in byte 1>
+                                               too_short,
+                                               // 1110'???? ????'???? <three byte lead in byte 1>
+                                               too_short | overlong_3 | surrogate,
+                                               // 1111'???? ????'???? <four+ byte lead in byte 1>
+                                               too_short | too_large | too_large_1000 | overlong_4,
+                                               // 16 - 31
+                                               // 0???'???? ????'???? <ASCII in byte 1>
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               too_long,
+                                               // 10??'???? ????'???? <continuation in byte 1>
+                                               two_conts,
+                                               two_conts,
+                                               two_conts,
+                                               two_conts,
+                                               // 1100'???? ????'???? <two byte lead in byte 1>
+                                               too_short | overlong_2,
+                                               // 1101'???? ????'???? <two byte lead in byte 1>
+                                               too_short,
+                                               // 1110'???? ????'???? <three byte lead in byte 1>
+                                               too_short | overlong_3 | surrogate,
+                                               // 1111'???? ????'???? <four+ byte lead in byte 1>
+                                               too_short | too_large | too_large_1000 | overlong_4};
+
+                // These all have ???? in byte 1.
+                constexpr ::std::uint8_t carry{too_short | too_long | two_conts};
+
+                constexpr u8x32simd lookup_b1l{// 0 - 15
+                                               // ????'0000 ????'????
+                                               carry | overlong_3 | overlong_2 | overlong_4,
+                                               // ????'0001 ????'????
+                                               carry | overlong_2,
+                                               // ????'001? ????'????
+                                               carry,
+                                               carry,
+                                               // ????'0100 ????'????
+                                               carry | too_large,
+                                               // ????'0101 ????'????
+                                               carry | too_large | too_large_1000,
+                                               // ????'011? ????'????
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               // ????'1??? ????'????
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               // ????'1101 ????'????
+                                               carry | too_large | too_large_1000 | surrogate,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               // 16 - 31
+                                               // ????'0000 ????'????
+                                               carry | overlong_3 | overlong_2 | overlong_4,
+                                               // ????'0001 ????'????
+                                               carry | overlong_2,
+                                               // ????'001? ????'????
+                                               carry,
+                                               carry,
+                                               // ????'0100 ????'????
+                                               carry | too_large,
+                                               // ????'0101 ????'????
+                                               carry | too_large | too_large_1000,
+                                               // ????'011? ????'????
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               // ????'1??? ????'????
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000,
+                                               // ????'1101 ????'????
+                                               carry | too_large | too_large_1000 | surrogate,
+                                               carry | too_large | too_large_1000,
+                                               carry | too_large | too_large_1000};
+
+                constexpr u8x32simd lookup_b2h{// 0 - 15
+                                               // ????'???? 0???'????
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               // ????'???? 1000'????
+                                               too_long | overlong_2 | two_conts | overlong_3 | too_large_1000 | overlong_4,
+                                               // ????'???? 1001'????
+                                               too_long | overlong_2 | two_conts | overlong_3 | too_large,
+                                               // ????'???? 101?'????
+                                               too_long | overlong_2 | two_conts | surrogate | too_large,
+                                               too_long | overlong_2 | two_conts | surrogate | too_large,
+                                               // ????'???? 11??'????
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               // 16 - 31
+                                               // ????'???? 0???'????
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               // ????'???? 1000'????
+                                               too_long | overlong_2 | two_conts | overlong_3 | too_large_1000 | overlong_4,
+                                               // ????'???? 1001'????
+                                               too_long | overlong_2 | two_conts | overlong_3 | too_large,
+                                               // ????'???? 101?'????
+                                               too_long | overlong_2 | two_conts | surrogate | too_large,
+                                               too_long | overlong_2 | two_conts | surrogate | too_large,
+                                               // ????'???? 11??'????
+                                               too_short,
+                                               too_short,
+                                               too_short,
+                                               too_short};
+
+                auto const prev1_shr4{::std::bit_cast<u8x32simd>(::std::bit_cast<u16x16simd>(prev1) >> static_cast<::std::uint16_t>(4u)) &
+                                      static_cast<::std::uint8_t>(0xFFu >> 4u)};
+
+                u8x32simd b1h;
+
+# if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)
+                b1h = ::std::bit_cast<u8x32simd>(__builtin_ia32_pshufb256(lookup_b1h, prev1_shr4));
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b)
+                b1h = ::std::bit_cast<u8x32simd>(__builtin_lasx_xvshuf_b(u8x32simd{}, lookup_b1h, prev1_shr4 & static_cast<::std::uint8_t>(0x1Fu)));
+# else
+#  error "missing instructions"
+# endif
+
+                const auto prev1_andF{prev1 & static_cast<::std::uint8_t>(0x0Fu)};
+
+                u8x32simd b1l;
+
+# if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)
+                b1l = ::std::bit_cast<u8x32simd>(__builtin_ia32_pshufb256(lookup_b1l, prev1_andF));
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b)
+                b1l = ::std::bit_cast<u8x32simd>(__builtin_lasx_xvshuf_b(u8x32simd{}, lookup_b1l, prev1_andF & static_cast<::std::uint8_t>(0x1Fu)));
+# else
+#  error "missing instructions"
+# endif
+
+                auto const inp_shr4{::std::bit_cast<u8x32simd>(::std::bit_cast<u16x16simd>(input) >> static_cast<::std::uint16_t>(4u)) &
+                                    static_cast<::std::uint8_t>(0xFFu >> 4u)};
+
+                u8x32simd b2h;
+
+# if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pshufb256)
+                b2h = ::std::bit_cast<u8x32simd>(__builtin_ia32_pshufb256(lookup_b2h, inp_shr4));
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvshuf_b)
+                b2h = ::std::bit_cast<u8x32simd>(__builtin_lasx_xvshuf_b(u8x32simd{}, lookup_b2h, inp_shr4 & static_cast<::std::uint8_t>(0x1Fu)));
+# else
+#  error "missing instructions"
+# endif
+
+                return b1h & b1l & b2h;
+            }};
+
+        constexpr auto check_multibyte_lengths{
+            [] UWVM_ALWAYS_INLINE(u8x32simd const input, u8x32simd const prev_input, u8x32simd const sc) constexpr noexcept -> u8x32simd
+            {
+                auto prev2{__builtin_shufflevector(prev_input,
+                                                   input,
+                                                   30,  // 0
+                                                   31,  // 1
+                                                   32,  // 2
+                                                   33,  // 3
+                                                   34,  // 4
+                                                   35,  // 5
+                                                   36,  // 6
+                                                   37,  // 7
+                                                   38,  // 8
+                                                   39,  // 9
+                                                   40,  // 10
+                                                   41,  // 11
+                                                   42,  // 12
+                                                   43,  // 13
+                                                   44,  // 14
+                                                   45,  // 15
+                                                   46,  // 16
+                                                   47,  // 17
+                                                   48,  // 18
+                                                   49,  // 19
+                                                   50,  // 20
+                                                   51,  // 21
+                                                   52,  // 22
+                                                   53,  // 23
+                                                   54,  // 24
+                                                   55,  // 25
+                                                   56,  // 26
+                                                   57,  // 27
+                                                   58,  // 28
+                                                   59,  // 29
+                                                   60,  // 30
+                                                   61   // 31
+                                                   )};
+
+                auto prev3{__builtin_shufflevector(prev_input,
+                                                   input,
+                                                   29,  // 0
+                                                   30,  // 1
+                                                   31,  // 2
+                                                   32,  // 3
+                                                   33,  // 4
+                                                   34,  // 5
+                                                   35,  // 6
+                                                   36,  // 7
+                                                   37,  // 8
+                                                   38,  // 9
+                                                   39,  // 10
+                                                   40,  // 11
+                                                   41,  // 12
+                                                   42,  // 13
+                                                   43,  // 14
+                                                   44,  // 15
+                                                   45,  // 16
+                                                   46,  // 17
+                                                   47,  // 18
+                                                   48,  // 19
+                                                   49,  // 20
+                                                   50,  // 21
+                                                   51,  // 22
+                                                   52,  // 23
+                                                   53,  // 24
+                                                   54,  // 25
+                                                   55,  // 26
+                                                   56,  // 27
+                                                   57,  // 28
+                                                   58,  // 29
+                                                   59,  // 30
+                                                   60   // 31
+                                                   )};
+
+                constexpr auto prev2_needsubs{static_cast<::std::uint8_t>(0xE0u - 0x80u)};
+                u8x32simd const prev2_needsubs_simd{
+                    prev2_needsubs,  // 0
+                    prev2_needsubs,  // 1
+                    prev2_needsubs,  // 2
+                    prev2_needsubs,  // 3
+                    prev2_needsubs,  // 4
+                    prev2_needsubs,  // 5
+                    prev2_needsubs,  // 6
+                    prev2_needsubs,  // 7
+                    prev2_needsubs,  // 8
+                    prev2_needsubs,  // 9
+                    prev2_needsubs,  // 10
+                    prev2_needsubs,  // 11
+                    prev2_needsubs,  // 12
+                    prev2_needsubs,  // 13
+                    prev2_needsubs,  // 14
+                    prev2_needsubs,  // 15
+                    prev2_needsubs,  // 16
+                    prev2_needsubs,  // 17
+                    prev2_needsubs,  // 18
+                    prev2_needsubs,  // 19
+                    prev2_needsubs,  // 20
+                    prev2_needsubs,  // 21
+                    prev2_needsubs,  // 22
+                    prev2_needsubs,  // 23
+                    prev2_needsubs,  // 24
+                    prev2_needsubs,  // 25
+                    prev2_needsubs,  // 26
+                    prev2_needsubs,  // 27
+                    prev2_needsubs,  // 28
+                    prev2_needsubs,  // 29
+                    prev2_needsubs,  // 30
+                    prev2_needsubs   // 31
+                };
+
+# if UWVM_HAS_BUILTIN(__builtin_elementwise_sub_sat)  // Clang
+                prev2 = __builtin_elementwise_sub_sat(prev2, prev2_needsubs_simd);
+# elif defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_psubusb256)
+                prev2 = __builtin_ia32_psubusb128(prev2, prev2_needsubs_simd);
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvssub_bu)
+                prev2 = __builtin_lasx_xvssub_bu(prev2, prev2_needsubs_simd);  /// @todo need test
+# else
+#  error "missing instruction"
+# endif
+
+                constexpr auto prev3_needsubs{static_cast<::std::uint8_t>(0xF0u - 0x80u)};
+                u8x32simd const prev3_needsubs_simd{
+                    prev3_needsubs,  // 0
+                    prev3_needsubs,  // 1
+                    prev3_needsubs,  // 2
+                    prev3_needsubs,  // 3
+                    prev3_needsubs,  // 4
+                    prev3_needsubs,  // 5
+                    prev3_needsubs,  // 6
+                    prev3_needsubs,  // 7
+                    prev3_needsubs,  // 8
+                    prev3_needsubs,  // 9
+                    prev3_needsubs,  // 10
+                    prev3_needsubs,  // 11
+                    prev3_needsubs,  // 12
+                    prev3_needsubs,  // 13
+                    prev3_needsubs,  // 14
+                    prev3_needsubs,  // 15
+                    prev3_needsubs,  // 16
+                    prev3_needsubs,  // 17
+                    prev3_needsubs,  // 18
+                    prev3_needsubs,  // 19
+                    prev3_needsubs,  // 20
+                    prev3_needsubs,  // 21
+                    prev3_needsubs,  // 22
+                    prev3_needsubs,  // 23
+                    prev3_needsubs,  // 24
+                    prev3_needsubs,  // 25
+                    prev3_needsubs,  // 26
+                    prev3_needsubs,  // 27
+                    prev3_needsubs,  // 28
+                    prev3_needsubs,  // 29
+                    prev3_needsubs,  // 30
+                    prev3_needsubs   // 31
+                };
+
+# if UWVM_HAS_BUILTIN(__builtin_elementwise_sub_sat)  // Clang
+                prev3 = __builtin_elementwise_sub_sat(prev3, prev3_needsubs_simd);
+# elif defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_psubusb256)
+                prev3 = __builtin_ia32_psubusb128(prev3, prev3_needsubs_simd);
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvssub_bu)
+                prev3 = __builtin_lasx_xvssub_bu(prev3, prev3_needsubs_simd);  /// @todo need test
+# else
+#  error "missing instruction"
+# endif
+
+                return ((prev2 | prev3) & static_cast<::std::uint8_t>(0x80u)) ^ sc;
+            }};
+
+        constexpr auto check_utf8_bytes{
+            [check_special_cases, check_multibyte_lengths] UWVM_ALWAYS_INLINE(u8x32simd const input, u8x32simd const prev_input) constexpr noexcept -> u8x32simd
+            {
+                auto const prev1{__builtin_shufflevector(prev_input,
+                                                         input,
+                                                         31,  // 0
+                                                         32,  // 1
+                                                         33,  // 2
+                                                         34,  // 3
+                                                         35,  // 4
+                                                         36,  // 5
+                                                         37,  // 6
+                                                         38,  // 7
+                                                         39,  // 8
+                                                         40,  // 9
+                                                         41,  // 10
+                                                         42,  // 11
+                                                         43,  // 12
+                                                         44,  // 13
+                                                         45,  // 14
+                                                         46,  // 15
+                                                         47,  // 16
+                                                         48,  // 17
+                                                         49,  // 18
+                                                         50,  // 19
+                                                         51,  // 20
+                                                         52,  // 21
+                                                         53,  // 22
+                                                         54,  // 23
+                                                         55,  // 24
+                                                         56,  // 25
+                                                         57,  // 26
+                                                         58,  // 27
+                                                         59,  // 28
+                                                         60,  // 29
+                                                         61,  // 30
+                                                         62   // 31
+                                                         )};
+
+                auto const sc{check_special_cases(input, prev1)};
+                return check_multibyte_lengths(input, prev_input, sc);
+            }};
+
+        constexpr auto is_incomplete{[] UWVM_ALWAYS_INLINE(u8x32simd input) constexpr noexcept -> u8x32simd
+                                     {
+                                         constexpr u8x32simd max_value{
+                                             255u,              // 0
+                                             255u,              // 1
+                                             255u,              // 2
+                                             255u,              // 3
+                                             255u,              // 4
+                                             255u,              // 5
+                                             255u,              // 6
+                                             255u,              // 7
+                                             255u,              // 8
+                                             255u,              // 9
+                                             255u,              // 10
+                                             255u,              // 11
+                                             255u,              // 12
+                                             255u,              // 13
+                                             255u,              // 14
+                                             255u,              // 15
+                                             255u,              // 16
+                                             255u,              // 17
+                                             255u,              // 18
+                                             255u,              // 19
+                                             255u,              // 20
+                                             255u,              // 21
+                                             255u,              // 22
+                                             255u,              // 23
+                                             255u,              // 24
+                                             255u,              // 25
+                                             255u,              // 26
+                                             255u,              // 27
+                                             255u,              // 28
+                                             0b11110000u - 1u,  // 29
+                                             0b11100000u - 1u,  // 30
+                                             0b11000000u - 1u   // 31
+                                         };
+
+# if UWVM_HAS_BUILTIN(__builtin_elementwise_sub_sat)  // Clang
+                                         input = __builtin_elementwise_sub_sat(input, max_value);
+# elif defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_psubusb256)
+                                         input = __builtin_ia32_psubusb128(input, max_value);
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvssub_bu)
+                                         input = __builtin_lasx_xvssub_bu(input, max_value);  /// @todo need test
+# else
+#  error "missing instruction"
+# endif
+                                         return input;
+                                     }};
+
+        u8x32simd error{};
+        u8x32simd prev_input_block{};
+        u8x32simd prev_incomplete{};
+
+        while(static_cast<::std::size_t>(str_end - str_curr) >= sizeof(u8x32simd) * 2uz)
+        {
+            u8x32simd curr0;
+            u8x32simd curr1;
+
+            ::std::memcpy(::std::addressof(curr0), str_curr + sizeof(u8x32simd) * 0uz, sizeof(u8x32simd));
+            ::std::memcpy(::std::addressof(curr1), str_curr + sizeof(u8x32simd) * 1uz, sizeof(u8x32simd));
+
+            // check null
+            if constexpr(zero_illegal)
+            {
+                auto const curr0_test{curr0 == static_cast<::std::uint8_t>(0u)};
+
+                if(
+# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
+                    !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(curr0_test), ::std::bit_cast<i64x4simd>(curr0_test))
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
+                    __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(curr0_test))  /// @todo need check
+# else
+#  error "missing instructions"
+# endif
+                        ) [[unlikely]]
+                {
+                    // Jump out to scalar processing
+                    break;
+                }
+
+                auto const curr1_test{curr1 == static_cast<::std::uint8_t>(0u)};
+
+                if(
+# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
+                    !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(curr1_test), ::std::bit_cast<i64x4simd>(curr1_test))
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
+                    __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(curr1_test))  /// @todo need check
+# else
+#  error "missing instructions"
+# endif
+                        ) [[unlikely]]
+                {
+                    // Jump out to scalar processing
+                    break;
+                }
+            }
+
+            // check ascii
+
+            auto const check_upper{(curr0 | curr1) > static_cast<::std::uint8_t>(0x7Fu)};
+
+            if(
+# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
+                !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(check_upper), ::std::bit_cast<i64x4simd>(check_upper))
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
+                __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))  /// @todo need check
+# else
+#  error "missing instructions"
+# endif
+            )
+            {
+                // utf-8
+
+                error |= check_utf8_bytes(curr0, prev_input_block);
+                error |= check_utf8_bytes(curr1, curr0);
+
+                prev_incomplete = is_incomplete(curr1);
+                prev_input_block = curr1;
+            }
+            else
+            {
+                // ascii
+
+                error |= prev_incomplete;
+            }
+
+            if(
+# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
+                !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(error), ::std::bit_cast<i64x4simd>(error))
+# elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
+                __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(error))  /// @todo need check
+# else
+#  error "missing instructions"
+# endif
+                    ) [[unlikely]]
+            {
+                // Jump out to scalar processing
+                break;
+            }
+
+            str_curr += sizeof(u8x32simd) * 2uz;
+
+            // prefetch
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(str_curr) + 64u);
+        }
+
+        // tail handling
+
+        while(str_curr != str_end)
+        {
+            auto const str_curr_val{*str_curr};
+
+            if(str_curr_val < static_cast<char8_t>(0b1000'0000u))
+            {
+                if constexpr(zero_illegal)
+                {
+                    if(str_curr_val == u8'\0') [[unlikely]] { return {str_curr, ::uwvm2::utils::utf::utf_error_code::contains_empty_characters}; }
+                }
+
+                ++str_curr;
+            }
+            else if((str_curr_val & static_cast<char8_t>(0b1110'0000u)) == static_cast<char8_t>(0b1100'0000u))
+            {
+                if(static_cast<::std::size_t>(str_end - str_curr) < 2u) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                auto const str_curr_p1_val{*(str_curr + 1u)};
+
+                if((str_curr_p1_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                constexpr auto utf8_length{2u};
+
+                ::std::uint_least32_t utf8_b0{static_cast<::std::uint_least32_t>(str_curr_val)};
+                constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                ::std::uint_least32_t utf8_b1{static_cast<::std::uint_least32_t>(str_curr_p1_val)};
+                utf8_b1 &= 0x3Fu;
+                utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1)};
+
+                constexpr auto test_overlong{utf8_length - 2u};
+                constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                }
+
+                str_curr += utf8_length;
+            }
+            else if((str_curr_val & static_cast<char8_t>(0b1111'0000u)) == static_cast<char8_t>(0b1110'0000u))
+            {
+                if(static_cast<::std::size_t>(str_end - str_curr) < 3u) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                auto const str_curr_p1_val{*(str_curr + 1u)};
+
+                if((str_curr_p1_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                auto const str_curr_p2_val{*(str_curr + 2u)};
+
+                if((str_curr_p2_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                constexpr auto utf8_length{3u};
+
+                ::std::uint_least32_t utf8_b0{static_cast<::std::uint_least32_t>(str_curr_val)};
+                constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                ::std::uint_least32_t utf8_b1{static_cast<::std::uint_least32_t>(str_curr_p1_val)};
+                utf8_b1 &= 0x3Fu;
+                utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                ::std::uint_least32_t utf8_b2{static_cast<::std::uint_least32_t>(str_curr_p2_val)};
+                utf8_b2 &= 0x3Fu;
+                utf8_b2 <<= (utf8_length - 3u) * 6u;
+
+                char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2)};
+
+                constexpr auto test_overlong{utf8_length - 2u};
+                constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                }
+
+                if(static_cast<char32_t>(0xD7FFu) < utf8_c && utf8_c < static_cast<char32_t>(0xE000u)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::illegal_surrogate};
+                }
+
+                str_curr += utf8_length;
+            }
+            else if((str_curr_val & static_cast<char8_t>(0b1111'1000u)) == static_cast<char8_t>(0b1111'0000u))
+            {
+                if(static_cast<::std::size_t>(str_end - str_curr) < 4u) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                auto const str_curr_p1_val{*(str_curr + 1u)};
+
+                if((str_curr_p1_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                auto const str_curr_p2_val{*(str_curr + 2u)};
+
+                if((str_curr_p2_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                auto const str_curr_p3_val{*(str_curr + 3u)};
+
+                if((str_curr_p3_val & static_cast<char8_t>(0b1100'0000u)) != static_cast<char8_t>(0b1000'0000u)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
+                }
+
+                constexpr auto utf8_length{4u};
+
+                ::std::uint_least32_t utf8_b0{static_cast<::std::uint_least32_t>(str_curr_val)};
+                constexpr auto utf8_b0_shu1{8u - (utf8_length + 1u)};
+                utf8_b0 &= ((1u << utf8_b0_shu1) - 1u);
+                utf8_b0 <<= (utf8_length - 1u) * 6u;
+
+                ::std::uint_least32_t utf8_b1{static_cast<::std::uint_least32_t>(str_curr_p1_val)};
+                utf8_b1 &= 0x3Fu;
+                utf8_b1 <<= (utf8_length - 2u) * 6u;
+
+                ::std::uint_least32_t utf8_b2{static_cast<::std::uint_least32_t>(str_curr_p2_val)};
+                utf8_b2 &= 0x3Fu;
+                utf8_b2 <<= (utf8_length - 3u) * 6u;
+
+                ::std::uint_least32_t utf8_b3{static_cast<::std::uint_least32_t>(str_curr_p3_val)};
+                utf8_b3 &= 0x3Fu;
+                utf8_b3 <<= (utf8_length - 4u) * 6u;
+
+                char32_t const utf8_c{static_cast<char32_t>(utf8_b0 | utf8_b1 | utf8_b2 | utf8_b3)};
+
+                constexpr auto test_overlong{utf8_length - 2u};
+                constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
+
+                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
+                {
+                    return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
+                }
+
+                str_curr += utf8_length;
+            }
+            else
+            {
+                return {str_curr, ::uwvm2::utils::utf::utf_error_code::long_header_bits};
+            }
+        }
+
+        return {str_curr, ::uwvm2::utils::utf::utf_error_code::success};
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) && defined(__LITTLE_ENDIAN__) &&                              \
     (defined(__SSSE3__) || defined(__ARM_NEON) || defined(__loongarch_sx))
@@ -218,12 +984,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqtbl1q_v)          // Clang
                 b1h = ::std::bit_cast<u8x16simd>(__builtin_neon_vqtbl1q_v(::std::bit_cast<i8x16simd>(prev1_shr4), ::std::bit_cast<i8x16simd>(lookup_b1h)));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
-                b1h = ::std::bit_cast<u8x16simd>(__builtin_lsx_vshuf_b(lookup_b1h, lookup_b1h, prev1_shr4));
+                b1h = ::std::bit_cast<u8x16simd>(__builtin_lsx_vshuf_b(lookup_b1h, lookup_b1h, prev1_shr4));  /// @todo need test
 # else
 #  error "missing instructions"
 # endif
 
-                const auto prev1_andF{prev1 & static_cast<::std::uint8_t>(0xFu)};
+                const auto prev1_andF{prev1 & static_cast<::std::uint8_t>(0x0Fu)};
 
                 u8x16simd b1l;
 
@@ -234,7 +1000,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqtbl1q_v)          // Clang
                 b1l = ::std::bit_cast<u8x16simd>(__builtin_neon_vqtbl1q_v(::std::bit_cast<i8x16simd>(prev1_andF), ::std::bit_cast<i8x16simd>(lookup_b1l)));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
-                b1l = ::std::bit_cast<u8x16simd>(__builtin_lsx_vshuf_b(lookup_b1l, lookup_b1l, prev1_andF));
+                b1l = ::std::bit_cast<u8x16simd>(__builtin_lsx_vshuf_b(lookup_b1l, lookup_b1l, prev1_andF));  /// @todo need test
 # else
 #  error "missing instructions"
 # endif
@@ -250,7 +1016,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqtbl1q_v)          // Clang
                 b2h = ::std::bit_cast<u8x16simd>(__builtin_neon_vqtbl1q_v(::std::bit_cast<i8x16simd>(inp_shr4), ::std::bit_cast<i8x16simd>(lookup_b2h)));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vshuf_b)
-                b2h = ::std::bit_cast<u8x16simd>(__builtin_lsx_vshuf_b(lookup_b2h, lookup_b2h, inp_shr4));
+                b2h = ::std::bit_cast<u8x16simd>(__builtin_lsx_vshuf_b(lookup_b2h, lookup_b2h, inp_shr4));  /// @todo need test
 # else
 #  error "missing instructions"
 # endif
@@ -327,10 +1093,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 prev2 = __builtin_ia32_psubusb128(prev2, prev2_needsubs_simd);
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_ussubv16qi_uuu)  // GCC
                 prev2 = __builtin_aarch64_ussubv16qi_uuu(prev2, prev2_needsubs_simd);
-# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)  // Clang
-                prev2 = ::std::bit_cast<u8x16simd>(::std::bit_cast<i8x16simd>(prev2), ::std::bit_cast<i8x16simd>(prev2_needsubs_simd));
+# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)        // Clang
+                prev2 =
+                    ::std::bit_cast<u8x16simd>(__builtin_neon_vqsubuv16qi(::std::bit_cast<i8x16simd>(prev2), ::std::bit_cast<i8x16simd>(prev2_needsubs_simd)));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vssub_bu)
-                prev2 = __builtin_lsx_vssub_bu(prev2, prev2_needsubs_simd);
+                prev2 = __builtin_lsx_vssub_bu(prev2, prev2_needsubs_simd);  /// @todo need test
 # else
 #  error "missing instruction"
 # endif
@@ -361,10 +1128,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 prev3 = __builtin_ia32_psubusb128(prev3, prev3_needsubs_simd);
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_ussubv16qi_uuu)  // GCC
                 prev3 = __builtin_aarch64_ussubv16qi_uuu(prev3, prev3_needsubs_simd);
-# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)  // Clang
-                prev3 = ::std::bit_cast<u8x16simd>(::std::bit_cast<i8x16simd>(prev3), ::std::bit_cast<i8x16simd>(prev3_needsubs_simd));
+# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)        // Clang
+                prev3 =
+                    ::std::bit_cast<u8x16simd>(__builtin_neon_vqsubuv16qi(::std::bit_cast<i8x16simd>(prev3), ::std::bit_cast<i8x16simd>(prev3_needsubs_simd)));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vssub_bu)
-                prev3 = __builtin_lsx_vssub_bu(prev3, prev3_needsubs_simd);
+                prev3 = __builtin_lsx_vssub_bu(prev3, prev3_needsubs_simd);  /// @todo need test
 # else
 #  error "missing instruction"
 # endif
@@ -426,10 +1194,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                          input = __builtin_ia32_psubusb128(input, max_value);
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_ussubv16qi_uuu)  // GCC
                                          input = __builtin_aarch64_ussubv16qi_uuu(input, max_value);
-# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)  // Clang
-                                         input = ::std::bit_cast<u8x16simd>(::std::bit_cast<i8x16simd>(input), ::std::bit_cast<i8x16simd>(max_value));
+# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)        // Clang
+                                         input = ::std::bit_cast<u8x16simd>(
+                                             __builtin_neon_vqsubuv16qi(::std::bit_cast<i8x16simd>(input), ::std::bit_cast<i8x16simd>(max_value)));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vssub_bu)
-                                         input = __builtin_lsx_vssub_bu(input, max_value);
+                                         input = __builtin_lsx_vssub_bu(input, max_value);  /// @todo need test
 # else
 #  error "missing instruction"
 # endif
