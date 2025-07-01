@@ -55,6 +55,10 @@ import uwvm.wasm.storage;
 # error "please enable cpp_exception first to run this fuzzer"
 #endif
 
+#if !((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
+# error "please enable a full check"
+#endif
+
 namespace test
 {
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>

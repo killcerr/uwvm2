@@ -327,7 +327,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 prev2 = __builtin_ia32_psubusb128(prev2, prev2_needsubs_simd);
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_ussubv16qi_uuu)  // GCC
                 prev2 = __builtin_aarch64_ussubv16qi_uuu(prev2, prev2_needsubs_simd);
-# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)
+# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)  // Clang
                 prev2 = ::std::bit_cast<u8x16simd>(::std::bit_cast<i8x16simd>(prev2), ::std::bit_cast<i8x16simd>(prev2_needsubs_simd));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vssub_bu)
                 prev2 = __builtin_lsx_vssub_bu(prev2, prev2_needsubs_simd);
@@ -361,7 +361,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 prev3 = __builtin_ia32_psubusb128(prev3, prev3_needsubs_simd);
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_ussubv16qi_uuu)  // GCC
                 prev3 = __builtin_aarch64_ussubv16qi_uuu(prev3, prev3_needsubs_simd);
-# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)
+# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)  // Clang
                 prev3 = ::std::bit_cast<u8x16simd>(::std::bit_cast<i8x16simd>(prev3), ::std::bit_cast<i8x16simd>(prev3_needsubs_simd));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vssub_bu)
                 prev3 = __builtin_lsx_vssub_bu(prev3, prev3_needsubs_simd);
@@ -426,7 +426,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                          input = __builtin_ia32_psubusb128(input, max_value);
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_ussubv16qi_uuu)  // GCC
                                          input = __builtin_aarch64_ussubv16qi_uuu(input, max_value);
-# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)
+# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vqsubuv16qi)  // Clang
                                          input = ::std::bit_cast<u8x16simd>(::std::bit_cast<i8x16simd>(input), ::std::bit_cast<i8x16simd>(max_value));
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vssub_bu)
                                          input = __builtin_lsx_vssub_bu(input, max_value);
