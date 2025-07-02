@@ -126,7 +126,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     {
         ::fast_io::array<parameter const*, N> res{};
         for(::std::size_t i{}; i < N; ++i) { res.index_unchecked(i) = punsort[i]; }
-        ::std::ranges::sort(res, [](parameter const* const a, parameter const* const b) noexcept -> bool { return a->name < b->name; });
+        ::std::ranges::sort(res, [](parameter const* const a, parameter const* const b) constexpr noexcept -> bool { return a->name < b->name; });
         return res;
     }
 
@@ -198,7 +198,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         }
 
         // sort
-        ::std::ranges::sort(res, [](alias_parameter const& a, alias_parameter const& b) noexcept -> bool { return a.str < b.str; });
+        ::std::ranges::sort(res, [](alias_parameter const& a, alias_parameter const& b) constexpr noexcept -> bool { return a.str < b.str; });
 
         // check is invalid
         ::fast_io::u8string_view check{};  // Empty strings will be sorted and placed first.
