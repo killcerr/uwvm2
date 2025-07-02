@@ -113,7 +113,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                        }
                                        else if((str_curr_val & static_cast<char8_t>(0b1110'0000u)) == static_cast<char8_t>(0b1100'0000u))
                                        {
-                                           if(static_cast<::std::size_t>(str_end - str_curr) < 2u) [[unlikely]]
+                                           if(static_cast<::std::size_t>(str_end - str_curr) < 2uz) [[unlikely]]
                                            {
                                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                                            }
@@ -141,7 +141,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                            constexpr auto test_overlong{utf8_length - 2u};
                                            constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                                           constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                                           constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                                                  << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                                            if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                                            {
                                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -151,7 +152,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                        }
                                        else if((str_curr_val & static_cast<char8_t>(0b1111'0000u)) == static_cast<char8_t>(0b1110'0000u))
                                        {
-                                           if(static_cast<::std::size_t>(str_end - str_curr) < 3u) [[unlikely]]
+                                           if(static_cast<::std::size_t>(str_end - str_curr) < 3uz) [[unlikely]]
                                            {
                                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                                            }
@@ -190,7 +191,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                            constexpr auto test_overlong{utf8_length - 2u};
                                            constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                                           constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                                           constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                                                  << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                                            if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                                            {
                                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -205,7 +207,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                        }
                                        else if((str_curr_val & static_cast<char8_t>(0b1111'1000u)) == static_cast<char8_t>(0b1111'0000u))
                                        {
-                                           if(static_cast<::std::size_t>(str_end - str_curr) < 4u) [[unlikely]]
+                                           if(static_cast<::std::size_t>(str_end - str_curr) < 4uz) [[unlikely]]
                                            {
                                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                                            }
@@ -255,7 +257,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                                            constexpr auto test_overlong{utf8_length - 2u};
                                            constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                                           constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                                           constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                                                  << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                                            if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                                            {
                                                return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -1520,7 +1523,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
             else if((str_curr_val & static_cast<char8_t>(0b1110'0000u)) == static_cast<char8_t>(0b1100'0000u))
             {
-                if(static_cast<::std::size_t>(str_end - str_curr) < 2u) [[unlikely]]
+                if(static_cast<::std::size_t>(str_end - str_curr) < 2uz) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                 }
@@ -1548,7 +1551,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 constexpr auto test_overlong{utf8_length - 2u};
                 constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                       << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                 if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -1558,7 +1562,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
             else if((str_curr_val & static_cast<char8_t>(0b1111'0000u)) == static_cast<char8_t>(0b1110'0000u))
             {
-                if(static_cast<::std::size_t>(str_end - str_curr) < 3u) [[unlikely]]
+                if(static_cast<::std::size_t>(str_end - str_curr) < 3uz) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                 }
@@ -1597,7 +1601,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 constexpr auto test_overlong{utf8_length - 2u};
                 constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                       << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                 if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -1612,7 +1617,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
             else if((str_curr_val & static_cast<char8_t>(0b1111'1000u)) == static_cast<char8_t>(0b1111'0000u))
             {
-                if(static_cast<::std::size_t>(str_end - str_curr) < 4u) [[unlikely]]
+                if(static_cast<::std::size_t>(str_end - str_curr) < 4uz) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                 }
@@ -1662,7 +1667,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 constexpr auto test_overlong{utf8_length - 2u};
                 constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                       << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                 if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -2255,7 +2261,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
             else if((str_curr_val & static_cast<char8_t>(0b1110'0000u)) == static_cast<char8_t>(0b1100'0000u))
             {
-                if(static_cast<::std::size_t>(str_end - str_curr) < 2u) [[unlikely]]
+                if(static_cast<::std::size_t>(str_end - str_curr) < 2uz) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                 }
@@ -2283,7 +2289,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 constexpr auto test_overlong{utf8_length - 2u};
                 constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                       << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                 if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -2293,7 +2300,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
             else if((str_curr_val & static_cast<char8_t>(0b1111'0000u)) == static_cast<char8_t>(0b1110'0000u))
             {
-                if(static_cast<::std::size_t>(str_end - str_curr) < 3u) [[unlikely]]
+                if(static_cast<::std::size_t>(str_end - str_curr) < 3uz) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                 }
@@ -2332,7 +2339,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 constexpr auto test_overlong{utf8_length - 2u};
                 constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                       << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                 if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};
@@ -2347,7 +2355,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
             else if((str_curr_val & static_cast<char8_t>(0b1111'1000u)) == static_cast<char8_t>(0b1111'0000u))
             {
-                if(static_cast<::std::size_t>(str_end - str_curr) < 4u) [[unlikely]]
+                if(static_cast<::std::size_t>(str_end - str_curr) < 4uz) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::too_short_sequence};
                 }
@@ -2397,7 +2405,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 constexpr auto test_overlong{utf8_length - 2u};
                 constexpr auto test_overlong_pc{(test_overlong + 1u) >> 1u};
 
-                constexpr auto test_overlong_low_bound{1u << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
+                constexpr auto test_overlong_low_bound{static_cast<::std::uint_least32_t>(1u)
+                                                       << (6u * test_overlong + (8u - utf8_length + (1u - test_overlong_pc)))};
                 if(utf8_c < static_cast<char32_t>(test_overlong_low_bound)) [[unlikely]]
                 {
                     return {str_curr, ::uwvm2::utils::utf::utf_error_code::overlong_encoding};

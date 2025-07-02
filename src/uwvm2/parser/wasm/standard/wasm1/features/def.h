@@ -409,6 +409,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         final_function_type<Fs...> const* func_type{};
     };
 
+    /////////////////////////////
+    //      Table Section      //
+    /////////////////////////////
+
+    /// @brief      allow multi table
+    /// @details    In the current version of WebAssembly, at most one table may be defined or imported in a single module,
+    ///             and all constructs implicitly reference this table 0. This restriction may be lifted in future versions.
+    ///
+    ///             Define this to eliminate checking the length of the result.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool allow_multi_table{true};
+    ///             };
+    ///             ```
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.4
+    /// @see        test\0001.parser\0002.binfmt1\section\table_section.cc
+    template <typename FsCurr>
+    concept has_allow_multi_table = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_table)>, bool>; };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool allow_multi_table() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_allow_multi_table<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::allow_multi_table};
+                                                                            return tallow;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 /// @brief Define container optimization operations for use with fast_io

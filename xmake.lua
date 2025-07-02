@@ -253,7 +253,9 @@ for _, file in ipairs(os.files("test/**.cc")) do
 			add_files("third-parties/fast_io/share/fast_io/fast_io.cppm", {public = is_debug_mode})
 			add_files("third-parties/fast_io/share/fast_io/fast_io_crypto.cppm", {public = is_debug_mode})
 		end
-
+		
+		-- uwvm
+		add_defines("UWVM=2")
 		-- uwvm test
 		add_defines("UWVM_TEST=2")
 

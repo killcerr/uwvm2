@@ -350,6 +350,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_module_name_is_invalid_utf8_sequence.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_table_count:
+            {
+#include "error_code_outputs/eco_invalid_table_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_table:
+            {
+#include "error_code_outputs/eco_wasm1_not_allow_multi_table.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::table_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_table_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::table_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_table_section_resolved_not_match_the_actual_number.h"
+                return;
+            }
         }
     }
 

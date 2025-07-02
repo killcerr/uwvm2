@@ -59,7 +59,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::table_section_resolved_not_match_the_actual_number) + 1u;
             ++i)
         {
             // Specialization of the addressing section

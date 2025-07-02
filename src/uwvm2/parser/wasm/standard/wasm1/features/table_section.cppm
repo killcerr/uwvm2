@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -9,7 +9,7 @@
  * @details     antecedent dependency: null
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-09
+ * @date        2025-07-03
  * @copyright   ASHP-1.0 License
  */
 
@@ -22,16 +22,27 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <memory>
+#include <limits>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+
+export module uwvm2.parser.wasm.standard.wasm1.features:table_section;
 
 #ifndef UWVM_MODULE
-# include "def.h"
-# include "feature_def.h"
-# include "types.h"
-# include "custom_section.h"
-# include "type_section.h"
-# include "import_section.h"
-# include "function_section.h"
-# include "table_section.h"
-# include "binfmt.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "table_section.h"
