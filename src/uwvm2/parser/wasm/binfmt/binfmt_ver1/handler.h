@@ -30,6 +30,8 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import uwvm2.utils.utf;
+import uwvm2.parser.wasm.text_format;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
@@ -41,6 +43,8 @@ import :def;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
+# include <climits>
 # include <concepts>
 # include <type_traits>
 # include <utility>
@@ -56,6 +60,8 @@ import :def;
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/utf/impl.h>
+# include <uwvm2/parser/wasm/text_format/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -139,7 +145,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             auto const& [... secs]{ret.sections};
             constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_id{generate_section_max_id<::std::remove_cvref_t<decltype(secs)>...>()};
             constexpr double max_id_probability{1.0 - 1.0 / static_cast<double>(max_id + 1)};
-            static_assert(0.0 <= max_id_probability && max_id_probability <= 1.1);
+            static_assert(0.0 <= max_id_probability && max_id_probability <= 1.0);
             return max_id_probability;
         }
 
@@ -149,7 +155,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             static_assert(sizeof...(Sec) != 0);
 
             constexpr auto max{generate_section_max_id<Sec...>};
-            ::fast_io::array<::fast_io::u8string_view, max> res{};
+            ::fast_io::array<::fast_io::u8string_view, max + 1u> res{};
 
             [&res]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             { ((res[Sec...[I] ::section_id] = Sec...[I] ::section_name), ...); }(::std::make_index_sequence<sizeof...(Sec)>{});
@@ -278,9 +284,73 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         }
     }
 
+    /// @brief      has module name text format
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using module_name_text_format = type_replacer<root_of_replacement, text_format_wapper<text_format::xxx>>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_module_name_text_format = requires {
+        typename FeatureType::module_name_text_format;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::module_name_text_format>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_module_name_text_format() noexcept
+    {
+        if constexpr(has_module_name_text_format<FeatureType>) { return typename FeatureType::module_name_text_format{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_module_name_text_format = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_module_name_text_format<Fs>())...>;
+
+    /// @brief Define functions for checking imports and exports name
+    template <typename... Fs>
+    concept can_check_module_name_text_format =
+        requires(final_module_name_text_format<Fs...> adl, ::std::byte const* begin, ::std::byte const* end, ::uwvm2::parser::wasm::base::error_impl& err) {
+            { check_module_name_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
+        };
+
+    /// @brief Define a function for binfmt1 to check for utf8 sequences.
+    /// @note  ADL for distribution to the correct handler function
+    inline constexpr void check_module_name_text_format(
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be
+                                                                                                                                               // replaced
+        ::std::byte const* begin,
+        ::std::byte const* end,
+        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        auto const [utf8pos, utf8err]{::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
+            reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
+            reinterpret_cast<char8_t_const_may_alias_ptr>(end))};
+
+        if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+        {
+            err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
+            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+            err.err_selectable.error_module_name.module_name = ::fast_io::u8string_view{
+                reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
+                static_cast<::std::size_t>(reinterpret_cast<char8_t_const_may_alias_ptr>(end) - reinterpret_cast<char8_t_const_may_alias_ptr>(begin))};
+            err.err_selectable.error_module_name.type = static_cast<::std::uint_least32_t>(utf8err);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+    }
+
     /// @brief This is a function that parses wasm binfmt ver1, and supports variable parameter template extensions.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     [[nodiscard]] inline constexpr wasm_binfmt_ver1_module_extensible_storage_t<Fs...> wasm_binfmt_ver1_handle_func(
+        ::fast_io::u8string_view module_name,
         ::std::byte const* const module_begin,
         ::std::byte const* const module_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
@@ -301,6 +371,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
             ret.module_span.module_begin = module_begin;
             ret.module_span.module_end = module_end;
+
+            // get default utf8-checker
+            using default_final_module_name_text_format_wapper =
+                ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>;
+
+            // check valid utf-8
+            check_module_name_text_format(default_final_module_name_text_format_wapper{},
+                                          reinterpret_cast<::std::byte const*>(module_name.cbegin()),
+                                          reinterpret_cast<::std::byte const*>(module_name.cend()),
+                                          err);
+
+            // set module_name
+            ret.module_name = module_name;
 
             ::std::byte const* module_curr{module_begin};
 
@@ -341,6 +424,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
             ret.module_span.module_begin = module_begin;
             ret.module_span.module_end = module_end;
+
+            // get final utf8-checker
+            using curr_final_module_name_text_format_wapper = final_module_name_text_format<Fs...>;
+#if 0
+            static_assert(can_check_module_name_text_format<curr_final_module_name_text_format_wapper>);
+#endif
+            // check valid utf-8
+            check_module_name_text_format(curr_final_module_name_text_format_wapper{},
+                                          reinterpret_cast<::std::byte const*>(module_name.cbegin()),
+                                          reinterpret_cast<::std::byte const*>(module_name.cend()),
+                                          err);
+
+            // set module_name
+            ret.module_name = module_name;
 
             ::std::byte const* module_curr{module_begin};
 
@@ -400,10 +497,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 //      ^^ sec_id_module_ptr
 
                 // get section type
-                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte sec_id{};
-                ::fast_io::freestanding::my_memcpy(::std::addressof(sec_id), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte));
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte sec_id;
+                ::std::memcpy(::std::addressof(sec_id), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte));
 
-                static_assert(sizeof(sec_id) == 1);
+                // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+                sec_id = static_cast<decltype(sec_id)>(static_cast<::std::uint_least8_t>(sec_id) & 0xFFu);
+#endif
+
+                static_assert(sizeof(sec_id) == 1uz);
                 // Size equal to one does not need to do little-endian conversion
 
                 // get section length

@@ -28,6 +28,7 @@
 import fast_io;
 import uwvm2.uwvm.io;
 import uwvm2.utils.ansies;
+import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.run;
 import uwvm2.uwvm.crtmain.global;
@@ -35,6 +36,7 @@ import uwvm2.uwvm.crtmain.global;
 // std
 # include <cstdint>
 # include <cstddef>
+# include <limits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -42,6 +44,7 @@ import uwvm2.uwvm.crtmain.global;
 # include <fast_io.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
+# include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/run/impl.h>
 # include "global/impl.h"
@@ -110,6 +113,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
                                     u8"\n\n");
                 return static_cast<int>(::uwvm2::uwvm::run::retval::parameter_error);
             }
+        }
+
+        // Just in case argc is less than 0.
+        if(argc < 0) [[unlikely]]
+        {
+            ::fast_io::io::perr(u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"argc \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                argc,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\" is less than zero.",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                u8"\n\n");
+            return static_cast<int>(::uwvm2::uwvm::run::retval::parameter_error);
         }
 
         // cast

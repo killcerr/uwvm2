@@ -24,15 +24,16 @@
 
 #pragma once
 
+// platfrom
+/// @brief      Including intrin.h in the absence of __builtin_prefetch
 #ifdef UWVM_MODULE
 // no import
 #else
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
-// include
-/// @brief      Including intrin.h in the absence of __builtin_prefetch
+// platform
 # if !UWVM_HAS_BUILTIN(__builtin_prefetch)
-#  include <intrin.h>;
+#  include <intrin.h>
 # endif
 #endif
 
@@ -45,7 +46,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
     enum class pfc_mode
     {
         read = 0,
-        write = 1
+        write = 1,
+        instruction = 2
     };
 
     enum class pfc_level
@@ -56,6 +58,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
         L1 = 3
     };
 
+    enum class ret_policy
+    {
+        keep = 0,
+        strm = 1,
+    };
+
     /// @brief      Direct conversion to cpu prefetch instructions
     /// @details    write: write or read sensitive
     ///             level == 0 -> nta (Non-Temporal Access)
@@ -64,16 +72,54 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
     ///             level == 3 -> L1, L2, L3
     /// @param      address address to be prefetched
     /// @see        __builtin_prefetch and _mm_prefetch
-    template <pfc_mode prefetch_write = pfc_mode::write, pfc_level prefetch_level = pfc_level::nta>
-        requires ((0 <= static_cast<int>(prefetch_write) && static_cast<int>(prefetch_write) <= 1) &&
-                  (0 <= static_cast<int>(prefetch_level) && static_cast<int>(prefetch_level) <= 3))
+    template <pfc_mode curr_prefetch_mode = pfc_mode::write, pfc_level prefetch_level = pfc_level::nta, ret_policy retention_policy = ret_policy::keep>
+        requires ((0 <= static_cast<int>(curr_prefetch_mode) && static_cast<int>(curr_prefetch_mode) < 3) &&
+                  (0 <= static_cast<int>(prefetch_level) && static_cast<int>(prefetch_level) < 4) &&
+                  (0 <= static_cast<int>(retention_policy) && static_cast<int>(retention_policy) < 2))
     UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL UWVM_GNU_NODEBUG inline void prefetch(void const* address) noexcept
     {
-#if UWVM_HAS_BUILTIN(__builtin_prefetch)
-        __builtin_prefetch(address, static_cast<int>(prefetch_write), static_cast<int>(prefetch_level));
-#else
-        ::_mm_prefetch(reinterpret_cast<char const*>(address), static_cast<int>(prefetch_write) << 2u | static_cast<int>(prefetch_level));
+        if constexpr(curr_prefetch_mode == pfc_mode::instruction)
+        {
+#if (defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)) && UWVM_HAS_BUILTIN(__builtin_arm_prefetch)  // Only Clang
+            // __builtin_arm_prefetch has different function prototypes between arm64 and arm
+            if constexpr(prefetch_level == pfc_level::nta) { __builtin_arm_prefetch(address, 0, 0, 1, 0); }
+            else
+            {
+                __builtin_arm_prefetch(address, 0, 3 - static_cast<int>(prefetch_level), static_cast<int>(retention_policy), 0);
+            }
+#elif UWVM_HAS_BUILTIN(__builtin_ia32_prefetchi)  // Clang + GCC
+            // llvm: have prefetchit0 and prefetchit1 instructions which map to _MM_HINT_T0(3) and _MM_HINT_T1(2).
+            //       Other arguments are not supported.
+            // GCC:  instruction prefetch applies when in 64-bit mode with RIP-relative addressing and option '-mprefetchi';
+            //       they stay NOPs otherwise
+            constexpr int actual_prefetch_level{static_cast<int>(prefetch_level) < 2 ? 2 : static_cast<int>(prefetch_level)};
+            __builtin_ia32_prefetchi(address, static_cast<int>(actual_prefetch_level));
 #endif
+            // Instructions that do not do generic processing to ensure that the correct prefetch instructions are generated.
+        }
+        else
+        {
+#if (defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)) && UWVM_HAS_BUILTIN(__builtin_arm_prefetch)  // Only Clang
+            // __builtin_arm_prefetch has different function prototypes between arm64 and arm
+            if constexpr(prefetch_level == pfc_level::nta)
+            {
+                // same as __builtin_prefetch(address, static_cast<int>(curr_prefetch_mode), 0)
+                __builtin_arm_prefetch(address, static_cast<int>(curr_prefetch_mode), 0, 1, 1);
+            }
+            else
+            {
+                __builtin_arm_prefetch(address,
+                                       static_cast<int>(curr_prefetch_mode),
+                                       3 - static_cast<int>(prefetch_level),
+                                       static_cast<int>(retention_policy),
+                                       1);
+            }
+#elif UWVM_HAS_BUILTIN(__builtin_prefetch)  // Clang + GCC
+            __builtin_prefetch(address, static_cast<int>(curr_prefetch_mode), static_cast<int>(prefetch_level));
+#else                                       // MSVC
+            ::_mm_prefetch(reinterpret_cast<char const*>(address), (static_cast<int>(curr_prefetch_mode) << 2u) | static_cast<int>(prefetch_level));
+#endif
+        }
     }
 
 }  // namespace uwvm2::utils::intrinsics::universal

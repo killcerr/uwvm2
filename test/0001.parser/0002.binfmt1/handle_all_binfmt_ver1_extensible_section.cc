@@ -98,6 +98,10 @@ struct Feature1
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using binfmt_ver1_section_type = ::fast_io::tuple<Sec0, Sec1<Fs...>>;
+
+    using module_name_text_format = ::uwvm2::parser::wasm::concepts::operation::type_replacer<
+        ::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>

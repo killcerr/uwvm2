@@ -28,10 +28,13 @@ import fast_io;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <stdfloat>
+# include <limits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -92,12 +95,57 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_func_count,
         func_section_resolved_exceeded_the_actual_number,
         func_section_resolved_not_match_the_actual_number,
-        size_exceeds_the_maximum_value_of_size_t
+        size_exceeds_the_maximum_value_of_size_t,
+        duplicate_imports_of_the_same_import_type,
+        invalid_utf8_sequence,
+        module_name_is_invalid_utf8_sequence,
+        invalid_table_count,
+        wasm1_not_allow_multi_table,
+        table_section_resolved_exceeded_the_actual_number,
+        table_section_resolved_not_match_the_actual_number
     };
 
-    /// @brief Additional information provided by wasm error, no more than 8 bytes
+    /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type
+    struct duplicate_imports_or_exports_t
+    {
+        ::fast_io::u8string_view module_name;
+        ::fast_io::u8string_view extern_name;
+        ::std::uint_least8_t type;
+    };
+
+    /// @brief Used to set the output of module_name errors
+    struct module_name_err_t
+    {
+        ::fast_io::u8string_view module_name;
+        ::std::uint_least32_t type;
+    };
+
+    /// @brief define IEEE 754 F32 and F64
+#ifdef __STDCPP_FLOAT32_T__
+    using error_f32 = ::std::float32_t;  // IEEE 754-2008
+#else
+    using error_f32 = float;  // The C++ Standard doesn't specify it. Gotta check.
+#endif
+    static_assert(::std::numeric_limits<error_f32>::is_iec559 && ::std::numeric_limits<error_f32>::digits == 24 &&
+                      ::std::numeric_limits<error_f32>::max_exponent == 128 && ::std::numeric_limits<error_f32>::min_exponent == -125,
+                  "error_f32 ain't of the IEC 559/IEEE 754 floating-point types");
+
+#ifdef __STDCPP_FLOAT64_T__
+    using error_f64 = ::std::float64_t;  // IEEE 754-2008
+#else
+    using error_f64 = double;  // The C++ Standard doesn't specify it. Gotta check.
+#endif
+    static_assert(::std::numeric_limits<error_f64>::is_iec559 && ::std::numeric_limits<error_f64>::digits == 53 &&
+                      ::std::numeric_limits<error_f64>::max_exponent == 1024 && ::std::numeric_limits<error_f64>::min_exponent == -1021,
+                  "error_f64 ain't of the IEC 559/IEEE 754 floating-point types");
+
+    /// @brief Additional information provided by wasm error
     union err_selectable_t
     {
+        duplicate_imports_or_exports_t duplic_imports_or_exports;
+
+        module_name_err_t error_module_name;
+
         ::std::byte const* err_end;
         ::std::size_t err_uz;
         ::std::ptrdiff_t err_pdt;
@@ -111,8 +159,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::std::uint_least8_t u8;
         ::std::int_least8_t i8;
 
-        double f64;
-        float f32;
+        error_f64 f64;
+        error_f32 f32;
         bool boolean;
 
         ::std::uint_least64_t u64arr[1];
@@ -124,8 +172,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::std::uint_least8_t u8arr[8];
         ::std::int_least8_t i8arr[8];
 
-        double f64arr[1];
-        float f32arr[2];
+        error_f64 f64arr[1];
+        error_f32 f32arr[2];
         bool booleanarr[8];
     };
 

@@ -53,13 +53,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils
     inline constexpr ::std::strong_ordering operator<=> (version v1, version v2) noexcept
     {
         auto const cx{v1.x <=> v2.x};
-        if(cx == 0)
+        if(cx == ::std::strong_ordering::equal)
         {
             auto const cy{v1.y <=> v2.y};
-            if(cy == 0)
+            if(cy == ::std::strong_ordering::equal)
             {
                 auto const cz{v1.z <=> v2.z};
-                if(cz == 0) { return v1.state <=> v2.state; }
+                if(cz == ::std::strong_ordering::equal) { return v1.state <=> v2.state; }
                 return cz;
             }
             return cy;

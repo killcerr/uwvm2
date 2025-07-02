@@ -20,12 +20,14 @@
  *                                      *
  ****************************************/
 
+// std
+#include <cstddef>
 #include <memory>
 #include <utility>
-
+// macro
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-
+// import
 #ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.utils.ansies;
@@ -43,7 +45,7 @@ import uwvm2.uwvm.cmdline;
 # include <uwvm2/uwvm/cmdline/impl.h>
 #endif
 
-namespace uwvm2::uwvm::cmdline::paras::details
+namespace uwvm2::uwvm::cmdline::params::details
 {
     template <::std::size_t N>
     inline constexpr ::fast_io::array<char8_t, N + 1> u8nspace() noexcept
@@ -299,7 +301,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
         return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
     }
 
-}  // namespace uwvm2::uwvm::cmdline::paras::details
+}  // namespace uwvm2::uwvm::cmdline::params::details
 
 // macro
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>

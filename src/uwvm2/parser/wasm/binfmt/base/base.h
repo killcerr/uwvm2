@@ -31,6 +31,8 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 // std
 # include <cstdint>
 # include <cstddef>
+# include <climits>
+# include <cstring>
 # include <type_traits>
 # include <memory>
 // import
@@ -50,33 +52,72 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         ::std::byte const* module_end{};
     };
 
+    /// @details    Assumed safe range: [module_curr, module_curr + 4)
+    /// @note       Before using the unchecked function, make sure that the safe part of the assume has been checked.
     inline constexpr bool is_wasm_file_unchecked(::std::byte const* module_curr) noexcept
     {
-        // assuming:
-        // [00 61 73 6D] Version ... (end)
-        // [   safe    ]
+        // [00 61 73 6D  ] Version ... (end)
+        // [safe (assume)]
         //  ^^ module_curr
 
-        return ::fast_io::freestanding::my_memcmp(module_curr, u8"\0asm", 4uz) == 0;
+        return ::std::memcmp(module_curr, u8"\0asm", 4uz * sizeof(char8_t)) == 0;
     }
 
+    /// @details    Assumed safe range: [module_curr - 4, module_curr + 4)
+    /// @note       Before using the unchecked function, make sure that the safe part of the assume has been checked.
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
     {
-        // assuming:
+
+#if CHAR_BIT == 8
         // [00 61 73 6D Version ...] (end)
-        // [           safe        ] unsafe
+        // [         safe (assume) ] unsafe
         //              ^^ module_curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
-        ::fast_io::freestanding::my_memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
-        static_assert(sizeof(temp) > 1);
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp;
+        ::std::memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
         // Size of temp greater than one requires little-endian conversion
+        // supported: big-endian, little-endian, pdp-endian
         temp = ::fast_io::little_endian(temp);
         return temp;
+
+#else
+        // CHAR_BIT > 8: The number of bits per byte is greater than 8, when only the lower eight bits of information are valid.
+
+        // assuming:
+        // [?00 ?61 ?73 ?6D Version ...] (end)
+        // [           safe (assume)   ] unsafe
+        //                  ^^ module_curr
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp{};
+
+        // simulate little endian
+        // [??? ??? ??? ??? ?00 ?01 ?02 ?03 ...] (end)
+        // [             safe (assume)         ] unsafe
+        //              ^^ module_curr - 1u: minus 1u is assumed to be legitimate
+        //                  ^^ module_curr
+        //                              ^^ module_curr + 3u
+
+        // 1st: module_curr + 3u
+        // 2nd: module_curr + 2u
+        // 3rd: module_curr + 1u
+        // 4th: module_curr
+        // 5th: (break) module_curr - 1u
+
+        for(auto c{module_curr + 3u}; c != module_curr - 1u; --c)
+        {
+            auto const c_val{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(*c) & 0xFFu};
+
+            temp <<= 8u;
+            temp |= c_val;
+        }
+
+        return temp;
+
+#endif
     }
 
     /// @brief      detect wasm binfmt version
-    /// @return     0 : error, other : binfmt version
+    /// @return     0: error, other: binfmt version
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version(::std::byte const* const module_begin,
                                                                                                        ::std::byte const* const module_end) noexcept
     {
@@ -105,6 +146,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
         // [           safe        ] unsafe
         //              ^^ module_curr
 
+        // assume that the safe part of the unchecked function is already checked.
         auto const binfmt_ver{detect_wasm_binfmt_version_unchecked(module_curr)};
 
         return binfmt_ver;

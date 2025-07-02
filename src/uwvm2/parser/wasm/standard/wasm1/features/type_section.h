@@ -42,10 +42,12 @@ import :types;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <type_traits>
 # include <utility>
 # include <memory>
+# include <limits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -84,6 +86,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     };
 
     /// @brief Define functions for value_type against wasm1 for checking value_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr bool define_check_value_type(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
@@ -270,6 +273,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief Define type_prefix for wasm1 Functions for checking type_prefix
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_type_prefix_handler(
         ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
@@ -413,15 +417,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [   safe   ] unsafe (could be the section_end)
             //      ^^ prefix_module_ptr
 
-            ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix{};
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix;
 
             // no necessary to check, because (section_curr != section_end)
-            ::fast_io::freestanding::my_memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));
+            ::std::memcpy(::std::addressof(prefix), section_curr, sizeof(prefix));
             // set section_curr to next
             // No sense check, never cross the line because (section_curr < section_end)
 
-            static_assert(sizeof(prefix) == 1);
+            static_assert(sizeof(prefix) == 1uz);
             // Size equal to one does not need to do little-endian conversion
+
+            // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+            prefix = static_cast<decltype(prefix)>(static_cast<::std::uint_least8_t>(prefix) & 0xFFu);
+#endif
 
             ++section_curr;
             // [... prefix] ...

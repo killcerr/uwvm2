@@ -32,6 +32,7 @@ import fast_io_crypto;
 # include <memory>
 # include <new>
 # include <algorithm>
+# include <limits>
 // import
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -70,72 +71,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         parameter_parsing_results_type type{};  // Parameter type
     };
 
-    /// @deprecated Not recommended, use fast_io::vector instead
-#if 0
-    /// @brief Structure to storage parameter_parsing_results
-    struct parameter_parsing_results_storage UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
-    {
-        using Alloc = ::fast_io::native_typed_global_allocator<parameter_parsing_results>;
-
-        parameter_parsing_results* begin{};
-        parameter_parsing_results* end{};
-
-        inline constexpr parameter_parsing_results_storage() noexcept = default;
-
-        inline constexpr parameter_parsing_results_storage(::std::size_t argc) noexcept
-        {
-            if UWVM_IF_CONSTEVAL { this->begin = ::new parameter_parsing_results[argc]; }
-            else { this->begin = Alloc::allocate(argc); }
-            this->end = this->begin + argc;
-        }
-
-        inline constexpr parameter_parsing_results_storage(parameter_parsing_results_storage const&) = delete;
-        inline constexpr parameter_parsing_results_storage& operator= (parameter_parsing_results_storage const&) = delete;
-
-        inline constexpr parameter_parsing_results_storage(parameter_parsing_results_storage&& other) noexcept : begin{other.begin}, end{other.end}
-        {
-            other.begin = nullptr;
-            other.end = nullptr;
-        }
-
-        inline constexpr parameter_parsing_results_storage& operator= (parameter_parsing_results_storage&& other) noexcept
-        {
-            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
-
-            this->begin = other.begin;
-            other.begin = nullptr;
-            this->end = other.end;
-            other.end = nullptr;
-            return *this;
-        }
-
-        inline constexpr ~parameter_parsing_results_storage() { clear(); }
-
-        inline constexpr void alloc(::std::size_t argc) noexcept
-        {
-            if(!this->begin) [[likely]]
-            {
-                if UWVM_IF_CONSTEVAL { this->begin = ::new parameter_parsing_results[argc]; }
-                else { this->begin = Alloc::allocate(argc); }
-                this->end = this->begin + argc;
-            }
-        }
-
-        inline constexpr void clear() noexcept
-        {
-            if(this->begin) [[likely]]
-            {
-                if UWVM_IF_CONSTEVAL { ::delete[] this->begin; }
-                else
-                {
-                    auto const dealloc_size{static_cast<::std::size_t>(this->end - this->begin)};
-                    Alloc::deallocate_n(this->begin, dealloc_size);
-                }
-            }
-        }
-    };
-#endif
-
     /// @brief Used to indicate the return type of the parameter parser
     enum class parameter_return_type : unsigned
     {
@@ -166,6 +101,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         wasm,
     };
 
+    /// @brief Execution charset EBCDIC not supported
+    static_assert((!::fast_io::details::is_ebcdic<char>), "exec-code EBCDIC not supported");
+
     /// @brief User-defined parameters and handlers
     /// @brief Command line arguments will be encoded in ascii and will not be specialized for encodings such as ebcdic.
     struct parameter
@@ -188,7 +126,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     {
         ::fast_io::array<parameter const*, N> res{};
         for(::std::size_t i{}; i < N; ++i) { res.index_unchecked(i) = punsort[i]; }
-        ::std::ranges::sort(res, [](parameter const* const a, parameter const* const b) noexcept -> bool { return a->name < b->name; });
+        ::std::ranges::sort(res, [](parameter const* const a, parameter const* const b) constexpr noexcept -> bool { return a->name < b->name; });
         return res;
     }
 
@@ -215,7 +153,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     }
 
     /// @brief judge whether parameter has invalid char
-    inline constexpr bool is_invalid_paramater_char(char8_t c) noexcept
+    inline constexpr bool is_invalid_parameter_char(char8_t c) noexcept
     {
         if(c >= 0x21 && c <= 0x7E)
         {
@@ -260,7 +198,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         }
 
         // sort
-        ::std::ranges::sort(res, [](alias_parameter const& a, alias_parameter const& b) noexcept -> bool { return a.str < b.str; });
+        ::std::ranges::sort(res, [](alias_parameter const& a, alias_parameter const& b) constexpr noexcept -> bool { return a.str < b.str; });
 
         // check is invalid
         ::fast_io::u8string_view check{};  // Empty strings will be sorted and placed first.
@@ -277,6 +215,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 // The first character of the parameter must be '-'
                 ::fast_io::fast_terminate();
             }
+
             if(i.str.size() == 1uz)
             {
                 // "-" is invalid
@@ -286,15 +225,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             for(auto c: i.str)
             {
 #if __cpp_contracts >= 202502L
-                contract_assert(!is_invalid_paramater_char(c));
+                contract_assert(!is_invalid_parameter_char(c));
 #else
-                if(is_invalid_paramater_char(c))
+                if(is_invalid_parameter_char(c))
                 {
                     // invalid parameter character
                     ::fast_io::fast_terminate();
                 }
 #endif
             }
+
             check = i.str;  // check duplicate
         }
         return res;
@@ -366,6 +306,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             if(!c) { return {hash_size, extra_size, real_max_conflict_size}; }
         }
         // The conflict size has not been able to stay within the maximum conflict size, try changing the initial seed.
+        // The consteval function reports an error if the memory is not properly freed.
         ::fast_io::fast_terminate();
     }
 
@@ -401,6 +342,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> res{};
 
         ::fast_io::crc32c_context crc32c{};
+
+        // Note: conflictplace is always 1 greater than its offset, because it prevents subsequent lookups that are equal to 0 (the first element) from being
+        // judged as having no content, leading to parsing failures.
         ::std::size_t conflictplace{1uz};
 
         for(auto const& j: ord)
@@ -419,7 +363,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                     if(!res.ht.index_unchecked(val).str.empty())
                     {
                         // Write a conflict table backward.
-                        for(auto& i: res.ct.index_unchecked(res.ht.index_unchecked(val).str.size() - 1).ctmem)
+
+                        // str.n (str.size()) records the number of conflicts, not the last position of the conflict table,
+                        // if you need to get the last position, you need to subtract one.
+
+                        for(auto& i: res.ct.index_unchecked(res.ht.index_unchecked(val).str.size() - 1uz).ctmem)
                         {
                             // Find an opening.
                             if(i.para == nullptr)
@@ -439,12 +387,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 }
                 else
                 {
-                    // Move the data to the conflict table
+                    // When a hash conflict occurs, move the original data to the conflict table.
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().para = res.ht.index_unchecked(val).para;
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().str = res.ht.index_unchecked(val).str;
+
+                    // Marking hash tables as having conflicting patterns
                     res.ht.index_unchecked(val).para = nullptr;         // Mark this as no available
                     res.ht.index_unchecked(val).str.ptr = nullptr;      // Mark this as no available
                     res.ht.index_unchecked(val).str.n = conflictplace;  // Conflict Table Location
+                    // Note: conflictplace is always 1 greater than its offset, because it prevents subsequent lookups that are equal to 0 (the first element)
+                    // from being judged as having no content, leading to parsing failures.
+
+                    // Setting the current content
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).para = j.para;
                     res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).str = j.str;
                     ++conflictplace;
@@ -495,7 +449,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 if(!htval.str.empty()) [[likely]]
                 {
                     // Get Conflict Table
-                    auto const& ct{ght.ct.index_unchecked(htval.str.size() - 1).ctmem};
+                    // htval.str.size() is created at compile time and is always greater than or equal to 1
+                    // Note: htval.str.size() is always 1 greater than its offset
+                    // index == htval.str.size() - 1uz
+                    auto const& ct{ght.ct.index_unchecked(htval.str.size() - 1uz).ctmem};
+
                     // Conflict table is always the last one is nullptr, here no longer judge cend, improve speed
                     for(auto curr_conflict{ct.cbegin()};; ++curr_conflict)
                     {

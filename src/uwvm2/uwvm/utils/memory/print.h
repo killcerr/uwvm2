@@ -62,7 +62,46 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::memory
         auto err_curr{mem.err_curr};
         auto err_end{mem.err_end};
 
-        if(err_begin > err_end || err_curr < err_begin || err_curr > err_end) [[unlikely]] { return; }
+        if(err_begin == nullptr || err_curr == nullptr || err_end == nullptr) [[unlikely]]
+        {
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "(null) "); }
+            else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"(null) "); }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(null) ");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"(null) ");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"(null) ");
+            }
+            return;
+        }
+
+        if(err_begin > err_end || err_curr < err_begin || err_curr > err_end) [[unlikely]]
+        {
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "(error) "); }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"(error) ");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(error) ");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"(error) ");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"(error) ");
+            }
+            return;
+        }
 
         bool print_front_ext{};
         bool print_end_ext{};

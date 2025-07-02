@@ -25,6 +25,7 @@ module;
 // std
 #include <cstdint>
 #include <cstddef>
+#include <cstring>
 #include <concepts>
 
 export module uwvm2.utils.ansies:cursor;

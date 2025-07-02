@@ -42,6 +42,7 @@
 # pragma pop_macro("UWVM_WIN32_TEXTATTR_GREEN")
 # pragma pop_macro("UWVM_WIN32_TEXTATTR_RED")
 # pragma pop_macro("UWVM_WIN32_TEXTATTR_BLACK")
+# pragma pop_macro("UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_PURPLE")
 # pragma pop_macro("UWVM_WIN32_TEXTATTR_RST_ALL_AND_SET_WHITE")
 # pragma pop_macro("UWVM_WIN32_TEXTATTR_RST_ALL")
 

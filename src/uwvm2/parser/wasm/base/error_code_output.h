@@ -25,11 +25,16 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.utils.ansies;
+import uwvm2.utils.utf;
+# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
+import uwvm2.utils.debug;
+# endif
 import :error_code;
 #else
 // std
 # include <cstddef>
 # include <cstdint>
+# include <type_traits>
 # include <concepts>
 # include <utility>
 # include <limits>
@@ -40,6 +45,10 @@ import :error_code;
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/ansies/impl.h>
+# include <uwvm2/utils/utf/impl.h>
+# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
+#  include <uwvm2/utils/debug/impl.h>
+# endif
 # include "error_code.h"
 #endif
 
@@ -324,6 +333,41 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t:
             {
 #include "error_code_outputs/eco_size_exceeds_the_maximum_value_of_size_t.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type:
+            {
+#include "error_code_outputs/eco_duplicate_imports_of_the_same_import_type.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence:
+            {
+#include "error_code_outputs/eco_invalid_utf8_sequence.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence:
+            {
+#include "error_code_outputs/eco_module_name_is_invalid_utf8_sequence.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_table_count:
+            {
+#include "error_code_outputs/eco_invalid_table_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_table:
+            {
+#include "error_code_outputs/eco_wasm1_not_allow_multi_table.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::table_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_table_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::table_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_table_section_resolved_not_match_the_actual_number.h"
                 return;
             }
         }

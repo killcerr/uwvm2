@@ -20,12 +20,17 @@
  *                                      *
  ****************************************/
 
+// std
 #include <memory>
 #include <utility>
-
+// macro
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-
+// platform
+#if defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
+# include <linux/version.h>
+#endif
+// std
 #ifdef UWVM_MODULE
 import fast_io;
 import fast_io_crypto;
@@ -53,7 +58,7 @@ import uwvm2.uwvm.utils.install_path;
 # include <uwvm2/uwvm/utils/install_path/impl.h>
 #endif
 
-namespace uwvm2::uwvm::cmdline::paras::details
+namespace uwvm2::uwvm::cmdline::params::details
 {
     template <typename Stm>
     inline void logo_u8print_not_rst_impl(Stm&& stm) noexcept
@@ -193,6 +198,24 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"\nVersion: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
                                 ::uwvm2::uwvm::custom::uwvm_version,
+        // flags
+#if defined(UWVM_VERSION_DEV)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [dev]",
+#elif defined(UWVM_VERSION_ALPHA)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [alpha]",
+#elif defined(UWVM_VERSION_BETA)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [beta]",
+#elif defined(UWVM_VERSION_RELEASE_CANDIDATE)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [rc]",
+#elif defined(UWVM_VERSION_STABLE_RELEASE)
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
+                                u8" [sr]",
+#endif
+                                // git commit data
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
 #if defined(UWVM_GIT_COMMIT_DATA)
                                 u8" (",
@@ -276,14 +299,15 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 #elif defined(__x86_64__) || defined(_M_AMD64)
                                 u8"x86_64"
-# if defined(__APX_F__)
-                                u8" (APX)"
-# endif
 #elif defined(__i386__) || defined(_M_IX86)
-# if defined(__MINGW32__) || defined(_MSC_VER)
+# if defined(_MSC_VER)
                                 u8"i686"
-# elif defined(__DJGPP__)
+# elif defined(__i686__)
+                                u8"i686"
+# elif defined(__i586__)
                                 u8"i586"
+# elif defined(__i486__)
+                                u8"i486"
 # else
                                 u8"i386"
 # endif
@@ -295,10 +319,13 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"E2K"
 #elif defined(__IA64__) || defined(_M_IA64)
                                 u8"Intel Itanium 64"
-#elif defined(__loongarch64__)
-                                u8"LoongArch64"
 #elif defined(__loongarch__)
-                                u8"LoongArch"
+# if defined(__loongarch64)
+                                u8"LoongArch64"
+# else
+                                u8"LoongArch32"
+# endif
+        // loongarch no big-endian mode
 #elif defined(__m68k__) || defined(__mc68000__)
                                 u8"Motorola 68k"
 #elif defined(__MIPS64__) || defined(__mips64__)
@@ -334,6 +361,10 @@ namespace uwvm2::uwvm::cmdline::paras::details
                                 u8"System/390"
 #elif defined(__pdp11)
                                 u8"PDP11"
+#elif defined(__pdp10)
+                                u8"PDP10"
+#elif defined(__pdp7)
+                                u8"PDP7"
 #elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)
                                 u8"PowerPC64"
 # if defined(_LITTLE_ENDIAN) || defined(__LITTLE_ENDIAN__)
@@ -397,7 +428,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # endif
 #elif defined(__wasm_simd128__)
                                 u8"\nISA support: SIMD128"
-#elif defined(__loongarch__) && (defined(__loongarch_sx) || UWVM_HAS_BUILTIN(__builtin_loongarch_crc32c_b))
+#elif defined(__loongarch__) && defined(__loongarch_sx)
                                 u8"\nISA support: LoongSX "
 # if defined(__loongarch_asx)
                                 u8"LoongASX "
@@ -445,8 +476,23 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__BMI2__)
                                 u8"BMI2 "
 # endif
+        // 'POPCNT' instruction is a subset of sse4
 # if defined(__PRFCHW__)
                                 u8"PRFCHW "
+# endif
+# if defined(__PREFETCHI__)
+                                u8"PREFETCHI "
+# endif
+# if 0  // uwvm don't need these instructions
+#  if defined(__RDSEED__)
+                                u8"RDSEED "
+#  endif
+#  if defined(__RDRND__)
+                                u8"RDRND "
+#  endif
+# endif
+# if defined(__RTM__)
+                                u8"RTM "
 # endif
 # if defined(__MMX__)
                                 u8"MMX "
@@ -514,6 +560,27 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__AVX512BF16__)
                                 u8"AVX512BF16 "
 # endif
+# if defined(__AVX512VPOPCNTDQ__)
+                                u8"AVX512VPOPCNTDQ "
+# endif
+# if defined(__AVX512VP2INTERSECT__)
+                                u8"AVX512VP2INTERSECT "
+# endif
+# if defined(__AVXIFMA__)
+                                u8"AVXIFMA "
+# endif
+# if defined(__AVXNECONVERT__)
+                                u8"AVXNECONVERT "
+# endif
+# if defined(__AVXVNNIINT16__)
+                                u8"AVXVNNIINT16 "
+# endif
+# if defined(__AVXVNNIINT8__)
+                                u8"AVXVNNIINT8 "
+# endif
+# if defined(__AVXVNNI__)
+                                u8"AVXVNNI "
+# endif
 # if defined(__AVX10_1__)
                                 u8"AVX10.1 "
 # endif
@@ -526,8 +593,18 @@ namespace uwvm2::uwvm::cmdline::paras::details
 # if defined(__AVX10_2_512__)
                                 u8"AVX10.2-512 "
 # endif
-#elif defined(__VECTOR4DOUBLE__) || defined(__VSX__) || (defined(__ALTIVEC__) || defined(__VEC__))
-                                u8"\nISA support: PPC SIMD"
+# if defined(__APX_F__)
+                                u8"APX "
+# endif
+#elif ((defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)) ||                                                         \
+       (defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC))) &&                                                                \
+    (defined(__ALTIVEC__) || defined(__VEC__))
+                                u8"\nISA support: ALTIVEC "
+# if defined(__VSX__)
+                                u8"VSX "
+# endif
+#elif defined(__riscv) && defined(__riscv_vector)
+                                u8"\nISA support: RVV "
 #endif
 
                                 // OS
@@ -587,7 +664,15 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #elif defined(__MSDOS__)
                                 u8"Microsoft Dos"
 #elif defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
-                                u8"Linux"
+                                u8"Linux "
+# if defined(LINUX_VERSION_CODE)
+                                ,
+                                static_cast<::std::make_unsigned_t<decltype(LINUX_VERSION_CODE)>>(LINUX_VERSION_CODE) >> 16u,
+                                u8".",
+                                (static_cast<::std::make_unsigned_t<decltype(LINUX_VERSION_CODE)>>(LINUX_VERSION_CODE) >> 8u) & 0xFFu,
+                                u8".",
+                                static_cast<::std::make_unsigned_t<decltype(LINUX_VERSION_CODE)>>(LINUX_VERSION_CODE) & 0xFFu,
+# endif
 #elif defined(__APPLE__) && defined(__MACH__)
                                 u8"Mac OS"
 #elif defined(__DragonFly__)
@@ -677,32 +762,32 @@ namespace uwvm2::uwvm::cmdline::paras::details
 #endif
                                 u8"\nAllocator: "
 #if defined(FAST_IO_USE_CUSTOM_GLOBAL_ALLOCATOR)
-                                u8"custom global"
+                                u8"Custom Allocator"
 #elif defined(FAST_IO_USE_MIMALLOC)
                                 u8"mimalloc"
 #elif (defined(__linux__) && defined(__KERNEL__)) || defined(FAST_IO_USE_LINUX_KERNEL_ALLOCATOR)
-                                u8"linux kmalloc"
+                                u8"Linux kmalloc"
 #elif ((__STDC_HOSTED__ == 1 && (!defined(_GLIBCXX_HOSTED) || _GLIBCXX_HOSTED == 1) && !defined(_LIBCPP_FREESTANDING)) ||                                      \
        defined(FAST_IO_ENABLE_HOSTED_FEATURES))
 # if defined(_WIN32) && !defined(__CYGWIN__) && !defined(__WINE__) && !defined(FAST_IO_USE_C_MALLOC)
 #  if defined(_DEBUG) && defined(_MSC_VER)
-                                u8"wincrt malloc dbg"
+                                u8"WinCRT malloc DBG"
 #  else
 #   if defined(_WIN32_WINDOWS)
-                                u8"win32 heapalloc"
+                                u8"Win32 Heapalloc"
 #   else
-                                u8"nt rtlallocateheap"
+                                u8"NT Rtlallocateheap"
 #   endif
 #  endif
 # else
 #  if defined(_DEBUG) && defined(_MSC_VER)
-                                u8"wincrt malloc dbg"
+                                u8"WinCRT malloc DBG"
 #  else
-                                u8"c malloc"
+                                u8"C's malloc"
 #  endif
 # endif
 #else
-                                u8"custom global"
+                                u8"Custom Allocator"
 #endif
                                 u8"\n"
                                 // Feature
@@ -734,7 +819,7 @@ namespace uwvm2::uwvm::cmdline::paras::details
         return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
     }
 
-}  // namespace uwvm2::uwvm::cmdline::paras::details
+}  // namespace uwvm2::uwvm::cmdline::params::details
 
 // macro
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>

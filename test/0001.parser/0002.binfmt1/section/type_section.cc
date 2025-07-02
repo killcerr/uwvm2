@@ -87,7 +87,7 @@ struct F2
 
 struct F3
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"F2"};
+    inline static constexpr ::fast_io::u8string_view feature_name{u8"F3"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
     using value_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<vt1, vt2>;
@@ -112,6 +112,5 @@ int main()
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2, F3>() == true);
 }
 
-
 // macro
-# include <uwvm2/utils/macro/pop_macros.h>
+#include <uwvm2/utils/macro/pop_macros.h>

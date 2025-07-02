@@ -40,6 +40,7 @@ import uwvm2.parser.wasm.text_format;
 # include <type_traits>
 # include <utility>
 # include <memory>
+# include <compare>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -349,48 +350,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             ```cpp
     ///             struct F
     ///             {
-    ///                 inline static constexpr text_format import_export_text_format{text_format::utf8_rfc3629_with_zero_illegal};
+    ///                 using import_export_text_format = type_replacer<root_of_replacement, text_format_wapper<text_format::xxx>>;
     ///             };
     ///             ```
     template <typename FeatureType>
     concept has_import_export_text_format = requires {
-        requires ::std::same_as<::std::remove_cvref_t<decltype(FeatureType::import_export_text_format)>, ::uwvm2::parser::wasm::text_format::text_format>;
+        typename FeatureType::import_export_text_format;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::import_export_text_format>;
     };
 
     template <typename FeatureType>
-    inline consteval ::uwvm2::parser::wasm::text_format::text_format get_import_export_text_format() noexcept
+    inline consteval auto get_import_export_text_format() noexcept
     {
-        if constexpr(has_import_export_text_format<FeatureType>) { return FeatureType::import_export_text_format; }
+        if constexpr(has_import_export_text_format<FeatureType>) { return typename FeatureType::import_export_text_format{}; }
         else
         {
-            return ::uwvm2::parser::wasm::text_format::text_format{};
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
         }
     }
 
-    template <::uwvm2::parser::wasm::text_format::text_format TFWapper>
-    struct text_format_wapper
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_import_export_text_format_wapper =
+        ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_import_export_text_format<Fs>())...>;
+
+    /// @brief name checker
+    struct name_checker
     {
-        inline static constexpr ::uwvm2::parser::wasm::text_format::text_format type{TFWapper};
+        ::fast_io::u8string_view module_name{};
+        ::fast_io::u8string_view extern_name{};
     };
 
-    /// @brief      can check import/export text format
-    /// @details
-    ///             ```cpp
-    ///             void check_import_export_text_format(text_format_wapper<FeatureType::import_export_text_format>,
-    ///                                                  ::std::byte const* begin,
-    ///                                                  ::std::byte const* end,
-    ///                                                  ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
-    ///             {
-    ///                 // to do ...
-    ///             }
-    ///             ```
-    template <typename FeatureType>
-    concept can_check_import_export_text_format = requires(text_format_wapper<FeatureType::import_export_text_format> adl,
-                                                           ::std::byte const* begin,
-                                                           ::std::byte const* end,
-                                                           ::uwvm2::parser::wasm::base::error_impl& err) {
-        { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
-    };
+    inline constexpr bool operator== (name_checker const& n1, name_checker const& n2) noexcept
+    {
+        return n1.module_name == n2.module_name && n1.extern_name == n2.extern_name;
+    }
+
+    inline constexpr ::std::strong_ordering operator<=> (name_checker const& n1, name_checker const& n2) noexcept
+    {
+        ::std::strong_ordering const module_name_check{n1.module_name <=> n2.module_name};
+
+        if(module_name_check != ::std::strong_ordering::equal) { return module_name_check; }
+
+        return n1.extern_name <=> n2.extern_name;
+    }
 
     /////////////////////////////
     //     Function Section    //
@@ -405,6 +408,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         final_function_type<Fs...> const* func_type{};
     };
+
+    /////////////////////////////
+    //      Table Section      //
+    /////////////////////////////
+
+    /// @brief      allow multi table
+    /// @details    In the current version of WebAssembly, at most one table may be defined or imported in a single module,
+    ///             and all constructs implicitly reference this table 0. This restriction may be lifted in future versions.
+    ///
+    ///             Define this to eliminate checking the length of the result.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool allow_multi_table{true};
+    ///             };
+    ///             ```
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.4
+    /// @see        test\0001.parser\0002.binfmt1\section\table_section.cc
+    template <typename FsCurr>
+    concept has_allow_multi_table = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_table)>, bool>; };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool allow_multi_table() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_allow_multi_table<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::allow_multi_table};
+                                                                            return tallow;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
 
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 

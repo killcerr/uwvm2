@@ -29,6 +29,7 @@ import fast_io;
 # ifdef UWVM_TIMER
 import uwvm2.utils.debug;
 # endif
+import uwvm2.utils.utf;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
@@ -43,10 +44,13 @@ import :type_section;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <type_traits>
 # include <utility>
 # include <memory>
+# include <limits>
+# include <set>  /// @todo use fast_io::set instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -57,6 +61,7 @@ import :type_section;
 # ifdef UWVM_TIMER
 #  include <uwvm2/utils/debug/impl.h>
 # endif
+# include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -151,6 +156,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_table_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -166,6 +172,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_memory_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -181,6 +188,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::table_type
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* extern_imports_global_handler(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -196,6 +204,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief Define function for wasm1 external_types
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_extern_prefix_imports_handler(
         ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
@@ -235,6 +244,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             default: ::fast_io::unreachable();  // never match, checked before
         }
         return section_curr;
+    }
+
+    /// @brief Define a function for wasm1 to check for utf8 sequences.
+    /// @note  ADL for distribution to the correct handler function
+    inline constexpr void check_import_export_text_format(
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be
+                                                                                                                                               // replaced
+        ::std::byte const* begin,
+        ::std::byte const* end,
+        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        auto const [utf8pos, utf8err]{::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
+            reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
+            reinterpret_cast<char8_t_const_may_alias_ptr>(end))};
+
+        if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+        {
+            err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
+            err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
     }
 
     /// @brief Define the handler function for type_section
@@ -341,8 +374,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};  // use for reserve
         // desc counter
 
+        ::fast_io::array<::std::set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker> /* @todo use fast_io::set instead */, importdesc_count>
+            duplicate_name_checker{};  // use for check duplicate name
+
         while(section_curr != section_end) [[likely]]
         {
+            // get final utf8-checker
+            using curr_final_import_export_text_format_wapper = ::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...>;
+#if 0
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::can_check_import_export_text_format<Fs...>);
+#endif
             // Ensuring the existence of valid information
 
             // [...  module_namelen] ... module_name ... extern_namelen ... extern_name ... import_type extern_func ...
@@ -415,7 +456,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // No access, security
             fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
 
-            /// @todo utf8 check
+            // For platforms with CHAR_BIT greater than 8, the view here does not need to do any non-zero checking of non-low 8 bits within a single byte,
+            // because a standards-compliant UTF-8 decoder must only care about the low 8 bits of each byte when verifying or decoding a byte sequence.
+
+            // check utf8
+            check_import_export_text_format(curr_final_import_export_text_format_wapper{},
+                                            reinterpret_cast<::std::byte const*>(fit.module_name.cbegin()),
+                                            reinterpret_cast<::std::byte const*>(fit.module_name.cend()),
+                                            err);
 
             section_curr += module_namelen;  // safe
 
@@ -475,7 +523,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
 
-            /// @todo utf8 check
+            // For platforms with CHAR_BIT greater than 8, the view here does not need to do any non-zero checking of non-low 8 bits within a single byte,
+            // because a standards-compliant UTF-8 decoder must only care about the low 8 bits of each byte when verifying or decoding a byte sequence.
+
+            // check utf8
+            check_import_export_text_format(curr_final_import_export_text_format_wapper{},
+                                            reinterpret_cast<::std::byte const*>(fit.extern_name.cbegin()),
+                                            reinterpret_cast<::std::byte const*>(fit.extern_name.cend()),
+                                            err);
 
             section_curr += extern_namelen;  // safe
             // [...  module_namelen ... module_name ... extern_namelen ... extern_name ...] import_type extern_func ...
@@ -495,10 +550,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [                                   safe                                               ] unsafe (could be the section_end)
             //                                                                             ^^ section_curr
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
+            ::std::memcpy(::std::addressof(fit.imports.type), section_curr, sizeof(fit.imports.type));
 
-            static_assert(sizeof(fit.imports.type) == 1);
+            static_assert(sizeof(fit.imports.type) == 1uz);
             // Size equal to one does not need to do little-endian conversion
+
+            // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+            fit.imports.type = static_cast<decltype(fit.imports.type)>(static_cast<::std::uint_least8_t>(fit.imports.type) & 0xFFu);
+#endif
 
             // importdesc_count never > 256 (max=255+1), convert to unsigned
             if(static_cast<unsigned>(fit.imports.type) >= static_cast<unsigned>(importdesc_count)) [[unlikely]]
@@ -510,10 +570,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // use for reserve
-            ++importdesc_counter.index_unchecked(
-                static_cast<::std::size_t>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type)));
+            // 0: func
+            // 1: table
+            // 2: mem
+            // 3: global
 
-            /// @todo check duplicate (set)
+            auto const fit_import_type{static_cast<::std::size_t>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type))};
+
+            // counter
+            ++importdesc_counter.index_unchecked(fit_import_type);
+
+            // check duplicate name
+            auto& curr_name_set{duplicate_name_checker.index_unchecked(fit_import_type)};
+
+            ::uwvm2::parser::wasm::standard::wasm1::features::name_checker const curr_name_check{fit.module_name, fit.extern_name};
+
+            if(curr_name_set.contains(curr_name_check)) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.duplic_imports_or_exports.module_name = fit.module_name;
+                err.err_selectable.duplic_imports_or_exports.extern_name = fit.extern_name;
+                err.err_selectable.duplic_imports_or_exports.type = static_cast<::std::uint_least8_t>(fit_import_type);
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            curr_name_set.insert(curr_name_check);  // std::set never throw (Disregarding new failures)
 
             ++section_curr;
 
@@ -560,9 +642,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             auto const imp_curr_imports_type_wasm_byte{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(imp_curr.imports.type)};
             // imp_curr_imports_type_wasm_byte have been previously checked and never cross the line
-#if __has_cpp_attribute(assume)
+
             [[assume(static_cast<unsigned>(imp_curr_imports_type_wasm_byte) < static_cast<unsigned>(importdesc_count))]];
-#endif
+
             importsec_importdesc_begin[imp_curr_imports_type_wasm_byte].push_back_unchecked(::std::addressof(imp_curr));
         }
     }

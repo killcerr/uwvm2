@@ -31,7 +31,7 @@ import uwvm2.utils.cmdline;
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-// improt
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/cmdline/impl.h>
@@ -41,7 +41,7 @@ import uwvm2.utils.cmdline;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::paras
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
@@ -68,7 +68,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::paras
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif
-}  // namespace uwvm2::uwvm::cmdline::paras
+}  // namespace uwvm2::uwvm::cmdline::params
 
 #ifndef UWVM_MODULE
 // macro

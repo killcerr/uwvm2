@@ -4,6 +4,9 @@
 UseTab: Never
 ColumnLimit: 160
 
+# Comments
+FixNamespaceComments: true
+
 # Indent
 IndentWidth: 4
 BracedInitializerIndentWidth: 4

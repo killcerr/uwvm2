@@ -110,7 +110,7 @@ struct load_file_allocation_guard
 	{
 		if (address == nullptr)
 		{
-			throw_posix_error(EINVAL);
+			throw_posix_error(ENOMEM);
 		}
 	}
 	inline load_file_allocation_guard(load_file_allocation_guard const &) = delete;
@@ -294,6 +294,13 @@ public:
 	}
 	inline allocation_file_loader &operator=(allocation_file_loader &&__restrict other) noexcept
 	{
+		if (__builtin_addressof(other) == this) [[unlikely]]
+		{
+			return *this;
+		}
+
+		::fast_io::details::close_allocation_file_loader_impl(fd, address_begin, address_end);
+
 		// There is no need to check the 'this' pointer as there are no side effects
 		address_begin = other.address_begin;
 		address_end = other.address_end;

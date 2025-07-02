@@ -5,8 +5,6 @@
  *************************************************************/
 
 /**
- * @file        prefetch.cppm
- * @brief       cpu prefetch instruction
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-05-16

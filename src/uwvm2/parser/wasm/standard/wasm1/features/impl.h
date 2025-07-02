@@ -32,5 +32,6 @@
 # include "type_section.h"
 # include "import_section.h"
 # include "function_section.h"
+# include "table_section.h"
 # include "binfmt.h"
 #endif

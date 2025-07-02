@@ -172,11 +172,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         namespace details
         {
             /// @brief Get the function type from the tuple
-            template <typename module_stroate_t, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-            inline consteval binfmt_handle_version_func_p_type<module_stroate_t, Fs...>
+            template <typename module_storage_t, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+            inline consteval binfmt_handle_version_func_p_type<module_storage_t, Fs...>
                 get_binfmt_handle_version_func_p_type_from_tuple(::fast_io::tuple<Fs...>) noexcept
             {
-                return ::uwvm2::parser::wasm::concepts::binfmt_handle_version_func_p_type<module_stroate_t, Fs...>{};
+                return ::uwvm2::parser::wasm::concepts::binfmt_handle_version_func_p_type<module_storage_t, Fs...>{};
             }
 
             /// @brief      Provide template meta to filter out different binfmt versions
@@ -525,7 +525,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         };
 
         template <typename... T1, typename... T2>
-        inline constexpr tuple_megger<T1..., T2...> operator, (tuple_megger<T1...>, tuple_megger<T2...>) noexcept
+        inline consteval tuple_megger<T1..., T2...> operator, (tuple_megger<T1...>, tuple_megger<T2...>) noexcept
         {
             // constexpr provides functions for use at runtime
             return tuple_megger<T1..., T2...>{};

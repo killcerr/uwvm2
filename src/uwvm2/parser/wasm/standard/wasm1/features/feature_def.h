@@ -185,6 +185,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             } -> ::std::same_as<::std::byte const*>;
         };
 
+    /// @brief Define functions for checking imports and exports name
+    template <typename... Fs>
+    concept can_check_import_export_text_format = requires(::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...> adl,
+                                                           ::std::byte const* begin,
+                                                           ::std::byte const* end,
+                                                           ::uwvm2::parser::wasm::base::error_impl& err) {
+        { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
+    };
+
     // function_section
     static_assert(
         ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
@@ -239,6 +248,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // destructor of 'vectypeidx_minimize_storage_u' is implicitly deleted because variant field 'typeidx_u8_vector' has a non-trivial destructor
             inline constexpr ~vectypeidx_minimize_storage_u() {}
+
+            // The release of fast_io::vectors is managed by struct vectypeidx_minimize_storage_t, there is no issue of raii resources being unreleased.
         };
 
         static_assert(sizeof(vectypeidx_minimize_storage_u) == sizeof_vectypeidx_minimize_storage_u,
@@ -439,7 +450,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             return *this;
         }
 
-        inline constexpr ~vectypeidx_minimize_storage_t() { clear_destroy(); }
+        inline constexpr ~vectypeidx_minimize_storage_t()
+        {
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    this->storage.typeidx_u8_view = {};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u8_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u16_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u32_vector));
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
+                }
+            }
+        }
 
         inline constexpr void clear_destroy() noexcept
         {
@@ -456,16 +503,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
+                    // clear_destroy equivalent to destructuring
                     this->storage.typeidx_u8_vector.clear_destroy();
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
+                    // clear_destroy equivalent to destructuring
                     this->storage.typeidx_u16_vector.clear_destroy();
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
+                    // clear_destroy equivalent to destructuring
                     this->storage.typeidx_u32_vector.clear_destroy();
                     break;
                 }
@@ -594,6 +644,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
             }
         }
+    };
+
+    // table_section
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct table_section_storage_t;
+
+    /// @brief Define functions for handle table section table
+    template <typename... Fs>
+    concept has_table_section_table_handler = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<table_section_storage_t<Fs...>> sec_adl,
+                                                       ::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...>& table_r,
+                                                       ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                                       ::std::byte const* section_curr,
+                                                       ::std::byte const* const section_end,
+                                                       ::uwvm2::parser::wasm::base::error_impl& err,
+                                                       ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        { table_section_table_handler(sec_adl, table_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
     };
 
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features

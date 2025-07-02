@@ -142,6 +142,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
         ::fast_io::u8ostring_ref_fast_io u8_storage_ref{::std::addressof(res.parameter_sequence)};
 
+        static_assert(sizeof(::std::size_t) == sizeof(char8_t const*));  // always true on windows NT platforms
+
         for(auto curr_argv{u16_cmdline_argv}; curr_argv != u16_cmdline_argv + res.argc; ++curr_argv)
         {
             // bit_cast into pointer staging, no addition or subtraction dependency

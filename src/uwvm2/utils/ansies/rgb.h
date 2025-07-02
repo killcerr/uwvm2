@@ -28,6 +28,7 @@ import fast_io;
 // std
 # include <cstdint>
 # include <cstddef>
+# include <cstring>
 # include <concepts>
 // import
 # include <fast_io.h>
@@ -62,9 +63,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
         inline constexpr char_type* rgb_print_reserve_impl(char_type* iter, ::std::uint_least32_t r, ::std::uint_least32_t g, ::std::uint_least32_t b) noexcept
         {
             // Multiple copies of one char will not exceed the boundary, and the efficiency will become higher.
-            ::fast_io::freestanding::my_memcpy(iter, u8"\033[38;2;\0", 8uz);
+            ::std::memcpy(iter, u8"\033[38;2;\0", 8uz);
             // memory copy
-            char_type* curr_pos{iter + 7uz};
+            char_type* curr_pos{iter + 7uz};  // 7uz: Replace the written '\0'
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(curr_pos, r);
             *curr_pos = static_cast<char_type>(u8';');
             curr_pos = ::fast_io::pr_rsv_to_iterator_unchecked(++curr_pos, g);

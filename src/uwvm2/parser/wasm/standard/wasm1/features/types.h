@@ -41,6 +41,7 @@ import :feature_def;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <type_traits>
 # include <utility>
@@ -69,11 +70,15 @@ import :feature_def;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 {
+    /// @brief These are proprietary implementations of wasm 1.0's types, which can be replaced by calls implemented via adl
+
     /// @brief      Value Types
     /// @details    Value types are encoded by a single byte.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.3.1
-    inline constexpr bool is_valid_value_type(::uwvm2::parser::wasm::standard::wasm1::type::value_type vt) noexcept
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr bool is_valid_value_type(::uwvm2::parser::wasm::standard::wasm1::type::value_type vt  // [adl]
+                                              ) noexcept
     {
         switch(vt)
         {
@@ -89,7 +94,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Limits classify the size range of resizeable storage associated with memory types and table types.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
-    inline constexpr ::std::byte const* scan_limit_type(::uwvm2::parser::wasm::standard::wasm1::type::limits_type & limit_r,
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr ::std::byte const* scan_limit_type(::uwvm2::parser::wasm::standard::wasm1::type::limits_type & limit_r,  // [adl]
                                                         ::std::byte const* const begin,
                                                         ::std::byte const* const end,
                                                         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -114,11 +120,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [safe] unsafe (could be the end)
         // ^^ curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte flags{};
-        ::fast_io::freestanding::my_memcpy(::std::addressof(flags), curr, sizeof(flags));
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte flags;
+        ::std::memcpy(::std::addressof(flags), curr, sizeof(flags));
 
-        static_assert(sizeof(flags) == 1);
+        static_assert(sizeof(flags) == 1uz);
         // Size equal to one does not need to do little-endian conversion
+
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        flags = static_cast<decltype(flags)>(static_cast<::std::uint_least8_t>(flags) & 0xFFu);
+#endif
 
         if(flags != 0u && flags != 1u) [[unlikely]]
         {
@@ -213,7 +224,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Memory types classify linear memories and their size range.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.6
-    inline constexpr ::std::byte const* scan_table_type(::uwvm2::parser::wasm::standard::wasm1::type::table_type & table_r,
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr ::std::byte const* scan_table_type(::uwvm2::parser::wasm::standard::wasm1::type::table_type & table_r,  // [adl]
                                                         ::std::byte const* const begin,
                                                         ::std::byte const* const end,
                                                         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -236,14 +248,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [ safe  ] unsafe (could be the end)
         // ^^ curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte elemtype{};
-        ::fast_io::freestanding::my_memcpy(::std::addressof(elemtype), curr, sizeof(elemtype));
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte elemtype;
+        ::std::memcpy(::std::addressof(elemtype), curr, sizeof(elemtype));
 
-        static_assert(sizeof(elemtype) == 1);
+        static_assert(sizeof(elemtype) == 1uz);
         // Size equal to one does not need to do little-endian conversion
 
-        // The element type elemtype must be funcref
-        if(elemtype != 0x70) [[unlikely]]
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        elemtype = static_cast<decltype(elemtype)>(static_cast<::std::uint_least8_t>(elemtype) & 0xFFu);
+#endif
+
+        // In wasm 1.0, the element type elemtype must be funcref
+        if(elemtype != 0x70u) [[unlikely]]
         {
             err.err_curr = curr;
             err.err_selectable.u8 = elemtype;
@@ -273,7 +290,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @details    Memory types classify linear memories and their size range.
     /// @details    New feature
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.5
-    inline constexpr ::std::byte const* scan_memory_type(::uwvm2::parser::wasm::standard::wasm1::type::memory_type & memory_r,
+    /// @note       ADL for distribution to the correct handler function
+    inline constexpr ::std::byte const* scan_memory_type(::uwvm2::parser::wasm::standard::wasm1::type::memory_type & memory_r,  // [adl]
                                                          ::std::byte const* const begin,
                                                          ::std::byte const* const end,
                                                          ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -325,10 +343,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::type::value_type gvt;
 
-        ::fast_io::freestanding::my_memcpy(::std::addressof(gvt), curr, sizeof(gvt));
+        ::std::memcpy(::std::addressof(gvt), curr, sizeof(gvt));
 
-        static_assert(sizeof(gvt) == 1);
+        static_assert(sizeof(gvt) == 1uz);
         // Size equal to one does not need to do little-endian conversion
+
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        gvt = static_cast<decltype(gvt)>(static_cast<::std::uint_least8_t>(gvt) & 0xFFu);
+#endif
 
         if(!is_valid_value_type(gvt)) [[unlikely]]
         {
@@ -357,12 +380,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [   safe   ] unsafe (could be the end)
         //          ^^ curr
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte mut{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte mut;
 
-        ::fast_io::freestanding::my_memcpy(::std::addressof(mut), curr, sizeof(mut));
+        ::std::memcpy(::std::addressof(mut), curr, sizeof(mut));
 
-        static_assert(sizeof(mut) == 1);
+        static_assert(sizeof(mut) == 1uz);
         // Size equal to one does not need to do little-endian conversion
+
+        // Avoid high invalid byte problem for platforms with CHAR_BIT greater than 8
+#if CHAR_BIT > 8
+        mut = static_cast<decltype(mut)>(static_cast<::std::uint_least8_t>(mut) & 0xFFu);
+#endif
 
         if(mut > 1) [[unlikely]]
         {

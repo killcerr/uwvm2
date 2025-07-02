@@ -29,10 +29,11 @@
 # include "mode.h"
 # include "wasm_abi.h"
 # include "wasm_binfmt.h"
+# include "wasm_set_main_module_name.h"
 # include "log_output.h"
 
 # ifdef _DEBUG
-#  include "test.h"
+#  include "debug_test.h"
 # endif
 
 # if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))

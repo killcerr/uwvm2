@@ -90,9 +90,7 @@ struct F2
     using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<vt1, vt3>;
     using table_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<vt1, vt4>;
     using memory_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<vt1, vt5>;
-
 };
-
 
 int main()
 {
@@ -105,6 +103,5 @@ int main()
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<F1, F2>, vt5>);
 }
 
-
 // macro
-# include <uwvm2/utils/macro/pop_macros.h>
+#include <uwvm2/utils/macro/pop_macros.h>

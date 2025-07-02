@@ -27,7 +27,6 @@ module;
 #include <cstddef>
 #include <concepts>
 #include <bit>
-
 // macro
 #include <uwvm2/parser/wasm/feature/feature_push_macro.h>
 

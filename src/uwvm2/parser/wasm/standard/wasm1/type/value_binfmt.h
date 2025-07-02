@@ -185,10 +185,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             {
                 switch(valtype)
                 {
-                    case value_type::i32: return ::fast_io::freestanding::my_copy_n(u"i32", 3u, iter);
-                    case value_type::i64: return ::fast_io::freestanding::my_copy_n(u"i64", 3u, iter);
-                    case value_type::f32: return ::fast_io::freestanding::my_copy_n(u"f32", 3u, iter);
-                    case value_type::f64: return ::fast_io::freestanding::my_copy_n(u"f64", 3u, iter);
+                    case value_type::i32: return ::fast_io::freestanding::my_copy_n("i32", 3u, iter);
+                    case value_type::i64: return ::fast_io::freestanding::my_copy_n("i64", 3u, iter);
+                    case value_type::f32: return ::fast_io::freestanding::my_copy_n("f32", 3u, iter);
+                    case value_type::f64: return ::fast_io::freestanding::my_copy_n("f64", 3u, iter);
                     default: return iter;
                 }
             }

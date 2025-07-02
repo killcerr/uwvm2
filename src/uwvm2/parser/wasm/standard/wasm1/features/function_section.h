@@ -44,12 +44,16 @@ import :type_section;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <type_traits>
 # include <utility>
 # include <memory>
 # include <bit>
 # include <numeric>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
+// platform
 # if defined(_MSC_VER) && !defined(__clang__)
 #  if !defined(_KERNEL_MODE) && defined(_M_AMD64)
 #   include <emmintrin.h>  // MSVC x86_64-SSE2
@@ -58,8 +62,6 @@ import :type_section;
 #   include <arm_neon.h>  // MSVC aarch64-NEON
 #  endif
 # endif
-// macro
-# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
@@ -98,6 +100,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_t funcs{};
     };
 
+    /// @brief  Supported SIMD instruction sets: (Algorithm by MacroModel)
+    ///             x86/x64 architectures:
+    ///                 * SSE2: 128-bit vector processing, 16 bytes at a time
+    ///                 * SSSE3: Enhanced byte reordering
+    ///                 * SSE4: Optimized vector test instructions
+    ///                 * AVX: 256-bit vector processing, 32 bytes at a time
+    ///                 * AVX2: Enhanced 256-bit integer operations
+    ///                 * AVX512BW: 512-bit vector processing, 64 bytes at a time
+    ///                 * AVX512VBMI + AVX512VBMI2: Advanced byte reordering and substitution for the most complex variable-length integer parsing
+    ///             ARM Architecture:
+    ///                 * NEON: 128-bit vector processing
+    ///                 * SVE: Variable-length vector expansion, supports dynamic vector lengths
+    ///                 * SME SVE Stream Mode: SVE Stream Mode in Matrix Expansion (not recommended for CPUs such as the Apple M4 because of high latency)
+    ///             Other architectures:
+    ///                 * LoongArch LASX: 256-bit vector processing
+    ///                 * LoongArch LSX: 128-bit vector processing
+    ///                 * WebAssembly SIMD128: 128-bit WebAssembly SIMD instructions
+
     /// @brief      Convert view to vec
     /// @param      func_counter The correct u8 size has been processed
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -115,9 +135,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
 
-#if __has_cpp_attribute(assume)
         [[assume(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u)]];
-#endif
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
 
@@ -130,7 +148,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         static_assert(sizeof(::std::byte) == sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
 
         // Copy the situation that has been processed correctly
-        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, section_leb_begin, func_counter);
+        // The func_counter is exactly the right size
+        // On platforms where CHAR_BIT is greater than 8, the func_counter that has been processed does not contain invalid high bit information at all and is
+        // copied directly
+        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
+                      section_leb_begin,
+                      func_counter * sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
+
         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += func_counter;
 
         // [typeidxbef ...] typeidx1 ... typeidx2 ...
@@ -138,6 +162,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                  ^^ section_curr
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        // Used to check if correct content is recognized as an error.
         bool correct_sequence_right_taken_for_wrong{true};
 #endif
 
@@ -162,6 +187,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [ ... typeidx1] ... typeidx2 ...
             // [     safe    ] unsafe (could be the section_end)
             //       ^^ section_curr
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK) && (CHAR_BIT > 8)
+            // Check for cases where the high position is an illegal value in platform which CHAR_BIT > 8
+            if(::std::to_integer<::std::uint_least8_t>(*section_curr) & ~static_cast<::std::uint_least8_t>(0xFFu)) [[unlikely]]
+            {
+                correct_sequence_right_taken_for_wrong = false;
+            }
+#endif
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
 
@@ -244,9 +277,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
 
-#if __has_cpp_attribute(assume)
         [[assume(type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u)]];
-#endif
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
 
@@ -277,22 +308,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // use fast_io simd on msvc
             using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
 
-            u8x16simd const simd_vector_check_u8x16{simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check,
-                                                    simd_vector_check};
+            u8x16simd const simd_vector_check_u8x16{
+                simd_vector_check,  // 0
+                simd_vector_check,  // 1
+                simd_vector_check,  // 2
+                simd_vector_check,  // 3
+                simd_vector_check,  // 4
+                simd_vector_check,  // 5
+                simd_vector_check,  // 6
+                simd_vector_check,  // 7
+                simd_vector_check,  // 8
+                simd_vector_check,  // 9
+                simd_vector_check,  // 10
+                simd_vector_check,  // 11
+                simd_vector_check,  // 12
+                simd_vector_check,  // 13
+                simd_vector_check,  // 14
+                simd_vector_check   // 15
+            };
 
             while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
@@ -343,6 +376,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // After testing, 6 are the fastest
+
+                // View mode, have to make reservations
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                    reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
             }
         }
 # endif
@@ -357,11 +398,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // Support for certain cpu's that don't have SVE but have SME like Apple M4
         //
         // However, for this type of cpu (e.g. Apple M4), the sme module is separated from the cpu,
-        // resulting in very high latency when using it (on Apple M4, SME (SVE stream mode) 15x slower than NEON),
-        // so llvm for Apple M4 march=native will not start armv8a+sme, but rather use it as armv8a.
-        //
-        // Here you just need to leave it to llvm's judgment, if the sme unit is done inside the cpu,
-        // then llvm's march=native will turn on by itself.
+        // resulting in very high latency when using it (on Apple M4, SME (SVE stream mode) 15x slower than NEON).
         //
         // You can use macro UWVM_ENABLE_SME_SVE_STREAM_MODE to enable SVE stream mode in SME in the above cpu (e.g. Apple M4).
 
@@ -406,7 +443,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     u8x16simd simd_vector_str;  // No initialization necessary
 
-                    ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+                    ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
 
                     // It's already a little-endian.
 
@@ -445,6 +482,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [                        safe                             ] unsafe (could be the section_end)
                         //                                                             ^^ section_curr
                     }
+
+#  if !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
+
+                    // After testing, 6 are the fastest
+
+                    // View mode, have to make reservations
+                    ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
+#  endif
                 }
             }
             else
@@ -492,6 +540,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [                        safe                                     ] unsafe (could be the section_end)
                         //                                                                     ^^ section_curr
                     }
+
+# if !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
+
+                    // After testing, 8 are the fastest
+
+                    // View mode, have to make reservations
+                    ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                    ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                    ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                        reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
+# endif
                 }
             }
 
@@ -529,16 +588,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(type_section_count)};
 
         u8x64simd const simd_vector_check_u8x64simd{
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-            simd_vector_check};
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 0 - 6
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 7 - 13
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 14 - 20
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 21 - 27
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 28 - 34
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 35 - 41
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 42 - 48
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 49 - 55
+            simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,  // 56 - 62
+            simd_vector_check                                                                                                                     // 63
+        };
 
         while(static_cast<::std::size_t>(section_end - section_curr) >= 64uz) [[likely]]
         {
@@ -549,7 +609,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x64simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
 
             // It's already a little-endian.
 
@@ -582,6 +642,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 8 are the fastest
+
+            // View mode, have to make reservations
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -610,7 +678,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x32simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
 
             /// @note The sse4 version of scan_function_section_impl_uN_Xb is about 6% faster than avx (mundane read+judge+ptest) on Windows because the kernel
             ///       mapping in the Windows kernel's ntoskrnl.exe uses the `movups xmm` instruction for out-of-page interrupts (The reason is that the kernel
@@ -619,6 +687,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
             ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
             ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+            ///
+            ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
+            ///       while the simd processing part of the time decreases)
 
             // It's already a little-endian.
 
@@ -657,6 +728,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 8 are the fastest
+
+            // View mode, have to make reservations
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
@@ -688,7 +767,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x16simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
 
             // It's already a little-endian.
 
@@ -737,6 +816,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 6 are the fastest
+
+            // View mode, have to make reservations
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
         }
 #endif
 
@@ -908,7 +995,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             if(last_load_predicate_size)
             {
-                // avoids ub: "u64max >> 64u", last_load_predicate_size > 0u && last_load_predicate_size < 64u
+                // avoids ub: "u64max >> 64u"
+                // naver cause ub: last_load_predicate_size > 0u && last_load_predicate_size < 64u
 
                 load_mask >>= 64uz - last_load_predicate_size;
 
@@ -956,9 +1044,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     section_curr += last_load_predicate_size;
 
-                    // [before_section ... | func_count ... typeidx1 ... (6last_load_predicate_size - 1) ...] (section_end)
-                    // [                        safe                                                        ] unsafe (could be the section_end)
-                    //                                                                                        ^^ section_curr
+                    // [before_section ... | func_count ... typeidx1 ... (last_load_predicate_size - 1) ...] (section_end)
+                    // [                        safe                                                       ] unsafe (could be the section_end)
+                    //                                                                                       ^^ section_curr
                 }
             }
         }
@@ -993,6 +1081,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [ ... typeidx1] ... typeidx2 ...
             // [     safe    ] unsafe (could be the section_end)
             //       ^^ section_curr
+
+# if CHAR_BIT > 8
+            // On platforms where CHAR_BIT is greater than 8, using view requires that you also check for invalid messages in the high bits, and if so, switch
+            // to vec The processing of uleb128 will completely ignore high level invalid messages, so they must be checked manually But this is legal, wasm
+            // files on platforms where CHAR_BIT is greater than 8 only the eighth bit is valid information, so no error is reported
+            if(::std::to_integer<::std::uint_least8_t>(*section_curr) & ~static_cast<::std::uint_least8_t>(0xFFu)) [[unlikely]]
+            {
+                return change_u8_1b_view_to_vec(sec_adl, module_storage, section_leb_begin, section_curr, section_end, err, fs_para, func_counter, func_count);
+            }
+# endif
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
 
@@ -1079,22 +1177,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using u8x16simd [[__gnu__::__vector_size__(16)]] = ::std::uint8_t;
 
         // This value represents the index that is 0 after mask, and you need to make sure that the value after adding 8 can also be masked to 0
-        constexpr u8x16simd can_mask_zero{mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero,
-                                          mask_zero};
+        constexpr u8x16simd can_mask_zero{
+            mask_zero,  // 0
+            mask_zero,  // 1
+            mask_zero,  // 2
+            mask_zero,  // 3
+            mask_zero,  // 4
+            mask_zero,  // 5
+            mask_zero,  // 6
+            mask_zero,  // 7
+            mask_zero,  // 8
+            mask_zero,  // 9
+            mask_zero,  // 10
+            mask_zero,  // 11
+            mask_zero,  // 12
+            mask_zero,  // 13
+            mask_zero,  // 14
+            mask_zero   // 15
+        };
 
         ::fast_io::array<simd128_shuffle_table_t, table_size> ret{};
 
@@ -1437,10 +1537,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
 
-#if __has_cpp_attribute(assume)
         [[assume(type_section_count >= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u &&
                  type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u)]];
-#endif
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
 
@@ -1472,22 +1570,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // use fast_io simd on msvc
             using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
 
-            constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check};
+            constexpr u8x16simd simd_vector_check_u8x16{
+                simd_vector_check,  // 0
+                simd_vector_check,  // 1
+                simd_vector_check,  // 2
+                simd_vector_check,  // 3
+                simd_vector_check,  // 4
+                simd_vector_check,  // 5
+                simd_vector_check,  // 6
+                simd_vector_check,  // 7
+                simd_vector_check,  // 8
+                simd_vector_check,  // 9
+                simd_vector_check,  // 10
+                simd_vector_check,  // 11
+                simd_vector_check,  // 12
+                simd_vector_check,  // 13
+                simd_vector_check,  // 14
+                simd_vector_check   // 15
+            };
 
             while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
@@ -1599,6 +1699,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // After testing, 4 and 3 are the fastest
+
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                    reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 3u);
             }
         }
 # endif
@@ -1624,6 +1735,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -1738,7 +1850,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x64simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
 
             // It's already a little-endian.
 
@@ -1795,9 +1907,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     func_counter += 32u;
 
-                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u8x32x2v0),
-                                                       sizeof(u8x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(need_write_u8x32x2v0), sizeof(u8x32simd));
 
                     functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 32u;
 
@@ -1807,70 +1917,71 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     simd_vector_str = __builtin_shufflevector(simd_vector_str,
                                                               simd_vector_str,
-                                                              32,
-                                                              33,
-                                                              34,
-                                                              35,
-                                                              36,
-                                                              37,
-                                                              38,
-                                                              39,
-                                                              40,
-                                                              41,
-                                                              42,
-                                                              43,
-                                                              44,
-                                                              45,
-                                                              46,
-                                                              47,
-                                                              48,
-                                                              49,
-                                                              50,
-                                                              51,
-                                                              52,
-                                                              53,
-                                                              54,
-                                                              55,
-                                                              56,
-                                                              57,
-                                                              58,
-                                                              59,
-                                                              60,
-                                                              61,
-                                                              62,
-                                                              63,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1);
+                                                              32,  // 0
+                                                              33,  // 1
+                                                              34,  // 2
+                                                              35,  // 3
+                                                              36,  // 4
+                                                              37,  // 5
+                                                              38,  // 6
+                                                              39,  // 7
+                                                              40,  // 8
+                                                              41,  // 9
+                                                              42,  // 10
+                                                              43,  // 11
+                                                              44,  // 12
+                                                              45,  // 13
+                                                              46,  // 14
+                                                              47,  // 15
+                                                              48,  // 16
+                                                              49,  // 17
+                                                              50,  // 18
+                                                              51,  // 19
+                                                              52,  // 20
+                                                              53,  // 21
+                                                              54,  // 22
+                                                              55,  // 23
+                                                              56,  // 24
+                                                              57,  // 25
+                                                              58,  // 26
+                                                              59,  // 27
+                                                              60,  // 28
+                                                              61,  // 29
+                                                              62,  // 30
+                                                              63,  // 31
+                                                              -1,  // 32
+                                                              -1,  // 33
+                                                              -1,  // 34
+                                                              -1,  // 35
+                                                              -1,  // 36
+                                                              -1,  // 37
+                                                              -1,  // 38
+                                                              -1,  // 39
+                                                              -1,  // 40
+                                                              -1,  // 41
+                                                              -1,  // 42
+                                                              -1,  // 43
+                                                              -1,  // 44
+                                                              -1,  // 45
+                                                              -1,  // 46
+                                                              -1,  // 47
+                                                              -1,  // 48
+                                                              -1,  // 49
+                                                              -1,  // 50
+                                                              -1,  // 51
+                                                              -1,  // 52
+                                                              -1,  // 53
+                                                              -1,  // 54
+                                                              -1,  // 55
+                                                              -1,  // 56
+                                                              -1,  // 57
+                                                              -1,  // 58
+                                                              -1,  // 59
+                                                              -1,  // 60
+                                                              -1,  // 61
+                                                              -1,  // 62
+                                                              -1   // 63
+                    );
                 }
 
                 // 2nd
@@ -1884,9 +1995,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
 
-                    constexpr u16x32simd conversion_table_1{0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
-                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
-                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u};
+                    constexpr u16x32simd conversion_table_1{
+                        0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,  // 0 - 10
+                        0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,  // 11 - 21
+                        0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u            // 22 - 31
+                    };
 
                     ::std::uint32_t check_mask_curr_2nd_curtailment{};
 
@@ -1896,11 +2009,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
 
-                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
-                        // No mods needed on x86, but preventing cxx language ub
-                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+                        // check_mask_curr_2nd_tmp != 0, check_mask_curr_2nd_tmp & 0x8000'0000 == 0
+                        // check_mask_curr_2nd_tmp max == 0b01..., crtz max == 30u
+                        // crtz < 31u, crtz + 1u < 32u, never cause ub
 
-                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
+                        auto const sizeFF{crtz + 1u};
+
+                        [[assume(sizeFF >= 1u && sizeFF < 32u)]];
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
@@ -1936,9 +2051,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // convert to:
                     // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
 
-                    constexpr u8x64simd conversion_table_2{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-                                                           22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
-                                                           44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
+                    constexpr u8x64simd conversion_table_2{
+                        0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,  // 0 - 21
+                        22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,  // 22 - 43
+                        44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63           // 44 - 63
+                    };
 
                     u8x64simd mask_table;
 
@@ -1970,11 +2087,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::std::uint32_t const gen_mask{(static_cast<::std::uint32_t>(1u) << handled_simd) - 1u};
 
                     u16x32simd const simd_vector_check_u16x32{
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
                         simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,  // 0 - 6
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,  // 7 - 13
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,  // 14 - 20
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,                    // 21 - 27
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check  // 28 - 31
                     };
 
                     if(
@@ -1999,70 +2120,71 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     auto const need_write{__builtin_shufflevector(::std::bit_cast<u8x64simd>(res),
                                                                   ::std::bit_cast<u8x64simd>(res),
-                                                                  0,
-                                                                  2,
-                                                                  4,
-                                                                  6,
-                                                                  8,
-                                                                  10,
-                                                                  12,
-                                                                  14,
-                                                                  16,
-                                                                  18,
-                                                                  20,
-                                                                  22,
-                                                                  24,
-                                                                  26,
-                                                                  28,
-                                                                  30,
-                                                                  32,
-                                                                  34,
-                                                                  36,
-                                                                  38,
-                                                                  40,
-                                                                  42,
-                                                                  44,
-                                                                  46,
-                                                                  48,
-                                                                  50,
-                                                                  52,
-                                                                  54,
-                                                                  56,
-                                                                  58,
-                                                                  60,
-                                                                  62,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1,
-                                                                  -1)};
+                                                                  0,   // 0
+                                                                  2,   // 1
+                                                                  4,   // 2
+                                                                  6,   // 3
+                                                                  8,   // 4
+                                                                  10,  // 5
+                                                                  12,  // 6
+                                                                  14,  // 7
+                                                                  16,  // 8
+                                                                  18,  // 9
+                                                                  20,  // 10
+                                                                  22,  // 11
+                                                                  24,  // 12
+                                                                  26,  // 13
+                                                                  28,  // 14
+                                                                  30,  // 15
+                                                                  32,  // 16
+                                                                  34,  // 17
+                                                                  36,  // 18
+                                                                  38,  // 19
+                                                                  40,  // 20
+                                                                  42,  // 21
+                                                                  44,  // 22
+                                                                  46,  // 23
+                                                                  48,  // 24
+                                                                  50,  // 25
+                                                                  52,  // 26
+                                                                  54,  // 27
+                                                                  56,  // 28
+                                                                  58,  // 29
+                                                                  60,  // 30
+                                                                  62,  // 31
+                                                                  -1,  // 32
+                                                                  -1,  // 33
+                                                                  -1,  // 34
+                                                                  -1,  // 35
+                                                                  -1,  // 36
+                                                                  -1,  // 37
+                                                                  -1,  // 38
+                                                                  -1,  // 39
+                                                                  -1,  // 40
+                                                                  -1,  // 41
+                                                                  -1,  // 42
+                                                                  -1,  // 43
+                                                                  -1,  // 44
+                                                                  -1,  // 45
+                                                                  -1,  // 46
+                                                                  -1,  // 47
+                                                                  -1,  // 48
+                                                                  -1,  // 49
+                                                                  -1,  // 50
+                                                                  -1,  // 51
+                                                                  -1,  // 52
+                                                                  -1,  // 53
+                                                                  -1,  // 54
+                                                                  -1,  // 55
+                                                                  -1,  // 56
+                                                                  -1,  // 57
+                                                                  -1,  // 58
+                                                                  -1,  // 59
+                                                                  -1,  // 60
+                                                                  -1,  // 61
+                                                                  -1,  // 62
+                                                                  -1   // 63
+                                                                  )};
 
                     auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(need_write)};
 
@@ -2075,12 +2197,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                     //      [    needwrite   ]
 
-                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time,
                     // and it's perfectly safe to do so here without any additional checks
 
-                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u8x32x2v0),
-                                                       sizeof(u8x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(need_write_u8x32x2v0), sizeof(u8x32simd));
 
                     functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += handled_simd;
 
@@ -2118,9 +2238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data, func_counter has been checked and is ready to be written.
-                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x64simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x64simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 64uz;
 
@@ -2131,9 +2249,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            // After testing, 12 and 8 are the fastest
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 12u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr));
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 8u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -2153,6 +2278,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
         ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
         ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+        ///
+        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
+        ///       while the simd processing part of the time decreases)
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
@@ -2170,6 +2298,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -2275,7 +2404,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x32simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
 
             // It's already a little-endian.
 
@@ -2396,75 +2525,77 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(simd_vector_str,
                                                                               simd_vector_str,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              7,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              -1,  // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              7,   // 16
+                                                                              8,   // 17
+                                                                              9,   // 18
+                                                                              10,  // 19
+                                                                              11,  // 20
+                                                                              12,  // 21
+                                                                              13,  // 22
+                                                                              14,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
                         else
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(simd_vector_str,
                                                                               simd_vector_str,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              7,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              15,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              7,   // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              8,   // 16
+                                                                              9,   // 17
+                                                                              10,  // 18
+                                                                              11,  // 19
+                                                                              12,  // 20
+                                                                              13,  // 21
+                                                                              14,  // 22
+                                                                              15,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
 
                         u16x16simd mask_res;
@@ -2527,190 +2658,195 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          16,  // 4
+                                                                          18,  // 5
+                                                                          20,  // 6
+                                                                          22,  // 7
+                                                                          24,  // 8
+                                                                          26,  // 9
+                                                                          28,  // 10
+                                                                          30,  // 11
+                                                                          -1,  // 12
+                                                                          -1,  // 13
+                                                                          -1,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 5u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          16,  // 5
+                                                                          18,  // 6
+                                                                          20,  // 7
+                                                                          22,  // 8
+                                                                          24,  // 9
+                                                                          26,  // 10
+                                                                          28,  // 11
+                                                                          30,  // 12
+                                                                          -1,  // 13
+                                                                          -1,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 6u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          10,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          10,  // 5
+                                                                          16,  // 6
+                                                                          18,  // 7
+                                                                          20,  // 8
+                                                                          22,  // 9
+                                                                          24,  // 10
+                                                                          26,  // 11
+                                                                          28,  // 12
+                                                                          30,  // 13
+                                                                          -1,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 7u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          10,
-                                                                          12,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          10,  // 5
+                                                                          12,  // 6
+                                                                          16,  // 7
+                                                                          18,  // 8
+                                                                          20,  // 9
+                                                                          22,  // 10
+                                                                          24,  // 11
+                                                                          26,  // 12
+                                                                          28,  // 13
+                                                                          30,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 8u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          10,
-                                                                          12,
-                                                                          14,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          10,  // 5
+                                                                          12,  // 6
+                                                                          14,  // 7
+                                                                          16,  // 8
+                                                                          18,  // 9
+                                                                          20,  // 10
+                                                                          22,  // 11
+                                                                          24,  // 12
+                                                                          26,  // 13
+                                                                          28,  // 14
+                                                                          30,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             default:
@@ -2731,9 +2867,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -2786,9 +2920,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16u;
 
@@ -2813,38 +2945,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         30,
-                                                                         31,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
+                                                                         16,  // 0
+                                                                         17,  // 1
+                                                                         18,  // 2
+                                                                         19,  // 3
+                                                                         20,  // 4
+                                                                         21,  // 5
+                                                                         22,  // 6
+                                                                         23,  // 7
+                                                                         24,  // 8
+                                                                         25,  // 9
+                                                                         26,  // 10
+                                                                         27,  // 11
+                                                                         28,  // 12
+                                                                         29,  // 13
+                                                                         30,  // 14
+                                                                         31,  // 15
+                                                                         -1,  // 16
+                                                                         -1,  // 17
+                                                                         -1,  // 18
+                                                                         -1,  // 19
+                                                                         -1,  // 20
+                                                                         -1,  // 21
+                                                                         -1,  // 22
+                                                                         -1,  // 23
+                                                                         -1,  // 24
+                                                                         -1,  // 25
+                                                                         -1,  // 26
+                                                                         -1,  // 27
+                                                                         -1,  // 28
+                                                                         -1,  // 29
+                                                                         -1,  // 30
+                                                                         -1   // 31
+                                                                         )};
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
@@ -2852,38 +2985,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
-                                                                         15,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         30,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
+                                                                         15,  // 0
+                                                                         16,  // 1
+                                                                         17,  // 2
+                                                                         18,  // 3
+                                                                         19,  // 4
+                                                                         20,  // 5
+                                                                         21,  // 6
+                                                                         22,  // 7
+                                                                         23,  // 8
+                                                                         24,  // 9
+                                                                         25,  // 10
+                                                                         26,  // 11
+                                                                         27,  // 12
+                                                                         28,  // 13
+                                                                         29,  // 14
+                                                                         30,  // 15
+                                                                         -1,  // 16
+                                                                         -1,  // 17
+                                                                         -1,  // 18
+                                                                         -1,  // 19
+                                                                         -1,  // 20
+                                                                         -1,  // 21
+                                                                         -1,  // 22
+                                                                         -1,  // 23
+                                                                         -1,  // 24
+                                                                         -1,  // 25
+                                                                         -1,  // 26
+                                                                         -1,  // 27
+                                                                         -1,  // 28
+                                                                         -1,  // 29
+                                                                         -1,  // 30
+                                                                         -1   // 31
+                                                                         )};
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
@@ -2891,38 +3025,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
-                                                                         14,
-                                                                         15,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
+                                                                         14,  // 0
+                                                                         15,  // 1
+                                                                         16,  // 2
+                                                                         17,  // 3
+                                                                         18,  // 4
+                                                                         19,  // 5
+                                                                         20,  // 6
+                                                                         21,  // 7
+                                                                         22,  // 8
+                                                                         23,  // 9
+                                                                         24,  // 10
+                                                                         25,  // 11
+                                                                         26,  // 12
+                                                                         27,  // 13
+                                                                         28,  // 14
+                                                                         29,  // 15
+                                                                         -1,  // 16
+                                                                         -1,  // 17
+                                                                         -1,  // 18
+                                                                         -1,  // 19
+                                                                         -1,  // 20
+                                                                         -1,  // 21
+                                                                         -1,  // 22
+                                                                         -1,  // 23
+                                                                         -1,  // 24
+                                                                         -1,  // 25
+                                                                         -1,  // 26
+                                                                         -1,  // 27
+                                                                         -1,  // 28
+                                                                         -1,  // 29
+                                                                         -1,  // 30
+                                                                         -1   // 31
+                                                                         )};
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
@@ -3019,75 +3154,77 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(third_fourth_round_simd_u8x32,
                                                                               third_fourth_round_simd_u8x32,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              7,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              -1,  // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              7,   // 16
+                                                                              8,   // 17
+                                                                              9,   // 18
+                                                                              10,  // 19
+                                                                              11,  // 20
+                                                                              12,  // 21
+                                                                              13,  // 22
+                                                                              14,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
                         else
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(third_fourth_round_simd_u8x32,
                                                                               third_fourth_round_simd_u8x32,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              7,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              15,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              7,   // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              8,   // 16
+                                                                              9,   // 17
+                                                                              10,  // 18
+                                                                              11,  // 19
+                                                                              12,  // 20
+                                                                              13,  // 21
+                                                                              14,  // 22
+                                                                              15,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
 
                         u16x16simd mask_res;
@@ -3150,190 +3287,195 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          16,  // 4
+                                                                          18,  // 5
+                                                                          20,  // 6
+                                                                          22,  // 7
+                                                                          24,  // 8
+                                                                          26,  // 9
+                                                                          28,  // 10
+                                                                          30,  // 11
+                                                                          -1,  // 12
+                                                                          -1,  // 13
+                                                                          -1,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 5u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          16,  // 5
+                                                                          18,  // 6
+                                                                          20,  // 7
+                                                                          22,  // 8
+                                                                          24,  // 9
+                                                                          26,  // 10
+                                                                          28,  // 11
+                                                                          30,  // 12
+                                                                          -1,  // 13
+                                                                          -1,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 6u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          10,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          10,  // 5
+                                                                          16,  // 6
+                                                                          18,  // 7
+                                                                          20,  // 8
+                                                                          22,  // 9
+                                                                          24,  // 10
+                                                                          26,  // 11
+                                                                          28,  // 12
+                                                                          30,  // 13
+                                                                          -1,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 7u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          10,
-                                                                          12,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          10,  // 5
+                                                                          12,  // 6
+                                                                          16,  // 7
+                                                                          18,  // 8
+                                                                          20,  // 9
+                                                                          22,  // 10
+                                                                          24,  // 11
+                                                                          26,  // 12
+                                                                          28,  // 13
+                                                                          30,  // 14
+                                                                          -1,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             case 8u:
                             {
                                 needwrite_u8x32 = __builtin_shufflevector(::std::bit_cast<u8x32simd>(res),
                                                                           ::std::bit_cast<u8x32simd>(res),
-                                                                          0,
-                                                                          2,
-                                                                          4,
-                                                                          6,
-                                                                          8,
-                                                                          10,
-                                                                          12,
-                                                                          14,
-                                                                          16,
-                                                                          18,
-                                                                          20,
-                                                                          22,
-                                                                          24,
-                                                                          26,
-                                                                          28,
-                                                                          30,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1,
-                                                                          -1);
+                                                                          0,   // 0
+                                                                          2,   // 1
+                                                                          4,   // 2
+                                                                          6,   // 3
+                                                                          8,   // 4
+                                                                          10,  // 5
+                                                                          12,  // 6
+                                                                          14,  // 7
+                                                                          16,  // 8
+                                                                          18,  // 9
+                                                                          20,  // 10
+                                                                          22,  // 11
+                                                                          24,  // 12
+                                                                          26,  // 13
+                                                                          28,  // 14
+                                                                          30,  // 15
+                                                                          -1,  // 16
+                                                                          -1,  // 17
+                                                                          -1,  // 18
+                                                                          -1,  // 19
+                                                                          -1,  // 20
+                                                                          -1,  // 21
+                                                                          -1,  // 22
+                                                                          -1,  // 23
+                                                                          -1,  // 24
+                                                                          -1,  // 25
+                                                                          -1,  // 26
+                                                                          -1,  // 27
+                                                                          -1,  // 28
+                                                                          -1,  // 29
+                                                                          -1,  // 30
+                                                                          -1   // 31
+                                );
                                 break;
                             }
                             default:
@@ -3354,9 +3496,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -3409,9 +3549,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x16x2v0),
-                                                           sizeof(u8x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x16x2v0), sizeof(u8x16simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16u;
 
@@ -3447,9 +3585,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data
-                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x32simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x32simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 32uz;
 
@@ -3459,6 +3595,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 6 and 4 are the fastest
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 6u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 4u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -3489,6 +3636,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -3588,7 +3736,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x16simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
 
             // It's already a little-endian.
 
@@ -3604,9 +3752,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             };
 
             // Since mask 16-bit stuff, it can be assumed that mask is less than 2^16
-# if __has_cpp_attribute(assume)
             [[assume(check_mask < 1u << 16u)]];
-# endif
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
@@ -3666,9 +3812,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
 
@@ -3788,22 +3932,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
                         auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(__builtin_shufflevector(::std::bit_cast<u8x16simd>(res),
                                                                                                       ::std::bit_cast<u8x16simd>(res),
-                                                                                                      0,
-                                                                                                      2,
-                                                                                                      4,
-                                                                                                      6,
-                                                                                                      8,
-                                                                                                      10,
-                                                                                                      12,
-                                                                                                      14,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1))};
+                                                                                                      0,   // 0
+                                                                                                      2,   // 1
+                                                                                                      4,   // 2
+                                                                                                      6,   // 3
+                                                                                                      8,   // 4
+                                                                                                      10,  // 5
+                                                                                                      12,  // 6
+                                                                                                      14,  // 7
+                                                                                                      -1,  // 8
+                                                                                                      -1,  // 9
+                                                                                                      -1,  // 10
+                                                                                                      -1,  // 11
+                                                                                                      -1,  // 12
+                                                                                                      -1,  // 13
+                                                                                                      -1,  // 14
+                                                                                                      -1   // 15
+                                                                                                      ))};
 
                         using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
                         auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
@@ -3815,9 +3960,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
 
@@ -3847,10 +3990,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // When first_round_handle_bytes is 7, check_table_index is always greater than 0，
                     // Because the highest bit of the first 8 bits is pop, 0bxxxx'xxxx'1xxx'xxxxu >> 7u == 0bxxxx'xxx1
 
-# if __has_cpp_attribute(assume)
                     [[assume((first_round_handle_bytes == static_cast<::std::uint8_t>(7u) && check_table_index != 0u) ||
                              first_round_handle_bytes == static_cast<::std::uint8_t>(8u))]];
-# endif
 
                     if(!check_table_index)
                     {
@@ -3911,9 +4052,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                        ^^^^^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //                       [    needwrite   ]...]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 8u;
 
@@ -4028,22 +4167,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // Because the value will be overwritten, use -1 to indicate that any value can be written by the fastest means possible.
                         auto const needwrite_u8x16{::std::bit_cast<u8x16simd>(__builtin_shufflevector(::std::bit_cast<u8x16simd>(res),
                                                                                                       ::std::bit_cast<u8x16simd>(res),
-                                                                                                      0,
-                                                                                                      2,
-                                                                                                      4,
-                                                                                                      6,
-                                                                                                      8,
-                                                                                                      10,
-                                                                                                      12,
-                                                                                                      14,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1,
-                                                                                                      -1))};
+                                                                                                      0,   // 0
+                                                                                                      2,   // 1
+                                                                                                      4,   // 2
+                                                                                                      6,   // 3
+                                                                                                      8,   // 4
+                                                                                                      10,  // 5
+                                                                                                      12,  // 6
+                                                                                                      14,  // 7
+                                                                                                      -1,  // 8
+                                                                                                      -1,  // 9
+                                                                                                      -1,  // 10
+                                                                                                      -1,  // 11
+                                                                                                      -1,  // 12
+                                                                                                      -1,  // 13
+                                                                                                      -1,  // 14
+                                                                                                      -1   // 15
+                                                                                                      ))};
 
                         using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
                         auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
@@ -4055,9 +4195,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                            ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //                            [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u8x8x2v0),
-                                                           sizeof(u8x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(needwrite_u8x8x2v0), sizeof(u8x8simd));
 
                         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += curr_table_processed_simd;
 
@@ -4094,9 +4232,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data
-                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x16simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x16simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16uz;
 
@@ -4106,7 +4242,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 4 and 3 are the fastest
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 3u);
         }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) ||                                                                                    \
      (defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))) ||                  \
@@ -4133,7 +4281,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x16simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
 
             // It's already a little-endian.
 
@@ -4247,9 +4395,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Since everything is less than 128, there is no need to check the typeidx.
 
                 // write data
-                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr,
-                                                   ::std::addressof(simd_vector_str),
-                                                   sizeof(u8x16simd));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr, ::std::addressof(simd_vector_str), sizeof(u8x16simd));
 
                 functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += 16uz;
 
@@ -4259,6 +4405,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 4 and 3 are the fastest
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr) + 64u * 3u);
         }
 #endif
 
@@ -4423,10 +4580,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
 
-#if __has_cpp_attribute(assume)
         [[assume(type_section_count >= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u &&
                  type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u)]];
-#endif
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
 
@@ -4461,22 +4616,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             using u8x16simd = ::fast_io::intrinsics::simd_vector<::std::uint8_t, 16uz>;
             using u16x8simd = ::fast_io::intrinsics::simd_vector<::std::uint16_t, 8uz>;
 
-            constexpr u8x16simd simd_vector_check_u8x16{simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check,
-                                                        simd_vector_check};
+            constexpr u8x16simd simd_vector_check_u8x16{
+                simd_vector_check,  // 0
+                simd_vector_check,  // 1
+                simd_vector_check,  // 2
+                simd_vector_check,  // 3
+                simd_vector_check,  // 4
+                simd_vector_check,  // 5
+                simd_vector_check,  // 6
+                simd_vector_check,  // 7
+                simd_vector_check,  // 8
+                simd_vector_check,  // 9
+                simd_vector_check,  // 10
+                simd_vector_check,  // 11
+                simd_vector_check,  // 12
+                simd_vector_check,  // 13
+                simd_vector_check,  // 14
+                simd_vector_check   // 15
+            };
 
             while(static_cast<::std::size_t>(section_end - section_curr) >= 16uz) [[likely]]
             {
@@ -4582,22 +4739,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // write data
                     auto functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp{functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr};
 
-                    u8x16simd const u8x16v0{simd_vector_str[0],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[1],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[2],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[3],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[4],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[5],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[6],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[7],
-                                            static_cast<::std::uint8_t>(0u)};
+                    u8x16simd const u8x16v0{
+                        simd_vector_str[0],               // 0
+                        static_cast<::std::uint8_t>(0u),  // 1
+                        simd_vector_str[1],               // 2
+                        static_cast<::std::uint8_t>(0u),  // 3
+                        simd_vector_str[2],               // 4
+                        static_cast<::std::uint8_t>(0u),  // 5
+                        simd_vector_str[3],               // 6
+                        static_cast<::std::uint8_t>(0u),  // 7
+                        simd_vector_str[4],               // 8
+                        static_cast<::std::uint8_t>(0u),  // 9
+                        simd_vector_str[5],               // 10
+                        static_cast<::std::uint8_t>(0u),  // 11
+                        simd_vector_str[6],               // 12
+                        static_cast<::std::uint8_t>(0u),  // 13
+                        simd_vector_str[7],               // 14
+                        static_cast<::std::uint8_t>(0u)   // 15
+                    };
 
                     auto const u16x8v0{::std::bit_cast<u16x8simd>(u8x16v0)};
 
@@ -4605,22 +4764,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
-                    u8x16simd const u8x16v1{simd_vector_str[8],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[9],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[10],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[11],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[12],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[13],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[14],
-                                            static_cast<::std::uint8_t>(0u),
-                                            simd_vector_str[15],
-                                            static_cast<::std::uint8_t>(0u)};
+                    u8x16simd const u8x16v1{
+                        simd_vector_str[8],               // 0
+                        static_cast<::std::uint8_t>(0u),  // 1
+                        simd_vector_str[9],               // 2
+                        static_cast<::std::uint8_t>(0u),  // 3
+                        simd_vector_str[10],              // 4
+                        static_cast<::std::uint8_t>(0u),  // 5
+                        simd_vector_str[11],              // 6
+                        static_cast<::std::uint8_t>(0u),  // 7
+                        simd_vector_str[12],              // 8
+                        static_cast<::std::uint8_t>(0u),  // 9
+                        simd_vector_str[13],              // 10
+                        static_cast<::std::uint8_t>(0u),  // 11
+                        simd_vector_str[14],              // 12
+                        static_cast<::std::uint8_t>(0u),  // 13
+                        simd_vector_str[15],              // 14
+                        static_cast<::std::uint8_t>(0u)   // 15
+                    };
 
                     auto const u16x8v1{::std::bit_cast<u16x8simd>(u8x16v1)};
 
@@ -4636,6 +4797,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [                        safe                             ] unsafe (could be the section_end)
                     //                                                             ^^ section_curr
                 }
+
+                // After testing, 2 and 3 are the fastest
+
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                    reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                    reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 3u);
             }
         }
 # endif
@@ -4661,6 +4833,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -4775,7 +4948,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x64simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x64simd));
 
             // It's already a little-endian.
 
@@ -4828,76 +5001,75 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     auto const need_write_u16x32{::std::bit_cast<u16x32simd>(__builtin_shufflevector(simd_vector_str,
                                                                                                      u8x64simd{},
-                                                                                                     0,
-                                                                                                     64,
-                                                                                                     1,
-                                                                                                     64,
-                                                                                                     2,
-                                                                                                     64,
-                                                                                                     3,
-                                                                                                     64,
-                                                                                                     4,
-                                                                                                     64,
-                                                                                                     5,
-                                                                                                     64,
-                                                                                                     6,
-                                                                                                     64,
-                                                                                                     7,
-                                                                                                     64,
-                                                                                                     8,
-                                                                                                     64,
-                                                                                                     9,
-                                                                                                     64,
-                                                                                                     10,
-                                                                                                     64,
-                                                                                                     11,
-                                                                                                     64,
-                                                                                                     12,
-                                                                                                     64,
-                                                                                                     13,
-                                                                                                     64,
-                                                                                                     14,
-                                                                                                     64,
-                                                                                                     15,
-                                                                                                     64,
-                                                                                                     16,
-                                                                                                     64,
-                                                                                                     17,
-                                                                                                     64,
-                                                                                                     18,
-                                                                                                     64,
-                                                                                                     19,
-                                                                                                     64,
-                                                                                                     20,
-                                                                                                     64,
-                                                                                                     21,
-                                                                                                     64,
-                                                                                                     22,
-                                                                                                     64,
-                                                                                                     23,
-                                                                                                     64,
-                                                                                                     24,
-                                                                                                     64,
-                                                                                                     25,
-                                                                                                     64,
-                                                                                                     26,
-                                                                                                     64,
-                                                                                                     27,
-                                                                                                     64,
-                                                                                                     28,
-                                                                                                     64,
-                                                                                                     29,
-                                                                                                     64,
-                                                                                                     30,
-                                                                                                     64,
-                                                                                                     31,
-                                                                                                     64))};
+                                                                                                     0,   // 0
+                                                                                                     64,  // 1
+                                                                                                     1,   // 2
+                                                                                                     64,  // 3
+                                                                                                     2,   // 4
+                                                                                                     64,  // 5
+                                                                                                     3,   // 6
+                                                                                                     64,  // 7
+                                                                                                     4,   // 8
+                                                                                                     64,  // 9
+                                                                                                     5,   // 10
+                                                                                                     64,  // 11
+                                                                                                     6,   // 12
+                                                                                                     64,  // 13
+                                                                                                     7,   // 14
+                                                                                                     64,  // 15
+                                                                                                     8,   // 16
+                                                                                                     64,  // 17
+                                                                                                     9,   // 18
+                                                                                                     64,  // 19
+                                                                                                     10,  // 20
+                                                                                                     64,  // 21
+                                                                                                     11,  // 22
+                                                                                                     64,  // 23
+                                                                                                     12,  // 24
+                                                                                                     64,  // 25
+                                                                                                     13,  // 26
+                                                                                                     64,  // 27
+                                                                                                     14,  // 28
+                                                                                                     64,  // 29
+                                                                                                     15,  // 30
+                                                                                                     64,  // 31
+                                                                                                     16,  // 32
+                                                                                                     64,  // 33
+                                                                                                     17,  // 34
+                                                                                                     64,  // 35
+                                                                                                     18,  // 36
+                                                                                                     64,  // 37
+                                                                                                     19,  // 38
+                                                                                                     64,  // 39
+                                                                                                     20,  // 40
+                                                                                                     64,  // 41
+                                                                                                     21,  // 42
+                                                                                                     64,  // 43
+                                                                                                     22,  // 44
+                                                                                                     64,  // 45
+                                                                                                     23,  // 46
+                                                                                                     64,  // 47
+                                                                                                     24,  // 48
+                                                                                                     64,  // 49
+                                                                                                     25,  // 50
+                                                                                                     64,  // 51
+                                                                                                     26,  // 52
+                                                                                                     64,  // 53
+                                                                                                     27,  // 54
+                                                                                                     64,  // 55
+                                                                                                     28,  // 56
+                                                                                                     64,  // 57
+                                                                                                     29,  // 58
+                                                                                                     64,  // 59
+                                                                                                     30,  // 60
+                                                                                                     64,  // 61
+                                                                                                     31,  // 62
+                                                                                                     64   // 63
+                                                                                                     ))};
 
                     func_counter += 32u;
 
-                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u16x32),
-                                                       sizeof(u16x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(need_write_u16x32), sizeof(u16x32simd));
 
                     functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 32u;
 
@@ -4907,70 +5079,71 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     simd_vector_str = __builtin_shufflevector(simd_vector_str,
                                                               simd_vector_str,
-                                                              32,
-                                                              33,
-                                                              34,
-                                                              35,
-                                                              36,
-                                                              37,
-                                                              38,
-                                                              39,
-                                                              40,
-                                                              41,
-                                                              42,
-                                                              43,
-                                                              44,
-                                                              45,
-                                                              46,
-                                                              47,
-                                                              48,
-                                                              49,
-                                                              50,
-                                                              51,
-                                                              52,
-                                                              53,
-                                                              54,
-                                                              55,
-                                                              56,
-                                                              57,
-                                                              58,
-                                                              59,
-                                                              60,
-                                                              61,
-                                                              62,
-                                                              63,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1,
-                                                              -1);
+                                                              32,  // 0
+                                                              33,  // 1
+                                                              34,  // 2
+                                                              35,  // 3
+                                                              36,  // 4
+                                                              37,  // 5
+                                                              38,  // 6
+                                                              39,  // 7
+                                                              40,  // 8
+                                                              41,  // 9
+                                                              42,  // 10
+                                                              43,  // 11
+                                                              44,  // 12
+                                                              45,  // 13
+                                                              46,  // 14
+                                                              47,  // 15
+                                                              48,  // 16
+                                                              49,  // 17
+                                                              50,  // 18
+                                                              51,  // 19
+                                                              52,  // 20
+                                                              53,  // 21
+                                                              54,  // 22
+                                                              55,  // 23
+                                                              56,  // 24
+                                                              57,  // 25
+                                                              58,  // 26
+                                                              59,  // 27
+                                                              60,  // 28
+                                                              61,  // 29
+                                                              62,  // 30
+                                                              63,  // 31
+                                                              -1,  // 32
+                                                              -1,  // 33
+                                                              -1,  // 34
+                                                              -1,  // 35
+                                                              -1,  // 36
+                                                              -1,  // 37
+                                                              -1,  // 38
+                                                              -1,  // 39
+                                                              -1,  // 40
+                                                              -1,  // 41
+                                                              -1,  // 42
+                                                              -1,  // 43
+                                                              -1,  // 44
+                                                              -1,  // 45
+                                                              -1,  // 46
+                                                              -1,  // 47
+                                                              -1,  // 48
+                                                              -1,  // 49
+                                                              -1,  // 50
+                                                              -1,  // 51
+                                                              -1,  // 52
+                                                              -1,  // 53
+                                                              -1,  // 54
+                                                              -1,  // 55
+                                                              -1,  // 56
+                                                              -1,  // 57
+                                                              -1,  // 58
+                                                              -1,  // 59
+                                                              -1,  // 60
+                                                              -1,  // 61
+                                                              -1,  // 62
+                                                              -1   // 63
+                    );
                 }
 
                 // 2nd
@@ -4984,9 +5157,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                     constexpr auto mask{static_cast<::std::uint64_t>(0x5555'5555'5555'5555u)};
 
-                    constexpr u16x32simd conversion_table_1{0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
-                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,
-                                                            0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u};
+                    constexpr u16x32simd conversion_table_1{
+                        0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,  // 0 - 10
+                        0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u,  // 11 - 21
+                        0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u, 0xFF00u            // 22 - 31
+                    };
 
                     ::std::uint32_t check_mask_curr_2nd_curtailment{};
 
@@ -4996,11 +5171,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const crtz{static_cast<unsigned>(::std::countr_zero(check_mask_curr_2nd_tmp))};
 
-                        // check_mask_curr_2nd_tmp != 0, crtz < 32u, crtz + 1u can be 32u and cause ub
-                        // No mods needed on x86, but preventing cxx language ub
-                        // mod 32 prevents subsequent impact by ub (compiler can optimize automatically)
+                        // check_mask_curr_2nd_tmp != 0, check_mask_curr_2nd_tmp & 0x8000'0000 == 0
+                        // check_mask_curr_2nd_tmp max == 0b01..., crtz max == 30u
+                        // crtz < 31u, crtz + 1u < 32u, never cause ub
 
-                        auto const sizeFF{(crtz + 1u) % static_cast<unsigned>(::std::numeric_limits<::std::uint32_t>::digits)};
+                        auto const sizeFF{crtz + 1u};
+
+                        [[assume(sizeFF >= 1u && sizeFF < 32u)]];
 
                         auto const FF{(static_cast<::std::uint32_t>(1u) << sizeFF) - 1u};
                         check_mask_curr_2nd_curtailment |= check_mask_curr_2nd_tmp & FF;
@@ -5036,9 +5213,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // convert to:
                     // conversion_res_2:                 ..., 0b, 0b, 1b, 0b, 0b, 0b, 0b, 0b, 0b, 0b, 1b, 0b, 0b, 0b
 
-                    constexpr u8x64simd conversion_table_2{0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-                                                           22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
-                                                           44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
+                    constexpr u8x64simd conversion_table_2{
+                        0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,  // 0 -21
+                        22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,  // 22 - 43
+                        44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63           // 44 - 63
+                    };
 
                     u8x64simd mask_table;
 
@@ -5070,11 +5249,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::std::uint32_t const gen_mask{(static_cast<::std::uint32_t>(1u) << handled_simd) - 1u};
 
                     u16x32simd const simd_vector_check_u16x32{
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
-                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
                         simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,  // 0 - 6
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,  // 7 - 13
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,  // 14 - 20
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check,
+                        simd_vector_check, simd_vector_check, simd_vector_check,                    // 21 - 27
+                        simd_vector_check, simd_vector_check, simd_vector_check, simd_vector_check  // 28 - 31
                     };
 
                     if(
@@ -5106,12 +5289,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                     //      [    needwrite   ]
 
-                    // The above func_counter check checks for a maximum of 64 data to be processed at a time, 
+                    // The above func_counter check checks for a maximum of 64 data to be processed at a time,
                     // and it's perfectly safe to do so here without any additional checks
 
-                    ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                       ::std::addressof(need_write_u16x32),
-                                                       sizeof(u16x32simd));
+                    ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(need_write_u16x32), sizeof(u16x32simd));
 
                     functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += handled_simd;
 
@@ -5157,139 +5338,138 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 auto const need_write_u16x64{::std::bit_cast<u16x64multisimd2x512>(__builtin_shufflevector(need_write_u8x128,
                                                                                                            u8x128multisimd2x512{},
-                                                                                                           0,
-                                                                                                           128,
-                                                                                                           1,
-                                                                                                           128,
-                                                                                                           2,
-                                                                                                           128,
-                                                                                                           3,
-                                                                                                           128,
-                                                                                                           4,
-                                                                                                           128,
-                                                                                                           5,
-                                                                                                           128,
-                                                                                                           6,
-                                                                                                           128,
-                                                                                                           7,
-                                                                                                           128,
-                                                                                                           8,
-                                                                                                           128,
-                                                                                                           9,
-                                                                                                           128,
-                                                                                                           10,
-                                                                                                           128,
-                                                                                                           11,
-                                                                                                           128,
-                                                                                                           12,
-                                                                                                           128,
-                                                                                                           13,
-                                                                                                           128,
-                                                                                                           14,
-                                                                                                           128,
-                                                                                                           15,
-                                                                                                           128,
-                                                                                                           16,
-                                                                                                           128,
-                                                                                                           17,
-                                                                                                           128,
-                                                                                                           18,
-                                                                                                           128,
-                                                                                                           19,
-                                                                                                           128,
-                                                                                                           20,
-                                                                                                           128,
-                                                                                                           21,
-                                                                                                           128,
-                                                                                                           22,
-                                                                                                           128,
-                                                                                                           23,
-                                                                                                           128,
-                                                                                                           24,
-                                                                                                           128,
-                                                                                                           25,
-                                                                                                           128,
-                                                                                                           26,
-                                                                                                           128,
-                                                                                                           27,
-                                                                                                           128,
-                                                                                                           28,
-                                                                                                           128,
-                                                                                                           29,
-                                                                                                           128,
-                                                                                                           30,
-                                                                                                           128,
-                                                                                                           31,
-                                                                                                           128,
-                                                                                                           32,
-                                                                                                           128,
-                                                                                                           33,
-                                                                                                           128,
-                                                                                                           34,
-                                                                                                           128,
-                                                                                                           35,
-                                                                                                           128,
-                                                                                                           36,
-                                                                                                           128,
-                                                                                                           37,
-                                                                                                           128,
-                                                                                                           38,
-                                                                                                           128,
-                                                                                                           39,
-                                                                                                           128,
-                                                                                                           40,
-                                                                                                           128,
-                                                                                                           41,
-                                                                                                           128,
-                                                                                                           42,
-                                                                                                           128,
-                                                                                                           43,
-                                                                                                           128,
-                                                                                                           44,
-                                                                                                           128,
-                                                                                                           45,
-                                                                                                           128,
-                                                                                                           46,
-                                                                                                           128,
-                                                                                                           47,
-                                                                                                           128,
-                                                                                                           48,
-                                                                                                           128,
-                                                                                                           49,
-                                                                                                           128,
-                                                                                                           50,
-                                                                                                           128,
-                                                                                                           51,
-                                                                                                           128,
-                                                                                                           52,
-                                                                                                           128,
-                                                                                                           53,
-                                                                                                           128,
-                                                                                                           54,
-                                                                                                           128,
-                                                                                                           55,
-                                                                                                           128,
-                                                                                                           56,
-                                                                                                           128,
-                                                                                                           57,
-                                                                                                           128,
-                                                                                                           58,
-                                                                                                           128,
-                                                                                                           59,
-                                                                                                           128,
-                                                                                                           60,
-                                                                                                           128,
-                                                                                                           61,
-                                                                                                           128,
-                                                                                                           62,
-                                                                                                           128,
-                                                                                                           63,
-                                                                                                           128))};
+                                                                                                           0,    // 0
+                                                                                                           128,  // 1
+                                                                                                           1,    // 2
+                                                                                                           128,  // 3
+                                                                                                           2,    // 4
+                                                                                                           128,  // 5
+                                                                                                           3,    // 6
+                                                                                                           128,  // 7
+                                                                                                           4,    // 8
+                                                                                                           128,  // 9
+                                                                                                           5,    // 10
+                                                                                                           128,  // 11
+                                                                                                           6,    // 12
+                                                                                                           128,  // 13
+                                                                                                           7,    // 14
+                                                                                                           128,  // 15
+                                                                                                           8,    // 16
+                                                                                                           128,  // 17
+                                                                                                           9,    // 18
+                                                                                                           128,  // 19
+                                                                                                           10,   // 20
+                                                                                                           128,  // 21
+                                                                                                           11,   // 22
+                                                                                                           128,  // 23
+                                                                                                           12,   // 24
+                                                                                                           128,  // 25
+                                                                                                           13,   // 26
+                                                                                                           128,  // 27
+                                                                                                           14,   // 28
+                                                                                                           128,  // 29
+                                                                                                           15,   // 30
+                                                                                                           128,  // 31
+                                                                                                           16,   // 32
+                                                                                                           128,  // 33
+                                                                                                           17,   // 34
+                                                                                                           128,  // 35
+                                                                                                           18,   // 36
+                                                                                                           128,  // 37
+                                                                                                           19,   // 38
+                                                                                                           128,  // 39
+                                                                                                           20,   // 40
+                                                                                                           128,  // 41
+                                                                                                           21,   // 42
+                                                                                                           128,  // 43
+                                                                                                           22,   // 44
+                                                                                                           128,  // 45
+                                                                                                           23,   // 46
+                                                                                                           128,  // 47
+                                                                                                           24,   // 48
+                                                                                                           128,  // 49
+                                                                                                           25,   // 50
+                                                                                                           128,  // 51
+                                                                                                           26,   // 52
+                                                                                                           128,  // 53
+                                                                                                           27,   // 54
+                                                                                                           128,  // 55
+                                                                                                           28,   // 56
+                                                                                                           128,  // 57
+                                                                                                           29,   // 58
+                                                                                                           128,  // 59
+                                                                                                           30,   // 60
+                                                                                                           128,  // 61
+                                                                                                           31,   // 62
+                                                                                                           128,  // 63
+                                                                                                           32,   // 64
+                                                                                                           128,  // 65
+                                                                                                           33,   // 66
+                                                                                                           128,  // 67
+                                                                                                           34,   // 68
+                                                                                                           128,  // 69
+                                                                                                           35,   // 70
+                                                                                                           128,  // 71
+                                                                                                           36,   // 72
+                                                                                                           128,  // 73
+                                                                                                           37,   // 74
+                                                                                                           128,  // 75
+                                                                                                           38,   // 76
+                                                                                                           128,  // 77
+                                                                                                           39,   // 78
+                                                                                                           128,  // 79
+                                                                                                           40,   // 80
+                                                                                                           128,  // 81
+                                                                                                           41,   // 82
+                                                                                                           128,  // 83
+                                                                                                           42,   // 84
+                                                                                                           128,  // 85
+                                                                                                           43,   // 86
+                                                                                                           128,  // 87
+                                                                                                           44,   // 88
+                                                                                                           128,  // 89
+                                                                                                           45,   // 90
+                                                                                                           128,  // 91
+                                                                                                           46,   // 92
+                                                                                                           128,  // 93
+                                                                                                           47,   // 94
+                                                                                                           128,  // 95
+                                                                                                           48,   // 96
+                                                                                                           128,  // 97
+                                                                                                           49,   // 98
+                                                                                                           128,  // 99
+                                                                                                           50,   // 100
+                                                                                                           128,  // 101
+                                                                                                           51,   // 102
+                                                                                                           128,  // 103
+                                                                                                           52,   // 104
+                                                                                                           128,  // 105
+                                                                                                           53,   // 106
+                                                                                                           128,  // 107
+                                                                                                           54,   // 108
+                                                                                                           128,  // 109
+                                                                                                           55,   // 110
+                                                                                                           128,  // 111
+                                                                                                           56,   // 112
+                                                                                                           128,  // 113
+                                                                                                           57,   // 114
+                                                                                                           128,  // 115
+                                                                                                           58,   // 116
+                                                                                                           128,  // 117
+                                                                                                           59,   // 118
+                                                                                                           128,  // 119
+                                                                                                           60,   // 120
+                                                                                                           128,  // 121
+                                                                                                           61,   // 122
+                                                                                                           128,  // 123
+                                                                                                           62,   // 124
+                                                                                                           128,  // 125
+                                                                                                           63,   // 126
+                                                                                                           128   // 127
+                                                                                                           ))};
 
                 // write data
-                ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                   ::std::addressof(need_write_u16x64),
-                                                   sizeof(u16x64multisimd2x512));
+                ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(need_write_u16x64), sizeof(u16x64multisimd2x512));
 
                 functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 64uz;
 
@@ -5300,12 +5480,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 //                                                             ^^ section_curr
             }
 
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 8u);
+
+            // Write up to 64 * 2, so prefetch 64 * 12 and 64 * 13.
+            // Tested to be 3% faster than 64 * 8 and 64 * 9.
+
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr));
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 12u);
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u);
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * (12u + 1u));
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -5325,6 +5515,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ///       of cpu instruction cycles for the switching back and forth. linux doesn't have this problem at all, and at the same time, due to the
         ///       better algorithm of the kernel mapping, the parsing efficiency is 4 times higher than that of Windows, and most of the time is wasted in
         ///       the ntoskrnl (This can be tested with vtune). Here still use avx version, if you need sse4 version, please choose sse4 version.
+        ///
+        ///       (It may be misrepresented, but the fact is that the time consumption of ntoskrnl is tested in vtune to increase a lot,
+        ///       while the simd processing part of the time decreases)
 
         auto error_handler{[&](::std::size_t n) constexpr UWVM_THROWS -> void
                            {
@@ -5342,6 +5535,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -5447,7 +5641,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x32simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x32simd));
 
             // It's already a little-endian.
 
@@ -5567,75 +5761,77 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(simd_vector_str,
                                                                               simd_vector_str,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              7,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              -1,  // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              7,   // 16
+                                                                              8,   // 17
+                                                                              9,   // 18
+                                                                              10,  // 19
+                                                                              11,  // 20
+                                                                              12,  // 21
+                                                                              13,  // 22
+                                                                              14,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
                         else
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(simd_vector_str,
                                                                               simd_vector_str,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              7,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              15,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              7,   // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              8,   // 16
+                                                                              9,   // 17
+                                                                              10,  // 18
+                                                                              11,  // 19
+                                                                              12,  // 20
+                                                                              13,  // 21
+                                                                              14,  // 22
+                                                                              15,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
 
                         u16x16simd mask_res;
@@ -5698,88 +5894,92 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1,
-                                                                           -1,
-                                                                           -1,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           8,   // 4
+                                                                           9,   // 5
+                                                                           10,  // 6
+                                                                           11,  // 7
+                                                                           12,  // 8
+                                                                           13,  // 9
+                                                                           14,  // 10
+                                                                           15,  // 11
+                                                                           -1,  // 12
+                                                                           -1,  // 13
+                                                                           -1,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 5u:
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           4,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1,
-                                                                           -1,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           4,   // 4
+                                                                           8,   // 5
+                                                                           9,   // 6
+                                                                           10,  // 7
+                                                                           11,  // 8
+                                                                           12,  // 9
+                                                                           13,  // 10
+                                                                           14,  // 11
+                                                                           15,  // 12
+                                                                           -1,  // 13
+                                                                           -1,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 6u:
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           4,
-                                                                           5,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           4,   // 4
+                                                                           5,   // 5
+                                                                           8,   // 6
+                                                                           9,   // 7
+                                                                           10,  // 8
+                                                                           11,  // 9
+                                                                           12,  // 10
+                                                                           13,  // 11
+                                                                           14,  // 12
+                                                                           15,  // 13
+                                                                           -1,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 7u:
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           4,
-                                                                           5,
-                                                                           6,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           4,   // 4
+                                                                           5,   // 5
+                                                                           6,   // 6
+                                                                           8,   // 7
+                                                                           9,   // 8
+                                                                           10,  // 9
+                                                                           11,  // 10
+                                                                           12,  // 11
+                                                                           13,  // 12
+                                                                           14,  // 13
+                                                                           15,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 8u:
@@ -5801,9 +6001,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -5845,47 +6043,46 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         auto const needwrite_u16x16{::std::bit_cast<u16x16simd>(__builtin_shufflevector(simd_vector_str,
                                                                                                         u8x32simd{},
-                                                                                                        0,
-                                                                                                        32,
-                                                                                                        1,
-                                                                                                        32,
-                                                                                                        2,
-                                                                                                        32,
-                                                                                                        3,
-                                                                                                        32,
-                                                                                                        4,
-                                                                                                        32,
-                                                                                                        5,
-                                                                                                        32,
-                                                                                                        6,
-                                                                                                        32,
-                                                                                                        7,
-                                                                                                        32,
-                                                                                                        8,
-                                                                                                        32,
-                                                                                                        9,
-                                                                                                        32,
-                                                                                                        10,
-                                                                                                        32,
-                                                                                                        11,
-                                                                                                        32,
-                                                                                                        12,
-                                                                                                        32,
-                                                                                                        13,
-                                                                                                        32,
-                                                                                                        14,
-                                                                                                        32,
-                                                                                                        15,
-                                                                                                        32))};
+                                                                                                        0,   // 0
+                                                                                                        32,  // 1
+                                                                                                        1,   // 2
+                                                                                                        32,  // 3
+                                                                                                        2,   // 4
+                                                                                                        32,  // 5
+                                                                                                        3,   // 6
+                                                                                                        32,  // 7
+                                                                                                        4,   // 8
+                                                                                                        32,  // 9
+                                                                                                        5,   // 10
+                                                                                                        32,  // 11
+                                                                                                        6,   // 12
+                                                                                                        32,  // 13
+                                                                                                        7,   // 14
+                                                                                                        32,  // 15
+                                                                                                        8,   // 16
+                                                                                                        32,  // 17
+                                                                                                        9,   // 18
+                                                                                                        32,  // 19
+                                                                                                        10,  // 20
+                                                                                                        32,  // 21
+                                                                                                        11,  // 22
+                                                                                                        32,  // 23
+                                                                                                        12,  // 24
+                                                                                                        32,  // 25
+                                                                                                        13,  // 26
+                                                                                                        32,  // 27
+                                                                                                        14,  // 28
+                                                                                                        32,  // 29
+                                                                                                        15,  // 30
+                                                                                                        32   // 31
+                                                                                                        ))};
 
                         //  [... curr ... (15) ... curr_next ... (15) ...]
                         //  [                 safe                       ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 16u;
 
@@ -5910,38 +6107,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         30,
-                                                                         31,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
+                                                                         16,  // 0
+                                                                         17,  // 1
+                                                                         18,  // 2
+                                                                         19,  // 3
+                                                                         20,  // 4
+                                                                         21,  // 5
+                                                                         22,  // 6
+                                                                         23,  // 7
+                                                                         24,  // 8
+                                                                         25,  // 9
+                                                                         26,  // 10
+                                                                         27,  // 11
+                                                                         28,  // 12
+                                                                         29,  // 13
+                                                                         30,  // 14
+                                                                         31,  // 15
+                                                                         -1,  // 16
+                                                                         -1,  // 17
+                                                                         -1,  // 18
+                                                                         -1,  // 19
+                                                                         -1,  // 20
+                                                                         -1,  // 21
+                                                                         -1,  // 22
+                                                                         -1,  // 23
+                                                                         -1,  // 24
+                                                                         -1,  // 25
+                                                                         -1,  // 26
+                                                                         -1,  // 27
+                                                                         -1,  // 28
+                                                                         -1,  // 29
+                                                                         -1,  // 30
+                                                                         -1   // 31
+                                                                         )};
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
@@ -5949,38 +6147,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
-                                                                         15,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         30,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
+                                                                         15,  // 0
+                                                                         16,  // 1
+                                                                         17,  // 2
+                                                                         18,  // 3
+                                                                         19,  // 4
+                                                                         20,  // 5
+                                                                         21,  // 6
+                                                                         22,  // 7
+                                                                         23,  // 8
+                                                                         24,  // 9
+                                                                         25,  // 10
+                                                                         26,  // 11
+                                                                         27,  // 12
+                                                                         28,  // 13
+                                                                         29,  // 14
+                                                                         30,  // 15
+                                                                         -1,  // 16
+                                                                         -1,  // 17
+                                                                         -1,  // 18
+                                                                         -1,  // 19
+                                                                         -1,  // 20
+                                                                         -1,  // 21
+                                                                         -1,  // 22
+                                                                         -1,  // 23
+                                                                         -1,  // 24
+                                                                         -1,  // 25
+                                                                         -1,  // 26
+                                                                         -1,  // 27
+                                                                         -1,  // 28
+                                                                         -1,  // 29
+                                                                         -1,  // 30
+                                                                         -1   // 31
+                                                                         )};
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
@@ -5988,38 +6187,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         auto const shuffle_u8x32{__builtin_shufflevector(simd_vector_str,
                                                                          simd_vector_str,
-                                                                         14,
-                                                                         15,
-                                                                         16,
-                                                                         17,
-                                                                         18,
-                                                                         19,
-                                                                         20,
-                                                                         21,
-                                                                         22,
-                                                                         23,
-                                                                         24,
-                                                                         25,
-                                                                         26,
-                                                                         27,
-                                                                         28,
-                                                                         29,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1,
-                                                                         -1)};
+                                                                         14,  // 0
+                                                                         15,  // 1
+                                                                         16,  // 2
+                                                                         17,  // 3
+                                                                         18,  // 4
+                                                                         19,  // 5
+                                                                         20,  // 6
+                                                                         21,  // 7
+                                                                         22,  // 8
+                                                                         23,  // 9
+                                                                         24,  // 10
+                                                                         25,  // 11
+                                                                         26,  // 12
+                                                                         27,  // 13
+                                                                         28,  // 14
+                                                                         29,  // 15
+                                                                         -1,  // 16
+                                                                         -1,  // 17
+                                                                         -1,  // 18
+                                                                         -1,  // 19
+                                                                         -1,  // 20
+                                                                         -1,  // 21
+                                                                         -1,  // 22
+                                                                         -1,  // 23
+                                                                         -1,  // 24
+                                                                         -1,  // 25
+                                                                         -1,  // 26
+                                                                         -1,  // 27
+                                                                         -1,  // 28
+                                                                         -1,  // 29
+                                                                         -1,  // 30
+                                                                         -1   // 31
+                                                                         )};
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
@@ -6116,75 +6316,77 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(third_fourth_round_simd_u8x32,
                                                                               third_fourth_round_simd_u8x32,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              7,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              -1,  // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              7,   // 16
+                                                                              8,   // 17
+                                                                              9,   // 18
+                                                                              10,  // 19
+                                                                              11,  // 20
+                                                                              12,  // 21
+                                                                              13,  // 22
+                                                                              14,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
                         else
                         {
                             simd_vector_str_shuffle = __builtin_shufflevector(third_fourth_round_simd_u8x32,
                                                                               third_fourth_round_simd_u8x32,
-                                                                              0,
-                                                                              1,
-                                                                              2,
-                                                                              3,
-                                                                              4,
-                                                                              5,
-                                                                              6,
-                                                                              7,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              8,
-                                                                              9,
-                                                                              10,
-                                                                              11,
-                                                                              12,
-                                                                              13,
-                                                                              14,
-                                                                              15,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1,
-                                                                              -1);
+                                                                              0,   // 0
+                                                                              1,   // 1
+                                                                              2,   // 2
+                                                                              3,   // 3
+                                                                              4,   // 4
+                                                                              5,   // 5
+                                                                              6,   // 6
+                                                                              7,   // 7
+                                                                              -1,  // 8
+                                                                              -1,  // 9
+                                                                              -1,  // 10
+                                                                              -1,  // 11
+                                                                              -1,  // 12
+                                                                              -1,  // 13
+                                                                              -1,  // 14
+                                                                              -1,  // 15
+                                                                              8,   // 16
+                                                                              9,   // 17
+                                                                              10,  // 18
+                                                                              11,  // 19
+                                                                              12,  // 20
+                                                                              13,  // 21
+                                                                              14,  // 22
+                                                                              15,  // 23
+                                                                              -1,  // 24
+                                                                              -1,  // 25
+                                                                              -1,  // 26
+                                                                              -1,  // 27
+                                                                              -1,  // 28
+                                                                              -1,  // 29
+                                                                              -1,  // 30
+                                                                              -1   // 31
+                            );
                         }
 
                         u16x16simd mask_res;
@@ -6247,88 +6449,92 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1,
-                                                                           -1,
-                                                                           -1,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           8,   // 4
+                                                                           9,   // 5
+                                                                           10,  // 6
+                                                                           11,  // 7
+                                                                           12,  // 8
+                                                                           13,  // 9
+                                                                           14,  // 10
+                                                                           15,  // 11
+                                                                           -1,  // 12
+                                                                           -1,  // 13
+                                                                           -1,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 5u:
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           4,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1,
-                                                                           -1,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           4,   // 4
+                                                                           8,   // 5
+                                                                           9,   // 6
+                                                                           10,  // 7
+                                                                           11,  // 8
+                                                                           12,  // 9
+                                                                           13,  // 10
+                                                                           14,  // 11
+                                                                           15,  // 12
+                                                                           -1,  // 13
+                                                                           -1,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 6u:
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           4,
-                                                                           5,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           4,   // 4
+                                                                           5,   // 5
+                                                                           8,   // 6
+                                                                           9,   // 7
+                                                                           10,  // 8
+                                                                           11,  // 9
+                                                                           12,  // 10
+                                                                           13,  // 11
+                                                                           14,  // 12
+                                                                           15,  // 13
+                                                                           -1,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 7u:
                             {
                                 needwrite_u16x16 = __builtin_shufflevector(::std::bit_cast<u16x16simd>(res),
                                                                            ::std::bit_cast<u16x16simd>(res),
-                                                                           0,
-                                                                           1,
-                                                                           2,
-                                                                           3,
-                                                                           4,
-                                                                           5,
-                                                                           6,
-                                                                           8,
-                                                                           9,
-                                                                           10,
-                                                                           11,
-                                                                           12,
-                                                                           13,
-                                                                           14,
-                                                                           15,
-                                                                           -1);
+                                                                           0,   // 0
+                                                                           1,   // 1
+                                                                           2,   // 2
+                                                                           3,   // 3
+                                                                           4,   // 4
+                                                                           5,   // 5
+                                                                           6,   // 6
+                                                                           8,   // 7
+                                                                           9,   // 8
+                                                                           10,  // 9
+                                                                           11,  // 10
+                                                                           12,  // 11
+                                                                           13,  // 12
+                                                                           14,  // 13
+                                                                           15,  // 14
+                                                                           -1   // 15
+                                );
                                 break;
                             }
                             case 8u:
@@ -6350,9 +6556,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd_sum;
 
@@ -6394,47 +6598,46 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         auto const needwrite_u16x16{::std::bit_cast<u16x16simd>(__builtin_shufflevector(third_fourth_round_simd_u8x32,
                                                                                                         u8x32simd{},
-                                                                                                        0,
-                                                                                                        32,
-                                                                                                        1,
-                                                                                                        32,
-                                                                                                        2,
-                                                                                                        32,
-                                                                                                        3,
-                                                                                                        32,
-                                                                                                        4,
-                                                                                                        32,
-                                                                                                        5,
-                                                                                                        32,
-                                                                                                        6,
-                                                                                                        32,
-                                                                                                        7,
-                                                                                                        32,
-                                                                                                        8,
-                                                                                                        32,
-                                                                                                        9,
-                                                                                                        32,
-                                                                                                        10,
-                                                                                                        32,
-                                                                                                        11,
-                                                                                                        32,
-                                                                                                        12,
-                                                                                                        32,
-                                                                                                        13,
-                                                                                                        32,
-                                                                                                        14,
-                                                                                                        32,
-                                                                                                        15,
-                                                                                                        32))};
+                                                                                                        0,   // 0
+                                                                                                        32,  // 1
+                                                                                                        1,   // 2
+                                                                                                        32,  // 3
+                                                                                                        2,   // 4
+                                                                                                        32,  // 5
+                                                                                                        3,   // 6
+                                                                                                        32,  // 7
+                                                                                                        4,   // 8
+                                                                                                        32,  // 9
+                                                                                                        5,   // 10
+                                                                                                        32,  // 11
+                                                                                                        6,   // 12
+                                                                                                        32,  // 13
+                                                                                                        7,   // 14
+                                                                                                        32,  // 15
+                                                                                                        8,   // 16
+                                                                                                        32,  // 17
+                                                                                                        9,   // 18
+                                                                                                        32,  // 19
+                                                                                                        10,  // 20
+                                                                                                        32,  // 21
+                                                                                                        11,  // 22
+                                                                                                        32,  // 23
+                                                                                                        12,  // 24
+                                                                                                        32,  // 25
+                                                                                                        13,  // 26
+                                                                                                        32,  // 27
+                                                                                                        14,  // 28
+                                                                                                        32,  // 29
+                                                                                                        15,  // 30
+                                                                                                        32   // 31
+                                                                                                        ))};
 
                         //  [... curr ... (15) ... curr_next ... (15) ...]
                         //  [                 safe                       ] unsafe (could be the section_end)
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite    ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x16),
-                                                           sizeof(u16x16simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x16), sizeof(u16x16simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 16u;
 
@@ -6474,83 +6677,81 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 u16x16simd const u16x16v0{::std::bit_cast<u16x16simd>(__builtin_shufflevector(simd_vector_str,
                                                                                               u8x32simd{},
-                                                                                              0,
-                                                                                              32,
-                                                                                              1,
-                                                                                              32,
-                                                                                              2,
-                                                                                              32,
-                                                                                              3,
-                                                                                              32,
-                                                                                              4,
-                                                                                              32,
-                                                                                              5,
-                                                                                              32,
-                                                                                              6,
-                                                                                              32,
-                                                                                              7,
-                                                                                              32,
-                                                                                              8,
-                                                                                              32,
-                                                                                              9,
-                                                                                              32,
-                                                                                              10,
-                                                                                              32,
-                                                                                              11,
-                                                                                              32,
-                                                                                              12,
-                                                                                              32,
-                                                                                              13,
-                                                                                              32,
-                                                                                              14,
-                                                                                              32,
-                                                                                              15,
-                                                                                              32))};
+                                                                                              0,   // 0
+                                                                                              32,  // 1
+                                                                                              1,   // 2
+                                                                                              32,  // 3
+                                                                                              2,   // 4
+                                                                                              32,  // 5
+                                                                                              3,   // 6
+                                                                                              32,  // 7
+                                                                                              4,   // 8
+                                                                                              32,  // 9
+                                                                                              5,   // 10
+                                                                                              32,  // 11
+                                                                                              6,   // 12
+                                                                                              32,  // 13
+                                                                                              7,   // 14
+                                                                                              32,  // 15
+                                                                                              8,   // 16
+                                                                                              32,  // 17
+                                                                                              9,   // 18
+                                                                                              32,  // 19
+                                                                                              10,  // 20
+                                                                                              32,  // 21
+                                                                                              11,  // 22
+                                                                                              32,  // 23
+                                                                                              12,  // 24
+                                                                                              32,  // 25
+                                                                                              13,  // 26
+                                                                                              32,  // 27
+                                                                                              14,  // 28
+                                                                                              32,  // 29
+                                                                                              15,  // 30
+                                                                                              32   // 31
+                                                                                              ))};
 
-                ::fast_io::freestanding::my_memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp,
-                                                   ::std::addressof(u16x16v0),
-                                                   sizeof(u16x16simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x16v0), sizeof(u16x16simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 16uz;
 
                 u16x16simd const u16x16v1{::std::bit_cast<u16x16simd>(__builtin_shufflevector(simd_vector_str,
                                                                                               u8x32simd{},
-                                                                                              16,
-                                                                                              32,
-                                                                                              17,
-                                                                                              32,
-                                                                                              18,
-                                                                                              32,
-                                                                                              19,
-                                                                                              32,
-                                                                                              20,
-                                                                                              32,
-                                                                                              21,
-                                                                                              32,
-                                                                                              22,
-                                                                                              32,
-                                                                                              23,
-                                                                                              32,
-                                                                                              24,
-                                                                                              32,
-                                                                                              25,
-                                                                                              32,
-                                                                                              26,
-                                                                                              32,
-                                                                                              27,
-                                                                                              32,
-                                                                                              28,
-                                                                                              32,
-                                                                                              29,
-                                                                                              32,
-                                                                                              30,
-                                                                                              32,
-                                                                                              31,
-                                                                                              32))};
+                                                                                              16,  // 0
+                                                                                              32,  // 1
+                                                                                              17,  // 2
+                                                                                              32,  // 3
+                                                                                              18,  // 4
+                                                                                              32,  // 5
+                                                                                              19,  // 6
+                                                                                              32,  // 7
+                                                                                              20,  // 8
+                                                                                              32,  // 9
+                                                                                              21,  // 10
+                                                                                              32,  // 11
+                                                                                              22,  // 12
+                                                                                              32,  // 13
+                                                                                              23,  // 14
+                                                                                              32,  // 15
+                                                                                              24,  // 16
+                                                                                              32,  // 17
+                                                                                              25,  // 18
+                                                                                              32,  // 19
+                                                                                              26,  // 20
+                                                                                              32,  // 21
+                                                                                              27,  // 22
+                                                                                              32,  // 23
+                                                                                              28,  // 24
+                                                                                              32,  // 25
+                                                                                              29,  // 26
+                                                                                              32,  // 27
+                                                                                              30,  // 28
+                                                                                              32,  // 29
+                                                                                              31,  // 30
+                                                                                              32   // 31
+                                                                                              ))};
 
-                ::fast_io::freestanding::my_memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp,
-                                                   ::std::addressof(u16x16v1),
-                                                   sizeof(u16x16simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x16v1), sizeof(u16x16simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 16uz;
 
@@ -6564,9 +6765,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // Each write is prefetched one write at a time within a full cache line.
+
+            // After testing, 4 and 6 are the fastest
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 4u);
+            // Write up to 32 * 2, so prefetch 64 * 6.
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
-                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2>(
-                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr));
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 6u);
         }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && UWVM_HAS_BUILTIN(__builtin_shufflevector) &&                              \
@@ -6597,6 +6807,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // of '!='
 
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                               // Used to check if correct content is recognized as an error.
                                bool correct_sequence_right_taken_for_wrong{true};
 # endif
 
@@ -6696,7 +6907,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x16simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
 
             // It's already a little-endian.
 
@@ -6712,9 +6923,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             };
 
             // Since mask 16-bit stuff, it can be assumed that mask is less than 2^16
-# if __has_cpp_attribute(assume)
             [[assume(check_mask < 1u << 16u)]];
-# endif
 
             if(
 # if UWVM_HAS_BUILTIN(__builtin_expect_with_probability)
@@ -6773,9 +6982,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x8),
-                                                           sizeof(u16x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x8), sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 8u;
 
@@ -6897,9 +7104,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x8),
-                                                           sizeof(u16x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x8), sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd;
 
@@ -6929,10 +7134,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // When first_round_handle_bytes is 7, check_table_index is always greater than 0，
                     // Because the highest bit of the first 8 bits is pop, 0bxxxx'xxxx'1xxx'xxxxu >> 7u == 0bxxxx'xxx1
 
-# if __has_cpp_attribute(assume)
                     [[assume((first_round_handle_bytes == static_cast<::std::uint8_t>(7u) && check_table_index != 0u) ||
                              first_round_handle_bytes == static_cast<::std::uint8_t>(8u))]];
-# endif
 
                     if(!check_table_index)
                     {
@@ -6981,9 +7184,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                        ^^^^^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //                       [    needwrite   ]...]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(simd_vector_str_need_write),
-                                                           sizeof(u16x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
+                                      ::std::addressof(simd_vector_str_need_write),
+                                      sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += 8u;
 
@@ -7100,9 +7303,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                            ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //                            [    needwrite   ]
 
-                        ::fast_io::freestanding::my_memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr,
-                                                           ::std::addressof(needwrite_u16x8),
-                                                           sizeof(u16x8simd));
+                        ::std::memcpy(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr, ::std::addressof(needwrite_u16x8), sizeof(u16x8simd));
 
                         functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr += curr_table_processed_simd;
 
@@ -7144,14 +7345,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 u16x8simd const u16x8v0{
                     ::std::bit_cast<u16x8simd>(__builtin_shufflevector(simd_vector_str, u8x16simd{}, 0, 16, 1, 16, 2, 16, 3, 16, 4, 16, 5, 16, 6, 16, 7, 16))};
 
-                ::fast_io::freestanding::my_memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v0), sizeof(u16x8simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v0), sizeof(u16x8simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
                 u16x8simd const u16x8v1{::std::bit_cast<u16x8simd>(
                     __builtin_shufflevector(simd_vector_str, u8x16simd{}, 8, 16, 9, 16, 10, 16, 11, 16, 12, 16, 13, 16, 14, 16, 15, 16))};
 
-                ::fast_io::freestanding::my_memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v1), sizeof(u16x8simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v1), sizeof(u16x8simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
@@ -7163,6 +7364,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // After testing, 2 and 3 are the fastest
+
+            // Each write is prefetched one write at a time within a full cache line.
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+            // Write up to 16 * 2, so prefetch 64 * 3.
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 3u);
         }
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) ||                                                                                    \
@@ -7191,7 +7405,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             u8x16simd simd_vector_str;  // No initialization necessary
 
-            ::fast_io::freestanding::my_memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
+            ::std::memcpy(::std::addressof(simd_vector_str), section_curr, sizeof(u8x16simd));
 
             // It's already a little-endian.
 
@@ -7312,14 +7526,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 u16x8simd const u16x8v0{
                     ::std::bit_cast<u16x8simd>(__builtin_shufflevector(simd_vector_str, u8x16simd{}, 0, 16, 1, 16, 2, 16, 3, 16, 4, 16, 5, 16, 6, 16, 7, 16))};
 
-                ::fast_io::freestanding::my_memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v0), sizeof(u16x8simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v0), sizeof(u16x8simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
                 u16x8simd const u16x8v1{::std::bit_cast<u16x8simd>(
                     __builtin_shufflevector(simd_vector_str, u8x16simd{}, 8, 16, 9, 16, 10, 16, 11, 16, 12, 16, 13, 16, 14, 16, 15, 16))};
 
-                ::fast_io::freestanding::my_memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v1), sizeof(u16x8simd));
+                ::std::memcpy(functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp, ::std::addressof(u16x8v1), sizeof(u16x8simd));
 
                 functionsec_funcs_storage_typeidx_u16_vector_imp_curr_ptr_tmp += 8uz;
 
@@ -7331,6 +7545,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                        safe                             ] unsafe (could be the section_end)
                 //                                                             ^^ section_curr
             }
+
+            // Each write is prefetched one write at a time within a full cache line.
+
+            // After testing, 2 and 3 are the fastest
+
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::nta,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::strm>(
+                reinterpret_cast<::std::byte const*>(section_curr) + 64u * 2u);
+            ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::write,
+                                                            ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+                reinterpret_cast<::std::byte const*>(functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr) + 64u * 3u);
         }
 #endif
 
@@ -7497,10 +7724,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
 
-#if __has_cpp_attribute(assume)
         [[assume(type_section_count >= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u &&
                  type_section_count < static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 16u)]];
-#endif
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
 
@@ -7600,9 +7825,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
         auto const type_section_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(typesec.types.size())};
 
-#if __has_cpp_attribute(assume)
         [[assume(type_section_count >= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 16u)]];
-#endif
 
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
 
