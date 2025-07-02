@@ -30,6 +30,7 @@ import fast_io;
 # include <cstddef>
 # include <cstring>
 # include <concepts>
+# include <memory>
 // platform
 # if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&              \
      !defined(__wasm__)
@@ -65,7 +66,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::console
 # if defined(__linux__) && defined(__NR_ioctl)
         if(::fast_io::system_call<__NR_ioctl, int>(::fast_io::posix_stdout_number, TIOCGWINSZ, ::std::addressof(size)) != 0) [[unlikely]] { return 0uz; }
 # else
-        if(::fast_io::posix::ioctl(::fast_io::posix_stdout_number, TIOCGWINSZ, ::std::addressof(size)) != 0) [[unlikely]] { return 0uz; }
+        if(::fast_io::posix::libc_ioctl(::fast_io::posix_stdout_number, TIOCGWINSZ, ::std::addressof(size)) != 0) [[unlikely]] { return 0uz; }
 # endif
         return static_cast<::std::size_t>(size.ws_col);
 

@@ -23,13 +23,13 @@
 // std
 #include <memory>
 #include <utility>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // platform
 #if defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
 # include <linux/version.h>
 #endif
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // std
 #ifdef UWVM_MODULE
 import fast_io;

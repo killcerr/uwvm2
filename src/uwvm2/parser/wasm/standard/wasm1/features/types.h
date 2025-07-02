@@ -70,6 +70,8 @@ import :feature_def;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 {
+    /// @brief These are proprietary implementations of wasm 1.0's types, which can be replaced by calls implemented via adl
+
     /// @brief      Value Types
     /// @details    Value types are encoded by a single byte.
     /// @details    New feature
@@ -257,8 +259,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         elemtype = static_cast<decltype(elemtype)>(static_cast<::std::uint_least8_t>(elemtype) & 0xFFu);
 #endif
 
-        // The element type elemtype must be funcref
-        if(elemtype != 0x70) [[unlikely]]
+        // In wasm 1.0, the element type elemtype must be funcref
+        if(elemtype != 0x70u) [[unlikely]]
         {
             err.err_curr = curr;
             err.err_selectable.u8 = elemtype;

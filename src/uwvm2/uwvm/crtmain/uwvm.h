@@ -28,6 +28,7 @@
 import fast_io;
 import uwvm2.uwvm.io;
 import uwvm2.utils.ansies;
+import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.run;
 import uwvm2.uwvm.crtmain.global;
@@ -35,6 +36,7 @@ import uwvm2.uwvm.crtmain.global;
 // std
 # include <cstdint>
 # include <cstddef>
+# include <limits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -42,6 +44,7 @@ import uwvm2.uwvm.crtmain.global;
 # include <fast_io.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
+# include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/run/impl.h>
 # include "global/impl.h"

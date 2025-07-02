@@ -100,6 +100,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [... table_curr] ...
         // [   safe       ] unsafe (could be the section_end)
         //      ^^ section_curr
+
+        // Handling of scan_table_type is completely memory-safe
+
         return ::uwvm2::parser::wasm::standard::wasm1::features::scan_table_type(table_r, section_curr, section_end, err);
     }
 

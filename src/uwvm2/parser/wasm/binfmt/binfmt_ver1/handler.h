@@ -31,6 +31,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.utils.utf;
+import uwvm2.parser.wasm.text_format;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
@@ -60,6 +61,7 @@ import :def;
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/tuple.h>
 # include <uwvm2/utils/utf/impl.h>
+# include <uwvm2/parser/wasm/text_format/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>

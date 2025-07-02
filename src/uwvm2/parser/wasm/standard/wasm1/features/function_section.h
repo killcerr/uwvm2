@@ -51,6 +51,8 @@ import :type_section;
 # include <memory>
 # include <bit>
 # include <numeric>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
 // platform
 # if defined(_MSC_VER) && !defined(__clang__)
 #  if !defined(_KERNEL_MODE) && defined(_M_AMD64)
@@ -60,8 +62,6 @@ import :type_section;
 #   include <arm_neon.h>  // MSVC aarch64-NEON
 #  endif
 # endif
-// macro
-# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
