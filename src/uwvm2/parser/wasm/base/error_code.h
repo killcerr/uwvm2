@@ -102,7 +102,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_table_count,
         wasm1_not_allow_multi_table,
         table_section_resolved_exceeded_the_actual_number,
-        table_section_resolved_not_match_the_actual_number
+        table_section_resolved_not_match_the_actual_number,
+        invalid_memory_count,
+        wasm1_not_allow_multi_memory,
+        memory_section_resolved_exceeded_the_actual_number,
+        memory_section_resolved_not_match_the_actual_number
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type

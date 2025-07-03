@@ -38,6 +38,8 @@ import :custom_section;
 import :type_section;
 import :import_section;
 import :function_section;
+import :table_section;
+import :memory_section;
 #else
 // std
 # include <cstddef>
@@ -64,6 +66,8 @@ import :function_section;
 # include "type_section.h"
 # include "import_section.h"
 # include "function_section.h"
+# include "table_section.h"
+# include "memory_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -109,7 +113,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>
                                                           /// @todo
                                                           >;
     };

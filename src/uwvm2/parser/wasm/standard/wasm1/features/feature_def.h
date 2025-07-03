@@ -662,6 +662,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         { table_section_table_handler(sec_adl, table_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
     };
 
+    // memory_section
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct memory_section_storage_t;
+
+    /// @brief Define functions for handle memory section memory
+    template <typename... Fs>
+    concept has_memory_section_memory_handler =
+        requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<memory_section_storage_t<Fs...>> sec_adl,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>& memory_r,
+                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+            { memory_section_memory_handler(sec_adl, memory_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
+        };
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

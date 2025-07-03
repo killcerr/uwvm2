@@ -453,6 +453,49 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
 
+    /////////////////////////////
+    //      Memory Section     //
+    /////////////////////////////
+
+    /// @brief      allow multi memory
+    /// @details    In the current version of WebAssembly, at most one memory may be defined or imported in a single module,
+    ///             and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions
+    ///
+    ///             Define this to eliminate checking the length of the result.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool allow_multi_memory{true};
+    ///             };
+    ///             ```
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.5
+    /// @see        test\0001.parser\0002.binfmt1\section\memory_section.cc
+    template <typename FsCurr>
+    concept has_allow_multi_memory = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_memory)>, bool>; };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool allow_multi_memory() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_allow_multi_memory<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::allow_multi_memory};
+                                                                            return tallow;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 /// @brief Define container optimization operations for use with fast_io
