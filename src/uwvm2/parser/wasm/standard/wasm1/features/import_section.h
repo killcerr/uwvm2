@@ -296,10 +296,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
             auto const defined_funcsec_funcs_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
 
+            // [func table mem global] (end)
+            // [         safe        ]
+            //  ^^importdesc_begin[0uz]
+
             // check imported_func_count
             auto const imported_func_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[0uz].size())};
 
-            if(imported_func_count > wasm_u32_max - defined_funcsec_funcs_size)
+            if(imported_func_count > wasm_u32_max - defined_funcsec_funcs_size) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.imp_def_num_exceed_u32max.type = 0x00;
@@ -314,6 +318,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // table section
             auto const& tablesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<table_section_storage_t<Fs...>>(module_storage.sections)};
             auto const defined_tablesec_tables_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(tablesec.tables.size())};
+
+            // [func table mem global] (end)
+            // [         safe        ]
+            //       ^^importdesc_begin[1uz]
 
             // check imported_table_count
             auto const imported_table_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[1uz].size())};
@@ -337,7 +345,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             else
             {
-                if(imported_table_count > wasm_u32_max - defined_tablesec_tables_size)
+                if(imported_table_count > wasm_u32_max - defined_tablesec_tables_size) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.imp_def_num_exceed_u32max.type = 0x01;
@@ -354,6 +362,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const& memorysec{
                 ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<memory_section_storage_t<Fs...>>(module_storage.sections)};
             auto const defined_memorysec_memories_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(memorysec.memories.size())};
+
+            // [func table mem global] (end)
+            // [         safe        ]
+            //             ^^importdesc_begin[2uz]
 
             // check imported_memory_count
             auto const imported_memory_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[2uz].size())};
@@ -377,7 +389,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             else
             {
-                if(imported_memory_count > wasm_u32_max - defined_memorysec_memories_size)
+                if(imported_memory_count > wasm_u32_max - defined_memorysec_memories_size) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.imp_def_num_exceed_u32max.type = 0x02;
@@ -423,21 +435,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
-        // There is no need to check it here, it can be checked later in handle_import_func with index
+        // There is no need to check typesec.sec_span.sec_begin (forward_dependency_missing) here,
+        // it can be checked later in handle_import_func with index
         // Turning on checking can instead cause non-typesection import dependencies to error out
-#if 0
-        // check has typesec
-        auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
-        if(!typesec.sec_span.sec_begin) [[unlikely]]
-        {
-            err.err_curr = sec_id_module_ptr;
-            err.err_selectable.u8arr[0] = typesec.section_id;
-            err.err_selectable.u8arr[1] = importsec.section_id;
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::forward_dependency_missing;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
-#endif
         // import section
         using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*;
 
