@@ -126,6 +126,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // get table_section_storage_t from storages
         auto& tablesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<table_section_storage_t<Fs...>>(module_storage.sections)};
 
+        // import section
+        auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(module_storage.sections)};
+        // importdesc[1]: table
+        constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
+        static_assert(importdesc_count > 1uz); // Ensure that subsequent index visits do not cross boundaries
+        auto const imported_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(1uz).size())};
+
         // check duplicate
         if(tablesec.sec_span.sec_begin) [[unlikely]]
         {
@@ -185,15 +192,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.4
         constexpr bool allow_multi_table{::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_table<Fs...>()};
         if constexpr(!allow_multi_table)
-        {
-            if(table_count > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
+        {            
+            [[assume(imported_table_size <= 1u)]];
+
+            // table_count is not incremental and requires overflow checking
+            constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+            
+            if(table_count + imported_table_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) ||
+               table_count > wasm_u32_max - imported_table_size) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_table;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
         }
-
+            
         tablesec.tables.reserve(static_cast<::std::size_t>(table_count));
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 table_counter{};  // use for check

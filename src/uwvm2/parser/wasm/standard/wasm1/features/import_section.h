@@ -314,7 +314,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 #endif
+                   
+        // table section
+        auto const& tablesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<table_section_storage_t<Fs...>>(module_storage.sections)};
+        auto const tablesec_tables_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(tablesec.tables.size())};
 
+        // import section
         using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*;
 
         importsec.sec_span.sec_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_begin);
@@ -574,11 +579,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // 1: table
             // 2: mem
             // 3: global
+            // 4: tag (wasm3)
 
             auto const fit_import_type{static_cast<::std::size_t>(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(fit.imports.type))};
 
             // counter
-            ++importdesc_counter.index_unchecked(fit_import_type);
+            auto& curr_importdesc_counter{importdesc_counter.index_unchecked(fit_import_type)};
+            ++curr_importdesc_counter;
+
+            /// @details    In the current version of WebAssembly, at most one table may be defined or imported in a single module,
+            ///             and all constructs implicitly reference this table 0. This restriction may be lifted in future versions.
+            /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.4
+            constexpr bool allow_multi_table{::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_table<Fs...>()};
+            if constexpr(!allow_multi_table)
+            {
+                [[assume(tablesec_tables_size <= 1u)]];
+
+                // 1: table
+                if(fit_import_type == 1uz)
+                {
+                    // Since curr_importdesc_counter is incremented from 1 and tablesec_tables_size <= 1u, the addition never crosses the boundary and there is no need to do an out-of-bounds check.
+                    constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+                    [[assume(curr_importdesc_counter <= wasm_u32_max - tablesec_tables_size)]];
+
+                    if (curr_importdesc_counter + tablesec_tables_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_table;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+                }
+            }
+
+            /// @todo allow_multi_memory
 
             // check duplicate name
             auto& curr_name_set{duplicate_name_checker.index_unchecked(fit_import_type)};
