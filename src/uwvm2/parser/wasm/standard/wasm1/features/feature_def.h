@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///////////////////////////
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    struct type_section_storage_t;
+    struct type_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
     /// @brief Define functions for checking value_type to provide extensibility
     template <typename... Fs>
@@ -108,7 +108,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /////////////////////////////
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    struct import_section_storage_t;
+    struct import_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
+
+    /// @brief Define functions for define_imported_and_defined_exceeding_checker
+    template <typename... Fs>
+    concept has_imported_and_defined_exceeding_checker = requires(
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_extern_type_t<Fs...>> extern_adl,
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*> const* importdesc_begin,
+        ::std::byte const* section_curr,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        {
+            define_imported_and_defined_exceeding_checker(sec_adl, extern_adl, module_storage, importdesc_begin, section_curr, err, fs_para)
+        } -> ::std::same_as<void>;
+    };
 
     /// @brief Define functions for handle extern_prefix
     template <typename... Fs>
@@ -194,7 +209,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
     };
 
-    // function_section
+    ///////////////////////////////
+    /// @brief function section ///
+    ///////////////////////////////
+
+    struct function_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
+
     static_assert(
         ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
             ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
@@ -646,9 +666,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
     };
 
-    // table_section
+    ////////////////////////////
+    /// @brief table section ///
+    ////////////////////////////
+
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    struct table_section_storage_t;
+    struct table_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
     /// @brief Define functions for handle table section table
     template <typename... Fs>
@@ -662,9 +685,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         { table_section_table_handler(sec_adl, table_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
     };
 
-    // memory_section
+    /////////////////////////////
+    /// @brief memory section ///
+    /////////////////////////////
+
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    struct memory_section_storage_t;
+    struct memory_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
     /// @brief Define functions for handle memory section memory
     template <typename... Fs>

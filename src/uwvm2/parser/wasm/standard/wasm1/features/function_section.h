@@ -8031,6 +8031,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // get function_section_storage_t from storages
         auto& functionsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
 
+        // import section
+        auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(module_storage.sections)};
+        // importdesc[0]: func
+        constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
+        static_assert(importdesc_count > 0uz);  // Ensure that subsequent index visits do not cross boundaries
+        auto const imported_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
+
         // check duplicate
         if(functionsec.sec_span.sec_begin) [[unlikely]]
         {
@@ -8096,6 +8103,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
+        }
+
+        if(func_count > wasm_u32_max - imported_func_size) [[unlikely]]
+        {
+            err.err_curr = section_curr;
+            err.err_selectable.imp_def_num_exceed_u32max.type = 0x00;  // func
+            err.err_selectable.imp_def_num_exceed_u32max.defined = func_count;
+            err.err_selectable.imp_def_num_exceed_u32max.imported = imported_func_size;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_counter{};  // use for check

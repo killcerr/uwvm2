@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -187,12 +187,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
-        /// @details    In the current version of WebAssembly, at most one memory may be defined or imported in a single module,
-        ///             and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions
-        /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.5
         constexpr bool allow_multi_memory{::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_memory<Fs...>()};
         if constexpr(!allow_multi_memory)
         {
+            /// @details    In the current version of WebAssembly, at most one memory may be defined or imported in a single module,
+            ///             and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions
+            /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.5
+
             [[assume(imported_memory_size <= 1u)]];
 
             // memory_count is not incremental and requires overflow checking
@@ -203,6 +204,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 err.err_curr = section_curr;
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_memory;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+        }
+        else
+        {
+            constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+
+            if(memory_count > wasm_u32_max - imported_memory_size) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.imp_def_num_exceed_u32max.type = 0x02;  // memory
+                err.err_selectable.imp_def_num_exceed_u32max.defined = memory_count;
+                err.err_selectable.imp_def_num_exceed_u32max.imported = imported_memory_size;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
         }

@@ -59,7 +59,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::memory_section_resolved_not_match_the_actual_number) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -81,6 +81,13 @@ int main()
                 {
                     errout.err.err_selectable.error_module_name.module_name = u8"test";
                     errout.err.err_selectable.error_module_name.type = 0x00;
+                    break;
+                }
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max:
+                {
+                    errout.err.err_selectable.imp_def_num_exceed_u32max.type = 0x00;
+                    errout.err.err_selectable.imp_def_num_exceed_u32max.defined = 114514;
+                    errout.err.err_selectable.imp_def_num_exceed_u32max.imported = 1919810;
                     break;
                 }
                 default:

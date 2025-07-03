@@ -95,8 +95,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // import section (template)
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        using extern_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-                                                                                      wasm1_final_extern_type<Fs...>>;
+        using extern_type =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...>>;
         using table_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::table_type>;
         using memory_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
