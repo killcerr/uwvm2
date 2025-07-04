@@ -241,7 +241,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // Note that section_curr may be equal to section_end, which needs to be checked
                 return extern_imports_global_handler(sec_adl, fit_imports.storage.global, module_storage, section_curr, section_end, err, fs_para);
             }
-            default: ::fast_io::unreachable();  // never match, checked before
+            [[unlikely]] default:
+            {
+                ::fast_io::unreachable();  // never match, checked before
+            }
         }
         return section_curr;
     }
@@ -734,9 +737,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             if(curr_name_set.contains(curr_name_check)) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_selectable.duplic_imports_or_exports.module_name = fit.module_name;
-                err.err_selectable.duplic_imports_or_exports.extern_name = fit.extern_name;
-                err.err_selectable.duplic_imports_or_exports.type = static_cast<::std::uint_least8_t>(fit_import_type);
+                err.err_selectable.duplic_imports.module_name = fit.module_name;
+                err.err_selectable.duplic_imports.extern_name = fit.extern_name;
+                err.err_selectable.duplic_imports.type = static_cast<::std::uint_least8_t>(fit_import_type);
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }

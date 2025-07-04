@@ -501,31 +501,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     //      Global Section     //
     /////////////////////////////
 
-    /// @brief      has global_storage_type
-    /// @details
-    ///             ```cpp
-    ///             struct F
-    ///             {
-    ///                 using global_storage_type = type_replacer<root_of_replacement, global_storage_type>;
-    ///             };
-    ///             ```
-    template <typename FeatureType>
-    concept has_global_storage_type = requires {
-        typename FeatureType::global_storage_type;
-        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
-                                                                                             typename FeatureType::global_storage_type>;
-    };
-
-    template <typename FeatureType>
-    inline consteval auto get_global_storage_type() noexcept
-    {
-        if constexpr(has_global_storage_type<FeatureType>) { return typename FeatureType::global_storage_type{}; }
-        else
-        {
-            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
-        }
-    }
-
     struct global_expr
     {
         // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
@@ -540,6 +515,72 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         final_global_type<Fs...> global;  // Types used to store global
         global_expr expr;                 // Expressions used to initialize global
+    };
+
+    /////////////////////////////
+    //      Export Section     //
+    /////////////////////////////
+
+    /// @brief      has export type
+    /// @details
+    ///             ```cpp
+    ///             enum class basic_external_type : wasm_byte
+    ///             {
+    ///                 e1 = 0x00u,
+    ///                 e2 = 0x01u,
+    ///                 external_type_end = e2 // Used to generate the length of the array
+    ///             };
+    ///
+    ///             template <typename ... Fs> // Fs is used as an extension to an existing type, but does not extend the type
+    ///             struct basic_export_type
+    ///             {
+    ///                 wasm_u32 idx{};
+    ///
+    ///                 basic_external_type type{};
+    ///             };
+    ///
+    ///             struct F
+    ///             {
+    ///                 template <typename ... Fs>
+    ///                 using export_type = type_replacer<root_of_replacement, basic_export_type<Fs...>>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_export_type = requires {
+        typename FeatureType::export_type;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::export_type>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_export_type() noexcept
+    {
+        if constexpr(has_export_type<FeatureType>) { return typename FeatureType::export_type{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_export_type_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_export_type<Fs>())...>;
+
+    template <typename... Fs>
+    concept is_valid_final_export_type_t = requires(final_export_type_t<Fs...> ext) {
+        requires ::std::is_enum_v<decltype(ext.type)>;
+        requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>;
+        decltype(ext.type)::external_type_end;
+        requires ::std::same_as<decltype(ext.idx), ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_wasm_export_type
+    {
+        static_assert(is_valid_final_export_type_t<Fs...>);
+
+        ::fast_io::u8string_view export_name{};
+
+        final_export_type_t<Fs...> exports{};
     };
 
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features

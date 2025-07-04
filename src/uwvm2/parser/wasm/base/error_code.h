@@ -111,14 +111,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_global_count,
         global_section_resolved_exceeded_the_actual_number,
         global_section_resolved_not_match_the_actual_number,
-        global_init_terminator_not_found
+        global_init_terminator_not_found,
+        invalid_export_count,
+        export_section_resolved_exceeded_the_actual_number,
+        export_name_length_cannot_be_zero,
+        export_name_too_length,
+        export_missing_export_type,
+        illegal_exportdesc_prefix,
+        duplicate_exports_of_the_same_export_type,
+        export_missing_export_idx,
+        export_section_resolved_not_match_the_actual_number,
+        invalid_export_idx,
+        exported_index_exceeds_maxvul,
+        invalid_export_name_length
     };
 
-    /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type
-    struct duplicate_imports_or_exports_t
+    /// @brief used for duplicate_imports_of_the_same_import_type
+    struct duplic_imports_t
     {
         ::fast_io::u8string_view module_name;
         ::fast_io::u8string_view extern_name;
+        ::std::uint_least8_t type;
+    };
+
+    /// @brief used for duplicate_exports_of_the_same_export_type
+    struct duplic_exports_t
+    {
+        ::fast_io::u8string_view export_name;
         ::std::uint_least8_t type;
     };
 
@@ -134,6 +153,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     {
         ::std::uint_least32_t imported;
         ::std::uint_least32_t defined;
+        ::std::uint_least8_t type;
+    };
+
+    /// @brief Used to set the output of imp_def_num_exceed_u32max errors
+    struct exported_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxvul;
         ::std::uint_least8_t type;
     };
 
@@ -159,11 +186,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     /// @brief Additional information provided by wasm error
     union err_selectable_t
     {
-        duplicate_imports_or_exports_t duplic_imports_or_exports;
-
+        duplic_imports_t duplic_imports;
+        duplic_exports_t duplic_exports;
         module_name_err_t error_module_name;
-
         imp_def_num_exceed_u32max_err_t imp_def_num_exceed_u32max;
+        exported_index_exceeds_maxvul_t exported_index_exceeds_maxvul;
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;

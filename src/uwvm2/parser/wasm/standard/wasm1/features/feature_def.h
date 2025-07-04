@@ -725,6 +725,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             { global_section_global_handler(sec_adl, global_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
         };
 
+    /////////////////////////////
+    /// @brief export section ///
+    /////////////////////////////
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct export_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
+
+    struct wasm1_final_export_type
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 idx{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};
+    };
+
+    template <typename... Fs>
+    concept has_check_export_index = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<export_section_storage_t<Fs...>> sec_adl,
+                                              ::uwvm2::parser::wasm::standard::wasm1::features::final_export_type_t<Fs...> const& fwet,
+                                              ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                              ::std::byte const* const section_curr,
+                                              ::uwvm2::parser::wasm::base::error_impl& err,
+                                              ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        { define_check_export_index(sec_adl, fwet, module_storage, section_curr, err, fs_para) } -> ::std::same_as<void>;
+    };
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

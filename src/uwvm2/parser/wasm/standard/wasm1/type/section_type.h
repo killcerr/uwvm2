@@ -113,11 +113,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         external_type_end = global
     };
 
-    /// @brief      Exports
-    /// @details    The exports component of a module defines a set of exports that become accessible to the host environment once
-    ///             the module has been instantiated
+    /// @brief      Imports
+    /// @details    The imports component of a module defines a set of imports that are required for instantiation
     /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.10
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.11
     struct extern_type
     {
         union storage_t

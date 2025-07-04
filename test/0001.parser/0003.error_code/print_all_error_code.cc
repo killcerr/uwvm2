@@ -59,7 +59,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -67,9 +67,9 @@ int main()
             {
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type:
                 {
-                    errout.err.err_selectable.duplic_imports_or_exports.module_name = u8"module_name";
-                    errout.err.err_selectable.duplic_imports_or_exports.extern_name = u8"extern_name";
-                    errout.err.err_selectable.duplic_imports_or_exports.type = 0u;  // func
+                    errout.err.err_selectable.duplic_imports.module_name = u8"module_name";
+                    errout.err.err_selectable.duplic_imports.extern_name = u8"extern_name";
+                    errout.err.err_selectable.duplic_imports.type = 0u;  // func
                     break;
                 }
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence:
@@ -88,6 +88,13 @@ int main()
                     errout.err.err_selectable.imp_def_num_exceed_u32max.type = 0x00;
                     errout.err.err_selectable.imp_def_num_exceed_u32max.defined = 114514;
                     errout.err.err_selectable.imp_def_num_exceed_u32max.imported = 1919810;
+                    break;
+                }
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul:
+                {
+                    errout.err.err_selectable.exported_index_exceeds_maxvul.idx = 114514;
+                    errout.err.err_selectable.exported_index_exceeds_maxvul.maxval = 1919810;
+                    errout.err.err_selectable.exported_index_exceeds_maxvul.type = 0;
                     break;
                 }
                 default:

@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-05-25
+ * @date        2025-07-05
  * @copyright   ASHP-1.0 License
  */
 
@@ -22,8 +22,7 @@
 
 // Without pragma once, this header file will be included in a specific code segment
 
-constexpr auto get_duplicate_imports_type_name =
-    []<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept -> ::fast_io::basic_string_view<char_type2>
+constexpr auto get_exported_type_name = []<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept -> ::fast_io::basic_string_view<char_type2>
 {
     switch(type)
     {
@@ -102,42 +101,44 @@ if constexpr(::std::same_as<char_type, char>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 "(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                ") Duplicate imports of the same import type (",
-                get_duplicate_imports_type_name.template operator()<char>(errout.err.err_selectable.duplic_imports.type),
-                "): \"",
+                ") Exported Index (",
                 UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
+                errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
                 UWVM_WIN32_TEXTATTR_WHITE,
+                ") Not Less Than Size (",
+                UWVM_WIN32_TEXTATTR_CYAN,
+                errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+                UWVM_WIN32_TEXTATTR_WHITE,
+                ") Of ",
+                get_exported_type_name.template operator()<char>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
                 ".",
-                UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                "\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
     }
 #endif
-    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
-                                                     "uwvm: ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RED),
-                                                     "[error] ",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
-                                                     "(offset=",
-                                                     ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     ") Duplicate imports of the same import type (",
-                                                     get_duplicate_imports_type_name.template operator()<char>(errout.err.err_selectable.duplic_imports.type),
-                                                     "): \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
-                                                     ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
-                                                     ".",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
-                                                     ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
-                                                     "\".",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
+
+    ::fast_io::operations::print_freestanding<false>(
+        ::std::forward<Stm>(stream),
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL UWVM_AES_WHITE),
+        "uwvm: ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RED),
+        "[error] ",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+        "(offset=",
+        ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
+        ") Exported Index (",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+        ") Not Less Than Size (",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+        ") Of ",
+        get_exported_type_name.template operator()<char>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
+        ".",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
     return;
 }
 else if constexpr(::std::same_as<char_type, wchar_t>)
@@ -159,17 +160,17 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 L"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                L") Duplicate imports of the same import type (",
-                get_duplicate_imports_type_name.template operator()<wchar_t>(errout.err.err_selectable.duplic_imports.type),
-                L"): \"",
+                L") Exported Index (",
                 UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
+                errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
                 UWVM_WIN32_TEXTATTR_WHITE,
+                L") Not Less Than Size (",
+                UWVM_WIN32_TEXTATTR_CYAN,
+                errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+                UWVM_WIN32_TEXTATTR_WHITE,
+                L") Of ",
+                get_exported_type_name.template operator()<wchar_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
                 L".",
-                UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                L"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -184,17 +185,17 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
         L"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        L") Duplicate imports of the same import type (",
-        get_duplicate_imports_type_name.template operator()<wchar_t>(errout.err.err_selectable.duplic_imports.type),
-        L"): \"",
+        L") Exported Index (",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
-        ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+        L") Not Less Than Size (",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+        L") Of ",
+        get_exported_type_name.template operator()<wchar_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
         L".",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
-        ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
-        L"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
 }
@@ -217,19 +218,18 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                u8") Duplicate imports of the same import type (",
-                get_duplicate_imports_type_name.template operator()<char8_t>(errout.err.err_selectable.duplic_imports.type),
-                u8"): \"",
+                u8") Exported Index (",
                 UWVM_WIN32_TEXTATTR_CYAN,
-                errout.err.err_selectable.duplic_imports.module_name,
+                errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
                 UWVM_WIN32_TEXTATTR_WHITE,
+                u8") Not Less Than Size (",
+                UWVM_WIN32_TEXTATTR_CYAN,
+                errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+                UWVM_WIN32_TEXTATTR_WHITE,
+                u8") Of ",
+                get_exported_type_name.template operator()<char8_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
                 u8".",
-                UWVM_WIN32_TEXTATTR_CYAN,
-                errout.err.err_selectable.duplic_imports.extern_name,
-                UWVM_WIN32_TEXTATTR_WHITE,
-                u8"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
-
             return;
         }
     }
@@ -243,17 +243,17 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        u8") Duplicate imports of the same import type (",
-        get_duplicate_imports_type_name.template operator()<char8_t>(errout.err.err_selectable.duplic_imports.type),
-        u8"): \"",
+        u8") Exported Index (",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
-        errout.err.err_selectable.duplic_imports.module_name,
+        errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+        u8") Not Less Than Size (",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+        u8") Of ",
+        get_exported_type_name.template operator()<char8_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
         u8".",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
-        errout.err.err_selectable.duplic_imports.extern_name,
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
-        u8"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
     return;
 }
@@ -276,17 +276,17 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                u") Duplicate imports of the same import type (",
-                get_duplicate_imports_type_name.template operator()<char16_t>(errout.err.err_selectable.duplic_imports.type),
-                u"): \"",
+                u") Exported Index (",
                 UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
+                errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
                 UWVM_WIN32_TEXTATTR_WHITE,
+                u") Not Less Than Size (",
+                UWVM_WIN32_TEXTATTR_CYAN,
+                errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+                UWVM_WIN32_TEXTATTR_WHITE,
+                u") Of ",
+                get_exported_type_name.template operator()<char16_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
                 u".",
-                UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                u"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -301,17 +301,17 @@ else if constexpr(::std::same_as<char_type, char16_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
         u"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        u") Duplicate imports of the same import type (",
-        get_duplicate_imports_type_name.template operator()<char16_t>(errout.err.err_selectable.duplic_imports.type),
-        u"): \"",
+        u") Exported Index (",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
-        ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+        u") Not Less Than Size (",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+        u") Of ",
+        get_exported_type_name.template operator()<char16_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
         u".",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
-        ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
-        u"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
     return;
 }
@@ -334,17 +334,17 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 U"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                U") Duplicate imports of the same import type (",
-                get_duplicate_imports_type_name.template operator()<char32_t>(errout.err.err_selectable.duplic_imports.type),
-                U"): \"",
+                U") Exported Index (",
                 UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
+                errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
                 UWVM_WIN32_TEXTATTR_WHITE,
+                U") Not Less Than Size (",
+                UWVM_WIN32_TEXTATTR_CYAN,
+                errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+                UWVM_WIN32_TEXTATTR_WHITE,
+                U") Of ",
+                get_exported_type_name.template operator()<char32_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
                 U".",
-                UWVM_WIN32_TEXTATTR_CYAN,
-                ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                U"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -359,17 +359,17 @@ else if constexpr(::std::same_as<char_type, char32_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
         U"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        U") Duplicate imports of the same import type (",
-        get_duplicate_imports_type_name.template operator()<char32_t>(errout.err.err_selectable.duplic_imports.type),
-        U"): \"",
+        U") Exported Index (",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
-        ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.module_name),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.idx,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+        U") Not Less Than Size (",
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
+        errout.err.err_selectable.exported_index_exceeds_maxvul.maxvul,
+        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+        U") Of ",
+        get_exported_type_name.template operator()<char32_t>(errout.err.err_selectable.exported_index_exceeds_maxvul.type),
         U".",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
-        ::fast_io::mnp::code_cvt(errout.err.err_selectable.duplic_imports.extern_name),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
-        U"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
     return;
 }
