@@ -167,6 +167,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                          ^^ ft.parameter.begin
             //                                          ^^ ft.parameter.end
 
+            // Storing Temporary Variables into Modules
             ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check handler
@@ -249,6 +250,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                                                ^^ ft.result.begin
             //                                                                               ^^ ft.result.end
 
+            // Storing Temporary Variables into Modules
             ft.result.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check results

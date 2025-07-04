@@ -484,6 +484,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [                            safe                                     ] unsafe (could be the section_end)
             //                                                         ^^ section_curr
 
+            // Storing Temporary Variables into Modules
             fwet.exports.idx = export_idx;
 
             // Check if index is greater than or equal to the type size

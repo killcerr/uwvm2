@@ -475,6 +475,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_invalid_export_name_length.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_start_idx:
+            {
+#include "error_code_outputs/eco_invalid_start_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::start_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_start_index_exceeds_maxvul.h"
+                return;
+            }
         }
     }
 

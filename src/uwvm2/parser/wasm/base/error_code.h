@@ -123,7 +123,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         export_section_resolved_not_match_the_actual_number,
         invalid_export_idx,
         exported_index_exceeds_maxvul,
-        invalid_export_name_length
+        invalid_export_name_length,
+        invalid_start_idx,
+        start_index_exceeds_maxvul
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type
@@ -156,12 +158,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::std::uint_least8_t type;
     };
 
-    /// @brief Used to set the output of imp_def_num_exceed_u32max errors
+    /// @brief Used to set the output of exported_index_exceeds_maxvul errors
     struct exported_index_exceeds_maxvul_t
     {
         ::std::uint_least32_t idx;
         ::std::uint_least32_t maxval;
         ::std::uint_least8_t type;
+    };
+
+    /// @brief Used to set the output of start_index_exceeds_maxvul errors
+    struct start_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxval;
     };
 
     /// @brief define IEEE 754 F32 and F64
@@ -191,6 +200,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         module_name_err_t error_module_name;
         imp_def_num_exceed_u32max_err_t imp_def_num_exceed_u32max;
         exported_index_exceeds_maxvul_t exported_index_exceeds_maxvul;
+        start_index_exceeds_maxvul_t start_index_exceeds_maxvul;
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;

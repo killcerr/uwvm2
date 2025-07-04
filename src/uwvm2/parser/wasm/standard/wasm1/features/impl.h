@@ -36,5 +36,6 @@
 # include "memory_section.h"
 # include "global_section.h"
 # include "export_section.h"
+# include "start_section.h"
 # include "binfmt.h"
 #endif

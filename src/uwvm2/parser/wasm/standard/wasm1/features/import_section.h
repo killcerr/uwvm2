@@ -144,6 +144,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
+        // Storing Temporary Variables into Modules
         funcptr_r = typesec.types.cbegin() + type_index;
 
         // set curr
@@ -602,6 +603,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
             // No access, security
+            // Storing Temporary Variables into Modules
             fit.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), module_namelen};
 
             // For platforms with CHAR_BIT greater than 8, the view here does not need to do any non-zero checking of non-low 8 bits within a single byte,
@@ -669,6 +671,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [                                safe                                      ] unsafe (could be the section_end)
             //                                                             ^^ section_curr
 
+            // Storing Temporary Variables into Modules
             fit.extern_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), extern_namelen};
 
             // For platforms with CHAR_BIT greater than 8, the view here does not need to do any non-zero checking of non-low 8 bits within a single byte,
