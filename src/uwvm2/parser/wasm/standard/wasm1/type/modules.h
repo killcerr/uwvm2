@@ -101,7 +101,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     };
 
     /// @brief      Used to store the contents of the result of a global constant expression calculation.
-    union global_storage_t 
+    union global_storage_t
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32 i32;
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64 i64;

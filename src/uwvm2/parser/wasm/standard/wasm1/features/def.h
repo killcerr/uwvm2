@@ -532,14 +532,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
 
         ::std::byte const* begin;
-        ::std::byte const* end; // The pointer to end is after 0x0b.
+        ::std::byte const* end;  // The pointer to end is after 0x0b.
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct final_local_global_type
     {
-        final_global_type<Fs...> global; // Types used to store global
-        global_expr expr; // Expressions used to initialize global
+        final_global_type<Fs...> global;  // Types used to store global
+        global_expr expr;                 // Expressions used to initialize global
     };
 
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features

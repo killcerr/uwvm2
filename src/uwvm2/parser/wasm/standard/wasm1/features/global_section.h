@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -196,7 +196,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
-        
 
         globalsec.local_globals.reserve(static_cast<::std::size_t>(global_count));
 
@@ -243,7 +242,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [   safe            ] unsafe (could be the section_end)
             //                       ^^ section_curr
 
-            // The initialization of global is not done here, its initialization constant expression contains the imported global, which can only be initialized after all modules have been imported, so it will be initialized before the execution of the wasm module.
+            // The initialization of global is not done here, its initialization constant expression contains the imported global, which can only be initialized
+            // after all modules have been imported, so it will be initialized before the execution of the wasm module.
 
             local_global.expr.begin = section_curr;
 
@@ -251,8 +251,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [   safe            ] unsafe (could be the section_end)
             //                       ^^ local_global.expr.begin
 
-            for (; section_curr != section_end; ++section_curr)
+            for(;; ++section_curr)
             {
+                if(section_curr == section_end) [[unlikely]]
+                {
+                    // [... global_curr ... expr_curr ...] (end) ...
+                    // [                   safe          ] unsafe (could be the section_end)
+                    //                                     ^^ section_curr
+
+                    err.err_curr = section_curr;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
                 // [... curr] ...
                 // [  safe  ] unsafe (could be the section_end)
                 //      ^^ section_curr
@@ -264,30 +275,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 section_curr_c8 &= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0xFFu);
 #endif
 
-                if (section_curr_c8 == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu))
-                {
-                    break;
-                }
-            }
-
-            // [... global_curr ... expr_curr ... 0x0B] global_next ...
-            // [                   safe               ] unsafe (could be the section_end)
-            //                                    ^^ section_curr
-            // or
-            // [... global_curr ... expr_curr ...] (end) ...
-            // [                   safe          ] unsafe (could be the section_end)
-            //                                     ^^ section_curr
-
-            // Check to see if 0x0B terminator is found
-            if (section_curr == section_end) [[unlikely]]
-            {
-                // [... global_curr ... expr_curr ...] (end) ...
-                // [                   safe          ] unsafe (could be the section_end)
-                //                                     ^^ section_curr
-
-                err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                if(section_curr_c8 == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)) { break; }
             }
 
             // [... global_curr ... expr_curr ... 0x0B] global_next ...

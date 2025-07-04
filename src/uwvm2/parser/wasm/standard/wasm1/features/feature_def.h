@@ -724,7 +724,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                  ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
             { global_section_global_handler(sec_adl, global_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
         };
-        
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
