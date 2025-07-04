@@ -59,7 +59,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::start_index_exceeds_maxvul) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -90,11 +90,23 @@ int main()
                     errout.err.err_selectable.imp_def_num_exceed_u32max.imported = 1919810;
                     break;
                 }
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_exports_of_the_same_export_type:
+                {
+                    errout.err.err_selectable.duplic_exports.export_name = u8"test";
+                    errout.err.err_selectable.duplic_exports.type = 0u;
+                    break;
+                }
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul:
                 {
                     errout.err.err_selectable.exported_index_exceeds_maxvul.idx = 114514;
                     errout.err.err_selectable.exported_index_exceeds_maxvul.maxval = 1919810;
                     errout.err.err_selectable.exported_index_exceeds_maxvul.type = 0;
+                    break;
+                }
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::start_index_exceeds_maxvul:
+                {
+                    errout.err.err_selectable.start_index_exceeds_maxvul.idx = 114514;
+                    errout.err.err_selectable.start_index_exceeds_maxvul.maxval = 1919810;
                     break;
                 }
                 default:
