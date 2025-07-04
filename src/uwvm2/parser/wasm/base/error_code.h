@@ -160,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     struct exported_index_exceeds_maxvul_t
     {
         ::std::uint_least32_t idx;
-        ::std::uint_least32_t maxvul;
+        ::std::uint_least32_t maxval;
         ::std::uint_least8_t type;
     };
 

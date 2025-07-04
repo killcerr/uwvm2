@@ -145,7 +145,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
-                    err.err_selectable.exported_index_exceeds_maxvul.maxvul = all_func_size;
+                    err.err_selectable.exported_index_exceeds_maxvul.maxval = all_func_size;
                     err.err_selectable.exported_index_exceeds_maxvul.type = 0x00;  // function
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -158,7 +158,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
-                    err.err_selectable.exported_index_exceeds_maxvul.maxvul = all_table_size;
+                    err.err_selectable.exported_index_exceeds_maxvul.maxval = all_table_size;
                     err.err_selectable.exported_index_exceeds_maxvul.type = 0x01;  // table
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -171,7 +171,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
-                    err.err_selectable.exported_index_exceeds_maxvul.maxvul = all_memory_size;
+                    err.err_selectable.exported_index_exceeds_maxvul.maxval = all_memory_size;
                     err.err_selectable.exported_index_exceeds_maxvul.type = 0x02;  // memory
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
@@ -184,7 +184,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
-                    err.err_selectable.exported_index_exceeds_maxvul.maxvul = all_global_size;
+                    err.err_selectable.exported_index_exceeds_maxvul.maxval = all_global_size;
                     err.err_selectable.exported_index_exceeds_maxvul.type = 0x03;  // global
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
