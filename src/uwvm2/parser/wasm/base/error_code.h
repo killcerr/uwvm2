@@ -102,7 +102,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_table_count,
         wasm1_not_allow_multi_table,
         table_section_resolved_exceeded_the_actual_number,
-        table_section_resolved_not_match_the_actual_number
+        table_section_resolved_not_match_the_actual_number,
+        invalid_memory_count,
+        wasm1_not_allow_multi_memory,
+        memory_section_resolved_exceeded_the_actual_number,
+        memory_section_resolved_not_match_the_actual_number,
+        imp_def_num_exceed_u32max,
+        invalid_global_count,
+        global_section_resolved_exceeded_the_actual_number,
+        global_section_resolved_not_match_the_actual_number,
+        global_init_terminator_not_found
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type
@@ -118,6 +127,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     {
         ::fast_io::u8string_view module_name;
         ::std::uint_least32_t type;
+    };
+
+    /// @brief Used to set the output of imp_def_num_exceed_u32max errors
+    struct imp_def_num_exceed_u32max_err_t
+    {
+        ::std::uint_least32_t imported;
+        ::std::uint_least32_t defined;
+        ::std::uint_least8_t type;
     };
 
     /// @brief define IEEE 754 F32 and F64
@@ -145,6 +162,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         duplicate_imports_or_exports_t duplic_imports_or_exports;
 
         module_name_err_t error_module_name;
+
+        imp_def_num_exceed_u32max_err_t imp_def_num_exceed_u32max;
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;

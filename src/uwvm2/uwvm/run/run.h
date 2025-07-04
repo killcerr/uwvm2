@@ -188,7 +188,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             }
             case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u):
             {
-                // handle exec module
+                // handle exec (main) module
                 {
                     // set module name
                     ::fast_io::u8string_view set_module_name;

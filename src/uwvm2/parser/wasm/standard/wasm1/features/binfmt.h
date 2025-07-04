@@ -38,6 +38,8 @@ import :custom_section;
 import :type_section;
 import :import_section;
 import :function_section;
+import :table_section;
+import :memory_section;
 #else
 // std
 # include <cstddef>
@@ -64,6 +66,8 @@ import :function_section;
 # include "type_section.h"
 # include "import_section.h"
 # include "function_section.h"
+# include "table_section.h"
+# include "memory_section.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -91,8 +95,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // import section (template)
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        using extern_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-                                                                                      wasm1_final_extern_type<Fs...>>;
+        using extern_type =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...>>;
         using table_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::table_type>;
         using memory_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
@@ -109,7 +114,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::global_section_storage_t<Fs...>
                                                           /// @todo
                                                           >;
     };

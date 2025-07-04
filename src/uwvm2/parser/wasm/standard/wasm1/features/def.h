@@ -453,6 +453,95 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
 
+    /////////////////////////////
+    //      Memory Section     //
+    /////////////////////////////
+
+    /// @brief      allow multi memory
+    /// @details    In the current version of WebAssembly, at most one memory may be defined or imported in a single module,
+    ///             and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions
+    ///
+    ///             Define this to eliminate checking the length of the result.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool allow_multi_memory{true};
+    ///             };
+    ///             ```
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.5
+    /// @see        test\0001.parser\0002.binfmt1\section\memory_section.cc
+    template <typename FsCurr>
+    concept has_allow_multi_memory = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::allow_multi_memory)>, bool>; };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool allow_multi_memory() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_allow_multi_memory<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::allow_multi_memory};
+                                                                            return tallow;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
+
+    /////////////////////////////
+    //      Global Section     //
+    /////////////////////////////
+
+    /// @brief      has global_storage_type
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using global_storage_type = type_replacer<root_of_replacement, global_storage_type>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_global_storage_type = requires {
+        typename FeatureType::global_storage_type;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::global_storage_type>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_global_storage_type() noexcept
+    {
+        if constexpr(has_global_storage_type<FeatureType>) { return typename FeatureType::global_storage_type{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    struct global_expr
+    {
+        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
+        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
+
+        ::std::byte const* begin;
+        ::std::byte const* end;  // The pointer to end is after 0x0b.
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_local_global_type
+    {
+        final_global_type<Fs...> global;  // Types used to store global
+        global_expr expr;                 // Expressions used to initialize global
+    };
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 /// @brief Define container optimization operations for use with fast_io
@@ -472,6 +561,18 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::global_expr>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_local_global_type<Fs...>>
     {
         inline static constexpr bool value = true;
     };

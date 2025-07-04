@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-06-21
+ * @date        2025-07-03
  * @copyright   ASHP-1.0 License
  */
 
@@ -41,11 +41,7 @@ if constexpr(::std::same_as<char_type, char>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 "(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                ") Invalid UTF-8 Sequence. Reason: \"",
-                UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                "\".",
+                ") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -60,11 +56,7 @@ if constexpr(::std::same_as<char_type, char>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
         "(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        ") Invalid UTF-8 Sequence. Reason: \"",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
-        "\".",
+        ") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
     return;
 }
@@ -87,11 +79,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 L"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                L") Invalid UTF-8 Sequence. Reason: \"",
-                UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                L"\".",
+                L") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -106,11 +94,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
         L"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        L") Invalid UTF-8 Sequence. Reason: \"",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
-        L"\".",
+        L") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
 }
@@ -133,11 +117,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                u8") Invalid UTF-8 Sequence. Reason: \"",
-                UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                u8"\".",
+                u8") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -152,11 +132,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        u8") Invalid UTF-8 Sequence. Reason: \"",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
-        u8"\".",
+        u8") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
     return;
 }
@@ -179,11 +155,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                u") Invalid UTF-8 Sequence. Reason: \"",
-                UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                u"\".",
+                u") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -198,11 +170,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
         u"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        u") Invalid UTF-8 Sequence. Reason: \"",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
-        u"\".",
+        u") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
     return;
 }
@@ -225,11 +193,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 U"(offset=",
                 ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                U") Invalid UTF-8 Sequence. Reason: \"",
-                UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-                UWVM_WIN32_TEXTATTR_WHITE,
-                U"\".",
+                U") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -244,11 +208,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
         U"(offset=",
         ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-        U") Invalid UTF-8 Sequence. Reason: \"",
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.err.err_selectable.u32)),
-        ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
-        U"\".",
+        U") In the WebAssembly Release 1.0 (2019-07-20), at most one memory may be defined or imported in a single module, and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
     return;
 }

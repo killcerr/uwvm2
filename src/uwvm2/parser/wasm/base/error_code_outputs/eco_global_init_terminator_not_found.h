@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-07-03
+ * @date        2025-07-04
  * @copyright   ASHP-1.0 License
  */
 
@@ -40,15 +40,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              "(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             ") The number of tables resolved \"",
-                                                             UWVM_WIN32_TEXTATTR_CYAN,
-                                                             errout.err.err_selectable.u32arr[0],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             "\" does not match the actual number \"",
-                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
-                                                             errout.err.err_selectable.u32arr[1],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             "\".",
+                                                             ") Global item initialization terminator not found.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -62,15 +54,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                      "(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     ") The number of tables resolved \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
-                                                     errout.err.err_selectable.u32arr[0],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
-                                                     "\" does not match the actual number \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_LT_GREEN),
-                                                     errout.err.err_selectable.u32arr[1],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
-                                                     "\".",
+                                                     ") Global item initialization terminator not found.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
     return;
 }
@@ -92,15 +76,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              L"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             L") The number of tables resolved \"",
-                                                             UWVM_WIN32_TEXTATTR_CYAN,
-                                                             errout.err.err_selectable.u32arr[0],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             L"\" does not match the actual number \"",
-                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
-                                                             errout.err.err_selectable.u32arr[1],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             L"\".",
+                                                             L") Global item initialization terminator not found.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -114,15 +90,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                      L"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     L") The number of tables resolved \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
-                                                     errout.err.err_selectable.u32arr[0],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
-                                                     L"\" does not match the actual number \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_LT_GREEN),
-                                                     errout.err.err_selectable.u32arr[1],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
-                                                     L"\".",
+                                                     L") Global item initialization terminator not found.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
 }
@@ -144,15 +112,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u8"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u8") The number of tables resolved \"",
-                                                             UWVM_WIN32_TEXTATTR_CYAN,
-                                                             errout.err.err_selectable.u32arr[0],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             u8"\" does not match the actual number \"",
-                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
-                                                             errout.err.err_selectable.u32arr[1],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             u8"\".",
+                                                             u8") Global item initialization terminator not found.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -166,15 +126,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                      u8"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u8") The number of tables resolved \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
-                                                     errout.err.err_selectable.u32arr[0],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
-                                                     u8"\" does not match the actual number \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_LT_GREEN),
-                                                     errout.err.err_selectable.u32arr[1],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
-                                                     u8"\".",
+                                                     u8") Global item initialization terminator not found.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
     return;
 }
@@ -196,15 +148,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u") The number of tables resolved \"",
-                                                             UWVM_WIN32_TEXTATTR_CYAN,
-                                                             errout.err.err_selectable.u32arr[0],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             u"\" does not match the actual number \"",
-                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
-                                                             errout.err.err_selectable.u32arr[1],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             u"\".",
+                                                             u") Global item initialization terminator not found.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -218,15 +162,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                      u"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u") The number of tables resolved \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
-                                                     errout.err.err_selectable.u32arr[0],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
-                                                     u"\" does not match the actual number \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_LT_GREEN),
-                                                     errout.err.err_selectable.u32arr[1],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
-                                                     u"\".",
+                                                     u") Global item initialization terminator not found.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
     return;
 }
@@ -248,15 +184,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              U"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             U") The number of tables resolved \"",
-                                                             UWVM_WIN32_TEXTATTR_CYAN,
-                                                             errout.err.err_selectable.u32arr[0],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             U"\" does not match the actual number \"",
-                                                             UWVM_WIN32_TEXTATTR_LT_GREEN,
-                                                             errout.err.err_selectable.u32arr[1],
-                                                             UWVM_WIN32_TEXTATTR_WHITE,
-                                                             U"\".",
+                                                             U") Global item initialization terminator not found.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -270,15 +198,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                      U"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     U") The number of tables resolved \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
-                                                     errout.err.err_selectable.u32arr[0],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
-                                                     U"\" does not match the actual number \"",
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_LT_GREEN),
-                                                     errout.err.err_selectable.u32arr[1],
-                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
-                                                     U"\".",
+                                                     U") Global item initialization terminator not found.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
     return;
 }

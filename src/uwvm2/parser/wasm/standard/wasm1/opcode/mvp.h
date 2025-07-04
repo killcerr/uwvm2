@@ -246,8 +246,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::opcode
         i32_reinterpret_f32 = 0xbc,
         i64_reinterpret_f64 = 0xbd,
         f32_reinterpret_i32 = 0xbe,
-        f64_reinterpret_i64 = 0xbf,
+        f64_reinterpret_i64 = 0xbf
+    };
 
+    enum class constexpr_op_basic : ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type
+    {
+        // Literals
+        i32_const = 0x41,
+        i64_const = 0x42,
+        f32_const = 0x43,
+        f64_const = 0x44,
+
+        global_get = 0x23
     };
 }
 

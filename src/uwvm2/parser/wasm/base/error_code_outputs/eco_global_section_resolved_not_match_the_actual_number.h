@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-07-03
+ * @date        2025-07-04
  * @copyright   ASHP-1.0 License
  */
 
@@ -40,7 +40,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              "(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             ") The number of tables resolved \"",
+                                                             ") The number of globals resolved \"",
                                                              UWVM_WIN32_TEXTATTR_CYAN,
                                                              errout.err.err_selectable.u32arr[0],
                                                              UWVM_WIN32_TEXTATTR_WHITE,
@@ -62,7 +62,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                      "(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     ") The number of tables resolved \"",
+                                                     ") The number of globals resolved \"",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
                                                      errout.err.err_selectable.u32arr[0],
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
@@ -92,7 +92,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              L"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             L") The number of tables resolved \"",
+                                                             L") The number of globals resolved \"",
                                                              UWVM_WIN32_TEXTATTR_CYAN,
                                                              errout.err.err_selectable.u32arr[0],
                                                              UWVM_WIN32_TEXTATTR_WHITE,
@@ -114,7 +114,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                      L"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     L") The number of tables resolved \"",
+                                                     L") The number of globals resolved \"",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
                                                      errout.err.err_selectable.u32arr[0],
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
@@ -144,7 +144,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u8"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u8") The number of tables resolved \"",
+                                                             u8") The number of globals resolved \"",
                                                              UWVM_WIN32_TEXTATTR_CYAN,
                                                              errout.err.err_selectable.u32arr[0],
                                                              UWVM_WIN32_TEXTATTR_WHITE,
@@ -166,7 +166,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                      u8"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u8") The number of tables resolved \"",
+                                                     u8") The number of globals resolved \"",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
                                                      errout.err.err_selectable.u32arr[0],
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
@@ -196,7 +196,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u") The number of tables resolved \"",
+                                                             u") The number of globals resolved \"",
                                                              UWVM_WIN32_TEXTATTR_CYAN,
                                                              errout.err.err_selectable.u32arr[0],
                                                              UWVM_WIN32_TEXTATTR_WHITE,
@@ -218,7 +218,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                      u"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u") The number of tables resolved \"",
+                                                     u") The number of globals resolved \"",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
                                                      errout.err.err_selectable.u32arr[0],
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
@@ -248,7 +248,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              U"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             U") The number of tables resolved \"",
+                                                             U") The number of globals resolved \"",
                                                              UWVM_WIN32_TEXTATTR_CYAN,
                                                              errout.err.err_selectable.u32arr[0],
                                                              UWVM_WIN32_TEXTATTR_WHITE,
@@ -270,7 +270,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                      U"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     U") The number of tables resolved \"",
+                                                     U") The number of globals resolved \"",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
                                                      errout.err.err_selectable.u32arr[0],
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),

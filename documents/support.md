@@ -33,7 +33,7 @@
 # Compiler Support
 - LLVM Clang >= 21 (recommended)
 - GCC >= 16
-- (MSVC hasn't support c++26 currently, not supported at this time)
+- (MSVC hasn't support C++26 currently, not supported at this time)
 
 # C++ Standard Library Support (Version is the same as the version released with the corresponding supported compiler)
 - GNU libstdc++ (recommended)
