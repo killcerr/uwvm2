@@ -107,7 +107,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         wasm1_not_allow_multi_memory,
         memory_section_resolved_exceeded_the_actual_number,
         memory_section_resolved_not_match_the_actual_number,
-        imp_def_num_exceed_u32max
+        imp_def_num_exceed_u32max,
+        invalid_global_count,
+        global_section_resolved_exceeded_the_actual_number,
+        global_section_resolved_not_match_the_actual_number,
+        global_init_terminator_not_found
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type

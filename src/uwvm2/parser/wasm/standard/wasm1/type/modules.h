@@ -100,6 +100,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types importdesc{};
     };
 
+    /// @brief      Used to store the contents of the result of a global constant expression calculation.
+    union global_storage_t 
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32 i32;
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64 i64;
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32 f32;
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64 f64;
+        ::std::size_t ref;
+    };
+
     /// @brief      Expressions
     /// @details    Function bodies, initialization values for globals, and offsets of element or data segments are given as expressions,
     ///             which are sequences of instructions terminated by an end marker.
@@ -107,13 +117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.4.6
     struct initializer_exp
     {
-        union GlobalStorage
-        {
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32 i32;
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64 i64;
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32 f32;
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64 f64;
-        } global_storage;
+        global_storage_t global_storage;
 
         ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type type_opcode{};
     };

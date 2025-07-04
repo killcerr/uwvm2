@@ -36,7 +36,7 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.parser.wasm.standard.wasm1.features:table_section;
+export module uwvm2.parser.wasm.standard.wasm1.features:memory_section;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -45,4 +45,4 @@ export module uwvm2.parser.wasm.standard.wasm1.features:table_section;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "table_section.h"
+#include "memory_section.h"

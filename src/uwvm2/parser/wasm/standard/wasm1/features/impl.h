@@ -34,5 +34,6 @@
 # include "function_section.h"
 # include "table_section.h"
 # include "memory_section.h"
+# include "global_section.h"
 # include "binfmt.h"
 #endif

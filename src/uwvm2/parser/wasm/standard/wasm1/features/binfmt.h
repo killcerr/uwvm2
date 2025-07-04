@@ -115,7 +115,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::global_section_storage_t<Fs...>
                                                           /// @todo
                                                           >;
     };

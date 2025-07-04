@@ -98,7 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
         // [... memory_curr] ...
-        // [   safe       ] unsafe (could be the section_end)
+        // [   safe        ] unsafe (could be the section_end)
         //      ^^ section_curr
 
         // Handling of scan_memory_type is completely memory-safe

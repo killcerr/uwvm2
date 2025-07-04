@@ -395,6 +395,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_imp_def_num_exceed_u32max.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_global_count:
+            {
+#include "error_code_outputs/eco_invalid_global_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_global_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_global_section_resolved_not_match_the_actual_number.h"
+                return;
+            }    
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found:
+            {
+#include "error_code_outputs/eco_global_init_terminator_not_found.h"
+                return;
+            }    
         }
     }
 

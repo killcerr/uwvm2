@@ -402,7 +402,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 
         {
-            /// @todo golbal section
+            // global section
+            auto const& globalsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<global_section_storage_t<Fs...>>(module_storage.sections)};
+            auto const defined_globalsec_globals_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(globalsec.local_globals.size())};
+
+            // [func table mem global] (end)
+            // [         safe        ]
+            //                 ^^importdesc_begin[3uz]
+
+            // check imported_global_count
+            auto const imported_global_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[3uz].size())};
+
+            if(imported_global_count > wasm_u32_max - defined_globalsec_globals_size) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.imp_def_num_exceed_u32max.type = 0x03;
+                err.err_selectable.imp_def_num_exceed_u32max.defined = defined_globalsec_globals_size;
+                err.err_selectable.imp_def_num_exceed_u32max.imported = imported_global_count;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
         }
     }
 
