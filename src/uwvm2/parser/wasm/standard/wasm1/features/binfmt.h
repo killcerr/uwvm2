@@ -109,9 +109,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
 
         // export section
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
         using export_type =
             ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_export_type>;
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_export_type<Fs...>>;
 
         // binfmt ver1
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>

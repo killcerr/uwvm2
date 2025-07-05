@@ -534,7 +534,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             template <typename ... Fs> // Fs is used as an extension to an existing type, but does not extend the type
     ///             struct basic_export_type
     ///             {
-    ///                 wasm_u32 idx{};
+    ///                 union export_storage_t storage{};
     ///
     ///                 basic_external_type type{};
     ///             };
@@ -545,17 +545,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///                 using export_type = type_replacer<root_of_replacement, basic_export_type<Fs...>>;
     ///             };
     ///             ```
-    template <typename FeatureType>
+    template <typename FeatureType, typename... Fs>
     concept has_export_type = requires {
-        typename FeatureType::export_type;
+        typename FeatureType::template export_type<Fs...>;
         requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
-                                                                                             typename FeatureType::export_type>;
+                                                                                             typename FeatureType::template export_type<Fs...>>;
     };
 
-    template <typename FeatureType>
+    template <typename FeatureType, typename... Fs>
     inline consteval auto get_export_type() noexcept
     {
-        if constexpr(has_export_type<FeatureType>) { return typename FeatureType::export_type{}; }
+        if constexpr(has_export_type<FeatureType>) { return typename FeatureType::template export_type<Fs...>{}; }
         else
         {
             return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
@@ -563,14 +563,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    using final_export_type_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_export_type<Fs>())...>;
+    using final_export_type_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_export_type<Fs, Fs...>())...>;
 
     template <typename... Fs>
     concept is_valid_final_export_type_t = requires(final_export_type_t<Fs...> ext) {
         requires ::std::is_enum_v<decltype(ext.type)>;
         requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>;
         decltype(ext.type)::external_type_end;
-        requires ::std::same_as<decltype(ext.idx), ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>;
+        requires ::std::is_union_v<decltype(ext.storage)>;
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -614,6 +614,12 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_local_global_type<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_export_type<Fs...>>
     {
         inline static constexpr bool value = true;
     };

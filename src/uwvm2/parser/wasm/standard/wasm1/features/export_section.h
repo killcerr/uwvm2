@@ -86,22 +86,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline static constexpr ::std::size_t exportdesc_count{
             static_cast<::std::size_t>(decltype(::uwvm2::parser::wasm::standard::wasm1::features::final_export_type_t<Fs...>{}.type)::external_type_end) + 1uz};
-        ::fast_io::array<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>, exportdesc_count> exportdesc{};
+        ::fast_io::array<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_export_type<Fs...> const*>, exportdesc_count>
+            exportdesc{};
     };
 
     /// @brief Define function for wasm1 external_types
     /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void define_check_export_index(
+    inline constexpr ::std::byte const* define_handler_export_index(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<export_section_storage_t<Fs...>> sec_adl,
-        ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_export_type const& fwet_exports,  // [adl] can be replaced
+        decltype(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_export_type<Fs...>{}.storage)& fwet_exports_storage,  // [adl] can be replaced
+        decltype(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_export_type<Fs...>{}.type) const fwet_exports_type,   // [adl] can be replaced
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-        ::std::byte const* const section_curr,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
-        auto const index{fwet_exports.idx};
-        auto const type{fwet_exports.type};
+        // type is what has been fetched
+        auto const type{fwet_exports_type};
 
         // import section
         auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(module_storage.sections)};
@@ -109,39 +112,47 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
         static_assert(importdesc_count > 3uz);  // Ensure that subsequent index visits do not cross boundaries
 
-        // function section
-        auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
-        auto const defined_funcsec_funcs_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
-        auto const imported_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
-        // Addition does not overflow, pre-checked.
-        auto const all_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_funcsec_funcs_size + imported_func_size)};
+        // Since this content is all idx, it is treated uniformly
 
-        // table section
-        auto const& tablesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<table_section_storage_t<Fs...>>(module_storage.sections)};
-        auto const defined_tablesec_tables_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(tablesec.tables.size())};
-        auto const imported_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(1uz).size())};
-        // Addition does not overflow, pre-checked.
-        auto const all_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_tablesec_tables_size + imported_table_size)};
+        // [...  export_namelen ... export_name ... export_type export_idx] ... next_export
+        // [                            safe                              ] unsafe (could be the section_end)
+        //                                                      ^^ section_curr
 
-        // memory section
-        auto const& memorysec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<memory_section_storage_t<Fs...>>(module_storage.sections)};
-        auto const defined_memorysec_memories_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(memorysec.memories.size())};
-        auto const imported_memory_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(2uz).size())};
-        // Addition does not overflow, pre-checked.
-        auto const all_memory_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_memorysec_memories_size + imported_memory_size)};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 export_idx;  // No initialization necessary
 
-        // global section
-        auto const& globalsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<global_section_storage_t<Fs...>>(module_storage.sections)};
-        auto const defined_globalsec_globals_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(globalsec.local_globals.size())};
-        auto const imported_global_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(3uz).size())};
-        // Addition does not overflow, pre-checked.
-        auto const all_global_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_globalsec_globals_size + imported_global_size)};
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
+        auto const [export_idx_next, export_idx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                              reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                              ::fast_io::mnp::leb128_get(export_idx))};
+
+        if(export_idx_err != ::fast_io::parse_code::ok) [[unlikely]]
+        {
+            err.err_curr = section_curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_export_idx;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(export_idx_err);
+        }
+
+        // [...  export_namelen ... export_name ... export_type export_idx ...] next_export
+        // [                            safe                                  ] unsafe (could be the section_end)
+        //                                                      ^^ section_curr
+
+        // Check if index is greater than or equal to the type size
         switch(type)
         {
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::func:
             {
-                if(index >= all_func_size) [[unlikely]]
+                fwet_exports_storage.func_idx = export_idx;
+
+                // function section
+                auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
+                auto const defined_funcsec_funcs_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
+                auto const imported_func_size{
+                    static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
+                // Addition does not overflow, pre-checked.
+                auto const all_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_funcsec_funcs_size + imported_func_size)};
+
+                if(auto const index{fwet_exports_storage.func_idx}; index >= all_func_size) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
@@ -154,7 +165,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::table:
             {
-                if(index >= all_table_size) [[unlikely]]
+                fwet_exports_storage.table_idx = export_idx;
+
+                // table section
+                auto const& tablesec{
+                    ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<table_section_storage_t<Fs...>>(module_storage.sections)};
+                auto const defined_tablesec_tables_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(tablesec.tables.size())};
+                auto const imported_table_size{
+                    static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(1uz).size())};
+                // Addition does not overflow, pre-checked.
+                auto const all_table_size{
+                    static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_tablesec_tables_size + imported_table_size)};
+
+                if(auto const index{fwet_exports_storage.table_idx}; index >= all_table_size) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
@@ -167,7 +190,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::memory:
             {
-                if(index >= all_memory_size) [[unlikely]]
+                fwet_exports_storage.memory_idx = export_idx;
+
+                // memory section
+                auto const& memorysec{
+                    ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<memory_section_storage_t<Fs...>>(module_storage.sections)};
+                auto const defined_memorysec_memories_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(memorysec.memories.size())};
+                auto const imported_memory_size{
+                    static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(2uz).size())};
+                // Addition does not overflow, pre-checked.
+                auto const all_memory_size{
+                    static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_memorysec_memories_size + imported_memory_size)};
+
+                if(auto const index{fwet_exports_storage.memory_idx}; index >= all_memory_size) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
@@ -180,7 +215,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::global:
             {
-                if(index >= all_global_size) [[unlikely]]
+                fwet_exports_storage.global_idx = export_idx;
+
+                // global section
+                auto const& globalsec{
+                    ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<global_section_storage_t<Fs...>>(module_storage.sections)};
+                auto const defined_globalsec_globals_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(globalsec.local_globals.size())};
+                auto const imported_global_size{
+                    static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(3uz).size())};
+                // Addition does not overflow, pre-checked.
+                auto const all_global_size{
+                    static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_globalsec_globals_size + imported_global_size)};
+
+                if(auto const index{fwet_exports_storage.global_idx}; index >= all_global_size) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.exported_index_exceeds_maxvul.idx = index;
@@ -196,6 +243,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::fast_io::unreachable();  // never match, checked before
             }
         }
+
+        section_curr = reinterpret_cast<::std::byte const*>(export_idx_next);
+
+        // [...  export_namelen ... export_name ... export_type export_idx ...] next_export
+        // [                            safe                                  ] unsafe (could be the section_end)
+        //                                                                      ^^ section_curr
+
+        return section_curr;
     }
 
     /// @brief Define the handler function for export_section
@@ -332,7 +387,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(export_namelen_err);
             }
 
-            // [...  export_namelen ...] export_namelen ... export_type export_idx ...
+            // [...  export_namelen ...] export_name ... export_type export_idx ...
             // [       safe            ] unsafe (could be the section_end)
             //       ^^ section_curr
 
@@ -344,14 +399,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             auto const export_module_name_too_length_ptr{section_curr};
-            // [...  export_namelen ...] export_namelen ... export_type export_idx ...
+            // [...  export_namelen ...] export_name ... export_type export_idx ...
             // [       safe            ] unsafe (could be the section_end)
             //       ^^ export_module_name_too_length_ptr
 
             section_curr = reinterpret_cast<::std::byte const*>(export_namelen_next);
             // Note that section_curr may be equal to section_end
 
-            // [...  export_namelen ...] export_namelen ... export_type export_idx ...
+            // [...  export_namelen ...] export_name ... export_type export_idx ...
             // [       safe            ] unsafe (could be the section_end)
             //                           ^^ section_curr
 
@@ -364,8 +419,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            // [...  export_namelen ... export_namelen ...] export_type export_idx ...
-            // [                  safe                    ] unsafe (could be the section_end)
+            // [...  export_namelen ... export_name ...] export_type export_idx ...
+            // [                  safe                 ] unsafe (could be the section_end)
             //                          ^^ section_curr
 
             using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
@@ -384,9 +439,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             section_curr += export_namelen;  // safe
 
-            // [...  export_namelen ... export_namelen ...] export_type export_idx ...
-            // [                  safe                    ] unsafe (could be the section_end)
-            //                                              ^^ section_curr
+            // [...  export_namelen ... export_name ...] export_type export_idx ...
+            // [                  safe                 ] unsafe (could be the section_end)
+            //                                           ^^ section_curr
 
             // Note that section_curr may be equal to section_end, checked in the subsequent parse_by_scan
 
@@ -397,9 +452,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            // [...  export_namelen ... export_namelen ... export_type] export_idx ...
-            // [                            safe                      ] unsafe (could be the section_end)
-            //                                             ^^ section_curr
+            // [...  export_namelen ... export_name ... export_type] export_idx ...
+            // [                            safe                   ] unsafe (could be the section_end)
+            //                                          ^^ section_curr
 
             ::std::memcpy(::std::addressof(fwet.exports.type), section_curr, sizeof(fwet.exports.type));
 
@@ -448,9 +503,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             ++section_curr;
 
-            // [...  export_namelen ... export_namelen ... export_type] export_idx ... next_export
-            // [                            safe                      ] unsafe (could be the section_end)
-            //                                                          ^^ section_curr
+            // [...  export_namelen ... export_name ... export_type] export_idx ... next_export
+            // [                            safe                   ] unsafe (could be the section_end)
+            //                                                       ^^ section_curr
 
             // Note that section_curr may be equal to section_end, checked in the subsequent define_extern_prefix_exports_handler
 
@@ -461,45 +516,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            // [...  export_namelen ... export_namelen ... export_type export_idx] ... next_export
-            // [                            safe                                 ] unsafe (could be the section_end)
-            //                                                         ^^ section_curr
+            // [...  export_namelen ... export_name ... export_type export_idx] ... next_export
+            // [                            safe                              ] unsafe (could be the section_end)
+            //                                                      ^^ section_curr
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 export_idx;  // No initialization necessary
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_handle_export_index<Fs...>);
 
-            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+            section_curr =
+                define_handler_export_index(sec_adl, fwet.exports.storage, fwet.exports.type, module_storage, section_curr, section_end, err, fs_para);
 
-            auto const [export_idx_next, export_idx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                  reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
-                                                                                  ::fast_io::mnp::leb128_get(export_idx))};
-
-            if(export_idx_err != ::fast_io::parse_code::ok) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_export_idx;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(export_idx_err);
-            }
-
-            // [...  export_namelen ... export_namelen ... export_type export_idx ...] next_export
-            // [                            safe                                     ] unsafe (could be the section_end)
-            //                                                         ^^ section_curr
-
-            // Storing Temporary Variables into Modules
-            fwet.exports.idx = export_idx;
-
-            // Check if index is greater than or equal to the type size
-
-            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_export_index<Fs...>);
-
-            define_check_export_index(sec_adl, fwet.exports, module_storage, section_curr, err, fs_para);
+            // [...  export_namelen ... export_name ... export_type export_idx ...] next_export
+            // [                            safe                                  ] unsafe (could be the section_end)
+            //                                                                      ^^ section_curr
 
             exportsec.exports.push_back_unchecked(::std::move(fwet));
-
-            section_curr = reinterpret_cast<::std::byte const*>(export_idx_next);
-
-            // [...  export_namelen ... export_namelen ... export_type export_idx ...] next_export
-            // [                            safe                                     ] unsafe (could be the section_end)
-            //                                                                         ^^ section_curr
         }
 
         // [... ] (section_end)
@@ -534,7 +564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             [[assume(static_cast<unsigned>(export_curr_exports_type_wasm_byte) < static_cast<unsigned>(exportdesc_count))]];
 
-            exportsec_exportdesc_begin[export_curr_exports_type_wasm_byte].push_back_unchecked(export_curr.exports.idx);
+            exportsec_exportdesc_begin[export_curr_exports_type_wasm_byte].push_back_unchecked(::std::addressof(export_curr));
         }
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
