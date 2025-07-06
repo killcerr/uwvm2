@@ -530,6 +530,46 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_element_section_resolved_not_match_the_actual_number.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_code_count:
+            {
+#include "error_code_outputs/eco_invalid_code_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_ne_defined_func:
+            {
+#include "error_code_outputs/eco_code_ne_defined_func.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_code_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_body_size:
+            {
+#include "error_code_outputs/eco_invalid_body_size.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_missing_local_type:
+            {
+#include "error_code_outputs/eco_code_missing_local_type.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_clocal_n:
+            {
+#include "error_code_outputs/eco_invalid_clocal_n.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_code_section_resolved_not_match_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_local_count:
+            {
+#include "error_code_outputs/eco_invalid_local_count.h"
+                return;
+            }
         }
     }
 

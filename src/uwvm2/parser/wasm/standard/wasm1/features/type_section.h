@@ -88,7 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief Define functions for value_type against wasm1 for checking value_type
     /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr bool define_check_value_type(
+    inline constexpr bool define_check_typesec_value_type(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
         ::uwvm2::parser::wasm::standard::wasm1::type::value_type value_type  // [adl] can be replaced
         ) noexcept
@@ -171,11 +171,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check handler
-            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_value_type<Fs...>, "define_check_value_type(...) not found");
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_typesec_value_type<Fs...>, "define_check_typesec_value_type(...) not found");
             // check parameters
             for(auto parameter_curr{ft.parameter.begin}; parameter_curr != ft.parameter.end; ++parameter_curr)
             {
-                if(!define_check_value_type(sec_adl, *parameter_curr)) [[unlikely]]
+                if(!define_check_typesec_value_type(sec_adl, *parameter_curr)) [[unlikely]]
                 {
                     err.err_curr = reinterpret_cast<::std::byte const*>(parameter_curr);
                     err.err_selectable.u8 =
@@ -256,7 +256,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // check results
             for(auto result_curr{ft.result.begin}; result_curr != ft.result.end; ++result_curr)
             {
-                if(!define_check_value_type(sec_adl, *result_curr)) [[unlikely]]
+                if(!define_check_typesec_value_type(sec_adl, *result_curr)) [[unlikely]]
                 {
                     err.err_curr = reinterpret_cast<::std::byte const*>(result_curr);
                     err.err_selectable.u8 =

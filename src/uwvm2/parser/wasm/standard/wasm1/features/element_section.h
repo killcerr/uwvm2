@@ -210,8 +210,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 elem_table_idx;  // No initialization necessary
 
-            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
-
             auto const [elem_table_idx_next, elem_table_idx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
                                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                                           ::fast_io::mnp::leb128_get(elem_table_idx))};

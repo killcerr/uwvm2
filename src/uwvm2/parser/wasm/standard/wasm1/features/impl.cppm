@@ -38,6 +38,7 @@ export import :global_section;
 export import :export_section;
 export improt :start_section;
 export improt :element_section;
+export import :code_section;
 export import :binfmt;
 
 #ifndef UWVM_MODULE

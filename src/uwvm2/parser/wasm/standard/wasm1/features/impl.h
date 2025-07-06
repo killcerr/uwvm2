@@ -38,5 +38,6 @@
 # include "export_section.h"
 # include "start_section.h"
 # include "element_section.h"
+# include "code_section.h"
 # include "binfmt.h"
 #endif

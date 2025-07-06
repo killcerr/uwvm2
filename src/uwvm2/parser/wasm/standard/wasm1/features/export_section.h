@@ -423,8 +423,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [                  safe                 ] unsafe (could be the section_end)
             //                          ^^ section_curr
 
-            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
-
             // No access, security
             fwet.export_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), export_namelen};
 
