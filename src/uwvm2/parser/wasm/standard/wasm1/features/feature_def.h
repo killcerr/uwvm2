@@ -783,22 +783,35 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::std::byte const* end{};  // The pointer to end is after 0x0b.
     };
 
-    struct wasm_elem_t
+    struct wasm_elem_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 table_idx{};
         elem_expr_t expr{};
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> vec_funcidx{};
     };
 
+    ///////////////////////////
+    /// @brief code section ///
+    ///////////////////////////
+
     struct code_body_t
     {
-        ::std::byte const* begin;
-        ::std::byte const* end;  // The pointer to end is after 0x0b.
+        ::std::byte const* begin{};
+        ::std::byte const* end{};  // The pointer to end is after 0x0b.
     };
 
-    struct wasm_code_t
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct local_entry_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 count{};
+        ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> type{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm_code_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         code_body_t body{};
+        ::fast_io::vector<local_entry_t<Fs...>> locals{};
     };
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
@@ -824,6 +837,24 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm_elem_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::local_entry_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::wasm_code_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm_code_t<Fs...>>
     {
         inline static constexpr bool value = true;
     };
