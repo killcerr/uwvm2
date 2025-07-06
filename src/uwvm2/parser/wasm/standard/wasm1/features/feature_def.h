@@ -759,6 +759,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             define_handler_export_index(sec_adl, fwet.storage, fwet.type, module_storage, section_curr, section_end, err, fs_para)
         } -> ::std::same_as<::std::byte const*>;
     };
+
+    //////////////////////////////
+    /// @brief element section ///
+    //////////////////////////////
+
+    struct elem_expr_t
+    {
+        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
+        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
+
+        ::std::byte const* begin;
+        ::std::byte const* end;  // The pointer to end is after 0x0b.
+    };
+
+    struct wasm_elem_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 table_idx{};
+        elem_expr_t expr{};
+        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> vec_funcidx{};
+    };
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
@@ -771,6 +792,18 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::wasm_elem_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm_elem_t>
     {
         inline static constexpr bool value = true;
     };

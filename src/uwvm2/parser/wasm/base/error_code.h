@@ -125,7 +125,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         exported_index_exceeds_maxvul,
         invalid_export_name_length,
         invalid_start_idx,
-        start_index_exceeds_maxvul
+        start_index_exceeds_maxvul,
+        invalid_elem_count,
+        elem_section_resolved_exceeded_the_actual_number,
+        invalid_elem_table_idx,
+        elem_table_index_exceeds_maxvul,
+        elem_init_terminator_not_found,
+        invalid_elem_funcidx_count,
+        invalid_elem_funcidx,
+        elem_func_index_exceeds_maxvul,
+        element_section_resolved_not_match_the_actual_number
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type
@@ -173,6 +182,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::std::uint_least32_t maxval;
     };
 
+    /// @brief Used to set the output of elem_table_index_exceeds_maxvul errors
+    struct elem_table_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxval;
+    };
+
+    /// @brief Used to set the output of elem_func_index_exceeds_maxvul errors
+    struct elem_func_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxval;
+    };
+
     /// @brief define IEEE 754 F32 and F64
 #ifdef __STDCPP_FLOAT32_T__
     using error_f32 = ::std::float32_t;  // IEEE 754-2008
@@ -201,6 +224,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         imp_def_num_exceed_u32max_err_t imp_def_num_exceed_u32max;
         exported_index_exceeds_maxvul_t exported_index_exceeds_maxvul;
         start_index_exceeds_maxvul_t start_index_exceeds_maxvul;
+        elem_table_index_exceeds_maxvul_t elem_table_index_exceeds_maxvul;
+        elem_func_index_exceeds_maxvul_t elem_func_index_exceeds_maxvul;
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;

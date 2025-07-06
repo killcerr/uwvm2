@@ -59,7 +59,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::start_index_exceeds_maxvul) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::element_section_resolved_not_match_the_actual_number) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -107,6 +107,18 @@ int main()
                 {
                     errout.err.err_selectable.start_index_exceeds_maxvul.idx = 114514;
                     errout.err.err_selectable.start_index_exceeds_maxvul.maxval = 1919810;
+                    break;
+                }
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_table_index_exceeds_maxvul:
+                {
+                    errout.err.err_selectable.elem_table_index_exceeds_maxvul.idx = 114514;
+                    errout.err.err_selectable.elem_table_index_exceeds_maxvul.maxval = 1919810;
+                    break;
+                }
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_func_index_exceeds_maxvul:
+                {
+                    errout.err.err_selectable.elem_func_index_exceeds_maxvul.idx = 114514;
+                    errout.err.err_selectable.elem_func_index_exceeds_maxvul.maxval = 1919810;
                     break;
                 }
                 default:

@@ -485,6 +485,51 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_start_index_exceeds_maxvul.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_count:
+            {
+#include "error_code_outputs/eco_invalid_elem_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_elem_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_table_idx:
+            {
+#include "error_code_outputs/eco_invalid_elem_table_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_table_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_elem_table_index_exceeds_maxvul.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_init_terminator_not_found:
+            {
+#include "error_code_outputs/eco_elem_init_terminator_not_found.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx_count:
+            {
+#include "error_code_outputs/eco_invalid_elem_funcidx_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx:
+            {
+#include "error_code_outputs/eco_invalid_elem_funcidx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_func_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_elem_func_index_exceeds_maxvul.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::element_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_element_section_resolved_not_match_the_actual_number.h"
+                return;
+            }
         }
     }
 
