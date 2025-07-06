@@ -123,8 +123,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         {
             function_type const* function;
             table_type table;
+            static_assert(::std::is_trivially_copyable_v<table_type> && ::std::is_trivially_destructible_v<table_type>);
             memory_type memory;
+            static_assert(::std::is_trivially_copyable_v<memory_type> && ::std::is_trivially_destructible_v<memory_type>);
             global_type global;
+            static_assert(::std::is_trivially_copyable_v<global_type> && ::std::is_trivially_destructible_v<global_type>);
         } storage;
 
         external_types type{};

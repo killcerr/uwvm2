@@ -148,8 +148,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const* function;
             ::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...> table;
+            static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...>> &&
+                          ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...>>);
             ::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...> memory;
+            static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>> &&
+                          ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>>);
             ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> global;
+            static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>> &&
+                          ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>>);
         } storage;
 
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};
@@ -259,9 +265,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         union vectypeidx_minimize_storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
             typeidx_u8_view_t typeidx_u8_view;
+            static_assert(::std::is_trivially_copyable_v<typeidx_u8_view_t> && ::std::is_trivially_destructible_v<typeidx_u8_view_t>);
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8> typeidx_u8_vector;
+            // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16> typeidx_u16_vector;
+            // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> typeidx_u32_vector;
+            // Self-control of the life cycle
 
             // Full occupancy is used to initialize the union, set the union to all zero.
             [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u]{};
@@ -769,8 +779,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
         inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
 
-        ::std::byte const* begin;
-        ::std::byte const* end;  // The pointer to end is after 0x0b.
+        ::std::byte const* begin{};
+        ::std::byte const* end{};  // The pointer to end is after 0x0b.
     };
 
     struct wasm_elem_t
@@ -780,6 +790,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> vec_funcidx{};
     };
 
+    struct code_body_t
+    {
+        ::std::byte const* begin;
+        ::std::byte const* end;  // The pointer to end is after 0x0b.
+    };
+
+    struct wasm_code_t
+    {
+        code_body_t body{};
+    };
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

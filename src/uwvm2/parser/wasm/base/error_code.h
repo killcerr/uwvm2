@@ -219,13 +219,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     union err_selectable_t
     {
         duplic_imports_t duplic_imports;
+        static_assert(::std::is_trivially_copyable_v<duplic_imports_t> && ::std::is_trivially_destructible_v<duplic_imports_t>);
         duplic_exports_t duplic_exports;
+        static_assert(::std::is_trivially_copyable_v<duplic_exports_t> && ::std::is_trivially_destructible_v<duplic_exports_t>);
         module_name_err_t error_module_name;
+        static_assert(::std::is_trivially_copyable_v<module_name_err_t> && ::std::is_trivially_destructible_v<module_name_err_t>);
         imp_def_num_exceed_u32max_err_t imp_def_num_exceed_u32max;
+        static_assert(::std::is_trivially_copyable_v<imp_def_num_exceed_u32max_err_t> && ::std::is_trivially_destructible_v<imp_def_num_exceed_u32max_err_t>);
         exported_index_exceeds_maxvul_t exported_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<exported_index_exceeds_maxvul_t> && ::std::is_trivially_destructible_v<exported_index_exceeds_maxvul_t>);
         start_index_exceeds_maxvul_t start_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<start_index_exceeds_maxvul_t> && ::std::is_trivially_destructible_v<start_index_exceeds_maxvul_t>);
         elem_table_index_exceeds_maxvul_t elem_table_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<elem_table_index_exceeds_maxvul_t> &&
+                      ::std::is_trivially_destructible_v<elem_table_index_exceeds_maxvul_t>);
         elem_func_index_exceeds_maxvul_t elem_func_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<elem_func_index_exceeds_maxvul_t> && ::std::is_trivially_destructible_v<elem_func_index_exceeds_maxvul_t>);
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;
