@@ -46,7 +46,7 @@ jobs:
       - name: Check UWVM version
         run: xmake run uwvm --version
       - name: Unit tests
-        run: xmake test -vD
+        run: xmake test -v
 
   # ---------------------------------------------------------------------------
   x86_64_apx-linux-gnu:
@@ -72,7 +72,7 @@ jobs:
       - name: Native (APX) Check UWVM version
         run: xmake run uwvm --version
       - name: Native (APX) Unit tests
-        run: xmake test -vD
+        run: xmake test -v
 
   # ---------------------------------------------------------------------------
   x86_64-windows-gnu:
@@ -107,7 +107,7 @@ jobs:
       - name: Check UWVM version
         run: xmake run uwvm --version
       - name: Unit tests
-        run: xmake test -vD
+        run: xmake test -v
 
   # ---------------------------------------------------------------------------
   x86_64-freebsd14:
@@ -129,4 +129,4 @@ jobs:
             xmake f -m debug --use-llvm=y -m ${{ matrix.mode }} --policies=${{ matrix.policies }}
             xmake b -rv
             xmake run uwvm --version
-            xmake test -vD
+            xmake test -v
