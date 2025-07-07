@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -22,10 +22,15 @@
 
 module;
 
-export module uwvm2.utils.cmdline;
-export import :shortest_path;
-export import :handle;
-export import :print_usage;
+// std
+#include <cstdint>
+#include <cstddef>
+#include <concepts>
+#include <new>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+
+export module uwvm2.utils.cmdline:print_usage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -34,4 +39,4 @@ export import :print_usage;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "print_usage.h"

@@ -85,8 +85,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i32: [[fallthrough]];
             case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i64: [[fallthrough]];
             case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f32: [[fallthrough]];
-            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64: return true;
-            default: return false;
+            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64:
+            {
+                return true;
+            }
+            default:
+            {
+                return false;
+            }
         }
     }
 

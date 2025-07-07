@@ -63,10 +63,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
     {
         switch(::uwvm2::uwvm::cmdline::parsing(argc, argv))
         {
-            case ::uwvm2::uwvm::cmdline::parsing_return_val::def: break;
-            case ::uwvm2::uwvm::cmdline::parsing_return_val::return0: return static_cast<int>(::uwvm2::uwvm::run::retval::ok);
-            case ::uwvm2::uwvm::cmdline::parsing_return_val::returnm1: return static_cast<int>(::uwvm2::uwvm::run::retval::parameter_error);
-            default: ::fast_io::unreachable();
+            case ::uwvm2::uwvm::cmdline::parsing_return_val::def:
+            {
+                break;
+            }
+            case ::uwvm2::uwvm::cmdline::parsing_return_val::return0:
+            {
+                return static_cast<int>(::uwvm2::uwvm::run::retval::ok);
+            }
+            case ::uwvm2::uwvm::cmdline::parsing_return_val::returnm1:
+            {
+                return static_cast<int>(::uwvm2::uwvm::run::retval::parameter_error);
+            }
+            [[unlikely]] default:
+            {
+                ::fast_io::unreachable();
+            }
         }
 
         return ::uwvm2::uwvm::run::run();

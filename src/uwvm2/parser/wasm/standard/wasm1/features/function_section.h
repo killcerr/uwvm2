@@ -2849,7 +2849,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 );
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -3061,7 +3061,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
-                    default:
+                    [[unlikely]] default:
                     {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                         ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -3478,7 +3478,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 );
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -5987,7 +5987,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 needwrite_u16x16 = ::std::bit_cast<u16x16simd>(res);
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -6223,7 +6223,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
-                    default:
+                    [[unlikely]] default:
                     {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                         ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -6542,7 +6542,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 needwrite_u16x16 = ::std::bit_cast<u16x16simd>(res);
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
