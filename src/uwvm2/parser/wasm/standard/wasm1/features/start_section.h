@@ -183,9 +183,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
             auto const defined_func_index{start_idx - imported_func_size};
-            auto const func_type_idx{funcsec.funcs.index_unchecked(defined_func_index)};
+            auto const func_type_idx{funcsec.funcs.index_unchecked(static_cast<::std::size_t>(defined_func_index))};
 
-            auto const& curr_type{typesec.types.index_unchecked(func_type_idx)};
+            auto const& curr_type{typesec.types.index_unchecked(static_cast<::std::size_t>(func_type_idx))};
 
             auto const func_para_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_type.parameter.end - curr_type.parameter.begin)};
 
@@ -201,7 +201,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
         else
         {
-            auto const& curr_type{*(imported_func.index_unchecked(start_idx)->imports.storage.function)};
+            auto const& curr_type{*(imported_func.index_unchecked(static_cast<::std::size_t>(start_idx))->imports.storage.function)};
 
             auto const func_para_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_type.parameter.end - curr_type.parameter.begin)};
 
