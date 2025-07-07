@@ -60,7 +60,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     inline constexpr ::uwvm2::utils::cmdline::parameter mode{.name{u8"--mode"},
                                                              .describe{u8"Select operation mode, (DEFAULT: objdump)."},
                                                              .usage{u8"[objdump]"},
-                                                             .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::mode_alias), 1}},
+                                                             .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::mode_alias), 1uz}},
                                                              .handle{::std::addressof(details::mode_callback)},
                                                              .is_exist{::std::addressof(details::mode_is_exist)}};
 #if defined(__clang__)
