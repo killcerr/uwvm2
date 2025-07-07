@@ -149,11 +149,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // importdesc[0]: func
         constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
         static_assert(importdesc_count > 0uz);  // Ensure that subsequent index visits do not cross boundaries
+        auto const& imported_func{importsec.importdesc.index_unchecked(0uz)};
+        auto const imported_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(imported_func.size())};
 
         // function section
         auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
         auto const defined_funcsec_funcs_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
-        auto const imported_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
         // Addition does not overflow, pre-checked.
         auto const all_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_funcsec_funcs_size + imported_func_size)};
 
@@ -174,6 +175,46 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [before_section ... ] | start_idx ...] (end)
         // [        safe                        ] unsafe (could be the section_end)
         //                                        ^^ section_curr
+
+        // Check if the signature of this function is "() -> ()"
+
+        if(start_idx >= imported_func_size)
+        {
+            auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+
+            auto const defined_func_index{start_idx - imported_func_size};
+            auto const func_type_idx{funcsec.funcs.index_unchecked(defined_func_index)};
+
+            auto const& curr_type{typesec.types.index_unchecked(func_type_idx)};
+
+            auto const func_para_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_type.parameter.end - curr_type.parameter.begin)};
+
+            auto const func_res_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_type.result.end - curr_type.result.begin)};
+
+            if(func_para_size != 0u || func_res_size != 0u) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = start_idx;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_ref_by_start_has_illegal_sign;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+        }
+        else
+        {
+            auto const& curr_type{*(imported_func.index_unchecked(start_idx)->imports.storage.function)};
+
+            auto const func_para_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_type.parameter.end - curr_type.parameter.begin)};
+
+            auto const func_res_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_type.result.end - curr_type.result.begin)};
+
+            if(func_para_size != 0u || func_res_size != 0u) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = start_idx;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_ref_by_start_has_illegal_sign;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+        }
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 

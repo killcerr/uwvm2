@@ -570,6 +570,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_invalid_local_count.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_ref_by_start_has_illegal_sign:
+            {
+#include "error_code_outputs/eco_func_ref_by_start_has_illegal_sign.h"
+                return;
+            }
         }
     }
 

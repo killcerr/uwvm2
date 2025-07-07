@@ -142,7 +142,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         code_missing_local_type,
         invalid_clocal_n,
         code_section_resolved_not_match_the_actual_number,
-        invalid_local_count
+        invalid_local_count,
+        func_ref_by_start_has_illegal_sign
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type
