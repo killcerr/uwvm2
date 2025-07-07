@@ -61,6 +61,16 @@ import uwvm.wasm.storage;
 
 namespace test
 {
+    inline constexpr void print_section(::std::byte const* const section_begin, ::std::byte const* const section_end) noexcept
+    {
+        ::fast_io::io::perr("Input: [");
+        for(auto section_curr{section_begin}; section_curr != section_end; ++section_curr)
+        {
+            ::fast_io::io::perr(fast_io::mnp::hexupper<false, true>(::std::to_integer<::std::uint_least8_t>(*section_curr)), " ");
+        }
+        ::fast_io::io::perr("]\n");
+    }
+
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void check_function_section([[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<
                                                      ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t> sec_adl,
@@ -110,7 +120,11 @@ namespace test
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(++func_counter > func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(++func_counter > func_count) [[unlikely]]
+            {
+                print_section(section_begin, section_end);
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             // [ ... typeidx1] ... typeidx2 ...
             // [     safe    ] unsafe (could be the section_end)
@@ -124,7 +138,11 @@ namespace test
                                                                             reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
                                                                             ::fast_io::mnp::leb128_get(typeidx))};
 
-            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+                print_section(section_begin, section_end);
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             // [ ... typeidx1 ...] typeidx2 ...
             // [      safe       ] unsafe (could be the section_end)
@@ -133,7 +151,11 @@ namespace test
             // check: type_index should less than type_section_count
             if(typeidx >= type_section_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
-            if(typeidx != functionsec.funcs.index_unchecked(index)) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(typeidx != functionsec.funcs.index_unchecked(index)) [[unlikely]]
+            {
+                print_section(section_begin, section_end);
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
 
@@ -252,7 +274,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -263,6 +290,8 @@ int main()
         }
         catch(::fast_io::error)
         {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
     }
@@ -312,7 +341,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -323,6 +357,8 @@ int main()
         }
         catch(::fast_io::error)
         {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
     }
@@ -371,7 +407,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -382,6 +423,8 @@ int main()
         }
         catch(::fast_io::error)
         {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
     }
@@ -442,7 +485,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -453,6 +501,8 @@ int main()
         }
         catch(::fast_io::error)
         {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
     }
@@ -513,7 +563,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -524,6 +579,8 @@ int main()
         }
         catch(::fast_io::error)
         {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
     }
@@ -584,7 +641,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -595,6 +657,8 @@ int main()
         }
         catch(::fast_io::error)
         {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
     }
@@ -657,7 +721,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -671,7 +740,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too large u82b
@@ -732,7 +806,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -746,7 +825,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too large u162b
@@ -807,7 +891,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -821,7 +910,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too large and error u81b
@@ -888,7 +982,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -902,7 +1001,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too large and error u82b
@@ -969,7 +1073,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -983,7 +1092,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too large and error u162b
@@ -1050,7 +1164,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -1064,7 +1183,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too long u81b
@@ -1128,7 +1252,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -1142,7 +1271,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too long u82b
@@ -1206,7 +1340,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -1220,7 +1359,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // too long u162b
@@ -1284,7 +1428,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -1298,7 +1447,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // hybird u81b
@@ -1377,7 +1531,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -1391,7 +1550,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // hybird u82b
@@ -1470,7 +1634,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -1484,7 +1653,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 
     // hybird u162b
@@ -1563,7 +1737,12 @@ int main()
                 func_counter,
                 func_count);
 
-            if(func_counter != func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+            if(func_counter != func_count) [[unlikely]]
+            {
+                ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                      reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             ::test::check_function_section(
                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>{},
@@ -1577,7 +1756,12 @@ int main()
             has_catch = true;
         }
 
-        if(!has_catch) { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+        if(!has_catch)
+        {
+            ::test::print_section(reinterpret_cast<::std::byte const*>(memory_safety_checker.cbegin()),
+                                  reinterpret_cast<::std::byte const*>(memory_safety_checker.cend()));
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
     }
 }
 
