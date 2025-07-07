@@ -49,7 +49,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_abi),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_binfmt),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_set_main_module_name),
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::u8log_output),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_output),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_disable_warning),
 
 #ifdef _DEBUG
             ::std::addressof(::uwvm2::uwvm::cmdline::params::debug_test),

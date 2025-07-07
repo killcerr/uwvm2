@@ -31,6 +31,7 @@ export import :wasm_abi;
 export import :wasm_binfmt;
 export import :wasm_set_main_module_name;
 export import :log_output;
+export import :log_disable_warning;
 
 #ifdef _DEBUG
 export import :debug_test;
