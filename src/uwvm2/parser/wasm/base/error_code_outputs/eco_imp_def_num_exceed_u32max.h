@@ -22,7 +22,7 @@
 
 // Without pragma once, this header file will be included in a specific code segment
 
-constexpr auto get_exceeding_imported_and_defined_type_name =
+constexpr auto get_exceeding_imported_type_name =
     []<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept -> ::fast_io::basic_string_view<char_type2>
 {
     switch(type)
@@ -111,7 +111,7 @@ if constexpr(::std::same_as<char_type, char>)
                 errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 ") the number of ",
-                get_exceeding_imported_and_defined_type_name.template operator()<char>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+                get_exceeding_imported_type_name.template operator()<char>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
                 "'s and exceeding u32 max.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
@@ -137,7 +137,7 @@ if constexpr(::std::same_as<char_type, char>)
         errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
         ") the number of ",
-        get_exceeding_imported_and_defined_type_name.template operator()<char>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+        get_exceeding_imported_type_name.template operator()<char>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
         "'s and exceeding u32 max.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
     return;
@@ -170,7 +170,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                 errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 L") the number of ",
-                get_exceeding_imported_and_defined_type_name.template operator()<wchar_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+                get_exceeding_imported_type_name.template operator()<wchar_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
                 L"'s and exceeding u32 max.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
@@ -195,7 +195,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
         errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
         L") the number of ",
-        get_exceeding_imported_and_defined_type_name.template operator()<wchar_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+        get_exceeding_imported_type_name.template operator()<wchar_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
         L"'s and exceeding u32 max.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
@@ -228,7 +228,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8") the number of ",
-                get_exceeding_imported_and_defined_type_name.template operator()<char8_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+                get_exceeding_imported_type_name.template operator()<char8_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
                 u8"'s and exceeding u32 max.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
@@ -253,7 +253,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8") the number of ",
-        get_exceeding_imported_and_defined_type_name.template operator()<char8_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+        get_exceeding_imported_type_name.template operator()<char8_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
         u8"'s and exceeding u32 max.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
     return;
@@ -286,7 +286,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                 errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u") the number of ",
-                get_exceeding_imported_and_defined_type_name.template operator()<char16_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+                get_exceeding_imported_type_name.template operator()<char16_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
                 u"'s and exceeding u32 max.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
@@ -311,7 +311,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
         errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
         u") the number of ",
-        get_exceeding_imported_and_defined_type_name.template operator()<char16_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+        get_exceeding_imported_type_name.template operator()<char16_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
         u"'s and exceeding u32 max.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
     return;
@@ -344,7 +344,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                 errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 U") the number of ",
-                get_exceeding_imported_and_defined_type_name.template operator()<char32_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+                get_exceeding_imported_type_name.template operator()<char32_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
                 U"'s and exceeding u32 max.",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
@@ -369,7 +369,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
         errout.err.err_selectable.imp_def_num_exceed_u32max.defined,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
         U") the number of ",
-        get_exceeding_imported_and_defined_type_name.template operator()<char32_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
+        get_exceeding_imported_type_name.template operator()<char32_t>(errout.err.err_selectable.imp_def_num_exceed_u32max.type),
         U"'s and exceeding u32 max.",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
     return;

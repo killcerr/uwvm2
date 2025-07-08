@@ -2480,12 +2480,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
-                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(check_table_index_1st)};
+                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_1st))};
                         auto const curr_table_shuffle_mask_1st{curr_table_1st.shuffle_mask};
                         auto const curr_table_processed_simd_1st{curr_table_1st.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_1st{curr_table_1st.processed_byte};  // size of handled uleb128
 
-                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(check_table_index_2nd)};
+                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_2nd))};
                         auto const curr_table_shuffle_mask_2nd{curr_table_2nd.shuffle_mask};
                         auto const curr_table_processed_simd_2nd{curr_table_2nd.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_2nd{curr_table_2nd.processed_byte};  // size of handled uleb128
@@ -2849,7 +2849,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 );
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -3061,7 +3061,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
-                    default:
+                    [[unlikely]] default:
                     {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                         ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -3110,12 +3110,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
-                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(check_table_index_1st)};
+                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_1st))};
                         auto const curr_table_shuffle_mask_1st{curr_table_1st.shuffle_mask};
                         auto const curr_table_processed_simd_1st{curr_table_1st.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_1st{curr_table_1st.processed_byte};  // size of handled uleb128
 
-                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(check_table_index_2nd)};
+                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_2nd))};
                         auto const curr_table_shuffle_mask_2nd{curr_table_2nd.shuffle_mask};
                         auto const curr_table_processed_simd_2nd{curr_table_2nd.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_2nd{curr_table_2nd.processed_byte};  // size of handled uleb128
@@ -3478,7 +3478,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 );
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -3846,7 +3846,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
 
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
+                        auto const& curr_table{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index))};
                         auto const curr_table_shuffle_mask{curr_table.shuffle_mask};
                         auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
@@ -4089,7 +4089,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
 
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
+                        auto const& curr_table{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index))};
                         // Since it's the second round, the data has to be moved back  the number of bytes processed in the first round
                         auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};
                         auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
@@ -5717,12 +5717,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
-                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(check_table_index_1st)};
+                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_1st))};
                         auto const curr_table_shuffle_mask_1st{curr_table_1st.shuffle_mask};
                         auto const curr_table_processed_simd_1st{curr_table_1st.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_1st{curr_table_1st.processed_byte};  // size of handled uleb128
 
-                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(check_table_index_2nd)};
+                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_2nd))};
                         auto const curr_table_shuffle_mask_2nd{curr_table_2nd.shuffle_mask};
                         auto const curr_table_processed_simd_2nd{curr_table_2nd.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_2nd{curr_table_2nd.processed_byte};  // size of handled uleb128
@@ -5987,7 +5987,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 needwrite_u16x16 = ::std::bit_cast<u16x16simd>(res);
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -6223,7 +6223,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         third_fourth_round_simd_u8x32 = ::std::bit_cast<u8x32simd>(shuffle_u8x32);
                         break;
                     }
-                    default:
+                    [[unlikely]] default:
                     {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                         ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -6272,12 +6272,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr
                         //      [ needwrite ] ... ] (Always writes 16 bits, but valid data may be less than 16 bits)
 
-                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(check_table_index_1st)};
+                        auto const& curr_table_1st{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_1st))};
                         auto const curr_table_shuffle_mask_1st{curr_table_1st.shuffle_mask};
                         auto const curr_table_processed_simd_1st{curr_table_1st.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_1st{curr_table_1st.processed_byte};  // size of handled uleb128
 
-                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(check_table_index_2nd)};
+                        auto const& curr_table_2nd{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index_2nd))};
                         auto const curr_table_shuffle_mask_2nd{curr_table_2nd.shuffle_mask};
                         auto const curr_table_processed_simd_2nd{curr_table_2nd.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte_2nd{curr_table_2nd.processed_byte};  // size of handled uleb128
@@ -6542,7 +6542,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                 needwrite_u16x16 = ::std::bit_cast<u16x16simd>(res);
                                 break;
                             }
-                            default:
+                            [[unlikely]] default:
                             {
 # if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -7016,7 +7016,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
 
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
+                        auto const& curr_table{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index))};
                         auto const curr_table_shuffle_mask{curr_table.shuffle_mask};
                         auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32
                         auto const curr_table_processed_byte{curr_table.processed_byte};  // size of handled uleb128
@@ -7223,7 +7223,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //       ^^ functionsec.funcs.storage.typeidx_u16_vector.imp.curr_ptr
                         //      [ needwrite ] ...] (Always writes 8 bits, but valid data may be less than 8 bits)
 
-                        auto const& curr_table{simd128_shuffle_table.index_unchecked(check_table_index)};
+                        auto const& curr_table{simd128_shuffle_table.index_unchecked(static_cast<::std::size_t>(check_table_index))};
                         // Since it's the second round, the data has to be moved back  the number of bytes processed in the first round
                         auto const curr_table_shuffle_mask{curr_table.shuffle_mask + first_round_handle_bytes};
                         auto const curr_table_processed_simd{curr_table.processed_simd};  // size of handled u32

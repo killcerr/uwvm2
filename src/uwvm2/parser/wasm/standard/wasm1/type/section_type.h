@@ -113,19 +113,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         external_type_end = global
     };
 
-    /// @brief      Exports
-    /// @details    The exports component of a module defines a set of exports that become accessible to the host environment once
-    ///             the module has been instantiated
+    /// @brief      Imports
+    /// @details    The imports component of a module defines a set of imports that are required for instantiation
     /// @details    New feature
-    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.10
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.11
     struct extern_type
     {
         union storage_t
         {
             function_type const* function;
             table_type table;
+            static_assert(::std::is_trivially_copyable_v<table_type> && ::std::is_trivially_destructible_v<table_type>);
             memory_type memory;
+            static_assert(::std::is_trivially_copyable_v<memory_type> && ::std::is_trivially_destructible_v<memory_type>);
             global_type global;
+            static_assert(::std::is_trivially_copyable_v<global_type> && ::std::is_trivially_destructible_v<global_type>);
         } storage;
 
         external_types type{};

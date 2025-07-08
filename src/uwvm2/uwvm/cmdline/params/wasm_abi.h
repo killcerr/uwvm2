@@ -61,7 +61,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
         .name{u8"--wasm-abi"},
         .describe{u8"Specifies the ABI used by the WASM module, (DEFAULT: auto-detection)."},
         .usage{u8"[bare|emscripten|wasip1|wasip2|wasix]"},
-        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1}},
+        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_abi_alias), 1uz}},
         .handle{::std::addressof(details::wasm_abi_callback)},
         .is_exist{::std::addressof(details::wasm_abi_is_exist)},
         .cate{::uwvm2::utils::cmdline::categorization::wasm}};

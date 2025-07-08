@@ -25,4 +25,5 @@
 #ifndef UWVM_MODULE
 # include "shortest_path.h"
 # include "handle.h"
+# include "print_usage.h"
 #endif

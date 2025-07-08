@@ -158,7 +158,7 @@ inline void run_fuzzer_tests(::std::size_t num_tests) noexcept
         {
             ::fast_io::io::perr("Test case #", i, " failed (zero_illegal=false):\n");
             ::fast_io::io::perr("  Input: ");
-            for(auto b: data_vec) { ::fast_io::io::perr(fast_io::mnp::hexupper<false, true>(b)); }
+            for(auto b: data_vec) { ::fast_io::io::perr(fast_io::mnp::hexupper<false, true>(b), " "); }
             ::fast_io::io::perrln("\n  Expected: err=",
                                   static_cast<int>(ref_result.err),
                                   ", pos=",
@@ -188,6 +188,8 @@ inline void run_fuzzer_tests(::std::size_t num_tests) noexcept
             if(test_result_true.pos != first_null)
             {
                 ::fast_io::io::perr("Test case #", i, " failed (zero_illegal=true):\n");
+                ::fast_io::io::perr("  Input: ");
+                for(auto b: data_vec) { ::fast_io::io::perr(::fast_io::mnp::hexupper<false, true>(b), " "); }
                 ::fast_io::io::perrln("  Expected: contains_empty_characters at ", (first_null - data));
                 ::fast_io::io::perrln("  Actual: err=", static_cast<int>(test_result_true.err), ", pos=", (test_result_true.pos - data));
                 ::fast_io::fast_terminate();
@@ -198,7 +200,7 @@ inline void run_fuzzer_tests(::std::size_t num_tests) noexcept
 
 int main()
 {
-    constexpr size_t NUM_TESTS = 100000;
+    constexpr size_t NUM_TESTS = 100'000;
     ::fast_io::io::perr("Running ", NUM_TESTS, " random UTF-8 fuzzer tests...\n");
     run_fuzzer_tests(NUM_TESTS);
 

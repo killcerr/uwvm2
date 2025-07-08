@@ -88,7 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief Define functions for value_type against wasm1 for checking value_type
     /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr bool define_check_value_type(
+    inline constexpr bool define_check_typesec_value_type(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
         ::uwvm2::parser::wasm::standard::wasm1::type::value_type value_type  // [adl] can be replaced
         ) noexcept
@@ -134,6 +134,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_para_len);
             }
 
+            // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+            constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+            if constexpr(size_t_max < wasm_u32_max)
+            {
+                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                if(para_len > size_t_max) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u64 = static_cast<::std::uint_least64_t>(para_len);
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
+
             // [... prefix para_len ...] para_begin ... res_len (para_end) ... res_begin ... prefix (res_end) ...
             // [           safe        ] unsafe (could be the section_end)
             //             ^^ section_curr
@@ -145,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [           safe        ] unsafe (could be the section_end)
             //                           ^^ section_curr
 
-            if(static_cast<::std::size_t>(section_end - section_curr) < para_len) [[unlikely]]
+            if(static_cast<::std::size_t>(section_end - section_curr) < static_cast<::std::size_t>(para_len)) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = para_len;
@@ -167,14 +182,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                          ^^ ft.parameter.begin
             //                                          ^^ ft.parameter.end
 
+            // Storing Temporary Variables into Modules
             ft.parameter.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check handler
-            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_value_type<Fs...>, "define_check_value_type(...) not found");
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_typesec_value_type<Fs...>,
+                          "define_check_typesec_value_type(...) not found");
             // check parameters
             for(auto parameter_curr{ft.parameter.begin}; parameter_curr != ft.parameter.end; ++parameter_curr)
             {
-                if(!define_check_value_type(sec_adl, *parameter_curr)) [[unlikely]]
+                if(!define_check_typesec_value_type(sec_adl, *parameter_curr)) [[unlikely]]
                 {
                     err.err_curr = reinterpret_cast<::std::byte const*>(parameter_curr);
                     err.err_selectable.u8 =
@@ -202,6 +219,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_result_len);
             }
 
+            // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+            constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+            if constexpr(size_t_max < wasm_u32_max)
+            {
+                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                if(result_len > size_t_max) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u64 = static_cast<::std::uint_least64_t>(result_len);
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
+
             // [... prefix para_len ... para_begin ... res_len (para_end) ...] res_begin ... prefix (res_end) ...
             // [                           safe                              ] unsafe (could be the section_end)
             //                                         ^^ section_curr
@@ -227,7 +259,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
             }
 
-            if(static_cast<::std::size_t>(section_end - section_curr) < result_len) [[unlikely]]
+            if(static_cast<::std::size_t>(section_end - section_curr) < static_cast<::std::size_t>(result_len)) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = result_len;
@@ -249,12 +281,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                                                ^^ ft.result.begin
             //                                                                               ^^ ft.result.end
 
+            // Storing Temporary Variables into Modules
             ft.result.end = reinterpret_cast<value_type_const_may_alias_ptr>(section_curr);
 
             // check results
             for(auto result_curr{ft.result.begin}; result_curr != ft.result.end; ++result_curr)
             {
-                if(!define_check_value_type(sec_adl, *result_curr)) [[unlikely]]
+                if(!define_check_typesec_value_type(sec_adl, *result_curr)) [[unlikely]]
                 {
                     err.err_curr = reinterpret_cast<::std::byte const*>(result_curr);
                     err.err_selectable.u8 =

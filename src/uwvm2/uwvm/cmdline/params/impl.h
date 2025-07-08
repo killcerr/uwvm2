@@ -31,6 +31,7 @@
 # include "wasm_binfmt.h"
 # include "wasm_set_main_module_name.h"
 # include "log_output.h"
+# include "log_disable_warning.h"
 
 # ifdef _DEBUG
 #  include "debug_test.h"

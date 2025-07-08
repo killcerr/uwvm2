@@ -25,4 +25,5 @@
 #ifndef UWVM_MODULE
 # include "io_device.h"
 # include "output.h"
+# include "warn_control.h"
 #endif

@@ -25,6 +25,7 @@ module;
 export module uwvm2.utils.cmdline;
 export import :shortest_path;
 export import :handle;
+export import :print_usage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

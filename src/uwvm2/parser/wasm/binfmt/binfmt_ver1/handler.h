@@ -105,6 +105,49 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
         has_handle_binfmt_ver1_extensible_section_define<Ty, Fs...> && has_section_id_define<Ty>;
 
+    /// @brief      has final_check type
+    /// @details
+    ///             ```cpp
+    ///
+    ///             struct basic_final_check
+    ///             {
+    ///             };
+    ///
+    ///             struct F
+    ///             {
+    ///                 template <typename ... Fs>
+    ///                 using final_check = type_replacer<root_of_replacement, basic_final_check>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_final_check = requires {
+        typename FeatureType::final_check;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::final_check>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_final_check() noexcept
+    {
+        if constexpr(has_final_check<FeatureType>) { return typename FeatureType::final_check{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_final_check_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_final_check<Fs>())...>;
+
+    template <typename... Fs>
+    concept has_final_check_handler = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<final_final_check_t<Fs...>> final_adl,
+                                               ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                               ::std::byte const* const module_end,
+                                               ::uwvm2::parser::wasm::base::error_impl& err,
+                                               ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        { define_final_check(final_adl, module_storage, module_end, err, fs_para) } -> ::std::same_as<void>;
+    };
+
     namespace details
     {
         template <typename... Sec>
@@ -322,8 +365,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     /// @brief Define a function for binfmt1 to check for utf8 sequences.
     /// @note  ADL for distribution to the correct handler function
     inline constexpr void check_module_name_text_format(
-        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be
-                                                                                                                                               // replaced
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl]
         ::std::byte const* begin,
         ::std::byte const* end,
         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -479,6 +521,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [         safe                 ] unsafe (could be the module_end)
             //                          ^^ module_curr
 
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_section_id{};
+
             // First loop with module_curr != module_end, so can use do-while.
 
             do
@@ -508,6 +552,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 static_assert(sizeof(sec_id) == 1uz);
                 // Size equal to one does not need to do little-endian conversion
 
+                // All standard sections (except custom sections) must be in canonical order.
+                if (sec_id != 0u)
+                {
+                    // There is no need to check for duplicate sections here, duplicate sections are checked inside the section parsing.
+
+                    if (sec_id < max_section_id) [[unlikely]]
+                    {
+                        err.err_curr = module_curr;
+                        err.err_selectable.u8arr[0] = sec_id;
+                        err.err_selectable.u8arr[1] = max_section_id;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_section_canonical_order;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    max_section_id = sec_id;
+                }
+
                 // get section length
                 ++module_curr;
 
@@ -529,6 +590,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(sec_len_err);
                 }
 
+                // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+                constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+                if constexpr(size_t_max < wasm_u32_max)
+                {
+                    // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                    if(sec_len > size_t_max) [[unlikely]]
+                    {
+                        err.err_curr = module_curr;
+                        err.err_selectable.u64 = static_cast<::std::uint_least64_t>(sec_len);
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+                }
+
                 // [... sec_id sec_len ...] sec_begin ... sec_id (sec_end)
                 // [       safe           ] unsafe (could be the module_end)
                 //             ^^ module_curr
@@ -541,7 +617,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 //                          ^^ module_curr
 
                 // check length
-                if(static_cast<::std::size_t>(module_end - module_curr) < sec_len) [[unlikely]]
+                if(static_cast<::std::size_t>(module_end - module_curr) < static_cast<::std::size_t>(sec_len)) [[unlikely]]
                 {
                     err.err_curr = module_curr;
                     err.err_selectable.u32 = sec_len;
@@ -549,13 +625,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
 
-                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [... sec_id sec_len ... sec_begin ...] next_sec_id ...
                 // [                safe                ] unsafe (could be the module_end)
                 //                         ^^ module_curr
 
                 auto const sec_end{module_curr + sec_len};
                 // Safe memory space from [module_curr, sec_end)
-                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [... sec_id sec_len ... sec_begin ...] next_sec_id ...
                 // [                safe                ] unsafe (could be the module_end)
                 //                         ^^ module_curr
                 //                                        ^^ sec_len
@@ -565,7 +641,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
                 module_curr = sec_end;
 
-                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [... sec_id sec_len ... sec_begin ...] next_sec_id ...
                 // [                safe                ] unsafe (could be the module_end)
                 //                                        ^^ module_curr
 
@@ -581,14 +657,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             );
 
             // (module_curr != module_end):
-            // [... sec_id sec_len ... sec_begin ... sec_id] ...
-            // [                safe                       ] unsafe (could be the module_end)
+            // [... sec_id sec_len ... sec_begin ... next_sec_id] ...
+            // [                safe                            ] unsafe (could be the module_end)
             //                                       ^^ module_curr
-
+            // or
             // (module_curr == module_end):
-            // [... sec_id sec_len ... sec_begin ...] sec_end ...
+            // [... sec_id sec_len ... sec_begin ...] (sec_end) ...
             // [                safe                ] unsafe (could be the module_end)
             //                                        ^^ module_curr
+
+            if constexpr (has_final_check_handler<Fs...>)
+            {
+                constexpr ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<final_final_check_t<Fs...>> final_adl{};
+                define_final_check(final_adl, ret, module_end, err, fs_para);
+            }
 
             return ret;
         }

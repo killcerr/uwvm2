@@ -108,7 +108,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
             ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
 
+        // export section
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        using export_type =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_export_type<Fs...>>;
+
         // binfmt ver1
+        using final_check = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_check>;
+
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
         using binfmt_ver1_section_type = ::fast_io::tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
@@ -116,9 +125,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::global_section_storage_t<Fs...>
-                                                          /// @todo
-                                                          >;
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::global_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::export_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::start_section_storage_t,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::code_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::data_section_storage_t>;
     };
 
     /// @note ADL for distribution to the correct handler function
@@ -143,7 +155,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_memory_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_global_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_import_export_text_format<wasm1>);
+    // export section
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_export_type<wasm1>);
     // binfmt ver1
+    static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_final_check<wasm1>);
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 

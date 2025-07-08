@@ -81,14 +81,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         ::uwvm2::utils::debug::timer parsing_timer{u8"parsing parameters"};
 #endif
 
-        // No copies will be made here.
-        auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
-        // Add raii locks while unlocking operations
-        ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
-            ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
-        // No copies will be made here.
-        auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
-
         auto& pr{parsing_result};
         auto const& ht{::uwvm2::uwvm::cmdline::hash_table};
 
@@ -102,7 +94,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         // If argc is 0uz, prohibit running
         if(!argc) [[unlikely]]
         {
-            ::fast_io::io::perr(u8log_output_ul,
+            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -165,24 +157,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     // grammatical error
                     if(++curr_argv == argv_end) [[unlikely]]
                     {
-                        ::fast_io::io::perr(u8log_output_ul,
+                        ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                             u8"[error] ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                            u8"Usage: [",
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
-                                            u8"--run",
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                            u8"|",
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
-                                            u8"-r",
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                            u8"] ",
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                            u8"<file> <argv[1]> <argv[2]> ...",
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                            u8"Usage: ",
+                                            ::uwvm2::utils::cmdline::print_usage(*run_para),
                                             u8"\n\n");
 
                         return parsing_return_val::returnm1;
@@ -228,12 +210,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     // If a signed integer is required for a subsequent argument,
                     // marking one bit back as occupied_arg prevents the negative sign from being misidentified as an argument prefix.
 
-                    if(para->pretreatment)
-                    {
-                        // Unlock with function call
-                        ::fast_io::operations::decay::unlock_stream_ref_decay_lock_guard u8log_output_ulg{u8log_output_lg};
-                        para->pretreatment(curr_argv, argv_end, pr);
-                    }
+                    if(para->pretreatment) { para->pretreatment(curr_argv, argv_end, pr); }
                 }
             }
             else
@@ -249,6 +226,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
         // Checking for wrong parameters vs. duplicates
         {
+            // Here, as an entire output, the mutex needs to be controlled uniformly.
+            // There are no unspecified external calls that make the mutex deadlock.
+
+            // No copies will be made here.
+            auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
+            // Add raii locks while unlocking operations
+            ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
+                ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
+            // No copies will be made here.
+            auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
+
             bool shouldreturn{};
 
             for(auto curr_pr{pr.begin() + 1u}; curr_pr != end_pos; ++curr_pr)
@@ -357,32 +345,52 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
             for(auto curr_pr{pr.begin() + 1u}; curr_pr != end_pos; ++curr_pr)
             {
-                if(curr_pr->para == nullptr)
+                auto const cp{curr_pr->para};
+
+                if(cp == nullptr)
                 {
                     // nonparametric
                     continue;
                 }
 
-                if(auto const cb{curr_pr->para->handle}; cb != nullptr)
+                if(auto const cb{cp->handle}; cb != nullptr)
                 {
                     ::uwvm2::utils::cmdline::parameter_return_type res;  // No initialization necessary
 
-                    {
-                        // Unlock with function call
-                        ::fast_io::operations::decay::unlock_stream_ref_decay_lock_guard u8log_output_ulg{u8log_output_lg};
-                        res = cb(pr.begin(), curr_pr, pr.end());
-                    }
+                    res = cb(pr.begin(), curr_pr, pr.end());
 
                     switch(res)
                     {
-                        case ::uwvm2::utils::cmdline::parameter_return_type::def: break;
-                        case ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme: return parsing_return_val::returnm1;
-                        case ::uwvm2::utils::cmdline::parameter_return_type::return_imme: return parsing_return_val::return0;
-                        case ::uwvm2::utils::cmdline::parameter_return_type::return_soon: needexit = true; break;
-                        case ::uwvm2::utils::cmdline::parameter_return_type::err_imme: ::fast_io::fast_terminate();
-                        case ::uwvm2::utils::cmdline::parameter_return_type::err_soon: needterminal = true; break;
-                        default:
+                        case ::uwvm2::utils::cmdline::parameter_return_type::def:
+                        {
+                            break;
+                        }
+                        case ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme:
+                        {
+                            return parsing_return_val::returnm1;
+                        }
+                        case ::uwvm2::utils::cmdline::parameter_return_type::return_imme:
+                        {
+                            return parsing_return_val::return0;
+                        }
+                        case ::uwvm2::utils::cmdline::parameter_return_type::return_soon:
+                        {
+                            needexit = true;
+                            break;
+                        }
+                        case ::uwvm2::utils::cmdline::parameter_return_type::err_imme:
+                        {
+                            ::fast_io::fast_terminate();
+                        }
+                        case ::uwvm2::utils::cmdline::parameter_return_type::err_soon:
+                        {
+                            needterminal = true;
+                            break;
+                        }
+                        [[unlikely]] default:
+                        {
                             ::fast_io::unreachable();  // A correct implementation will not show any other results, and if it does, the behavior is undefined.
+                        }
                     }
                 }
             }
@@ -390,8 +398,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             if(needterminal) [[unlikely]] { ::fast_io::fast_terminate(); }
 
             if(needexit) [[unlikely]] { return parsing_return_val::returnm1; }
+        }
 
-            // Check for unmarked arg
+        // Check for unmarked arg
+        {
+            // Here, as an entire output, the mutex needs to be controlled uniformly.
+            // There are no unspecified external calls that make the mutex deadlock.
+
+            // No copies will be made here.
+            auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
+            // Add raii locks while unlocking operations
+            ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
+                ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
+            // No copies will be made here.
+            auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
 
             bool shouldreturn{};
 
@@ -421,6 +441,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                 return parsing_return_val::returnm1;
             }
         }
+
         return parsing_return_val::def;
     }
 }  // namespace uwvm2::uwvm::cmdline

@@ -111,14 +111,64 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_global_count,
         global_section_resolved_exceeded_the_actual_number,
         global_section_resolved_not_match_the_actual_number,
-        global_init_terminator_not_found
+        global_init_terminator_not_found,
+        invalid_export_count,
+        export_section_resolved_exceeded_the_actual_number,
+        export_name_length_cannot_be_zero,
+        export_name_too_length,
+        export_missing_export_type,
+        illegal_exportdesc_prefix,
+        duplicate_exports_of_the_same_export_type,
+        export_missing_export_idx,
+        export_section_resolved_not_match_the_actual_number,
+        invalid_export_idx,
+        exported_index_exceeds_maxvul,
+        invalid_export_name_length,
+        invalid_start_idx,
+        start_index_exceeds_maxvul,
+        invalid_elem_count,
+        elem_section_resolved_exceeded_the_actual_number,
+        invalid_elem_table_idx,
+        elem_table_index_exceeds_maxvul,
+        elem_init_terminator_not_found,
+        invalid_elem_funcidx_count,
+        invalid_elem_funcidx,
+        elem_func_index_exceeds_maxvul,
+        element_section_resolved_not_match_the_actual_number,
+        invalid_code_count,
+        code_ne_defined_func,
+        code_section_resolved_exceeded_the_actual_number,
+        invalid_code_body_size,
+        illegal_code_body_size,
+        code_missing_local_type,
+        invalid_clocal_n,
+        final_list_of_locals_exceeds_the_maximum_value_of_u32max,
+        code_section_resolved_not_match_the_actual_number,
+        invalid_local_count,
+        func_ref_by_start_has_illegal_sign,
+        invalid_data_count,
+        data_section_resolved_exceeded_the_actual_number,
+        invalid_data_memory_idx,
+        data_memory_index_exceeds_maxvul,
+        data_init_terminator_not_found,
+        invalid_data_byte_size_count,
+        illegal_data_byte_size_count,
+        data_section_resolved_not_match_the_actual_number,
+        invalid_section_canonical_order
     };
 
-    /// @brief used for duplicate_imports_of_the_same_import_type and duplicate_exports_of_the_same_export_type
-    struct duplicate_imports_or_exports_t
+    /// @brief used for duplicate_imports_of_the_same_import_type
+    struct duplic_imports_t
     {
         ::fast_io::u8string_view module_name;
         ::fast_io::u8string_view extern_name;
+        ::std::uint_least8_t type;
+    };
+
+    /// @brief used for duplicate_exports_of_the_same_export_type
+    struct duplic_exports_t
+    {
+        ::fast_io::u8string_view export_name;
         ::std::uint_least8_t type;
     };
 
@@ -135,6 +185,35 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::std::uint_least32_t imported;
         ::std::uint_least32_t defined;
         ::std::uint_least8_t type;
+    };
+
+    /// @brief Used to set the output of exported_index_exceeds_maxvul errors
+    struct exported_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxval;
+        ::std::uint_least8_t type;
+    };
+
+    /// @brief Used to set the output of start_index_exceeds_maxvul errors
+    struct start_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxval;
+    };
+
+    /// @brief Used to set the output of elem_table_index_exceeds_maxvul errors
+    struct elem_table_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxval;
+    };
+
+    /// @brief Used to set the output of elem_func_index_exceeds_maxvul errors
+    struct elem_func_index_exceeds_maxvul_t
+    {
+        ::std::uint_least32_t idx;
+        ::std::uint_least32_t maxval;
     };
 
     /// @brief define IEEE 754 F32 and F64
@@ -159,11 +238,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     /// @brief Additional information provided by wasm error
     union err_selectable_t
     {
-        duplicate_imports_or_exports_t duplic_imports_or_exports;
-
+        duplic_imports_t duplic_imports;
+        static_assert(::std::is_trivially_copyable_v<duplic_imports_t> && ::std::is_trivially_destructible_v<duplic_imports_t>);
+        duplic_exports_t duplic_exports;
+        static_assert(::std::is_trivially_copyable_v<duplic_exports_t> && ::std::is_trivially_destructible_v<duplic_exports_t>);
         module_name_err_t error_module_name;
-
+        static_assert(::std::is_trivially_copyable_v<module_name_err_t> && ::std::is_trivially_destructible_v<module_name_err_t>);
         imp_def_num_exceed_u32max_err_t imp_def_num_exceed_u32max;
+        static_assert(::std::is_trivially_copyable_v<imp_def_num_exceed_u32max_err_t> && ::std::is_trivially_destructible_v<imp_def_num_exceed_u32max_err_t>);
+        exported_index_exceeds_maxvul_t exported_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<exported_index_exceeds_maxvul_t> && ::std::is_trivially_destructible_v<exported_index_exceeds_maxvul_t>);
+        start_index_exceeds_maxvul_t start_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<start_index_exceeds_maxvul_t> && ::std::is_trivially_destructible_v<start_index_exceeds_maxvul_t>);
+        elem_table_index_exceeds_maxvul_t elem_table_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<elem_table_index_exceeds_maxvul_t> &&
+                      ::std::is_trivially_destructible_v<elem_table_index_exceeds_maxvul_t>);
+        elem_func_index_exceeds_maxvul_t elem_func_index_exceeds_maxvul;
+        static_assert(::std::is_trivially_copyable_v<elem_func_index_exceeds_maxvul_t> && ::std::is_trivially_destructible_v<elem_func_index_exceeds_maxvul_t>);
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;

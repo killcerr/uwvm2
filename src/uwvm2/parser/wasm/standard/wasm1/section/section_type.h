@@ -80,6 +80,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::section
         section_span_view sec_span{};
         ::fast_io::u8string_view custom_name{};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* custom_begin{};
+        // please use sec_span.sec_end instead custom_end.
     };
 
     /// @brief      Type Section

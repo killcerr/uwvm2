@@ -415,6 +415,221 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_global_init_terminator_not_found.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_export_count:
+            {
+#include "error_code_outputs/eco_invalid_export_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::export_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_export_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::export_name_length_cannot_be_zero:
+            {
+#include "error_code_outputs/eco_export_name_length_cannot_be_zero.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::export_name_too_length:
+            {
+#include "error_code_outputs/eco_export_name_too_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::export_missing_export_type:
+            {
+#include "error_code_outputs/eco_export_missing_export_type.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_exportdesc_prefix:
+            {
+#include "error_code_outputs/eco_illegal_exportdesc_prefix.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_exports_of_the_same_export_type:
+            {
+#include "error_code_outputs/eco_duplicate_exports_of_the_same_export_type.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::export_missing_export_idx:
+            {
+#include "error_code_outputs/eco_export_missing_export_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::export_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_export_section_resolved_not_match_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_export_idx:
+            {
+#include "error_code_outputs/eco_invalid_export_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::exported_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_exported_index_exceeds_maxvul.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_export_name_length:
+            {
+#include "error_code_outputs/eco_invalid_export_name_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_start_idx:
+            {
+#include "error_code_outputs/eco_invalid_start_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::start_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_start_index_exceeds_maxvul.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_count:
+            {
+#include "error_code_outputs/eco_invalid_elem_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_elem_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_table_idx:
+            {
+#include "error_code_outputs/eco_invalid_elem_table_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_table_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_elem_table_index_exceeds_maxvul.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_init_terminator_not_found:
+            {
+#include "error_code_outputs/eco_elem_init_terminator_not_found.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx_count:
+            {
+#include "error_code_outputs/eco_invalid_elem_funcidx_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx:
+            {
+#include "error_code_outputs/eco_invalid_elem_funcidx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_func_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_elem_func_index_exceeds_maxvul.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::element_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_element_section_resolved_not_match_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_code_count:
+            {
+#include "error_code_outputs/eco_invalid_code_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_ne_defined_func:
+            {
+#include "error_code_outputs/eco_code_ne_defined_func.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_code_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_code_body_size:
+            {
+#include "error_code_outputs/eco_invalid_code_body_size.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_code_body_size:
+            {
+#include "error_code_outputs/eco_illegal_code_body_size.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_missing_local_type:
+            {
+#include "error_code_outputs/eco_code_missing_local_type.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_clocal_n:
+            {
+#include "error_code_outputs/eco_invalid_clocal_n.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::final_list_of_locals_exceeds_the_maximum_value_of_u32max:
+            {
+#include "error_code_outputs/eco_final_list_of_locals_exceeds_the_maximum_value_of_u32max.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_code_section_resolved_not_match_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_local_count:
+            {
+#include "error_code_outputs/eco_invalid_local_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_ref_by_start_has_illegal_sign:
+            {
+#include "error_code_outputs/eco_func_ref_by_start_has_illegal_sign.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_data_count:
+            {
+#include "error_code_outputs/eco_invalid_data_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::data_section_resolved_exceeded_the_actual_number:
+            {
+#include "error_code_outputs/eco_data_section_resolved_exceeded_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_data_memory_idx:
+            {
+#include "error_code_outputs/eco_invalid_data_memory_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::data_memory_index_exceeds_maxvul:
+            {
+#include "error_code_outputs/eco_data_memory_index_exceeds_maxvul.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::data_init_terminator_not_found:
+            {
+#include "error_code_outputs/eco_data_init_terminator_not_found.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_data_byte_size_count:
+            {
+#include "error_code_outputs/eco_invalid_data_byte_size_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_data_byte_size_count:
+            {
+#include "error_code_outputs/eco_illegal_data_byte_size_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::data_section_resolved_not_match_the_actual_number:
+            {
+#include "error_code_outputs/eco_data_section_resolved_not_match_the_actual_number.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_section_canonical_order:
+            {
+#include "error_code_outputs/eco_invalid_section_canonical_order.h"
+                return;
+            }
         }
     }
 

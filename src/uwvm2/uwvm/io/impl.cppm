@@ -25,6 +25,7 @@ module;
 export module uwvm2.uwvm.io;
 export import :io_device;
 export import :output;
+export improt :warn_control;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

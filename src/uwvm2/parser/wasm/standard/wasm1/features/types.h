@@ -85,8 +85,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i32: [[fallthrough]];
             case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i64: [[fallthrough]];
             case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f32: [[fallthrough]];
-            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64: return true;
-            default: return false;
+            case ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64:
+            {
+                return true;
+            }
+            default:
+            {
+                return false;
+            }
         }
     }
 
@@ -139,6 +145,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
+        // flags does not need to be stored
+
         ++curr;
 
         // [flag] min ... max (end)
@@ -153,7 +161,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //        ^^ curr
 
             // scan min
-            // set present_max
+            // Storing Temporary Variables into Modules
             limit_r.present_max = false;
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_min;  // No initialization necessary
@@ -172,7 +180,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [    safe    ] unsafe (could be the end)
             //       ^^ curr
 
-            // set min
+            // Storing Temporary Variables into Modules
             limit_r.min = n_min;
 
             curr = reinterpret_cast<::std::byte const*>(next_n_min);
@@ -188,7 +196,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                ^^ curr
 
             // scan max
-            // set present_max
+            // Storing Temporary Variables into Modules
             limit_r.present_max = true;
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_max;  // No initialization necessary
@@ -207,7 +215,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [        safe        ] unsafe (could be the end)
             //               ^^ curr
 
-            // set max
+            // Storing Temporary Variables into Modules
             limit_r.max = n_max;
 
             curr = reinterpret_cast<::std::byte const*>(next_n_max);
@@ -361,6 +369,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
+        // Storing Temporary Variables into Modules
         global_r.type = gvt;
 
         ++curr;
@@ -400,6 +409,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
+        // Storing Temporary Variables into Modules
         global_r.is_mutable = static_cast<bool>(mut);
 
         ++curr;

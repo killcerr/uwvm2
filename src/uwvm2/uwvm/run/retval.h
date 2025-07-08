@@ -36,12 +36,23 @@
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
     /// @brief      main return value
-    /// @details    retval should be [0, 126) to support various platforms
+    /// @details    In posix [0, 128) are available return values and [128, 256) are signal values. In wasi_proc_exit the available values are [0, 126), so
+    ///             [126, 128) can be used as error codes for non-executable parts of the VM, such as parameter errors, wasm parsing errors, etc. On the
+    ///             wasm-wasi version of uwvm, the error code is uniformly represented by 1.
     enum retval
     {
         ok = 0,
+
+#ifdef __wasi__
         parameter_error = 1,  // Invalid parameter or handling failure
-        load_error = 2,       // The specified file is not available or cannot be opened
-        wasm_parser_error = 3
+        load_error = 1,       // The specified file is not available or cannot be opened
+        wasm_parser_error = 1
+
+#else
+        parameter_error = 126,  // Invalid parameter or handling failure
+        load_error = 127,       // The specified file is not available or cannot be opened
+        wasm_parser_error = 127
+#endif
+
     };
 }  // namespace uwvm2::uwvm::custom

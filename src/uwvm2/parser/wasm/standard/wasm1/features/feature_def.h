@@ -83,9 +83,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @brief Define functions for checking value_type to provide extensibility
     template <typename... Fs>
-    concept has_check_value_type = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                            ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> value_type) {
-        { define_check_value_type(sec_adl, value_type) } -> ::std::same_as<bool>;
+    concept has_check_typesec_value_type = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                                                    ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> value_type) {
+        { define_check_typesec_value_type(sec_adl, value_type) } -> ::std::same_as<bool>;
     };
 
     /// @brief Define functions to handle type prefix
@@ -148,8 +148,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const* function;
             ::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...> table;
+            static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...>> &&
+                          ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...>>);
             ::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...> memory;
+            static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>> &&
+                          ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>>);
             ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> global;
+            static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>> &&
+                          ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>>);
         } storage;
 
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};
@@ -259,9 +265,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         union vectypeidx_minimize_storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
             typeidx_u8_view_t typeidx_u8_view;
+            static_assert(::std::is_trivially_copyable_v<typeidx_u8_view_t> && ::std::is_trivially_destructible_v<typeidx_u8_view_t>);
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8> typeidx_u8_vector;
+            // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16> typeidx_u16_vector;
+            // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> typeidx_u32_vector;
+            // Self-control of the life cycle
 
             // Full occupancy is used to initialize the union, set the union to all zero.
             [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u]{};
@@ -725,6 +735,128 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             { global_section_global_handler(sec_adl, global_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
         };
 
+    /////////////////////////////
+    /// @brief export section ///
+    /////////////////////////////
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct export_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
+
+    union wasm1_final_export_storage_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_idx;
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 table_idx;
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 memory_idx;
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 global_idx;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm1_final_export_type
+    {
+        wasm1_final_export_storage_t storage{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};
+    };
+
+    template <typename... Fs>
+    concept has_handle_export_index = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<export_section_storage_t<Fs...>> sec_adl,
+                                               ::uwvm2::parser::wasm::standard::wasm1::features::final_export_type_t<Fs...>& fwet,
+                                               ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                               ::std::byte const* section_curr,
+                                               ::std::byte const* const section_end,
+                                               ::uwvm2::parser::wasm::base::error_impl& err,
+                                               ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        {
+            define_handler_export_index(sec_adl, fwet.storage, fwet.type, module_storage, section_curr, section_end, err, fs_para)
+        } -> ::std::same_as<::std::byte const*>;
+    };
+
+    //////////////////////////////
+    /// @brief element section ///
+    //////////////////////////////
+
+    struct elem_expr_t
+    {
+        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
+        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};  // The pointer to end is after 0x0b.
+    };
+
+    struct wasm_elem_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 table_idx{};
+        elem_expr_t expr{};
+        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> vec_funcidx{};
+    };
+
+    ///////////////////////////
+    /// @brief code section ///
+    ///////////////////////////
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct code_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
+
+    struct code_body_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* code_begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* expr_begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* code_end{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_local_entry_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 count{};
+        ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> type{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_wasm_code_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
+    {
+        code_body_t body{};
+        ::fast_io::vector<final_local_entry_t<Fs...>> locals{};
+    };
+
+    /// @brief Define functions for checking value_type to provide extensibility
+    template <typename... Fs>
+    concept has_check_codesec_value_type = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<code_section_storage_t<Fs...>> sec_adl,
+                                                    ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> value_type) {
+        { define_check_codesec_value_type(sec_adl, value_type) } -> ::std::same_as<bool>;
+    };
+
+    ///////////////////////////
+    /// @brief data section ///
+    ///////////////////////////
+
+    struct data_expr_t
+    {
+        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
+        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};  // The pointer to end is after 0x0b.
+    };
+
+    struct data_init_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};
+    };
+
+    struct wasm_data_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 memory_idx{};
+        data_expr_t expr{};
+        data_init_t byte{};
+    };
+
+    //////////////////////////
+    /// @brief Final Check ///
+    //////////////////////////
+
+    struct wasm1_final_check;
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
@@ -737,6 +869,42 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::wasm_elem_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm_elem_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_local_entry_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_code_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_code_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm_data_t>
     {
         inline static constexpr bool value = true;
     };

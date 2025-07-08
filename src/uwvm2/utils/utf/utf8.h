@@ -1483,11 +1483,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 error |= prev_incomplete;
             }
 
+            auto const error_need_check{error != static_cast<::std::uint8_t>(0u)};
+
             if(
 # if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
-                !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(error), ::std::bit_cast<i64x4simd>(error))
+                !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(error_need_check), ::std::bit_cast<i64x4simd>(error_need_check))
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
-                __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(error))  /// @todo need check
+                __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(error_need_check))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
@@ -2211,21 +2213,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 error |= prev_incomplete;
             }
 
+            auto const error_need_check{error != static_cast<::std::uint8_t>(0u)};
+
             if(
 # if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(error), ::std::bit_cast<i64x2simd>(error))
+                !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(error_need_check), ::std::bit_cast<i64x2simd>(error_need_check))
 # elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(error))
+                __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(error_need_check))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
-                !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~error))
+                !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~error_need_check))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
-                __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(error))
+                __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(error_need_check))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                  // Only supported by clang
-                __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(error))
+                __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(error_need_check))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
-                __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(error))
+                __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(error_need_check))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(error))  /// @todo need check
+                __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(error_need_check))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif

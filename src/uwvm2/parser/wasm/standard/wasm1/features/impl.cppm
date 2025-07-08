@@ -35,6 +35,12 @@ export import :function_section;
 export import :table_section;
 export import :memory_section;
 export import :global_section;
+export import :export_section;
+export improt :start_section;
+export improt :element_section;
+export import :code_section;
+export import :data_section;
+export import :final_check;
 export import :binfmt;
 
 #ifndef UWVM_MODULE

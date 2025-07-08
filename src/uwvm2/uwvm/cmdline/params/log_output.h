@@ -57,7 +57,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wbraced-scalar-init"
 #endif
-    inline constexpr ::uwvm2::utils::cmdline::parameter u8log_output{
+    inline constexpr ::uwvm2::utils::cmdline::parameter log_output{
         .name{u8"--log-output"},
         .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
         .usage{
@@ -68,7 +68,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
             u8"[out|err]"
 #endif
         },
-        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1}},
+        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1uz}},
         .handle{::std::addressof(details::log_output_callback)},
         .is_exist{::std::addressof(details::log_output_is_exist)}};
 #if defined(__clang__)
