@@ -132,7 +132,14 @@ int main()
 
             errout.err.err_code = static_cast<::uwvm2::parser::wasm::base::wasm_parse_error_code>(i);
 
-            ::fast_io::io::perrln(obuf_u8err, errout);
+            {
+                ::uwvm2::parser::wasm::base::error_output_t obuf_u8err_errout{errout};
+                obuf_u8err_errout.flag.enable_ansi = static_cast<::std::uint_least8_t>(::uwvm2::uwvm::utils::ansies::put_color);
+#  if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+                obuf_u8err_errout.flag.win32_use_text_attr = static_cast<::std::uint_least8_t>(!::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b);
+#  endif
+                ::fast_io::io::perrln(obuf_u8err, obuf_u8err_errout);
+            }
 
             ::fast_io::io::perrln(cf, errout);
             ::fast_io::io::perrln(wcf, errout);

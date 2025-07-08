@@ -312,6 +312,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [                     safe                          ]   ......                                           ] unsafe
             //                                                       ^^ section_curr
 
+            // The final list of local variables obtained by concatenating all groups must not exceed u32max.
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 all_clocal_counter{};
+
             for(::std::size_t local_counter{}; local_counter != local_count; ++local_counter)
             {
                 ::uwvm2::parser::wasm::standard::wasm1::features::final_local_entry_t<Fs...> fle{};
@@ -345,6 +348,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
                 }
+
+                // The final list of local variables obtained by concatenating all groups must not exceed u32max.
+                if(clocal_n > wasm_u32_max - all_clocal_counter) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::final_list_of_locals_exceeds_the_maximum_value_of_u32max;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                all_clocal_counter += clocal_n;
 
                 // [ ... body_size ... local_count(code_body_begin) ... clocal_n ...] clocal_type next_clocal_n ... code ...]
                 // [                             safe                               ]    ......                             ] unsafe

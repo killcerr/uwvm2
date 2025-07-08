@@ -563,13 +563,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
 
-                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [... sec_id sec_len ... sec_begin ...] next_sec_id ...
                 // [                safe                ] unsafe (could be the module_end)
                 //                         ^^ module_curr
 
                 auto const sec_end{module_curr + sec_len};
                 // Safe memory space from [module_curr, sec_end)
-                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [... sec_id sec_len ... sec_begin ...] next_sec_id ...
                 // [                safe                ] unsafe (could be the module_end)
                 //                         ^^ module_curr
                 //                                        ^^ sec_len
@@ -579,7 +579,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
                 module_curr = sec_end;
 
-                // [... sec_id sec_len ... sec_begin ...] sec_id (sec_end)
+                // [... sec_id sec_len ... sec_begin ...] next_sec_id ...
                 // [                safe                ] unsafe (could be the module_end)
                 //                                        ^^ module_curr
 
@@ -595,12 +595,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             );
 
             // (module_curr != module_end):
-            // [... sec_id sec_len ... sec_begin ... sec_id] ...
-            // [                safe                       ] unsafe (could be the module_end)
+            // [... sec_id sec_len ... sec_begin ... next_sec_id] ...
+            // [                safe                            ] unsafe (could be the module_end)
             //                                       ^^ module_curr
-
+            // or
             // (module_curr == module_end):
-            // [... sec_id sec_len ... sec_begin ...] sec_end ...
+            // [... sec_id sec_len ... sec_begin ...] (sec_end) ...
             // [                safe                ] unsafe (could be the module_end)
             //                                        ^^ module_curr
 
