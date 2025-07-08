@@ -139,6 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 u8"\n"
 # endif
             );
+
             return static_cast<int>(::uwvm2::uwvm::run::retval::load_error);
         }
 #endif
@@ -279,7 +280,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     ::uwvm2::parser::wasm_custom::base::handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_binfmt_ver1_storage,
                                                                                       ::uwvm2::uwvm::wasm::custom::custom_handle_funcs);
 
-
                     // set exec module name
                     // 1st: para --wasm-set-main-module-name
                     // 2st: custom section "name": module name
@@ -289,6 +289,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 }
 
                 /// @todo handle import modules
+
+                /// @todo handle import dll
+
+                /// @todo handle cli module
 
                 break;
             }

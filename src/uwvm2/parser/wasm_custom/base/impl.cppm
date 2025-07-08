@@ -33,6 +33,7 @@ module;
 
 export module uwvm2.parser.wasm_custom.base;
 export import :base;
+export import :cwrapper;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

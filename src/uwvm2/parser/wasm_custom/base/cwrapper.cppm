@@ -20,9 +20,26 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <map>  /// @todo use fast_io::string_hashmap instead
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+
+export module uwvm2.parser.wasm_custom.base:cwrapper;
 
 #ifndef UWVM_MODULE
-# include "base.h"
-# include "cwrapper.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "cwrapper.h"
