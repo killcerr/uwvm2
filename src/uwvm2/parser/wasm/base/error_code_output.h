@@ -345,11 +345,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_invalid_utf8_sequence.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence:
-            {
-#include "error_code_outputs/eco_module_name_is_invalid_utf8_sequence.h"
-                return;
-            }
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_table_count:
             {
 #include "error_code_outputs/eco_invalid_table_count.h"

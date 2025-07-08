@@ -66,10 +66,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::base
     /// @param  1: custom_end
     /// @return int. 0: success, others: fault
     using handlefunc_ptr_t =
-        int (*)(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*) noexcept;
+        void (*)(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*) noexcept;
 
-    inline int handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t const& module_storage,
-                                             ::std::map<::fast_io::u8string, handlefunc_ptr_t> const& custom_handler) noexcept
+    inline void handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t const& module_storage,
+                                              ::std::map<::fast_io::u8string, handlefunc_ptr_t> const& custom_handler) noexcept
     {
         auto const& customsec{
             ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t>(
@@ -80,13 +80,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::base
             if(auto const curr_custom_handler{custom_handler.find(::fast_io::u8string{cs.custom_name})}; curr_custom_handler != custom_handler.cend())
             {
                 using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = parser::wasm::standard::wasm1::type::wasm_byte const*;
-                auto res{(curr_custom_handler->second)(cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end))};
-                // 0: success, others: fault
-                if(res) [[unlikely]] { return res; }
+                (curr_custom_handler->second)(cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end));
+                // The custom section should not be terminated if an error occurs.
             }
         }
-
-        return 0;
     }
 }
 

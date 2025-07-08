@@ -59,8 +59,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
     /// @brief      Structures are specialized to store wasm binfmt ver1's module
     /// @details    module_span: The entire scope of the module, due to the 0-copy technique used by the interpreter, has to continuously open the file mapping
-    ///             module_name: The name of the module, the main module does not need to specify the name, using the path name, but the import module needs to
-    ///                          specify the name for the import
     ///             sections:    Stores a tuple of all sections, which are merged together and can be extended by templates.
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct wasm_binfmt_ver1_module_extensible_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
@@ -68,7 +66,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
         ::uwvm2::parser::wasm::binfmt::module_span_t module_span{};
-        ::fast_io::u8string_view module_name{};
         ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> sections{};
 
         static_assert(::fast_io::is_tuple<::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...>>);  // check sections is tuple

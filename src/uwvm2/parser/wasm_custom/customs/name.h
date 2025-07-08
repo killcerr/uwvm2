@@ -60,7 +60,12 @@ import uwvm2.uwvm.wasm.storage;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs {}
+UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
+{
+    struct name_storage_t
+    {
+    };
+}
 
 #ifndef UWVM_MODULE
 // macro

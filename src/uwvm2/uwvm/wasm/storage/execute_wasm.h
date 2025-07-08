@@ -46,7 +46,6 @@ import uwvm2.uwvm.wasm.feature;
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    inline ::fast_io::native_file_loader execute_wasm_file{};  // [global] No global variable dependencies from other translation units
     inline ::uwvm2::uwvm::wasm::base::mode execute_wasm_mode{
         ::uwvm2::uwvm::wasm::base::mode::objdump};  // [global] No global variable dependencies from other translation units
     inline ::uwvm2::uwvm::wasm::base::abi execute_wasm_abi{
@@ -54,13 +53,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
     inline ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
         execute_wasm_binfmt_ver{};  // [global] No global variable dependencies from other translation units
 
-    // WASM Module Binfmt 1
+    // WASM Module Binfmt 1 Parameter
     inline ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_feature_parameter_storage_t
         global_wasm_binfmt_ver1_parameters{};  // [global] No global variable dependencies from other translation units
 
-    inline ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t
-        execute_wasm_binfmt_ver1_storage{};  // [global] No global variable dependencies from other translation units
+    // WASM Module Binfmt 1 Storage
+    struct exec_wasm_t
+    {
+        ::fast_io::u8string_view module_name{};
+        ::fast_io::native_file_loader wasm_file{};
+        ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t wasm_binfmt_ver1_storage{};
+    };
 
-    inline ::fast_io::u8string_view rename_module_name{};  // [global] No global variable dependencies from other translation units
+    inline exec_wasm_t execute_wasm{};  // [global] No global variable dependencies from other translation units
 
 }  // namespace uwvm2::uwvm::wasm::storage
