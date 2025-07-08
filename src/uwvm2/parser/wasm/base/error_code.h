@@ -153,7 +153,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         data_init_terminator_not_found,
         invalid_data_byte_size_count,
         illegal_data_byte_size_count,
-        data_section_resolved_not_match_the_actual_number
+        data_section_resolved_not_match_the_actual_number,
+        invalid_section_canonical_order
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type

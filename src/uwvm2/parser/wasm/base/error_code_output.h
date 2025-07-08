@@ -625,6 +625,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_data_section_resolved_not_match_the_actual_number.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_section_canonical_order:
+            {
+#include "error_code_outputs/eco_invalid_section_canonical_order.h"
+                return;
+            }
         }
     }
 

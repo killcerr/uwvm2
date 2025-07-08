@@ -521,6 +521,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [         safe                 ] unsafe (could be the module_end)
             //                          ^^ module_curr
 
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_section_id{};
+
             // First loop with module_curr != module_end, so can use do-while.
 
             do
@@ -549,6 +551,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
                 static_assert(sizeof(sec_id) == 1uz);
                 // Size equal to one does not need to do little-endian conversion
+
+                // All standard sections (except custom sections) must be in canonical order.
+                if (sec_id != 0u)
+                {
+                    // There is no need to check for duplicate sections here, duplicate sections are checked inside the section parsing.
+
+                    if (sec_id < max_section_id) [[unlikely]]
+                    {
+                        err.err_curr = module_curr;
+                        err.err_selectable.u8arr[0] = sec_id;
+                        err.err_selectable.u8arr[1] = max_section_id;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_section_canonical_order;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    max_section_id = sec_id;
+                }
 
                 // get section length
                 ++module_curr;
@@ -647,10 +666,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [                safe                ] unsafe (could be the module_end)
             //                                        ^^ module_curr
 
-            static_assert(has_final_check_handler<Fs...>);
-
-            constexpr ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<final_final_check_t<Fs...>> final_adl{};
-            define_final_check(final_adl, ret, module_end, err, fs_para);
+            if constexpr (has_final_check_handler<Fs...>)
+            {
+                constexpr ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<final_final_check_t<Fs...>> final_adl{};
+                define_final_check(final_adl, ret, module_end, err, fs_para);
+            }
 
             return ret;
         }
