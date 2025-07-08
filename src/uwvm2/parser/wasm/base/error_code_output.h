@@ -630,6 +630,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_invalid_section_canonical_order.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_kind:
+            {
+#include "error_code_outputs/eco_invalid_elem_kind.h"
+                return;
+            }
         }
     }
 

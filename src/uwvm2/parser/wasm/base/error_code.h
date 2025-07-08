@@ -154,7 +154,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_data_byte_size_count,
         illegal_data_byte_size_count,
         data_section_resolved_not_match_the_actual_number,
-        invalid_section_canonical_order
+        invalid_section_canonical_order,
+        invalid_elem_kind
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type

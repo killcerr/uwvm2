@@ -552,12 +552,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 static_assert(sizeof(sec_id) == 1uz);
                 // Size equal to one does not need to do little-endian conversion
 
-                // All standard sections (except custom sections) must be in canonical order.
-                if (sec_id != 0u)
+                // All standard sections (except custom sections, id: 0) must be in canonical order.
+                if(sec_id != 0u)
                 {
-                    // There is no need to check for duplicate sections here, duplicate sections are checked inside the section parsing.
+                    // There is no need to check for duplicate (sec_id <= max_section_id) sections here,
+                    // duplicate sections are checked inside the section parsing.
 
-                    if (sec_id < max_section_id) [[unlikely]]
+                    if(sec_id < max_section_id) [[unlikely]]
                     {
                         err.err_curr = module_curr;
                         err.err_selectable.u8arr[0] = sec_id;
@@ -666,7 +667,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [                safe                ] unsafe (could be the module_end)
             //                                        ^^ module_curr
 
-            if constexpr (has_final_check_handler<Fs...>)
+            if constexpr(has_final_check_handler<Fs...>)
             {
                 constexpr ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<final_final_check_t<Fs...>> final_adl{};
                 define_final_check(final_adl, ret, module_end, err, fs_para);

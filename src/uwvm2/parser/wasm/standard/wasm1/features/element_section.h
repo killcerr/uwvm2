@@ -73,6 +73,7 @@ import :types;
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 {
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct element_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         inline static constexpr ::fast_io::u8string_view section_name{u8"Element"};
@@ -81,28 +82,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::wasm_elem_t> elems{};
+        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_element_type_t<Fs...>> elems{};
     };
 
-    /// @brief Define the handler function for element_section
+    /// @brief Define function for wasm1 wasm1_element_t
+    /// @note  ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void handle_binfmt_ver1_extensible_section_define(
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<element_section_storage_t> sec_adl,
-        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-        ::std::byte const* const section_begin,
+    inline constexpr ::std::byte const* define_handler_element_type(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<element_section_storage_t<Fs...>> sec_adl,
+        decltype(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_element_t<Fs...>{}.storage)& fet_storage,  // [adl]
+        decltype(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_element_t<Fs...>{}.type) const fet_type,   // [adl]
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+        ::std::byte const* section_curr,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
-        ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
-#ifdef UWVM_TIMER
-        ::uwvm2::utils::debug::timer parsing_timer{u8"parse element section (id: 9)"};
-#endif
-        // Note that section_begin may be equal to section_end
-        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+        // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
+        // [     safe    ] unsafe (could be the section_end)
+        //                 ^^ section_curr
 
-        // get element_section_storage_t from storages
-        auto& elemsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<element_section_storage_t>(module_storage.sections)};
+        ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t& wet{fet_storage.table_idx};
+        auto const elem_table_idx{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(fet_type)};
 
         // import section
         auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(module_storage.sections)};
@@ -123,6 +124,181 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const imported_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(1uz).size())};
         // Addition does not overflow
         auto const all_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_table_size + imported_table_size)};
+
+        // check table index
+        if(elem_table_idx >= all_table_size) [[unlikely]]
+        {
+            err.err_curr = section_curr;
+            err.err_selectable.elem_table_index_exceeds_maxvul.idx = elem_table_idx;
+            err.err_selectable.elem_table_index_exceeds_maxvul.maxval = all_table_size;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_table_index_exceeds_maxvul;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        wet.table_idx = elem_table_idx;
+
+        // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
+        // [     safe    ] unsafe (could be the section_end)
+        //                 ^^ section_curr
+
+        using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*;
+
+        // get expr
+        wet.expr.begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
+
+        // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
+        // [     safe    ] unsafe (could be the section_end)
+        //                 ^^ wet.expr.begin
+
+        for(;; ++section_curr)
+        {
+            if(section_curr == section_end) [[unlikely]]
+            {
+                // [table_idx ... ...] (end)
+                // [     safe        ] unsafe (could be the section_end)
+                //                     ^^ section_curr
+
+                err.err_curr = section_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_init_terminator_not_found;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [... curr] ...
+            // [  safe  ] unsafe (could be the section_end)
+            //      ^^ section_curr
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type section_curr_c8;
+            ::std::memcpy(::std::addressof(section_curr_c8), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type));
+
+#if CHAR_BIT > 8
+            section_curr_c8 &= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0xFFu);
+#endif
+
+            if(section_curr_c8 == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)) { break; }
+        }
+
+        // [table_idx ... expr ... 0x0B] func_count ... func ... next_table_idx ...
+        // [            safe           ] unsafe (could be the section_end)
+        //                         ^^ section_curr
+
+        ++section_curr;
+
+        // [table_idx ... expr ... 0x0B] func_count ... func ... next_table_idx ...
+        // [            safe           ] unsafe (could be the section_end)
+        //                               ^^ section_curr
+        //                               ^^ wet.expr.end
+
+        wet.expr.end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
+
+        // No boundary check is needed here, parse_by_scan comes with its own checks
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 funcidx_count;
+
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        auto const [funcidx_count_next, funcidx_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                    ::fast_io::mnp::leb128_get(funcidx_count))};
+
+        if(funcidx_count_err != ::fast_io::parse_code::ok) [[unlikely]]
+        {
+            err.err_curr = section_curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx_count;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(funcidx_count_err);
+        }
+
+        // [table_idx ... expr ... 0x0B func_count ...] func ... next_table_idx ...
+        // [                     safe                 ] unsafe (could be the section_end)
+        //                              ^^ section_curr
+
+        // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+        if constexpr(size_t_max < wasm_u32_max)
+        {
+            // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            if(funcidx_count > size_t_max) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u64 = static_cast<::std::uint_least64_t>(funcidx_count);
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+        }
+
+        wet.vec_funcidx.reserve(static_cast<::std::size_t>(funcidx_count));
+
+        section_curr = reinterpret_cast<::std::byte const*>(funcidx_count_next);
+
+        // [table_idx ... expr ... 0x0B func_count ...] func ... next_table_idx ...
+        // [                     safe                 ] unsafe (could be the section_end)
+        //                                              ^^ section_curr
+
+        for(::std::size_t funcidx_counter{}; funcidx_counter != funcidx_count; ++funcidx_counter)
+        {
+            // [ ...] func_curr ... func_next ...
+            // [safe] unsafe (could be the section_end)
+            //        ^^ section_curr
+
+            // No boundary check is needed here, parse_by_scan comes with its own checks
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 funcidx;
+
+            auto const [funcidx_next, funcidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                            ::fast_io::mnp::leb128_get(funcidx))};
+
+            if(funcidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(funcidx_err);
+            }
+
+            // [ ... func_curr ...] func_next ...
+            // [       safe       ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
+            if(funcidx >= all_func_size) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.elem_func_index_exceeds_maxvul.idx = funcidx;
+                err.err_selectable.elem_func_index_exceeds_maxvul.maxval = all_func_size;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_func_index_exceeds_maxvul;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            wet.vec_funcidx.push_back_unchecked(funcidx);
+
+            section_curr = reinterpret_cast<::std::byte const*>(funcidx_next);
+
+            // [ ... func_curr ...] func_next ...
+            // [       safe       ] unsafe (could be the section_end)
+            //                      ^^ section_curr
+        }
+
+        return section_curr;
+    }
+
+    /// @brief Define the handler function for element_section
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void handle_binfmt_ver1_extensible_section_define(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<element_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* const section_begin,
+        ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+        ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
+    {
+#ifdef UWVM_TIMER
+        ::uwvm2::utils::debug::timer parsing_timer{u8"parse element section (id: 9)"};
+#endif
+        // Note that section_begin may be equal to section_end
+        // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
+
+        // get element_section_storage_t from storages
+        auto& elemsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<element_section_storage_t<Fs...>>(module_storage.sections)};
 
         // check duplicate
         if(elemsec.sec_span.sec_begin) [[unlikely]]
@@ -192,7 +368,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             // Ensuring the existence of valid information
 
-            // [table_idx] ... expr ... 0x0B func_count ... func ... next_table_idx ...
+            // [elem_kind] ...
             // [   safe  ] unsafe (could be the section_end)
             //  ^^ section_curr
 
@@ -206,174 +382,47 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
-            ::uwvm2::parser::wasm::standard::wasm1::features::wasm_elem_t wet{};
+            // be used to store
+            ::uwvm2::parser::wasm::standard::wasm1::features::final_element_type_t<Fs...> fet{};
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 elem_table_idx;  // No initialization necessary
+            // [elem_kind] ...
+            // [   safe  ] unsafe (could be the section_end)
+            //  ^^ section_curr
 
-            auto const [elem_table_idx_next, elem_table_idx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                          reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
-                                                                                          ::fast_io::mnp::leb128_get(elem_table_idx))};
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 elem_kind;  // No initialization necessary
 
-            if(elem_table_idx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            auto const [elem_kind_next, elem_kind_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                ::fast_io::mnp::leb128_get(elem_kind))};
+
+            if(elem_kind_err != ::fast_io::parse_code::ok) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_table_idx;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(elem_table_idx_err);
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_kind;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(elem_kind_err);
             }
 
-            // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
+            // [elem_kind ...] ...
             // [     safe    ] unsafe (could be the section_end)
             //  ^^ section_curr
 
-            // check table index
-            if(elem_table_idx >= all_table_size) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_selectable.elem_table_index_exceeds_maxvul.idx = elem_table_idx;
-                err.err_selectable.elem_table_index_exceeds_maxvul.maxval = all_table_size;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_table_index_exceeds_maxvul;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
+            fet.type = static_cast<decltype(fet.type)>(elem_kind);
 
-            wet.table_idx = elem_table_idx;
+            section_curr = reinterpret_cast<::std::byte const*>(elem_kind_next);
 
-            section_curr = reinterpret_cast<::std::byte const*>(elem_table_idx_next);
-
-            // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
+            // [elem_kind ...] ...
             // [     safe    ] unsafe (could be the section_end)
             //                 ^^ section_curr
 
-            // get expr
-            wet.expr.begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_handle_element_type<Fs...>);
 
-            // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
-            // [     safe    ] unsafe (could be the section_end)
-            //                 ^^ wet.expr.begin
+            section_curr = define_handler_element_type(sec_adl, fet.storage, fet.type, module_storage, section_curr, section_end, err, fs_para);
 
-            for(;; ++section_curr)
-            {
-                if(section_curr == section_end) [[unlikely]]
-                {
-                    // [table_idx ... ...] (end)
-                    // [     safe        ] unsafe (could be the section_end)
-                    //                     ^^ section_curr
+            // [elem_kind ... ...] (end)
+            // [     safe     unsafe (could be the section_end)
+            //                     ^^ section_curr
 
-                    err.err_curr = section_curr;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_init_terminator_not_found;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-
-                // [... curr] ...
-                // [  safe  ] unsafe (could be the section_end)
-                //      ^^ section_curr
-
-                ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type section_curr_c8;
-                ::std::memcpy(::std::addressof(section_curr_c8), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type));
-
-#if CHAR_BIT > 8
-                section_curr_c8 &= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0xFFu);
-#endif
-
-                if(section_curr_c8 == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)) { break; }
-            }
-
-            // [table_idx ... expr ... 0x0B] func_count ... func ... next_table_idx ...
-            // [            safe           ] unsafe (could be the section_end)
-            //                         ^^ section_curr
-
-            ++section_curr;
-
-            // [table_idx ... expr ... 0x0B] func_count ... func ... next_table_idx ...
-            // [            safe           ] unsafe (could be the section_end)
-            //                               ^^ section_curr
-            //                               ^^ wet.expr.end
-
-            wet.expr.end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
-
-            // No boundary check is needed here, parse_by_scan comes with its own checks
-
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 funcidx_count;
-
-            auto const [funcidx_count_next, funcidx_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                        reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
-                                                                                        ::fast_io::mnp::leb128_get(funcidx_count))};
-
-            if(funcidx_count_err != ::fast_io::parse_code::ok) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx_count;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(funcidx_count_err);
-            }
-
-            // [table_idx ... expr ... 0x0B func_count ...] func ... next_table_idx ...
-            // [                     safe                 ] unsafe (could be the section_end)
-            //                              ^^ section_curr
-
-            // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
-            if constexpr(size_t_max < wasm_u32_max)
-            {
-                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
-                if(funcidx_count > size_t_max) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.u64 = static_cast<::std::uint_least64_t>(funcidx_count);
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-            }
-
-            wet.vec_funcidx.reserve(static_cast<::std::size_t>(funcidx_count));
-
-            section_curr = reinterpret_cast<::std::byte const*>(funcidx_count_next);
-
-            // [table_idx ... expr ... 0x0B func_count ...] func ... next_table_idx ...
-            // [                     safe                 ] unsafe (could be the section_end)
-            //                                              ^^ section_curr
-
-            for(::std::size_t funcidx_counter{}; funcidx_counter != funcidx_count; ++funcidx_counter)
-            {
-                // [ ...] func_curr ... func_next ...
-                // [safe] unsafe (could be the section_end)
-                //        ^^ section_curr
-
-                // No boundary check is needed here, parse_by_scan comes with its own checks
-
-                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 funcidx;
-
-                auto const [funcidx_next, funcidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
-                                                                                ::fast_io::mnp::leb128_get(funcidx))};
-
-                if(funcidx_err != ::fast_io::parse_code::ok) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(funcidx_err);
-                }
-
-                // [ ... func_curr ...] func_next ...
-                // [       safe       ] unsafe (could be the section_end)
-                //       ^^ section_curr
-
-                if(funcidx >= all_func_size) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.elem_func_index_exceeds_maxvul.idx = funcidx;
-                    err.err_selectable.elem_func_index_exceeds_maxvul.maxval = all_func_size;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_func_index_exceeds_maxvul;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-
-                wet.vec_funcidx.push_back_unchecked(funcidx);
-
-                section_curr = reinterpret_cast<::std::byte const*>(funcidx_next);
-
-                // [ ... func_curr ...] func_next ...
-                // [       safe       ] unsafe (could be the section_end)
-                //                      ^^ section_curr
-            }
-
-            elemsec.elems.push_back_unchecked(::std::move(wet));
+            elemsec.elems.push_back_unchecked(::std::move(fet));
         }
 
         // [... ] (section_end)
@@ -395,14 +444,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
-    template <>
-    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t>
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t<Fs...>>
     {
         inline static constexpr bool value = true;
     };
 
-    template <>
-    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t>
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t<Fs...>>
     {
         inline static constexpr bool value = true;
     };
