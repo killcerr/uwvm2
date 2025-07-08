@@ -99,6 +99,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         global = 0u,
         debug,
         wasm,
+        log
     };
 
     /// @brief Execution charset EBCDIC not supported
