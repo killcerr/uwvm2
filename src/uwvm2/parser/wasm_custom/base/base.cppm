@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-19
+ * @date        2025-07-09
  * @copyright   ASHP-1.0 License
  */
 
@@ -33,7 +33,7 @@ module;
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
-export module uwvm2.uwvm.wasm.custom:base;
+export module uwvm2.parser.wasm_custom.base:base;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

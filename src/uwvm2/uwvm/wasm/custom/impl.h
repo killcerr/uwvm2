@@ -23,6 +23,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "base.h"
 # include "storage.h"
 #endif

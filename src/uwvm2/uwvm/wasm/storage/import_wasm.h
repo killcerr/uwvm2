@@ -33,6 +33,7 @@ import uwvm2.uwvm.wasm.feature;
 #else
 // import
 # include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
@@ -44,8 +45,12 @@ import uwvm2.uwvm.wasm.feature;
 #endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    inline ::fast_io::vector<::fast_io::native_file_loader> import_wasm_file{};  // [global] No global variable dependencies from other translation units
-    inline ::fast_io::vector<::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t>
-        import_wasm_binfmt_ver1_storage{};  // [global] No global variable dependencies from other translation units
-    // TODO: import_wasm_module // The result of parsing the wasm is used to add the import module directly.
+    struct imported_wasm_t
+    {
+        ::fast_io::u8string_view import_wasm_module_name{};
+        ::fast_io::native_file_loader import_wasm_file{};
+        ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t import_wasm_binfmt_ver1_storage{};
+    };
+
+    inline ::fast_io::vector<imported_wasm_t> imported_wasm{};  // [global] No global variable dependencies from other translation units
 }  // namespace uwvm2::uwvm::wasm::storage

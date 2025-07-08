@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-19
+ * @date        2025-07-09
  * @copyright   ASHP-1.0 License
  */
 
@@ -24,7 +24,13 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm2.parser.wasm_custom;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.standard;
+import uwvm2.uwvm.io;
+import uwvm2.uwvm.utils.ansies;
+import uwvm2.uwvm.utils.memory;
+import uwvm2.uwvm.wasm.feature;
+import uwvm2.uwvm.wasm.storage;
 #else
 // std
 # include <cstddef>
@@ -35,26 +41,29 @@ import uwvm2.parser.wasm_custom;
 # include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
-# include <uwvm2/parser/wasm_custom/impl.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm/standard/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/uwvm/utils/ansies/impl.h>
+# include <uwvm2/uwvm/utils/memory/impl.h>
+# include <uwvm2/uwvm/wasm/feature/impl.h>
+# include <uwvm2/uwvm/wasm/storage/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
-{
-    /// @todo use fast_io::unorder_map instead
-    inline ::std::map<::fast_io::u8string, ::uwvm2::parser::wasm_custom::base::handlefunc_ptr_t>
-        custom_handle_funcs{};  // [global] No global variable dependencies from other translation units
-}
+UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs {}
 
 #ifndef UWVM_MODULE
 // macro
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

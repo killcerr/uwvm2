@@ -271,9 +271,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                         // Output the main information and memory indication
                         ::fast_io::io::perr(u8log_output_ul,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Parsing error in WebAssembly Module \"",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            set_module_name,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\" to be executed.\n",
                                             errout,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                            u8"\nuwvm: ",
+                                            u8"\n" u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                             u8"[info]  ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
@@ -312,11 +322,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error);
                     }
 #endif
-                    /// @todo
                     // handle custom section
                     auto const custom_res{
-                        ::uwvm2::uwvm::wasm::custom::handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
-                                                                                   ::uwvm2::uwvm::wasm::custom::custom_handle_funcs)};
+                        ::uwvm2::parser::wasm_custom::base::handle_binfmt1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver1_storage,
+                                                                                          ::uwvm2::uwvm::wasm::custom::custom_handle_funcs)};
+
                     // 0: success, others: fault
                     if(custom_res) [[unlikely]] { return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error); }
                 }

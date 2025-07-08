@@ -40,7 +40,13 @@ import fast_io;
 # endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    inline ::fast_io::vector<::fast_io::native_dll_file> import_dl_file{};  // [global] No global variable dependencies from other translation units
+    struct imported_dl_t
+    {
+        ::fast_io::u8string_view import_wasm_module_name{};
+        ::fast_io::native_dll_file import_dll_file{};
+    };
+
+    inline ::fast_io::vector<imported_dl_t> imported_dl{};  // [global] No global variable dependencies from other translation units
 
     // TODO: import_dl_func // The result of parsing the dl is used to add the import module directly.
 }  // namespace uwvm2::uwvm::wasm::storage
