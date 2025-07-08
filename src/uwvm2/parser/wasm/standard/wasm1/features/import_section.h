@@ -568,6 +568,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [         safe          ] unsafe (could be the section_end)
             //       ^^ section_curr
 
+            // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            if constexpr(size_t_max < wasm_u32_max)
+            {
+                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                if(module_namelen > size_t_max) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u64 = static_cast<::std::uint_least64_t>(module_namelen);
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
+
             if(module_namelen == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
             {
                 err.err_curr = section_curr;
@@ -588,7 +601,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                           ^^ section_curr
 
             // check modulenamelen
-            if(static_cast<::std::size_t>(section_end - section_curr) < module_namelen) [[unlikely]]
+            if(static_cast<::std::size_t>(section_end - section_curr) < static_cast<::std::size_t>(module_namelen)) [[unlikely]]
             {
                 err.err_curr = import_module_name_too_length_ptr;
                 err.err_selectable.u32 = module_namelen;
@@ -633,6 +646,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(extern_namelen_err);
             }
 
+            // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            if constexpr(size_t_max < wasm_u32_max)
+            {
+                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                if(extern_namelen > size_t_max) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u64 = static_cast<::std::uint_least64_t>(extern_namelen);
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
+
             // [...  module_namelen ... module_name ... extern_namelen ...] extern_name ... import_type extern_func ...
             // [                            safe                          ] unsafe (could be the section_end)
             //                                          ^^ section_curr
@@ -657,7 +683,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                                                              ^^ section_curr
 
             // check externnamelen
-            if(static_cast<::std::size_t>(section_end - section_curr) < extern_namelen) [[unlikely]]
+            if(static_cast<::std::size_t>(section_end - section_curr) < static_cast<::std::size_t>(extern_namelen)) [[unlikely]]
             {
                 err.err_curr = import_extern_name_too_length_ptr;
                 err.err_selectable.u32 = extern_namelen;

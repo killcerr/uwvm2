@@ -779,8 +779,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
         inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
 
-        ::std::byte const* begin{};
-        ::std::byte const* end{};  // The pointer to end is after 0x0b.
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};  // The pointer to end is after 0x0b.
     };
 
     struct wasm_elem_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
@@ -799,9 +799,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     struct code_body_t
     {
-        ::std::byte const* code_begin{};
-        ::std::byte const* expr_begin{};
-        ::std::byte const* code_end{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* code_begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* expr_begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* code_end{};
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -824,6 +824,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                     ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> value_type) {
         { define_check_codesec_value_type(sec_adl, value_type) } -> ::std::same_as<bool>;
     };
+
+    ///////////////////////////
+    /// @brief data section ///
+    ///////////////////////////
+
+    struct data_expr_t
+    {
+        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
+        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};  // The pointer to end is after 0x0b.
+    };
+
+    struct data_init_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};
+    };
+
+    struct wasm_data_t
+    {
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 memory_idx{};
+        data_expr_t expr{};
+        data_init_t byte{};
+    };
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
@@ -866,6 +893,12 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_code_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm_data_t>
     {
         inline static constexpr bool value = true;
     };

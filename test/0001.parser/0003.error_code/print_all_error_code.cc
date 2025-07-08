@@ -51,6 +51,8 @@ import uwvm2.uwvm.wasm.storage;
 int main()
 {
     {
+        ::fast_io::basic_obuf<::fast_io::u8native_io_observer> obuf_u8err{::fast_io::u8err()};
+
         ::fast_io::obuf_file cf{u8"error_code_test_c.log"};
         ::fast_io::wobuf_file wcf{u8"error_code_test_wc.log"};
         ::fast_io::u8obuf_file u8cf{u8"error_code_test_u8c.log"};
@@ -59,7 +61,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::func_ref_by_start_has_illegal_sign) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::data_section_resolved_not_match_the_actual_number) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -129,6 +131,9 @@ int main()
             }
 
             errout.err.err_code = static_cast<::uwvm2::parser::wasm::base::wasm_parse_error_code>(i);
+
+            ::fast_io::io::perrln(obuf_u8err, errout);
+
             ::fast_io::io::perrln(cf, errout);
             ::fast_io::io::perrln(wcf, errout);
             ::fast_io::io::perrln(u8cf, errout);

@@ -244,7 +244,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                 ^^ section_curr
 
             // get expr
-            wet.expr.begin = section_curr;
+            wet.expr.begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
 
             // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
             // [     safe    ] unsafe (could be the section_end)
@@ -263,9 +263,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
 
-                // [table_idx ...] expr ... 0x0B func_count ... func ... next_table_idx ...
-                // [     safe    ] unsafe (could be the section_end)
-                //                 ^^^^^^^^ section_curr
+                // [... curr] ...
+                // [  safe  ] unsafe (could be the section_end)
+                //      ^^ section_curr
 
                 ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type section_curr_c8;
                 ::std::memcpy(::std::addressof(section_curr_c8), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type));
@@ -288,7 +288,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                               ^^ section_curr
             //                               ^^ wet.expr.end
 
-            wet.expr.end = section_curr;
+            wet.expr.end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
 
             // No boundary check is needed here, parse_by_scan comes with its own checks
 
@@ -322,7 +322,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
             }
 
-            wet.vec_funcidx.reserve(funcidx_count);
+            wet.vec_funcidx.reserve(static_cast<::std::size_t>(funcidx_count));
 
             section_curr = reinterpret_cast<::std::byte const*>(funcidx_count_next);
 

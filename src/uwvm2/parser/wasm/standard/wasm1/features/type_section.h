@@ -134,6 +134,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_para_len);
             }
 
+            // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+            constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+            if constexpr(size_t_max < wasm_u32_max)
+            {
+                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                if(para_len > size_t_max) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u64 = static_cast<::std::uint_least64_t>(para_len);
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
+
             // [... prefix para_len ...] para_begin ... res_len (para_end) ... res_begin ... prefix (res_end) ...
             // [           safe        ] unsafe (could be the section_end)
             //             ^^ section_curr
@@ -145,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [           safe        ] unsafe (could be the section_end)
             //                           ^^ section_curr
 
-            if(static_cast<::std::size_t>(section_end - section_curr) < para_len) [[unlikely]]
+            if(static_cast<::std::size_t>(section_end - section_curr) < static_cast<::std::size_t>(para_len)) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = para_len;
@@ -204,6 +219,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_result_len);
             }
 
+            // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+            constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+            constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+            if constexpr(size_t_max < wasm_u32_max)
+            {
+                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                if(result_len > size_t_max) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u64 = static_cast<::std::uint_least64_t>(result_len);
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
+
             // [... prefix para_len ... para_begin ... res_len (para_end) ...] res_begin ... prefix (res_end) ...
             // [                           safe                              ] unsafe (could be the section_end)
             //                                         ^^ section_curr
@@ -229,7 +259,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
             }
 
-            if(static_cast<::std::size_t>(section_end - section_curr) < result_len) [[unlikely]]
+            if(static_cast<::std::size_t>(section_end - section_curr) < static_cast<::std::size_t>(result_len)) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = result_len;

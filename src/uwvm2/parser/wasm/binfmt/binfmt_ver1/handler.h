@@ -322,8 +322,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     /// @brief Define a function for binfmt1 to check for utf8 sequences.
     /// @note  ADL for distribution to the correct handler function
     inline constexpr void check_module_name_text_format(
-        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl] can be
-                                                                                                                                               // replaced
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl]
         ::std::byte const* begin,
         ::std::byte const* end,
         ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -529,6 +528,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(sec_len_err);
                 }
 
+                // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+                constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+                if constexpr(size_t_max < wasm_u32_max)
+                {
+                    // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                    if(sec_len > size_t_max) [[unlikely]]
+                    {
+                        err.err_curr = module_curr;
+                        err.err_selectable.u64 = static_cast<::std::uint_least64_t>(sec_len);
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::size_exceeds_the_maximum_value_of_size_t;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+                }
+
                 // [... sec_id sec_len ...] sec_begin ... sec_id (sec_end)
                 // [       safe           ] unsafe (could be the module_end)
                 //             ^^ module_curr
@@ -541,7 +555,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 //                          ^^ module_curr
 
                 // check length
-                if(static_cast<::std::size_t>(module_end - module_curr) < sec_len) [[unlikely]]
+                if(static_cast<::std::size_t>(module_end - module_curr) < static_cast<::std::size_t>(sec_len)) [[unlikely]]
                 {
                     err.err_curr = module_curr;
                     err.err_selectable.u32 = sec_len;

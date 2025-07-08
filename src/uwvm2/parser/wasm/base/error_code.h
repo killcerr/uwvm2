@@ -138,12 +138,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_code_count,
         code_ne_defined_func,
         code_section_resolved_exceeded_the_actual_number,
-        invalid_body_size,
+        invalid_code_body_size,
+        illegal_code_body_size,
         code_missing_local_type,
         invalid_clocal_n,
         code_section_resolved_not_match_the_actual_number,
         invalid_local_count,
-        func_ref_by_start_has_illegal_sign
+        func_ref_by_start_has_illegal_sign,
+        invalid_data_count,
+        data_section_resolved_exceeded_the_actual_number,
+        invalid_data_memory_idx,
+        data_memory_index_exceeds_maxvul,
+        data_init_terminator_not_found,
+        invalid_data_byte_size_count,
+        illegal_data_byte_size_count,
+        data_section_resolved_not_match_the_actual_number
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type

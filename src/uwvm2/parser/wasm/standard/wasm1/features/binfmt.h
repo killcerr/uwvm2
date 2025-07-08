@@ -126,9 +126,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::export_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::start_section_storage_t,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::code_section_storage_t<Fs...>
-                                                          /// @todo
-                                                          >;
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::code_section_storage_t<Fs...>,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::data_section_storage_t>;
     };
 
     /// @note ADL for distribution to the correct handler function
