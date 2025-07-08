@@ -283,12 +283,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief Define the handler function for element_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<element_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<element_section_storage_t<Fs...>> sec_adl,
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* const section_begin,
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
         ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
@@ -398,7 +398,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             if(elem_kind_err != ::fast_io::parse_code::ok) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_kind;
+                if constexpr(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_element_type_t<Fs...>,
+                                            ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_element_t<Fs...>>)
+                {
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_table_idx;
+                }
+                else
+                {
+                    // In wasm 1.1 the table idx can only be 0 for expansion using wasm 1.0, so the type of error reported is different
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_kind;
+                }
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(elem_kind_err);
             }
 
@@ -419,7 +428,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             section_curr = define_handler_element_type(sec_adl, fet.storage, fet.type, module_storage, section_curr, section_end, err, fs_para);
 
             // [elem_kind ... ...] (end)
-            // [     safe     unsafe (could be the section_end)
+            // [     safe        ] unsafe (could be the section_end)
             //                     ^^ section_curr
 
             elemsec.elems.push_back_unchecked(::std::move(fet));

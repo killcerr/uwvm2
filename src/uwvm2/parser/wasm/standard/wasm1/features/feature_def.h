@@ -801,20 +801,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <typename... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
     struct wasm1_element_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::std::size_t sizeof_vectypeidx_minimize_storage_u{get_union_size<typeidx_u8_view_t, wasm1_elem_storage_t>()};
+        inline static constexpr ::std::size_t sizeof_storage_u{get_union_size<typeidx_u8_view_t, wasm1_elem_storage_t>()};
 
-        union storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
+        union storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
+            // This type can be initialized with all zeros
             wasm1_elem_storage_t table_idx;
 
             // Full occupancy is used to initialize the union, set the union to all zero.
-            [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u]{};
+            [[maybe_unused]] ::std::byte sizeof_storage_u_reserve[sizeof_storage_u]{};
 
-            // destructor of 'storage_t' is implicitly deleted because variant field 'typeidx_u8_vector' has a non-trivial destructor
-            inline constexpr ~storage_t() noexcept {}
+            // destructor of 'storage_u' is implicitly deleted because variant field 'typeidx_u8_vector' has a non-trivial destructor
+            inline constexpr ~storage_u() noexcept {}
 
             // The release of table_idx is managed by struct wasm1_element_t, there is no issue of raii resources being unreleased.
         } storage;
+
+        static_assert(sizeof(storage_u) == sizeof_storage_u, "sizeof(storage_t) not equal to sizeof_storage_u");
 
         wasm1_element_type_t type{};
 
@@ -905,7 +908,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief data section ///
     ///////////////////////////
 
-    struct data_expr_t
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct data_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
+
+    struct wasm1_data_expr_t
     {
         // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
         inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
@@ -914,17 +920,48 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};  // The pointer to end is after 0x0b.
     };
 
-    struct data_init_t
+    struct wasm1_data_init_t
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};
     };
 
-    struct wasm_data_t
+    struct wasm1_data_storage_t
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 memory_idx{};
-        data_expr_t expr{};
-        data_init_t byte{};
+        wasm1_data_expr_t expr{};
+        wasm1_data_init_t byte{};
+    };
+
+    enum class wasm1_data_type_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
+    {
+        memoryidx = 0u,
+    };
+
+    template <typename... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
+    struct wasm1_data_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
+    {
+        union storage_u
+        {
+            wasm1_data_storage_t memory_idx;
+
+            static_assert(::std::is_trivially_copyable_v<wasm1_data_storage_t> && ::std::is_trivially_destructible_v<wasm1_data_storage_t>);
+        } storage;
+
+        wasm1_data_type_t type{};
+    };
+
+    template <typename... Fs>
+    concept has_handle_data_type = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<data_section_storage_t<Fs...>> sec_adl,
+                                            ::uwvm2::parser::wasm::standard::wasm1::features::final_data_type_t<Fs...>& fet,
+                                            ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                            ::std::byte const* section_curr,
+                                            ::std::byte const* const section_end,
+                                            ::uwvm2::parser::wasm::base::error_impl& err,
+                                            ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        {
+            define_handler_data_type(sec_adl, fet.storage, fet.type, module_storage, section_curr, section_end, err, fs_para)
+        } -> ::std::same_as<::std::byte const*>;
     };
 
     //////////////////////////
@@ -979,8 +1016,8 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
         inline static constexpr bool value = true;
     };
 
-    template <>
-    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm_data_t>
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_data_t<Fs...>>
     {
         inline static constexpr bool value = true;
     };
