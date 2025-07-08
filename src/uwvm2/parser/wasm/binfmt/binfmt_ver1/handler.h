@@ -105,6 +105,49 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
         has_handle_binfmt_ver1_extensible_section_define<Ty, Fs...> && has_section_id_define<Ty>;
 
+    /// @brief      has final_check type
+    /// @details
+    ///             ```cpp
+    ///
+    ///             struct basic_final_check
+    ///             {
+    ///             };
+    ///
+    ///             struct F
+    ///             {
+    ///                 template <typename ... Fs>
+    ///                 using final_check = type_replacer<root_of_replacement, basic_final_check>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_final_check = requires {
+        typename FeatureType::final_check;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::final_check>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_final_check() noexcept
+    {
+        if constexpr(has_final_check<FeatureType>) { return typename FeatureType::final_check{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_final_check_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_final_check<Fs>())...>;
+
+    template <typename... Fs>
+    concept has_final_check_handler = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<final_final_check_t<Fs...>> final_adl,
+                                               ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                                               ::std::byte const* const module_end,
+                                               ::uwvm2::parser::wasm::base::error_impl& err,
+                                               ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        { define_final_check(final_adl, module_storage, module_end, err, fs_para) } -> ::std::same_as<void>;
+    };
+
     namespace details
     {
         template <typename... Sec>
@@ -603,6 +646,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [... sec_id sec_len ... sec_begin ...] (sec_end) ...
             // [                safe                ] unsafe (could be the module_end)
             //                                        ^^ module_curr
+
+            static_assert(has_final_check_handler<Fs...>);
+
+            constexpr ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<final_final_check_t<Fs...>> final_adl{};
+            define_final_check(final_adl, ret, module_end, err, fs_para);
 
             return ret;
         }

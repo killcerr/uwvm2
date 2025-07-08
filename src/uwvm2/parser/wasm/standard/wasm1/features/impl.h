@@ -40,5 +40,6 @@
 # include "element_section.h"
 # include "code_section.h"
 # include "data_section.h"
+# include "final_check.h"
 # include "binfmt.h"
 #endif

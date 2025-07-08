@@ -169,7 +169,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             err.err_selectable.u32arr[0] = code_count;
             err.err_selectable.u32arr[1] = defined_func_count;
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_ne_defined_func;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(code_count_err);
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
         codesec.codes.reserve(static_cast<::std::size_t>(code_count));
