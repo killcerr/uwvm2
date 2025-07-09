@@ -263,21 +263,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [        safe      ]        .....                        ] unsafe (could be the section_end)
             //                      ^^ code.body.code_begin
 
-            code.body.code_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr) + body_size;
-
-            // [ ... body_size ...] local_count(code_body_begin) ... ...] (code_body_end)
-            // [        safe      ]        .....                        ] unsafe (could be the section_end)
-            //                                                            ^^ code.body.code_end
+            // Subsequent boundary adjustments section_end to code_end
+            auto const code_end{section_curr + body_size};
 
             // Prefetching makes the next round of processing faster
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
-                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(code.body.code_end);
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(code_end);
+
+            code.body.code_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(code_end);
+
+            // [ ... body_size ...] local_count(code_body_begin) ... ...] (code_body_end)
+            // [        safe      ]        .....                        ] unsafe (could be the section_end)
+            //                                                            ^^ code_end
+            //                                                            ^^ code.body.code_end
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 local_count;
 
             auto const [local_count_next, local_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(code_end),
                                                                                     ::fast_io::mnp::leb128_get(local_count))};
 
             if(local_count_err != ::fast_io::parse_code::ok) [[unlikely]]
@@ -326,7 +330,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 clocal_n;
 
                 auto const [clocal_n_next, clocal_n_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                  reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                  reinterpret_cast<char8_t_const_may_alias_ptr>(code_end),
                                                                                   ::fast_io::mnp::leb128_get(clocal_n))};
 
                 if(clocal_n_err != ::fast_io::parse_code::ok) [[unlikely]]
@@ -371,7 +375,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                             safe                               ]    ......                             ] unsafe
                 //                                                                    ^^ section_curr
 
-                if(section_curr == section_end) [[unlikely]]
+                if(section_curr == code_end) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_missing_local_type;
@@ -412,14 +416,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             code.body.expr_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
 
-            // [ ...] (end)
-            // or
             // [ ...] (code_end)
             // [safe] unsafe (could be the section_end)
             //        ^^ section_curr
 
-            section_curr = reinterpret_cast<::std::byte const*>(code.body.code_end);
+            section_curr = reinterpret_cast<::std::byte const*>(code_end);
 
+            // Subsequent boundary adjustments code_end to section_end
+
+            // [ ...] (section_end)
+            // or
             // [ ...] (code_end)
             // [safe] unsafe (could be the section_end)
             //        ^^ section_curr
