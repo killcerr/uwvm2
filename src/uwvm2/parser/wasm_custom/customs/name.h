@@ -79,7 +79,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
         invalid_function_name_length,
         illegal_section_id,
         illegal_function_name_length,
-        duplicate_func_idx
+        duplicate_func_idx,
+        duplicate_local_name,
+        invalid_local_count,
+        invalid_function_local_count,
+        invalid_function_local_index,
+        invalid_function_local_name_length,
+        illegal_function_local_name_length,
+        duplicate_code_function_index,
+        duplicate_code_local_name_function_index
     };
 
     union name_err_storage_t
@@ -176,6 +184,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                 return;
             }
 
+            // [...  section_id name_map_length ...] ...
+            // [             safe                  ] unsafe (could be the end)
+            //                   ^^ curr
+
             // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
             constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
@@ -189,10 +201,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     return;
                 }
             }
-
-            // [...  section_id name_map_length ...] ...
-            // [             safe                  ] unsafe (could be the end)
-            //                   ^^ curr
 
             curr = reinterpret_cast<::std::byte const*>(name_map_length_next);
 
@@ -254,6 +262,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         continue;
                     }
 
+                    // [...  module_name_length ...] name_begin ... (map_end)
+                    // [           safe            ] unsafe (could be the map_end)
+                    //       ^^ curr
+
                     // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
                     if constexpr(size_t_max < wasm_u32_max)
                     {
@@ -266,10 +278,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             continue;
                         }
                     }
-
-                    // [...  module_name_length ...] name_begin ... (map_end)
-                    // [           safe            ] unsafe (could be the map_end)
-                    //       ^^ curr
 
                     curr = reinterpret_cast<::std::byte const*>(module_name_length_next);
 
@@ -368,6 +376,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         continue;
                     }
 
+                    // [...  name_count ...] ... (map_end)
+                    // [       safe        ] unsafe (could be the map_end)
+                    //       ^^ curr
+
                     // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
                     if constexpr(size_t_max < wasm_u32_max)
                     {
@@ -381,10 +393,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         }
                     }
 
-                    // [...  name_count ...] ... (map_end)
-                    // [       safe        ] unsafe (could be the map_end)
-                    //       ^^ curr
-
                     curr = reinterpret_cast<::std::byte const*>(name_count_next);
 
                     // [...  name_count ...] ... (map_end)
@@ -396,7 +404,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 name_counter{}; name_counter != name_count; ++name_counter)
                     {
                         // [... ] func_idx ... name_len ... ... (map_end)
-                        // [safe] unsafe (could be the end)
+                        // [safe] unsafe (could be the map_end)
                         //        ^^ curr
 
                         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_index;
@@ -449,6 +457,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [...  func_idx ... name_len ...] ... (map_end)
                         // [             safe             ] unsafe (could be the map_end)
                         //                    ^^ curr
+
+                        if constexpr(size_t_max < wasm_u32_max)
+                        {
+                            // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                            if(func_name_length > size_t_max) [[unlikely]]
+                            {
+                                err.emplace_back(curr, name_err_type_t::size_exceeds_the_maximum_value_of_size_t, name_err_storage_t{.u32 = func_name_length});
+                                curr = map_end;
+                                // End of current map
+                                // Implementation of ct_1 via state variables
+                                ct_1 = true;
+                                break;
+                            }
+                        }
 
                         curr = reinterpret_cast<::std::byte const*>(func_name_length_next);
 
@@ -541,6 +563,309 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                 case 2u:
                 {
                     // local name
+
+                    if(!ns.code_local_name.empty()) [[unlikely]]
+                    {
+                        err.emplace_back(curr, name_err_type_t::duplicate_local_name);
+                        curr = map_end;
+                        // End of current map
+                        continue;
+                    }
+
+                    // [... ] local_count ... ... (map_end)
+                    // [safe] unsafe (could be the map_end)
+                    //        ^^ curr
+
+                    ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 local_count;  // number of naming in names
+                    auto const [local_count_next, local_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
+                                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(map_end),
+                                                                                            ::fast_io::mnp::leb128_get(local_count))};
+
+                    if(local_count_err != ::fast_io::parse_code::ok) [[unlikely]]
+                    {
+                        err.emplace_back(curr, name_err_type_t::invalid_local_count);
+                        curr = map_end;
+                        // End of current map
+                        continue;
+                    }
+
+                    // [...  local_count ...] ... (map_end)
+                    // [        safe        ] unsafe (could be the map_end)
+                    //       ^^ curr
+
+                    // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                    if constexpr(size_t_max < wasm_u32_max)
+                    {
+                        // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                        if(local_count > size_t_max) [[unlikely]]
+                        {
+                            err.emplace_back(curr, name_err_type_t::size_exceeds_the_maximum_value_of_size_t, name_err_storage_t{.u32 = local_count});
+                            curr = map_end;
+                            // End of current map
+                            continue;
+                        }
+                    }
+
+                    curr = reinterpret_cast<::std::byte const*>(local_count_next);
+                    // [...  local_count ...] ... (map_end)
+                    // [        safe        ] unsafe (could be the map_end)
+                    //                        ^^ curr
+
+                    bool ct_1{};
+
+                    for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 local_counter{}; local_counter != local_count; ++local_counter)
+                    {
+                        // [... ] function_index ... ... (map_end)
+                        // [safe] unsafe (could be the map_end)
+                        //        ^^ curr
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 function_index;  // number of naming in names
+                        auto const [function_index_next, function_index_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
+                                                                                                      reinterpret_cast<char8_t_const_may_alias_ptr>(map_end),
+                                                                                                      ::fast_io::mnp::leb128_get(function_index))};
+
+                        if(function_index_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.emplace_back(curr, name_err_type_t::invalid_function_index);
+                            curr = map_end;
+                            // End of current map
+                            ct_1 = true;
+                            break;
+                        }
+
+                        // [...  function_index ...] ... (map_end)
+                        // [         safe          ] unsafe (could be the map_end)
+                        //       ^^ curr
+
+                        curr = reinterpret_cast<::std::byte const*>(function_index_next);
+
+                        // [...  function_index ...] function_local_count ... (map_end)
+                        // [         safe          ] unsafe (could be the map_end)
+                        //                           ^^ curr
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 function_local_count;  // number of naming in names
+                        auto const [function_local_count_next,
+                                    function_local_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
+                                                                                       reinterpret_cast<char8_t_const_may_alias_ptr>(map_end),
+                                                                                       ::fast_io::mnp::leb128_get(function_local_count))};
+
+                        if(function_local_count_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.emplace_back(curr, name_err_type_t::invalid_function_local_count);
+                            curr = map_end;
+                            // End of current map
+                            ct_1 = true;
+                            break;
+                        }
+
+                        // [...  function_index ... function_local_count ...] ... (map_end)
+                        // [                      safe                      ] unsafe (could be the map_end)
+                        //                          ^^ curr
+
+                        // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                        if constexpr(size_t_max < wasm_u32_max)
+                        {
+                            // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                            if(function_local_count > size_t_max) [[unlikely]]
+                            {
+                                err.emplace_back(curr,
+                                                 name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                                 name_err_storage_t{.u32 = function_local_count});
+                                curr = map_end;
+                                // End of current map
+                                ct_1 = true;
+                                break;
+                            }
+                        }
+
+                        curr = reinterpret_cast<::std::byte const*>(function_local_count_next);
+
+                        // [...  function_index ... function_local_count ...] ... (map_end)
+                        // [                      safe                      ] unsafe (could be the map_end)
+                        //                                                    ^^ curr
+
+                        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::fast_io::u8string_view> ns_code_local_name_function_index{};
+
+                        bool ct_2{};
+
+                        for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 function_local_counter{}; function_local_counter != function_local_count;
+                            ++function_local_counter)
+                        {
+                            // [... ] function_local_index ... ... (map_end)
+                            // [safe] unsafe (could be the map_end)
+                            //        ^^ curr
+
+                            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 function_local_index;  // number of naming in names
+                            auto const [function_local_index_next,
+                                        function_local_index_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
+                                                                                           reinterpret_cast<char8_t_const_may_alias_ptr>(map_end),
+                                                                                           ::fast_io::mnp::leb128_get(function_local_index))};
+
+                            if(function_local_index_err != ::fast_io::parse_code::ok) [[unlikely]]
+                            {
+                                err.emplace_back(curr, name_err_type_t::invalid_function_local_index);
+                                curr = map_end;
+                                // End of current map
+                                ct_2 = true;
+                                break;
+                            }
+
+                            // [...  function_local_index ...] ... (map_end)
+                            // [            safe             ] unsafe (could be the map_end)
+                            //       ^^ curr
+
+                            curr = reinterpret_cast<::std::byte const*>(function_local_index_next);
+
+                            // [...  function_local_index ...] function_local_name_length ... ... (map_end)
+                            // [            safe             ] unsafe (could be the map_end)
+                            //                                 ^^ curr
+
+                            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 function_local_name_length;  // number of naming in names
+                            auto const [function_local_name_length_next,
+                                        function_local_name_length_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
+                                                                                                 reinterpret_cast<char8_t_const_may_alias_ptr>(map_end),
+                                                                                                 ::fast_io::mnp::leb128_get(function_local_name_length))};
+
+                            if(function_local_name_length_err != ::fast_io::parse_code::ok) [[unlikely]]
+                            {
+                                err.emplace_back(curr, name_err_type_t::invalid_function_local_name_length);
+                                curr = map_end;
+                                // End of current map
+                                ct_2 = true;
+                                break;
+                            }
+
+                            // [...  function_local_index ... function_local_name_length ...] ... (map_end)
+                            // [                             safe                           ] unsafe (could be the map_end)
+                            //                                ^^ curr
+
+                            if constexpr(size_t_max < wasm_u32_max)
+                            {
+                                // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
+                                if(function_local_name_length > size_t_max) [[unlikely]]
+                                {
+                                    err.emplace_back(curr,
+                                                     name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                                     name_err_storage_t{.u32 = function_local_name_length});
+                                    curr = map_end;
+                                    // End of current map
+                                    // Implementation of ct_2 via state variables
+                                    ct_2 = true;
+                                    break;
+                                }
+                            }
+
+                            curr = reinterpret_cast<::std::byte const*>(function_local_name_length_next);
+
+                            // [...  function_local_index ... function_local_name_length ...] ... (map_end)
+                            // [                             safe                           ] unsafe (could be the map_end)
+                            //                                                                ^^ curr
+
+                            if(static_cast<::std::size_t>(map_end - curr) < static_cast<::std::size_t>(function_local_name_length)) [[unlikely]]
+                            {
+                                err.emplace_back(curr,
+                                                 name_err_type_t::illegal_function_local_name_length,
+                                                 name_err_storage_t{.u32 = function_local_name_length});
+                                curr = map_end;
+                                // End of current map
+                                // Implementation of ct_2 via state variables
+                                ct_2 = true;
+                                break;
+                            }
+
+                            // [...  function_local_index ... function_local_name_length ... name ...] (map_end)
+                            // [                             safe                                    ] unsafe (could be the map_end)
+                            //                                                                ^^ curr
+
+                            auto const function_local_name_begin{reinterpret_cast<char8_t_const_may_alias_ptr>(curr)};
+
+                            // [...  function_local_index ... function_local_name_length ... name ...] (map_end)
+                            // [                             safe                                    ] unsafe (could be the map_end)
+                            //                                                                ^^ function_local_name_begin
+
+                            curr += function_local_name_length;
+
+                            // [...  function_local_index ... function_local_name_length ... name ...] (map_end)
+                            // [                             safe                                    ] unsafe (could be the map_end)
+                            //                                                                         ^^ curr
+
+                            auto const function_local_name_end{reinterpret_cast<char8_t_const_may_alias_ptr>(curr)};
+
+                            // [...  function_local_index ... function_local_name_length ... name ...] (map_end)
+                            // [                             safe                                    ] unsafe (could be the map_end)
+                            //                                                                         ^^ function_local_name_end
+
+                            ::fast_io::u8string_view const function_local_name_begin_tmp{
+                                function_local_name_begin,
+                                static_cast<::std::size_t>(function_local_name_end - function_local_name_begin)};
+
+                            // Subsequent parsing will not directly skip the parsing of this map.
+
+                            if(ns_code_local_name_function_index.contains(function_local_index)) [[unlikely]]
+                            {
+                                err.emplace_back(curr,
+                                                 name_err_type_t::duplicate_code_local_name_function_index,
+                                                 name_err_storage_t{.u32 = function_local_index});
+                                curr = map_end;
+                                // End of current paragraph
+                                continue;
+                            }
+
+                            // Check if it is legal utf-8
+
+                            auto const [utf8pos, utf8err]{
+                                ::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
+                                    function_local_name_begin_tmp.cbegin(),
+                                    function_local_name_begin_tmp.cend())};
+
+                            if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+                            {
+                                err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
+                                                 name_err_type_t::illegal_utf8_sequence,
+                                                 name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
+                                curr = map_end;
+                                // End of current paragraph
+                                continue;
+                            }
+
+                            ns_code_local_name_function_index.emplace(function_local_index, function_local_name_begin_tmp);
+                        }
+
+                        if(ct_2) [[unlikely]]
+                        {
+                            ct_1 = true;
+                            break;
+                        }
+
+                        // Subsequent parsing will not directly skip the parsing of this map.
+                        
+                        if(ns.code_local_name.contains(function_index)) [[unlikely]]
+                        {
+                            err.emplace_back(curr, name_err_type_t::duplicate_code_function_index, name_err_storage_t{.u32 = function_index});
+                            curr = map_end;
+                            // End of current paragraph
+                            continue;
+                        }
+
+                        ns.code_local_name.emplace(function_index, ::std::move(ns_code_local_name_function_index));
+                    }
+
+                    if(ct_1) [[unlikely]]
+                    {
+                        // End of current map
+                        // ct_1 is just a state variable that only controls the jumps
+                        // already set "curr = map_end"
+                        continue;
+                    }
+
+                    if(curr != map_end) [[unlikely]]
+                    {
+                        err.emplace_back(curr, name_err_type_t::invalid_data_exists, name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
+                        curr = map_end;
+                        // End of current map
+                        continue;
+                    }
+
                     break;
                 }
 #if 0  /// @todo feature

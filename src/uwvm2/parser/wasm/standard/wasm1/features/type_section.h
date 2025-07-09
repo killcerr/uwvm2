@@ -134,6 +134,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_para_len);
             }
 
+            // [... prefix para_len ...] para_begin ... res_len (para_end) ... res_begin ... prefix (res_end) ...
+            // [           safe        ] unsafe (could be the section_end)
+            //             ^^ section_curr
+
             // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
             constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
@@ -148,10 +152,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
-
-            // [... prefix para_len ...] para_begin ... res_len (para_end) ... res_begin ... prefix (res_end) ...
-            // [           safe        ] unsafe (could be the section_end)
-            //             ^^ section_curr
 
             section_curr = reinterpret_cast<::std::byte const*>(next_para_len);
             // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
@@ -219,6 +219,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_result_len);
             }
 
+            // [... prefix para_len ... para_begin ... res_len (para_end) ...] res_begin ... prefix (res_end) ...
+            // [                           safe                              ] unsafe (could be the section_end)
+            //                                         ^^ section_curr
+
             // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
             constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
@@ -233,10 +237,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
-
-            // [... prefix para_len ... para_begin ... res_len (para_end) ...] res_begin ... prefix (res_end) ...
-            // [                           safe                              ] unsafe (could be the section_end)
-            //                                         ^^ section_curr
 
             section_curr = reinterpret_cast<::std::byte const*>(next_result_len);
             // No explicit checking required because ::fast_io::parse_by_scan self-checking (::fast_io::parse_code::end_of_file)
