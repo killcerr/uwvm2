@@ -30,6 +30,7 @@ import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.feature;
+import uwvm2.uwvm.wasm.type;
 #else
 // import
 # include <fast_io.h>
@@ -38,6 +39,7 @@ import uwvm2.uwvm.wasm.feature;
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -45,12 +47,5 @@ import uwvm2.uwvm.wasm.feature;
 #endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    struct imported_wasm_t
-    {
-        ::fast_io::u8string_view import_wasm_module_name{};
-        ::fast_io::native_file_loader import_wasm_file{};
-        ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t import_wasm_binfmt_ver1_storage{};
-    };
-
-    inline ::fast_io::vector<imported_wasm_t> imported_wasm{};  // [global] No global variable dependencies from other translation units
+    inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_file_t> imported_wasm{};  // [global] No global variable dependencies from other translation units
 }  // namespace uwvm2::uwvm::wasm::storage

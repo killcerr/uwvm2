@@ -23,6 +23,8 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+# include "customs/impl.h"
+# include "cwrapper.h"
 # include "storage.h"
 # include "handler.h"
 #endif

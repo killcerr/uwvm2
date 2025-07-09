@@ -30,10 +30,9 @@ module;
 #include <utility>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
-export module uwvm2.parser.wasm_custom.base;
-export import :base;
-export import :cwrapper;
+export module uwvm2.uwvm.wasm.custom:cwrapper;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -42,4 +41,4 @@ export import :cwrapper;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "cwrapper.h"

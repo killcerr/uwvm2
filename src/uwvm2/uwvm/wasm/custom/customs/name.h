@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -25,8 +25,6 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.parser.wasm_custom;
-import uwvm2.uwvm.wasm.custom.customs;
-import :handler;
 #else
 // std
 # include <cstddef>
@@ -43,20 +41,29 @@ import :handler;
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm_custom/impl.h>
-# include "customs/impl.h"
-# include "handler.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
 {
-    /// @todo use fast_io::unorder_map instead
-    inline ::std::map<::fast_io::u8string_view, ::uwvm2::uwvm::wasm::custom::handlefunc_t> custom_handle_funcs{
-        {u8"name", {reinterpret_cast<void*>(::std::addressof(::uwvm2::uwvm::wasm::custom::customs::name_handler))}}
-    };  // [global]
+    inline constexpr void name_handler(::uwvm2::uwvm::wasm::type::wasm_file_t & file,
+                                       ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* const begin,
+                                       ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* const end) noexcept
+    {
+        ::fast_io::vector<::uwvm2::parser::wasm_custom::customs::name_err_t> name_err{};
+        ::uwvm2::parser::wasm_custom::customs::parse_name_storage(file.wasm_binfmt_ver1_name,
+                                                                  reinterpret_cast<::std::byte const*>(begin),
+                                                                  reinterpret_cast<::std::byte const*>(end),
+                                                                  name_err);
+
+        if(::uwvm2::uwvm::show_warning)
+        {
+            /// @todo name_err
+        }
+    }
 }
 
 #ifndef UWVM_MODULE

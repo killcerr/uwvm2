@@ -23,6 +23,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "base/impl.h"
 # include "customs/impl.h"
 #endif

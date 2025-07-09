@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-07-09
+ * @date        2025-04-19
  * @copyright   ASHP-1.0 License
  */
 
@@ -20,26 +20,8 @@
  *                                      *
  ****************************************/
 
-module;
-
-// std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <map>  /// @todo use fast_io::string_hashmap instead
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-
-export module uwvm2.parser.wasm_custom.base:base;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+# include "name.h"
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "base.h"

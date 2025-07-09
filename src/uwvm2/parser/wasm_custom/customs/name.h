@@ -24,6 +24,9 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+# ifdef UWVM_TIMER
+import uwvm2.utils.debug;
+# endif
 import uwvm2.utils.utf;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard;
@@ -43,6 +46,9 @@ import uwvm2.parser.wasm.standard;
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
+# ifdef UWVM_TIMER
+#  include <uwvm2/utils/debug/impl.h>
+# endif
 # include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
@@ -135,6 +141,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                                              ::std::byte const* const end,
                                              ::fast_io::vector<name_err_t>& err) noexcept
     {
+#ifdef UWVM_TIMER
+        ::uwvm2::utils::debug::timer parsing_timer{u8"parse custom section: name"};
+#endif
+
         // Since wasm specifies that custom section processing failures should not throw exceptions
         // The custom section is not as strict as the standard section, so there is no need to extend the template type with variable parameters.
 
@@ -838,7 +848,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         }
 
                         // Subsequent parsing will not directly skip the parsing of this map.
-                        
+
                         if(ns.code_local_name.contains(function_index)) [[unlikely]]
                         {
                             err.emplace_back(curr, name_err_type_t::duplicate_code_function_index, name_err_storage_t{.u32 = function_index});

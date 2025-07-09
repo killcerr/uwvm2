@@ -277,7 +277,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     }
 #endif
                     // handle custom section
-                    ::uwvm2::uwvm::wasm::custom::handle_binfmtver1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_binfmt_ver1_storage,
+                    ::uwvm2::uwvm::wasm::custom::handle_binfmtver1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm,
                                                                                   ::uwvm2::uwvm::wasm::custom::custom_handle_funcs);
 
                     // set exec module name

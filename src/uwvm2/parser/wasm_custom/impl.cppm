@@ -32,7 +32,6 @@ module;
 #include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.parser.wasm_custom;
-export import uwvm2.parser.wasm_custom.base;
 export import uwvm2.parser.wasm_custom.customs;
 
 #ifndef UWVM_MODULE

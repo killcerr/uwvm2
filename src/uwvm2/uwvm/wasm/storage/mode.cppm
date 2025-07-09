@@ -5,9 +5,11 @@
  *************************************************************/
 
 /**
+ * @brief       The wasm file that will be run
+ * @details     "--run" or "-r"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-07-09
+ * @date        2025-03-28
  * @copyright   ASHP-1.0 License
  */
 
@@ -22,17 +24,7 @@
 
 module;
 
-// std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-
-export module uwvm2.parser.wasm_custom.base:cwrapper;
+export module uwvm2.uwvm.wasm.storage:mode;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -41,4 +33,4 @@ export module uwvm2.parser.wasm_custom.base:cwrapper;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "cwrapper.h"
+#include "mode.h"
