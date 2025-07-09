@@ -33,6 +33,7 @@ module;
 
 export module uwvm2.uwvm.wasm.custom;
 export import :storage;
+export import :handler;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

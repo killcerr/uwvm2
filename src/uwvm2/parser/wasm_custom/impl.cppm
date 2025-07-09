@@ -34,7 +34,6 @@ module;
 export module uwvm2.parser.wasm_custom;
 export import uwvm2.parser.wasm_custom.base;
 export import uwvm2.parser.wasm_custom.customs;
-export import uwvm2.parser.wasm_custom.import;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

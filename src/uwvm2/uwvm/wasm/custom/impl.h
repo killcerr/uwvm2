@@ -24,4 +24,5 @@
 
 #ifndef UWVM_MODULE
 # include "storage.h"
+# include "handler.h"
 #endif

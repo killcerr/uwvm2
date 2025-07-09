@@ -24,13 +24,6 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard;
-import uwvm2.uwvm.io;
-import uwvm2.uwvm.utils.ansies;
-import uwvm2.uwvm.utils.memory;
-import uwvm2.uwvm.wasm.feature;
-import uwvm2.uwvm.wasm.storage;
 #else
 // std
 # include <cstddef>
@@ -38,22 +31,13 @@ import uwvm2.uwvm.wasm.storage;
 # include <concepts>
 # include <type_traits>
 # include <utility>
-# include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
-# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
-# include <uwvm2/parser/wasm/concepts/impl.h>
-# include <uwvm2/parser/wasm/standard/impl.h>
-# include <uwvm2/uwvm/io/impl.h>
-# include <uwvm2/uwvm/utils/ansies/impl.h>
-# include <uwvm2/uwvm/utils/memory/impl.h>
-# include <uwvm2/uwvm/wasm/feature/impl.h>
-# include <uwvm2/uwvm/wasm/storage/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -68,6 +52,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::base
 
 #ifndef UWVM_MODULE
 // macro
-# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

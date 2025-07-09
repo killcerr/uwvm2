@@ -408,6 +408,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 code.locals.push_back_unchecked(::std::move(fle));
             }
 
+            code.all_local_count = all_clocal_counter;
+
             code.body.expr_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
 
             // [ ...] (end)

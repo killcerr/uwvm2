@@ -28,6 +28,7 @@
 import fast_io;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.parser.wasm_custom.customs;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.feature;
 #else
@@ -36,6 +37,7 @@ import uwvm2.uwvm.wasm.feature;
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/parser/wasm_custom/customs/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 #endif
@@ -60,9 +62,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
     // WASM Module Binfmt 1 Storage
     struct exec_wasm_t
     {
+        // Accurate module names that must work
         ::fast_io::u8string_view module_name{};
+        // Memory-mapped or memory-copy (for platforms that don't support memory mapping) open wasm files
         ::fast_io::native_file_loader wasm_file{};
+        // Module parsing results
         ::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t wasm_binfmt_ver1_storage{};
+        // (Optional) Module name + symbol name
+        ::uwvm2::parser::wasm_custom::customs::name_storage_t wasm_binfmt_ver1_name{};
     };
 
     inline exec_wasm_t execute_wasm{};  // [global] No global variable dependencies from other translation units

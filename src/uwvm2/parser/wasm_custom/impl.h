@@ -25,5 +25,4 @@
 #ifndef UWVM_MODULE
 # include "base/impl.h"
 # include "customs/impl.h"
-# include "import/impl.h"
 #endif

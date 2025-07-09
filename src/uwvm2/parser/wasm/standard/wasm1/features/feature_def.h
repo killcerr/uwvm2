@@ -895,6 +895,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         code_body_t body{};
         ::fast_io::vector<final_local_entry_t<Fs...>> locals{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 all_local_count{};
     };
 
     /// @brief Define functions for checking value_type to provide extensibility
