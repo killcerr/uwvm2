@@ -231,7 +231,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
 
                         // default print_memory
-                        ::uwvm2::uwvm::utils::memory::print_memory memory_printer{
+                        ::uwvm2::uwvm::utils::memory::print_memory const memory_printer{
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cbegin()),
                             execute_wasm_binfmt_ver1_storage_wasm_err.err_curr,
                             reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cend())};

@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-07-09
+ * @date        2025-04-27
  * @copyright   ASHP-1.0 License
  */
 
@@ -20,9 +20,27 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include <concepts>
+#include <utility>
+#include <limits>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/utils/ansies/ansi_push_macro.h>
+#include <uwvm2/utils/ansies/win32_text_attr_push_macro.h>
+
+export module uwvm2.parser.wasm_custom.customs:name_error_output;
 
 #ifndef UWVM_MODULE
-# include "name.h"
-# include "name_error_output.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "name_error_output.h"

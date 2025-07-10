@@ -173,6 +173,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
             section_id &= 0xFFu;
 #endif
 
+            auto const section_id_ptr{curr};
+
             ++curr;
 
             // [...  section_id] name_map_length ...
@@ -897,7 +899,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 #endif
                 [[unlikely]] default:
                 {
-                    err.emplace_back(curr, name_err_type_t::illegal_section_id, name_err_storage_t{.u8 = section_id});
+                    err.emplace_back(section_id_ptr, name_err_type_t::illegal_section_id, name_err_storage_t{.u8 = section_id});
 
                     // Jump directly to the next loop
                     curr = map_end;
