@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -209,7 +209,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                 if(name_map_length > size_t_max) [[unlikely]]
                 {
                     // name map exceeds the platform maximum length (size_t), then pointer addition may have overflow undefined behavior and exit directly.
-                    err.emplace_back(curr, name_err_type_t::size_exceeds_the_maximum_value_of_size_t, name_err_storage_t{.u32 = name_map_length});
+                    err.emplace_back(curr,
+                                     name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                     name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_map_length)});
                     return;
                 }
             }
@@ -248,7 +250,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(!ns.module_name.empty()) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::duplicate_module_name);
+                        err.emplace_back(section_id_ptr, name_err_type_t::duplicate_module_name);
                         curr = map_end;
                         // End of current map
                         continue;
@@ -284,7 +286,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
                         if(module_name_length > size_t_max) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::size_exceeds_the_maximum_value_of_size_t, name_err_storage_t{.u32 = module_name_length});
+                            err.emplace_back(curr,
+                                             name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                             name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(module_name_length)});
                             curr = map_end;
                             // End of current map
                             continue;
@@ -365,7 +369,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(!ns.function_name.empty()) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::duplicate_function_name);
+                        err.emplace_back(section_id_ptr, name_err_type_t::duplicate_function_name);
                         curr = map_end;
                         // End of current map
                         continue;
@@ -398,7 +402,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
                         if(name_count > size_t_max) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::size_exceeds_the_maximum_value_of_size_t, name_err_storage_t{.u32 = name_count});
+                            err.emplace_back(curr,
+                                             name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                             name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_count)});
                             curr = map_end;
                             // End of current map
                             continue;
@@ -441,6 +447,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [        safe     ] unsafe (could be the map_end)
                         //       ^^ curr
 
+                        auto const func_index_ptr{curr};
+
                         curr = reinterpret_cast<::std::byte const*>(func_index_next);
 
                         // [...  func_idx ...] name_len ... ... (map_end)
@@ -475,7 +483,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
                             if(func_name_length > size_t_max) [[unlikely]]
                             {
-                                err.emplace_back(curr, name_err_type_t::size_exceeds_the_maximum_value_of_size_t, name_err_storage_t{.u32 = func_name_length});
+                                err.emplace_back(curr,
+                                                 name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                                 name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(func_name_length)});
                                 curr = map_end;
                                 // End of current map
                                 // Implementation of ct_1 via state variables
@@ -528,7 +538,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         if(ns.function_name.contains(func_index)) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::duplicate_func_idx, name_err_storage_t{.u32 = func_index});
+                            err.emplace_back(func_index_ptr, name_err_type_t::duplicate_func_idx, name_err_storage_t{.u32 = func_index});
                             curr = map_end;
                             // End of current paragraph
                             continue;
@@ -578,7 +588,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(!ns.code_local_name.empty()) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::duplicate_local_name);
+                        err.emplace_back(section_id_ptr, name_err_type_t::duplicate_local_name);
                         curr = map_end;
                         // End of current map
                         continue;
@@ -611,7 +621,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
                         if(local_count > size_t_max) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::size_exceeds_the_maximum_value_of_size_t, name_err_storage_t{.u32 = local_count});
+                            err.emplace_back(curr,
+                                             name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                             name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(local_count)});
                             curr = map_end;
                             // End of current map
                             continue;
@@ -649,6 +661,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [         safe          ] unsafe (could be the map_end)
                         //       ^^ curr
 
+                        auto const function_index_ptr{curr};
+
                         curr = reinterpret_cast<::std::byte const*>(function_index_next);
 
                         // [...  function_index ...] function_local_count ... (map_end)
@@ -682,7 +696,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             {
                                 err.emplace_back(curr,
                                                  name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                                 name_err_storage_t{.u32 = function_local_count});
+                                                 name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(function_local_count)});
                                 curr = map_end;
                                 // End of current map
                                 ct_1 = true;
@@ -726,6 +740,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // [            safe             ] unsafe (could be the map_end)
                             //       ^^ curr
 
+                            auto const function_local_index_ptr{curr};
+
                             curr = reinterpret_cast<::std::byte const*>(function_local_index_next);
 
                             // [...  function_local_index ...] function_local_name_length ... ... (map_end)
@@ -758,7 +774,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                                 {
                                     err.emplace_back(curr,
                                                      name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                                     name_err_storage_t{.u32 = function_local_name_length});
+                                                     name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(function_local_name_length)});
                                     curr = map_end;
                                     // End of current map
                                     // Implementation of ct_2 via state variables
@@ -815,7 +831,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                             if(ns_code_local_name_function_index.contains(function_local_index)) [[unlikely]]
                             {
-                                err.emplace_back(curr,
+                                err.emplace_back(function_local_index_ptr,
                                                  name_err_type_t::duplicate_code_local_name_function_index,
                                                  name_err_storage_t{.u32 = function_local_index});
                                 curr = map_end;
@@ -853,7 +869,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         if(ns.code_local_name.contains(function_index)) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::duplicate_code_function_index, name_err_storage_t{.u32 = function_index});
+                            err.emplace_back(function_index_ptr, name_err_type_t::duplicate_code_function_index, name_err_storage_t{.u32 = function_index});
                             curr = map_end;
                             // End of current paragraph
                             continue;

@@ -42,10 +42,6 @@ $ uwvm <param0> <param1> ... --run <wasm> <argv1> <argv2> ...
 ```bash
 $ uwvm --wasi-mount-root $WASM_ROOT_PATH ... --run ...
 ```
-* set argv0
-```bash
-$ uwvm --wasi-set-argv0 argv0 ... --run ...
-```
 
 ## How to build
 * Windows (aka. unknown-windows-msvc). See [windows.md](documents/how-to-build/windows.md)

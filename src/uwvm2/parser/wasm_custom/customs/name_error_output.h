@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -83,6 +83,121 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
             default:
             {
 #include "name_error_code_outputs/name_eco_default.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_name_map_length:
+            {
+#include "name_error_code_outputs/name_eco_invalid_name_map_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t:
+            {
+#include "name_error_code_outputs/name_eco_size_exceeds_the_maximum_value_of_size_t.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_name_map_length:
+            {
+#include "name_error_code_outputs/name_eco_illegal_name_map_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_module_name_length:
+            {
+#include "name_error_code_outputs/name_eco_invalid_module_name_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_module_name_length:
+            {
+#include "name_error_code_outputs/name_eco_illegal_module_name_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_utf8_sequence:
+            {
+#include "name_error_code_outputs/name_eco_illegal_utf8_sequence.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_module_name:
+            {
+#include "name_error_code_outputs/name_eco_duplicate_module_name.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_function_name:
+            {
+#include "name_error_code_outputs/name_eco_duplicate_function_name.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_data_exists:
+            {
+#include "name_error_code_outputs/name_eco_invalid_data_exists.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_name_count:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_name_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_index.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_name_length:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_name_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_section_id:
+            {
+#include "name_error_code_outputs/name_eco_illegal_section_id.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_function_name_length:
+            {
+#include "name_error_code_outputs/name_eco_illegal_function_name_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_func_idx:
+            {
+#include "name_error_code_outputs/name_eco_duplicate_func_idx.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_local_name:
+            {
+#include "name_error_code_outputs/name_eco_duplicate_local_name.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_local_count:
+            {
+#include "name_error_code_outputs/name_eco_invalid_local_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_count:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_local_count.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_index:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_local_index.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_name_length:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_local_name_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_function_local_name_length:
+            {
+#include "name_error_code_outputs/name_eco_illegal_function_local_name_length.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_code_function_index:
+            {
+#include "name_error_code_outputs/name_eco_duplicate_code_function_index.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_code_local_name_function_index:
+            {
+#include "name_error_code_outputs/name_eco_duplicate_code_local_name_function_index.h"
                 return;
             }
         }
