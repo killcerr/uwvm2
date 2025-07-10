@@ -1,13 +1,13 @@
 /*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
- * Licensed under the ASHP-1.0 License (see LICENSE file).   *
+ * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @copyright   ASHP-1.0 License
+ * @copyright   APL-2.0 License
  */
 
 /****************************************
