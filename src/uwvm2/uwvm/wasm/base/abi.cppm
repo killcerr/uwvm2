@@ -5,11 +5,8 @@
  *************************************************************/
 
 /**
- * @brief       The wasm file that will be run
- * @details     "--run" or "-r"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-31
  * @copyright   ASHP-1.0 License
  */
 

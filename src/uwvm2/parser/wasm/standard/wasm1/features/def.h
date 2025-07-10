@@ -583,6 +583,120 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         final_export_type_t<Fs...> exports{};
     };
 
+    //////////////////////////////
+    //      Element Section     //
+    //////////////////////////////
+
+    /// @brief      has element type
+    /// @details
+    ///             ```cpp
+    ///             enum class basic_element_type : wasm_u32
+    ///             {
+    ///                 e1 = 0x00u,
+    ///                 e2 = 0x01u,
+    ///             };
+    ///
+    ///             template <typename ... Fs> // Fs is used as an extension to an existing type, but does not extend the type
+    ///             struct basic_element_t
+    ///             {
+    ///                 union storage_t
+    ///                 {
+    ///                     // ...
+    ///                 } storage;
+    ///
+    ///                 basic_element_type type{};
+    ///             };
+    ///
+    ///             struct F
+    ///             {
+    ///                 template <typename ... Fs>
+    ///                 using element_type = type_replacer<root_of_replacement, basic_element_t<Fs...>>;
+    ///             };
+    ///             ```
+    template <typename FeatureType, typename... Fs>
+    concept has_element_type = requires {
+        typename FeatureType::template element_type<Fs...>;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::template element_type<Fs...>>;
+    };
+
+    template <typename FeatureType, typename... Fs>
+    inline consteval auto get_element_type() noexcept
+    {
+        if constexpr(has_element_type<FeatureType>) { return typename FeatureType::template element_type<Fs...>{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_element_type_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_element_type<Fs, Fs...>())...>;
+
+    template <typename... Fs>
+    concept is_valid_final_element_type_t = requires(final_element_type_t<Fs...> ext) {
+        requires ::std::is_enum_v<decltype(ext.type)>;
+        requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>;
+        requires ::std::is_union_v<decltype(ext.storage)>;
+    };
+
+    ////////////////////////////
+    //      Data Section      //
+    ////////////////////////////
+
+    /// @brief      has data type
+    /// @details
+    ///             ```cpp
+    ///             enum class basic_data_type : wasm_u32
+    ///             {
+    ///                 e1 = 0x00u,
+    ///                 e2 = 0x01u,
+    ///             };
+    ///
+    ///             template <typename ... Fs> // Fs is used as an extension to an existing type, but does not extend the type
+    ///             struct basic_data_t
+    ///             {
+    ///                 union storage_t
+    ///                 {
+    ///                     // ...
+    ///                 } storage;
+    ///
+    ///                 basic_data_type type{};
+    ///             };
+    ///
+    ///             struct F
+    ///             {
+    ///                 template <typename ... Fs>
+    ///                 using data_type = type_replacer<root_of_replacement, basic_data_t<Fs...>>;
+    ///             };
+    ///             ```
+    template <typename FeatureType, typename... Fs>
+    concept has_data_type = requires {
+        typename FeatureType::template data_type<Fs...>;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::template data_type<Fs...>>;
+    };
+
+    template <typename FeatureType, typename... Fs>
+    inline consteval auto get_data_type() noexcept
+    {
+        if constexpr(has_data_type<FeatureType>) { return typename FeatureType::template data_type<Fs...>{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_data_type_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_data_type<Fs, Fs...>())...>;
+
+    template <typename... Fs>
+    concept is_valid_final_data_type_t = requires(final_data_type_t<Fs...> ext) {
+        requires ::std::is_enum_v<decltype(ext.type)>;
+        requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>;
+        requires ::std::is_union_v<decltype(ext.storage)>;
+    };
+
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 
 /// @brief Define container optimization operations for use with fast_io

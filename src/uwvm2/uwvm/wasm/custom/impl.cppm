@@ -32,8 +32,10 @@ module;
 #include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.uwvm.wasm.custom;
-export import :base;
+export import uwvm2.uwvm.wasm.custom.customs;
+export import :cwrapper;
 export import :storage;
+export import :handler;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

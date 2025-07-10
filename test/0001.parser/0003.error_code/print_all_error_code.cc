@@ -61,7 +61,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::data_section_resolved_not_match_the_actual_number) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_data_kind) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -77,12 +77,6 @@ int main()
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence:
                 {
                     errout.err.err_selectable.u32 = 0x00;
-                    break;
-                }
-                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::module_name_is_invalid_utf8_sequence:
-                {
-                    errout.err.err_selectable.error_module_name.module_name = u8"test";
-                    errout.err.err_selectable.error_module_name.type = 0x00;
                     break;
                 }
                 case ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max:

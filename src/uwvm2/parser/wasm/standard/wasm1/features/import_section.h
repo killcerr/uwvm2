@@ -646,6 +646,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(extern_namelen_err);
             }
 
+            // [...  module_namelen ... module_name ... extern_namelen ...] extern_name ... import_type extern_func ...
+            // [                            safe                          ] unsafe (could be the section_end)
+            //                                          ^^ section_curr
+
             // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
             if constexpr(size_t_max < wasm_u32_max)
             {
@@ -658,10 +662,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
-
-            // [...  module_namelen ... module_name ... extern_namelen ...] extern_name ... import_type extern_func ...
-            // [                            safe                          ] unsafe (could be the section_end)
-            //                                          ^^ section_curr
 
             if(extern_namelen == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
             {

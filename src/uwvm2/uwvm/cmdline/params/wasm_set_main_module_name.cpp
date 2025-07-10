@@ -105,7 +105,7 @@ namespace uwvm2::uwvm::cmdline::params::details
 
         // There is no need to check for utf-8 sequences here, leave that to the parser.
 
-        ::uwvm2::uwvm::wasm::storage::rename_module_name = ::fast_io::u8string_view{currp1_str};
+        ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name = ::fast_io::u8string_view{currp1_str};
 
         return ::uwvm2::utils::cmdline::parameter_return_type::def;
     }

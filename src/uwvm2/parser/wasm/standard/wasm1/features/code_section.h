@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the ASHP-1.0 License (see LICENSE file).   *
@@ -220,6 +220,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(body_size_err);
             }
 
+            // [ ... body_size ...] local_count(code_body_begin) ... ...
+            // [        safe      ] unsafe (could be the section_end)
+            //       ^^ section_curr
+
             // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
             constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
@@ -234,10 +238,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
-
-            // [ ... body_size ...] local_count(code_body_begin) ... ...
-            // [        safe      ] unsafe (could be the section_end)
-            //       ^^ section_curr
 
             section_curr = reinterpret_cast<::std::byte const*>(body_size_next);
 
@@ -263,21 +263,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [        safe      ]        .....                        ] unsafe (could be the section_end)
             //                      ^^ code.body.code_begin
 
-            code.body.code_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr) + body_size;
-
-            // [ ... body_size ...] local_count(code_body_begin) ... ...] (code_body_end)
-            // [        safe      ]        .....                        ] unsafe (could be the section_end)
-            //                                                            ^^ code.body.code_end
+            // Subsequent boundary adjustments section_end to code_end
+            auto const code_end{section_curr + body_size};
 
             // Prefetching makes the next round of processing faster
             ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                             ::uwvm2::utils::intrinsics::universal::pfc_level::L2,
-                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(code.body.code_end);
+                                                            ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(code_end);
+
+            code.body.code_end = reinterpret_cast<wasm_byte_const_may_alias_ptr>(code_end);
+
+            // [ ... body_size ...] local_count(code_body_begin) ... ...] (code_body_end)
+            // [        safe      ]        .....                        ] unsafe (could be the section_end)
+            //                                                            ^^ code_end
+            //                                                            ^^ code.body.code_end
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 local_count;
 
             auto const [local_count_next, local_count_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(code_end),
                                                                                     ::fast_io::mnp::leb128_get(local_count))};
 
             if(local_count_err != ::fast_io::parse_code::ok) [[unlikely]]
@@ -286,6 +290,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_local_count;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(local_count_err);
             }
+
+            // [ ... body_size ... local_count(code_body_begin) ...] clocal_n ... clocal_type next_clocal_n ... code ...]
+            // [                     safe                          ]   ......                                           ] unsafe
+            //                     ^^ section_curr
 
             // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
             if constexpr(size_t_max < wasm_u32_max)
@@ -299,10 +307,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
-
-            // [ ... body_size ... local_count(code_body_begin) ...] clocal_n ... clocal_type next_clocal_n ... code ...]
-            // [                     safe                          ]   ......                                           ] unsafe
-            //                     ^^ section_curr
 
             code.locals.reserve(static_cast<::std::size_t>(local_count));
 
@@ -326,7 +330,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 clocal_n;
 
                 auto const [clocal_n_next, clocal_n_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                                  reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                  reinterpret_cast<char8_t_const_may_alias_ptr>(code_end),
                                                                                   ::fast_io::mnp::leb128_get(clocal_n))};
 
                 if(clocal_n_err != ::fast_io::parse_code::ok) [[unlikely]]
@@ -335,6 +339,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_clocal_n;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(clocal_n_err);
                 }
+
+                // [ ... body_size ... local_count(code_body_begin) ... clocal_n ...] clocal_type next_clocal_n ... code ...]
+                // [                             safe                               ]    ......                             ] unsafe
+                //                                                      ^^ section_curr
 
                 // The size_t of some platforms is smaller than u32, in these platforms you need to do a size check before conversion
                 if constexpr(size_t_max < wasm_u32_max)
@@ -359,10 +367,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 all_clocal_counter += clocal_n;
 
-                // [ ... body_size ... local_count(code_body_begin) ... clocal_n ...] clocal_type next_clocal_n ... code ...]
-                // [                             safe                               ]    ......                             ] unsafe
-                //                                                      ^^ section_curr
-
                 fle.count = clocal_n;
 
                 section_curr = reinterpret_cast<::std::byte const*>(clocal_n_next);
@@ -371,7 +375,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // [                             safe                               ]    ......                             ] unsafe
                 //                                                                    ^^ section_curr
 
-                if(section_curr == section_end) [[unlikely]]
+                if(section_curr == code_end) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_missing_local_type;
@@ -408,16 +412,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 code.locals.push_back_unchecked(::std::move(fle));
             }
 
+            code.all_local_count = all_clocal_counter;
+
             code.body.expr_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
 
-            // [ ...] (end)
-            // or
             // [ ...] (code_end)
             // [safe] unsafe (could be the section_end)
             //        ^^ section_curr
 
-            section_curr = reinterpret_cast<::std::byte const*>(code.body.code_end);
+            section_curr = reinterpret_cast<::std::byte const*>(code_end);
 
+            // Subsequent boundary adjustments code_end to section_end
+
+            // [ ...] (section_end)
+            // or
             // [ ...] (code_end)
             // [safe] unsafe (could be the section_end)
             //        ^^ section_curr

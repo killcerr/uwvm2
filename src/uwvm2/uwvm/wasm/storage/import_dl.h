@@ -26,12 +26,20 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.uwvm.wasm.base;
+import uwvm2.uwvm.wasm.feature;
+import uwvm2.uwvm.wasm.type;
 #else
-// macro
-# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
-# include <fast_io_dsal/vector.h>
+# include <fast_io_dsal/string_view.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/uwvm/wasm/base/impl.h>
+# include <uwvm2/uwvm/wasm/feature/impl.h>
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
 #ifdef UWVM_CAN_LOAD_DL
@@ -40,14 +48,8 @@ import fast_io;
 # endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    inline ::fast_io::vector<::fast_io::native_dll_file> import_dl_file{};  // [global] No global variable dependencies from other translation units
+    inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_dl_t> imported_dl{};  // [global] No global variable dependencies from other translation units
 
-    // TODO: import_dl_func // The result of parsing the dl is used to add the import module directly.
 }  // namespace uwvm2::uwvm::wasm::storage
-#endif
-
-#ifndef UWVM_MODULE
-// macro
-# include <uwvm2/utils/macro/pop_macros.h>
 #endif
 

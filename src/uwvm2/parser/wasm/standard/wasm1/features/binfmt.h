@@ -82,11 +82,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         inline static constexpr ::fast_io::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-        // binfmt1
-        using module_name_text_format = ::uwvm2::parser::wasm::concepts::operation::type_replacer<
-            ::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-            ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>>;
-
         // type section
         using value_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::value_type>;
@@ -114,6 +109,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                       ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_export_type<Fs...>>;
 
+        // element section
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        using element_type =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_element_t<Fs...>>;
+        // data section
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        using data_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                                    ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_data_t<Fs...>>;
+
         // binfmt ver1
         using final_check = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_check>;
@@ -128,9 +133,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::global_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::export_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::start_section_storage_t,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t,
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t<Fs...>,
                                                           ::uwvm2::parser::wasm::standard::wasm1::features::code_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::data_section_storage_t>;
+                                                          ::uwvm2::parser::wasm::standard::wasm1::features::data_section_storage_t<Fs...>>;
     };
 
     /// @note ADL for distribution to the correct handler function
@@ -144,8 +149,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     // feature
     static_assert(::uwvm2::parser::wasm::concepts::wasm_feature<wasm1>);
     static_assert(::uwvm2::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<wasm1>);
-    // binfmt1
-    static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_module_name_text_format<wasm1>);
     // type section
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_value_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix<wasm1>);
@@ -157,6 +160,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_import_export_text_format<wasm1>);
     // export section
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_export_type<wasm1>);
+    // element setcion
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_element_type<wasm1>);
+    // data setcion
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_data_type<wasm1>);
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_final_check<wasm1>);
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);

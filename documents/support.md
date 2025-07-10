@@ -7,7 +7,7 @@
 * NetBSD: unknown(50+)-netbsd
 * OpenBSD: unknown-openbsd
 * DragonflyBSD: (x86\_64, i386, aarch64, arm, powerpc64, etc.)-dragonfly
-* WASM-WASI (bootstrap): (wasm32, wasm64)-(wasip1, wasip2)-(none, threads, neoh)
+* WASM-WASI (self-hosting): (wasm32, wasm64)-(wasip1, wasip2)-(none, threads, neoh)
 * SerenityOS: (x86\_64, i686)-serenity
 * SunOS: (sparc, x86)-(sunos, solaris)-gnu
 

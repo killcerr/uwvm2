@@ -51,7 +51,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline constexpr ::fast_io::u8string_view log_win32_use_ansi_alias{u8"-ansi-log"};
+        inline constexpr ::fast_io::u8string_view log_win32_use_ansi_alias{u8"-log-ansi"};
     }  // namespace details
 
 # if defined(__clang__)
@@ -62,7 +62,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
         .name{u8"--log-win32-use-ansi"},
         .describe{u8"Log on Win32 system using ANSI sequence under Win10. SetConsoleTextAttribute api is used by default."},
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_win32_use_ansi_alias), 1uz}},
-        .is_exist{::std::addressof(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b)}};
+        .is_exist{::std::addressof(::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b)},
+        .cate{::uwvm2::utils::cmdline::categorization::log}};
 # if defined(__clang__)
 #  pragma clang diagnostic pop
 # endif

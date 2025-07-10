@@ -42,10 +42,6 @@ $ uwvm <param0> <param1> ... --run <wasm> <argv1> <argv2> ...
 ```bash
 $ uwvm --wasi-mount-root $WASM_ROOT_PATH ... --run ...
 ```
-* set argv0
-```bash
-$ uwvm --wasi-set-argv0 argv0 ... --run ...
-```
 
 ## How to build
 * Windows (aka. unknown-windows-msvc). See [windows.md](documents/how-to-build/windows.md)
@@ -53,4 +49,4 @@ $ uwvm --wasi-set-argv0 argv0 ... --run ...
 * Linux (aka. unknown-linux-unknown). See [linux.md](documents/how-to-build/linux.md)
 * Darwin (aka. unknown-apple-darwin). See [darwin.md](documents/how-to-build/darwin.md)
 * FreeBSD (aka. unknown-freebsd(Version)). See [freebsd.md](documents/how-to-build/freebsd.md)
-* WASM-WASI (bootstrap) (aka. [wasm32|wasm64]-[wasip1|wasip2]-(threads)). See [wasm-wasi.md](documents/how-to-build/wasm-wasi.md)
+* WASM-WASI (self-hosting) (aka. [wasm32|wasm64]-[wasip1|wasip2]-(threads)). See [wasm-wasi.md](documents/how-to-build/wasm-wasi.md)

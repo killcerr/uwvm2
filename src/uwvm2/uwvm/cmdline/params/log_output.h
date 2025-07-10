@@ -70,7 +70,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
         },
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1uz}},
         .handle{::std::addressof(details::log_output_callback)},
-        .is_exist{::std::addressof(details::log_output_is_exist)}};
+        .is_exist{::std::addressof(details::log_output_is_exist)},
+        .cate{::uwvm2::utils::cmdline::categorization::log}};
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif
