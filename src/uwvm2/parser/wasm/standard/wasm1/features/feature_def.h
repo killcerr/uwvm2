@@ -147,12 +147,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         union storage_t
         {
             ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> const* function;
+            static_assert(::std::is_trivially_copyable_v<decltype(function)> && ::std::is_trivially_destructible_v<decltype(function)>);
+
             ::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...> table;
             static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...>> &&
                           ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<Fs...>>);
+
             ::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...> memory;
             static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>> &&
                           ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>>);
+
             ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> global;
             static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>> &&
                           ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>>);
@@ -221,15 +225,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     struct function_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
-    static_assert(
-        ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
-            ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>> &&
-            ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>> &&
-            ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>> &&
-            ::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>> &&
-            ::fast_io::freestanding::is_zero_default_constructible_v<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>>,
-        "::fast_io::vector is not trivially_copyable_or_relocatable or zero_default_constructible");
-
     enum class vectypeidx_minimize_storage_mode : unsigned
     {
         null,
@@ -266,12 +261,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             typeidx_u8_view_t typeidx_u8_view;
             static_assert(::std::is_trivially_copyable_v<typeidx_u8_view_t> && ::std::is_trivially_destructible_v<typeidx_u8_view_t>);
+
+            // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8> typeidx_u8_vector;
+            static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<decltype(typeidx_u8_vector)> &&
+                          ::fast_io::freestanding::is_zero_default_constructible_v<decltype(typeidx_u8_vector)>);
+
             // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16> typeidx_u16_vector;
+            static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<decltype(typeidx_u16_vector)> &&
+                          ::fast_io::freestanding::is_zero_default_constructible_v<decltype(typeidx_u16_vector)>);
+
             // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> typeidx_u32_vector;
-            // Self-control of the life cycle
+            static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<decltype(typeidx_u32_vector)> &&
+                          ::fast_io::freestanding::is_zero_default_constructible_v<decltype(typeidx_u32_vector)>);
 
             // Full occupancy is used to initialize the union, set the union to all zero.
             [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u]{};
@@ -792,7 +796,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         wasm1_elem_expr_t expr{};
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> vec_funcidx{};
     };
+}
 
+// Subsequent specifications of union must include this information, so it has to be declared here.
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t>
+    {
+        inline static constexpr bool value = true;
+    };
+}
+
+UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
+{
     enum class wasm1_element_type_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
     {
         tableidx = 0u,
@@ -801,12 +824,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <typename... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
     struct wasm1_element_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::std::size_t sizeof_storage_u{get_union_size<typeidx_u8_view_t, wasm1_elem_storage_t>()};
+        inline static constexpr ::std::size_t sizeof_storage_u{
+            get_union_size<typeidx_u8_view_t, ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t>()};
 
         union storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
             // This type can be initialized with all zeros
-            wasm1_elem_storage_t table_idx;
+            ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t table_idx;
+            static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<decltype(table_idx)> &&
+                          ::fast_io::freestanding::is_zero_default_constructible_v<decltype(table_idx)>);
 
             // Full occupancy is used to initialize the union, set the union to all zero.
             [[maybe_unused]] ::std::byte sizeof_storage_u_reserve[sizeof_storage_u]{};
@@ -825,12 +851,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline constexpr wasm1_element_t(wasm1_element_t const& other) noexcept : type{other.type}
         {
-            ::new(::std::addressof(this->storage.table_idx)) wasm1_elem_storage_t{other.storage.table_idx};
+            ::new(::std::addressof(this->storage.table_idx))::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t{other.storage.table_idx};
         }
 
         inline constexpr wasm1_element_t(wasm1_element_t&& other) noexcept : type{other.type}
         {
-            ::new(::std::addressof(this->storage.table_idx)) wasm1_elem_storage_t{::std::move(other.storage.table_idx)};
+            ::new(::std::addressof(this->storage.table_idx))::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t{
+                ::std::move(other.storage.table_idx)};
         }
 
         inline constexpr wasm1_element_t& operator= (wasm1_element_t const& other) noexcept
@@ -945,8 +972,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         union storage_u
         {
             wasm1_data_storage_t memory_idx;
-
             static_assert(::std::is_trivially_copyable_v<wasm1_data_storage_t> && ::std::is_trivially_destructible_v<wasm1_data_storage_t>);
+
         } storage;
 
         wasm1_data_type_t type{};

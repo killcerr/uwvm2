@@ -122,6 +122,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         union storage_t
         {
             function_type const* function;
+            static_assert(::std::is_trivially_copyable_v<decltype(function)> && ::std::is_trivially_destructible_v<decltype(function)>);
             table_type table;
             static_assert(::std::is_trivially_copyable_v<table_type> && ::std::is_trivially_destructible_v<table_type>);
             memory_type memory;
