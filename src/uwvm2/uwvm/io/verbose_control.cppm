@@ -5,9 +5,9 @@
  *************************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-07-07
  * @copyright   ASHP-1.0 License
  */
 
@@ -22,11 +22,7 @@
 
 module;
 
-export module uwvm2.uwvm.io;
-export import :io_device;
-export import :output;
-export improt :warn_control;
-export improt :verbose_control;
+export module uwvm2.uwvm.io:verbose_control;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -35,4 +31,4 @@ export improt :verbose_control;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "verbose_control.h"

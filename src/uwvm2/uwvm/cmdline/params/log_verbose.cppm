@@ -5,9 +5,9 @@
  *************************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-03-31
  * @copyright   ASHP-1.0 License
  */
 
@@ -22,11 +22,13 @@
 
 module;
 
-export module uwvm2.uwvm.io;
-export import :io_device;
-export import :output;
-export improt :warn_control;
-export improt :verbose_control;
+// std
+#include <memory>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+
+export module uwvm2.uwvm.cmdline.params:log_verbose;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -35,4 +37,4 @@ export improt :verbose_control;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "log_verbose.h"

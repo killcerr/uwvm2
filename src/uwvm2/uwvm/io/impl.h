@@ -26,4 +26,5 @@
 # include "io_device.h"
 # include "output.h"
 # include "warn_control.h"
+# include "verbose_control.h"
 #endif

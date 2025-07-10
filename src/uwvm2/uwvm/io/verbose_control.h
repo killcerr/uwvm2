@@ -5,9 +5,8 @@
  *************************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
  * @copyright   ASHP-1.0 License
  */
 
@@ -20,19 +19,21 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
-export module uwvm2.uwvm.io;
-export import :io_device;
-export import :output;
-export improt :warn_control;
-export improt :verbose_control;
-
-#ifndef UWVM_MODULE
-# define UWVM_MODULE
+#ifdef UWVM_MODULE
+// import
+import fast_io;
+#else
+// import
+# include <fast_io.h>
+# include <fast_io_device.h>
 #endif
+
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
+# define UWVM_MODULE_EXPORT
 #endif
-
-#include "impl.h"
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm
+{
+    inline bool show_verbose{};  // [global] No global variable dependencies from other translation units
+}  // namespace uwvm2::utils
