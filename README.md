@@ -1,24 +1,7 @@
 <div align="center">
-  <style>
-    .fade-in-img {
-      opacity: 0;
-      animation: fadeInImg 2s ease-in forwards;
-    }
-    .fade-in-text {
-      opacity: 0;
-      animation: fadeInText 1s ease-in forwards;
-      animation-delay: 3s;
-    }
-    @keyframes fadeInImg {
-      to { opacity: 1; }
-    }
-    @keyframes fadeInText {
-      to { opacity: 1; }
-    }
-  </style>
-  <img src="documents/logo/uwvm2.svg" alt="uwvm2 logo" width="240" class="fade-in-img"/>
+  <img src="documents/logo/uwvm2.svg" alt="uwvm2 logo" width="240"/>
   <br/>
-  <b class="fade-in-text">Ultimate WebAssembly Virtual Machine 2</b>
+  <h1>Ultimate WebAssembly Virtual Machine 2</h1>
 </div>
 
 > [!IMPORTANT]
