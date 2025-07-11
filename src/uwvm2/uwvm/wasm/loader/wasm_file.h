@@ -244,7 +244,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                                               reinterpret_cast<::std::byte const*>(wf.wasm_file.cend()),
                                                                               execute_wasm_binfmt_ver1_storage_wasm_err,
                                                                               wf.wasm_parameter.binfmt1_para);
-                                                                              
+
                     }
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     catch(::fast_io::error)
@@ -340,19 +340,43 @@ namespace uwvm2::uwvm::wasm::loader
                     // handle custom section
                     ::uwvm2::uwvm::wasm::custom::handle_binfmtver1_custom_section(wf, ::uwvm2::uwvm::wasm::custom::custom_handle_funcs);
 
-                    /// @todo set exec module name
+                    // handle overall module name
+
                     // 1st: para --wasm-set-main-module-name
                     // 2st: custom section "name": module name
                     // 3st: file path
 
-                    /// @todo
+                    if (wf.module_name.empty())
+                    {
+                        if (wf.wasm_custom_name.module_name.empty())
+                        {
+                            wf.module_name = ::fast_io::u8string_view{load_file_name};
+                        }
+                        else
+                        {
+                            wf.module_name = wf.wasm_custom_name.module_name;
+                        }
+                    }
+
+                    // verbose
+                    if(::uwvm2::uwvm::show_verbose) [[unlikely]]
+                    {
+                        ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            u8"[info]  ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Overall WebAssembly Module Name \"",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            wf.module_name,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\". ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(verbose)\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                    }
                 }
-
-                /// @todo handle import modules
-
-                /// @todo handle import dll
-
-                /// @todo handle cli module
 
                 break;
             }

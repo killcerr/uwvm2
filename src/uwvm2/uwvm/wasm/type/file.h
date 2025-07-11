@@ -89,7 +89,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         // wasm_parameter_u
         ::uwvm2::uwvm::wasm::type::wasm_parameter_u wasm_parameter{};
         // (Optional) Module name + symbol name
-        ::uwvm2::parser::wasm_custom::customs::name_storage_t wasm_binfmt_ver1_name{};
+        ::uwvm2::parser::wasm_custom::customs::name_storage_t wasm_custom_name{};
 
         // Since the default is to initialize to binfmt 0, there is no need to do any constructs
         inline constexpr wasm_file_t() noexcept = default;
@@ -99,7 +99,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         inline constexpr wasm_file_t(wasm_file_t&& other) noexcept :
             file_name{::std::move(other.file_name)}, module_name{::std::move(other.module_name)}, binfmt_ver{::std::move(other.binfmt_ver)},
             wasm_file{::std::move(other.wasm_file)}, wasm_parameter{::std::move(other.wasm_parameter)},
-            wasm_binfmt_ver1_name{::std::move(other.wasm_binfmt_ver1_name)}
+            wasm_custom_name{::std::move(other.wasm_custom_name)}
         {
             switch(this->binfmt_ver)
             {
@@ -140,7 +140,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
             this->binfmt_ver = ::std::move(other.binfmt_ver);
             this->wasm_file = ::std::move(other.wasm_file);
             this->wasm_parameter = ::std::move(other.wasm_parameter);
-            this->wasm_binfmt_ver1_name = ::std::move(other.wasm_binfmt_ver1_name);
+            this->wasm_custom_name = ::std::move(other.wasm_custom_name);
 
             switch(this->binfmt_ver)
             {
