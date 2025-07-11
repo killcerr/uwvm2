@@ -417,3 +417,8 @@ namespace uwvm2::uwvm::wasm::loader
     }
 
 }  // namespace uwvm2::uwvm::wasm::loader
+
+#ifndef UWVM_MODULE
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif

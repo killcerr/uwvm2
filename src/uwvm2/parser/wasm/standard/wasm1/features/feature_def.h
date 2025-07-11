@@ -110,6 +110,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct import_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
+    /// @deprecated The wasm standard states that the standard sections follow a sequence, which can never happen
 #if 0
     /// @brief Define functions for define_imported_and_defined_exceeding_checker
     template <typename... Fs>
