@@ -199,8 +199,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // memory_count is not incremental and requires overflow checking
             constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
 
-            if(memory_count + imported_memory_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) ||
-               memory_count > wasm_u32_max - imported_memory_size) [[unlikely]]
+            if(memory_count > wasm_u32_max - imported_memory_size ||
+               memory_count + imported_memory_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_memory;

@@ -341,8 +341,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 [[assume(defined_tablesec_tables_size <= 1u)]];
 
-                if(imported_table_count + defined_tablesec_tables_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) ||
-                   imported_table_count > wasm_u32_max - defined_tablesec_tables_size) [[unlikely]]
+                if(imported_table_count > wasm_u32_max - defined_tablesec_tables_size ||
+                   imported_table_count + defined_tablesec_tables_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_table;
@@ -385,8 +385,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 [[assume(defined_memorysec_memories_size <= 1u)]];
 
-                if(imported_memory_count + defined_memorysec_memories_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) ||
-                   imported_memory_count > wasm_u32_max - defined_memorysec_memories_size) [[unlikely]]
+                if(imported_memory_count > wasm_u32_max - defined_memorysec_memories_size || 
+                   imported_memory_count + defined_memorysec_memories_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_memory;

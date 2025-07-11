@@ -98,8 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 
         inline constexpr wasm_file_t(wasm_file_t&& other) noexcept :
             file_name{::std::move(other.file_name)}, module_name{::std::move(other.module_name)}, binfmt_ver{::std::move(other.binfmt_ver)},
-            wasm_file{::std::move(other.wasm_file)}, wasm_parameter{::std::move(other.wasm_parameter)},
-            wasm_custom_name{::std::move(other.wasm_custom_name)}
+            wasm_file{::std::move(other.wasm_file)}, wasm_parameter{::std::move(other.wasm_parameter)}, wasm_custom_name{::std::move(other.wasm_custom_name)}
         {
             switch(this->binfmt_ver)
             {

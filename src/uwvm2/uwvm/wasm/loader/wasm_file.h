@@ -244,7 +244,6 @@ namespace uwvm2::uwvm::wasm::loader
                                                                               reinterpret_cast<::std::byte const*>(wf.wasm_file.cend()),
                                                                               execute_wasm_binfmt_ver1_storage_wasm_err,
                                                                               wf.wasm_parameter.binfmt1_para);
-
                     }
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     catch(::fast_io::error)
@@ -346,12 +345,9 @@ namespace uwvm2::uwvm::wasm::loader
                     // 2st: custom section "name": module name
                     // 3st: file path
 
-                    if (wf.module_name.empty())
+                    if(wf.module_name.empty())
                     {
-                        if (wf.wasm_custom_name.module_name.empty())
-                        {
-                            wf.module_name = ::fast_io::u8string_view{load_file_name};
-                        }
+                        if(wf.wasm_custom_name.module_name.empty()) { wf.module_name = ::fast_io::u8string_view{load_file_name}; }
                         else
                         {
                             wf.module_name = wf.wasm_custom_name.module_name;
