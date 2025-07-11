@@ -593,5 +593,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
             return get<type_index>(tuple);
         }
+
+        /// @brief get union size
+        template <typename... Ty>
+        inline consteval ::std::size_t get_union_size() noexcept
+        {
+            ::std::size_t max_size{};
+            [&max_size]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            { ((max_size = ::std::max(max_size, sizeof(Ty...[I]))), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
+            return max_size;
+        }
     }  // namespace operation
 }  // namespace uwvm2::parser::wasm::concepts
