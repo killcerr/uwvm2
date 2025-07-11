@@ -23,6 +23,7 @@
 module;
 
 export module uwvm2.uwvm.wasm.type;
+export import :para;
 export import :file;
 export import :dl;
 

@@ -222,7 +222,7 @@ target("uwvm")
 		add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
 		-- wasm parser
-		add_files("src/uwvm2/parser/wasm/**.cppm", {public = is_debug_mode})
+		add_files("src/uwvm2/parser/**.cppm", {public = is_debug_mode})
 
 		-- uwvm
 		add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
@@ -267,7 +267,7 @@ for _, file in ipairs(os.files("test/**.cc")) do
 			add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
 			-- wasm parser
-			add_files("src/uwvm2/parser/wasm/**.cppm", {public = is_debug_mode})
+			add_files("src/uwvm2/parser/**.cppm", {public = is_debug_mode})
 
 			-- uwvm
 			add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})

@@ -28,7 +28,6 @@
 # include "help.h"
 # include "mode.h"
 # include "wasm_abi.h"
-# include "wasm_binfmt.h"
 # include "wasm_set_main_module_name.h"
 # include "log_output.h"
 # include "log_disable_warning.h"

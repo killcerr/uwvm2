@@ -22,15 +22,6 @@
 
 module;
 
-// std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-
 export module uwvm2.uwvm.wasm.custom.customs;
 export import :name;
 

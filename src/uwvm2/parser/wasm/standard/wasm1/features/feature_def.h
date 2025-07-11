@@ -110,6 +110,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct import_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
+    /// @deprecated The wasm standard states that the standard sections follow a sequence, which can never happen
+#if 0
     /// @brief Define functions for define_imported_and_defined_exceeding_checker
     template <typename... Fs>
     concept has_imported_and_defined_exceeding_checker = requires(
@@ -124,6 +126,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             define_imported_and_defined_exceeding_checker(sec_adl, extern_adl, module_storage, importdesc_begin, section_curr, err, fs_para)
         } -> ::std::same_as<void>;
     };
+#endif
 
     /// @brief Define functions for handle extern_prefix
     template <typename... Fs>
@@ -240,22 +243,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8 const* end{};
     };
 
-    template <typename... Ty>
-    inline consteval ::std::size_t get_union_size() noexcept
-    {
-        ::std::size_t max_size{};
-        [&max_size]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-        { ((max_size = ::std::max(max_size, sizeof(Ty...[I]))), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
-        return max_size;
-    }
-
     struct vectypeidx_minimize_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         inline static constexpr ::std::size_t sizeof_vectypeidx_minimize_storage_u{
-            get_union_size<typeidx_u8_view_t,
-                           ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>,
-                           ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>,
-                           ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>>()};
+            ::uwvm2::parser::wasm::concepts::operation::get_union_size<typeidx_u8_view_t,
+                                                                       ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>,
+                                                                       ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>,
+                                                                       ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>>()};
 
         union vectypeidx_minimize_storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
@@ -281,7 +275,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             [[maybe_unused]] ::std::byte vectypeidx_minimize_storage_u_reserve[sizeof_vectypeidx_minimize_storage_u]{};
 
             // destructor of 'vectypeidx_minimize_storage_u' is implicitly deleted because variant field 'typeidx_u8_vector' has a non-trivial destructor
-            inline constexpr ~vectypeidx_minimize_storage_u() noexcept {}
+            inline constexpr ~vectypeidx_minimize_storage_u() {}
 
             // The release of fast_io::vectors is managed by struct vectypeidx_minimize_storage_t, there is no issue of raii resources being unreleased.
         };
@@ -300,33 +294,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
+                    // do nothing
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
-                    // trivial
-                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
+                    // trivial, placement new (regulate)
+                    ::new(::std::addressof(this->storage.typeidx_u8_view)) decltype(this->storage.typeidx_u8_view){other.storage.typeidx_u8_view};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
                     // copy constructor, placement new
-                    ::new(::std::addressof(this->storage.typeidx_u8_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>{
-                        other.storage.typeidx_u8_vector};
+                    ::new(::std::addressof(this->storage.typeidx_u8_vector)) decltype(this->storage.typeidx_u8_vector){other.storage.typeidx_u8_vector};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
                     // copy constructor, placement new
-                    ::new(::std::addressof(this->storage.typeidx_u16_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>{
-                        other.storage.typeidx_u16_vector};
+                    ::new(::std::addressof(this->storage.typeidx_u16_vector)) decltype(this->storage.typeidx_u16_vector){other.storage.typeidx_u16_vector};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
                     // copy constructor, placement new
-                    ::new(::std::addressof(this->storage.typeidx_u32_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>{
-                        other.storage.typeidx_u32_vector};
+                    ::new(::std::addressof(this->storage.typeidx_u32_vector)) decltype(this->storage.typeidx_u32_vector){other.storage.typeidx_u32_vector};
                     break;
                 }
                 [[unlikely]] default:
@@ -342,39 +334,41 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         inline constexpr vectypeidx_minimize_storage_t(vectypeidx_minimize_storage_t&& other) noexcept : mode{other.mode}
         {
             // Since fast_io::vector satisfies both is_trivially_copyable_or_relocatable and is_zero_default_constructible, it is possible to do this
-            other.mode = {};  // set to u8_view
+
+            // There is no need to set other.mode here, as it is a move, and if you want to modify other.mode you need to destruct the type on other
 
             // move data
             switch(this->mode)
             {
                 [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
+                    // do nothing
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
-                    // trivial
-                    this->storage.typeidx_u8_view = ::std::move(other.storage.typeidx_u8_view);
+                    // trivial, placement new (regulate)
+                    ::new(::std::addressof(this->storage.typeidx_u8_view)) decltype(this->storage.typeidx_u8_view){::std::move(other.storage.typeidx_u8_view)};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
                 {
                     // move constructor, placement new
-                    ::new(::std::addressof(this->storage.typeidx_u8_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>{
+                    ::new(::std::addressof(this->storage.typeidx_u8_vector)) decltype(this->storage.typeidx_u8_vector){
                         ::std::move(other.storage.typeidx_u8_vector)};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u16_vector:
                 {
                     // move constructor, placement new
-                    ::new(::std::addressof(this->storage.typeidx_u16_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16>{
+                    ::new(::std::addressof(this->storage.typeidx_u16_vector)) decltype(this->storage.typeidx_u16_vector){
                         ::std::move(other.storage.typeidx_u16_vector)};
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u32_vector:
                 {
                     // move constructor, placement new
-                    ::new(::std::addressof(this->storage.typeidx_u32_vector))::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>{
+                    ::new(::std::addressof(this->storage.typeidx_u32_vector)) decltype(this->storage.typeidx_u32_vector){
                         ::std::move(other.storage.typeidx_u32_vector)};
                     break;
                 }
@@ -392,109 +386,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             if(::std::addressof(other) == this) [[unlikely]] { return *this; }
 
-            clear_destroy();
-
-            this->mode = other.mode;
-
+            // Prevent type puns, must destruct union
             switch(this->mode)
             {
                 [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
+                    // do nothing
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
-                    this->storage.typeidx_u8_view = other.storage.typeidx_u8_view;
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u8_vector:
-                {
-                    this->storage.typeidx_u8_vector = other.storage.typeidx_u8_vector;
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u16_vector:
-                {
-                    this->storage.typeidx_u16_vector = other.storage.typeidx_u16_vector;
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u32_vector:
-                {
-                    this->storage.typeidx_u32_vector = other.storage.typeidx_u32_vector;
-                    break;
-                }
-                [[unlikely]] default:
-                {
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
-                    ::fast_io::unreachable();
-                }
-            }
-
-            return *this;
-        }
-
-        inline constexpr vectypeidx_minimize_storage_t& operator= (vectypeidx_minimize_storage_t&& other) noexcept
-        {
-            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
-
-            clear_destroy();
-
-            // Since fast_io::vector satisfies both is_trivially_copyable_or_relocatable and is_zero_default_constructible, it is possible to do this
-
-            this->mode = other.mode;
-
-            other.mode = {};  // set to u8_view
-
-            switch(this->mode)
-            {
-                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
-                {
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u8_view:
-                {
-                    this->storage.typeidx_u8_view = ::std::move(other.storage.typeidx_u8_view);
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u8_vector:
-                {
-                    this->storage.typeidx_u8_vector = ::std::move(other.storage.typeidx_u8_vector);
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u16_vector:
-                {
-                    this->storage.typeidx_u16_vector = ::std::move(other.storage.typeidx_u16_vector);
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u32_vector:
-                {
-                    this->storage.typeidx_u32_vector = ::std::move(other.storage.typeidx_u32_vector);
-                    break;
-                }
-                [[unlikely]] default:
-                {
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
-                    ::fast_io::unreachable();
-                }
-            }
-
-            return *this;
-        }
-
-        inline constexpr ~vectypeidx_minimize_storage_t()
-        {
-            switch(this->mode)
-            {
-                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
-                {
-                    break;
-                }
-                case vectypeidx_minimize_storage_mode::u8_view:
-                {
-                    this->storage.typeidx_u8_view = {};
+                    // The trivial destructor type does not require any destructors.
+                    static_assert(::std::is_trivially_destructible_v<decltype(this->storage.typeidx_u8_view)>);
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
@@ -520,6 +423,176 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::unreachable();
                 }
             }
+
+            this->mode = other.mode;
+
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    // do nothing
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_view)) decltype(this->storage.typeidx_u8_view){other.storage.typeidx_u8_view};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_vector)) decltype(this->storage.typeidx_u8_vector){other.storage.typeidx_u8_vector};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u16_vector)) decltype(this->storage.typeidx_u16_vector){other.storage.typeidx_u16_vector};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u32_vector)) decltype(this->storage.typeidx_u32_vector){other.storage.typeidx_u32_vector};
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
+                }
+            }
+
+            return *this;
+        }
+
+        inline constexpr vectypeidx_minimize_storage_t& operator= (vectypeidx_minimize_storage_t&& other) noexcept
+        {
+            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
+
+            // Prevent type puns, must destruct union
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    // do nothing
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    static_assert(::std::is_trivially_destructible_v<decltype(this->storage.typeidx_u8_view)>);
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u8_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u16_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u32_vector));
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
+                }
+            }
+
+            // Since fast_io::vector satisfies both is_trivially_copyable_or_relocatable and is_zero_default_constructible, it is possible to do this
+
+            this->mode = other.mode;
+
+            // There is no need to set other.mode here, as it is a move, and if you want to modify other.mode you need to destruct the type on other
+
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    // do nothing
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_view)) decltype(this->storage.typeidx_u8_view){::std::move(other.storage.typeidx_u8_view)};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_vector)) decltype(this->storage.typeidx_u8_vector){
+                        ::std::move(other.storage.typeidx_u8_vector)};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u16_vector)) decltype(this->storage.typeidx_u16_vector){
+                        ::std::move(other.storage.typeidx_u16_vector)};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u32_vector)) decltype(this->storage.typeidx_u32_vector){
+                        ::std::move(other.storage.typeidx_u32_vector)};
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
+                }
+            }
+
+            return *this;
+        }
+
+        inline constexpr ~vectypeidx_minimize_storage_t()
+        {
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    // Multiple destructuring is ub in the standard, so mundane types don't need to do any operations
+                    // this->storage.typeidx_u8_view = {};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u8_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u16_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u32_vector));
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
+                }
+            }
+
+            // No need to set this mode, multiple destructs ub
         }
 
         inline constexpr void clear_destroy() noexcept
@@ -561,8 +634,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::unreachable();
                 }
             }
-
-            this->mode = {};
         }
 
         inline constexpr void clear() noexcept
@@ -606,9 +677,54 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         inline constexpr void change_mode(vectypeidx_minimize_storage_mode mode) noexcept
         {
             // chang mode need destroy first
-            clear_destroy();
+
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    // Multiple destructuring is ub in the standard, so mundane types don't need to do any operations
+                    // this->storage.typeidx_u8_view = {};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u8_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u16_vector));
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::std::destroy_at(::std::addressof(this->storage.typeidx_u32_vector));
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::unreachable();
+                }
+            }
+
             this->mode = mode;
+
             // Because the fast_io vector is constructed with all zeros, there is no need to do any constructor operations
+            static_assert(::std::is_trivially_copyable_v<decltype(this->storage.typeidx_u8_view)> &&
+                          ::std::is_trivially_destructible_v<decltype(this->storage.typeidx_u8_view)>);
+            static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u8_vector)>);
+            static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u16_vector)>);
+            static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u32_vector)>);
+
+            // The union behavior is equivalent to the constructor
+            ::std::memset(this->storage.vectypeidx_minimize_storage_u_reserve, 0, sizeof(this->storage.vectypeidx_minimize_storage_u_reserve));
         }
 
         inline constexpr ::std::size_t size() const noexcept
@@ -617,7 +733,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
-                    return 0;
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::fast_terminate();
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
@@ -651,7 +770,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 [[unlikely]] case vectypeidx_minimize_storage_mode::null:
                 {
-                    return static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(-1);
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::fast_io::fast_terminate();
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
@@ -824,8 +946,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <typename... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
     struct wasm1_element_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::std::size_t sizeof_storage_u{
-            get_union_size<typeidx_u8_view_t, ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t>()};
+        inline static constexpr ::std::size_t sizeof_storage_u{sizeof(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t)};
 
         union storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
@@ -838,12 +959,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             [[maybe_unused]] ::std::byte sizeof_storage_u_reserve[sizeof_storage_u]{};
 
             // destructor of 'storage_u' is implicitly deleted because variant field 'typeidx_u8_vector' has a non-trivial destructor
-            inline constexpr ~storage_u() noexcept {}
+            inline constexpr ~storage_u() {}
 
             // The release of table_idx is managed by struct wasm1_element_t, there is no issue of raii resources being unreleased.
         } storage;
 
         static_assert(sizeof(storage_u) == sizeof_storage_u, "sizeof(storage_t) not equal to sizeof_storage_u");
+
+        // In wasm1, type stands for table index, which conceptually can be any value, but since the standard specifies only 1 table, it can only be 0. Here
+        // union does not need to make any type-safe judgments since there is only one type.
 
         wasm1_element_type_t type{};
 
@@ -851,20 +975,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline constexpr wasm1_element_t(wasm1_element_t const& other) noexcept : type{other.type}
         {
-            ::new(::std::addressof(this->storage.table_idx))::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t{other.storage.table_idx};
+            ::new(::std::addressof(this->storage.table_idx)) decltype(this->storage.table_idx){other.storage.table_idx};
         }
 
         inline constexpr wasm1_element_t(wasm1_element_t&& other) noexcept : type{other.type}
         {
-            ::new(::std::addressof(this->storage.table_idx))::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t{
-                ::std::move(other.storage.table_idx)};
+            ::new(::std::addressof(this->storage.table_idx)) decltype(this->storage.table_idx){::std::move(other.storage.table_idx)};
         }
 
         inline constexpr wasm1_element_t& operator= (wasm1_element_t const& other) noexcept
         {
             if(::std::addressof(other) == this) [[unlikely]] { return *this; }
 
+            // The table_idx type in union is always valid regardless of the value of type.
+
             this->type = other.type;
+
             this->storage.table_idx = other.storage.table_idx;
 
             return *this;
@@ -874,7 +1000,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             if(::std::addressof(other) == this) [[unlikely]] { return *this; }
 
+            // The table_idx type in union is always valid regardless of the value of type.
+
             this->type = other.type;
+
             this->storage.table_idx = ::std::move(other.storage.table_idx);
 
             return *this;

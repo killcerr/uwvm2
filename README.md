@@ -1,9 +1,14 @@
+<div align="center">
+  <img src="documents/logo/uwvm2.svg" alt="uwvm2 logo" width="240"/>
+  <br/>
+  <h1>Ultimate WebAssembly Virtual Machine 2</h1>
+</div>
+
 > [!IMPORTANT]
 > This project is currently only developer stable
 >
 
 <div style="text-align:center">
-    <h1>Ultimate WebAssembly Virtual Machine</h1>
     <a href="https://github.com/UlteSoft/uwvm2/actions?query=workflow%3ACI">
         <img src="https://img.shields.io/github/actions/workflow/status/UlteSoft/uwvm2/ci.yml?branch=master" alt="github-ci" />
     </a>

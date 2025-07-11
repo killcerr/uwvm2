@@ -25,6 +25,8 @@
 #ifndef UWVM_MODULE
 # include "base/impl.h"
 # include "feature/impl.h"
+# include "type/impl.h"
 # include "storage/impl.h"
 # include "custom/impl.h"
+# include "loader/impl.h"
 #endif

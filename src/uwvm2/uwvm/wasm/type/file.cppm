@@ -21,6 +21,16 @@
 
 module;
 
+// std
+#include <cstdint>
+#include <cstddef>
+#include <cstring>
+#include <new>
+#include <memory>
+#include <type_traits>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
+
 export module uwvm2.uwvm.wasm.type:file;
 
 #ifndef UWVM_MODULE

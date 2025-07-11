@@ -25,6 +25,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.parser.wasm_custom;
+import uwvm2.uwvm.wasm.type;
 #else
 // std
 # include <cstddef>
@@ -41,6 +42,7 @@ import uwvm2.parser.wasm_custom;
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm_custom/impl.h>
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -54,7 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
                                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* const end) noexcept
     {
         ::fast_io::vector<::uwvm2::parser::wasm_custom::customs::name_err_t> name_err{};
-        ::uwvm2::parser::wasm_custom::customs::parse_name_storage(file.wasm_binfmt_ver1_name,
+        ::uwvm2::parser::wasm_custom::customs::parse_name_storage(file.wasm_custom_name,
                                                                   reinterpret_cast<::std::byte const*>(begin),
                                                                   reinterpret_cast<::std::byte const*>(end),
                                                                   name_err);

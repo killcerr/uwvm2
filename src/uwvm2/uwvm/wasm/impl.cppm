@@ -24,9 +24,11 @@ module;
 
 export module uwvm2.uwvm.wasm;
 export import uwvm2.uwvm.wasm.base;
-export import uwvm2.uwvm.wasm.storage;
 export import uwvm2.uwvm.wasm.feature;
+export import uwvm2.uwvm.wasm.type;
+export import uwvm2.uwvm.wasm.storage;
 export import uwvm2.uwvm.wasm.custom;
+export import uwvm2.uwvm.wasm.loader;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
