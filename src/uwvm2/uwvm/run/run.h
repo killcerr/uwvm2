@@ -104,7 +104,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
         // load main module
 
-        auto const load_wasm_file_rtl{::uwvm2::uwvm::wasm::loader::load_wasm_file(::uwvm2::uwvm::wasm::storage::execute_wasm, module_file_name)};
+        auto const load_wasm_file_rtl{::uwvm2::uwvm::wasm::loader::load_wasm_file(::uwvm2::uwvm::wasm::storage::execute_wasm,
+                                                                                  module_file_name,
+                                                                                  ::uwvm2::uwvm::wasm::storage::wasm_parameter)};
 
         switch(load_wasm_file_rtl)
         {

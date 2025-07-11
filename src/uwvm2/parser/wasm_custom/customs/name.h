@@ -28,6 +28,7 @@ import fast_io;
 import uwvm2.utils.debug;
 # endif
 import uwvm2.utils.utf;
+import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard;
 #else
@@ -50,6 +51,7 @@ import uwvm2.parser.wasm.standard;
 #  include <uwvm2/utils/debug/impl.h>
 # endif
 # include <uwvm2/utils/utf/impl.h>
+# include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
 #endif

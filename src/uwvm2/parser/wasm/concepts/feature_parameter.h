@@ -146,9 +146,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         using storage_t = splice_feature_parameter_t<Fs...>;  // ::fast_io::tuple
         storage_t parameters{};
 
-        static_assert((::uwvm2::parser::wasm::concepts::wasm_feature<Fs> && ...), "Fs is not wasm feature");  // check is wasm feature
-        static_assert(::fast_io::is_tuple<storage_t>, "storage_t is not fast_io::tuple");                     // check is tuple
-        static_assert(check_has_duplicate_feature_parameter_ret_true<Fs...>());                               // check no duplicate
+        // check is wasm feature
+        static_assert((::uwvm2::parser::wasm::concepts::wasm_feature<Fs> && ...), "Fs is not wasm feature");
+        // check is tuple
+        static_assert(::fast_io::is_tuple<storage_t>, "storage_t is not fast_io::tuple");
+        // check no duplicate
+        static_assert(check_has_duplicate_feature_parameter_ret_true<Fs...>());
+        // check whether or not it is stored in union without side effects
+        static_assert(::std::is_trivially_copyable_v<storage_t> && ::std::is_trivially_destructible_v<storage_t>);
     };
 
     /// @brief get feature parameter type from wasm feature tuple

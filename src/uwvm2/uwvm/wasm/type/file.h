@@ -28,7 +28,17 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm_custom.customs;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.feature;
+import :para;
 #else
+// std
+# include <cstdint>
+# include <cstddef>
+# include <cstring>
+# include <new>
+# include <memory>
+# include <type_traits>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
@@ -37,6 +47,7 @@ import uwvm2.uwvm.wasm.feature;
 # include <uwvm2/parser/wasm_custom/customs/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
+# include "para.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -47,8 +58,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 {
     struct wasm_file_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::std::size_t sizeof_wasm_file_module_storage_u{
-            ::uwvm2::parser::wasm::concepts::operation::get_union_size<::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t>()};
+        inline static constexpr ::std::size_t sizeof_wasm_file_module_storage_u{sizeof(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_module_storage_t)};
 
         union wasm_file_module_storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
@@ -67,7 +77,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         };
 
         // wasm file name
-        ::fast_io::u8string_view file_name{};
+        ::fast_io::u8cstring_view file_name{};
         // Accurate module names that must work
         ::fast_io::u8string_view module_name{};
         // Recording the binfmt version of the wasm module
@@ -76,6 +86,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         ::fast_io::native_file_loader wasm_file{};
         // Module parsing results
         wasm_file_module_storage_u wasm_module_storage{};
+        // wasm_parameter_u
+        ::uwvm2::uwvm::wasm::type::wasm_parameter_u wasm_parameter{};
         // (Optional) Module name + symbol name
         ::uwvm2::parser::wasm_custom::customs::name_storage_t wasm_binfmt_ver1_name{};
 
@@ -86,7 +98,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 
         inline constexpr wasm_file_t(wasm_file_t&& other) noexcept :
             file_name{::std::move(other.file_name)}, module_name{::std::move(other.module_name)}, binfmt_ver{::std::move(other.binfmt_ver)},
-            wasm_file{::std::move(other.wasm_file)}, wasm_binfmt_ver1_name{::std::move(other.wasm_binfmt_ver1_name)}
+            wasm_file{::std::move(other.wasm_file)}, wasm_parameter{::std::move(other.wasm_parameter)},
+            wasm_binfmt_ver1_name{::std::move(other.wasm_binfmt_ver1_name)}
         {
             switch(this->binfmt_ver)
             {
@@ -126,6 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
             this->module_name = ::std::move(other.module_name);
             this->binfmt_ver = ::std::move(other.binfmt_ver);
             this->wasm_file = ::std::move(other.wasm_file);
+            this->wasm_parameter = ::std::move(other.wasm_parameter);
             this->wasm_binfmt_ver1_name = ::std::move(other.wasm_binfmt_ver1_name);
 
             switch(this->binfmt_ver)
@@ -193,3 +207,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         }
     };
 }  // namespace uwvm2::uwvm::wasm::storage
+
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif

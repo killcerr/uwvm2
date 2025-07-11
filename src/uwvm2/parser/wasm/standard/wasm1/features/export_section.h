@@ -37,6 +37,7 @@ import uwvm2.parser.wasm.standard.wasm1.opcode;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :feature_def;
+import :import_section;
 import :types;
 #else
 // std
@@ -48,6 +49,7 @@ import :types;
 # include <utility>
 # include <memory>
 # include <limits>
+# include <set>  /// @todo replace
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -64,6 +66,7 @@ import :types;
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
 # include "feature_def.h"
+# include "import_section.h"
 # include "types.h"
 #endif
 

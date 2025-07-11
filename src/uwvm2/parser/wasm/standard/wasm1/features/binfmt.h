@@ -40,6 +40,13 @@ import :import_section;
 import :function_section;
 import :table_section;
 import :memory_section;
+import :global_section;
+import :export_section;
+import :start_section;
+import :element_section;
+import :code_section;
+import :data_section;
+import :final_check;
 #else
 // std
 # include <cstddef>
@@ -68,6 +75,13 @@ import :memory_section;
 # include "function_section.h"
 # include "table_section.h"
 # include "memory_section.h"
+# include "global_section.h"
+# include "export_section.h"
+# include "start_section.h"
+# include "element_section.h"
+# include "code_section.h"
+# include "data_section.h"
+# include "final_check.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

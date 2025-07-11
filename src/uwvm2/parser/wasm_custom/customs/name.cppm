@@ -32,7 +32,6 @@ module;
 #include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
 export module uwvm2.parser.wasm_custom.customs:name;
 

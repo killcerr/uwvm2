@@ -945,9 +945,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <typename... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
     struct wasm1_element_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::std::size_t sizeof_storage_u{
-            ::uwvm2::parser::wasm::concepts::operation::get_union_size<typeidx_u8_view_t,
-                                                                       ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t>()};
+        inline static constexpr ::std::size_t sizeof_storage_u{sizeof(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t)};
 
         union storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {

@@ -27,6 +27,7 @@ module;
 #include <cstdint>
 #include <stdfloat>
 #include <limits>
+#include <type_traits>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 

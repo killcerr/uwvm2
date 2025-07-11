@@ -80,9 +80,13 @@ namespace uwvm2::uwvm::wasm::loader
         wasm_parser_error
     };
 
-    inline constexpr load_wasm_file_rtl load_wasm_file(::uwvm2::uwvm::wasm::type::wasm_file_t& wf, ::fast_io::u8cstring_view load_file_name) noexcept
+    inline constexpr load_wasm_file_rtl load_wasm_file(::uwvm2::uwvm::wasm::type::wasm_file_t& wf,
+                                                       ::fast_io::u8cstring_view load_file_name,
+                                                       ::uwvm2::uwvm::wasm::type::wasm_parameter_u para) noexcept
     {
-        wf.file_name = ::fast_io::u8string_view{load_file_name};
+        wf.file_name = load_file_name;
+
+        wf.wasm_parameter = para;
 
 #ifdef __cpp_exceptions
         try
@@ -140,6 +144,7 @@ namespace uwvm2::uwvm::wasm::loader
         }
 #endif
 
+        // binfmt_ver has to be modified by the change_binfmt_ver function.
         wf.change_binfmt_ver(::uwvm2::parser::wasm::binfmt::detect_wasm_binfmt_version(reinterpret_cast<::std::byte const*>(wf.wasm_file.cbegin()),
                                                                                        reinterpret_cast<::std::byte const*>(wf.wasm_file.cend())));
 
@@ -234,11 +239,12 @@ namespace uwvm2::uwvm::wasm::loader
                         ::uwvm2::utils::debug::timer parsing_timer{u8"parse binfmt ver1"};
 #endif
 
-                        wf.wasm_module_storage.wasm_binfmt_ver1_storage = ::uwvm2::uwvm::wasm::feature::binfmt_ver1_handler(
-                            reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cbegin()),
-                            reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cend()),
-                            execute_wasm_binfmt_ver1_storage_wasm_err,
-                            ::uwvm2::uwvm::wasm::storage::global_wasm_binfmt_ver1_parameters);
+                        wf.wasm_module_storage.wasm_binfmt_ver1_storage =
+                            ::uwvm2::uwvm::wasm::feature::binfmt_ver1_handler(reinterpret_cast<::std::byte const*>(wf.wasm_file.cbegin()),
+                                                                              reinterpret_cast<::std::byte const*>(wf.wasm_file.cend()),
+                                                                              execute_wasm_binfmt_ver1_storage_wasm_err,
+                                                                              wf.wasm_parameter.binfmt1_para);
+                                                                              
                     }
 #if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     catch(::fast_io::error)
@@ -263,14 +269,13 @@ namespace uwvm2::uwvm::wasm::loader
                         auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
 
                         // default print_memory
-                        ::uwvm2::uwvm::utils::memory::print_memory const memory_printer{
-                            reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cbegin()),
-                            execute_wasm_binfmt_ver1_storage_wasm_err.err_curr,
-                            reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cend())};
+                        ::uwvm2::uwvm::utils::memory::print_memory const memory_printer{reinterpret_cast<::std::byte const*>(wf.wasm_file.cbegin()),
+                                                                                        execute_wasm_binfmt_ver1_storage_wasm_err.err_curr,
+                                                                                        reinterpret_cast<::std::byte const*>(wf.wasm_file.cend())};
 
                         // set errout
                         ::uwvm2::parser::wasm::base::error_output_t errout;
-                        errout.module_begin = reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cbegin());
+                        errout.module_begin = reinterpret_cast<::std::byte const*>(wf.wasm_file.cbegin());
                         errout.err = execute_wasm_binfmt_ver1_storage_wasm_err;
                         errout.flag.enable_ansi = static_cast<::std::uint_least8_t>(::uwvm2::uwvm::utils::ansies::put_color);
 #  if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
@@ -279,6 +284,7 @@ namespace uwvm2::uwvm::wasm::loader
 
                         // Output the main information and memory indication
                         ::fast_io::io::perr(u8log_output_ul,
+                                            // 1
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -289,9 +295,12 @@ namespace uwvm2::uwvm::wasm::loader
                                             load_file_name,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"\" to be executed.\n",
+                                            // 2
                                             errout,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                            u8"\n" u8"uwvm: ",
+                                            u8"\n"
+                                            // 3
+                                            u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                             u8"[info]  ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
@@ -329,8 +338,7 @@ namespace uwvm2::uwvm::wasm::loader
                     }
 
                     // handle custom section
-                    ::uwvm2::uwvm::wasm::custom::handle_binfmtver1_custom_section(::uwvm2::uwvm::wasm::storage::execute_wasm,
-                                                                                  ::uwvm2::uwvm::wasm::custom::custom_handle_funcs);
+                    ::uwvm2::uwvm::wasm::custom::handle_binfmtver1_custom_section(wf, ::uwvm2::uwvm::wasm::custom::custom_handle_funcs);
 
                     /// @todo set exec module name
                     // 1st: para --wasm-set-main-module-name
@@ -361,7 +369,7 @@ namespace uwvm2::uwvm::wasm::loader
                                     ::fast_io::mnp::addrvw(4uz),
                                     u8") Unknown Binary Format Version of WebAssembly: \"",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                    ::uwvm2::uwvm::wasm::storage::execute_wasm_binfmt_ver,
+                                    wf.binfmt_ver,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\".",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
@@ -370,10 +378,9 @@ namespace uwvm2::uwvm::wasm::loader
                                     u8"[info]  ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Parser Memory Indication: ",
-                                    ::uwvm2::uwvm::utils::memory::print_memory{
-                                        reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cbegin()),
-                                        reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cbegin()) + 4uz,
-                                        reinterpret_cast<::std::byte const*>(::uwvm2::uwvm::wasm::storage::execute_wasm.wasm_file.cend())},
+                                    ::uwvm2::uwvm::utils::memory::print_memory{reinterpret_cast<::std::byte const*>(wf.wasm_file.cbegin()),
+                                                                               reinterpret_cast<::std::byte const*>(wf.wasm_file.cbegin()) + 4uz,
+                                                                               reinterpret_cast<::std::byte const*>(wf.wasm_file.cend())},
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                     u8"\n\n");
 #endif
