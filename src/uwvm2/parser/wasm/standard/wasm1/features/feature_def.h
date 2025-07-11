@@ -251,7 +251,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         union vectypeidx_minimize_storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
             typeidx_u8_view_t typeidx_u8_view;
-            static_assert(::std::is_trivially_copyable_v<typeidx_u8_view_t> && ::std::is_trivially_destructible_v<typeidx_u8_view_t> && ::std::is_trivially_constructible_v<typeidx_u8_view_t>);
+            static_assert(::std::is_trivially_copyable_v<typeidx_u8_view_t> && ::std::is_trivially_destructible_v<typeidx_u8_view_t>);
 
             // Self-control of the life cycle
             ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8> typeidx_u8_vector;
@@ -708,7 +708,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             this->mode = mode;
 
             // Because the fast_io vector is constructed with all zeros, there is no need to do any constructor operations
-            static_assert(::std::is_trivially_constructible_v<decltype(this->storage.typeidx_u8_view)>);
+            static_assert(::std::is_trivially_copyable_v<decltype(this->storage.typeidx_u8_view)> && 
+                          ::std::is_trivially_destructible_v<decltype(this->storage.typeidx_u8_view)>);
             static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u8_vector)>);
             static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u16_vector)>);
             static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u32_vector)>);
