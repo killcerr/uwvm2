@@ -25,6 +25,7 @@
 #ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.parser.wasm_custom;
+import uwvm2.uwvm.wasm.type;
 #else
 // std
 # include <cstddef>
@@ -41,6 +42,7 @@ import uwvm2.parser.wasm_custom;
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm_custom/impl.h>
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

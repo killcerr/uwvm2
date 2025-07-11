@@ -273,6 +273,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
     }
 
+    // The wasm standard states that the standard sections follow a sequence, which can never happen
+#if 0
     /// @brief Define a function for wasm1 to check for the number of imported
     ///        items plus the number of defined items does not exceed u32 max.
     /// @note  ADL for distribution to the correct handler function
@@ -429,6 +431,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
     }
+#endif
 
     /// @brief Define the handler function for type_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -824,6 +827,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             importsec_importdesc_begin[imp_curr_imports_type_wasm_byte].push_back_unchecked(::std::addressof(imp_curr));
         }
 
+        // The wasm standard states that the standard sections follow a sequence, which can never happen
+#if 0
         // In the WebAssembly specification, the total number of internal functions defined in imported functions and function sections cannot exceed the
         // maximum value of u32 (4,294,967,295).
 
@@ -833,6 +838,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             final_extern_type_adl{};
 
         define_imported_and_defined_exceeding_checker(sec_adl, final_extern_type_adl, module_storage, importsec_importdesc_begin, section_curr, err, fs_para);
+#endif
     }
 }  // namespace uwvm2::parser::wasm::standard::wasm1::features
 

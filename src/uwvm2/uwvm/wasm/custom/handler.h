@@ -63,9 +63,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
     inline void handle_binfmtver1_custom_section(::uwvm2::uwvm::wasm::type::wasm_file_t & wasm_file,
                                                  ::std::map<::fast_io::u8string_view, handlefunc_t> const& custom_handler) noexcept
     {
+        if(wasm_file.binfmt_ver != 1u) [[unlikely]] { return; }
+
         auto const& customsec{
             ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t>(
-                wasm_file.wasm_binfmt_ver1_storage.sections)};
+                wasm_file.wasm_module_storage.wasm_binfmt_ver1_storage.sections)};
 
         for(auto const& cs: customsec.customs)
         {
