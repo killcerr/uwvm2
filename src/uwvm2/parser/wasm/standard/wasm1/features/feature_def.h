@@ -714,7 +714,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u16_vector)>);
             static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u32_vector)>);
 
-            ::std::memset(::std::addressof(this->storage), 0, sizeof(this->storage));
+            ::std::memset(this->storage.vectypeidx_minimize_storage_u_reserve, 0, sizeof(this->storage.vectypeidx_minimize_storage_u_reserve));
         }
 
         inline constexpr ::std::size_t size() const noexcept
