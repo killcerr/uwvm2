@@ -82,6 +82,7 @@ namespace uwvm2::uwvm::wasm::loader
 
     inline constexpr load_wasm_file_rtl load_wasm_file(::uwvm2::uwvm::wasm::type::wasm_file_t& wf,
                                                        ::fast_io::u8cstring_view load_file_name,
+                                                       ::fast_io::u8string_view rename_module_name,
                                                        ::uwvm2::uwvm::wasm::type::wasm_parameter_u para) noexcept
     {
         wf.file_name = load_file_name;
@@ -345,13 +346,17 @@ namespace uwvm2::uwvm::wasm::loader
                     // 2st: custom section "name": module name
                     // 3st: file path
 
-                    if(wf.module_name.empty())
+                    if(rename_module_name.empty())
                     {
                         if(wf.wasm_custom_name.module_name.empty()) { wf.module_name = ::fast_io::u8string_view{load_file_name}; }
                         else
                         {
                             wf.module_name = wf.wasm_custom_name.module_name;
                         }
+                    }
+                    else
+                    {
+                        wf.module_name = rename_module_name;
                     }
 
                     // verbose

@@ -1,15 +1,13 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
- * @brief       Imported wasm modules
- * @details     "--wasm-load-wasm" or "-Wlw"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-28
+ * @date        2025-03-31
  * @copyright   APL-2.0 License
  */
 
@@ -24,7 +22,13 @@
 
 module;
 
-export module uwvm2.uwvm.wasm.storage:import_wasm;
+// std
+#include <memory>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+
+export module uwvm2.uwvm.cmdline.params:wasm_preload_library;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -33,4 +37,4 @@ export module uwvm2.uwvm.wasm.storage:import_wasm;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "import_wasm.h"
+#include "wasm_preload_library.h"

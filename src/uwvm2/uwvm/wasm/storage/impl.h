@@ -25,6 +25,6 @@
 #ifndef UWVM_MODULE
 # include "mode.h"
 # include "execute_wasm.h"
-# include "import_wasm.h"
-# include "import_dl.h"
+# include "preloaded_wasm.h"
+# include "preloaded_dl.h"
 #endif

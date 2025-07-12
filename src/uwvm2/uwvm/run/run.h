@@ -73,6 +73,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
     inline int run() noexcept
     {
+        // The wasm preload has been fully parsed
+        // The dl preload has been fully registered
+
         if(!::uwvm2::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
         {
             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
@@ -82,7 +85,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"No input file.\n"
+                                u8"No execution of WASM files.\n"
                                 // 2
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
@@ -106,6 +109,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
         auto const load_wasm_file_rtl{::uwvm2::uwvm::wasm::loader::load_wasm_file(::uwvm2::uwvm::wasm::storage::execute_wasm,
                                                                                   module_file_name,
+                                                                                  ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name,
                                                                                   ::uwvm2::uwvm::wasm::storage::wasm_parameter)};
 
         switch(load_wasm_file_rtl)

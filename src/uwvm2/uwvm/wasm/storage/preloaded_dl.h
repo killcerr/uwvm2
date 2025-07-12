@@ -22,15 +22,34 @@
  *                                      *
  ****************************************/
 
-module;
+#pragma once
 
-export module uwvm2.uwvm.wasm.storage:import_dl;
-
-#ifndef UWVM_MODULE
-# define UWVM_MODULE
+#ifdef UWVM_MODULE
+import fast_io;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.uwvm.wasm.base;
+import uwvm2.uwvm.wasm.feature;
+import uwvm2.uwvm.wasm.type;
+#else
+// import
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/uwvm/wasm/base/impl.h>
+# include <uwvm2/uwvm/wasm/feature/impl.h>
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
+
+#ifdef UWVM_CAN_LOAD_DL
+# ifndef UWVM_MODULE_EXPORT
+#  define UWVM_MODULE_EXPORT
+# endif
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
+{
+    inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_dl_t> preloaded_dl{};  // [global] No global variable dependencies from other translation units
+
+}  // namespace uwvm2::uwvm::wasm::storage
 #endif
 
-#include "import_dl.h"

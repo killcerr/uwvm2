@@ -23,20 +23,26 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+// global
 # include "version.h"
 # include "run.h"
 # include "help.h"
 # include "mode.h"
-# include "wasm_abi.h"
-# include "wasm_set_main_module_name.h"
-# include "log_output.h"
-# include "log_disable_warning.h"
-# include "log_verbose.h"
 
+// debug
 # ifdef _DEBUG
 #  include "debug_test.h"
 # endif
 
+// wasm
+# include "wasm_abi.h"
+# include "wasm_set_main_module_name.h"
+# include "wasm_preload_library.h"
+
+// log
+# include "log_output.h"
+# include "log_disable_warning.h"
+# include "log_verbose.h"
 # if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
 #  include "log_win32_use_ansi.h"
 # endif

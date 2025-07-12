@@ -25,8 +25,8 @@ module;
 export module uwvm2.uwvm.wasm.storage;
 export import :mode;
 export import :execute_wasm;
-export import :import_wasm;
-export import :import_dl;
+export import :preloaded_wasm;
+export import :preloaded_dl;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
