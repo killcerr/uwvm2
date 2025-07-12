@@ -56,12 +56,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
         preloaded_dl
     };
 
+    union module_storage_ptr_u
+    {
+        ::uwvm2::uwvm::wasm::type::wasm_file_t const* wf;
+        ::uwvm2::uwvm::wasm::type::wasm_dl_t const* wd;
+    };
+
     struct all_module_t
     {
-        void* module_storage_ptr{};
+        module_storage_ptr_u module_storage_ptr{};
         module_type_t type{};
     };
 
-    inline ::std::map<::fast_io::u8string_view, all_module_t> all_module_map{};  // [global]
+    inline ::std::map<::fast_io::u8string_view, all_module_t> all_module{};  // [global]
 
 }  // namespace uwvm2::uwvm::wasm::storage

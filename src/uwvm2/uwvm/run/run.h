@@ -136,6 +136,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         }
 
         // check for Check for duplicate modulename
+        // Since vector expansion invalidates the iterator, the build map operation will not be performed on change here
+
+        ::uwvm2::uwvm::wasm::storage::all_module.emplace(
+            ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name,
+            ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wf = ::std::addressof(::uwvm2::uwvm::wasm::storage::execute_wasm)});
+
+        for(auto const& lwc: ::uwvm2::uwvm::wasm::storage::preloaded_wasm)
+        {
+            if(::uwvm2::uwvm::wasm::storage::all_module.contains(lwc.module_name)) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Duplicate WASM module names: \"",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    lwc.module_name,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"\".\n\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return static_cast<int>(::uwvm2::uwvm::run::retval::duplicate_module_name);
+            }
+
+            ::uwvm2::uwvm::wasm::storage::all_module.emplace(lwc.module_name, ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wf = ::std::addressof(lwc)});
+        }
+
+        for(auto const& ldc: ::uwvm2::uwvm::wasm::storage::preloaded_dl)
+        {
+            if(::uwvm2::uwvm::wasm::storage::all_module.contains(ldc.module_name)) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Duplicate WASM module names: \"",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    ldc.module_name,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"\".\n\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return static_cast<int>(::uwvm2::uwvm::run::retval::duplicate_module_name);
+            }
+
+            ::uwvm2::uwvm::wasm::storage::all_module.emplace(ldc.module_name, ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wd = ::std::addressof(ldc)});
+        }
 
         // run vm
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
