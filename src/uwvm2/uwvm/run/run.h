@@ -135,6 +135,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             }
         }
 
+        // check for Check for duplicate modulename
+
         // run vm
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
         {

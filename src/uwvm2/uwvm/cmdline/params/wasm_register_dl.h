@@ -45,10 +45,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline constexpr ::fast_io::u8string_view wasm_preload_library_alias{u8"-Wpl"};
-        extern "C++" ::uwvm2::utils::cmdline::parameter_return_type wasm_preload_library_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                                  ::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                                  ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
+        inline constexpr ::fast_io::u8string_view wasm_register_dl_alias{u8"-Wrdl"};
+        extern "C++" ::uwvm2::utils::cmdline::parameter_return_type wasm_register_dl_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                              ::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                              ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
@@ -56,12 +56,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wbraced-scalar-init"
 #endif
-    inline constexpr ::uwvm2::utils::cmdline::parameter wasm_preload_library{
-        .name{u8"--wasm-preload-library"},
-        .describe{u8"Preloading wasm files as dynamic libraries."},
-        .usage{u8"<wasm> (<rename>)"},
-        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_preload_library_alias), 1uz}},
-        .handle{::std::addressof(details::wasm_preload_library_callback)},
+    inline constexpr ::uwvm2::utils::cmdline::parameter wasm_register_dl{
+        .name{u8"--wasm-register-dl"},
+        .describe{u8"Loads a dynamic library and registers its exported functions as a WebAssembly module."},
+        .usage{u8"<dl> (<rename>)"},
+        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_register_dl_alias), 1uz}},
+        .handle{::std::addressof(details::wasm_register_dl_callback)},
         .cate{::uwvm2::utils::cmdline::categorization::wasm}};
 #if defined(__clang__)
 # pragma clang diagnostic pop

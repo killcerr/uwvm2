@@ -42,21 +42,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
     namespace details
     {
         inline constexpr ::uwvm2::utils::cmdline::parameter const* parameter_unsort[]{
+            // global
             ::std::addressof(::uwvm2::uwvm::cmdline::params::version),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::run),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::help),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::mode),
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_abi),
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_set_main_module_name),
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_preload_library),
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_output),
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_disable_warning),
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_verbose),
 
+        // debug
 #ifdef _DEBUG
             ::std::addressof(::uwvm2::uwvm::cmdline::params::debug_test),
 #endif
 
+            // wasm
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_abi),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_set_main_module_name),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_preload_library),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_register_dl),
+
+            // log
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_output),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_disable_warning),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_verbose),
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_win32_use_ansi),
 #endif

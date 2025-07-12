@@ -23,4 +23,5 @@
 
 #ifndef UWVM_MODULE
 # include "wasm_file.h"
+# include "dl.h"
 #endif

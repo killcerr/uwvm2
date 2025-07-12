@@ -38,6 +38,7 @@ export import :debug_test;
 export import :wasm_abi;
 export import :wasm_set_main_module_name;
 export import :wasm_preload_library;
+export import :wasm_register_dl;
 
 // log
 export import :log_output;

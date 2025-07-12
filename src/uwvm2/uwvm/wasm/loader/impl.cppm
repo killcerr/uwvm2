@@ -24,6 +24,7 @@ module;
 
 export module uwvm2.uwvm.wasm.loader;
 export import :wasm_file;
+export import :dl;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

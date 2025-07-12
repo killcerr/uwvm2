@@ -51,9 +51,9 @@ import uwvm2.uwvm.wasm.loader;
 namespace uwvm2::uwvm::cmdline::params::details
 {
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type
-        wasm_preload_library_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_begin,
-                                      ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
-                                      ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
+        wasm_register_dl_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_begin,
+                                  ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
+                                  ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
         // [... curr] ...
         // [  safe  ] unsafe (could be the module_end)
@@ -85,7 +85,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"[error] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Usage: ",
-                                ::uwvm2::utils::cmdline::print_usage(::uwvm2::uwvm::cmdline::params::wasm_preload_library),
+                                ::uwvm2::utils::cmdline::print_usage(::uwvm2::uwvm::cmdline::params::wasm_register_dl),
                                 u8"\n\n");
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
         }
@@ -120,22 +120,18 @@ namespace uwvm2::uwvm::cmdline::params::details
             rename_module_name = ::fast_io::u8string_view{currp2_str};
         }
 
-        auto& new_preloaded_wasm{::uwvm2::uwvm::wasm::storage::preloaded_wasm.emplace_back()};
+        auto& new_preloaded_dl{::uwvm2::uwvm::wasm::storage::preloaded_dl.emplace_back()};
 
-        auto const load_wasm_file_rtl{
-            ::uwvm2::uwvm::wasm::loader::load_wasm_file(new_preloaded_wasm, file_name, rename_module_name, ::uwvm2::uwvm::wasm::storage::wasm_parameter)};
+        auto const load_dl_rtl{
+            ::uwvm2::uwvm::wasm::loader::load_dl(new_preloaded_dl, file_name, rename_module_name, ::uwvm2::uwvm::wasm::storage::wasm_parameter)};
 
-        switch(load_wasm_file_rtl)
+        switch(load_dl_rtl)
         {
-            [[likely]] case ::uwvm2::uwvm::wasm::loader::load_wasm_file_rtl::ok:
+            [[likely]] case ::uwvm2::uwvm::wasm::loader::load_dl_rtl::ok:
             {
                 break;
             }
-            case ::uwvm2::uwvm::wasm::loader::load_wasm_file_rtl::load_error:
-            {
-                return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
-            }
-            case ::uwvm2::uwvm::wasm::loader::load_wasm_file_rtl::wasm_parser_error:
+            case ::uwvm2::uwvm::wasm::loader::load_dl_rtl::load_error:
             {
                 return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
             }

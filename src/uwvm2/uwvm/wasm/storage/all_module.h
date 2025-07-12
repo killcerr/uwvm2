@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -28,7 +28,10 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm_custom.customs;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.feature;
+import uwvm2.uwvm.wasm.type;
 #else
+// std
+# include <map>  /// @todo replace
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
@@ -37,24 +40,28 @@ import uwvm2.uwvm.wasm.feature;
 # include <uwvm2/parser/wasm_custom/customs/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    struct wasm_dl_t
+    enum class module_type_t : unsigned
     {
-        // wasm file name
-        ::fast_io::u8cstring_view file_name{};
-        // Accurate module names that must work
-        ::fast_io::u8string_view module_name{};
-        // DL File
-        ::fast_io::native_dll_file import_dll_file{};
-        // wasm_parameter_u
-        ::uwvm2::uwvm::wasm::type::wasm_parameter_u wasm_parameter{};
+        exec_wasm,
+        preloaded_wasm,
+        preloaded_dl
     };
+
+    struct all_module_t
+    {
+        void* module_storage_ptr{};
+        module_type_t type{};
+    };
+
+    inline ::std::map<::fast_io::u8string_view, all_module_t> all_module_map{};  // [global]
 
 }  // namespace uwvm2::uwvm::wasm::storage

@@ -27,4 +27,5 @@
 # include "execute_wasm.h"
 # include "preloaded_wasm.h"
 # include "preloaded_dl.h"
+# include "all_module.h"
 #endif
