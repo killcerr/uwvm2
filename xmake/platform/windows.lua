@@ -241,34 +241,58 @@ function windows_target()
         -- Windows NT (without win32 api)，unverified.
     
         elseif opt_name == "NT400" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0400")
+            add_defines("_WIN32_WINNT=0x0400")
             add_defines("WINVER=0x0400")
             add_ldflags("-Wl,--major-subsystem-version=4", "-Wl,--minor-subsystem-version=0", {force = true})
             add_syslinks("ntdll")
-            add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
+            add_syslinks("msvcrt")
+            add_ldflags("-static", {force = true}) -- Forced static linking on win9x
+            local march = get_config("march")
+            if march == "default" and is_arch("i686") then
+                -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
+                -- MinGW only supports 32-bit processors of the x86 family.
+                add_cxflags("-march=i686")
+            end
         elseif opt_name == "NT351" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0351")
+            add_defines("_WIN32_WINNT=0x0351")
             add_defines("WINVER=0x0351")
             add_ldflags("-Wl,--major-subsystem-version=3", "-Wl,--minor-subsystem-version=51", {force = true})
             add_syslinks("ntdll")
-            add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
+            add_syslinks("msvcrt")
+            add_ldflags("-static", {force = true}) -- Forced static linking on win9x
+            local march = get_config("march")
+            if march == "default" and is_arch("i686") then
+                -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
+                -- MinGW only supports 32-bit processors of the x86 family.
+                add_cxflags("-march=i686")
+            end
         elseif opt_name == "NT350" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0350")
+            add_defines("_WIN32_WINNT=0x0350")
             add_defines("WINVER=0x0350")
             add_ldflags("-Wl,--major-subsystem-version=3", "-Wl,--minor-subsystem-version=50", {force = true})
             add_syslinks("ntdll")
-            add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
+            add_syslinks("msvcrt")
+            add_ldflags("-static", {force = true}) -- Forced static linking on win9x
+            local march = get_config("march")
+            if march == "default" and is_arch("i686") then
+                -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
+                -- MinGW only supports 32-bit processors of the x86 family.
+                add_cxflags("-march=i686")
+            end
         elseif opt_name == "NT310" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0310")
+            add_defines("_WIN32_WINNT=0x0310")
             add_defines("WINVER=0x0310")
             add_ldflags("-Wl,--major-subsystem-version=3", "-Wl,--minor-subsystem-version=10", {force = true})
             add_syslinks("ntdll")
-            add_ldflags("-static", {force = true}) -- Forced static linking on winnt (witout win32)
-    
+            add_syslinks("msvcrt")
+            add_ldflags("-static", {force = true}) -- Forced static linking on win9x
+            local march = get_config("march")
+            if march == "default" and is_arch("i686") then
+                -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
+                -- MinGW only supports 32-bit processors of the x86 family.
+                add_cxflags("-march=i686")
+            end
+
         -- Windows 1.0 2.0 3.0 are not supported because it only supports x86 (16-bit).
     
         else
@@ -429,29 +453,29 @@ function windows_target()
         -- Windows NT (without win32 api)，unverified.
     
         elseif opt_name == "NT400" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0400")
+            add_defines("_WIN32_WINNT=0x0400")
             add_defines("WINVER=0x0400")
             add_ldflags("-SUBSYSTEM:CONSOLE,4.00")
             add_syslinks("ntdll")
+            add_syslinks("mscvrt")
         elseif opt_name == "NT351" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0351")
+            add_defines("_WIN32_WINNT=0x0351")
             add_defines("WINVER=0x0351")
             add_ldflags("-SUBSYSTEM:CONSOLE,3.51")
             add_syslinks("ntdll")
+            add_syslinks("mscvrt")
         elseif opt_name == "NT350" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0350")
+            add_defines("_WIN32_WINNT=0x0350")
             add_defines("WINVER=0x0350")
             add_ldflags("-SUBSYSTEM:CONSOLE,3.50")
             add_syslinks("ntdll")
+            add_syslinks("mscvrt")
         elseif opt_name == "NT310" then -- unverified
-            add_undefines("_WIN32_WINNT")
-            add_defines("_WINNT=0x0310")
+            add_defines("_WIN32_WINNT=0x0310")
             add_defines("WINVER=0x0310")
             add_ldflags("-SUBSYSTEM:CONSOLE,3.10")
             add_syslinks("ntdll")
+            add_syslinks("mscvrt")
         else
             error("invalid value")
         end
