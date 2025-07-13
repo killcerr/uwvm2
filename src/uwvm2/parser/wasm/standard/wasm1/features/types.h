@@ -155,7 +155,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // Add scope space to prevent subsequent access to variables that should not be accessed
 
-        {
+        // min, alway exists
+
             // [flag] min ... max (end)
             // [safe] unsafe (could be the end)
             //        ^^ curr
@@ -187,7 +188,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [flag min ...] max (end)
             // [    safe    ] unsafe (could be the end)
             //                ^^ curr
-        }
 
         if(flags == 1u)
         {
@@ -214,6 +214,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [flag min ... max ...] (end)
             // [        safe        ] unsafe (could be the end)
             //               ^^ curr
+
+            if (n_max < n_min) [[unlikely]]
+            {
+                err.err_curr = curr;
+                err.err_selectable.u32arr[0u] = n_max;
+                err.err_selectable.u32arr[1u] = n_min;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::limit_type_max_lt_min;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
 
             // Storing Temporary Variables into Modules
             limit_r.max = n_max;
