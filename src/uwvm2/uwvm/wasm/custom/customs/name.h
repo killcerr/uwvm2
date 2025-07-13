@@ -24,7 +24,10 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import uwvm2.utils.ansies;
 import uwvm2.parser.wasm_custom;
+import uwvm2.uwvm.io;
+import uwvm2.uwvm.utils.memory;
 import uwvm2.uwvm.wasm.type;
 #else
 // std
@@ -41,7 +44,10 @@ import uwvm2.uwvm.wasm.type;
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/parser/wasm_custom/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/uwvm/utils/memory/impl.h>
 # include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 

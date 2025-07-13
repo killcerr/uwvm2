@@ -157,37 +157,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         // min, alway exists
 
-            // [flag] min ... max (end)
-            // [safe] unsafe (could be the end)
-            //        ^^ curr
+        // [flag] min ... max (end)
+        // [safe] unsafe (could be the end)
+        //        ^^ curr
 
-            // scan min
-            // Storing Temporary Variables into Modules
-            limit_r.present_max = false;
+        // scan min
+        // Storing Temporary Variables into Modules
+        limit_r.present_max = false;
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_min;  // No initialization necessary
-            auto const [next_n_min, err_n_min]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
-                                                                        reinterpret_cast<char8_t_const_may_alias_ptr>(end),
-                                                                        ::fast_io::mnp::leb128_get(n_min))};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 n_min;  // No initialization necessary
+        auto const [next_n_min, err_n_min]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(curr),
+                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(end),
+                                                                    ::fast_io::mnp::leb128_get(n_min))};
 
-            if(err_n_min != ::fast_io::parse_code::ok) [[unlikely]]
-            {
-                err.err_curr = curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::limit_type_invalid_min;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_n_min);
-            }
+        if(err_n_min != ::fast_io::parse_code::ok) [[unlikely]]
+        {
+            err.err_curr = curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::limit_type_invalid_min;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(err_n_min);
+        }
 
-            // [flag min ...] max (end)
-            // [    safe    ] unsafe (could be the end)
-            //       ^^ curr
+        // [flag min ...] max (end)
+        // [    safe    ] unsafe (could be the end)
+        //       ^^ curr
 
-            // Storing Temporary Variables into Modules
-            limit_r.min = n_min;
+        // Storing Temporary Variables into Modules
+        limit_r.min = n_min;
 
-            curr = reinterpret_cast<::std::byte const*>(next_n_min);
-            // [flag min ...] max (end)
-            // [    safe    ] unsafe (could be the end)
-            //                ^^ curr
+        curr = reinterpret_cast<::std::byte const*>(next_n_min);
+        // [flag min ...] max (end)
+        // [    safe    ] unsafe (could be the end)
+        //                ^^ curr
 
         if(flags == 1u)
         {
@@ -215,7 +215,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [        safe        ] unsafe (could be the end)
             //               ^^ curr
 
-            if (n_max < n_min) [[unlikely]]
+            if(n_max < n_min) [[unlikely]]
             {
                 err.err_curr = curr;
                 err.err_selectable.u32arr[0u] = n_max;
