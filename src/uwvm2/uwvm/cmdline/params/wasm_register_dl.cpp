@@ -20,13 +20,16 @@
  *                                      *
  ****************************************/
 
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+
 // std
-#include <memory>
+# include <memory>
 // macro
-#include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
-#ifdef UWVM_MODULE
+# ifdef UWVM_MODULE
 import fast_io;
 import uwvm2.utils.ansies;
 import uwvm2.utils.cmdline;
@@ -36,17 +39,17 @@ import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.storage;
 import uwvm2.uwvm.wasm.loader;
-#else
-# include <fast_io.h>
-# include <uwvm2/utils/ansies/impl.h>
-# include <uwvm2/utils/cmdline/impl.h>
-# include <uwvm2/uwvm/io/impl.h>
-# include <uwvm2/uwvm/utils/ansies/impl.h>
-# include <uwvm2/uwvm/cmdline/impl.h>
-# include <uwvm2/uwvm/wasm/base/impl.h>
-# include <uwvm2/uwvm/wasm/storage/impl.h>
-# include <uwvm2/uwvm/wasm/loader/impl.h>
-#endif
+# else
+#  include <fast_io.h>
+#  include <uwvm2/utils/ansies/impl.h>
+#  include <uwvm2/utils/cmdline/impl.h>
+#  include <uwvm2/uwvm/io/impl.h>
+#  include <uwvm2/uwvm/utils/ansies/impl.h>
+#  include <uwvm2/uwvm/cmdline/impl.h>
+#  include <uwvm2/uwvm/wasm/base/impl.h>
+#  include <uwvm2/uwvm/wasm/storage/impl.h>
+#  include <uwvm2/uwvm/wasm/loader/impl.h>
+# endif
 
 namespace uwvm2::uwvm::cmdline::params::details
 {
@@ -137,9 +140,9 @@ namespace uwvm2::uwvm::cmdline::params::details
             }
             [[unlikely]] default:
             {
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
+# endif
                 ::fast_io::unreachable();
             }
         }
@@ -150,5 +153,8 @@ namespace uwvm2::uwvm::cmdline::params::details
 }  // namespace uwvm2::uwvm::cmdline::params::details
 
 // macro
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
-#include <uwvm2/utils/macro/pop_macros.h>
+
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm2/utils/macro/pop_macros.h>
+
+#endif

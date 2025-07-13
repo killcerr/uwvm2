@@ -45,6 +45,9 @@ import uwvm2.uwvm.wasm.feature;
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 {
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+
     struct wasm_dl_t
     {
         // wasm file name
@@ -57,4 +60,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         ::uwvm2::uwvm::wasm::type::wasm_parameter_u wasm_parameter{};
     };
 
+#endif
 }  // namespace uwvm2::uwvm::wasm::storage

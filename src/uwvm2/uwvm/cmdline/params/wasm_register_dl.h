@@ -43,6 +43,9 @@ import uwvm2.utils.cmdline;
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+
     namespace details
     {
         inline constexpr ::fast_io::u8string_view wasm_register_dl_alias{u8"-Wrdl"};
@@ -52,10 +55,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 
     }  // namespace details
 
-#if defined(__clang__)
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Wbraced-scalar-init"
-#endif
+# if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wbraced-scalar-init"
+# endif
     inline constexpr ::uwvm2::utils::cmdline::parameter wasm_register_dl{
         .name{u8"--wasm-register-dl"},
         .describe{u8"Loads a dynamic library and registers its exported functions as a WebAssembly module."},
@@ -63,8 +66,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_register_dl_alias), 1uz}},
         .handle{::std::addressof(details::wasm_register_dl_callback)},
         .cate{::uwvm2::utils::cmdline::categorization::wasm}};
-#if defined(__clang__)
-# pragma clang diagnostic pop
+# if defined(__clang__)
+#  pragma clang diagnostic pop
+# endif
+
 #endif
 }  // namespace uwvm2::uwvm::cmdline::params
 

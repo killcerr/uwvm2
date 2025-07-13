@@ -59,7 +59,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
     union module_storage_ptr_u
     {
         ::uwvm2::uwvm::wasm::type::wasm_file_t const* wf;
+
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
         ::uwvm2::uwvm::wasm::type::wasm_dl_t const* wd;
+#endif
     };
 
     struct all_module_t

@@ -164,6 +164,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             ::uwvm2::uwvm::wasm::storage::all_module.emplace(lwc.module_name, ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wf = ::std::addressof(lwc)});
         }
 
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+
         for(auto const& ldc: ::uwvm2::uwvm::wasm::storage::preloaded_dl)
         {
             if(::uwvm2::uwvm::wasm::storage::all_module.contains(ldc.module_name)) [[unlikely]]
@@ -185,6 +188,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
             ::uwvm2::uwvm::wasm::storage::all_module.emplace(ldc.module_name, ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wd = ::std::addressof(ldc)});
         }
+#endif
 
         // run vm
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)

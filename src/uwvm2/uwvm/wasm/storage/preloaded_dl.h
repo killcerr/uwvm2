@@ -48,7 +48,10 @@ import uwvm2.uwvm.wasm.type;
 # endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
+# if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \
+     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
     inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_dl_t> preloaded_dl{};  // [global] No global variable dependencies from other translation units
+# endif
 
 }  // namespace uwvm2::uwvm::wasm::storage
 #endif

@@ -38,7 +38,10 @@
 # include "wasm_abi.h"
 # include "wasm_set_main_module_name.h"
 # include "wasm_preload_library.h"
-# include "wasm_register_dl.h"
+# if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \
+     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#  include "wasm_register_dl.h"
+# endif
 
 // log
 # include "log_output.h"

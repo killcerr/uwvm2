@@ -26,6 +26,9 @@
 # include "mode.h"
 # include "execute_wasm.h"
 # include "preloaded_wasm.h"
-# include "preloaded_dl.h"
+# if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \
+     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#  include "preloaded_dl.h"
+# endif
 # include "all_module.h"
 #endif

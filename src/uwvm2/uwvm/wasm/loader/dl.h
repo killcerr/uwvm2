@@ -73,6 +73,9 @@ import uwvm2.uwvm.wasm.custom;
 
 namespace uwvm2::uwvm::wasm::loader
 {
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+
     enum class load_dl_rtl
     {
         ok,
@@ -89,9 +92,9 @@ namespace uwvm2::uwvm::wasm::loader
 
         wd.wasm_parameter = para;
 
-#ifdef __cpp_exceptions
+# ifdef __cpp_exceptions
         try
-#endif
+# endif
         {
             // verbose
             if(::uwvm2::uwvm::show_verbose) [[unlikely]]
@@ -112,13 +115,13 @@ namespace uwvm2::uwvm::wasm::loader
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
             }
 
-#ifdef UWVM_TIMER
+# ifdef UWVM_TIMER
             ::uwvm2::utils::debug::timer parsing_timer{u8"dl loader"};
-#endif
+# endif
 
             wd.import_dll_file = ::fast_io::native_dll_file{load_file_name, ::fast_io::dll_mode::posix_rtld_lazy};
         }
-#ifdef __cpp_exceptions
+# ifdef __cpp_exceptions
         catch(::fast_io::error e)
         {
             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
@@ -135,14 +138,14 @@ namespace uwvm2::uwvm::wasm::loader
                                 e,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n"
-# ifndef _WIN32  // Win32 automatically adds a newline (winnt and win9x)
+#  ifndef _WIN32  // Win32 automatically adds a newline (winnt and win9x)
                                 u8"\n"
-# endif
+#  endif
             );
 
             return load_dl_rtl::load_error;
         }
-#endif
+# endif
 
         // 1st: para --wasm-set-main-module-name
         // 2st: custom section "name": module name
@@ -175,6 +178,7 @@ namespace uwvm2::uwvm::wasm::loader
 
         return load_dl_rtl::ok;
     }
+#endif
 
 }  // namespace uwvm2::uwvm::wasm::loader
 
