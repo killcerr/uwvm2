@@ -83,7 +83,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                   u8"Usage: ",
                                   ::uwvm2::utils::cmdline::print_usage(*p)
                                   // print_usage comes with UWVM_COLOR_U8_RST_ALL
-                                );
+            );
         }
     }
 
@@ -107,7 +107,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                   u8"Usage: ",
                                   ::uwvm2::utils::cmdline::print_usage(*p)
                                   // print_usage comes with UWVM_COLOR_U8_RST_ALL
-                                );
+            );
         }
     }
 
@@ -152,7 +152,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"Arguments:\n");
             help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::global);
             // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
-            
+
             // display other parameter
             ::fast_io::io::perr(u8log_output_ul,
                                 // ln
