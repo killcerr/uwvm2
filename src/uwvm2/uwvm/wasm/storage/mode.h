@@ -51,7 +51,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
         ::uwvm2::uwvm::wasm::base::mode::objdump};  // [global] No global variable dependencies from other translation units
 
     inline ::uwvm2::uwvm::wasm::base::abi execute_wasm_abi{
-        ::uwvm2::uwvm::wasm::base::abi::detect};  // [global] No global variable dependencies from other translation units
+        ::uwvm2::uwvm::wasm::base::abi::wasip1};  // [global] No global variable dependencies from other translation units
 
     inline ::uwvm2::uwvm::wasm::type::wasm_parameter_u wasm_parameter{};  // [global] No global variable dependencies from other translation units
 }  // namespace uwvm2::uwvm::wasm::storage

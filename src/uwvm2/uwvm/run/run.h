@@ -199,14 +199,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             {
                 case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm:
                 {
+                    /// @todo
                     break;
                 }
                 case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
                 {
+                    /// @todo
                     break;
                 }
                 case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
                 {
+                    /// @todo
                     break;
                 }
                 [[unlikely]] default:
@@ -224,7 +227,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             case ::uwvm2::uwvm::wasm::base::mode::objdump:
             {
-                // 
+                /// @todo
                 break;
             }
             [[unlikely]] default:
