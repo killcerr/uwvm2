@@ -34,6 +34,7 @@ constexpr auto get_duplicate_imports_type_name =
             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"func"}; }
             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"func"}; }
             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"func"}; }
+            ::std::unreachable();
         }
         case 1u:
         {
@@ -42,6 +43,7 @@ constexpr auto get_duplicate_imports_type_name =
             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"table"}; }
             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"table"}; }
             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"table"}; }
+            ::std::unreachable();
         }
         case 2u:
         {
@@ -50,6 +52,7 @@ constexpr auto get_duplicate_imports_type_name =
             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"mem"}; }
             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"mem"}; }
             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"mem"}; }
+            ::std::unreachable();
         }
         case 3u:
         {
@@ -58,6 +61,7 @@ constexpr auto get_duplicate_imports_type_name =
             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"global"}; }
             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"global"}; }
             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"global"}; }
+            ::std::unreachable();
         }
         case 4u:
         {
@@ -66,6 +70,7 @@ constexpr auto get_duplicate_imports_type_name =
             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"tag"}; }
             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"tag"}; }
             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"tag"}; }
+            ::std::unreachable();
         }
         [[unlikely]] default:
         {
@@ -79,6 +84,7 @@ constexpr auto get_duplicate_imports_type_name =
             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"unknown"}; }
             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"unknown"}; }
             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"unknown"}; }
+            ::std::unreachable();
         }
     }
 };
@@ -221,10 +227,12 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 get_duplicate_imports_type_name.template operator()<char8_t>(errout.err.err_selectable.duplic_imports.type),
                 u8"): \"",
                 UWVM_WIN32_TEXTATTR_CYAN,
+                // Same type, no conversion required
                 errout.err.err_selectable.duplic_imports.module_name,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8".",
                 UWVM_WIN32_TEXTATTR_CYAN,
+                 // Same type, no conversion required
                 errout.err.err_selectable.duplic_imports.extern_name,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8"\".",
@@ -247,10 +255,12 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         get_duplicate_imports_type_name.template operator()<char8_t>(errout.err.err_selectable.duplic_imports.type),
         u8"): \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+         // Same type, no conversion required
         errout.err.err_selectable.duplic_imports.module_name,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+         // Same type, no conversion required
         errout.err.err_selectable.duplic_imports.extern_name,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8"\".",

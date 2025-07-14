@@ -296,7 +296,7 @@ namespace uwvm2::uwvm::wasm::loader
                                     ::fast_io::mnp::addrvw(utf8pos - wd.module_name.cbegin()),
                                     u8") Module Name Is Invalid UTF-8 Sequence. Reason: \"",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                    ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(utf8err),
+                                    ::uwvm2::utils::utf::get_utf_error_description<char8_t>(utf8err),
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"\".\n"
                                     // 3
@@ -454,7 +454,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::addrvw(utf8pos - custom_name.cbegin()),
                                                 u8") Custom Name Is Invalid UTF-8 Sequence. Reason: \"",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                                ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(utf8err),
+                                                ::uwvm2::utils::utf::get_utf_error_description<char8_t>(utf8err),
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".\n"
                                                 // 3
@@ -639,7 +639,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::addrvw(utf8pos - func_name.cbegin()),
                                                 u8") Function Name Is Invalid UTF-8 Sequence. Reason: \"",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                                ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(utf8err),
+                                                ::uwvm2::utils::utf::get_utf_error_description<char8_t>(utf8err),
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".\n"
                                                 // 3

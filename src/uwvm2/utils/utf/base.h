@@ -69,17 +69,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
     using u32result = result_base<char32_t>;
 
     template <::std::integral char_type2>
-    inline constexpr ::fast_io::basic_string_view<char_type2> get_utf_error_descripten(::uwvm2::utils::utf::utf_error_code type) noexcept
+    inline constexpr ::fast_io::basic_string_view<char_type2> get_utf_error_description(::uwvm2::utils::utf::utf_error_code type) noexcept
     {
         switch(type)
         {
             case utf_error_code::success:
             {
-                if constexpr(::std::same_as<char_type2, char>) { return {"Successed"}; }
-                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"Successed"}; }
-                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"Successed"}; }
-                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"Successed"}; }
-                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"Successed"}; }
+                if constexpr(::std::same_as<char_type2, char>) { return {"Succeeded"}; }
+                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"Succeeded"}; }
+                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"Succeeded"}; }
+                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"Succeeded"}; }
+                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"Succeeded"}; }
             }
             case utf_error_code::long_header_bits:
             {

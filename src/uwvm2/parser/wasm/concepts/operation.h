@@ -146,6 +146,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             // Check for duplicates
             for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 tmp{0u}; auto curr: binfmt_handlers)
             {
+                // The version of binfmt cannot be 0. If 0 occurs, it will terminate on the first try.
 #if __cpp_contracts >= 202502L
                 contract_assert(curr != tmp);
 #else

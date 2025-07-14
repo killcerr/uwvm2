@@ -42,7 +42,7 @@ if constexpr(::std::same_as<char_type, char>)
                 ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
                 ") Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+                ::uwvm2::utils::utf::get_utf_error_description<char>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
                 UWVM_WIN32_TEXTATTR_WHITE,
                 "\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -61,7 +61,7 @@ if constexpr(::std::same_as<char_type, char>)
         ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
         ") Invalid UTF-8 Sequence. Reason: \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+        ::uwvm2::utils::utf::get_utf_error_description<char>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
         "\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
@@ -88,7 +88,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                 ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
                 L") Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+                ::uwvm2::utils::utf::get_utf_error_description<wchar_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
                 UWVM_WIN32_TEXTATTR_WHITE,
                 L"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -107,7 +107,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
         ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
         L") Invalid UTF-8 Sequence. Reason: \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<wchar_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+        ::uwvm2::utils::utf::get_utf_error_description<wchar_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
         L"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
@@ -134,7 +134,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
                 u8") Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+                ::uwvm2::utils::utf::get_utf_error_description<char8_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -153,7 +153,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
         u8") Invalid UTF-8 Sequence. Reason: \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char8_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+        ::uwvm2::utils::utf::get_utf_error_description<char8_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
@@ -180,7 +180,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                 ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
                 u") Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+                ::uwvm2::utils::utf::get_utf_error_description<char16_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -199,7 +199,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
         ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
         u") Invalid UTF-8 Sequence. Reason: \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char16_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+        ::uwvm2::utils::utf::get_utf_error_description<char16_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
         u"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
@@ -226,7 +226,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                 ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
                 U") Invalid UTF-8 Sequence. Reason: \"",
                 UWVM_WIN32_TEXTATTR_YELLOW,
-                ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+                ::uwvm2::utils::utf::get_utf_error_description<char32_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
                 UWVM_WIN32_TEXTATTR_WHITE,
                 U"\".",
                 UWVM_WIN32_TEXTATTR_RST_ALL);
@@ -245,7 +245,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
         ::fast_io::mnp::addrvw(errout.name_err.curr - errout.name_begin),
         U") Invalid UTF-8 Sequence. Reason: \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_YELLOW),
-        ::uwvm2::utils::utf::get_utf_error_descripten<char32_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
+        ::uwvm2::utils::utf::get_utf_error_description<char32_t>(static_cast<::uwvm2::utils::utf::utf_error_code>(errout.name_err.err.u32)),
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
         U"\".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
