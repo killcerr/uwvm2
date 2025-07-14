@@ -100,7 +100,7 @@ namespace uwvm2::uwvm::wasm::loader
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                     // 1
-                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     u8"[warn]  ",
@@ -234,6 +234,32 @@ namespace uwvm2::uwvm::wasm::loader
                 wd.module_name = rename_module_name;
             }
 
+                    if (wd.module_name.empty()) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                                // Output the main information and memory indication
+                                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                                    // 1
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[error] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"Parsing error in DL \"",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                    load_file_name,
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"\".\n"
+                                                    // 2
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[error] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"The Overall WebAssembly Module Name Length Cannot Be 0.\n\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+#endif
+                    }
+
             // check module_name is utf8
             auto const [utf8pos, utf8err]{::uwvm2::uwvm::wasm::feature::handle_text_format(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_text_format_wapper,
                                                                                            wd.module_name.cbegin(),
@@ -251,7 +277,7 @@ namespace uwvm2::uwvm::wasm::loader
                 // Output the main information and memory indication
                 ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                     // 1
-                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
@@ -355,6 +381,38 @@ namespace uwvm2::uwvm::wasm::loader
                     ::fast_io::u8string_view const custom_name{reinterpret_cast<char8_t_const_may_alias_ptr>(handler_curr->custom_name_ptr),
                                                                handler_curr->custom_name_length};
 
+                    if (custom_name.empty()) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        if(::uwvm2::uwvm::show_parser_warning)
+                        {
+                                // Output the main information and memory indication
+                                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                                    // 1
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[warn] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"Parsing error in DL \"",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                    load_file_name,
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"\".",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                    u8" (parser)\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    // 2
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[warn] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"The Custom Name Length Cannot Be 0.\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        }
+#endif
+                    }
+
                     // check custom_name is utf8
                     auto const [utf8pos,
                                 utf8err]{::uwvm2::uwvm::wasm::feature::handle_text_format(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_text_format_wapper,
@@ -374,7 +432,7 @@ namespace uwvm2::uwvm::wasm::loader
                             // Output the main information and memory indication
                             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                                 // 1
-                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                                 u8"uwvm: ",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                                 u8"[warn]  ",
@@ -423,7 +481,7 @@ namespace uwvm2::uwvm::wasm::loader
                             // Output the main information and memory indication
                             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                                 // 1
-                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                                 u8"uwvm: ",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                                 u8"[warn]  ",
@@ -445,7 +503,8 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                                 custom_name,
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                                u8"\".\n");
+                                                u8"\".\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                         }
 # endif
 
@@ -504,8 +563,41 @@ namespace uwvm2::uwvm::wasm::loader
 
                 for(auto func_curr{func_begin}; func_curr != func_end; ++func_curr)
                 {
-                    ::fast_io::u8string_view const func_name{reinterpret_cast<char8_t_const_may_alias_ptr>(func_begin->func_name_ptr),
-                                                             func_begin->func_name_length};
+                    ::fast_io::u8string_view const func_name{reinterpret_cast<char8_t_const_may_alias_ptr>(func_curr->func_name_ptr),
+                                                             func_curr->func_name_length};
+
+                    if (func_name.empty()) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        if(::uwvm2::uwvm::show_parser_warning)
+                        {
+                                // Output the main information and memory indication
+                                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                                    // 1
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[error] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"Parsing error in DL \"",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                    load_file_name,
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"\".",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                    u8" (parser)\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    // 2
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[error] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"The Function Name Length Cannot Be 0.\n\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                }
+#endif
+                    }
+
                     // check custom_name is utf8
                     auto const [utf8pos,
                                 utf8err]{::uwvm2::uwvm::wasm::feature::handle_text_format(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_text_format_wapper,
@@ -525,7 +617,7 @@ namespace uwvm2::uwvm::wasm::loader
                             // Output the main information and memory indication
                             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                                 // 1
-                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                                 u8"uwvm: ",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                                 u8"[warn]  ",
@@ -567,6 +659,40 @@ namespace uwvm2::uwvm::wasm::loader
                     }
 
                     // Parameter checking needs to be done at compile time
+
+                    if (func_curr->func_ptr == nullptr) [[unlikely]]
+                    {
+                        # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        if(::uwvm2::uwvm::show_parser_warning)
+                        {
+                            // Output the main information and memory indication
+                            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                                // 1
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                u8"[warn]  ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Parsing error in DL \"",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                load_file_name,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"\".",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                u8" (parser)\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                // 2
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                u8"[warn]  ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Functions cannot be nullptr.\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        }
+# endif
+                        // Just skip here, no need to disable
+                        continue;
+                    }
                 }
             }
         }

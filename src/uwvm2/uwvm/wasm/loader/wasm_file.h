@@ -281,7 +281,7 @@ namespace uwvm2::uwvm::wasm::loader
                         // Output the main information and memory indication
                         ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                             // 1
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                             u8"[error] ",
@@ -359,7 +359,7 @@ namespace uwvm2::uwvm::wasm::loader
                                 // Output the main information and memory indication
                                 ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                                     // 1
-                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                                     u8"uwvm: ",
                                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                                     u8"[error] ",
@@ -415,6 +415,32 @@ namespace uwvm2::uwvm::wasm::loader
                     {
                         wf.module_name = rename_module_name;
                         if(!check_module_name(wf.module_name)) [[unlikely]] { return load_wasm_file_rtl::wasm_parser_error; }
+                    }
+
+                    if (wf.module_name.empty()) [[unlikely]]
+                    {
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                                // Output the main information and memory indication
+                                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                                    // 1
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[error] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"Parsing error in WebAssembly File \"",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                    load_file_name,
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"\".\n"
+                                                    // 2
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[error] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"The Overall WebAssembly Module Name Length Cannot Be 0.\n\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+#endif
                     }
 
                     // verbose

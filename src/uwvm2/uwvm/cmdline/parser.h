@@ -165,6 +165,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"Usage: ",
                                             ::uwvm2::utils::cmdline::print_usage(*run_para),
+                                            // print_usage comes with UWVM_COLOR_U8_RST_ALL
                                             u8"\n\n");
 
                         return parsing_return_val::returnm1;
