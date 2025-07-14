@@ -39,6 +39,7 @@ import :params;
 # include <cstddef>
 # include <memory>
 # include <bit>
+# include <utility>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -390,7 +391,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                         }
                         [[unlikely]] default:
                         {
-                            ::fast_io::unreachable();  // A correct implementation will not show any other results, and if it does, the behavior is undefined.
+                            ::std::unreachable();  // A correct implementation will not show any other results, and if it does, the behavior is undefined.
                         }
                     }
                 }

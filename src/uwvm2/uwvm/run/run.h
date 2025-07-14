@@ -44,6 +44,7 @@ import :retval;
 # include <cstddef>
 # include <cstdint>
 # include <type_traits>
+# include <utility>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -131,7 +132,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                ::fast_io::unreachable();
+                ::std::unreachable();
             }
         }
 
@@ -190,17 +191,45 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         }
 #endif
 
+        // Checking for import and export inequalities
+
+        for (auto const& curr_module: ::uwvm2::uwvm::wasm::storage::all_module)
+        {
+            switch(curr_module.second.type)
+            {
+                case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm:
+                {
+                    break;
+                }
+                case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
+                {
+                    break;
+                }
+                case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
+                {
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::std::unreachable();
+                }
+            }
+        }
+
         // run vm
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
         {
             case ::uwvm2::uwvm::wasm::base::mode::objdump:
             {
-                /// @todo objdump
+                // 
                 break;
             }
             [[unlikely]] default:
             {
-                ::fast_io::unreachable();
+                ::std::unreachable();
             }
         }
 

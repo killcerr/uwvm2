@@ -29,6 +29,7 @@ module;
 #include <new>
 #include <algorithm>
 #include <limits>
+#include <utility>
 // import
 #include <uwvm2/utils/macro/push_macros.h>
 

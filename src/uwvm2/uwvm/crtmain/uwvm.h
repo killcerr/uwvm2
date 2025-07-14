@@ -37,6 +37,7 @@ import uwvm2.uwvm.crtmain.global;
 # include <cstdint>
 # include <cstddef>
 # include <limits>
+# include <utility>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -77,7 +78,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
             }
             [[unlikely]] default:
             {
-                ::fast_io::unreachable();
+                ::std::unreachable();
             }
         }
 

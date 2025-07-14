@@ -244,7 +244,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             [[unlikely]] default:
             {
-                ::fast_io::unreachable();  // never match, checked before
+                ::std::unreachable();  // never match, checked before
             }
         }
         return section_curr;
