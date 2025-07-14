@@ -355,7 +355,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         while(section_curr != section_end) [[likely]]
         {
             // get final utf8-checker
-            using curr_final_import_export_text_format_wapper = ::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...>;
+            using curr_final_import_export_text_format_wapper = ::uwvm2::parser::wasm::standard::wasm1::features::final_text_format_wapper<Fs...>;
 #if 0
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::can_check_import_export_text_format<Fs...>);
 #endif

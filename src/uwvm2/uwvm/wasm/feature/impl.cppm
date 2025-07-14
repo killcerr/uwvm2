@@ -24,6 +24,7 @@ module;
 
 export module uwvm2.uwvm.wasm.feature;
 export import :feature;
+export import :handle_text_format;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

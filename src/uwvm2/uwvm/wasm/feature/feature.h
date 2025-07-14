@@ -70,4 +70,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
     /// @brief binfmt ver1 module parameter storage_t (feature_parameter_t)
     using wasm_binfmt_ver1_feature_parameter_storage_t =
         decltype(::uwvm2::parser::wasm::concepts::get_feature_parameter_type_from_tuple(wasm_binfmt1_features));
+    /// @brief Unified utf8 version
+    using wasm_binfmt_ver1_text_format_wapper_t =
+        decltype(::uwvm2::parser::wasm::standard::wasm1::features::get_final_text_format_wapper_from_tuple(wasm_binfmt1_features));
+    inline constexpr wasm_binfmt_ver1_text_format_wapper_t wasm_binfmt_ver1_text_format_wapper{};
+
 }  // namespace uwvm2::uwvm::wasm::feature

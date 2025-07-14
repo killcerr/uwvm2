@@ -69,7 +69,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
         if(!name_err.empty()) [[unlikely]]
         {
-            if(::uwvm2::uwvm::show_warning)
+            if(::uwvm2::uwvm::show_parser_warning)
             {
                 // Here, as an entire output, the mutex needs to be controlled uniformly.
                 // There are no unspecified external calls that make the mutex deadlock.
@@ -92,7 +92,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     u8"name",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"\":\n");
+                                    u8"\"",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8" (parser)",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8":\n");
 
                 for(auto const& name_err_curr: name_err)
                 {

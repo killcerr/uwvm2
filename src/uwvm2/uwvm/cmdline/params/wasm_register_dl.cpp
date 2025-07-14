@@ -134,16 +134,9 @@ namespace uwvm2::uwvm::cmdline::params::details
             {
                 break;
             }
-            case ::uwvm2::uwvm::wasm::loader::load_dl_rtl::load_error:
-            {
-                return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
-            }
             [[unlikely]] default:
             {
-# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-# endif
-                ::fast_io::unreachable();
+                return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
             }
         }
 

@@ -215,7 +215,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @brief Define functions for checking imports and exports name
     template <typename... Fs>
-    concept can_check_import_export_text_format = requires(::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...> adl,
+    concept can_check_import_export_text_format = requires(::uwvm2::parser::wasm::standard::wasm1::features::final_text_format_wapper<Fs...> adl,
                                                            ::std::byte const* begin,
                                                            ::std::byte const* end,
                                                            ::uwvm2::parser::wasm::base::error_impl& err) {
