@@ -38,4 +38,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
     inline bool show_vm_warning{true};            // [global]
     inline bool show_parser_warning{true};        // [global]
     inline bool show_untrusted_dl_warning{true};  // [global]
+    inline bool show_dl_warning{true};            // [global]
 }  // namespace uwvm2::utils

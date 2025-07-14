@@ -107,7 +107,7 @@ namespace uwvm2::uwvm::wasm::loader
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Importing an untrusted dl may cause security issues, please make sure the dl is trusted. ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                    u8"(dl)\n",
+                                    u8"(untrusted-dl)\n",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
             }
         }
@@ -384,7 +384,7 @@ namespace uwvm2::uwvm::wasm::loader
                     if(custom_name.empty()) [[unlikely]]
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        if(::uwvm2::uwvm::show_parser_warning)
+                        if(::uwvm2::uwvm::show_dl_warning)
                         {
                             // Output the main information and memory indication
                             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
@@ -400,7 +400,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                                u8" (parser)\n",
+                                                u8" (dl)\n",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 // 2
                                                 u8"uwvm: ",
@@ -422,7 +422,7 @@ namespace uwvm2::uwvm::wasm::loader
                     if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        if(::uwvm2::uwvm::show_parser_warning)
+                        if(::uwvm2::uwvm::show_dl_warning)
                         {
                             // default print_memory
                             ::uwvm2::uwvm::utils::memory::print_memory const memory_printer{reinterpret_cast<::std::byte const*>(custom_name.cbegin()),
@@ -443,7 +443,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                                u8" (parser)\n",
+                                                u8" (dl)\n",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 // 2
                                                 u8"uwvm: ",
@@ -476,7 +476,7 @@ namespace uwvm2::uwvm::wasm::loader
                     if(::uwvm2::uwvm::wasm::custom::custom_handle_funcs.contains(custom_name)) [[unlikely]]
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        if(::uwvm2::uwvm::show_parser_warning)
+                        if(::uwvm2::uwvm::show_dl_warning)
                         {
                             // Output the main information and memory indication
                             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
@@ -492,7 +492,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                                u8" (parser)\n",
+                                                u8" (dl)\n",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 // 2
                                                 u8"uwvm: ",
@@ -569,7 +569,7 @@ namespace uwvm2::uwvm::wasm::loader
                     if(func_name.empty()) [[unlikely]]
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        if(::uwvm2::uwvm::show_parser_warning)
+                        if(::uwvm2::uwvm::show_dl_warning)
                         {
                             // Output the main information and memory indication
                             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
@@ -585,7 +585,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                                u8" (parser)\n",
+                                                u8" (dl)\n",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 // 2
                                                 u8"uwvm: ",
@@ -607,7 +607,7 @@ namespace uwvm2::uwvm::wasm::loader
                     if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        if(::uwvm2::uwvm::show_parser_warning)
+                        if(::uwvm2::uwvm::show_dl_warning)
                         {
                             // default print_memory
                             ::uwvm2::uwvm::utils::memory::print_memory const memory_printer{reinterpret_cast<::std::byte const*>(func_name.cbegin()),
@@ -628,7 +628,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                                u8" (parser)\n",
+                                                u8" (dl)\n",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 // 2
                                                 u8"uwvm: ",
@@ -663,7 +663,7 @@ namespace uwvm2::uwvm::wasm::loader
                     if(func_curr->func_ptr == nullptr) [[unlikely]]
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
-                        if(::uwvm2::uwvm::show_parser_warning)
+                        if(::uwvm2::uwvm::show_dl_warning)
                         {
                             // Output the main information and memory indication
                             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
@@ -679,7 +679,7 @@ namespace uwvm2::uwvm::wasm::loader
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 u8"\".",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                                u8" (parser)\n",
+                                                u8" (dl)\n",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                 // 2
                                                 u8"uwvm: ",

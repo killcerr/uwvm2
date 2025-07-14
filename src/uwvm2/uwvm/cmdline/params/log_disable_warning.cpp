@@ -101,10 +101,12 @@ namespace uwvm2::uwvm::cmdline::params::details
             ::uwvm2::uwvm::show_vm_warning = false;
             ::uwvm2::uwvm::show_parser_warning = false;
             ::uwvm2::uwvm::show_untrusted_dl_warning = false;
+            ::uwvm2::uwvm::show_dl_warning = false;
         }
         else if(currp1_str == u8"vm") { ::uwvm2::uwvm::show_vm_warning = false; }
         else if(currp1_str == u8"parser") { ::uwvm2::uwvm::show_parser_warning = false; }
-        else if(currp1_str == u8"dl") { ::uwvm2::uwvm::show_untrusted_dl_warning = false; }
+        else if(currp1_str == u8"untrusted-dl") { ::uwvm2::uwvm::show_untrusted_dl_warning = false; }
+        else if(currp1_str == u8"dl") { ::uwvm2::uwvm::show_dl_warning = false; }
         else
         {
             ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
