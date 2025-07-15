@@ -244,7 +244,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             [[unlikely]] default:
             {
-                ::fast_io::unreachable();  // never match, checked before
+                ::std::unreachable();  // never match, checked before
             }
         }
         return section_curr;
@@ -341,8 +341,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 [[assume(defined_tablesec_tables_size <= 1u)]];
 
-                if(imported_table_count + defined_tablesec_tables_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) ||
-                   imported_table_count > wasm_u32_max - defined_tablesec_tables_size) [[unlikely]]
+                if(imported_table_count > wasm_u32_max - defined_tablesec_tables_size ||
+                   imported_table_count + defined_tablesec_tables_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_table;
@@ -385,8 +385,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 [[assume(defined_memorysec_memories_size <= 1u)]];
 
-                if(imported_memory_count + defined_memorysec_memories_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) ||
-                   imported_memory_count > wasm_u32_max - defined_memorysec_memories_size) [[unlikely]]
+                if(imported_memory_count > wasm_u32_max - defined_memorysec_memories_size || 
+                   imported_memory_count + defined_memorysec_memories_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_memory;
@@ -532,7 +532,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         while(section_curr != section_end) [[likely]]
         {
             // get final utf8-checker
-            using curr_final_import_export_text_format_wapper = ::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...>;
+            using curr_final_import_export_text_format_wapper = ::uwvm2::parser::wasm::standard::wasm1::features::final_text_format_wapper<Fs...>;
 #if 0
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::can_check_import_export_text_format<Fs...>);
 #endif

@@ -215,7 +215,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @brief Define functions for checking imports and exports name
     template <typename... Fs>
-    concept can_check_import_export_text_format = requires(::uwvm2::parser::wasm::standard::wasm1::features::final_import_export_text_format_wapper<Fs...> adl,
+    concept can_check_import_export_text_format = requires(::uwvm2::parser::wasm::standard::wasm1::features::final_text_format_wapper<Fs...> adl,
                                                            ::std::byte const* begin,
                                                            ::std::byte const* end,
                                                            ::uwvm2::parser::wasm::base::error_impl& err) {
@@ -326,7 +326,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
         }
@@ -377,7 +377,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
         }
@@ -420,7 +420,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
 
@@ -458,7 +458,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
 
@@ -502,7 +502,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
 
@@ -547,7 +547,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
 
@@ -588,7 +588,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
 
@@ -631,7 +631,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
         }
@@ -669,7 +669,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
         }
@@ -710,7 +710,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
 
@@ -759,7 +759,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
         }
@@ -796,7 +796,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
             }
         }

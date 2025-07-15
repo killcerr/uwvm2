@@ -635,6 +635,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_invalid_data_kind.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::limit_type_max_lt_min:
+            {
+#include "error_code_outputs/eco_limit_type_max_lt_min.h"
+                return;
+            }
         }
     }
 

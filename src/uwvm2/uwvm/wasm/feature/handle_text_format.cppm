@@ -1,15 +1,13 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
- * @brief       Imported local dynamic libraries
- * @details     "--wasm-load-dl" or "-Wld"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-28
+ * @date        2025-04-09
  * @copyright   APL-2.0 License
  */
 
@@ -24,7 +22,11 @@
 
 module;
 
-export module uwvm2.uwvm.wasm.storage:import_dl;
+// std
+#include <type_traits>
+#include <concepts>
+
+export module uwvm2.uwvm.wasm.feature:handle_text_format;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -33,4 +35,4 @@ export module uwvm2.uwvm.wasm.storage:import_dl;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "import_dl.h"
+#include "handle_text_format.h"

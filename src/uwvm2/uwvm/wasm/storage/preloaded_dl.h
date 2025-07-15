@@ -5,8 +5,8 @@
  *************************************************************/
 
 /**
- * @brief       Imported wasm modules
- * @details     "--wasm-load-wasm" or "-Wlw"
+ * @brief       Imported local dynamic libraries
+ * @details     "--wasm-load-dl" or "-Wld"
  * @author      MacroModel
  * @version     2.0.0
  * @date        2025-03-28
@@ -42,10 +42,17 @@ import uwvm2.uwvm.wasm.type;
 # include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
-#endif
+#ifdef UWVM_CAN_LOAD_DL
+# ifndef UWVM_MODULE_EXPORT
+#  define UWVM_MODULE_EXPORT
+# endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_file_t> imported_wasm{};  // [global] No global variable dependencies from other translation units
+# if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \
+     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+    inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_dl_t> preloaded_dl{};  // [global] No global variable dependencies from other translation units
+# endif
+
 }  // namespace uwvm2::uwvm::wasm::storage
+#endif
+

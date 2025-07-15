@@ -303,6 +303,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     // [           safe            ] unsafe (could be the map_end)
                     //                               ^^ curr
 
+                    // The length of name cannot be 0
+                    if(module_name_length == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+                    {
+                        err.emplace_back(curr, name_err_type_t::illegal_module_name_length, name_err_storage_t{.u32 = module_name_length});
+                        // End of current map
+                        continue;
+                    }
+
                     if(static_cast<::std::size_t>(map_end - curr) < static_cast<::std::size_t>(module_name_length)) [[unlikely]]
                     {
                         err.emplace_back(curr, name_err_type_t::illegal_module_name_length, name_err_storage_t{.u32 = module_name_length});
@@ -501,6 +509,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [...  func_idx ... name_len ...] ... (map_end)
                         // [             safe             ] unsafe (could be the map_end)
                         //                                  ^^ curr
+
+                        // The length of name cannot be 0
+                        if(func_name_length == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+                        {
+                            err.emplace_back(curr, name_err_type_t::illegal_function_name_length, name_err_storage_t{.u32 = func_name_length});
+                            // End of current paragraph
+                            continue;
+                        }
 
                         if(static_cast<::std::size_t>(map_end - curr) < static_cast<::std::size_t>(func_name_length)) [[unlikely]]
                         {
@@ -790,6 +806,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // [...  function_local_index ... function_local_name_length ...] ... (map_end)
                             // [                             safe                           ] unsafe (could be the map_end)
                             //                                                                ^^ curr
+
+                            // The length of name cannot be 0
+                            if(function_local_name_length == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+                            {
+                                err.emplace_back(curr,
+                                                 name_err_type_t::illegal_function_local_name_length,
+                                                 name_err_storage_t{.u32 = function_local_name_length});
+                                // End of current paragraph
+                                continue;
+                            }
 
                             if(static_cast<::std::size_t>(map_end - curr) < static_cast<::std::size_t>(function_local_name_length)) [[unlikely]]
                             {

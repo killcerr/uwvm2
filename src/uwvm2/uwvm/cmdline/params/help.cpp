@@ -81,7 +81,9 @@ namespace uwvm2::uwvm::cmdline::params::details
                                   parameter_max_principal_name_size_u8nspace.element,
                                   ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
                                   u8"Usage: ",
-                                  ::uwvm2::utils::cmdline::print_usage(*p));
+                                  ::uwvm2::utils::cmdline::print_usage(*p)
+                                  // print_usage comes with UWVM_COLOR_U8_RST_ALL
+            );
         }
     }
 
@@ -103,7 +105,9 @@ namespace uwvm2::uwvm::cmdline::params::details
                                   parameter_max_principal_name_size_u8nspace.element,
                                   ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_PURPLE),
                                   u8"Usage: ",
-                                  ::uwvm2::utils::cmdline::print_usage(*p));
+                                  ::uwvm2::utils::cmdline::print_usage(*p)
+                                  // print_usage comes with UWVM_COLOR_U8_RST_ALL
+            );
         }
     }
 
@@ -147,6 +151,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n");
             help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::global);
+            // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
 
             // display other parameter
             ::fast_io::io::perr(u8log_output_ul,
@@ -207,6 +212,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"Arguments:\n");
             help_output_all(u8log_output_ul);
+            // help_output_all comes with UWVM_COLOR_U8_RST_ALL
             ::fast_io::io::perrln(u8log_output_ul);
         }
         else if(currp1_str == u8"global")
@@ -219,6 +225,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::global);
+            // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
             ::fast_io::io::perrln(u8log_output_ul);
         }
         else if(currp1_str == u8"debug")
@@ -231,6 +238,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::debug);
+            // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
             ::fast_io::io::perrln(u8log_output_ul);
         }
         else if(currp1_str == u8"wasm")
@@ -243,6 +251,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::wasm);
+            // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
             ::fast_io::io::perrln(u8log_output_ul);
         }
         else if(currp1_str == u8"log")
@@ -255,6 +264,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::log);
+            // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
             ::fast_io::io::perrln(u8log_output_ul);
         }
         else
@@ -271,6 +281,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\". Usage: ",
                                 ::uwvm2::utils::cmdline::print_usage(::uwvm2::uwvm::cmdline::params::help),
+                                // print_usage comes with UWVM_COLOR_U8_RST_ALL
                                 u8"\n\n");
 
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;

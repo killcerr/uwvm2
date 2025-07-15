@@ -65,6 +65,44 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief Define structures or concepts related to the version of binfmt
     ///
 
+    ///////////////////////////
+    //     Binary Format     //
+    ///////////////////////////
+
+    /// @brief      has text format
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using text_format = type_replacer<root_of_replacement, text_format_wapper<text_format::xxx>>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_text_format = requires {
+        typename FeatureType::text_format;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::text_format>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_text_format() noexcept
+    {
+        if constexpr(has_text_format<FeatureType>) { return typename FeatureType::text_format{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_text_format_wapper = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_text_format<Fs>())...>;
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval auto get_final_text_format_wapper_from_tuple(::fast_io::tuple<Fs...>) noexcept
+    {
+        return final_text_format_wapper<Fs...>{};
+    }
+
     ////////////////////////////
     //      Type Section      //
     ////////////////////////////
@@ -344,35 +382,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using final_global_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_global_type<Fs>())...>;
-
-    /// @brief      has import/export text format
-    /// @details
-    ///             ```cpp
-    ///             struct F
-    ///             {
-    ///                 using import_export_text_format = type_replacer<root_of_replacement, text_format_wapper<text_format::xxx>>;
-    ///             };
-    ///             ```
-    template <typename FeatureType>
-    concept has_import_export_text_format = requires {
-        typename FeatureType::import_export_text_format;
-        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
-                                                                                             typename FeatureType::import_export_text_format>;
-    };
-
-    template <typename FeatureType>
-    inline consteval auto get_import_export_text_format() noexcept
-    {
-        if constexpr(has_import_export_text_format<FeatureType>) { return typename FeatureType::import_export_text_format{}; }
-        else
-        {
-            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
-        }
-    }
-
-    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    using final_import_export_text_format_wapper =
-        ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_import_export_text_format<Fs>())...>;
 
     /// @brief name checker
     struct name_checker

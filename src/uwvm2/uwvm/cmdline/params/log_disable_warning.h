@@ -49,7 +49,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline bool log_disable_warning_is_exist{};
         inline constexpr ::fast_io::u8string_view log_disable_warning_alias{u8"-log-dw"};
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type log_disable_warning_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                                  ::uwvm2::utils::cmdline::parameter_parsing_results*,
@@ -64,9 +63,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     inline constexpr ::uwvm2::utils::cmdline::parameter log_disable_warning{
         .name{u8"--log-disable-warning"},
         .describe{u8"Turn off the warning output of the uwvm."},
+        .usage{u8"[all|vm|parser|untrusted-dl|dl]"},
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_disable_warning_alias), 1uz}},
         .handle{::std::addressof(details::log_disable_warning_callback)},
-        .is_exist{::std::addressof(details::log_disable_warning_is_exist)},
         .cate{::uwvm2::utils::cmdline::categorization::log}};
 #if defined(__clang__)
 # pragma clang diagnostic pop

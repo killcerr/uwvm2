@@ -24,4 +24,5 @@
 
 #ifndef UWVM_MODULE
 # include "feature.h"
+# include "handle_text_format.h"
 #endif

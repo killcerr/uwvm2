@@ -36,6 +36,7 @@ import :cwrapper;
 # include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
@@ -83,7 +84,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
                     ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
                                         u8"[info]  ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"Parsing the custom section \"",
@@ -106,19 +107,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
                     try
 #endif
                     {
-                        reinterpret_cast<::uwvm2::uwvm::wasm::custom::imported_c_handlefunc_ptr_t>(
+                        using imported_c_handlefunc_may_alias_ptr_t UWVM_GNU_MAY_ALIAS = ::uwvm2::uwvm::wasm::custom::imported_c_handlefunc_ptr_t;
+                        reinterpret_cast<imported_c_handlefunc_may_alias_ptr_t>(
                             curr_custom_handler->second.handler)(cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end));
                     }
 #ifdef __cpp_exceptions
                     catch(...)
                     {
+                        if(::uwvm2::uwvm::show_vm_warning)
+                        {
+                            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                u8"[warn]  ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Caught to c++ exception when handling externally imported custom handler. ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                u8"(vm)\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        }
                         // An exception may be thrown to catch.
                     }
 #endif
                 }
                 else
                 {
-                    reinterpret_cast<handlefunc_ptr_t>(
+                    using handlefunc_may_alias_ptr_t UWVM_GNU_MAY_ALIAS = handlefunc_ptr_t;
+                    reinterpret_cast<handlefunc_may_alias_ptr_t>(
                         curr_custom_handler->second.handler)(wasm_file, cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end));
                 }
 
@@ -130,5 +146,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
 
 #ifndef UWVM_MODULE
 // macro
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

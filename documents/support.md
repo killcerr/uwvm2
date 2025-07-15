@@ -36,6 +36,6 @@
 - (MSVC hasn't support C++26 currently, not supported at this time)
 
 # C++ Standard Library Support (Version is the same as the version released with the corresponding supported compiler)
-- GNU libstdc++ (recommended)
-- LLVM libc++
-- MSVC STL
+- GNU libstdc++ >= 15
+- LLVM libc++ >= 21
+- MSVC STL >= 202501

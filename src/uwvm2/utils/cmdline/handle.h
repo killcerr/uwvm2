@@ -33,6 +33,7 @@ import fast_io_crypto;
 # include <new>
 # include <algorithm>
 # include <limits>
+# include <utility>
 // import
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -462,7 +463,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                         else if(curr_conflict->para == nullptr) [[unlikely]] { return nullptr; }
                     }
                     // If the above scenario is defined, there will never be a hit here.
-                    ::fast_io::unreachable();
+                    ::std::unreachable();
                 }
                 else [[unlikely]]
                 {

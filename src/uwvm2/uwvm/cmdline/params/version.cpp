@@ -353,12 +353,12 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8" 64"
 #  endif
 # endif
-#elif defined(__370__) || defined(__THW_370__)
-                                u8"System/370"
 #elif defined(__s390x__)
                                 u8"System/390 Extended"
 #elif defined(__s390__)
                                 u8"System/390"
+#elif defined(__370__) || defined(__THW_370__)
+                                u8"System/370"
 #elif defined(__pdp11)
                                 u8"PDP11"
 #elif defined(__pdp10)
@@ -612,7 +612,7 @@ namespace uwvm2::uwvm::cmdline::params::details
 #if defined(__CYGWIN__)
                                 u8"Cygwin"
 #elif defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || defined(_WIN32_WINNT) ||                     \
-    defined(_WIN32_WINDOWS) || defined(_WINNT) || defined(_WINDOWS)
+    defined(_WIN32_WINDOWS) || defined(_WINDOWS)
                                 u8"Microsoft Windows"
 # if defined(_WIN32_WINDOWS)
                                 u8" - "
@@ -641,15 +641,13 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"Windows NT 5.1 (WINXP)"
 #  elif _WIN32_WINNT >= 0x0500
                                 u8"Windows NT 5.0 (WS2K, WIN2K)"
-#  endif
-# elif defined(_WINNT)
-#  if _WINNT >= 0x0400
+#  elif _WIN32_WINNT >= 0x0400
                                 u8"Windows NT 4.0"
-#  elif _WINNT >= 0x0351
+#  elif _WIN32_WINNT >= 0x0351
                                 u8"Windows NT 3.51"
-#  elif _WINNT >= 0x0350
+#  elif _WIN32_WINNT >= 0x0350
                                 u8"Windows NT 3.50"
-#  elif _WINNT >= 0x0310
+#  elif _WIN32_WINNT >= 0x0310
                                 u8"Windows NT 3.10"
 #  endif
 # elif defined(_WINDOWS)

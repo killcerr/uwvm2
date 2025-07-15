@@ -24,7 +24,10 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
+import uwvm2.utils.ansies;
 import uwvm2.parser.wasm_custom;
+import uwvm2.uwvm.io;
+import uwvm2.uwvm.utils.memory;
 import uwvm2.uwvm.wasm.type;
 #else
 // std
@@ -36,12 +39,16 @@ import uwvm2.uwvm.wasm.type;
 # include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/parser/wasm_custom/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/uwvm/utils/memory/impl.h>
 # include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
@@ -63,7 +70,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
         if(!name_err.empty()) [[unlikely]]
         {
-            if(::uwvm2::uwvm::show_warning)
+            if(::uwvm2::uwvm::show_parser_warning)
             {
                 // Here, as an entire output, the mutex needs to be controlled uniformly.
                 // There are no unspecified external calls that make the mutex deadlock.
@@ -77,16 +84,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
                 auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
 
                 ::fast_io::io::perr(u8log_output_ul,
-                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
-                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     u8"[warn]  ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Parsing error in Custom Section \"",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     u8"name",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                    u8"\":\n");
+                                    u8"\":",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8" (parser)\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE));
 
                 for(auto const& name_err_curr: name_err)
                 {
@@ -109,7 +119,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
                                         errout,
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"\n" u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
                                         u8"[info]  ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"Parser Memory Indication: ",
@@ -125,5 +135,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
 
 #ifndef UWVM_MODULE
 // macro
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

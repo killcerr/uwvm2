@@ -29,7 +29,7 @@ module;
 #include <concepts>
 #include <memory>
 // platform
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&             \
+#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
     !defined(__wasm__)
 # include <sys/ioctl.h>
 #endif

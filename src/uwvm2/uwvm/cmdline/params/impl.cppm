@@ -23,20 +23,30 @@
 module;
 
 export module uwvm2.uwvm.cmdline.params;
+// global
 export import :version;
 export import :run;
 export import :help;
 export import :mode;
-export import :wasm_abi;
-export import :wasm_set_main_module_name;
-export import :log_output;
-export import :log_disable_warning;
-export import :log_verbose;
 
+// debug
 #ifdef _DEBUG
 export import :debug_test;
 #endif
 
+// wasm
+export import :wasm_abi;
+export import :wasm_set_main_module_name;
+export import :wasm_preload_library;
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+export import :wasm_register_dl;
+#endif
+
+// log
+export import :log_output;
+export import :log_disable_warning;
+export import :log_verbose;
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
 export import :log_win32_use_ansi;
 #endif

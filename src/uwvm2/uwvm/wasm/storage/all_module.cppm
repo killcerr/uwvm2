@@ -1,15 +1,12 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
- * @brief       Imported wasm modules
- * @details     "--wasm-load-wasm" or "-Wlw"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-28
  * @copyright   APL-2.0 License
  */
 
@@ -24,7 +21,10 @@
 
 module;
 
-export module uwvm2.uwvm.wasm.storage:import_wasm;
+// std
+#include <map>  /// @todo replace
+
+export module uwvm2.uwvm.wasm.storage:all_module;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -33,4 +33,4 @@ export module uwvm2.uwvm.wasm.storage:import_wasm;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "import_wasm.h"
+#include "all_module.h"
