@@ -125,7 +125,7 @@ int main()
 
     constexpr auto binfmt1_funcp{::uwvm2::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(features)};
     using wasm_binfmt1_features_t =
-        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(features));
+        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_features_tuple<1>(features));
     static_assert(::std::same_as<wasm_binfmt1_features_t, ::fast_io::tuple<B1F1, B1F2>>, "wasm_binfmt1_features_t includes only features with a binfmt of 1");
     using wasm_binfmt1_storage_t = decltype(::uwvm2::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features_t{}));
     static_assert(::std::same_as<wasm_binfmt1_storage_t, binfmt_ver1_module_storage_t>,
@@ -136,7 +136,7 @@ int main()
 
     constexpr auto binfmt2_funcp{::uwvm2::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<2>(features)};
     using wasm_binfmt2_features_t =
-        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<2>(features));
+        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_features_tuple<2>(features));
     static_assert(::std::same_as<wasm_binfmt2_features_t, ::fast_io::tuple<B2F3>>, "wasm_binfmt2_features_t includes only features with a binfmt of 2");
     using wasm_binfmt2_storage_t = decltype(::uwvm2::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt2_features_t{}));
     static_assert(::std::same_as<wasm_binfmt2_storage_t, binfmt_ver2_module_storage_t<B2F3>>,
