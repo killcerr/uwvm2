@@ -180,6 +180,9 @@ namespace uwvm2::uwvm::wasm::loader
         {
             [[unlikely]] case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u):
             {
+                // ...
+                // unsafe
+
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
@@ -465,6 +468,9 @@ namespace uwvm2::uwvm::wasm::loader
             }
             [[unlikely]] default:
             {
+                // [\0 a s m ?? ?? ?? ??]
+                // [        safe        ]
+                
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(
                     ::uwvm2::uwvm::u8log_output,

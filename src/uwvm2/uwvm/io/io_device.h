@@ -5,7 +5,6 @@
  *************************************************************/
 
 /**
- * @file        io_device.cppm
  * @brief       Set up the lowest-level implementation of uwvm.
  *              Use the C API in the minimal C host environment and the user-space lowest-level API in other environments.
  *              Automatically add file-form buffers to out and in.
@@ -65,4 +64,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
     // No buffer is provided to u8err
 # endif
 #endif
-}  // namespace uwvm2::utils
+}  // namespace uwvm2::uwvm

@@ -366,7 +366,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
         /// @brief      Get binfmt version tuple type
         template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        inline consteval auto get_specified_binfmt_feature_tuple_from_all_freatures() noexcept
+        inline consteval auto get_specified_binfmt_feature_tuple_from_all_features() noexcept
         {
             using current_binfmt_version_feature_tuple = details::Fs_binfmt_controler_r<binfmt_version, Fs...>;
             return current_binfmt_version_feature_tuple{};
@@ -374,9 +374,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
         /// @brief      Get binfmt version tuple type from tuple
         template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        inline consteval auto get_specified_binfmt_feature_tuple_from_all_freatures_tuple(::fast_io::tuple<Fs...>) noexcept
+        inline consteval auto get_specified_binfmt_feature_tuple_from_all_features_tuple(::fast_io::tuple<Fs...>) noexcept
         {
-            return get_specified_binfmt_feature_tuple_from_all_freatures<binfmt_version, Fs...>();
+            return get_specified_binfmt_feature_tuple_from_all_features<binfmt_version, Fs...>();
         }
 
         /// @brief      Structure Replacement

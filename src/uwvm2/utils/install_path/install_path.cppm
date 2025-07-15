@@ -24,6 +24,9 @@ module;
 
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
+# ifdef UWVM
+#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+# endif
 // include
 #ifdef UWVM_SUPPORT_INSTALL_PATH
 # include <fast_io.h>

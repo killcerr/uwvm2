@@ -58,7 +58,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
     /// @brief wasm binfmt ver1 features ///
     ////////////////////////////////////////
     using wasm_binfmt_ver1_features_t =
-        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_freatures_tuple<1>(all_features));
+        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_features_tuple<1>(all_features));
     static_assert(::fast_io::is_tuple<wasm_binfmt_ver1_features_t>);  // check is tuple
     static_assert(::std::is_empty_v<wasm_binfmt_ver1_features_t>);    // check is empty
     inline constexpr wasm_binfmt_ver1_features_t wasm_binfmt1_features{};

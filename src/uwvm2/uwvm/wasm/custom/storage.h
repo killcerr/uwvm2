@@ -55,7 +55,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
 {
     /// @todo use fast_io::unorder_map instead
     inline ::std::map<::fast_io::u8string_view, ::uwvm2::uwvm::wasm::custom::handlefunc_t> custom_handle_funcs{
-        {u8"name", {reinterpret_cast<void*>(::std::addressof(::uwvm2::uwvm::wasm::custom::customs::name_handler))}}
+        {u8"name", {reinterpret_cast<void*>(::std::addressof(::uwvm2::uwvm::wasm::custom::customs::name_handler)), false}}
     };  // [global]
 }
 
