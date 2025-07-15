@@ -21,3 +21,4 @@ featurs:       wasm1    wasm1.1  wasm2  ... (standard, proposal)
 
 ## Features 
 * `Thread-safe`: wasm-parser is thread-safe. All functions are reentrant and do not use global mutable state. You can safely call functions within the wasm-parser concurrently from multiple threads.
+* `Freestanding`: Support for c++ standalone implementations (need to define your own concepts) for use in OS-less environments.
