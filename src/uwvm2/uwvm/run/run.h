@@ -139,7 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // check for Check for duplicate modulename
         // Since vector expansion invalidates the iterator, the build map operation will not be performed on change here
 
-        if(auto const ret{::uwvm2::uwvm::run::check_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }
+        if(auto const ret{::uwvm2::uwvm::run::load_and_check_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }
 
         // run vm
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)

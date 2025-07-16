@@ -1,13 +1,15 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
+ * @brief       Imported wasm modules
+ * @details     "--wasm-load-wasm" or "-Wlw"
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-03-28
  * @copyright   APL-2.0 License
  */
 
@@ -22,10 +24,7 @@
 
 module;
 
-export module uwvm2.uwvm.run;
-export import :retval;
-export import :load_and_check_modules;
-export import :run;
+export module uwvm2.uwvm.wasm.storage:local_preload;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -34,4 +33,4 @@ export import :run;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "local_preload.h"

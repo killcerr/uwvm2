@@ -73,10 +73,20 @@ import :retval;
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
     /// @brief Check for duplicates or mismatched imports and exports
-    inline int check_modules() noexcept
+    inline int load_and_check_modules() noexcept
     {
         // preload abi
-        /// @todo wasi1 wasi2
+        {
+            if (::uwvm2::uwvm::wasm::storage::local_preload_wasip1)
+            {
+                /// @todo
+            }
+
+            if (::uwvm2::uwvm::wasm::storage::local_preload_wasip2)
+            {
+                /// @todo
+            }
+        }
 
         // preloaded wasm
         for(auto const& lwc: ::uwvm2::uwvm::wasm::storage::preloaded_wasm)
@@ -98,7 +108,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 return static_cast<int>(::uwvm2::uwvm::run::retval::duplicate_module_name);
             }
 
-            ::uwvm2::uwvm::wasm::storage::all_module.emplace(lwc.module_name, ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wf = ::std::addressof(lwc)});
+            ::uwvm2::uwvm::wasm::storage::all_module.emplace(
+                lwc.module_name,
+                ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(lwc)},
+                                                           .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm});
         }
 
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
@@ -124,7 +137,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 return static_cast<int>(::uwvm2::uwvm::run::retval::duplicate_module_name);
             }
 
-            ::uwvm2::uwvm::wasm::storage::all_module.emplace(ldc.module_name, ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wd = ::std::addressof(ldc)});
+            ::uwvm2::uwvm::wasm::storage::all_module.emplace(
+                ldc.module_name,
+                ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wd = ::std::addressof(ldc)},
+                                                           .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl});
         }
 #endif
 
@@ -149,7 +165,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
             ::uwvm2::uwvm::wasm::storage::all_module.emplace(
                 ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name,
-                ::uwvm2::uwvm::wasm::storage::module_storage_ptr_u{.wf = ::std::addressof(::uwvm2::uwvm::wasm::storage::execute_wasm)});
+                ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(::uwvm2::uwvm::wasm::storage::execute_wasm)},
+                                                           .type = ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm});
         }
 
         // Checking for import and export inequalities

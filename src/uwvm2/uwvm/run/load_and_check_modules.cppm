@@ -31,7 +31,7 @@ module;
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
-export module uwvm2.uwvm.run:check_modules;
+export module uwvm2.uwvm.run:load_and_check_modules;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -40,4 +40,4 @@ export module uwvm2.uwvm.run:check_modules;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "check_modules.h"
+#include "load_and_check_modules.h"
