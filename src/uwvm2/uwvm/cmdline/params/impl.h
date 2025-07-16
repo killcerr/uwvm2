@@ -35,7 +35,6 @@
 # endif
 
 // wasm
-# include "wasm_abi.h"
 # include "wasm_set_main_module_name.h"
 # include "wasm_preload_library.h"
 # if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \

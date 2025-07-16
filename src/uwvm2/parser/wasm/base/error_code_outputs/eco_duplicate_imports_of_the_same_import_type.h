@@ -232,7 +232,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8".",
                 UWVM_WIN32_TEXTATTR_CYAN,
-                 // Same type, no conversion required
+                // Same type, no conversion required
                 errout.err.err_selectable.duplic_imports.extern_name,
                 UWVM_WIN32_TEXTATTR_WHITE,
                 u8"\".",
@@ -255,12 +255,12 @@ else if constexpr(::std::same_as<char_type, char8_t>)
         get_duplicate_imports_type_name.template operator()<char8_t>(errout.err.err_selectable.duplic_imports.type),
         u8"): \"",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
-         // Same type, no conversion required
+        // Same type, no conversion required
         errout.err.err_selectable.duplic_imports.module_name,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8".",
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
-         // Same type, no conversion required
+        // Same type, no conversion required
         errout.err.err_selectable.duplic_imports.extern_name,
         ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
         u8"\".",

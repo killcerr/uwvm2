@@ -54,7 +54,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 #endif
 
             // wasm
-            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_abi),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_set_main_module_name),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_preload_library),
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \

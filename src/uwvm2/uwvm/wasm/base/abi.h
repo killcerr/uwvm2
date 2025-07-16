@@ -32,7 +32,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::base
     {
         detect,
         bare,
-        emscripten,
         wasip1,
         wasip2,
         wasix

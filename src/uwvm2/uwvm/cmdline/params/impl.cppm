@@ -35,7 +35,6 @@ export import :debug_test;
 #endif
 
 // wasm
-export import :wasm_abi;
 export import :wasm_set_main_module_name;
 export import :wasm_preload_library;
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \

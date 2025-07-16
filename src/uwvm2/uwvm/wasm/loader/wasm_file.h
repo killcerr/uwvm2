@@ -470,7 +470,7 @@ namespace uwvm2::uwvm::wasm::loader
             {
                 // [\0 a s m ?? ?? ?? ??]
                 // [        safe        ]
-                
+
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                 ::fast_io::io::perr(
                     ::uwvm2::uwvm::u8log_output,
