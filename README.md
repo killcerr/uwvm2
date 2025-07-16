@@ -21,7 +21,7 @@
 </div>
 
 ## Introduction
-Ultimate WebAssembly Virtual Machine (Version 2), the abbreviation is uwvm2.
+Ultimate WebAssembly Virtual Machine 2
 
 ## Features
 ### WASM Feature Extensions

@@ -47,6 +47,7 @@ import uwvm2.uwvm.wasm.type;
 #endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    inline bool local_preload_wasip1{true}; // [global]
-    inline bool local_preload_wasip2{true}; // [global]
+    inline bool local_preload_wasip1{true};  // [global]
+    inline bool local_preload_wasip2{true};  // [global]
+    inline bool local_preload_wasix{false};  // [global]
 }  // namespace uwvm2::uwvm::wasm::storage

@@ -77,12 +77,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
     {
         // preload abi
         {
-            if (::uwvm2::uwvm::wasm::storage::local_preload_wasip1)
+            if(::uwvm2::uwvm::wasm::storage::local_preload_wasip1)
             {
                 /// @todo
             }
 
-            if (::uwvm2::uwvm::wasm::storage::local_preload_wasip2)
+            if(::uwvm2::uwvm::wasm::storage::local_preload_wasip2)
+            {
+                /// @todo
+            }
+
+            if(::uwvm2::uwvm::wasm::storage::local_preload_wasix)
             {
                 /// @todo
             }
