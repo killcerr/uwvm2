@@ -57,6 +57,8 @@ using wasi_uintptr_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32;
 using wasi_size_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32;
 using wasi_void_ptr_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32;
 
+using wasi_posix_fd_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32;
+
 enum class advice_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
 {
     advice_normal,
