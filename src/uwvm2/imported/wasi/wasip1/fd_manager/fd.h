@@ -77,20 +77,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         inline constexpr wasi_fd_t& operator= (wasi_fd_t const& other) noexcept = delete;
 
-        inline constexpr wasi_fd_t(wasi_fd_t&& other) noexcept
+        inline constexpr wasi_fd_t(wasi_fd_t&& other) noexcept :
+            file_fd{::std::move(other.file_fd)}, dir_fd{::std::move(other.dir_fd)}, is_dir{other.is_dir}, rights_base{other.rights_base},
+            rights_inherit{other.rights_inherit}, fd_mutex{other.fd_mutex}, close_pos{other.close_pos}
         {
-            // Prevents the vector managed behind the scenes from expanding while in use, requiring locks to be added
-            ::fast_io::io_lock_guard fd_lock{*other.fd_mutex};
-
-            ::new(::std::addressof(this->file_fd)) decltype(this->file_fd){::std::move(other.file_fd)};
-            ::new(::std::addressof(this->win9x_dir_file)) decltype(this->win9x_dir_file){::std::move(other.win9x_dir_file)};
-
-            this->is_dir = other.is_dir;
-            this->rights_base = other.rights_base;
-            this->rights_inherit = other.rights_inherit;
-            this->fd_mutex = other.fd_mutex;
-            this->close_pos = other.close_pos;
-
             other.is_dir = false;
             other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
             other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
@@ -102,11 +92,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         {
             if(::std::addressof(other) == this) [[unlikely]] { return *this; }
 
-            // Prevents the vector managed behind the scenes from expanding while in use, requiring locks to be added
-            ::fast_io::io_lock_guard fd_lock{*other.fd_mutex};
-
             this->file_fd = ::std::move(other.file_fd);
-            this->win9x_dir_file = ::std::move(other.win9x_dir_file);
+            this->dir_fd = ::std::move(other.dir_fd);
 
             this->is_dir = other.is_dir;
             this->rights_base = other.rights_base;
@@ -133,8 +120,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         void close()
         {
             ::fast_io::io_lock_guard fd_look{*(this->fd_mutex)};
-            this->file_fd.close();
             this->dir_fd.close();
+            this->file_fd.close();
             other.is_dir = false;
             other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
             other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
@@ -155,7 +142,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
 
         // ====== for vm ======
-        mutex_t* fd_mutex{};
+        mutex_t* fd_mutex{};  //
         ::std::size_t close_pos{SIZE_MAX};
 
         inline constexpr wasi_fd_t() noexcept
@@ -168,17 +155,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         inline constexpr wasi_fd_t& operator= (wasi_fd_t const& other) noexcept = delete;
 
-        inline constexpr wasi_fd_t(wasi_fd_t&& other) noexcept
+        inline constexpr wasi_fd_t(wasi_fd_t&& other) noexcept :
+            file_fd{::std::move(other.file_fd)}, rights_base{other.rights_base}, rights_inherit{other.rights_inherit}, fd_mutex{other.fd_mutex},
+            close_pos{other.close_pos}
         {
-            // Prevents the vector managed behind the scenes from expanding while in use, requiring locks to be added
-            ::fast_io::io_lock_guard fd_lock{*other.fd_mutex};
-
-            ::new(::std::addressof(this->file_fd)) decltype(this->file_fd){::std::move(other.file_fd)};
-
-            this->rights_base = other.rights_base;
-            this->rights_inherit = other.rights_inherit;
-            this->fd_mutex = other.fd_mutex;
-            this->close_pos = other.close_pos;
+            // deque-managed fd, expansion does not invalidate the original iterator
 
             other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
             other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
@@ -190,8 +171,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         {
             if(::std::addressof(other) == this) [[unlikely]] { return *this; }
 
-            // Prevents the vector managed behind the scenes from expanding while in use, requiring locks to be added
-            ::fast_io::io_lock_guard fd_lock{*other.fd_mutex};
+            // deque-managed fd, expansion does not invalidate the original iterator
 
             this->file_fd = ::std::move(other.file_fd);
 
@@ -222,7 +202,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
             other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
             other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
         }
-    };    
+    };
+    
 #endif
 
 }  // namespace uwvm2::parser::wasm::base

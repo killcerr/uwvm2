@@ -23,7 +23,8 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm2.parser.wasm.standard.wasm1.type import uwvm2.imported.wasi.wasip1.abi;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.imported.wasi.wasip1.abi;
 import :fd;
 #else
 // std
@@ -53,7 +54,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
     /// @brief [singleton]
     struct wasm_fd_storage_t
     {
-        ::fast_io::vector<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t> opens{};
+        // Ensure that iterators can't fail during expansion
+        ::fast_io::deque<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t> opens{};
+        // Used to record the coordinates of closure for subsequent builds
         ::fast_io::vector<::std::size_t> closes{};
         ::fast_io::native_mutex fds_mutex{};  // [singleton]
         ::std::size_t fd_limit{};
@@ -110,7 +113,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
             { 
                 return {static_cast<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t>(-1), nullptr}; 
             }
-            
+
             auto const ret_wasi_fd{::std::addressof(wasm_fd_storage.opens.emplace_back())};
             auto const ret_wasi_posix_fd{static_cast<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t>(static_cast<::std::size_t>(ret_wasi_fd - wasm_fd_storage.opens.begin()))};
             return {ret_wasi_posix_fd, ret_wasi_fd};
