@@ -209,8 +209,8 @@ target("uwvm")
 		add_files("third-parties/fast_io/share/fast_io/fast_io_crypto.cppm", {public = is_debug_mode})
 	end 
 		
-	-- third-parties/YexuanXiao
-	add_includedirs("third-parties/YexuanXiao/include")
+	-- third-parties/bizwen
+	add_includedirs("third-parties/bizwen/include")
 	
 	-- uwvm
 	add_defines("UWVM=2")
@@ -257,8 +257,8 @@ for _, file in ipairs(os.files("test/**.cc")) do
 			add_files("third-parties/fast_io/share/fast_io/fast_io_crypto.cppm", {public = is_debug_mode})
 		end
 				
-		-- third-parties/YexuanXiao
-		add_includedirs("third-parties/YexuanXiao/include")
+		-- third-parties/bizwen
+		add_includedirs("third-parties/bizwen/include")
 
 		-- uwvm
 		add_defines("UWVM=2")
