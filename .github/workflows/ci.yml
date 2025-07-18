@@ -19,7 +19,6 @@ jobs:
       matrix:
         mode: ["debug"]
         policies: ["build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined"]
-        use_cxx_module: ["y", "n"]
         cxx_flags: 
           [
             "\"\"", # SSE2
@@ -41,7 +40,7 @@ jobs:
           sudo apt-get install clang clang-tools lld xmake
 
       - name: Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags=${{ matrix.cxx_flags }} --use-cxx-module=${{ matrix.use_cxx_module }}
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags=${{ matrix.cxx_flags }}
       - name: Build
         run: xmake b -rv
       - name: Check UWVM version
