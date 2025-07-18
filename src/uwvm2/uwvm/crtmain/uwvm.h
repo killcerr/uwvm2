@@ -100,7 +100,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
             // The size_t of current platforms is smaller than int, in these platforms you need to do a size check before conversion
             if(argc > size_t_max) [[unlikely]]
             {
-                ::fast_io::io::perr(u8log_output,
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -124,7 +124,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
         // Just in case argc is less than 0.
         if(argc < 0) [[unlikely]]
         {
-            ::fast_io::io::perr(u8log_output,
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
