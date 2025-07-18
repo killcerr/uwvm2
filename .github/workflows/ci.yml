@@ -12,8 +12,8 @@ on:
 
 jobs:
   # ---------------------------------------------------------------------------
-  x86_64-linux-gnu:
-    name: x86_64-linux-gnu (ubuntu-24.04)
+  x86_64-linux-gnu-uwvm-default:
+    name: x86_64-linux-gnu (ubuntu-24.04) uwvm
     runs-on: ubuntu-24.04 # noble
     strategy:
       matrix:
@@ -48,6 +48,30 @@ jobs:
         run: xmake run uwvm --version
       - name: Unit tests
         run: xmake test -v
+
+  # ---------------------------------------------------------------------------
+  x86_64-linux-gnu-uwvm-cxxmodule:
+    name: x86_64-linux-gnu (ubuntu-24.04) uwvm (cxx-module build)
+    runs-on: ubuntu-24.04 # noble
+    strategy:
+      matrix:
+        mode: ["debug"]
+        policies: ["build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
+          sudo add-apt-repository ppa:xmake-io/xmake
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
+          sudo apt-get install clang clang-tools lld xmake
+
+      - name: Configure
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-21 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --use-cxx-module=y
+      - name: Build
+        run: xmake b -rv
+      - name: Check UWVM version
+        run: xmake run uwvm --version
 
   # ---------------------------------------------------------------------------
   x86_64_apx-linux-gnu:
