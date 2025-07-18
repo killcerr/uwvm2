@@ -60,11 +60,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
 
         [[nodiscard]] inline constexpr T* allocate(::std::size_t n) noexcept { return fast_io_type_allocator::allocate(n); }
 
+#if __cpp_lib_allocate_at_least >= 202302L
         [[nodiscard]] inline constexpr ::std::allocation_result<T*> allocate_at_least(::std::size_t n) noexcept
         {
             auto const [ptr, count]{fast_io_type_allocator::allocate_at_least(n)};
             return {ptr, count};
         }
+#endif
 
         inline constexpr void deallocate(T* p, ::std::size_t n) noexcept { fast_io_type_allocator::deallocate_n(p, n); }
 
