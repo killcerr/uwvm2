@@ -99,20 +99,20 @@ inline constexpr binfmt_ver1_module_storage_t binfmt_ver1_handle_func(::std::byt
     // This defines the function that handles binary format 1.
     // Supported by <::uwvm2::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
     []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-    { ((::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"binfmt1: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+    { ((::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"binfmt1: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
 
     if constexpr((::std::same_as<B1F1, Fs> || ...))
     {
         /// @brief Before using it, you must determine if there is a desired type in the Fs.
         auto const& B1F1_feapara_r{::uwvm2::parser::wasm::concepts::get_curr_feature_parameter<B1F1>(feapara)};
-        ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"B1F1_feapara_r: ", B1F1_feapara_r.test);
+        ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"B1F1_feapara_r: ", B1F1_feapara_r.test);
     }
 
     if constexpr((::std::same_as<B1F2, Fs> || ...))
     {
         /// @brief Before using it, you must determine if there is a desired type in the Fs.
         auto const& B1F2_feapara_r{::uwvm2::parser::wasm::concepts::get_curr_feature_parameter<B1F2>(feapara)};
-        ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"B1F2_feapara_r: ", B1F2_feapara_r.test);
+        ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"B1F2_feapara_r: ", B1F2_feapara_r.test);
     }
     return {};
 }
@@ -148,7 +148,7 @@ inline constexpr binfmt_ver2_module_storage_t<Fs...> binfmt_ver2_handle_func(::s
     // This defines the function that handles binary format 2.
     // Supported by <::uwvm2::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
     []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-    { ((::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"binfmt2: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+    { ((::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"binfmt2: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
     return {};
 }
 

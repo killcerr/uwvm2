@@ -63,13 +63,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
 #ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
         if(!name_err.empty()) [[unlikely]]
         {
-            if(::uwvm2::uwvm::show_parser_warning)
+            if(::uwvm2::uwvm::io::show_parser_warning)
             {
                 // Here, as an entire output, the mutex needs to be controlled uniformly.
                 // There are no unspecified external calls that make the mutex deadlock.
 
                 // No copies will be made here.
-                auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
+                auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::io::u8log_output)};
                 // Add raii locks while unlocking operations
                 ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
                     ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};

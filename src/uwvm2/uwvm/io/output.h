@@ -32,7 +32,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
 {
     /// @brief      Control VM output via virtual functions, can be set via option in `--log-output`, not supported by avr
     /// @details    multi-threaded security

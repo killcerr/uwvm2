@@ -75,9 +75,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
                 if(curr_custom_handler->second.handler == nullptr) [[unlikely]] { continue; }
 
                 // verbose
-                if(::uwvm2::uwvm::show_verbose) [[unlikely]]
+                if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
                 {
-                    ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                         u8"uwvm: ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
@@ -110,9 +110,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
 #ifdef __cpp_exceptions
                     catch(...)
                     {
-                        if(::uwvm2::uwvm::show_vm_warning)
+                        if(::uwvm2::uwvm::io::show_vm_warning)
                         {
-                            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                                 u8"uwvm: ",
                                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),

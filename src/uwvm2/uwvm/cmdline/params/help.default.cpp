@@ -110,7 +110,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                       ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
         // No copies will be made here.
-        auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
+        auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::io::u8log_output)};
         // Add raii locks while unlocking operations
         ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
             ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};

@@ -56,7 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
         .name{u8"--log-verbose"},
         .describe{u8"Make log output verbose."},
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_verbose_alias), 1uz}},
-        .is_exist{::std::addressof(::uwvm2::uwvm::show_verbose)},
+        .is_exist{::std::addressof(::uwvm2::uwvm::io::show_verbose)},
         .cate{::uwvm2::utils::cmdline::categorization::log}};
 #if defined(__clang__)
 # pragma clang diagnostic pop

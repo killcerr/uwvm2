@@ -67,7 +67,7 @@ inline constexpr binfmt_ver1_module_storage_t binfmt_ver1_handle_func(::std::byt
     // This defines the function that handles binary format 1.
     // Supported by <::uwvm2::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
     []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-    { ((::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"binfmt1: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+    { ((::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"binfmt1: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
     return {};
 }
 
@@ -106,7 +106,7 @@ inline constexpr binfmt_ver2_module_storage_t<Fs...> binfmt_ver2_handle_func(::s
     // This defines the function that handles binary format 2.
     // Supported by <::uwvm2::parser::wasm::concepts::wasm_feature... Fs> Continued Expansion
     []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
-    { ((::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"binfmt2: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+    { ((::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"binfmt2: ", Fs...[I] ::feature_name)), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
     return {};
 }
 

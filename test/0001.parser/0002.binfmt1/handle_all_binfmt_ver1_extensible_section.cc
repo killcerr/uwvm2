@@ -66,7 +66,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
     ::std::byte const* const)
 {
-    ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test0\n");
+    ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test0\n");
 }
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -88,7 +88,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
     ::std::byte const* const)
 {
-    ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test1\n");
+    ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test1\n");
 }
 
 struct Feature1
@@ -119,7 +119,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
     ::std::byte const* const)
 {
-    ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test2\n");
+    ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test2\n");
 }
 
 struct Sec3
@@ -140,7 +140,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
     ::std::byte const* const)
 {
-    ::fast_io::io::perrln(::uwvm2::uwvm::u8log_output, u8"test3\n");
+    ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test3\n");
 }
 
 struct Feature2
@@ -197,7 +197,7 @@ int main()
 
     ::uwvm2::parser::wasm::base::error_impl e{};
 
-    ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, u8"sec0:\n");
+    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output, u8"sec0:\n");
     ::uwvm2::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1,
                                                                                    0,
                                                                                    nullptr,
@@ -206,7 +206,7 @@ int main()
                                                                                    wasm_binfmt1_feature_parameter,
                                                                                    nullptr);
 
-    ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, u8"sec1:\n");
+    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output, u8"sec1:\n");
     ::uwvm2::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1,
                                                                                    1,
                                                                                    nullptr,
@@ -214,7 +214,7 @@ int main()
                                                                                    e,
                                                                                    wasm_binfmt1_feature_parameter,
                                                                                    nullptr);
-    ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, u8"sec2:\n");
+    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output, u8"sec2:\n");
     ::uwvm2::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1,
                                                                                    2,
                                                                                    nullptr,
@@ -222,7 +222,7 @@ int main()
                                                                                    e,
                                                                                    wasm_binfmt1_feature_parameter,
                                                                                    nullptr);
-    ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, u8"sec3:\n");
+    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output, u8"sec3:\n");
     ::uwvm2::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1,
                                                                                    3,
                                                                                    nullptr,
@@ -230,7 +230,7 @@ int main()
                                                                                    e,
                                                                                    wasm_binfmt1_feature_parameter,
                                                                                    nullptr);
-    ::fast_io::io::perr(::uwvm2::uwvm::u8log_output, u8"sec4:\n");
+    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output, u8"sec4:\n");
     try
     {
         ::uwvm2::parser::wasm::binfmt::ver1::handle_all_binfmt_ver1_extensible_section(wasm_module1,
@@ -243,7 +243,7 @@ int main()
     }
     catch(::fast_io::error e)
     {
-        ::fast_io::perr(::uwvm2::uwvm::u8log_output, u8"test4, not found\n");
+        ::fast_io::perr(::uwvm2::uwvm::io::u8log_output, u8"test4, not found\n");
     }
 }
 

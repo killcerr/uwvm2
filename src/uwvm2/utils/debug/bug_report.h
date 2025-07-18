@@ -42,10 +42,7 @@
 #endif
 
 #ifdef UWVM
-namespace uwvm2::uwvm::utils::ansies
-{
-    extern bool const put_color;
-}
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::ansies { extern "C++" bool const put_color; }
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::debug

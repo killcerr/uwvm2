@@ -82,7 +82,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         // If argc is 0uz, prohibit running
         if(!argc) [[unlikely]]
         {
-            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -145,7 +145,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     // grammatical error
                     if(++curr_argv == argv_end) [[unlikely]]
                     {
-                        ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -219,7 +219,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             // There are no unspecified external calls that make the mutex deadlock.
 
             // No copies will be made here.
-            auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
+            auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::io::u8log_output)};
             // Add raii locks while unlocking operations
             ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
                 ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
@@ -395,7 +395,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             // There are no unspecified external calls that make the mutex deadlock.
 
             // No copies will be made here.
-            auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::u8log_output)};
+            auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::io::u8log_output)};
             // Add raii locks while unlocking operations
             ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
                 ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};

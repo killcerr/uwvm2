@@ -80,7 +80,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             if(::uwvm2::uwvm::wasm::storage::all_module.contains(lwc.module_name)) [[unlikely]]
             {
-                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -109,7 +109,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             if(::uwvm2::uwvm::wasm::storage::all_module.contains(ldc.module_name)) [[unlikely]]
             {
-                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -135,7 +135,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             if(::uwvm2::uwvm::wasm::storage::all_module.contains(::uwvm2::uwvm::wasm::storage::execute_wasm.module_name)) [[unlikely]]
             {
-                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),

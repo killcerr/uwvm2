@@ -30,7 +30,8 @@
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm
+
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
 {
     inline bool show_vm_warning{true};            // [global]
     inline bool show_parser_warning{true};        // [global]

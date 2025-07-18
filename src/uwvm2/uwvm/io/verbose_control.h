@@ -30,7 +30,8 @@
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm
+
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
 {
     inline bool show_verbose{};  // [global] No global variable dependencies from other translation units
 }  // namespace uwvm2::utils

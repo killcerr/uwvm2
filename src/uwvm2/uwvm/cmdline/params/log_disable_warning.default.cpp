@@ -68,7 +68,7 @@ namespace uwvm2::uwvm::cmdline::params::details
             // [     safe    ] unsafe (could be the module_end)
             //           ^^ currp1
 
-            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
@@ -91,18 +91,18 @@ namespace uwvm2::uwvm::cmdline::params::details
 
         if(auto currp1_str{currp1->str}; currp1_str == u8"all")
         {
-            ::uwvm2::uwvm::show_vm_warning = false;
-            ::uwvm2::uwvm::show_parser_warning = false;
-            ::uwvm2::uwvm::show_untrusted_dl_warning = false;
-            ::uwvm2::uwvm::show_dl_warning = false;
+            ::uwvm2::uwvm::io::show_vm_warning = false;
+            ::uwvm2::uwvm::io::show_parser_warning = false;
+            ::uwvm2::uwvm::io::show_untrusted_dl_warning = false;
+            ::uwvm2::uwvm::io::show_dl_warning = false;
         }
-        else if(currp1_str == u8"vm") { ::uwvm2::uwvm::show_vm_warning = false; }
-        else if(currp1_str == u8"parser") { ::uwvm2::uwvm::show_parser_warning = false; }
-        else if(currp1_str == u8"untrusted-dl") { ::uwvm2::uwvm::show_untrusted_dl_warning = false; }
-        else if(currp1_str == u8"dl") { ::uwvm2::uwvm::show_dl_warning = false; }
+        else if(currp1_str == u8"vm") { ::uwvm2::uwvm::io::show_vm_warning = false; }
+        else if(currp1_str == u8"parser") { ::uwvm2::uwvm::io::show_parser_warning = false; }
+        else if(currp1_str == u8"untrusted-dl") { ::uwvm2::uwvm::io::show_untrusted_dl_warning = false; }
+        else if(currp1_str == u8"dl") { ::uwvm2::uwvm::io::show_dl_warning = false; }
         else
         {
-            ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                 u8"uwvm: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),

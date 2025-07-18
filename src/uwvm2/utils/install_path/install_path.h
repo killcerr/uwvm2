@@ -44,26 +44,23 @@
 #ifdef UWVM_SUPPORT_INSTALL_PATH
 
 # ifdef UWVM
-namespace uwvm2::uwvm
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
 {
     // output
 #  if defined(__AVR__)
-    extern ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8c_io_observer> u8log_output;
+    extern "C++" ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8c_io_observer> u8log_output;
 #  elif ((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__)) ||                                  \
       (defined(__NEWLIB__) && !defined(__CYGWIN__)) || defined(_PICOLIBC__) || defined(__wasm__)
-    extern ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_io_observer> u8log_output;
+    extern "C++" ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_io_observer> u8log_output;
 #  else
-    extern ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_file> u8log_output;
+    extern "C++" ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_file> u8log_output;
 #  endif
 
     // warning
-    extern bool show_vm_warning;
+    extern "C++" bool show_vm_warning;
 }  // namespace uwvm2::uwvm
 
-namespace uwvm2::uwvm::utils::ansies
-{
-    extern bool const put_color;
-}
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::ansies { extern "C++" bool const put_color; }
 # endif
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
@@ -81,9 +78,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
         catch(::fast_io::error)
         {
 #  ifdef UWVM
-            if(::uwvm2::uwvm::show_vm_warning)
+            if(::uwvm2::uwvm::io::show_vm_warning)
             {
-                ::fast_io::io::perr(::uwvm2::uwvm::u8log_output,
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                     u8"uwvm: ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
