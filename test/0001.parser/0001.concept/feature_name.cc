@@ -25,15 +25,13 @@
 #include <type_traits>
 #include <concepts>
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-#else
+#ifndef UWVM_MODULE
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+#else
+# error "Module testing is not currently supported"
 #endif
 
 struct feature1

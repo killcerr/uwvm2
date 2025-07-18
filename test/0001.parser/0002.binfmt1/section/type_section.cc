@@ -28,15 +28,7 @@
 
 #include <uwvm2/utils/macro/push_macros.h>
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.base;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm.binfmt.binfmt_ver1;
-import uwvm2.uwvm.io;
-import uwvm2.uwvm.wasm.storage;
-#else
+#ifndef UWVM_MODULE
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
@@ -45,6 +37,8 @@ import uwvm2.uwvm.wasm.storage;
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/wasm/storage/impl.h>
+#else
+# error "Module testing is not currently supported"
 #endif
 
 enum class vt1 : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32

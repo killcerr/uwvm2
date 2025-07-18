@@ -27,14 +27,13 @@
 #include <memory>
 #include <random>
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.utf;
-#else
+#ifndef UWVM_MODULE
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
 # include <uwvm2/utils/utf/impl.h>
+#else
+# error "Module testing is not currently supported"
 #endif
 
 inline ::uwvm2::utils::utf::u8result reference_check_legal_utf8_rfc3629_unchecked(const char8_t* str_begin, const char8_t* str_end) noexcept
