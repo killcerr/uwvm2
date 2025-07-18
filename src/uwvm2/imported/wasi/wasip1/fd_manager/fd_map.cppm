@@ -33,6 +33,12 @@ module;
 
 export module uwvm2.imported.wasi.wasip1.abi:fd_map;
 
+import fast_io;
+import uwvm2.utils.container;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.imported.wasi.wasip1.abi;
+import :fd;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

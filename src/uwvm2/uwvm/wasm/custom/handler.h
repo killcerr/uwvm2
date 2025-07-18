@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm_custom;
-import :cwrapper;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>
@@ -42,7 +38,7 @@ import :cwrapper;
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/parser/wasm_custom/impl.h>
-# include "cwrapper.h"
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -107,7 +103,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
                     try
 #endif
                     {
-                        using imported_c_handlefunc_may_alias_ptr_t UWVM_GNU_MAY_ALIAS = ::uwvm2::uwvm::wasm::custom::imported_c_handlefunc_ptr_t;
+                        using imported_c_handlefunc_may_alias_ptr_t UWVM_GNU_MAY_ALIAS = ::uwvm2::uwvm::wasm::type::imported_c_handlefunc_ptr_t;
                         reinterpret_cast<imported_c_handlefunc_may_alias_ptr_t>(
                             curr_custom_handler->second.handler)(cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end));
                     }

@@ -34,6 +34,10 @@ module;
 
 export module uwvm2.uwvm.wasm.custom:handler;
 
+import fast_io;
+import uwvm2.parser.wasm_custom;
+import uwvm2.uwvm.wasm.type;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import :allocatore;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
@@ -46,6 +43,6 @@ import :allocatore;
 UWVM_MODULE_EXPORT namespace uwvm2::utils::container
 {
     template <typename T>
-    using deque = ::bizwen::deque<T, ::uwvm2::utils::container::fast_io_std_allocator>;
+    using deque = ::bizwen::deque<T, ::uwvm2::utils::container::fast_io_std_allocator<T>>;
 
 }  // namespace uwvm2::utils::ansies

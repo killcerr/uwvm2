@@ -29,6 +29,9 @@ module;
 
 export module uwvm2.uwvm.cmdline.params:help;
 
+import fast_io;
+import uwvm2.utils.cmdline;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

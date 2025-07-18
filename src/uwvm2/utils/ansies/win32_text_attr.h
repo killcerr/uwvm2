@@ -22,27 +22,22 @@
 
 #pragma once
 
-#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-// Enabled only under win95 to win7
-
-# ifdef UWVM_MODULE
-import fast_io;
-# else
+#ifndef UWVM_MODULE
 // std
-#  include <cstdint>
-#  include <cstddef>
-#  include <concepts>
-#  include <utility>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <utility>
 // import
-#  include <fast_io.h>
-# endif
+# include <fast_io.h>
+#endif
 
-# ifndef UWVM_MODULE_EXPORT
-#  define UWVM_MODULE_EXPORT
-# endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
 
 /// @brief In win7 to win95, cmd does not support ansi escape sequence
-
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
 UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
 {
     enum class text_attr : ::std::int_least32_t
@@ -144,5 +139,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
         }
     }
 }  // namespace uwvm2::utils::ansies
-
 #endif

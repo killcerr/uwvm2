@@ -34,6 +34,15 @@ module;
 
 export module uwvm2.uwvm.cmdline:parser;
 
+import fast_io;
+import uwvm2.uwvm.io;
+import uwvm2.utils.ansies;
+import uwvm2.utils.cmdline;
+import uwvm2.utils.debug;
+import uwvm2.uwvm.utils.ansies;
+import uwvm2.uwvm.cmdline.params;
+import :params;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

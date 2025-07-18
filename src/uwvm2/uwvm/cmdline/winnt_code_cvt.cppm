@@ -47,6 +47,11 @@ module;
 
 export module uwvm2.uwvm.cmdline:winnt_code_cvt;
 
+import fast_io;
+import uwvm2.utils.ansies;
+import uwvm2.uwvm.io;
+import uwvm2.uwvm.utils.ansies;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

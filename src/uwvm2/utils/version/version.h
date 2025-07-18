@@ -22,9 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
@@ -37,6 +35,7 @@ import fast_io;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
+
 UWVM_MODULE_EXPORT namespace uwvm2::utils
 {
     // version does not add meaningless namespaces.

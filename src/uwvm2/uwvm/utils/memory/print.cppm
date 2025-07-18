@@ -33,6 +33,9 @@ module;
 
 export module uwvm2.uwvm.utils.memory:print;
 
+import fast_io;
+import uwvm2.uwvm.io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

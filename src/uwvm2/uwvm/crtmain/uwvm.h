@@ -24,15 +24,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.uwvm.io;
-import uwvm2.utils.ansies;
-import uwvm2.uwvm.utils.ansies;
-import uwvm2.uwvm.cmdline;
-import uwvm2.uwvm.run;
-import uwvm2.uwvm.crtmain.global;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
@@ -54,6 +46,7 @@ import uwvm2.uwvm.crtmain.global;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
+
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm
 {
     /// @brief      uwvm c++ uz u8 main function

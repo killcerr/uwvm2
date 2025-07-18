@@ -24,7 +24,6 @@ module;
 
 export module uwvm2.uwvm.wasm.custom;
 export import uwvm2.uwvm.wasm.custom.customs;
-export import :cwrapper;
 export import :storage;
 export import :handler;
 

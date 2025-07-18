@@ -24,9 +24,6 @@
 
 #ifndef UWVM_MODULE
 # include "tzset.h"
-/// @brief only support on winnt (with win32 api)
-# if defined(_WIN32) && !defined(__CYGWIN__)
-#  include "ansi_win32.h"
-#  include "consolecp_win32.h"
-# endif
+# include "ansi_win32.h"
+# include "consolecp_win32.h"
 #endif

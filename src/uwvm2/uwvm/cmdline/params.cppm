@@ -27,6 +27,9 @@ module;
 
 export module uwvm2.uwvm.cmdline:params;
 
+import uwvm2.utils.cmdline;
+import uwvm2.uwvm.cmdline.params;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

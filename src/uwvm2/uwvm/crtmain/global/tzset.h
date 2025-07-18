@@ -22,9 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-#else
+#ifndef UWVM_MODULE
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import

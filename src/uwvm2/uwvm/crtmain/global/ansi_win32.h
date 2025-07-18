@@ -23,29 +23,25 @@
 #pragma once
 
 /// @brief      only support on winnt (with win32 api)
-#if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
 
-# ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.uwvm.utils.ansies;
-import uwvm2.uwvm.io;
-# else
+#ifndef UWVM_MODULE
 // std
-#  include <cstdint>
-#  include <memory>
+# include <cstdint>
+# include <memory>
 // macro
-#  include <uwvm2/utils/macro/push_macros.h>
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
-#  include <fast_io.h>
-#  include <uwvm2/uwvm/utils/ansies/impl.h>
-#  include <uwvm2/uwvm/io/impl.h>
-# endif
+# include <fast_io.h>
+# include <uwvm2/uwvm/utils/ansies/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
+#endif
 
-# ifndef UWVM_MODULE_EXPORT
-#  define UWVM_MODULE_EXPORT
-# endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
 
+#if (defined(_WIN32) && !defined(__CYGWIN__)) && !defined(_WIN32_WINDOWS)
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::global
 {
     /// @brief      cmd on windows nt does not enable ansi escaping by default.
@@ -182,11 +178,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::global
         }
     };
 }  // namespace uwvm2::uwvm::global
+#endif
 
-# ifndef UWVM_MODULE
+#ifndef UWVM_MODULE
 // macro
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
-#  include <uwvm2/utils/macro/pop_macros.h>
-# endif
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm2/utils/macro/pop_macros.h>
 #endif
 

@@ -24,6 +24,10 @@ module;
 
 export module uwvm2.parser.wasm.standard.wasm1.section:section_type;
 
+import fast_io;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import :funcbody;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

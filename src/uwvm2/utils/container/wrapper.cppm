@@ -29,9 +29,12 @@ module;
 #include <concepts>
 #include <memory>
 // platform
-#include <YexuanXiao/deque.hpp>
+#include <bizwen/deque.hpp>
 
 export module uwvm2.utils.container:wrapper;
+
+import fast_io;
+import :allocator;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

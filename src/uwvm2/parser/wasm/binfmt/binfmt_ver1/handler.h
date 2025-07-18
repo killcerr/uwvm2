@@ -28,18 +28,7 @@
 # error "UWVM requires at least C++26 standard compiler. See https://en.cppreference.com/w/cpp/compiler_support/26#cpp_structured_bindings_202411L"
 #endif
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.utf;
-import uwvm2.parser.wasm.text_format;
-import uwvm2.parser.wasm.base;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm.standard.wasm1.section;
-import uwvm2.parser.wasm.binfmt.base;
-import :section;
-import :def;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>

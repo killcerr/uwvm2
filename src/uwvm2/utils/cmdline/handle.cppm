@@ -35,6 +35,9 @@ module;
 
 export module uwvm2.utils.cmdline:handle;
 
+import fast_io;
+import fast_io_crypto;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

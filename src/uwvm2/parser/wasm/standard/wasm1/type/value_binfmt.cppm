@@ -32,6 +32,9 @@ module;
 
 export module uwvm2.parser.wasm.standard.wasm1.type:value_binfmt;
 
+import fast_io;
+import :value_type;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

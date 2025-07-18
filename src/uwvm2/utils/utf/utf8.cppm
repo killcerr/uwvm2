@@ -36,6 +36,10 @@ module;
 
 export module uwvm2.utils.utf:utf8;
 
+import fast_io;
+import uwvm2.utils.intrinsics;
+import :base;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

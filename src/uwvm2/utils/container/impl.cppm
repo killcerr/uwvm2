@@ -23,7 +23,7 @@ module;
 
 export module uwvm2.utils.container;
 export import :allocator;
-export improt :wrapper;
+export import :wrapper;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

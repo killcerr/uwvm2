@@ -24,6 +24,8 @@ module;
 
 export module uwvm2.uwvm.io:output;
 
+import fast_io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

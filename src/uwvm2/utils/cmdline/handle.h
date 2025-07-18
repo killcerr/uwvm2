@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import fast_io_crypto;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>

@@ -24,23 +24,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-# ifdef UWVM_TIMER
-import uwvm2.utils.debug;
-# endif
-import uwvm2.utils.utf;
-import uwvm2.parser.wasm.base;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm.standard.wasm1.section;
-import uwvm2.parser.wasm.standard.wasm1.opcode;
-import uwvm2.parser.wasm.binfmt.binfmt_ver1;
-import :def;
-import :types;
-import :feature_def;
-import :type_section;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>
@@ -58,9 +42,7 @@ import :type_section;
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
-# ifdef UWVM_TIMER
-#  include <uwvm2/utils/debug/impl.h>
-# endif
+# include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>

@@ -21,15 +21,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm_custom.customs;
-import uwvm2.uwvm.wasm.base;
-import uwvm2.uwvm.wasm.feature;
-import uwvm2.uwvm.wasm.custom;
-#else
+#ifndef UWVM_MODULE
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
@@ -38,7 +30,6 @@ import uwvm2.uwvm.wasm.custom;
 # include <uwvm2/parser/wasm_custom/customs/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
-# include <uwvm2/uwvm/wasm/custom/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -65,7 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         {
             char const* custom_name_ptr;
             ::std::size_t custom_name_length;
-            ::uwvm2::uwvm::wasm::custom::imported_c_handlefunc_ptr_t custom_handle_func;
+            ::uwvm2::uwvm::wasm::type::imported_c_handlefunc_ptr_t custom_handle_func;
         };
 
         struct capi_custom_handler_vec_t

@@ -24,14 +24,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm.standard.wasm1.section;
-import uwvm2.parser.wasm.binfmt.base;
-import :section;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>
@@ -88,6 +81,7 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
         inline static constexpr bool value = true;
     };
 }
+
 #ifndef UWVM_MODULE
 // macro
 # include <uwvm2/utils/macro/pop_macros.h>

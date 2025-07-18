@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.standard.wasm1;
-import :value_type;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
@@ -34,6 +30,7 @@ import :value_type;
 # include <bit>
 // macro
 # include <uwvm2/parser/wasm/feature/feature_push_macro.h>
+// import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include "value_type.h"

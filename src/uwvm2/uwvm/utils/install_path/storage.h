@@ -22,12 +22,10 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import uwvm2.utils.install_path;
-#else
+#ifndef UWVM_MODULE
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
-// include
+// platform
 # ifdef UWVM_SUPPORT_INSTALL_PATH
 #  include <fast_io.h>
 #  include <fast_io_driver/install_path.h>

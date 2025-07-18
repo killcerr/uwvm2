@@ -24,11 +24,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>

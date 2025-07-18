@@ -32,6 +32,8 @@ module;
 
 export module uwvm2.parser.wasm.standard.wasm3.type:section_type;
 
+import uwvm2.parser.wasm.standard.wasm2;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

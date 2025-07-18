@@ -21,15 +21,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm_custom.customs;
-import uwvm2.uwvm.wasm.base;
-import uwvm2.uwvm.wasm.feature;
-import uwvm2.uwvm.wasm.type;
-#else
+#ifndef UWVM_MODULE
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>

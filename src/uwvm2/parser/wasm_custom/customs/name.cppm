@@ -35,6 +35,13 @@ module;
 
 export module uwvm2.parser.wasm_custom.customs:name;
 
+import fast_io;
+import uwvm2.utils.debug;
+import uwvm2.utils.utf;
+import uwvm2.parser.wasm.base;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.standard;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

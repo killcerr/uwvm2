@@ -33,6 +33,10 @@ module;
 
 export module uwvm2.parser.wasm.concepts:operation;
 
+import fast_io;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import :root;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

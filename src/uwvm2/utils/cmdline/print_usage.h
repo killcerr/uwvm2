@@ -22,13 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-# ifdef UWVM
-import uwvm2.uwvm.utils.ansies;
-# endif
-import :handle;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
@@ -37,18 +31,25 @@ import :handle;
 # include <memory>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
-# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+// macro-controlled macro
+# ifdef UWVM
+#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+# endif
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
-# ifdef UWVM
-#  include <uwvm2/uwvm/utils/ansies/impl.h>
-# endif
 # include "handle.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
+#endif
+
+#ifdef UWVM
+namespace uwvm2::uwvm::utils::ansies
+{
+    extern bool const put_color;
+}
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
@@ -109,7 +110,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 }  // namespace uwvm2::utils::cmdline
 
 #ifndef UWVM_MODULE
+// macro-controlled macro
+# ifdef UWVM
+#  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# endif
 // macro
-# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

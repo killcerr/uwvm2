@@ -36,6 +36,12 @@ module;
 
 export module uwvm2.parser.wasm_custom.customs:name_error_output;
 
+import fast_io;
+import uwvm2.utils.ansies;
+import uwvm2.utils.utf;
+import uwvm2.utils.debug;
+import :name;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

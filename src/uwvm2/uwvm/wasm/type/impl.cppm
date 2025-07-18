@@ -23,12 +23,10 @@
 module;
 
 export module uwvm2.uwvm.wasm.type;
+export import :cwrapper;
 export import :para;
 export import :file;
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
 export import :dl;
-#endif
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

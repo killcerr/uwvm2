@@ -26,11 +26,7 @@
 # error "UWVM requires at least C++26 standard compiler. See https://en.cppreference.com/w/cpp/feature_test#cpp_pack_indexing"
 #endif
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import :root;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>

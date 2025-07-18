@@ -27,6 +27,8 @@ module;
 
 export module uwvm2.uwvm.crtmain.global:tzset;
 
+import fast_io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

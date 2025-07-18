@@ -31,6 +31,10 @@ module;
 
 export module uwvm2.uwvm.crtmain.global:ansi_win32;
 
+import fast_io;
+import uwvm2.uwvm.utils.ansies;
+import uwvm2.uwvm.io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

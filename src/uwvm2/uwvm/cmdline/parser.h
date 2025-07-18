@@ -22,18 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.uwvm.io;
-import uwvm2.utils.ansies;
-import uwvm2.utils.cmdline;
-# ifdef UWVM_TIMER
-import uwvm2.utils.debug;
-# endif
-import uwvm2.uwvm.utils.ansies;
-import uwvm2.uwvm.cmdline.params;
-import :params;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
@@ -50,9 +39,7 @@ import :params;
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
-# ifdef UWVM_TIMER
-#  include <uwvm2/utils/debug/impl.h>
-# endif
+# include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include "params/impl.h"
 # include "params.h"

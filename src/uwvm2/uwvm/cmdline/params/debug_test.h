@@ -22,27 +22,23 @@
 
 #pragma once
 
-#ifdef _DEBUG
-
-# ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.cmdline;
-# else
+#ifndef UWVM_MODULE
 // std
-#  include <memory>
+# include <memory>
 // macro
-#  include <uwvm2/utils/macro/push_macros.h>
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
-#  include <fast_io.h>
-#  include <fast_io_dsal/string_view.h>
-#  include <uwvm2/utils/cmdline/impl.h>
-# endif
+# include <fast_io.h>
+# include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/cmdline/impl.h>
+#endif
 
-# ifndef UWVM_MODULE_EXPORT
-#  define UWVM_MODULE_EXPORT
-# endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
 
+#ifdef _DEBUG
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
@@ -67,9 +63,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 #  pragma clang diagnostic pop
 # endif
 }  // namespace uwvm2::uwvm::cmdline::params
-
-# ifndef UWVM_MODULE
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
-#  include <uwvm2/utils/macro/pop_macros.h>
-# endif
 #endif
+
+#ifndef UWVM_MODULE
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif
+

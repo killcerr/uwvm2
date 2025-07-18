@@ -37,17 +37,12 @@
 // wasm
 # include "wasm_set_main_module_name.h"
 # include "wasm_preload_library.h"
-# if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \
-     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
-#  include "wasm_register_dl.h"
-# endif
+# include "wasm_register_dl.h"
 
 // log
 # include "log_output.h"
 # include "log_disable_warning.h"
 # include "log_verbose.h"
-# if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
-#  include "log_win32_use_ansi.h"
-# endif
+# include "log_win32_use_ansi.h"
 
 #endif

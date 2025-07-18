@@ -30,6 +30,8 @@ module;
 
 export module uwvm2.utils.ansies:rgb;
 
+import fast_io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

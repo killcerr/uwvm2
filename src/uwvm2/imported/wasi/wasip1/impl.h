@@ -22,5 +22,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "abi.impl.h"
+# include "abi/impl.h"
+# include "fd_manager/impl.h"
 #endif

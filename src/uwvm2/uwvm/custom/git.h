@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export import uwvm2.utils.version;  // print defined method should be export
-import fast_io;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>

@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.cmdline;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <memory>
 // macro
@@ -41,10 +38,10 @@ import uwvm2.utils.cmdline;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
-{
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
+{
 
     namespace details
     {
@@ -69,9 +66,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 # if defined(__clang__)
 #  pragma clang diagnostic pop
 # endif
-
-#endif
 }  // namespace uwvm2::uwvm::cmdline::params
+#endif
 
 #ifndef UWVM_MODULE
 // macro

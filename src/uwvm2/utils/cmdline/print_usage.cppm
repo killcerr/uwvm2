@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -23,15 +23,22 @@
 module;
 
 // std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <new>
+# include <cstdint>
+# include <cstddef>
+# include <concepts>
+# include <new>
+# include <memory>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+// macro-controlled macro
+# ifdef UWVM
+#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+# endif
 
 export module uwvm2.utils.cmdline:print_usage;
+
+import fast_io;
+import :handle;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

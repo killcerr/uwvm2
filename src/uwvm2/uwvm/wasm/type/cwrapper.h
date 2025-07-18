@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.standard.wasm1.type;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>
@@ -46,7 +43,7 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 {
     extern "C" using imported_c_handlefunc_ptr_t =
         void (*)(::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*);

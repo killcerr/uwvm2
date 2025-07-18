@@ -22,20 +22,17 @@
 
 #pragma once
 
-#if defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME)
-
-# ifdef UWVM_MODULE
-// no import
-# else
+#ifndef UWVM_MODULE
 // std
-#  include <cstddef>
-#  include <cstdint>
-# endif
+# include <cstddef>
+# include <cstdint>
+#endif
 
-# ifndef UWVM_MODULE_EXPORT
-#  define UWVM_MODULE_EXPORT
-# endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
 
+#if defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_SME)
 UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 {
 # if defined(__clang__)
@@ -104,7 +101,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 
 #  pragma GCC aarch64 "arm_sve.h"
 
+# else
+
+// Defined platform macros, but don't know the exact implementation
+#  error "unsupport platform"
+
 # endif
 }  // namespace uwvm2::utils::intrinsics::arm_sve
-
 #endif

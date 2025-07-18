@@ -21,9 +21,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
@@ -40,7 +38,6 @@ import fast_io;
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::container
 {
-
     template <typename T>
     struct fast_io_std_allocator
     {

@@ -22,18 +22,12 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.ansies;
-# ifdef UWVM
-import uwvm2.uwvm.io;
-import uwvm2.uwvm.utils.ansies;
-# endif
-#else
+#ifndef UWVM_MODULE
 // std
 # include <source_location>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
+// macro-controlled macro
 # ifdef UWVM
 #  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 # endif
@@ -41,14 +35,17 @@ import uwvm2.uwvm.utils.ansies;
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/ansies/impl.h>
-# ifdef UWVM
-#  include <uwvm2/uwvm/io/impl.h>
-#  include <uwvm2/uwvm/utils/ansies/impl.h>
-# endif
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
+#endif
+
+#ifdef UWVM
+namespace uwvm2::uwvm::utils::ansies
+{
+    extern bool const put_color;
+}
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
@@ -95,9 +92,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 }  // namespace uwvm2::utils::debug
 
 #ifndef UWVM_MODULE
-// macro
+// macro-controlled macro
 # ifdef UWVM
 #  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # endif
+// macro
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

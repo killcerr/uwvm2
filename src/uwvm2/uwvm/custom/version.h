@@ -22,9 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-export import uwvm2.utils.version;  // print defined method should be export
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>

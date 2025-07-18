@@ -28,6 +28,9 @@ module;
 
 export module uwvm2.uwvm.custom:git;
 
+export import uwvm2.utils.version;  // print defined method should be export
+import fast_io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.cmdline;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <memory>
 // macro

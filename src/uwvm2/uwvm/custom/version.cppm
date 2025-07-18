@@ -27,6 +27,7 @@ module;
 #include <cstddef>
 
 export module uwvm2.uwvm.custom:version;
+export import uwvm2.utils.version;  // print defined method should be export
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

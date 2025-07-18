@@ -22,15 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.ansies;
-import uwvm2.utils.utf;
-# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
-import uwvm2.utils.debug;
-# endif
-import :error_code;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>
@@ -46,9 +38,7 @@ import :error_code;
 # include <fast_io.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/utf/impl.h>
-# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
-#  include <uwvm2/utils/debug/impl.h>
-# endif
+# include <uwvm2/utils/debug/impl.h>
 # include "error_code.h"
 #endif
 
@@ -647,7 +637,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 
 #ifndef UWVM_MODULE
 // macro
+# include <uwvm2/utils/ansies/win32_text_attr_pop_macro.h>
 # include <uwvm2/utils/ansies/ansi_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
-# include <uwvm2/utils/ansies/win32_text_attr_pop_macro.h>
 #endif

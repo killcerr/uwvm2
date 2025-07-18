@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.cmdline;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <memory>
 // macro
@@ -40,6 +37,7 @@ import uwvm2.utils.cmdline;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
+
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details

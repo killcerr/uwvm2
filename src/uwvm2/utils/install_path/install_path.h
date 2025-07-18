@@ -22,26 +22,19 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-# ifdef UWVM
-import uwvm2.uwvm.io;
-import uwvm2.uwvm.utils.ansies;
-# endif
-#else
+#ifndef UWVM_MODULE
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
+// macro-controlled macro
 # ifdef UWVM
 #  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 # endif
-// include
+// platform
 # ifdef UWVM_SUPPORT_INSTALL_PATH
-#  include <fast_io.h>
 #  include <fast_io_driver/install_path.h>
 # endif
-# ifdef UWVM
-#  include <uwvm2/uwvm/io/impl.h>
-#  include <uwvm2/uwvm/utils/ansies/impl.h>
-# endif
+// import
+# include <fast_io.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -49,6 +42,30 @@ import uwvm2.uwvm.utils.ansies;
 #endif
 
 #ifdef UWVM_SUPPORT_INSTALL_PATH
+
+# ifdef UWVM
+namespace uwvm2::uwvm
+{
+    // output
+#  if defined(__AVR__)
+    extern ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8c_io_observer> u8log_output;
+#  elif ((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__)) ||                                  \
+      (defined(__NEWLIB__) && !defined(__CYGWIN__)) || defined(_PICOLIBC__) || defined(__wasm__)
+    extern ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_io_observer> u8log_output;
+#  else
+    extern ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_file> u8log_output;
+#  endif
+
+    // warning
+    extern bool show_vm_warning;
+}  // namespace uwvm2::uwvm
+
+namespace uwvm2::uwvm::utils::ansies
+{
+    extern bool const put_color;
+}
+# endif
+
 UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
 {
     inline ::fast_io::install_path get_module_install_path_noexcept() noexcept
@@ -89,9 +106,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
 #endif
 
 #ifndef UWVM_MODULE
-// macro
+// macro-controlled macro
 # ifdef UWVM
 #  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # endif
+// macro
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

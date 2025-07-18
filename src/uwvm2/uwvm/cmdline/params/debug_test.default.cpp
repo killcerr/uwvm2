@@ -20,27 +20,23 @@
  *                                      *
  ****************************************/
 
-#ifdef _DEBUG
 // std
-# include <cstddef>
-# include <cstdint>
-# include <type_traits>
-# include <concepts>
-# include <memory>
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include <concepts>
+#include <memory>
 // macro
-# include <uwvm2/utils/macro/push_macros.h>
-# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
-# ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.cmdline;
-import uwvm2.uwvm.io;
-# else
-#  include <fast_io.h>
-#  include <uwvm2/utils/cmdline/impl.h>
-#  include <uwvm2/uwvm/io/impl.h>
-# endif
+#ifndef UWVM_MODULE
+# include <fast_io.h>
+# include <uwvm2/utils/cmdline/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
+#endif
 
+#ifdef _DEBUG
 namespace uwvm2::uwvm::cmdline::params::details
 {
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type
@@ -55,9 +51,10 @@ namespace uwvm2::uwvm::cmdline::params::details
     }
 
 }  // namespace uwvm2::uwvm::cmdline::params::details
-
-// macro
-# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
-# include <uwvm2/utils/macro/pop_macros.h>
-
 #endif
+
+// This cpp may not be the end of the translation unit, it may be included in other cpp files. So it needs to be pop.
+// macro
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
+#include <uwvm2/utils/macro/pop_macros.h>
+

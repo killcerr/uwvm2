@@ -25,10 +25,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-// import
-import fast_io;
-#else
+#ifndef UWVM_MODULE
 // import
 # include <fast_io.h>
 # include <fast_io_device.h>

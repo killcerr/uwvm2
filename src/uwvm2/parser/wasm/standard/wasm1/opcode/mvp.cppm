@@ -32,6 +32,8 @@ module;
 
 export module uwvm2.parser.wasm.standard.wasm1.opcode:mvp;
 
+import uwvm2.parser.wasm.standard.wasm1.type;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

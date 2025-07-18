@@ -231,11 +231,20 @@ target("uwvm")
 		add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
 	end 
 
-	-- uwvm cmd callback
-	add_files("src/uwvm2/uwvm/cmdline/params/**.cpp")
+	if enable_cxx_module then
+		-- uwvm cmd callback
+		add_files("src/uwvm2/uwvm/cmdline/params/**.module.cpp")
 
-	-- uwvm main
-	add_files("src/uwvm2/uwvm/main.cpp")
+		-- uwvm main
+		add_files("src/uwvm2/uwvm/main.module.cpp")
+
+	else
+		-- uwvm cmd callback
+		add_files("src/uwvm2/uwvm/cmdline/params/**.default.cpp")
+
+		-- uwvm main
+		add_files("src/uwvm2/uwvm/main.default.cpp")
+	end
 
 target_end()
 
@@ -279,8 +288,13 @@ for _, file in ipairs(os.files("test/**.cc")) do
 			add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
 		end 
 
-		-- uwvm cmd callback
-		add_files("src/uwvm2/uwvm/cmdline/params/**.cpp")
+		if enable_cxx_module then
+			-- uwvm cmd callback
+			add_files("src/uwvm2/uwvm/cmdline/params/**.module.cpp")
+		else
+			-- uwvm cmd callback
+			add_files("src/uwvm2/uwvm/cmdline/params/**.default.cpp")
+		end
 
         add_files(file)
 

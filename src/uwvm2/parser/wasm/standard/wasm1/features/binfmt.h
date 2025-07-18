@@ -24,30 +24,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm.standard.wasm1.section;
-import uwvm2.parser.wasm.standard.wasm1.opcode;
-import uwvm2.parser.wasm.binfmt.binfmt_ver1;
-import uwvm2.parser.wasm.text_format;
-import :def;
-import :feature_def;
-import :custom_section;
-import :type_section;
-import :import_section;
-import :function_section;
-import :table_section;
-import :memory_section;
-import :global_section;
-import :export_section;
-import :start_section;
-import :element_section;
-import :code_section;
-import :data_section;
-import :final_check;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>

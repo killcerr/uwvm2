@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <type_traits>
 # include <concepts>
@@ -40,6 +36,7 @@ import uwvm2.parser.wasm.standard;
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
+
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
 {
     //////////////////////////

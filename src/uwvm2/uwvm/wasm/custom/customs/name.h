@@ -22,14 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.ansies;
-import uwvm2.parser.wasm_custom;
-import uwvm2.uwvm.io;
-import uwvm2.uwvm.utils.memory;
-import uwvm2.uwvm.wasm.type;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>

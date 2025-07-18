@@ -28,14 +28,7 @@
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.ansies;
-import uwvm2.utils.cmdline;
-import uwvm2.uwvm.io;
-import uwvm2.uwvm.utils.ansies;
-import uwvm2.uwvm.cmdline;
-#else
+#ifndef UWVM_MODULE
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
 # include <uwvm2/utils/ansies/impl.h>
@@ -292,6 +285,7 @@ namespace uwvm2::uwvm::cmdline::params::details
 
 }  // namespace uwvm2::uwvm::cmdline::params::details
 
+// This cpp may not be the end of the translation unit, it may be included in other cpp files. So it needs to be pop.
 // macro
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 #include <uwvm2/utils/macro/pop_macros.h>

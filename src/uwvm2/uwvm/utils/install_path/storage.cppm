@@ -24,13 +24,14 @@ module;
 
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
-// include
 #ifdef UWVM_SUPPORT_INSTALL_PATH
 # include <fast_io.h>
 # include <fast_io_driver/install_path.h>
 #endif
 
 export module uwvm2.uwvm.utils.install_path:storage;
+
+import uwvm2.utils.install_path;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

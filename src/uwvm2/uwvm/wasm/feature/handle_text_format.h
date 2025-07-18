@@ -22,13 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.utils.utf;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard;
-import :feature;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <type_traits>
 # include <concepts>

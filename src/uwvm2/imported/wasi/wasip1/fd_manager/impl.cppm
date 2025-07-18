@@ -22,8 +22,8 @@
 module;
 
 export module uwvm2.imported.wasi.wasip1.fd_manager;
-export improt :fd;
-export improt :fd_map;
+export import :fd;
+export import :fd_map;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

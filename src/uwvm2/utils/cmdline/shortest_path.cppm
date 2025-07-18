@@ -32,6 +32,8 @@ module;
 
 export module uwvm2.utils.cmdline:shortest_path;
 
+import fast_io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

@@ -30,6 +30,8 @@ module;
 
 export module uwvm2.utils.ansies:cursor;
 
+import fast_io;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif

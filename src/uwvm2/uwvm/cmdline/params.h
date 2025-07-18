@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import uwvm2.utils.cmdline;
-import uwvm2.uwvm.cmdline.params;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <memory>
 // import

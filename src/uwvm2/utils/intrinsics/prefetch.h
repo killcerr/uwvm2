@@ -26,9 +26,7 @@
 
 // platfrom
 /// @brief      Including intrin.h in the absence of __builtin_prefetch
-#ifdef UWVM_MODULE
-// no import
-#else
+#ifndef UWVM_MODULE
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // platform

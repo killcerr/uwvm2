@@ -21,27 +21,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-import fast_io;
-import uwvm2.uwvm.io;
-import uwvm2.utils.ansies;
-# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
-import uwvm2.utils.debug;
-# endif
-import uwvm2.utils.madvise;
-import uwvm2.parser.wasm.base;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard;
-import uwvm2.parser.wasm.binfmt.base;
-import uwvm2.uwvm.utils.ansies;
-import uwvm2.uwvm.utils.memory;
-import uwvm2.uwvm.cmdline;
-import uwvm2.uwvm.wasm.base;
-import uwvm2.uwvm.wasm.type;
-import uwvm2.uwvm.wasm.storage;
-import uwvm2.uwvm.wasm.feature;
-import uwvm2.uwvm.wasm.custom;
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstddef>
 # include <cstdint>
@@ -54,9 +34,7 @@ import uwvm2.uwvm.wasm.custom;
 # include <fast_io.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
-# if defined(UWVM_TIMER) || ((defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK))
-#  include <uwvm2/utils/debug/impl.h>
-# endif
+# include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/madvise/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>

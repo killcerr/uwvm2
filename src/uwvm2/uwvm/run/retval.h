@@ -22,8 +22,7 @@
 
 #pragma once
 
-#ifdef UWVM_MODULE
-#else
+#ifndef UWVM_MODULE
 // std
 # include <cstdint>
 # include <cstddef>
