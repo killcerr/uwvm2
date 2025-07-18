@@ -25,6 +25,8 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
@@ -35,17 +37,21 @@
 # include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
 
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
 #ifdef UWVM_CAN_LOAD_DL
-# ifndef UWVM_MODULE_EXPORT
-#  define UWVM_MODULE_EXPORT
-# endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
 # if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \
      ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
     inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_dl_t> preloaded_dl{};  // [global] No global variable dependencies from other translation units
 # endif
-
 }  // namespace uwvm2::uwvm::wasm::storage
 #endif
 
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif

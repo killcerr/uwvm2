@@ -27,22 +27,16 @@
 # include <source_location>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
-// macro-controlled macro
-# ifdef UWVM
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-# endif
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/ansies/impl.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
-#endif
-
-#ifdef UWVM
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::ansies { extern "C++" bool const put_color; }
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::debug

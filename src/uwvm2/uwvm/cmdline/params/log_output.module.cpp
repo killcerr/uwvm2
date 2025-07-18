@@ -25,5 +25,6 @@ import uwvm2.utils.cmdline;
 import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
+import uwvm2.uwvm.cmdline.params;
 
 #include "log_output.default.cpp"

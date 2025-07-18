@@ -28,6 +28,7 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
+import uwvm2.uwvm.cmdline.params;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.storage;
 

@@ -25,9 +25,7 @@ module;
 export module uwvm2.uwvm.cmdline;
 export import :parser;
 export import :params;
-#if defined(_WIN32) && !defined(_WIN32_WINDOWS)
 export import :winnt_code_cvt;
-#endif
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

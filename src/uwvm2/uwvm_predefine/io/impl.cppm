@@ -20,11 +20,19 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+export module uwvm2.uwvm_predefine.io;
+export import :io_device;
+export import :output;
+export import :warn_control;
+export import :verbose_control;
 
 #ifndef UWVM_MODULE
-# ifndef UWVM
-#  define UWVM
-# endif
-# include <uwvm2/uwvm_predefine/io/impl.h>
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "impl.h"

@@ -47,6 +47,7 @@ import uwvm2.uwvm.utils.memory;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.wasm;
 import :retval;
+import :load_and_check_modules;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

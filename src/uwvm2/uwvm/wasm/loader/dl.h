@@ -36,6 +36,7 @@
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/madvise/impl.h>
+# include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
@@ -50,7 +51,11 @@
 # include <uwvm2/uwvm/wasm/custom/impl.h>
 #endif
 
-namespace uwvm2::uwvm::wasm::loader
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 {
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
@@ -63,7 +68,7 @@ namespace uwvm2::uwvm::wasm::loader
     };
 
     /// @todo load dl not finished
-    inline constexpr load_dl_rtl load_dl(::uwvm2::uwvm::wasm::type::wasm_dl_t& wd,
+    inline constexpr load_dl_rtl load_dl(::uwvm2::uwvm::wasm::type::wasm_dl_t & wd,
                                          ::fast_io::u8cstring_view load_file_name,
                                          ::fast_io::u8string_view rename_module_name,
                                          ::uwvm2::uwvm::wasm::type::wasm_parameter_u para) noexcept

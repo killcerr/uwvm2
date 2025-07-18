@@ -7,7 +7,6 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-15
  * @copyright   APL-2.0 License
  */
 
@@ -20,24 +19,24 @@
  *                                      *
  ****************************************/
 
-module;
-
-// std
-#include <cstdint>
-#include <cstddef>
-#include <concepts>
-#include <cstdlib>
-#include <memory>
-
-export module uwvm2.uwvm.utils.ansies:no_color;
-
-import fast_io;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
-#endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
+// import
+# include <fast_io.h>
+# include <fast_io_device.h>
 #endif
 
-#include "no_color.h"
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+#ifdef UWVM
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
+{
+    inline bool show_vm_warning{true};            // [global]
+    inline bool show_parser_warning{true};        // [global]
+    inline bool show_untrusted_dl_warning{true};  // [global]
+    inline bool show_dl_warning{true};            // [global]
+}  // namespace uwvm2::utils
+#endif

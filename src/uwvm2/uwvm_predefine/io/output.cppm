@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-07-07
+ * @date        2025-04-16
  * @copyright   APL-2.0 License
  */
 
@@ -22,7 +22,7 @@
 
 module;
 
-export module uwvm2.uwvm.io:verbose_control;
+export module uwvm2.uwvm_predefine.io:output;
 
 import fast_io;
 
@@ -33,4 +33,4 @@ import fast_io;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "verbose_control.h"
+#include "output.h"

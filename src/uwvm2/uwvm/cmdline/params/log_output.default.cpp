@@ -34,6 +34,7 @@
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
+# include <uwvm2/uwvm/cmdline/params/impl.h>
 #endif
 
 namespace uwvm2::uwvm::cmdline::params::details

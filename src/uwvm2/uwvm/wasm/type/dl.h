@@ -22,6 +22,9 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+// std
+# include <cstdint>
+# include <cstddef>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
@@ -30,6 +33,8 @@
 # include <uwvm2/parser/wasm_custom/customs/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
+# include "para.h"
+# include "cwrapper.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

@@ -46,6 +46,7 @@
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/wasm/impl.h>
 # include "retval.h"
+# include "load_and_check_modules.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

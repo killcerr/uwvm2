@@ -7,6 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-07-07
  * @copyright   APL-2.0 License
  */
 
@@ -19,22 +20,17 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+export module uwvm2.uwvm_predefine.io:warn_control;
+
+import fast_io;
 
 #ifndef UWVM_MODULE
-// import
-# include <fast_io.h>
-# include <fast_io_device.h>
+# define UWVM_MODULE
 #endif
-
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
-{
-    inline bool show_vm_warning{true};            // [global]
-    inline bool show_parser_warning{true};        // [global]
-    inline bool show_untrusted_dl_warning{true};  // [global]
-    inline bool show_dl_warning{true};            // [global]
-}  // namespace uwvm2::utils
+#include "warn_control.h"

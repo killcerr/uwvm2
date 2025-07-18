@@ -35,6 +35,7 @@
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/madvise/impl.h>
+# include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
@@ -49,7 +50,11 @@
 # include <uwvm2/uwvm/wasm/custom/impl.h>
 #endif
 
-namespace uwvm2::uwvm::wasm::loader
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 {
     enum class load_wasm_file_rtl
     {
@@ -58,7 +63,7 @@ namespace uwvm2::uwvm::wasm::loader
         wasm_parser_error
     };
 
-    inline constexpr load_wasm_file_rtl load_wasm_file(::uwvm2::uwvm::wasm::type::wasm_file_t& wf,
+    inline constexpr load_wasm_file_rtl load_wasm_file(::uwvm2::uwvm::wasm::type::wasm_file_t & wf,
                                                        ::fast_io::u8cstring_view load_file_name,
                                                        ::fast_io::u8string_view rename_module_name,
                                                        ::uwvm2::uwvm::wasm::type::wasm_parameter_u para) noexcept

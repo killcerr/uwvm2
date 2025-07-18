@@ -114,6 +114,8 @@ using ::fast_io::posix_stderr;
 
 #if(defined(_WIN32) || defined(__CYGWIN__)) || ((!defined(_WIN32) || defined(__WINE__)) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__))))
 using ::fast_io::native_dll_file;
+using ::fast_io::dll_mode;
+using ::fast_io::dll_load_symbol;
 #endif
 
 #if defined(__linux__)

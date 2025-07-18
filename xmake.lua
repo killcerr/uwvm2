@@ -221,6 +221,9 @@ target("uwvm")
 	add_headerfiles("src/**.h")
 
 	if enable_cxx_module then
+		-- uwvm predefine
+		add_files("src/uwvm2/uwvm_predefine/**.cppm", {public = is_debug_mode})
+
 		-- utils
 		add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
@@ -278,6 +281,9 @@ for _, file in ipairs(os.files("test/**.cc")) do
 		add_includedirs("src/")
 
 		if enable_cxx_module then
+			-- uwvm predefine
+			add_files("src/uwvm2/uwvm_predefine/**.cppm", {public = is_debug_mode})
+			
 			-- utils
 			add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 

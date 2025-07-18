@@ -23,5 +23,7 @@
 import fast_io;
 import uwvm2.utils.cmdline;
 import uwvm2.uwvm.io;
+import uwvm2.uwvm.cmdline;
+import uwvm2.uwvm.cmdline.params;
 
 #include "debug_test.default.cpp"

@@ -24,15 +24,14 @@ module;
 
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
-// macro-controlled macro
-# ifdef UWVM
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-# endif
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 
 export module uwvm2.utils.debug:timer;
 
 import fast_io;
 import uwvm2.utils.ansies;
+import uwvm2.uwvm_predefine.io;
+import uwvm2.uwvm_predefine.utils.ansies;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

@@ -5,9 +5,8 @@
  *************************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
  * @copyright   APL-2.0 License
  */
 
@@ -23,8 +22,18 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# ifndef UWVM
-#  define UWVM
-# endif
-# include <uwvm2/uwvm_predefine/io/impl.h>
+// import
+# include <fast_io.h>
+# include <fast_io_device.h>
+#endif
+
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+#ifdef UWVM
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
+{
+    inline bool show_verbose{};  // [global] No global variable dependencies from other translation units
+}  // namespace uwvm2::utils
 #endif

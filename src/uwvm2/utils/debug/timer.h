@@ -25,38 +25,17 @@
 #ifndef UWVM_MODULE
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
-// macro-controlled macro
-# ifdef UWVM
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-# endif
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/ansies/impl.h>
+# include <uwvm2/uwvm_predefine/io/impl.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
-#endif
-
-#ifdef UWVM
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
-{
-    // output
-# if defined(__AVR__)
-    extern "C++" ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8c_io_observer> u8log_output;
-# elif ((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) || (defined(__MSDOS__) || defined(__DJGPP__)) ||                                   \
-     (defined(__NEWLIB__) && !defined(__CYGWIN__)) || defined(_PICOLIBC__) || defined(__wasm__)
-    extern "C++" ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_io_observer> u8log_output;
-# else
-    extern "C++" ::fast_io::basic_io_lockable_nonmovable<::fast_io::u8native_file> u8log_output;
-# endif
-
-    // warning
-    extern "C++" bool show_vm_warning;
-}  // namespace uwvm2::uwvm
-
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::ansies { extern "C++" bool const put_color; }
 #endif
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::debug

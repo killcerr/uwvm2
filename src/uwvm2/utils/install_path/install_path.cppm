@@ -24,10 +24,7 @@ module;
 
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
-// macro-controlled macro
-#ifdef UWVM
-# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-#endif
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 // platform
 #ifdef UWVM_SUPPORT_INSTALL_PATH
 # include <fast_io_driver/install_path.h>
@@ -36,6 +33,8 @@ module;
 export module uwvm2.utils.install_path:install_path;
 
 import fast_io;
+import uwvm2.uwvm_predefine.io;
+import uwvm2.uwvm_predefine.utils.ansies;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

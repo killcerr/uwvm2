@@ -23,10 +23,7 @@
 module;
 
 export module uwvm2.uwvm.io;
-export import :io_device;
-export import :output;
-export import :warn_control;
-export import :verbose_control;
+export import uwvm2.uwvm_predefine.io;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

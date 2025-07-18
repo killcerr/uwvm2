@@ -5,9 +5,9 @@
  *************************************************************/
 
 /**
- * @author      24bit-xjkp
+ * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-21
+ * @date        2025-03-24
  * @copyright   APL-2.0 License
  */
 
@@ -23,8 +23,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# ifndef UWVM
-#  define UWVM
-# endif
-# include <uwvm2/uwvm_predefine/io/impl.h>
+# include "no_color.h"
+
 #endif

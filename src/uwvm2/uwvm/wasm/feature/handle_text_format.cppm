@@ -32,6 +32,7 @@ import fast_io;
 import uwvm2.utils.utf;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard;
+import uwvm2.parser.wasm.text_format;
 import :feature;
 
 #ifndef UWVM_MODULE

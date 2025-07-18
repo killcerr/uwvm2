@@ -32,6 +32,7 @@
 # include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
+# include <uwvm2/parser/wasm/text_format/impl.h>
 # include "feature.h"
 #endif
 
@@ -40,7 +41,6 @@
 #endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
 {
-
     inline constexpr ::uwvm2::utils::utf::u8result handle_text_format(
         ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl]
         char8_t const* begin,

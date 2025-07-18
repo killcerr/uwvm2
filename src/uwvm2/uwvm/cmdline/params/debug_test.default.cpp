@@ -34,6 +34,8 @@
 # include <fast_io.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/uwvm/cmdline/impl.h>
+# include <uwvm2/uwvm/cmdline/params/impl.h>
 #endif
 
 #ifdef _DEBUG

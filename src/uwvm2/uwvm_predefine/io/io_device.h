@@ -34,12 +34,14 @@
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
+
+#ifdef UWVM
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
 {
     // io does not add meaningless namespaces.
     /// @deprecated It is no longer recommended to use u8err, use u8log_output.
-#if 0
-# ifndef __AVR__
+# if 0
+#  ifndef __AVR__
 
     /// @brief      native stdout
     /// @details    on non-windows (POSIX) systems (fd): (int)[0, 1, 2]
@@ -51,7 +53,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
     inline ::fast_io::u8native_io_observer u8out{::fast_io::u8out()};                // [global] No global variable dependencies from other translation units
     inline ::fast_io::u8native_io_observer u8err{::fast_io::u8err()};                // [global] No global variable dependencies from other translation units
     // No buffer is provided to u8err
-# else
+#  else
     /// @brief      C's STDOUT
     /// @details    The C API of avrlibc does not have any buffers.
 
@@ -59,6 +61,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
     inline ::fast_io::u8c_io_observer u8out{::fast_io::u8c_stdout()};           // [global] No global variable dependencies from other translation units
     inline ::fast_io::u8c_io_observer u8err{::fast_io::u8c_stderr()};           // [global] No global variable dependencies from other translation units
     // No buffer is provided to u8err
+#  endif
 # endif
-#endif
 }  // namespace uwvm2::uwvm
+#endif

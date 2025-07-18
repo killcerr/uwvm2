@@ -7,6 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-03-24
  * @copyright   APL-2.0 License
  */
 
@@ -19,19 +20,16 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+export module uwvm2.uwvm_predefine.utils.ansies;
+export import :no_color;
 
 #ifndef UWVM_MODULE
-// import
-# include <fast_io.h>
-# include <fast_io_device.h>
+# define UWVM_MODULE
 #endif
-
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
-{
-    inline bool show_verbose{};  // [global] No global variable dependencies from other translation units
-}  // namespace uwvm2::utils
+#include "impl.h"

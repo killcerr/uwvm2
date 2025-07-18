@@ -5,9 +5,9 @@
  *************************************************************/
 
 /**
- * @author      MacroModel
+ * @author      24bit-xjkp
  * @version     2.0.0
- * @date        2025-03-24
+ * @date        2025-03-21
  * @copyright   APL-2.0 License
  */
 
@@ -23,7 +23,7 @@
 module;
 
 export module uwvm2.uwvm.utils.ansies;
-export import :no_color;
+export import uwvm2.uwvm_predefine.utils.ansies;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

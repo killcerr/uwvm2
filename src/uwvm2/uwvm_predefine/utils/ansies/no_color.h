@@ -37,12 +37,13 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
+#ifdef UWVM
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::ansies
 {
     namespace details::posix
     {
 #if !(defined(_WIN32) && !defined(__CYGWIN__) && !defined(__WINE__))
-# if defined(__DARWIN_C_LEVEL) || defined(__MSDOS__)
+# if defined(__DARWIN_C_LEVEL) || defined(__DJGPP__)
         extern char* libc_getenv(char const*) noexcept __asm__("_getenv");
 # else
         extern char* libc_getenv(char const*) noexcept __asm__("getenv");
@@ -81,3 +82,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::ansies
     inline bool log_win32_use_ansi_b{false};  // [global] No global variable dependencies from other translation units
 #endif
 }  // namespace uwvm2::utils::ansies
+#endif
