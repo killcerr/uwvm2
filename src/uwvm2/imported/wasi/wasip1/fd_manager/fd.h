@@ -23,7 +23,8 @@
 
 #ifdef UWVM_MODULE
 import fast_io;
-import uwvm2.parser.wasm.standard.wasm1.type import uwvm2.imported.wasi.wasip1.abi;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.imported.wasi.wasip1.abi;
 #else
 // std
 # include <cstddef>
@@ -49,7 +50,6 @@ import uwvm2.parser.wasm.standard.wasm1.type import uwvm2.imported.wasi.wasip1.a
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 {
-#if defined(_WIN32) && defined(_WIN32_WINDOWS)
     struct wasi_fd_t
     {
         using mutex_t = ::fast_io::native_mutex;
@@ -57,154 +57,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         // ====== for wasi ======
         ::fast_io::posix_file file_fd{};
+#if defined(_WIN32) && defined(_WIN32_WINDOWS)
         ::fast_io::win32_9xa_dir_file dir_fd{};
         bool is_dir{};
-
-        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_base{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
-        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
-
-        // ====== for vm ======
-        mutex_t* fd_mutex{};
-        ::std::size_t close_pos{SIZE_MAX};
-
-        inline constexpr wasi_fd_t() noexcept
-        {
-            this->fd_mutex = mutex_alloc_t::allocate(1uz);
-            ::new(this->fd_mutex) mutex_t{};
-        }
-
-        inline constexpr wasi_fd_t(wasi_fd_t const& other) noexcept = delete;
-
-        inline constexpr wasi_fd_t& operator= (wasi_fd_t const& other) noexcept = delete;
-
-        inline constexpr wasi_fd_t(wasi_fd_t&& other) noexcept :
-            file_fd{::std::move(other.file_fd)}, dir_fd{::std::move(other.dir_fd)}, is_dir{other.is_dir}, rights_base{other.rights_base},
-            rights_inherit{other.rights_inherit}, fd_mutex{other.fd_mutex}, close_pos{other.close_pos}
-        {
-            other.is_dir = false;
-            other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.fd_mutex = nullptr;
-            other.close_pos = SIZE_MAX;
-        }
-
-        inline constexpr wasi_fd_t& operator= (wasi_fd_t&& other) noexcept
-        {
-            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
-
-            this->file_fd = ::std::move(other.file_fd);
-            this->dir_fd = ::std::move(other.dir_fd);
-
-            this->is_dir = other.is_dir;
-            this->rights_base = other.rights_base;
-            this->rights_inherit = other.rights_inherit;
-            this->fd_mutex = other.fd_mutex;
-            this->close_pos = other.close_pos;
-
-            other.is_dir = false;
-            other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.fd_mutex = nullptr;
-            other.close_pos = SIZE_MAX;
-
-            return *this;
-        }
-
-        ~wasi_fd_t()
-        {
-            // Multiple calls to the destructor are ub, so no type changes are made here
-            ::std::destroy_at(this->fd_mutex);
-            mutex_alloc_t::deallocate_n(this->fd_mutex, 1uz);
-        }
-
-        void close()
-        {
-            ::fast_io::io_lock_guard fd_look{*(this->fd_mutex)};
-            this->dir_fd.close();
-            this->file_fd.close();
-            other.is_dir = false;
-            other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-        }
-    };
-
-#else  // winnt, posix, dos
-
-    struct wasi_fd_t
-    {
-        using mutex_t = ::fast_io::native_mutex;
-        using mutex_alloc_t = ::fast_io::native_typed_global_allocator<mutex_t>;
-
-        // ====== for wasi ======
-        ::fast_io::posix_file file_fd{};
-
-        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_base{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
-        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
-
-        // ====== for vm ======
-        mutex_t* fd_mutex{};  //
-        ::std::size_t close_pos{SIZE_MAX};
-
-        inline constexpr wasi_fd_t() noexcept
-        {
-            this->fd_mutex = mutex_alloc_t::allocate(1uz);
-            ::new(this->fd_mutex) mutex_t{};
-        }
-
-        inline constexpr wasi_fd_t(wasi_fd_t const& other) noexcept = delete;
-
-        inline constexpr wasi_fd_t& operator= (wasi_fd_t const& other) noexcept = delete;
-
-        inline constexpr wasi_fd_t(wasi_fd_t&& other) noexcept :
-            file_fd{::std::move(other.file_fd)}, rights_base{other.rights_base}, rights_inherit{other.rights_inherit}, fd_mutex{other.fd_mutex},
-            close_pos{other.close_pos}
-        {
-            // deque-managed fd, expansion does not invalidate the original iterator
-
-            other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.fd_mutex = nullptr;
-            other.close_pos = SIZE_MAX;
-        }
-
-        inline constexpr wasi_fd_t& operator= (wasi_fd_t&& other) noexcept
-        {
-            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
-
-            // deque-managed fd, expansion does not invalidate the original iterator
-
-            this->file_fd = ::std::move(other.file_fd);
-
-            this->rights_base = other.rights_base;
-            this->rights_inherit = other.rights_inherit;
-            this->fd_mutex = other.fd_mutex;
-            this->close_pos = other.close_pos;
-
-            other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.fd_mutex = nullptr;
-            other.close_pos = SIZE_MAX;
-
-            return *this;
-        }
-
-        ~wasi_fd_t()
-        {
-            // Multiple calls to the destructor are ub, so no type changes are made here
-            ::std::destroy_at(this->fd_mutex);
-            mutex_alloc_t::deallocate_n(this->fd_mutex, 1uz);
-        }
-
-        void close()
-        {
-            ::fast_io::io_lock_guard fd_look{*(this->fd_mutex)};
-            this->file_fd.close();
-            other.rights_base = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-            other.rights_inherit = static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1);
-        }
-    };
-    
 #endif
+        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_base{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
+        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
+
+        // ====== for vm ======
+        mutex_t fd_mutex{};  // [singleton]
+        ::std::size_t close_pos{SIZE_MAX};
+
+        inline constexpr wasi_fd_t() noexcept = default;
+
+        inline constexpr wasi_fd_t(wasi_fd_t const& other) noexcept = delete;
+
+        inline constexpr wasi_fd_t& operator= (wasi_fd_t const& other) noexcept = delete;
+
+        inline constexpr wasi_fd_t(wasi_fd_t&& other) noexcept = delete;
+
+        inline constexpr wasi_fd_t& operator= (wasi_fd_t&& other) noexcept = delete;
+
+        inline constexpr ~wasi_fd_t() = default;
+    };
 
 }  // namespace uwvm2::parser::wasm::base
 

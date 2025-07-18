@@ -73,18 +73,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         wasm_fd_storage.closes.reserve(reserve_sizes);
     }
 
-    inline constexpr ::uwvm::vm::wasi::wasi_fd_t* get_original_wasm_fd_p(
-        wasm_fd_storage_t& wasm_fd_storage, ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t wfd) noexcept
+    inline constexpr ::uwvm::vm::wasi::wasi_fd_t* get_original_wasm_fd_p(wasm_fd_storage_t & wasm_fd_storage,
+                                                                         ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t wfd) noexcept
     {
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
         constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
         if constexpr(size_t_max < wasm_u32_max)
         {
             // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
-            if(wfd > size_t_max) [[unlikely]]
-            {
-                return nullptr;
-            }
+            if(wfd > size_t_max) [[unlikely]] { return nullptr; }
         }
 
         auto const wasm_fd_pos{static_cast<::std::size_t>(wfd)};
@@ -94,7 +91,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         // wasm_fd_storage.opens can't be changed.
 
         if(wasm_fd_storage.opens.size() <= wasm_fd_pos) [[unlikely]] { return nullptr; }
-        else { return wasm_fd_storage.opens.begin() + wasm_fd_pos; }
+        else
+        {
+            return wasm_fd_storage.opens.begin() + wasm_fd_pos;
+        }
     }
 
     struct create_wasm_fd_ret
@@ -103,7 +103,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t* wasi_fd{};
     };
 
-    inline constexpr create_wasm_fd_ret create_wasm_fd(wasm_fd_storage_t& wasm_fd_storage) noexcept
+    inline constexpr create_wasm_fd_ret create_wasm_fd(wasm_fd_storage_t & wasm_fd_storage) noexcept
     {
         ::fast_io::io_lock_guard fds_lock{wasm_fd_storage.fds_mutex};
 
@@ -111,13 +111,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         if(wasm_fd_storage.closes.empty())
         {
-            if(wasm_fd_storage.opens.size() == wasm_fd_storage.fd_limit) [[unlikely]] 
-            { 
-                return {static_cast<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t>(-1), nullptr}; 
+            if(wasm_fd_storage.opens.size() == wasm_fd_storage.fd_limit) [[unlikely]]
+            {
+                return {static_cast<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t>(-1), nullptr};
             }
 
             auto const ret_wasi_fd{::std::addressof(wasm_fd_storage.opens.emplace_back())};
-            auto const ret_wasi_posix_fd{static_cast<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t>(static_cast<::std::size_t>(ret_wasi_fd - wasm_fd_storage.opens.begin()))};
+            auto const ret_wasi_posix_fd{static_cast<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_posix_fd_t>(
+                static_cast<::std::size_t>(ret_wasi_fd - wasm_fd_storage.opens.begin()))};
             return {ret_wasi_posix_fd, ret_wasi_fd};
         }
         else

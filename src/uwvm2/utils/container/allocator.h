@@ -5,9 +5,8 @@
  *************************************************************/
 
 /**
- * @author      MacroModel
+ * @author      YexuanXiao
  * @version     2.0.0
- * @date        2025-06-30
  * @copyright   APL-2.0 License
  */
 
