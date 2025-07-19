@@ -77,6 +77,49 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         inline constexpr ~wasi_fd_t() = default;
     };
 
+    struct wasi_fd_unique_ptr_t
+    {
+        using wasi_fd_t_fast_io_type_allocator = ::fast_io::native_typed_global_allocator<wasi_fd_t>;
+
+        wasi_fd_t* fd_p;
+
+        inline constexpr wasi_fd_unique_ptr_t() noexcept
+        {
+            fd_p = wasi_fd_t_fast_io_type_allocator::allocate(1uz);
+            ::new (fd_p) wasi_fd_t{};
+        }
+
+        inline constexpr wasi_fd_unique_ptr_t(wasi_fd_unique_ptr_t const&) noexcept = delete;
+        inline constexpr wasi_fd_unique_ptr_t& operator=(wasi_fd_unique_ptr_t const&) noexcept = delete;
+
+        inline constexpr wasi_fd_unique_ptr_t(wasi_fd_unique_ptr_t && other) noexcept
+        {
+            this->fd_p = other.fd_p;
+            other.fd_p = nullptr
+        }
+
+        inline constexpr wasi_fd_unique_ptr_t& operator=(wasi_fd_unique_ptr_t && other) noexcept 
+        {
+            if (::std::addressof(other) == this) [[unlikely]]
+            {
+                return *this;
+            }
+
+            ::std::destroy_at(fd_p);
+            wasi_fd_t_fast_io_type_allocator::deallocate_n(fd_p, 1uz);
+
+            this->fd_p = other.fd_p;
+            other.fd_p = nullptr
+        }
+
+        inline constexpr ~wasi_fd_unique_ptr_t()
+        {
+            ::std::destroy_at(fd_p);
+            wasi_fd_t_fast_io_type_allocator::deallocate_n(fd_p, 1uz);
+        }
+
+    };
+
 }  // namespace uwvm2::parser::wasm::base
 
 #ifndef UWVM_MODULE
