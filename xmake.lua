@@ -212,6 +212,9 @@ target("uwvm")
 	-- third-parties/bizwen
 	add_includedirs("third-parties/bizwen/include")
 	
+	-- third-parties/boost
+	add_includedirs("third-parties/boost_unordered/include")
+
 	-- uwvm
 	add_defines("UWVM=2")
 
@@ -271,6 +274,9 @@ for _, file in ipairs(os.files("test/**.cc")) do
 				
 		-- third-parties/bizwen
 		add_includedirs("third-parties/bizwen/include")
+
+		-- third-parties/boost
+		add_includedirs("third-parties/boost_unordered/include")
 
 		-- uwvm
 		add_defines("UWVM=2")

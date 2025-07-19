@@ -28,8 +28,12 @@ module;
 #include <cstring>
 #include <concepts>
 #include <memory>
+#include <utility>
+#include <type_traits>
 // platform
 #include <bizwen/deque.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
+#include <boost/unordered/unordered_flat_set.hpp>
 
 export module uwvm2.utils.container:wrapper;
 
