@@ -4323,7 +4323,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 16
-                ::uwvm2::parser::wasm::utils::counter_addadd_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                  section_curr,
                                                                                  err);
