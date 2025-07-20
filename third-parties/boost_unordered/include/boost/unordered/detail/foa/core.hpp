@@ -1,4 +1,4 @@
-/* Common base for Boost.Unordered open-addressing tables.
+﻿/* Common base for Boost.Unordered open-addressing tables.
  *
  * Copyright 2022-2024 Joaquin M Lopez Munoz.
  * Copyright 2023 Christian Mazakas.

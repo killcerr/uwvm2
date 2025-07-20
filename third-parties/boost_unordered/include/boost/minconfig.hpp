@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // This is a minimal header that contains only the small set
 // config entries needed to use boost::unordered, so that the

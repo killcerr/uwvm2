@@ -1,4 +1,4 @@
-/* Fast open-addressing, node-based concurrent hashmap.
+﻿/* Fast open-addressing, node-based concurrent hashmap.
  *
  * Copyright 2023 Christian Mazakas.
  * Copyright 2023-2024 Joaquin M Lopez Munoz.

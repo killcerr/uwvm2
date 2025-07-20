@@ -1,4 +1,4 @@
-/* Fast open-addressing concurrent hash table.
+﻿/* Fast open-addressing concurrent hash table.
  *
  * Copyright 2023-2024 Joaquin M Lopez Munoz.
  * Copyright 2024 Braden Ganetsky.

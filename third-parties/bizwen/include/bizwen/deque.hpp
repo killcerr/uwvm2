@@ -1,4 +1,4 @@
-#if not defined(BIZWEN_DEQUE)
+﻿#if not defined(BIZWEN_DEQUE)
 #define BIZWEN_DEQUE
 
 // assert

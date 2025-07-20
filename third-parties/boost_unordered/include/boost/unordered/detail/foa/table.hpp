@@ -1,4 +1,4 @@
-/* Fast open-addressing hash table.
+﻿/* Fast open-addressing hash table.
  *
  * Copyright 2022-2024 Joaquin M Lopez Munoz.
  * Copyright 2023 Christian Mazakas.

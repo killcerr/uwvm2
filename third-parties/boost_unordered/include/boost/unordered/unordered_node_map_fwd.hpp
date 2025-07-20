@@ -1,4 +1,4 @@
-
+﻿
 // Copyright (C) 2022 Christian Mazakas
 // Copyright (C) 2024 Braden Ganetsky
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
