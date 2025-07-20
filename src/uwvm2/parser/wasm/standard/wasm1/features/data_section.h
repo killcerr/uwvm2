@@ -147,6 +147,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type section_curr_c8;
             ::std::memcpy(::std::addressof(section_curr_c8), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type));
 
+            // Size equal to one does not need to do little-endian conversion
+            static_assert(sizeof(section_curr_c8) == 1uz);
+
 #if CHAR_BIT > 8
             section_curr_c8 &= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0xFFu);
 #endif

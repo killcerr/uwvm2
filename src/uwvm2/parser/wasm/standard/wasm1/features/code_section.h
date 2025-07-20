@@ -372,6 +372,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> fvt;
 
                 ::std::memcpy(::std::addressof(fvt), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>));
+                
+                // Size equal to one does not need to do little-endian conversion
+                static_assert(sizeof(fvt) == 1uz);
 
                 // check fvt
                 static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_codesec_value_type<Fs...>);
