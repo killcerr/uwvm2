@@ -159,6 +159,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         // Instructs to read the file all the way into memory
         ::uwvm2::utils::madvise::my_madvise(wf.wasm_file.cbegin(), wf.wasm_file.size(), ::uwvm2::utils::madvise::madvise_flag::willneed);
 
+#if CHAR_BIT > 8
+        // Since files are either private page mapped or memory allocated and read, they can be modified directly.
+        // Prevents invalid content in non-low eight bits of char_bit not equal to 8 from causing an unknown error in the parser.
+        auto const wf_wasm_file_end{wf.wasm_file.end()};
+        for (auto wf_wasm_file_curr{wf.wasm_file.begin()}; wf_wasm_file_curr != wf_wasm_file_end; ++wf_wasm_file_curr)
+        {
+            *wf_wasm_file_curr &= 0xFFu;
+        }
+#endif
+
         switch(wf.binfmt_ver)
         {
             [[unlikely]] case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u):
