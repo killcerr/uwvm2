@@ -69,8 +69,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
                                     u8"(vm)\n",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
             }
-#  else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [warn]  Cannot get install path.\n");
 #  endif
         }
 # endif
@@ -80,10 +78,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
 #endif
 
 #ifndef UWVM_MODULE
-// macro-controlled macro
-# ifdef UWVM
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
-# endif
 // macro
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif

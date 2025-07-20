@@ -64,7 +64,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::ansies
         ::fast_io::win32::nt::unicode_string out_us{};
         auto const status{
             ::fast_io::win32::nt::RtlQueryEnvironmentVariable_U(curr_peb->ProcessParameters->Environment, ::std::addressof(env_us), ::std::addressof(out_us))};
-        return status == 0xc0000023 || status == 0x00000000;
+        return status == 0xC000'0023u || status == 0x0000'0000u;
 #  else
         auto const no_color_env{::fast_io::win32::GetEnvironmentVariableA(reinterpret_cast<char const*>(u8"NO_COLOR"), nullptr, 0)};
         return static_cast<bool>(no_color_env);

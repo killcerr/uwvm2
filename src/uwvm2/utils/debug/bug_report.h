@@ -83,10 +83,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 }
 
 #ifndef UWVM_MODULE
-// macro-controlled macro
-# ifdef UWVM
-#  include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
-# endif
 // macro
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
 #endif
