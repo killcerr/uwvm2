@@ -102,7 +102,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         {
             if(::std::addressof(other) == this) [[unlikely]] { return *this; }
 
-            if (this->fd_p) [[likely]]
+            if(this->fd_p) [[likely]]
             {
                 ::std::destroy_at(this->fd_p);
                 wasi_fd_t_fast_io_type_allocator::deallocate_n(this->fd_p, 1uz);
@@ -114,18 +114,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         inline constexpr clear_destroy() noexcept
         {
-            if (this->fd_p) [[likely]]
+            if(this->fd_p) [[likely]]
             {
                 ::std::destroy_at(this->fd_p);
                 wasi_fd_t_fast_io_type_allocator::deallocate_n(this->fd_p, 1uz);
-                
+
                 this->fd_p = nullptr;
             }
         }
 
         inline constexpr ~wasi_fd_unique_ptr_t()
         {
-            if (this->fd_p) [[likely]]
+            if(this->fd_p) [[likely]]
             {
                 ::std::destroy_at(this->fd_p);
                 wasi_fd_t_fast_io_type_allocator::deallocate_n(this->fd_p, 1uz);

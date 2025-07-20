@@ -41,6 +41,7 @@ export module uwvm2.parser.wasm.standard.wasm1.features:table_section;
 import fast_io;
 import uwvm2.utils.debug;
 import uwvm2.parser.wasm.base;
+import uwvm2.parser.wasm.utils;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm.standard.wasm1.section;

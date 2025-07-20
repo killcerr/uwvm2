@@ -155,7 +155,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_section_canonical_order,
         invalid_elem_kind,
         invalid_data_kind,
-        limit_type_max_lt_min
+        limit_type_max_lt_min,
+        counter_overflows
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type

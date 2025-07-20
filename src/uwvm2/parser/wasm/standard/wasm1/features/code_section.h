@@ -42,6 +42,7 @@
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/intrinsics/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
+# include <uwvm2/parser/wasm/utils/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
@@ -175,7 +176,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check table counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(++code_counter > code_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(code_counter, section_curr, err) > code_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = code_count;
@@ -302,6 +303,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // The final list of local variables obtained by concatenating all groups must not exceed u32max.
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 all_clocal_counter{};
 
+            // Undeterministic boundaries need to use quantity loops (No local_end)
             for(::std::size_t local_counter{}; local_counter != local_count; ++local_counter)
             {
                 ::uwvm2::parser::wasm::standard::wasm1::features::final_local_entry_t<Fs...> fle{};
@@ -372,7 +374,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> fvt;
 
                 ::std::memcpy(::std::addressof(fvt), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>));
-                
+
                 // Size equal to one does not need to do little-endian conversion
                 static_assert(sizeof(fvt) == 1uz);
 

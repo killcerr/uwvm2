@@ -150,8 +150,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             for(auto i: vec)
             {
 #if __cpp_contracts >= 202502L
+                contract_assert(counter != ::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>::max());
                 contract_assert(i == counter++);
 #else
+                if(counter == ::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>::max()) { ::fast_io::fast_terminate(); }
                 if(i != counter++) { ::fast_io::fast_terminate(); }
 #endif
             }

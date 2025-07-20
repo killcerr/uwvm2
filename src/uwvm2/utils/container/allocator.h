@@ -119,5 +119,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
             return true;
         }
     };
-
 }

@@ -105,7 +105,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         using u8ostring_ref_uwvm_tlc = basic_ostring_ref_uwvm_tlc<char8_t>;
         using u16ostring_ref_uwvm_tlc = basic_ostring_ref_uwvm_tlc<char16_t>;
         using u32ostring_ref_uwvm_tlc = basic_ostring_ref_uwvm_tlc<char32_t>;
-    } // namespace tlc
+    }  // namespace tlc
 
     /// @brief vector
     template <::std::movable T, typename Alloc = ::fast_io::native_global_allocator>
@@ -138,12 +138,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
     namespace tlc
     {
         template <typename Key, typename Hash = ::std::hash<Key>, typename Pred = ::std::equal_to<Key>>
-        using unordered_flat_set = ::uwvm2::utils::container::unordered_flat_set<Key, Hash, Pred, ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key const>>;
+        using unordered_flat_set =
+            ::uwvm2::utils::container::unordered_flat_set<Key, Hash, Pred, ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key const>>;
 
         template <typename Key, typename Val, typename Hash = ::std::hash<Key>, typename Pred = ::std::equal_to<Key>>
-        using unordered_flat_map =
-            ::uwvm2::utils::container::unordered_flat_map<Key, Val, Hash, Pred, ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>;
-    }
+        using unordered_flat_map = ::uwvm2::utils::container::
+            unordered_flat_map<Key, Val, Hash, Pred, ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>;
+    }  // namespace tlc
 }
 
 template <::std::integral char_type>

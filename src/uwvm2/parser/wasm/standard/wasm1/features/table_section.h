@@ -41,6 +41,7 @@
 # include <fast_io_dsal/vector.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
+# include <uwvm2/parser/wasm/utils/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
@@ -227,7 +228,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check table counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(++table_counter > table_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(table_counter, section_curr, err) > table_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = table_count;

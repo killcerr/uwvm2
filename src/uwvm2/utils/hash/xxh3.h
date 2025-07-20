@@ -40,7 +40,7 @@
 #if CHAR_BIT == 8
 /// @brief "XXH3 only support CHAR_BIT == 8"
 
-UWVM_MODULE_EXPORT namespace uwvm2::utils::hash 
+UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 {
     namespace details
     {
@@ -50,7 +50,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             XX3H_128
         }
 
-#if !defined(__SIZEOF_INT128__)
+# if !defined(__SIZEOF_INT128__)
         struct xxh3_128_storage_t
         {
             // For msvc, which targets little-endian, msvc does not have the uint128 extension.
@@ -59,22 +59,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             ::std::uint64_t low64;
             ::std::uint64_t high64;
         };
-#else
+# else
         using xxh3_128_storage_t = __uint128_t;
-#endif
+# endif
 
         template <xxh3_width_t Wid>
-            requires(static_cast<unsigned>(Wid) <= static_cast<unsigned>(XX3H_128))
+            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(XX3H_128))
         inline consteval auto get_xxh3_output_struct() noexcept
         {
-            if constexpr(Wid == xxh3_width_t::XX3H_64)
-            {
-                return ::std::uint_least64_t{};
-            }
-            else if constexpr(Wid == xxh3_width_t::XX3H_128)
-            {
-                return xxh3_128_storage_t{};
-            }
+            if constexpr(Wid == xxh3_width_t::XX3H_64) { return ::std::uint_least64_t{}; }
+            else if constexpr(Wid == xxh3_width_t::XX3H_128) { return xxh3_128_storage_t{}; }
         }
 
         template <xxh3_width_t Wid>
@@ -82,10 +76,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline consteval auto get_currplatform_xxh3_output_struct() noexcept
         {
-            if constexpr (sizeof(::std::size_t) > sizeof(::std::uint_least64_t))
-            {   
-                return get_xxh3_output_struct<xxh3_width_t::XX3H_128>();
-            }
+            if constexpr(sizeof(::std::size_t) > sizeof(::std::uint_least64_t)) { return get_xxh3_output_struct<xxh3_width_t::XX3H_128>(); }
             else
             {
                 return get_xxh3_output_struct<xxh3_width_t::XX3H_64>();
@@ -94,17 +85,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         using currplatform_xxh3_output_struct = decltype(get_currplatform_xxh3_output_struct());
 
-        template<typename T>
+        template <typename T>
         inline constexpr ::std::size_t to_size_t(T t) noexcept
         {
-            if constexpr (::std::same_as<T, xxh3_128_storage_t>)
+            if constexpr(::std::same_as<T, xxh3_128_storage_t>)
             {
                 ::std::size_t tmp{t.high64};
                 // Avoid ub, loop displacement
-                for (unsigned i{}; i != 64u; ++i)
-                {
-                    tmp <<= 1u;
-                }
+                for(unsigned i{}; i != 64u; ++i) { tmp <<= 1u; }
                 tmp |= t.low64;
                 return tmp;
             }
@@ -115,39 +103,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         }
 
         template <xxh3_width_t Wid>
-            requires(static_cast<unsigned>(Wid) <= static_cast<unsigned>(XX3H_128))
+            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(XX3H_128))
         struct basic_xxh3_context
         {
             using digest_t = xxh3_output_struct<Wid>;
 
-            static inline constexpr ::std::size_t digest_size{sizeof(digest_t)};
+            inline static constexpr ::std::size_t digest_size{sizeof(digest_t)};
 
-            inline constexpr void update(::std::byte const *first, ::std::byte const *last) noexcept
-            {
-                
-            }
+            inline constexpr void update(::std::byte const* first, ::std::byte const* last) noexcept {}
 
-            inline constexpr void reset() noexcept
-            {
-                
-            }
+            inline constexpr void reset() noexcept {}
 
-            inline constexpr digest_t digest_value() const noexcept
-            {
-                
-            }
+            inline constexpr digest_t digest_value() const noexcept {}
 
-            inline constexpr void do_final() const noexcept
-            {
-                
-            }
+            inline constexpr void do_final() const noexcept {}
 
-            inline constexpr void digest_to_byte_ptr(::std::byte *ptr) const noexcept
-            {
-                
-            }
+            inline constexpr void digest_to_byte_ptr(::std::byte* ptr) const noexcept {}
         };
-    }
+    }  // namespace details
 
     using xxh3_64_context = details::basic_xxh3_context<details::xxh3_width_t::XX3H_64>;
     using xxh3_128_context = details::basic_xxh3_context<details::xxh3_width_t::XX3H_128>;

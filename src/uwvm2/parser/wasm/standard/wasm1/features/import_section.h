@@ -45,6 +45,7 @@
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
+# include <uwvm2/parser/wasm/utils/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
@@ -526,7 +527,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check import counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(++import_counter > import_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(import_counter, section_curr, err) > import_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = import_count;
