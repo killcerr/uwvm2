@@ -85,8 +85,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         inline constexpr wasi_fd_unique_ptr_t() noexcept
         {
-            fd_p = wasi_fd_t_fast_io_type_allocator::allocate(1uz);
-            ::new(fd_p) wasi_fd_t{};
+            this->fd_p = wasi_fd_t_fast_io_type_allocator::allocate(1uz);
+            ::new(this->fd_p) wasi_fd_t{};
         }
 
         inline constexpr wasi_fd_unique_ptr_t(wasi_fd_unique_ptr_t const&) noexcept = delete;
@@ -102,17 +102,36 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         {
             if(::std::addressof(other) == this) [[unlikely]] { return *this; }
 
-            ::std::destroy_at(fd_p);
-            wasi_fd_t_fast_io_type_allocator::deallocate_n(fd_p, 1uz);
+            if (this->fd_p) [[likely]]
+            {
+                ::std::destroy_at(this->fd_p);
+                wasi_fd_t_fast_io_type_allocator::deallocate_n(this->fd_p, 1uz);
+            }
 
             this->fd_p = other.fd_p;
             other.fd_p = nullptr
         }
 
+        inline constexpr clear_destroy() noexcept
+        {
+            if (this->fd_p) [[likely]]
+            {
+                ::std::destroy_at(this->fd_p);
+                wasi_fd_t_fast_io_type_allocator::deallocate_n(this->fd_p, 1uz);
+                
+                this->fd_p = nullptr;
+            }
+        }
+
         inline constexpr ~wasi_fd_unique_ptr_t()
         {
-            ::std::destroy_at(fd_p);
-            wasi_fd_t_fast_io_type_allocator::deallocate_n(fd_p, 1uz);
+            if (this->fd_p) [[likely]]
+            {
+                ::std::destroy_at(this->fd_p);
+                wasi_fd_t_fast_io_type_allocator::deallocate_n(this->fd_p, 1uz);
+
+                // Multiple calls to the destructor are ub, no need to set it to nullptr here
+            }
         }
     };
 }
