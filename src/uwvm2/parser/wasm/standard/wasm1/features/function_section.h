@@ -138,6 +138,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                       section_leb_begin,
                       func_counter * sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8));
 
+        // Addition doesn't overflow here.
         functionsec.funcs.storage.typeidx_u8_vector.imp.curr_ptr += func_counter;
 
         // [typeidxbef ...] typeidx1 ... typeidx2 ...
@@ -159,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = func_count;
@@ -342,7 +343,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     // all are single bytes, so there are 16
                     // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                    ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                    ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                      static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                      section_curr,
                                                                                      err);
@@ -451,7 +452,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     else
                     {
                         // all are single bytes, so there are 16
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                             section_curr,
@@ -474,7 +475,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     }
 
 #  if !((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
-
+                    // Unable to use prefetch in sve stream mode
                     // After testing, 6 are the fastest
 
                     // View mode, have to make reservations
@@ -513,7 +514,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     {
                         // all are single bytes, so there are 64
                         // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(svc_sz),
                             section_curr,
@@ -619,7 +620,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 // all are single bytes, so there are 64
                 // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(64u),
                                                                                  section_curr,
                                                                                  err);
@@ -708,7 +709,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             else
             {
                 // all are single bytes, so there are 32
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(32u),
                                                                                  section_curr,
                                                                                  err);
@@ -799,7 +800,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             else
             {
                 // all are single bytes, so there are 16
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                  section_curr,
                                                                                  err);
@@ -967,7 +968,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                 // all are single bytes, so there are 64
                 // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                     func_counter,
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(last_load_predicate_size),
                     section_curr,
@@ -1046,7 +1047,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     // all are single bytes, so there are 'last_load_predicate_size'
                     // There is no need to staging func_counter_this_round_end, as the special case no longer exists.
-                    ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                    ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                         func_counter,
                         static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(last_load_predicate_size),
                         section_curr,
@@ -1644,7 +1645,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                         //       ^^ section_curr
 
-                        if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+                        if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
                         {
                             err.err_curr = section_curr;
                             err.err_selectable.u32 = func_count;
@@ -1702,7 +1703,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 else
                 {
                     // all are single bytes, so there are 16
-                    ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                    ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                      static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                      section_curr,
                                                                                      err);
@@ -1776,7 +1777,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                                    //       ^^ section_curr
 
-                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count)
+                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count)
                                        [[unlikely]]
                                    {
                                        err.err_curr = section_curr;
@@ -2265,7 +2266,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 64
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(64u),
                                                                                  section_curr,
                                                                                  err);
@@ -2353,7 +2354,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                                    //       ^^ section_curr
 
-                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count)
+                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count)
                                        [[unlikely]]
                                    {
                                        err.err_curr = section_curr;
@@ -2947,7 +2948,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // check func_counter before write
                         // The check is all done and the status can be changed, if it is less than the value written, then something is wrong.
 
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                             section_curr,
@@ -3590,7 +3591,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // check func_counter before write
                         // The check is all done and the status can be changed, if it is less than the value written, then something is wrong.
 
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                             section_curr,
@@ -3644,7 +3645,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 32
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(32u),
                                                                                  section_curr,
                                                                                  err);
@@ -3723,7 +3724,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                                    //       ^^ section_curr
 
-                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count)
+                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count)
                                        [[unlikely]]
                                    {
                                        err.err_curr = section_curr;
@@ -3861,7 +3862,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         check_mask_curr >>= 8u;
 
                         // check func_counter before write
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(8u),
                             section_curr,
@@ -4095,7 +4096,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // last round no necessary to check_mask_curr >>= 8u;
 
                         // check func_counter before write
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(8u),
                             section_curr,
@@ -4323,7 +4324,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 16
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                  section_curr,
                                                                                  err);
@@ -4431,7 +4432,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                     //       ^^ section_curr
 
-                    if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+                    if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
                     {
                         err.err_curr = section_curr;
                         err.err_selectable.u32 = func_count;
@@ -4489,7 +4490,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             else
             {
                 // all are single bytes, so there are 16
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                  section_curr,
                                                                                  err);
@@ -4548,7 +4549,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = func_count;
@@ -4615,7 +4616,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = func_count;
@@ -4774,7 +4775,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                         //       ^^ section_curr
 
-                        if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+                        if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
                         {
                             err.err_curr = section_curr;
                             err.err_selectable.u32 = func_count;
@@ -4834,7 +4835,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // All correct, can change state: func_counter, section_curr
 
                     // all are single bytes, so there are 16
-                    ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                    ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                      static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                      section_curr,
                                                                                      err);
@@ -4958,7 +4959,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                                    //       ^^ section_curr
 
-                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count)
+                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count)
                                        [[unlikely]]
                                    {
                                        err.err_curr = section_curr;
@@ -5441,7 +5442,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 64
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(64u),
                                                                                  section_curr,
                                                                                  err);
@@ -5674,7 +5675,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                                    //       ^^ section_curr
 
-                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count)
+                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count)
                                        [[unlikely]]
                                    {
                                        err.err_curr = section_curr;
@@ -6165,7 +6166,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // check func_counter before write
                         // The check is all done and the status can be changed, if it is less than the value written, then something is wrong.
 
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                             section_curr,
@@ -6734,7 +6735,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // check func_counter before write
                         // The check is all done and the status can be changed, if it is less than the value written, then something is wrong.
 
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                             section_curr,
@@ -6816,7 +6817,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 32
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(32u),
                                                                                  section_curr,
                                                                                  err);
@@ -6978,7 +6979,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                    // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                                    //       ^^ section_curr
 
-                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count)
+                                   if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count)
                                        [[unlikely]]
                                    {
                                        err.err_curr = section_curr;
@@ -7116,7 +7117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         check_mask_curr >>= 8u;
 
                         // check func_counter before write
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(8u),
                             section_curr,
@@ -7323,7 +7324,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // last round no necessary to check_mask_curr >>= 8u;
 
                         // check func_counter before write
-                        ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(
+                        ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(
                             func_counter,
                             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(8u),
                             section_curr,
@@ -7515,7 +7516,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 16
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                  section_curr,
                                                                                  err);
@@ -7639,7 +7640,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // [     safe    ] ... (outer) ] unsafe (could be the section_end)
                     //       ^^ section_curr
 
-                    if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+                    if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
                     {
                         err.err_curr = section_curr;
                         err.err_selectable.u32 = func_count;
@@ -7699,7 +7700,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 // All correct, can change state: func_counter, section_curr
 
                 // all are single bytes, so there are 16
-                ::uwvm2::parser::wasm::utils::counter_addass_when_overflow_throw(func_counter,
+                ::uwvm2::parser::wasm::utils::counter_addass_throw_when_overflow(func_counter,
                                                                                  static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(16u),
                                                                                  section_curr,
                                                                                  err);
@@ -7774,7 +7775,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = func_count;
@@ -7841,7 +7842,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = func_count;
@@ -7944,7 +7945,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = func_count;
@@ -8044,7 +8045,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = func_count;
@@ -8169,6 +8170,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             auto const func_counter_end{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(func_counter + 1u)};
 
+            // check overflow
             if (func_counter_end < func_counter) [[unlikely]]
             {
                 // overflow

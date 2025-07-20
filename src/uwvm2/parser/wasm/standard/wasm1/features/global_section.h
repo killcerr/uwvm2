@@ -203,7 +203,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check global counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(global_counter, section_curr, err) > global_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(global_counter, section_curr, err) > global_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = global_count;

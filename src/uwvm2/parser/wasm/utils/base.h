@@ -46,7 +46,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
 {
     /// @brief ++i, Exception thrown on overflow
     template <::std::unsigned_integral I>
-    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I counter_selfinc_when_overflow_throw(I & i,
+    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I counter_selfinc_throw_when_overflow(I & i,
                                                                                              ::std::byte const* section_curr,
                                                                                              ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
@@ -62,7 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
 
     /// @brief i + add, Exception thrown on overflow
     template <::std::unsigned_integral I>
-    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I counter_add_when_overflow_throw(I i,
+    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I counter_add_throw_when_overflow(I i,
                                                                                          I add,
                                                                                          ::std::byte const* section_curr,
                                                                                          ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
@@ -230,12 +230,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
 
     /// @brief i += add, Exception thrown on overflow
     template <::std::unsigned_integral I>
-    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I counter_addass_when_overflow_throw(I & i,
+    UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I counter_addass_throw_when_overflow(I & i,
                                                                                             I add,
                                                                                             ::std::byte const* section_curr,
                                                                                             ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
-        return i = counter_add_when_overflow_throw(i, add, section_curr, err);
+        return i = counter_add_throw_when_overflow(i, add, section_curr, err);
     }
 }
 

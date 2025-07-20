@@ -422,7 +422,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check type counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(type_counter, section_curr, err) > type_count) [[unlikely]]
+            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(type_counter, section_curr, err) > type_count) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = type_count;

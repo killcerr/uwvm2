@@ -300,13 +300,15 @@ for _, file in ipairs(os.files("test/**.cc")) do
 			add_files("src/uwvm2/uwvm/**.cppm", {public = is_debug_mode})
 		end 
 
-		if enable_cxx_module then
-			-- uwvm cmd callback
-			add_files("src/uwvm2/uwvm/cmdline/params/**.module.cpp")
-		else
-			-- uwvm cmd callback
-			add_files("src/uwvm2/uwvm/cmdline/params/**.default.cpp")
-		end
+		if false then -- Most cases do not need to use functions in cpp to speed up compilation
+			if enable_cxx_module then
+				-- uwvm cmd callback
+				add_files("src/uwvm2/uwvm/cmdline/params/**.module.cpp")
+			else
+				-- uwvm cmd callback
+				add_files("src/uwvm2/uwvm/cmdline/params/**.default.cpp")
+			end
+		end 
 
         add_files(file)
 

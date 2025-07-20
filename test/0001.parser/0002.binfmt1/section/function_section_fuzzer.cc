@@ -116,6 +116,7 @@ namespace test
 
             auto const func_counter_end{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(func_counter + 1u)};
 
+            // check overflow
             if (func_counter_end < func_counter) [[unlikely]]
             {
                 // It never happens in the use cases tested
