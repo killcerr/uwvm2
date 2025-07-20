@@ -139,7 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             inline constexpr void do_final() const noexcept
             {
-
+                
             }
 
             inline constexpr void digest_to_byte_ptr(::std::byte *ptr) const noexcept
