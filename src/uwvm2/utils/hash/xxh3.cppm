@@ -7,7 +7,6 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-29
  * @copyright   APL-2.0 License
  */
 
@@ -22,6 +21,11 @@
 
 module;
 
+// std
+# include <cstddef>
+# include <cstdint>
+# include <concepts>
+# include <bit>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
