@@ -46,7 +46,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     namespace details
     {
         inline constexpr ::fast_io::u8string_view log_verbose_alias{u8"-log-vb"};
-    }  // namespace details
+    }
 
 #if defined(__clang__)
 # pragma clang diagnostic push
@@ -61,7 +61,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif
-}  // namespace uwvm2::uwvm::cmdline::params
+}
 
 #ifndef UWVM_MODULE
 // macro

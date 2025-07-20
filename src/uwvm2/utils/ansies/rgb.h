@@ -80,5 +80,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
     {
         return details::rgb_print_reserve_impl(iter, color.r, color.g, color.b);
     }
-
-}  // namespace uwvm2::utils::ansies
+}

@@ -42,7 +42,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     namespace details
     {
         inline constexpr ::fast_io::array<::fast_io::u8string_view, 2uz> run_alias{u8"-r", u8"--"};
-    }  // namespace details
+    }
 
 #if defined(__clang__)
 # pragma clang diagnostic push
@@ -56,7 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif
-}  // namespace uwvm2::uwvm::cmdline::params
+}
 
 #ifndef UWVM_MODULE
 // macro

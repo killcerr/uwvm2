@@ -150,8 +150,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         initializer_exp offset{};
         ::uwvm2::parser::wasm::standard::wasm1::type::vec_byte init{};
     };
-
-}  // namespace uwvm2::parser::wasm::standard::wasm1::type
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
@@ -203,7 +202,7 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
     {
         inline static constexpr bool value = true;
     };
-}  // namespace fast_io::freestanding
+}
 
 #ifndef UWVM_MODULE
 // macro

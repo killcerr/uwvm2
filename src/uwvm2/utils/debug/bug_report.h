@@ -80,7 +80,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
             u8"\n\nuwvm: [info]  Please submit a bug report with version information (\"uwvm --version\") and the configuration information (\"xmake config -v\") in the issue at (https://github.com/UlteSoft/uwvm2).\n\n");
 #endif
     }
-}  // namespace uwvm2::utils::debug
+}
 
 #ifndef UWVM_MODULE
 // macro-controlled macro

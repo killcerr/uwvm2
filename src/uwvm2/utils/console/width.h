@@ -73,5 +73,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::console
 
 #endif
     }
-
-}  // namespace uwvm2::utils::ansies
+}

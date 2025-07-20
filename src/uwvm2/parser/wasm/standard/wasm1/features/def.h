@@ -697,8 +697,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>;
         requires ::std::is_union_v<decltype(ext.storage)>;
     };
-
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

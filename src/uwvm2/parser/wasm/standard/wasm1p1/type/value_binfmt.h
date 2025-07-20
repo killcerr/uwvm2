@@ -314,7 +314,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
     {
         return details::print_reserve_value_type_impl(iter, valtype);
     }
-}  // namespace uwvm2::parser::wasm::standard::wasm1p1::type
+}
 
 #ifndef UWVM_MODULE
 // macro

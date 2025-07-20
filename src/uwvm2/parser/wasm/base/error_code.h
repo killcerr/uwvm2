@@ -295,8 +295,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::std::byte const* err_curr{};
         wasm_parse_error_code err_code{};
     };
-
-}  // namespace uwvm2::parser::wasm::base
+}
 
 #ifndef UWVM_MODULE
 // macro

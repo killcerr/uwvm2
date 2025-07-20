@@ -49,8 +49,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm3::type
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64 max{};
         bool present_max{};
     };
-
-}  // namespace uwvm2::parser::wasm::standard::wasm3::type
+}
 
 #ifndef UWVM_MODULE
 // macro

@@ -138,5 +138,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
             // No need to check for error codes, can't output here, guaranteed not to affect output
         }
     }
-}  // namespace uwvm2::utils::ansies
+}
 #endif

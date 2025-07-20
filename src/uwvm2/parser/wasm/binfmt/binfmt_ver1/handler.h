@@ -575,7 +575,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             return ret;
         }
     }
-}  // namespace uwvm2::parser::wasm::binfmt::ver1
+}
 
 #ifndef UWVM_MODULE
 // macro

@@ -62,7 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 # if defined(__clang__)
 #  pragma clang diagnostic pop
 # endif
-}  // namespace uwvm2::uwvm::cmdline::params
+}
 #endif
 
 #ifndef UWVM_MODULE

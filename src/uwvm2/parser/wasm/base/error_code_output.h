@@ -632,9 +632,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
             }
         }
     }
-
-}  // namespace uwvm2::parser::wasm::base
-
+}
 #ifndef UWVM_MODULE
 // macro
 # include <uwvm2/utils/ansies/win32_text_attr_pop_macro.h>

@@ -124,5 +124,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils
     {
         return details::version_print_reserve_impl(iter, ver.x, ver.y, ver.z, ver.state);
     }
-
-}  // namespace uwvm2::utils
+}

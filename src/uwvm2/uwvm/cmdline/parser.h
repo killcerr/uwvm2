@@ -433,7 +433,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
         return parsing_return_val::def;
     }
-}  // namespace uwvm2::uwvm::cmdline
+}
 
 #ifndef UWVM_MODULE
 // macro

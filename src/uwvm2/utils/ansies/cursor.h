@@ -82,5 +82,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::ansies
     {
         return details::crs_print_reserve_impl(iter, c.cursor_var, c.feat);
     }
-
-}  // namespace uwvm2::utils::ansies
+}

@@ -229,4 +229,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::madvise
 # endif
 #endif
     }
-}  // namespace uwvm2::utils::madvise
+}

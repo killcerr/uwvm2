@@ -157,8 +157,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 #endif
         }
     };
-
-}  // namespace uwvm2::utils::debug
+}
 
 #ifndef UWVM_MODULE
 // macro-controlled macro

@@ -45,8 +45,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::proposal::relaxed_simd::value_
 #if defined(UWVM_WASM_SUPPORT_BF16)
     using wasm_bf16 = decltype(0.0bf16);
 #endif
-
-}  // namespace uwvm2::parser::wasm::proposal::relaxed_simd::value_type
+}
 
 #ifndef UWVM_MODULE
 // macro

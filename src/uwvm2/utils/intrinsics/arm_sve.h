@@ -107,5 +107,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 #  error "unsupport platform"
 
 # endif
-}  // namespace uwvm2::utils::intrinsics::arm_sve
+}
 #endif

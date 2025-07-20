@@ -148,4 +148,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
 
         return binfmt_ver;
     }
-}  // namespace uwvm2::parser::wasm::binfmt
+}

@@ -42,4 +42,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::text_format
         utf8_rfc3629,
         utf8_rfc3629_with_zero_illegal
     };
-}  // namespace uwvm2::parser::wasm::text_format
+}

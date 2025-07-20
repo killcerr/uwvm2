@@ -822,7 +822,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         define_imported_and_defined_exceeding_checker(sec_adl, final_extern_type_adl, module_storage, importsec_importdesc_begin, section_curr, err, fs_para);
 #endif
     }
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

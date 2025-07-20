@@ -1113,8 +1113,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     //////////////////////////
 
     struct wasm1_final_check;
-
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {

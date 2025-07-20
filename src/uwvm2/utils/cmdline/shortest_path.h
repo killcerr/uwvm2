@@ -105,8 +105,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 
         return ret;
     }
-
-}  // namespace uwvm2::utils::cmdline
+}
 
 #ifndef UWVM_MODULE
 // macro

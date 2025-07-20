@@ -85,7 +85,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 #ifndef UWVM_MODULE
 // macro

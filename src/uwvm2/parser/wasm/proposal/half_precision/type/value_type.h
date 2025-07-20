@@ -44,8 +44,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::proposal::half_precision::valu
 #if defined(UWVM_WASM_SUPPORT_FP16)
     using wasm_fp16 = __float16;
 #endif
-
-}  // namespace uwvm2::parser::wasm::proposal::half_precision::value_type
+}
 
 #ifndef UWVM_MODULE
 // macro

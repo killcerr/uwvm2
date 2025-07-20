@@ -255,4 +255,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
         }
     }
-}  // namespace uwvm2::utils::utf
+}

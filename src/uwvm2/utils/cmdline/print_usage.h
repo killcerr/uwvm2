@@ -98,7 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     {
         return details::usage_printer{::std::addressof(para)};
     }
-}  // namespace uwvm2::utils::cmdline
+}
 
 #ifndef UWVM_MODULE
 // macro

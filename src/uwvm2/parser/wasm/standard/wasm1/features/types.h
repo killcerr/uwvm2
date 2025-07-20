@@ -414,7 +414,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         return curr;
     }
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 #ifndef UWVM_MODULE
 // macro

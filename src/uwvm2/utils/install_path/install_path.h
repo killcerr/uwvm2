@@ -76,8 +76,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
 # endif
         return ret;
     }
-
-}  // namespace uwvm2::utils::install_path
+}
 #endif
 
 #ifndef UWVM_MODULE

@@ -3533,8 +3533,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
         return check_legal_utf8_unchecked<spec>(str_begin, str_end);
     }
-
-}  // namespace uwvm2::utils::utf
+}
 
 #ifndef UWVM_MODULE
 // macro

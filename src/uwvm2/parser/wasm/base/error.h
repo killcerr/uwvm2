@@ -54,7 +54,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 # endif
 #endif
     }
-}  // namespace uwvm2::parser::wasm::base
+}
 
 #ifndef UWVM_MODULE
 // macro

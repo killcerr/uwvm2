@@ -377,8 +377,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
     {
         preopentype_dir
     };
-
-}  // namespace uwvm2::parser::wasm::base
+}
 
 #ifndef UWVM_MODULE
 // macro

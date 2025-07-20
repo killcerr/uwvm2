@@ -160,7 +160,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // storage
         customsec.customs.push_back(::std::move(cs));
     }
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

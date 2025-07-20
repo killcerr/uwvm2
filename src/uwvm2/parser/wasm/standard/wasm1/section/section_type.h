@@ -213,7 +213,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::section
 
         ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::data_segment> datasec{};
     };
-}  // namespace uwvm2::parser::wasm::standard::wasm1::section
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
@@ -223,4 +223,4 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
     {
         inline static constexpr bool value = true;
     };
-}  // namespace fast_io::freestanding
+}

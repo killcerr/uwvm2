@@ -564,7 +564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             exportsec_exportdesc_begin[export_curr_exports_type_wasm_byte].push_back_unchecked(::std::addressof(export_curr));
         }
     }
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

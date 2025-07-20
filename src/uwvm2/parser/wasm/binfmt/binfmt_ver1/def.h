@@ -63,8 +63,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
         static_assert(::fast_io::is_tuple<::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...>>);  // check sections is tuple
     };
-
-}  // namespace uwvm2::parser::wasm::binfmt::ver1
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding

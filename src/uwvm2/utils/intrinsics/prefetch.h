@@ -119,8 +119,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
 #endif
         }
     }
-
-}  // namespace uwvm2::utils::intrinsics::universal
+}
 
 #ifndef UWVM_MODULE
 // macro

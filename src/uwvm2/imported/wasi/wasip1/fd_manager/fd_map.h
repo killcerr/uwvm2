@@ -57,9 +57,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         ::fast_io::native_mutex fds_mutex{};  // [singleton]
         ::std::size_t fd_limit{};
     };
-
-
-}  // namespace uwvm2::parser::wasm::base
+}
 
 #ifndef UWVM_MODULE
 // macro

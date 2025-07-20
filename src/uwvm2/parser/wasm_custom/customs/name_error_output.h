@@ -192,8 +192,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
             }
         }
     }
-
-}  // namespace uwvm2::parser::wasm::base
+}
 
 #ifndef UWVM_MODULE
 // macro

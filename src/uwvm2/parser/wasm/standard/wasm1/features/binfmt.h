@@ -161,7 +161,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_final_check<wasm1>);
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
-}  // namespace uwvm2::parser::wasm::standard::wasm1::features
+}
 
 #ifndef UWVM_MODULE
 // macro

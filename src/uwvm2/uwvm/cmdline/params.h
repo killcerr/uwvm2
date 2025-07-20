@@ -83,4 +83,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
     inline constexpr ::std::size_t hash_table_byte_sz{sizeof(hash_table)};
     // inline constexpr auto sizeof_hash_table{sizeof(hash_table)};
-}  // namespace uwvm2::uwvm::cmdline
+}

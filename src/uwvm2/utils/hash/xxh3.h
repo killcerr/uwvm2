@@ -33,10 +33,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
-{
-    
-}  // namespace uwvm2::utils::install_path
+UWVM_MODULE_EXPORT namespace uwvm2::utils::hash {}
 
 #ifndef UWVM_MODULE
 // macro

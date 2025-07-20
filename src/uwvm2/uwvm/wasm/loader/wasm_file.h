@@ -163,10 +163,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         // Since files are either private page mapped or memory allocated and read, they can be modified directly.
         // Prevents invalid content in non-low eight bits of char_bit not equal to 8 from causing an unknown error in the parser.
         auto const wf_wasm_file_end{wf.wasm_file.end()};
-        for (auto wf_wasm_file_curr{wf.wasm_file.begin()}; wf_wasm_file_curr != wf_wasm_file_end; ++wf_wasm_file_curr)
-        {
-            *wf_wasm_file_curr &= 0xFFu;
-        }
+        for(auto wf_wasm_file_curr{wf.wasm_file.begin()}; wf_wasm_file_curr != wf_wasm_file_end; ++wf_wasm_file_curr) { *wf_wasm_file_curr &= 0xFFu; }
 #endif
 
         switch(wf.binfmt_ver)

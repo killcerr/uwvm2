@@ -601,4 +601,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             return max_size;
         }
     }  // namespace operation
-}  // namespace uwvm2::parser::wasm::concepts
+}

@@ -195,5 +195,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         using fc_para = typename Fc::parameter;
         return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<fc_para>(fs_para.parameters);
     }
-
-}  // namespace uwvm2::parser::wasm::concepts
+}
