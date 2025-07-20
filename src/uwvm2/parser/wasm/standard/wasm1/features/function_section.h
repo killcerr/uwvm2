@@ -8166,7 +8166,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_when_overflow_throw(func_counter, section_curr, err) > func_count) [[unlikely]]
+
+            auto const func_counter_end{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(func_counter + 1u)};
+
+            if (func_counter_end < func_counter) [[unlikely]]
+            {
+                // overflow
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
+
+            func_counter = func_counter_end;
+
+            if(func_counter > func_count) [[unlikely]]
             {
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
             }

@@ -113,7 +113,19 @@ namespace test
 
             // check function counter
             // Ensure content is available before counting (section_curr != section_end)
-            if(++func_counter > func_count) [[unlikely]]
+
+            auto const func_counter_end{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(func_counter + 1u)};
+
+            if (func_counter_end < func_counter) [[unlikely]]
+            {
+                // It never happens in the use cases tested
+                print_section(section_begin, section_end);
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
+
+            func_counter = func_counter_end;
+
+            if(func_counter > func_count) [[unlikely]]
             {
                 print_section(section_begin, section_end);
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
