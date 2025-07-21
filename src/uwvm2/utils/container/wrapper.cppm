@@ -30,6 +30,7 @@ module;
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <string_view>
 // platform
 #include <bizwen/deque.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
@@ -38,6 +39,7 @@ module;
 export module uwvm2.utils.container:wrapper;
 
 import fast_io;
+import uwvm2.utils.hash;
 import :allocator;
 
 #ifndef UWVM_MODULE

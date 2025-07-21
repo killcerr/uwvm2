@@ -31,6 +31,7 @@
 # include <memory>
 # include <utility>
 # include <type_traits>
+# include <string_view>
 // platform
 # include <bizwen/deque.hpp>
 # include <boost/unordered/unordered_flat_map.hpp>
@@ -38,6 +39,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/hash/impl.h>
 # include "allocator.h"
 #endif
 
@@ -152,9 +154,14 @@ UWVM_MODULE_EXPORT struct ::std::hash<::uwvm2::utils::container::basic_string_vi
 {
     inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string_view<char_type> obj) const noexcept
     {
+#if CHAR_BIT == 8
+        // xxhash
         ::fast_io::fast_terminate();
-        /// @todo use xxhash
-        return {};
+#else
+        // use std hash
+        using strvw = ::std::basic_string_view<char_type>;
+        return ::std::hash<strvw>{}(strvw{obj});
+#endif
     }
 };
 
@@ -163,9 +170,14 @@ UWVM_MODULE_EXPORT struct ::std::hash<::uwvm2::utils::container::basic_cstring_v
 {
     inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_cstring_view<char_type> obj) const noexcept
     {
+#if CHAR_BIT == 8
+        // xxhash
         ::fast_io::fast_terminate();
-        /// @todo use xxhash
-        return {};
+#else
+        // use std hash
+        using strvw = ::std::basic_string_view<char_type>;
+        return ::std::hash<strvw>{}(strvw{obj});
+#endif
     }
 };
 
@@ -174,8 +186,13 @@ UWVM_MODULE_EXPORT struct ::std::hash<::uwvm2::utils::container::basic_string<ch
 {
     inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string<char_type, Alloc> const& obj) const noexcept
     {
+#if CHAR_BIT == 8
+        // xxhash
         ::fast_io::fast_terminate();
-        /// @todo use xxhash
-        return {};
+#else
+        // use std hash
+        using strvw = ::std::basic_string_view<char_type>;
+        return ::std::hash<strvw>{}(strvw{obj});
+#endif
     }
 };
