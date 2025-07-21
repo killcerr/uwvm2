@@ -77,10 +77,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         inline consteval auto get_currplatform_xxh3_output_struct() noexcept
         {
             if constexpr(sizeof(::std::size_t) > sizeof(::std::uint_least64_t)) { return get_xxh3_output_struct<xxh3_width_t::XX3H_128>(); }
-            else
-            {
-                return get_xxh3_output_struct<xxh3_width_t::XX3H_64>();
-            }
+            else { return get_xxh3_output_struct<xxh3_width_t::XX3H_64>(); }
         }
 
         using currplatform_xxh3_output_struct = decltype(get_currplatform_xxh3_output_struct());
@@ -96,10 +93,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 tmp |= t.low64;
                 return tmp;
             }
-            else
-            {
-                return static_cast<::std::size_t>(t);
-            }
+            else { return static_cast<::std::size_t>(t); }
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_64bits_internal(::std::byte const* __restrict input,
+                                                                    ::std::size_t len,
+                                                                    ::std::uint_least64_t seed64,
+                                                                    ::std::byte const* __restrict secret,
+                                                                    ::std::size_t secretLen)
+        {
+            constexpr ::std::size_t xxh3_secret_size_min{136uz};
+            [[assume(secretLen >= xxh3_secret_size_min)]];
+
+            /*
+             * If an action is to be taken if `secretLen` condition is not respected,
+             * it should be done here.
+             * For now, it's a contract pre-condition.
+             * Adding a check and a branch here would cost performance at every hash.
+             * Also, note that function signature doesn't offer room to return an error.
+             */
+#if 0
+            if(len <= 16uz) { return xxh3_len_0to16_64b(input, len, secret, seed64); }
+            else if(len <= 128uz) { return xxh3_len_17to128_64b(input, len, secret, secretLen, seed64); }
+            else if(len <= 140uz) { return xxh3_len_129to240_64b(input, len, secret, secretLen, seed64); }
+            else { return xxh3_hash_long(input, len, seed64, secret, secretLen); }
+#endif
         }
 
         template <xxh3_width_t Wid>
