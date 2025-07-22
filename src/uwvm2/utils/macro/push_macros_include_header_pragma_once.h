@@ -27,3 +27,4 @@
 #include <cstdint>
 #include <climits>
 #include <cstdlib>
+#include <type_traits>

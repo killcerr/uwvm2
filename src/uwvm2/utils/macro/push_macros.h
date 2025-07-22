@@ -358,7 +358,11 @@
 #if __cpp_if_consteval >= 202106L
 # define UWVM_IF_CONSTEVAL consteval
 #else
-# define UWVM_IF_CONSTEVAL (__builtin_is_constant_evaluated())
+# if UWVM_HAS_BUILTIN(__builtin_is_constant_evaluated)
+#  define UWVM_IF_CONSTEVAL (__builtin_is_constant_evaluated())
+# else
+#  define UWVM_IF_CONSTEVAL (::std::is_constant_evaluated())
+# endif
 #endif
 
 /// @brief        MSVC may not support if consteval, so macros are used to select the appropriate version.
@@ -369,7 +373,11 @@
 #if __cpp_if_consteval >= 202106L
 # define UWVM_IF_NOT_CONSTEVAL !consteval
 #else
-# define UWVM_IF_NOT_CONSTEVAL (!__builtin_is_constant_evaluated())
+# if UWVM_HAS_BUILTIN(__builtin_is_constant_evaluated)
+#  define UWVM_IF_NOT_CONSTEVAL (!__builtin_is_constant_evaluated())
+# else
+#  define UWVM_IF_NOT_CONSTEVAL (!::std::is_constant_evaluated())
+# endif
 #endif
 
 /// @brief        You can specify the may_alias type attribute for a type so that lvalues of

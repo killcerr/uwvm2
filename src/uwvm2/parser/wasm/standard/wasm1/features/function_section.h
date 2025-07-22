@@ -8171,7 +8171,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             auto const func_counter_end{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(func_counter + 1u)};
 
             // check overflow
-            if (func_counter_end < func_counter) [[unlikely]]
+            if(func_counter_end < func_counter) [[unlikely]]
             {
                 // overflow
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
@@ -8179,10 +8179,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             func_counter = func_counter_end;
 
-            if(func_counter > func_count) [[unlikely]]
-            {
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+            if(func_counter > func_count) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
 
             // [ ... typeidx1] ... typeidx2 ...
             // [     safe    ] unsafe (could be the section_end)
