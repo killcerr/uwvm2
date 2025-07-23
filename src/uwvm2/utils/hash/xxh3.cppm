@@ -24,14 +24,17 @@ module;
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <bit>
+# include <limits>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.utils.hash:xxh3;
 
 import fast_io;
+import uwvm2.utils.intrinsics;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

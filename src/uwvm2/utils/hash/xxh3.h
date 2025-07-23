@@ -25,12 +25,15 @@
 // std
 # include <cstddef>
 # include <cstdint>
+# include <cstring>
 # include <concepts>
 # include <bit>
+# include <limits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/intrinsics/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -77,7 +80,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         inline consteval auto get_currplatform_xxh3_output_struct() noexcept
         {
             if constexpr(sizeof(::std::size_t) > sizeof(::std::uint_least64_t)) { return get_xxh3_output_struct<xxh3_width_t::XX3H_128>(); }
-            else { return get_xxh3_output_struct<xxh3_width_t::XX3H_64>(); }
+            else
+            {
+                return get_xxh3_output_struct<xxh3_width_t::XX3H_64>();
+            }
         }
 
         using currplatform_xxh3_output_struct = decltype(get_currplatform_xxh3_output_struct());
@@ -93,14 +99,597 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 tmp |= t.low64;
                 return tmp;
             }
-            else { return static_cast<::std::size_t>(t); }
+            else
+            {
+                return static_cast<::std::size_t>(t);
+            }
+        }
+
+        inline constexpr ::std::uint_least8_t xxh_read8(::std::byte const* ptr) noexcept
+        {
+            if UWVM_IF_CONSTEVAL
+            {
+                auto res{::std::to_integer<::std::uint_least8_t>(*ptr)};
+                res &= 0xFFu;
+                return res;
+            }
+            else
+            {
+# if CHAR_BIT != 8
+                auto res{::std::to_integer<::std::uint_least8_t>(*ptr)};
+                res &= 0xFFu;
+                return res;
+# else
+                ::std::uint8_t res;
+                ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint8_t));
+                return res;
+# endif
+            }
+        }
+
+        inline constexpr ::std::uint_least16_t xxh_readLE16(::std::byte const* ptr) noexcept
+        {
+            if UWVM_IF_CONSTEVAL
+            {
+                ::std::uint_least16_t res{};
+                unsigned shf{};
+                for(unsigned i{}; i != 2u; ++i)
+                {
+                    auto curr{::std::to_integer<::std::uint_least16_t>(ptr[i])};
+                    curr &= 0xFFu;
+
+                    res |= curr << shf;
+                    shf += 8u;
+                }
+                return res;
+            }
+            else
+            {
+# if CHAR_BIT != 8
+                ::std::uint_least16_t res{};
+                unsigned shf{};
+                for(unsigned i{}; i != 2u; ++i)
+                {
+                    auto curr{::std::to_integer<::std::uint_least16_t>(ptr[i])};
+                    curr &= 0xFFu;
+
+                    res |= curr << shf;
+                    shf += 8u;
+                }
+                return res;
+# else
+                ::std::uint16_t res;
+                ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint16_t));
+                return ::fast_io::little_endian(res);
+# endif
+            }
+        }
+
+        inline constexpr ::std::uint_least32_t xxh_readLE32(::std::byte const* ptr) noexcept
+        {
+            if UWVM_IF_CONSTEVAL
+            {
+                ::std::uint_least32_t res{};
+                unsigned shf{};
+                for(unsigned i{}; i != 4u; ++i)
+                {
+                    auto curr{::std::to_integer<::std::uint_least32_t>(ptr[i])};
+                    curr &= 0xFFu;
+
+                    res |= curr << shf;
+                    shf += 8u;
+                }
+                return res;
+            }
+            else
+            {
+# if CHAR_BIT != 8
+                ::std::uint_least32_t res{};
+                unsigned shf{};
+                for(unsigned i{}; i != 4u; ++i)
+                {
+                    auto curr{::std::to_integer<::std::uint_least32_t>(ptr[i])};
+                    curr &= 0xFFu;
+
+                    res |= curr << shf;
+                    shf += 8u;
+                }
+                return res;
+# else
+                ::std::uint32_t res;
+                ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint32_t));
+                return ::fast_io::little_endian(res);
+# endif
+            }
+        }
+
+        inline constexpr ::std::uint_least64_t xxh_readLE64(::std::byte const* ptr) noexcept
+        {
+            if UWVM_IF_CONSTEVAL
+            {
+                ::std::uint_least64_t res{};
+                unsigned shf{};
+                for(unsigned i{}; i != 8u; ++i)
+                {
+                    auto curr{::std::to_integer<::std::uint_least64_t>(ptr[i])};
+                    curr &= 0xFFu;
+
+                    res |= curr << shf;
+                    shf += 8u;
+                }
+                return res;
+            }
+            else
+            {
+# if CHAR_BIT != 8
+                ::std::uint_least64_t res{};
+                unsigned shf{};
+                for(unsigned i{}; i != 8u; ++i)
+                {
+                    auto curr{::std::to_integer<::std::uint_least64_t>(ptr[i])};
+                    curr &= 0xFFu;
+
+                    res |= curr << shf;
+                    shf += 8u;
+                }
+                return res;
+# else
+                ::std::uint64_t res;
+                ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint64_t));
+                return ::fast_io::little_endian(res);
+# endif
+            }
+        }
+
+        inline constexpr ::std::uint_least32_t xxh_prime32_1{0x9E3779B1U}; /*!< 0b10011110001101110111100110110001 */
+        inline constexpr ::std::uint_least32_t xxh_prime32_2{0x85EBCA77U}; /*!< 0b10000101111010111100101001110111 */
+        inline constexpr ::std::uint_least32_t xxh_prime32_3{0xC2B2AE3DU}; /*!< 0b11000010101100101010111000111101 */
+        inline constexpr ::std::uint_least32_t xxh_prime32_4{0x27D4EB2FU}; /*!< 0b00100111110101001110101100101111 */
+        inline constexpr ::std::uint_least32_t xxh_prime32_5{0x165667B1U}; /*!< 0b00010110010101100110011110110001 */
+
+        inline constexpr ::std::uint_least64_t xxh_prime64_1{0x9E3779B185EBCA87ULL}; /*!< 0b1001111000110111011110011011000110000101111010111100101010000111 */
+        inline constexpr ::std::uint_least64_t xxh_prime64_2{0xC2B2AE3D27D4EB4FULL}; /*!< 0b1100001010110010101011100011110100100111110101001110101101001111 */
+        inline constexpr ::std::uint_least64_t xxh_prime64_3{0x165667B19E3779F9ULL}; /*!< 0b0001011001010110011001111011000110011110001101110111100111111001 */
+        inline constexpr ::std::uint_least64_t xxh_prime64_4{0x85EBCA77C2B2AE63ULL}; /*!< 0b1000010111101011110010100111011111000010101100101010111001100011 */
+        inline constexpr ::std::uint_least64_t xxh_prime64_5{0x27D4EB2F165667C5ULL}; /*!< 0b0010011111010100111010110010111100010110010101100110011111000101 */
+
+        inline constexpr ::std::uint_least64_t prime_mx1{0x165667919E3779F9ULL}; /*!< 0b0001011001010110011001111001000110011110001101110111100111111001 */
+        inline constexpr ::std::uint_least64_t prime_mx2{0x9FB21C651E98DF25ULL}; /*!< 0b1001111110110010000111000110010100011110100110001101111100100101 */
+
+        inline constexpr ::std::uint_least64_t xxh64_avalanche(::std::uint_least64_t hash) noexcept
+        {
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            hash ^= hash >> 33u;
+            hash *= xxh_prime64_2;
+            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu }
+            hash ^= hash >> 29u;
+            hash *= xxh_prime64_3;
+            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu }
+            hash ^= hash >> 32u;
+
+            return hash;
+        }
+
+        inline constexpr ::std::uint_least64_t xxh_xorshift64(::std::uint_least64_t val, unsigned shf) noexcept
+        {
+            [[assume(0u <= shf && shf < 64u)]];
+
+            return val ^ (val >> shf);
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_avalanche(::std::uint_least64_t hash) noexcept
+        {
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            hash = xxh_xorshift64(hash, 37u);
+            hash *= prime_mx1;
+            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu }
+            hash = xxh_xorshift64(hash, 32u);
+            return hash;
+        }
+
+        inline constexpr xxh_rotl64(::std::uint_least64_t val, unsigned shf) noexcept
+        {
+            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits == 64) { return ::std::rotl(val, static_cast<int>(shf)); }
+            else
+            {
+                constexpr unsigned bits{64u};
+                unsigned const s{shf & (bits - 1u)};
+                return ((val << s) & 0xFFFF'FFFF'FFFF'FFFFu) | ((val & 0xFFFF'FFFF'FFFF'FFFFu) >> (bits - s));
+            }
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_rrmxmx(::std::uint_least64_t h64, ::std::uint_least64_t len) noexcept
+        {
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            /* this mix is inspired by Pelle Evensen's rrmxmx */
+            h64 ^= xxh_rotl64(h64, 49u) ^ xxh_rotl64(h64, 24u);
+            h64 *= prime_mx2;
+            if constexpr(dig64 != 64) { h64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            h64 ^= (h64 >> 35u) + len;
+            h64 *= prime_mx2;
+            if constexpr(dig64 != 64) { h64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            return xxh_xorshift64(h64, 28u);
+        }
+
+        inline constexpr ::std::uint_least16_t xxh_swap16(::std::uint_least16_t val) noexcept
+        {
+            constexpr auto dig16{::std::numberic_limit<::std::uint_least16_t>::digits};
+
+            if constexpr(dig16 == 16) { return ::fast_io::byte_swap(val); }
+            else
+            {
+                ::std::uint_least16_t res{};
+                res |= (val & 0xFF00u) >> 8u;
+                res |= (val & 0x00FFu) << 8u;
+                return res;
+            }
+        }
+
+        inline constexpr ::std::uint_least32_t xxh_swap32(::std::uint_least32_t val) noexcept
+        {
+            constexpr auto dig32{::std::numberic_limit<::std::uint_least32_t>::digits};
+
+            if constexpr(dig32 == 32) { return ::fast_io::byte_swap(val); }
+            else
+            {
+                ::std::uint_least32_t res{};
+                res |= (val & 0xFF00'0000u) >> 24u;
+                res |= (val & 0x00FF'0000u) >> 8u;
+                res |= (val & 0x0000'FF00u) << 8u;
+                res |= (val & 0x0000'00FFu) << 24u;
+                return res;
+            }
+        }
+
+        inline constexpr ::std::uint_least64_t xxh_swap64(::std::uint_least64_t val) noexcept
+        {
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 == 64) { return ::fast_io::byte_swap(val); }
+            else
+            {
+                ::std::uint_least64_t res{};
+                res |= (val & 0xFF00'0000'0000'0000u) >> 56u;
+                res |= (val & 0x00FF'0000'0000'0000u) >> 40u;
+                res |= (val & 0x0000'FF00'0000'0000u) >> 24u;
+                res |= (val & 0x0000'00FF'0000'0000u) >> 8u;
+                res |= (val & 0x0000'0000'FF00'0000u) << 8u;
+                res |= (val & 0x0000'0000'00FF'0000u) << 24u;
+                res |= (val & 0x0000'0000'0000'FF00u) << 40u;
+                res |= (val & 0x0000'0000'0000'00FFu) << 56u;
+                return res;
+            }
+        }
+
+        inline constexpr ::std::uint_least64_t
+            xxh3_mix16B(::std::byte cosnt* __restrict input, ::std::byte const* __restrict secret, ::std::uint_least64_t seed64) noexcept
+        {
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 != 64) { seed64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            ::std::uint_least64_t const input_lo{xxh_readLE64(input)};
+            ::std::uint_least64_t const input_hi{xxh_readLE64(input + 8u)};
+            ::std::uint_least64_t f1{input_lo ^ (xxh_readLE64(secret) + seed64)};
+
+            if constexpr(dig64 != 64) { f1 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            ::std::uint_least64_t f2{input_hi ^ (xxh_readLE64(secret + 8u) - seed64)};
+
+            if constexpr(dig64 != 64) { f2 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            return xxh3_mul128_fold64(f1, f2);
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_mul128_fold64(::std::uint_least64_t a, ::std::uint_least64_t b) noexcept
+        {
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 == 64)
+            {
+                ::std::uint_least64_t h;
+                auto const l{::fast_io::intrinsics::umul(a, b, h)};
+                return l ^ h;
+            }
+            else
+            {
+# ifdef __SIZEOF_INT128__
+                __uint128_t const res{static_cast<__uint128_t>(a) * static_cast<__uint128_t>(b)};
+                auto const l{static_cast<::std::uint_least64_t>(res) & 0xFFFF'FFFF'FFFF'FFFFu};
+                auto const h{static_cast<::std::uint_least64_t>(res >> 64u) & 0xFFFF'FFFF'FFFF'FFFFu};
+                return l ^ h;
+# else
+                ::std::uint_least64_t const a_lo{a & 0xFFFF'FFFFu};
+                ::std::uint_least64_t const a_hi{(a >> 32u) & 0xFFFF'FFFFu};
+                ::std::uint_least64_t const b_lo{b & 0xFFFF'FFFFu};
+                ::std::uint_least64_t const b_hi{(b >> 32u) & 0xFFFF'FFFFu};
+
+                ::std::uint_least64_t const p0{a_lo * b_lo};
+                ::std::uint_least64_t const p1{a_lo * b_hi};
+                ::std::uint_least64_t const p2{a_hi * b_lo};
+                ::std::uint_least64_t const p3{a_hi * b_hi};
+
+                ::std::uint_least64_t const mid = (p0 >> 32u) + (p1 & 0xFFFF'FFFFu) + (p2 & 0xFFFF'FFFFu);
+                ::std::uint_least64_t const low = (p0 & 0xFFFF'FFFFu) | ((mid << 32u) & 0xFFFF'FFFF'FFFF'FFFFu);
+
+                ::std::uint_least64_t const high = p3 + (p1 >> 32u) + (p2 >> 32u) + (mid >> 32u);
+
+                return low ^ high;
+# endif
+            }
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_mix2_accs(::std::uint_least64_t const* __restrict acc,
+                                                              ::std::uint_least8_t __restrict const secret) noexcept
+        {
+            return xxh3_mul128_fold64(acc[0u] ^ xxh_readLE64(secret), acc[1u] ^ xxh_readLE64(secret + 8u));
+        }
+
+        inline constexpr ::std::uint_least64_t
+            xxh3_merge_accs(::std::uint_least64_t const* __restrict acc, ::std::uint_least8_t __restrict const secret, ::std::uint_least64_t start) noexcept
+        {
+            ::std::uint_least64_t result64{start};
+            for(unsigned i{}; i != 4u; ++i) { result64 += xxh3_mix2_accs(acc + 2u * i, secret + 16u * i); }
+
+            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits != 64) { result64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            return xxh3_avalanche(result64);
+        }
+
+        inline constexpr ::std::uint_least64_t
+            xxh3_finalize_long_64b(::std::uint_least64_t const* __restrict acc, ::std::byte const* __restrict secret, ::std::uint_least64_t len) noexcept
+        {
+            auto start{len * xxh_prime64_1};
+
+            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits != 64) { start &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            return xxh3_merge_accs(acc, secret + 11u, start);
+        }
+
+        inline constexpr ::std::uint_least64_t
+            xxh3_len_1to3_64b(::std::byte const* __restrict input, ::std::size_t len, ::std::byte const* __restrict secret, ::std::uint_least64_t seed) noexcept
+        {
+            [[assume(input != nullptr)]];
+            [[assume(1uz <= len && len <= 3uz)]];
+            [[assume(secret != nullptr)]];
+
+            constexpr auto dig32{::std::numberic_limit<::std::uint_least32_t>::digits};
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            /*
+             * len = 1: combined = { input[0], 0x01, input[0], input[0] }
+             * len = 2: combined = { input[1], 0x02, input[0], input[1] }
+             * len = 3: combined = { input[2], 0x03, input[0], input[1] }
+             */
+
+            if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            auto const c1{xxh_read8(input)};
+            auto const c2{xxh_read8(input + (len >> 1u))};
+            auto const c3{xxh_read8(input + (len - 1u))};
+            auto const combined{static_cast<::std::uint_least32_t>((static_cast<::std::uint_least32_t>(c1) << 16u) |
+                                                                   (static_cast<::std::uint_least32_t>(c2) << 24u) | static_cast<::std::uint_least32_t>(c3) |
+                                                                   (static_cast<::std::uint_least32_t>(len) << 8u))};
+            auto const bitflip{static_cast<::std::uint_least64_t>((xxh_readLE32(secret) ^ xxh_readLE32(secret + 4u)) + seed)};
+            if constexpr(dig64 != 64) { bitflip &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            auto const keyed{static_cast<::std::uint_least64_t>(static_cast<::std::uint_least64_t>(combined) ^ bitflip)};
+            return xxh64_avalanche(keyed);
+        }
+
+        inline constexpr ::std::uint_least64_t
+            xxh3_len_4to8_64b(::std::byte const* __restrict input, ::std::size_t len, ::std::byte const* __restrict secret, ::std::uint_least64_t seed) noexcept
+        {
+            [[assume(input != nullptr)]];
+            [[assume(secret != nullptr)]];
+            [[assume(4uz <= len && len <= 8uz)]];
+
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            seed ^= static_cast<::std::uint_least64_t>(xxh_swap32(static_cast<::std::uint_least32_t>(seed))) << 32u;
+
+            ::std::uint_least32_t const input1{xxh_readLE32(input)};
+            ::std::uint_least32_t const input2{xxh_readLE32(input + (len - 4u))};
+            ::std::uint_least64_t const bitflip{(xxh_readLE64(secret + 8u) ^ xxh_readLE64(secret + 16u)) - seed};
+            if constexpr(dig64 != 64) { bitflip &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            ::std::uint_least64_t const input64{input2 + ((static_cast<::std::uint_least64_t>(input1)) << 32u)};
+            ::std::uint_least64_t const keyed{input64 ^ bitflip};
+            return xxh3_rrmxmx(keyed, len);
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_len_9to16_64b(::std::byte const* __restrict input,
+                                                                  ::std::size_t len,
+                                                                  ::std::byte const* __restrict secret,
+                                                                  ::std::uint_least64_t seed) noexcept
+        {
+            [[assume(input != nullptr)]];
+            [[assume(secret != nullptr)]];
+            [[assume(9uz <= len && len <= 16uz)]];
+
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            ::std::uint_least64_t const bitflip1{(xxh_readLE64(secret + 24u) ^ xxh_readLE64(secret + 32u)) + seed};
+            if constexpr(dig64 != 64) { bitflip1 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            ::std::uint_least64_t const bitflip2{(xxh_readLE64(secret + 40u) ^ xxh_readLE64(secret + 48u)) - seed};
+            if constexpr(dig64 != 64) { bitflip2 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            ::std::uint_least64_t const input_lo{xxh_readLE64(input) ^ bitflip1};
+            ::std::uint_least64_t const input_hi{xxh_readLE64(input + (len - 8u)) ^ bitflip2};
+            ::std::uint_least64_t const acc{len + xxh_swap64(input_lo) + input_hi + xxh3_mul128_fold64(input_lo, input_hi)};
+            if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            return xxh3_avalanche(acc);
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_len_0to16_64b(::std::byte const* __restrict input,
+                                                                  ::std::size_t len,
+                                                                  ::std::byte const* __restrict secret,
+                                                                  ::std::uint_least64_t seed64) noexcept
+        {
+            [[assume(len <= 16uz)]];
+            if(len > 8uz) { return xxh3_len_9to16_64b(input, len, secret, seed); }
+            else if(len >= 4uz) { return xxh3_len_4to8_64b(input, len, secret, seed); }
+            else if(len) { return xxh3_len_1to3_64b(input, len, secret, seed); }
+            else
+            {
+                return xxh64_avalanche(seed ^ (xxh_readLE64(secret + 56u) ^ xxh_readLE64(secret + 64u)));
+            }
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_len_17to128_64b(::std::byte const* __restrict input,
+                                                                    ::std::size_t len,
+                                                                    ::std::byte const* __restrict secret,
+                                                                    [[maybe_unused]] ::std::size_t secretLen,
+                                                                    ::std::uint_least64_t seed) noexcept
+        {
+            [[assume(secretLen >= 136uz)]];
+            [[assume(16uz < len && len <= 128uz)]];
+
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            ::std::uint_least64_t acc{len * xxh_prime64_1};
+
+            if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            if(len > 32uz)
+            {
+                if(len > 64uz)
+                {
+                    if(len > 96uz)
+                    {
+                        acc += xxh3_mix16B(input + 48u, secret + 96u, seed);
+                        acc += xxh3_mix16B(input + (len - 64uz), secret + 112u, seed);
+                    }
+                    acc += xxh3_mix16B(input + 32u, secret + 64u, seed);
+                    acc += xxh3_mix16B(input + (len - 48uz), secret + 80u, seed);
+                }
+                acc += xxh3_mix16B(input + 16u, secret + 32u, seed);
+                acc += xxh3_mix16B(input + (len - 32uz), secret + 48u, seed);
+            }
+            acc += xxh3_mix16B(input, secret, seed);
+            acc += xxh3_mix16B(input + (len - 16uz), secret + 16u, seed);
+            if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            return xxh3_avalanche(acc);
+        }
+
+        inline constexpr ::std::uint_least64_t XXH3_len_17to128_64b(::std::byte const* __restrict input,
+                                                                    ::std::size_t len,
+                                                                    ::std::byte const* __restrict secret,
+                                                                    [[maybe_unused]] ::std::size_t secretSize,
+                                                                    ::std::uint_least64_t seed) noexcept
+        {
+            [[assume(secretSize >= 136uz)]];
+            [[assume(16uz < len && len <= 128uz)]];
+
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            ::std::uint_least64_t acc{len * xxh_prime64_1};
+            if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            if(len > 32uz)
+            {
+                if(len > 64uz)
+                {
+                    if(len > 96uz)
+                    {
+                        acc += xxh3_mix16B(input + 48u, secret + 96u, seed);
+                        acc += xxh3_mix16B(input + (len - 64uz), secret + 112u, seed);
+                    }
+                    acc += xxh3_mix16B(input + 32u, secret + 64u, seed);
+                    acc += xxh3_mix16B(input + (len - 48uz), secret + 80u, seed);
+                }
+                acc += xxh3_mix16B(input + 16u, secret + 32u, seed);
+                acc += xxh3_mix16B(input + (len - 32uz), secret + 48u, seed);
+            }
+            acc += xxh3_mix16B(input, secret, seed);
+            acc += xxh3_mix16B(input + (len - 16uz), secret + 16u, seed);
+            if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            return xxh3_avalanche(acc);
+        }
+
+        inline constexpr void
+            xxh3_accumulate_512(::std::byte* __restrict acc, ::std::byte const* __restrict input, ::std::byte const* __restrict secret) noexcept
+        {
+            /// @todo simd
+        }
+
+        inline constexpr void xxh3_scramble_acc(::std::uint_least64_t* __restrict acc, ::std::byte const* __restrict secret) noexcept
+        {
+            /// @todo simd
+        }
+
+        inline constexpr void xxh3_accumulate(::std::uint_least64_t* __restrict acc,
+                                              ::std::byte const* __restrict input,
+                                              ::std::byte const* __restrict secret,
+                                              ::std::size_t nbStripes) noexcept
+        {
+            for(::std::size_t n{}; n != nbStripes; ++n)
+            {
+                ::std::byte const* const in{input + n * 64uz};
+                ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
+                                                                ::uwvm2::utils::intrinsics::universal::pfc_level::L1,
+                                                                ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
+# ifdef __AVX512F__
+                    in + 512u
+# else
+                    in + 384u
+# endif
+                );
+
+                xxh3_accumulate_512(acc, in, secret + 8u);
+            }
+        }
+
+        inline constexpr ::std::uint_least64_t xxh3_hash_long_64bits_internal(::std::byte const* __restrict input,
+                                                                              ::std::size_t len,
+                                                                              ::std::byte const* __restrict secret,
+                                                                              ::std::size_t secretSize) noexcept
+        {
+# if __has_cpp_attribute(__gnu__::__aligned__)
+            [[__gnu__::__aligned__(64uz)]]
+# elif defined(_MSC_VER) && !defined(__clang__)
+            __declspec(align(64uz))
+# else
+            alignas(64uz)
+# endif
+            ::std::uint_least64_t
+                acc[8uz]{xxh_prime32_3, xxh_prime64_1, xxh_prime64_2, xxh_prime64_3, xxh_prime64_4, xxh_prime32_2, xxh_prime64_5, xxh_prime32_1};
+            static_assert(sizeof(acc) == 64uz);
+
+            ::std::size_t const nbStripesPerBlock{(secretSize - 64uz) / 8uz};
+            ::std::size_t const block_len{64uz * nbStripesPerBlock};
+            ::std::size_t const nb_blocks{(len - 1uz) / block_len};
+
+            for(::std::size_t n{}; n < nb_blocks; ++n)
+            {
+                xxh3_accumulate(acc, input + n * block_len, secret, nbStripesPerBlock);
+                xxh3_scramble_acc(acc, secret + (secretSize - 64uz));
+            }
+
+            ::std::size_t const nbStripes{((len - 1uz) - (block_len * nb_blocks)) / 64uz};
+
+            xxh3_accumulate(acc, input + nb_blocks * block_len, secret, nbStripes);
+
+            /* last stripe */
+            ::std::byte const* const p{input + (len - 64uz)};
+
+            xxh3_accumulate_512(acc, p, secret + (secretSize - 64uz - 7uz));
+
+            return xxh3_finalize_long_64b(acc, secret, len);
         }
 
         inline constexpr ::std::uint_least64_t xxh3_64bits_internal(::std::byte const* __restrict input,
                                                                     ::std::size_t len,
                                                                     ::std::uint_least64_t seed64,
                                                                     ::std::byte const* __restrict secret,
-                                                                    ::std::size_t secretLen)
+                                                                    ::std::size_t secretLen) noexcept
         {
             constexpr ::std::size_t xxh3_secret_size_min{136uz};
             [[assume(secretLen >= xxh3_secret_size_min)]];
@@ -112,12 +701,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
              * Adding a check and a branch here would cost performance at every hash.
              * Also, note that function signature doesn't offer room to return an error.
              */
-#if 0
             if(len <= 16uz) { return xxh3_len_0to16_64b(input, len, secret, seed64); }
             else if(len <= 128uz) { return xxh3_len_17to128_64b(input, len, secret, secretLen, seed64); }
-            else if(len <= 140uz) { return xxh3_len_129to240_64b(input, len, secret, secretLen, seed64); }
-            else { return xxh3_hash_long(input, len, seed64, secret, secretLen); }
-#endif
+            else if(len <= 240uz) { return xxh3_len_129to240_64b(input, len, secret, secretLen, seed64); }
+            else
+            {
+                return xxh3_hash_long_64bits_internal(input, len, secret, secretLen);
+            }
         }
 
         template <xxh3_width_t Wid>

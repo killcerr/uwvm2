@@ -287,6 +287,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     }
                 }
             }
+
             return {str_curr, ::uwvm2::utils::utf::utf_error_code::success};
         }
         else
