@@ -40,9 +40,6 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-#if CHAR_BIT == 8
-/// @brief "XXH3 only support CHAR_BIT == 8"
-
 UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 {
     namespace details
@@ -733,7 +730,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
     using xxh3_64_context = details::basic_xxh3_context<details::xxh3_width_t::XX3H_64>;
     using xxh3_128_context = details::basic_xxh3_context<details::xxh3_width_t::XX3H_128>;
 }
-#endif
 
 #ifndef UWVM_MODULE
 // macro
