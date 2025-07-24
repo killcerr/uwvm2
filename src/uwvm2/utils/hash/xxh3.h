@@ -237,6 +237,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #endif
             }
         }
+#if __has_cpp_attribute(__gnu__::__aligned__)
+        [[__gnu__::__aligned__(64uz)]]
+#elif defined(_MSC_VER) && !defined(__clang__)
+        __declspec(align(64uz))
+#else
+        alignas(64uz)
+#endif
+        inline constexpr ::std::byte xxh3_kSecret[192u]{
+            0xb8, 0xfe, 0x6c, 0x39, 0x23, 0xa4, 0x4b, 0xbe, 0x7c, 0x01, 0x81, 0x2c, 0xf7, 0x21, 0xad, 0x1c, 0xde, 0xd4, 0x6d, 0xe9, 0x83, 0x90, 0x97, 0xdb,
+            0x72, 0x40, 0xa4, 0xa4, 0xb7, 0xb3, 0x67, 0x1f, 0xcb, 0x79, 0xe6, 0x4e, 0xcc, 0xc0, 0xe5, 0x78, 0x82, 0x5a, 0xd0, 0x7d, 0xcc, 0xff, 0x72, 0x21,
+            0xb8, 0x08, 0x46, 0x74, 0xf7, 0x43, 0x24, 0x8e, 0xe0, 0x35, 0x90, 0xe6, 0x81, 0x3a, 0x26, 0x4c, 0x3c, 0x28, 0x52, 0xbb, 0x91, 0xc3, 0x00, 0xcb,
+            0x88, 0xd0, 0x65, 0x8b, 0x1b, 0x53, 0x2e, 0xa3, 0x71, 0x64, 0x48, 0x97, 0xa2, 0x0d, 0xf9, 0x4e, 0x38, 0x19, 0xef, 0x46, 0xa9, 0xde, 0xac, 0xd8,
+            0xa8, 0xfa, 0x76, 0x3f, 0xe3, 0x9c, 0x34, 0x3f, 0xf9, 0xdc, 0xbb, 0xc7, 0xc7, 0x0b, 0x4f, 0x1d, 0x8a, 0x51, 0xe0, 0x4b, 0xcd, 0xb4, 0x59, 0x31,
+            0xc8, 0x9f, 0x7e, 0xc9, 0xd9, 0x78, 0x73, 0x64, 0xea, 0xc5, 0xac, 0x83, 0x34, 0xd3, 0xeb, 0xc3, 0xc5, 0x81, 0xa0, 0xff, 0xfa, 0x13, 0x63, 0xeb,
+            0x17, 0x0d, 0xdd, 0x51, 0xb7, 0xf0, 0xda, 0x49, 0xd3, 0x16, 0x55, 0x26, 0x29, 0xd4, 0x68, 0x9e, 0x2b, 0x16, 0xbe, 0x58, 0x7d, 0x47, 0xa1, 0xfc,
+            0x8f, 0xf8, 0xb8, 0xd1, 0x7a, 0xd0, 0x31, 0xce, 0x45, 0xcb, 0x3a, 0x8f, 0x95, 0x16, 0x04, 0x28, 0xaf, 0xd7, 0xfb, 0xca, 0xbb, 0x4b, 0x40, 0x7e};
 
         inline constexpr ::std::uint_least32_t xxh_prime32_1{0x9E3779B1U}; /*!< 0b10011110001101110111100110110001 */
         inline constexpr ::std::uint_least32_t xxh_prime32_2{0x85EBCA77U}; /*!< 0b10000101111010111100101001110111 */
@@ -361,26 +377,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
         }
 
-        inline constexpr ::std::uint_least64_t
-            xxh3_mix16B(::std::byte const* __restrict input, ::std::byte const* __restrict secret, ::std::uint_least64_t seed64) noexcept
-        {
-            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
-
-            if constexpr(dig64 != 64) { seed64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
-
-            ::std::uint_least64_t const input_lo{xxh_readLE64(input)};
-            ::std::uint_least64_t const input_hi{xxh_readLE64(input + 8u)};
-            ::std::uint_least64_t f1{input_lo ^ (xxh_readLE64(secret) + seed64)};
-
-            if constexpr(dig64 != 64) { f1 &= 0xFFFF'FFFF'FFFF'FFFFu; }
-
-            ::std::uint_least64_t f2{input_hi ^ (xxh_readLE64(secret + 8u) - seed64)};
-
-            if constexpr(dig64 != 64) { f2 &= 0xFFFF'FFFF'FFFF'FFFFu; }
-
-            return xxh3_mul128_fold64(f1, f2);
-        }
-
         inline constexpr ::std::uint_least64_t xxh3_mul128_fold64(::std::uint_least64_t a, ::std::uint_least64_t b) noexcept
         {
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
@@ -409,14 +405,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ::std::uint_least64_t const p2{a_hi * b_lo};
                 ::std::uint_least64_t const p3{a_hi * b_hi};
 
-                ::std::uint_least64_t const mid = (p0 >> 32u) + (p1 & 0xFFFF'FFFFu) + (p2 & 0xFFFF'FFFFu);
-                ::std::uint_least64_t const low = (p0 & 0xFFFF'FFFFu) | ((mid << 32u) & 0xFFFF'FFFF'FFFF'FFFFu);
+                ::std::uint_least64_t const mid{(p0 >> 32u) + (p1 & 0xFFFF'FFFFu) + (p2 & 0xFFFF'FFFFu)};
+                ::std::uint_least64_t const low{(p0 & 0xFFFF'FFFFu) | ((mid << 32u) & 0xFFFF'FFFF'FFFF'FFFFu)};
 
-                ::std::uint_least64_t const high = p3 + (p1 >> 32u) + (p2 >> 32u) + (mid >> 32u);
+                ::std::uint_least64_t const high{p3 + (p1 >> 32u) + (p2 >> 32u) + (mid >> 32u)};
 
                 return low ^ high;
 #endif
             }
+        }
+
+        inline constexpr ::std::uint_least64_t
+            xxh3_mix16B(::std::byte const* __restrict input, ::std::byte const* __restrict secret, ::std::uint_least64_t seed64) noexcept
+        {
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
+
+            if constexpr(dig64 != 64) { seed64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            ::std::uint_least64_t const input_lo{xxh_readLE64(input)};
+            ::std::uint_least64_t const input_hi{xxh_readLE64(input + 8u)};
+            ::std::uint_least64_t f1{input_lo ^ (xxh_readLE64(secret) + seed64)};
+
+            if constexpr(dig64 != 64) { f1 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            ::std::uint_least64_t f2{input_hi ^ (xxh_readLE64(secret + 8u) - seed64)};
+
+            if constexpr(dig64 != 64) { f2 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            return xxh3_mul128_fold64(f1, f2);
         }
 
         inline constexpr ::std::uint_least64_t xxh3_mix2_accs(::std::uint_least64_t const* __restrict acc, :: : std::byte const* __restrict secret) noexcept
@@ -682,7 +698,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #endif
                 );
 
-                xxh3_accumulate_512(reinterpret_cast<::std::byte*>(acc), in, secret + 8u);
+                xxh3_accumulate_512(reinterpret_cast<::std::byte*>(acc), in, secret + n * 8uz);
             }
         }
 
@@ -709,7 +725,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             for(::std::size_t n{}; n < nb_blocks; ++n)
             {
                 xxh3_accumulate(acc, input + n * block_len, secret, nbStripesPerBlock);
-                xxh3_scramble_acc(acc, secret + (secretSize - 64uz));
+                xxh3_scramble_acc(reinterpret_cast<::std : byte*>(acc), secret + (secretSize - 64uz));
             }
 
             ::std::size_t const nbStripes{((len - 1uz) - (block_len * nb_blocks)) / 64uz};
@@ -719,7 +735,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             /* last stripe */
             ::std::byte const* const p{input + (len - 64uz)};
 
-            xxh3_accumulate_512(acc, p, secret + (secretSize - 64uz - 7uz));
+            xxh3_accumulate_512(reinterpret_cast<::std : byte*>(acc), p, secret + (secretSize - 64uz - 7uz));
 
             return xxh3_finalize_long_64b(acc, secret, len);
         }
