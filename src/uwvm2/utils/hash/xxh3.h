@@ -48,9 +48,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         {
             XX3H_64,
             XX3H_128
-        }
+        };
 
-# if !defined(__SIZEOF_INT128__)
+#if !defined(__SIZEOF_INT128__)
         struct xxh3_128_storage_t
         {
             // For msvc, which targets little-endian, msvc does not have the uint128 extension.
@@ -59,12 +59,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             ::std::uint64_t low64;
             ::std::uint64_t high64;
         };
-# else
+#else
         using xxh3_128_storage_t = __uint128_t;
-# endif
+#endif
 
         template <xxh3_width_t Wid>
-            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(XX3H_128))
+            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(xxh3_width_t::XX3H_128))
         inline consteval auto get_xxh3_output_struct() noexcept
         {
             if constexpr(Wid == xxh3_width_t::XX3H_64) { return ::std::uint_least64_t{}; }
@@ -112,15 +112,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-# if CHAR_BIT != 8
+#if CHAR_BIT != 8
                 auto res{::std::to_integer<::std::uint_least8_t>(*ptr)};
                 res &= 0xFFu;
                 return res;
-# else
+#else
                 ::std::uint8_t res;
                 ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint8_t));
                 return res;
-# endif
+#endif
             }
         }
 
@@ -142,7 +142,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-# if CHAR_BIT != 8
+#if CHAR_BIT != 8
                 ::std::uint_least16_t res{};
                 unsigned shf{};
                 for(unsigned i{}; i != 2u; ++i)
@@ -154,11 +154,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     shf += 8u;
                 }
                 return res;
-# else
+#else
                 ::std::uint16_t res;
                 ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint16_t));
                 return ::fast_io::little_endian(res);
-# endif
+#endif
             }
         }
 
@@ -180,7 +180,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-# if CHAR_BIT != 8
+#if CHAR_BIT != 8
                 ::std::uint_least32_t res{};
                 unsigned shf{};
                 for(unsigned i{}; i != 4u; ++i)
@@ -192,11 +192,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     shf += 8u;
                 }
                 return res;
-# else
+#else
                 ::std::uint32_t res;
                 ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint32_t));
                 return ::fast_io::little_endian(res);
-# endif
+#endif
             }
         }
 
@@ -218,7 +218,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-# if CHAR_BIT != 8
+#if CHAR_BIT != 8
                 ::std::uint_least64_t res{};
                 unsigned shf{};
                 for(unsigned i{}; i != 8u; ++i)
@@ -230,11 +230,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     shf += 8u;
                 }
                 return res;
-# else
+#else
                 ::std::uint64_t res;
                 ::std::memcpy(::std::addressof(res), ptr, sizeof(::std::uint64_t));
                 return ::fast_io::little_endian(res);
-# endif
+#endif
             }
         }
 
@@ -255,14 +255,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least64_t xxh64_avalanche(::std::uint_least64_t hash) noexcept
         {
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             hash ^= hash >> 33u;
             hash *= xxh_prime64_2;
-            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu }
+            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu; }
             hash ^= hash >> 29u;
             hash *= xxh_prime64_3;
-            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu }
+            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu; }
             hash ^= hash >> 32u;
 
             return hash;
@@ -277,18 +277,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least64_t xxh3_avalanche(::std::uint_least64_t hash) noexcept
         {
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             hash = xxh_xorshift64(hash, 37u);
             hash *= prime_mx1;
-            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu }
+            if constexpr(dig64 != 64) { hash &= 0xFFFF'FFFF'FFFF'FFFFu; }
             hash = xxh_xorshift64(hash, 32u);
             return hash;
         }
 
-        inline constexpr xxh_rotl64(::std::uint_least64_t val, unsigned shf) noexcept
+        inline constexpr ::std::uint_least64_t xxh_rotl64(::std::uint_least64_t val, unsigned shf) noexcept
         {
-            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits == 64) { return ::std::rotl(val, static_cast<int>(shf)); }
+            if constexpr(::std::numeric_limits<::std::uint_least64_t>::digits == 64) { return ::std::rotl(val, static_cast<int>(shf)); }
             else
             {
                 constexpr unsigned bits{64u};
@@ -299,7 +299,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least64_t xxh3_rrmxmx(::std::uint_least64_t h64, ::std::uint_least64_t len) noexcept
         {
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             /* this mix is inspired by Pelle Evensen's rrmxmx */
             h64 ^= xxh_rotl64(h64, 49u) ^ xxh_rotl64(h64, 24u);
@@ -313,7 +313,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least16_t xxh_swap16(::std::uint_least16_t val) noexcept
         {
-            constexpr auto dig16{::std::numberic_limit<::std::uint_least16_t>::digits};
+            constexpr auto dig16{::std::numeric_limits<::std::uint_least16_t>::digits};
 
             if constexpr(dig16 == 16) { return ::fast_io::byte_swap(val); }
             else
@@ -327,7 +327,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least32_t xxh_swap32(::std::uint_least32_t val) noexcept
         {
-            constexpr auto dig32{::std::numberic_limit<::std::uint_least32_t>::digits};
+            constexpr auto dig32{::std::numeric_limits<::std::uint_least32_t>::digits};
 
             if constexpr(dig32 == 32) { return ::fast_io::byte_swap(val); }
             else
@@ -343,7 +343,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least64_t xxh_swap64(::std::uint_least64_t val) noexcept
         {
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             if constexpr(dig64 == 64) { return ::fast_io::byte_swap(val); }
             else
@@ -362,9 +362,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         }
 
         inline constexpr ::std::uint_least64_t
-            xxh3_mix16B(::std::byte cosnt* __restrict input, ::std::byte const* __restrict secret, ::std::uint_least64_t seed64) noexcept
+            xxh3_mix16B(::std::byte const* __restrict input, ::std::byte const* __restrict secret, ::std::uint_least64_t seed64) noexcept
         {
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             if constexpr(dig64 != 64) { seed64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
 
@@ -383,7 +383,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least64_t xxh3_mul128_fold64(::std::uint_least64_t a, ::std::uint_least64_t b) noexcept
         {
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             if constexpr(dig64 == 64)
             {
@@ -393,12 +393,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-# ifdef __SIZEOF_INT128__
+#ifdef __SIZEOF_INT128__
                 __uint128_t const res{static_cast<__uint128_t>(a) * static_cast<__uint128_t>(b)};
                 auto const l{static_cast<::std::uint_least64_t>(res) & 0xFFFF'FFFF'FFFF'FFFFu};
                 auto const h{static_cast<::std::uint_least64_t>(res >> 64u) & 0xFFFF'FFFF'FFFF'FFFFu};
                 return l ^ h;
-# else
+#else
                 ::std::uint_least64_t const a_lo{a & 0xFFFF'FFFFu};
                 ::std::uint_least64_t const a_hi{(a >> 32u) & 0xFFFF'FFFFu};
                 ::std::uint_least64_t const b_lo{b & 0xFFFF'FFFFu};
@@ -415,23 +415,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ::std::uint_least64_t const high = p3 + (p1 >> 32u) + (p2 >> 32u) + (mid >> 32u);
 
                 return low ^ high;
-# endif
+#endif
             }
         }
 
-        inline constexpr ::std::uint_least64_t xxh3_mix2_accs(::std::uint_least64_t const* __restrict acc,
-                                                              ::std::uint_least8_t __restrict const secret) noexcept
+        inline constexpr ::std::uint_least64_t xxh3_mix2_accs(::std::uint_least64_t const* __restrict acc, :: : std::byte const* __restrict secret) noexcept
         {
             return xxh3_mul128_fold64(acc[0u] ^ xxh_readLE64(secret), acc[1u] ^ xxh_readLE64(secret + 8u));
         }
 
         inline constexpr ::std::uint_least64_t
-            xxh3_merge_accs(::std::uint_least64_t const* __restrict acc, ::std::uint_least8_t __restrict const secret, ::std::uint_least64_t start) noexcept
+            xxh3_merge_accs(::std::uint_least64_t const* __restrict acc, ::std::byte const* __restrict secret, ::std::uint_least64_t start) noexcept
         {
             ::std::uint_least64_t result64{start};
             for(unsigned i{}; i != 4u; ++i) { result64 += xxh3_mix2_accs(acc + 2u * i, secret + 16u * i); }
 
-            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits != 64) { result64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            if constexpr(::std::numeric_limits<::std::uint_least64_t>::digits != 64) { result64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
 
             return xxh3_avalanche(result64);
         }
@@ -441,15 +440,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         {
             auto start{len * xxh_prime64_1};
 
-            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits != 64) { start &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            if constexpr(::std::numeric_limits<::std::uint_least64_t>::digits != 64) { start &= 0xFFFF'FFFF'FFFF'FFFFu; }
 
             return xxh3_merge_accs(acc, secret + 11u, start);
         }
 
-        inline constexpr ::std::uint_least64_t xxh_mult32to64_add64(::std::uint_least64_t lhs, ::std::uint_least64_t rhs, ::std::uint_least64_t acc)noexcept
+        inline constexpr ::std::uint_least64_t xxh_mult32to64_add64(::std::uint_least64_t lhs, ::std::uint_least64_t rhs, ::std::uint_least64_t acc) noexcept
         {
             auto res{(lhs & 0xFFFF'FFFFu) * (rhs & 0xFFFF'FFFFu) + acc};
-            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits != 64) { res &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            if constexpr(::std::numeric_limits<::std::uint_least64_t>::digits != 64) { res &= 0xFFFF'FFFF'FFFF'FFFFu; }
             return res;
         }
 
@@ -460,8 +459,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             [[assume(1uz <= len && len <= 3uz)]];
             [[assume(secret != nullptr)]];
 
-            constexpr auto dig32{::std::numberic_limit<::std::uint_least32_t>::digits};
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig32{::std::numeric_limits<::std::uint_least32_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             /*
              * len = 1: combined = { input[0], 0x01, input[0], input[0] }
@@ -477,7 +476,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             auto const combined{static_cast<::std::uint_least32_t>((static_cast<::std::uint_least32_t>(c1) << 16u) |
                                                                    (static_cast<::std::uint_least32_t>(c2) << 24u) | static_cast<::std::uint_least32_t>(c3) |
                                                                    (static_cast<::std::uint_least32_t>(len) << 8u))};
-            auto const bitflip{static_cast<::std::uint_least64_t>((xxh_readLE32(secret) ^ xxh_readLE32(secret + 4u)) + seed)};
+            auto bitflip{static_cast<::std::uint_least64_t>((xxh_readLE32(secret) ^ xxh_readLE32(secret + 4u)) + seed)};
             if constexpr(dig64 != 64) { bitflip &= 0xFFFF'FFFF'FFFF'FFFFu; }
             auto const keyed{static_cast<::std::uint_least64_t>(static_cast<::std::uint_least64_t>(combined) ^ bitflip)};
             return xxh64_avalanche(keyed);
@@ -490,7 +489,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             [[assume(secret != nullptr)]];
             [[assume(4uz <= len && len <= 8uz)]];
 
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
 
@@ -498,7 +497,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             ::std::uint_least32_t const input1{xxh_readLE32(input)};
             ::std::uint_least32_t const input2{xxh_readLE32(input + (len - 4u))};
-            ::std::uint_least64_t const bitflip{(xxh_readLE64(secret + 8u) ^ xxh_readLE64(secret + 16u)) - seed};
+            ::std::uint_least64_t bitflip{(xxh_readLE64(secret + 8u) ^ xxh_readLE64(secret + 16u)) - seed};
             if constexpr(dig64 != 64) { bitflip &= 0xFFFF'FFFF'FFFF'FFFFu; }
             ::std::uint_least64_t const input64{input2 + ((static_cast<::std::uint_least64_t>(input1)) << 32u)};
             ::std::uint_least64_t const keyed{input64 ^ bitflip};
@@ -514,17 +513,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             [[assume(secret != nullptr)]];
             [[assume(9uz <= len && len <= 16uz)]];
 
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
 
-            ::std::uint_least64_t const bitflip1{(xxh_readLE64(secret + 24u) ^ xxh_readLE64(secret + 32u)) + seed};
+            ::std::uint_least64_t bitflip1{(xxh_readLE64(secret + 24u) ^ xxh_readLE64(secret + 32u)) + seed};
             if constexpr(dig64 != 64) { bitflip1 &= 0xFFFF'FFFF'FFFF'FFFFu; }
-            ::std::uint_least64_t const bitflip2{(xxh_readLE64(secret + 40u) ^ xxh_readLE64(secret + 48u)) - seed};
+            ::std::uint_least64_t bitflip2{(xxh_readLE64(secret + 40u) ^ xxh_readLE64(secret + 48u)) - seed};
             if constexpr(dig64 != 64) { bitflip2 &= 0xFFFF'FFFF'FFFF'FFFFu; }
             ::std::uint_least64_t const input_lo{xxh_readLE64(input) ^ bitflip1};
             ::std::uint_least64_t const input_hi{xxh_readLE64(input + (len - 8u)) ^ bitflip2};
-            ::std::uint_least64_t const acc{len + xxh_swap64(input_lo) + input_hi + xxh3_mul128_fold64(input_lo, input_hi)};
+            ::std::uint_least64_t acc{len + xxh_swap64(input_lo) + input_hi + xxh3_mul128_fold64(input_lo, input_hi)};
             if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
             return xxh3_avalanche(acc);
         }
@@ -532,7 +531,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         inline constexpr ::std::uint_least64_t xxh3_len_0to16_64b(::std::byte const* __restrict input,
                                                                   ::std::size_t len,
                                                                   ::std::byte const* __restrict secret,
-                                                                  ::std::uint_least64_t seed64) noexcept
+                                                                  ::std::uint_least64_t seed) noexcept
         {
             [[assume(len <= 16uz)]];
             if(len > 8uz) { return xxh3_len_9to16_64b(input, len, secret, seed); }
@@ -553,7 +552,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             [[assume(secretLen >= 136uz)]];
             [[assume(16uz < len && len <= 128uz)]];
 
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
 
@@ -582,40 +581,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             return xxh3_avalanche(acc);
         }
 
-        inline constexpr ::std::uint_least64_t XXH3_len_17to128_64b(::std::byte const* __restrict input,
-                                                                    ::std::size_t len,
-                                                                    ::std::byte const* __restrict secret,
-                                                                    [[maybe_unused]] ::std::size_t secretSize,
-                                                                    ::std::uint_least64_t seed) noexcept
+        inline constexpr ::std::uint_least64_t xxh3_len_129to240_64b(::std::byte const* __restrict input,
+                                                                     ::std::size_t len,
+                                                                     ::std::byte const* __restrict secret,
+                                                                     [[maybe_unused]] ::std::size_t secretSize,
+                                                                     ::std::uint_least64_t seed) noexcept
         {
             [[assume(secretSize >= 136uz)]];
-            [[assume(16uz < len && len <= 128uz)]];
+            [[assume(128uz < len && len <= 240uz)]];
 
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
-
             ::std::uint_least64_t acc{len * xxh_prime64_1};
-            if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
-            if(len > 32uz)
-            {
-                if(len > 64uz)
-                {
-                    if(len > 96uz)
-                    {
-                        acc += xxh3_mix16B(input + 48u, secret + 96u, seed);
-                        acc += xxh3_mix16B(input + (len - 64uz), secret + 112u, seed);
-                    }
-                    acc += xxh3_mix16B(input + 32u, secret + 64u, seed);
-                    acc += xxh3_mix16B(input + (len - 48uz), secret + 80u, seed);
-                }
-                acc += xxh3_mix16B(input + 16u, secret + 32u, seed);
-                acc += xxh3_mix16B(input + (len - 32uz), secret + 48u, seed);
-            }
-            acc += xxh3_mix16B(input, secret, seed);
-            acc += xxh3_mix16B(input + (len - 16uz), secret + 16u, seed);
-            if constexpr(dig64 != 64) { acc &= 0xFFFF'FFFF'FFFF'FFFFu; }
-            return xxh3_avalanche(acc);
+            unsigned const nbRounds{static_cast<unsigned>(len) / 16u};
+            for(unsigned i{}; i < 8u; ++i) { acc += xxh3_mix16B(input + (16u * i), secret + (16u * i), seed); }
+            /* last bytes */
+            ::std::uint_least64_t acc_end{xxh3_mix16B(input + (len - 16u), secret + (136u - 17u), seed)};
+
+            acc = xxh3_avalanche(acc);
+
+            for(unsigned i{8u}; i < nbRounds; ++i) { acc_end += xxh3_mix16B(input + (16u * i), secret + ((16u * (i - 8u)) + 3u), seed); }
+            return xxh3_avalanche(acc + acc_end);
         }
 
         inline constexpr void
@@ -624,18 +611,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__) && 0
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
+    ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_asx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
 #else
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             using UWVM_GNU_MAY_ALIAS uint_least64_t_may_alias_ptr = ::std::uint_least64_t*;
             auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc)};
-            for (::std::size_t i{}; i != 8uz; ++i)
+            for(::std::size_t i{}; i != 8uz; ++i)
             {
                 auto const data_val{xxh_readLE64(input + i * 8uz)};
                 auto const data_key{data_val ^ xxh_readLE64(secret + i * 8uz)};
@@ -651,18 +639,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__) && 0
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
+    ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_asx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
 #else
-            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             using UWVM_GNU_MAY_ALIAS uint_least64_t_may_alias_ptr = ::std::uint_least64_t*;
             auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc)};
-            for (::std::size_t i{}; i != 8uz; ++i)
+            for(::std::size_t i{}; i != 8uz; ++i)
             {
                 auto const key64{xxh_readLE64(secret + i * 8uz)};
                 auto acc64{xacc[i]};
@@ -686,14 +675,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L1,
                                                                 ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
-# ifdef __AVX512F__
+#ifdef __AVX512F__
                     in + 512u
-# else
+#else
                     in + 384u
-# endif
+#endif
                 );
 
-                xxh3_accumulate_512(reinterpret_cast<::std::byte const*>(acc), in, secret + 8u);
+                xxh3_accumulate_512(reinterpret_cast<::std::byte*>(acc), in, secret + 8u);
             }
         }
 
@@ -702,13 +691,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                                                               ::std::byte const* __restrict secret,
                                                                               ::std::size_t secretSize) noexcept
         {
-# if __has_cpp_attribute(__gnu__::__aligned__)
+#if __has_cpp_attribute(__gnu__::__aligned__)
             [[__gnu__::__aligned__(64uz)]]
-# elif defined(_MSC_VER) && !defined(__clang__)
+#elif defined(_MSC_VER) && !defined(__clang__)
             __declspec(align(64uz))
-# else
+#else
             alignas(64uz)
-# endif
+#endif
             ::std::uint_least64_t
                 acc[8uz]{xxh_prime32_3, xxh_prime64_1, xxh_prime64_2, xxh_prime64_3, xxh_prime64_4, xxh_prime32_2, xxh_prime64_5, xxh_prime32_1};
             static_assert(sizeof(acc) == 64uz);
@@ -761,7 +750,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         }
 
         template <xxh3_width_t Wid>
-            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(XX3H_128))
+            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(Xxxh3_width_t::X3H_128))
         struct basic_xxh3_context
         {
             using digest_t = xxh3_output_struct<Wid>;
