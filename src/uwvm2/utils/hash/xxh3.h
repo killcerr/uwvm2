@@ -446,6 +446,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             return xxh3_merge_accs(acc, secret + 11u, start);
         }
 
+        inline constexpr ::std::uint_least64_t xxh_mult32to64_add64(::std::uint_least64_t lhs, ::std::uint_least64_t rhs, ::std::uint_least64_t acc)noexcept
+        {
+            auto res{(lhs & 0xFFFF'FFFFu) * (rhs & 0xFFFF'FFFFu) + acc};
+            if constexpr(::std::numberic_limit<::std::uint_least64_t>::digits != 64) { res &= 0xFFFF'FFFF'FFFF'FFFFu; }
+            return res;
+        }
+
         inline constexpr ::std::uint_least64_t
             xxh3_len_1to3_64b(::std::byte const* __restrict input, ::std::size_t len, ::std::byte const* __restrict secret, ::std::uint_least64_t seed) noexcept
         {
@@ -614,12 +621,58 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         inline constexpr void
             xxh3_accumulate_512(::std::byte* __restrict acc, ::std::byte const* __restrict input, ::std::byte const* __restrict secret) noexcept
         {
-            /// @todo simd
+#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_asx) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
+#else
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            using UWVM_GNU_MAY_ALIAS uint_least64_t_may_alias_ptr = ::std::uint_least64_t*;
+            auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc)};
+            for (::std::size_t i{}; i != 8uz; ++i)
+            {
+                auto const data_val{xxh_readLE64(input + i * 8uz)};
+                auto const data_key{data_val ^ xxh_readLE64(secret + i * 8uz)};
+                xacc[i ^ 1u] += data_val;
+                if constexpr(dig64 != 64) { xacc[i ^ 1u] &= 0xFFFF'FFFF'FFFF'FFFFu; }
+                xacc[i] = xxh_mult32to64_add64(data_key, data_key >> 32u, xacc[i]);
+            }
+#endif
         }
 
-        inline constexpr void xxh3_scramble_acc(::std::uint_least64_t* __restrict acc, ::std::byte const* __restrict secret) noexcept
+        inline constexpr void xxh3_scramble_acc(::std::byte* __restrict acc, ::std::byte const* __restrict secret) noexcept
         {
-            /// @todo simd
+#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_asx) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
+#else
+            constexpr auto dig64{::std::numberic_limit<::std::uint_least64_t>::digits};
+
+            using UWVM_GNU_MAY_ALIAS uint_least64_t_may_alias_ptr = ::std::uint_least64_t*;
+            auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc)};
+            for (::std::size_t i{}; i != 8uz; ++i)
+            {
+                auto const key64{xxh_readLE64(secret + i * 8uz)};
+                auto acc64{xacc[i]};
+                acc64 = xxh_xorshift64(acc64, 47u);
+                acc64 ^= key64;
+                acc64 *= xxh_prime32_1;
+                if constexpr(dig64 != 64) { acc64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+                xacc[i] = acc64;
+            }
+#endif
         }
 
         inline constexpr void xxh3_accumulate(::std::uint_least64_t* __restrict acc,
@@ -640,7 +693,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # endif
                 );
 
-                xxh3_accumulate_512(acc, in, secret + 8u);
+                xxh3_accumulate_512(reinterpret_cast<::std::byte const*>(acc), in, secret + 8u);
             }
         }
 
