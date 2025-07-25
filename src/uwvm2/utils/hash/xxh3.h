@@ -237,6 +237,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #endif
             }
         }
+
 #if __has_cpp_attribute(__gnu__::__aligned__)
         [[__gnu__::__aligned__(64uz)]]
 #elif defined(_MSC_VER) && !defined(__clang__)
@@ -245,14 +246,54 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         alignas(64uz)
 #endif
         inline constexpr ::std::byte xxh3_kSecret[192u]{
-            0xb8, 0xfe, 0x6c, 0x39, 0x23, 0xa4, 0x4b, 0xbe, 0x7c, 0x01, 0x81, 0x2c, 0xf7, 0x21, 0xad, 0x1c, 0xde, 0xd4, 0x6d, 0xe9, 0x83, 0x90, 0x97, 0xdb,
-            0x72, 0x40, 0xa4, 0xa4, 0xb7, 0xb3, 0x67, 0x1f, 0xcb, 0x79, 0xe6, 0x4e, 0xcc, 0xc0, 0xe5, 0x78, 0x82, 0x5a, 0xd0, 0x7d, 0xcc, 0xff, 0x72, 0x21,
-            0xb8, 0x08, 0x46, 0x74, 0xf7, 0x43, 0x24, 0x8e, 0xe0, 0x35, 0x90, 0xe6, 0x81, 0x3a, 0x26, 0x4c, 0x3c, 0x28, 0x52, 0xbb, 0x91, 0xc3, 0x00, 0xcb,
-            0x88, 0xd0, 0x65, 0x8b, 0x1b, 0x53, 0x2e, 0xa3, 0x71, 0x64, 0x48, 0x97, 0xa2, 0x0d, 0xf9, 0x4e, 0x38, 0x19, 0xef, 0x46, 0xa9, 0xde, 0xac, 0xd8,
-            0xa8, 0xfa, 0x76, 0x3f, 0xe3, 0x9c, 0x34, 0x3f, 0xf9, 0xdc, 0xbb, 0xc7, 0xc7, 0x0b, 0x4f, 0x1d, 0x8a, 0x51, 0xe0, 0x4b, 0xcd, 0xb4, 0x59, 0x31,
-            0xc8, 0x9f, 0x7e, 0xc9, 0xd9, 0x78, 0x73, 0x64, 0xea, 0xc5, 0xac, 0x83, 0x34, 0xd3, 0xeb, 0xc3, 0xc5, 0x81, 0xa0, 0xff, 0xfa, 0x13, 0x63, 0xeb,
-            0x17, 0x0d, 0xdd, 0x51, 0xb7, 0xf0, 0xda, 0x49, 0xd3, 0x16, 0x55, 0x26, 0x29, 0xd4, 0x68, 0x9e, 0x2b, 0x16, 0xbe, 0x58, 0x7d, 0x47, 0xa1, 0xfc,
-            0x8f, 0xf8, 0xb8, 0xd1, 0x7a, 0xd0, 0x31, 0xce, 0x45, 0xcb, 0x3a, 0x8f, 0x95, 0x16, 0x04, 0x28, 0xaf, 0xd7, 0xfb, 0xca, 0xbb, 0x4b, 0x40, 0x7e};
+            static_cast<::std::byte>(0xb8), static_cast<::std::byte>(0xfe), static_cast<::std::byte>(0x6c), static_cast<::std::byte>(0x39),
+            static_cast<::std::byte>(0x23), static_cast<::std::byte>(0xa4), static_cast<::std::byte>(0x4b), static_cast<::std::byte>(0xbe),
+            static_cast<::std::byte>(0x7c), static_cast<::std::byte>(0x01), static_cast<::std::byte>(0x81), static_cast<::std::byte>(0x2c),
+            static_cast<::std::byte>(0xf7), static_cast<::std::byte>(0x21), static_cast<::std::byte>(0xad), static_cast<::std::byte>(0x1c),
+            static_cast<::std::byte>(0xde), static_cast<::std::byte>(0xd4), static_cast<::std::byte>(0x6d), static_cast<::std::byte>(0xe9),
+            static_cast<::std::byte>(0x83), static_cast<::std::byte>(0x90), static_cast<::std::byte>(0x97), static_cast<::std::byte>(0xdb),
+            static_cast<::std::byte>(0x72), static_cast<::std::byte>(0x40), static_cast<::std::byte>(0xa4), static_cast<::std::byte>(0xa4),
+            static_cast<::std::byte>(0xb7), static_cast<::std::byte>(0xb3), static_cast<::std::byte>(0x67), static_cast<::std::byte>(0x1f),
+            static_cast<::std::byte>(0xcb), static_cast<::std::byte>(0x79), static_cast<::std::byte>(0xe6), static_cast<::std::byte>(0x4e),
+            static_cast<::std::byte>(0xcc), static_cast<::std::byte>(0xc0), static_cast<::std::byte>(0xe5), static_cast<::std::byte>(0x78),
+            static_cast<::std::byte>(0x82), static_cast<::std::byte>(0x5a), static_cast<::std::byte>(0xd0), static_cast<::std::byte>(0x7d),
+            static_cast<::std::byte>(0xcc), static_cast<::std::byte>(0xff), static_cast<::std::byte>(0x72), static_cast<::std::byte>(0x21),
+            static_cast<::std::byte>(0xb8), static_cast<::std::byte>(0x08), static_cast<::std::byte>(0x46), static_cast<::std::byte>(0x74),
+            static_cast<::std::byte>(0xf7), static_cast<::std::byte>(0x43), static_cast<::std::byte>(0x24), static_cast<::std::byte>(0x8e),
+            static_cast<::std::byte>(0xe0), static_cast<::std::byte>(0x35), static_cast<::std::byte>(0x90), static_cast<::std::byte>(0xe6),
+            static_cast<::std::byte>(0x81), static_cast<::std::byte>(0x3a), static_cast<::std::byte>(0x26), static_cast<::std::byte>(0x4c),
+            static_cast<::std::byte>(0x3c), static_cast<::std::byte>(0x28), static_cast<::std::byte>(0x52), static_cast<::std::byte>(0xbb),
+            static_cast<::std::byte>(0x91), static_cast<::std::byte>(0xc3), static_cast<::std::byte>(0x00), static_cast<::std::byte>(0xcb),
+            static_cast<::std::byte>(0x88), static_cast<::std::byte>(0xd0), static_cast<::std::byte>(0x65), static_cast<::std::byte>(0x8b),
+            static_cast<::std::byte>(0x1b), static_cast<::std::byte>(0x53), static_cast<::std::byte>(0x2e), static_cast<::std::byte>(0xa3),
+            static_cast<::std::byte>(0x71), static_cast<::std::byte>(0x64), static_cast<::std::byte>(0x48), static_cast<::std::byte>(0x97),
+            static_cast<::std::byte>(0xa2), static_cast<::std::byte>(0x0d), static_cast<::std::byte>(0xf9), static_cast<::std::byte>(0x4e),
+            static_cast<::std::byte>(0x38), static_cast<::std::byte>(0x19), static_cast<::std::byte>(0xef), static_cast<::std::byte>(0x46),
+            static_cast<::std::byte>(0xa9), static_cast<::std::byte>(0xde), static_cast<::std::byte>(0xac), static_cast<::std::byte>(0xd8),
+            static_cast<::std::byte>(0xa8), static_cast<::std::byte>(0xfa), static_cast<::std::byte>(0x76), static_cast<::std::byte>(0x3f),
+            static_cast<::std::byte>(0xe3), static_cast<::std::byte>(0x9c), static_cast<::std::byte>(0x34), static_cast<::std::byte>(0x3f),
+            static_cast<::std::byte>(0xf9), static_cast<::std::byte>(0xdc), static_cast<::std::byte>(0xbb), static_cast<::std::byte>(0xc7),
+            static_cast<::std::byte>(0xc7), static_cast<::std::byte>(0x0b), static_cast<::std::byte>(0x4f), static_cast<::std::byte>(0x1d),
+            static_cast<::std::byte>(0x8a), static_cast<::std::byte>(0x51), static_cast<::std::byte>(0xe0), static_cast<::std::byte>(0x4b),
+            static_cast<::std::byte>(0xcd), static_cast<::std::byte>(0xb4), static_cast<::std::byte>(0x59), static_cast<::std::byte>(0x31),
+            static_cast<::std::byte>(0xc8), static_cast<::std::byte>(0x9f), static_cast<::std::byte>(0x7e), static_cast<::std::byte>(0xc9),
+            static_cast<::std::byte>(0xd9), static_cast<::std::byte>(0x78), static_cast<::std::byte>(0x73), static_cast<::std::byte>(0x64),
+            static_cast<::std::byte>(0xea), static_cast<::std::byte>(0xc5), static_cast<::std::byte>(0xac), static_cast<::std::byte>(0x83),
+            static_cast<::std::byte>(0x34), static_cast<::std::byte>(0xd3), static_cast<::std::byte>(0xeb), static_cast<::std::byte>(0xc3),
+            static_cast<::std::byte>(0xc5), static_cast<::std::byte>(0x81), static_cast<::std::byte>(0xa0), static_cast<::std::byte>(0xff),
+            static_cast<::std::byte>(0xfa), static_cast<::std::byte>(0x13), static_cast<::std::byte>(0x63), static_cast<::std::byte>(0xeb),
+            static_cast<::std::byte>(0x17), static_cast<::std::byte>(0x0d), static_cast<::std::byte>(0xdd), static_cast<::std::byte>(0x51),
+            static_cast<::std::byte>(0xb7), static_cast<::std::byte>(0xf0), static_cast<::std::byte>(0xda), static_cast<::std::byte>(0x49),
+            static_cast<::std::byte>(0xd3), static_cast<::std::byte>(0x16), static_cast<::std::byte>(0x55), static_cast<::std::byte>(0x26),
+            static_cast<::std::byte>(0x29), static_cast<::std::byte>(0xd4), static_cast<::std::byte>(0x68), static_cast<::std::byte>(0x9e),
+            static_cast<::std::byte>(0x2b), static_cast<::std::byte>(0x16), static_cast<::std::byte>(0xbe), static_cast<::std::byte>(0x58),
+            static_cast<::std::byte>(0x7d), static_cast<::std::byte>(0x47), static_cast<::std::byte>(0xa1), static_cast<::std::byte>(0xfc),
+            static_cast<::std::byte>(0x8f), static_cast<::std::byte>(0xf8), static_cast<::std::byte>(0xb8), static_cast<::std::byte>(0xd1),
+            static_cast<::std::byte>(0x7a), static_cast<::std::byte>(0xd0), static_cast<::std::byte>(0x31), static_cast<::std::byte>(0xce),
+            static_cast<::std::byte>(0x45), static_cast<::std::byte>(0xcb), static_cast<::std::byte>(0x3a), static_cast<::std::byte>(0x8f),
+            static_cast<::std::byte>(0x95), static_cast<::std::byte>(0x16), static_cast<::std::byte>(0x04), static_cast<::std::byte>(0x28),
+            static_cast<::std::byte>(0xaf), static_cast<::std::byte>(0xd7), static_cast<::std::byte>(0xfb), static_cast<::std::byte>(0xca),
+            static_cast<::std::byte>(0xbb), static_cast<::std::byte>(0x4b), static_cast<::std::byte>(0x40), static_cast<::std::byte>(0x7e)};
 
         inline constexpr ::std::uint_least32_t xxh_prime32_1{0x9E3779B1U}; /*!< 0b10011110001101110111100110110001 */
         inline constexpr ::std::uint_least32_t xxh_prime32_2{0x85EBCA77U}; /*!< 0b10000101111010111100101001110111 */
@@ -435,7 +476,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             return xxh3_mul128_fold64(f1, f2);
         }
 
-        inline constexpr ::std::uint_least64_t xxh3_mix2_accs(::std::uint_least64_t const* __restrict acc, :: : std::byte const* __restrict secret) noexcept
+        inline constexpr ::std::uint_least64_t xxh3_mix2_accs(::std::uint_least64_t const* __restrict acc, ::std::byte const* __restrict secret) noexcept
         {
             return xxh3_mul128_fold64(acc[0u] ^ xxh_readLE64(secret), acc[1u] ^ xxh_readLE64(secret + 8u));
         }
@@ -475,7 +516,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             [[assume(1uz <= len && len <= 3uz)]];
             [[assume(secret != nullptr)]];
 
-            constexpr auto dig32{::std::numeric_limits<::std::uint_least32_t>::digits};
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
             /*
@@ -626,7 +666,54 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         {
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__)
+            using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+            using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
+            auto const xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
+
+            for(unsigned i{}; i != 4u; ++i)
+            {
+                u8x16simd data_vec;
+                ::std::memcpy(::std::addressof(data_vec), input, sizeof(u8x16simd));
+                input += sizeof(u8x16simd);
+
+                u8x16simd key_vec;
+                ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u8x16simd));
+                secret += sizeof(u8x16simd);
+
+                auto const data_key{data_vec ^ key_vec};
+
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pshufd)
+                auto const data_key_lo{__builtin_ia32_pshufd(::std::bit_cast<i32x4simd>(data_key), static_cast<int>(0u << 6u | 3u << 4u | 0u << 2u | 1u))};
+# else
+#  error "missing instruction"
+# endif
+
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq128)
+                auto const product{__builtin_ia32_pmuludq128(::std::bit_cast<i32x4simd>(data_key), ::std::bit_cast<i32x4simd>(data_key_lo))};
+# else
+#  error "missing instruction"
+# endif
+
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pshufd)
+                auto const data_swap{__builtin_ia32_pshufd(::std::bit_cast<i32x4simd>(data_vec), static_cast<int>(1u << 6u | 0u << 4u | 3u << 2u | 2u))};
+# else
+#  error "missing instruction"
+# endif
+
+                auto const sum{::std::bit_cast<u64x2simd>(xacc[i]) + ::std::bit_cast<u64x2simd>(data_swap)};
+
+                xacc[i] = ::std::bit_cast<u64x2simd>(product) + ::std::bit_cast<u64x2simd>(sum);
+            }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE) && 0
@@ -637,14 +724,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #else
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
-            using UWVM_GNU_MAY_ALIAS uint_least64_t_may_alias_ptr = ::std::uint_least64_t*;
-            auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc)};
-            for(::std::size_t i{}; i != 8uz; ++i)
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using uint_least64_t_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint_least64_t*;
+            auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc_64aligned)};
+
+            for(unsigned i{}; i != 8u; ++i)
             {
-                auto const data_val{xxh_readLE64(input + i * 8uz)};
-                auto const data_key{data_val ^ xxh_readLE64(secret + i * 8uz)};
+                auto const data_val{xxh_readLE64(input)};
+                input += 8uz;
+
+                auto const data_key{data_val ^ xxh_readLE64(secret)};
+                secret += 8uz;
+
                 xacc[i ^ 1u] += data_val;
                 if constexpr(dig64 != 64) { xacc[i ^ 1u] &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
                 xacc[i] = xxh_mult32to64_add64(data_key, data_key >> 32u, xacc[i]);
             }
 #endif
@@ -665,11 +759,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #else
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
-            using UWVM_GNU_MAY_ALIAS uint_least64_t_may_alias_ptr = ::std::uint_least64_t*;
-            auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc)};
-            for(::std::size_t i{}; i != 8uz; ++i)
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using uint_least64_t_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint_least64_t*;
+            auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc_64aligned)};
+
+            for(unsigned i{}; i != 8u; ++i)
             {
-                auto const key64{xxh_readLE64(secret + i * 8uz)};
+                auto const key64{xxh_readLE64(secret)};
+                secret += 8uz;
+
                 auto acc64{xacc[i]};
                 acc64 = xxh_xorshift64(acc64, 47u);
                 acc64 ^= key64;
@@ -687,7 +785,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         {
             for(::std::size_t n{}; n != nbStripes; ++n)
             {
-                ::std::byte const* const in{input + n * 64uz};
+                ::std::byte const* const in{input};
+                input += 64u;
                 ::uwvm2::utils::intrinsics::universal::prefetch<::uwvm2::utils::intrinsics::universal::pfc_mode::read,
                                                                 ::uwvm2::utils::intrinsics::universal::pfc_level::L1,
                                                                 ::uwvm2::utils::intrinsics::universal::ret_policy::keep>(
@@ -698,7 +797,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #endif
                 );
 
-                xxh3_accumulate_512(reinterpret_cast<::std::byte*>(acc), in, secret + n * 8uz);
+                xxh3_accumulate_512(reinterpret_cast<::std::byte*>(acc), in, secret);
+                secret += 8uz;
             }
         }
 
@@ -718,14 +818,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 acc[8uz]{xxh_prime32_3, xxh_prime64_1, xxh_prime64_2, xxh_prime64_3, xxh_prime64_4, xxh_prime32_2, xxh_prime64_5, xxh_prime32_1};
             static_assert(sizeof(acc) == 64uz);
 
+            // acc can be aliased to other types for more aggressive optimization
+
             ::std::size_t const nbStripesPerBlock{(secretSize - 64uz) / 8uz};
             ::std::size_t const block_len{64uz * nbStripesPerBlock};
             ::std::size_t const nb_blocks{(len - 1uz) / block_len};
 
-            for(::std::size_t n{}; n < nb_blocks; ++n)
+            auto input_curr{input};
+            for(::std::size_t n{}; n != nb_blocks; ++n)
             {
-                xxh3_accumulate(acc, input + n * block_len, secret, nbStripesPerBlock);
-                xxh3_scramble_acc(reinterpret_cast<::std : byte*>(acc), secret + (secretSize - 64uz));
+                xxh3_accumulate(acc, input_curr, secret, nbStripesPerBlock);
+                input_curr += block_len;
+                xxh3_scramble_acc(reinterpret_cast<::std::byte*>(acc), secret + (secretSize - 64uz));
             }
 
             ::std::size_t const nbStripes{((len - 1uz) - (block_len * nb_blocks)) / 64uz};
@@ -735,7 +839,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             /* last stripe */
             ::std::byte const* const p{input + (len - 64uz)};
 
-            xxh3_accumulate_512(reinterpret_cast<::std : byte*>(acc), p, secret + (secretSize - 64uz - 7uz));
+            xxh3_accumulate_512(reinterpret_cast<::std::byte*>(acc), p, secret + (secretSize - 64uz - 7uz));
 
             return xxh3_finalize_long_64b(acc, secret, len);
         }
@@ -766,14 +870,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         }
 
         template <xxh3_width_t Wid>
-            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(Xxxh3_width_t::X3H_128))
+            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(xxh3_width_t::XX3H_128))
         struct basic_xxh3_context
         {
             using digest_t = xxh3_output_struct<Wid>;
 
             inline static constexpr ::std::size_t digest_size{sizeof(digest_t)};
 
-            inline constexpr void update(::std::byte const* first, ::std::byte const* last) noexcept {}
+            inline constexpr void update([[maybe_unused]] ::std::byte const* first, [[maybe_unused]] ::std::byte const* last) noexcept {}
 
             inline constexpr void reset() noexcept {}
 
@@ -781,7 +885,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             inline constexpr void do_final() const noexcept {}
 
-            inline constexpr void digest_to_byte_ptr(::std::byte* ptr) const noexcept {}
+            inline constexpr void digest_to_byte_ptr([[maybe_unused]] ::std::byte* ptr) const noexcept {}
         };
     }  // namespace details
 
