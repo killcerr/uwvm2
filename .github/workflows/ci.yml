@@ -18,17 +18,20 @@ jobs:
     strategy:
       matrix:
         mode: ["debug"]
-        policies: ["build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined"]
-        cxx_flags: 
+        policies:
           [
-            "\"\"", # SSE2
-            "\"-msse3\"", # SSE2 SSE3
-            "\"-mssse3\"", # SSE2 SSE3 SSSE3
-            "\"-msse4 -mbmi -mbmi2\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 BMI BMI2
-            "\"-mavx -mbmi -mbmi2 -mprfchw\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX BMI BMI2
-            "\"-mavx2 -mbmi -mbmi2 -mprfchw\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 BMI BMI2
-            # "\"-mavx512bw -mbmi -mbmi2 -mprfchw\"", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW BMI BMI2
-            # "\"-mavx512vbmi -mavx512vbmi2 -mbmi -mbmi2 -mprfchw\"" # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW AVX512VBMI AVX512VBMI2 BMI BMI2
+            "build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined",
+          ]
+        cxx_flags: [
+            "", # SSE2
+            "-msse3", # SSE2 SSE3
+            "-mssse3", # SSE2 SSE3 SSSE3
+            "-msse4 -mbmi -mbmi2", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 BMI BMI2
+            "-mavx -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX BMI BMI2
+            "-mavx2 -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 BMI BMI2
+            "-mapxf -mbmi -mbmi2 -mprfchw",
+            # "-mavx512bw -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW BMI BMI2
+            # "-mavx512vbmi -mavx512vbmi2 -mbmi -mbmi2 -mprfchw" # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW AVX512VBMI AVX512VBMI2 BMI BMI2
           ]
     steps:
       - uses: actions/checkout@v4
@@ -37,10 +40,10 @@ jobs:
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
           sudo add-apt-repository ppa:xmake-io/xmake
           sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
-          sudo apt-get install clang clang-tools lld xmake
+          sudo apt-get install clang-22 clang-tools-22 lld-22 xmake
 
       - name: Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-22 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags=${{ matrix.cxx_flags }}
+        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-22 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="${{ matrix.cxx_flags }}"
       - name: Build
         run: xmake b -rv
       - name: Check UWVM version
@@ -56,7 +59,10 @@ jobs:
     strategy:
       matrix:
         mode: ["debug"]
-        policies: ["build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined"]
+        policies:
+          [
+            "build.sanitizer.address,build.sanitizer.leak,build.sanitizer.undefined",
+          ]
     steps:
       - uses: actions/checkout@v4
       - name: Setup
@@ -64,7 +70,7 @@ jobs:
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
           sudo add-apt-repository ppa:xmake-io/xmake
           sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
-          sudo apt-get install clang clang-tools lld xmake
+          sudo apt-get install clang-22 clang-tools-22 lld-22 xmake
 
       - name: Configure
         run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-22 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --use-cxx-module=y
@@ -72,32 +78,6 @@ jobs:
         run: xmake b -rv
       - name: Check UWVM version
         run: xmake run uwvm --version
-
-  # ---------------------------------------------------------------------------
-  x86_64_apx-linux-gnu:
-    if: ${{ !always() }}
-    name: x86_64_apx-linux-gnu (ubuntu-24.04)
-    runs-on: ubuntu-24.04 # noble
-    strategy:
-      matrix:
-        mode: ["debug"]
-        policies: ["build.sanitizer.address"]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup
-        run: |
-          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/llvm.asc
-          sudo add-apt-repository ppa:xmake-io/xmake
-          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main"
-          sudo apt-get install clang clang-tools lld xmake
-      - name: Native (APX) Configure
-        run: xmake f -m debug --use-llvm=y --sdk=/usr/lib/llvm-22 -m ${{ matrix.mode }} --policies=${{ matrix.policies }} --march=none --cxflags="-mapxf -mbmi -mbmi2 -mprfchw"
-      - name: Native (APX) Build
-        run: xmake b -rv
-      - name: Native (APX) Check UWVM version
-        run: xmake run uwvm --version
-      - name: Native (APX) Unit tests
-        run: xmake test -v
 
   # ---------------------------------------------------------------------------
   x86_64-windows-gnu:
@@ -136,7 +116,6 @@ jobs:
 
   # ---------------------------------------------------------------------------
   x86_64-freebsd14:
-    if: ${{ !always() }} # Remove it once support "202411L: Structured bindings can introduce a pack"
     name: x86_64-freebsd14
     runs-on: ubuntu-latest
     strategy:
