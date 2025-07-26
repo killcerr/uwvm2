@@ -238,14 +238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
         }
 
-#if __has_cpp_attribute(__gnu__::__aligned__)
-        [[__gnu__::__aligned__(64uz)]]
-#elif defined(_MSC_VER) && !defined(__clang__)
-        __declspec(align(64uz))
-#else
-        alignas(64uz)
-#endif
-        inline constexpr ::std::byte xxh3_kSecret[192u]{
+        alignas(64uz) inline constexpr ::std::byte xxh3_kSecret [192u] {
             static_cast<::std::byte>(0xb8), static_cast<::std::byte>(0xfe), static_cast<::std::byte>(0x6c), static_cast<::std::byte>(0x39),
             static_cast<::std::byte>(0x23), static_cast<::std::byte>(0xa4), static_cast<::std::byte>(0x4b), static_cast<::std::byte>(0xbe),
             static_cast<::std::byte>(0x7c), static_cast<::std::byte>(0x01), static_cast<::std::byte>(0x81), static_cast<::std::byte>(0x2c),
@@ -651,7 +644,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             if constexpr(dig64 != 64) { seed &= 0xFFFF'FFFF'FFFF'FFFFu; }
             ::std::uint_least64_t acc{len * xxh_prime64_1};
             unsigned const nbRounds{static_cast<unsigned>(len) / 16u};
-            for(unsigned i{}; i < 8u; ++i) { acc += xxh3_mix16B(input + (16u * i), secret + (16u * i), seed); }
+            for(unsigned i{}; i != 8u; ++i) { acc += xxh3_mix16B(input + (16u * i), secret + (16u * i), seed); }
             /* last bytes */
             ::std::uint_least64_t acc_end{xxh3_mix16B(input + (len - 16u), secret + (136u - 17u), seed)};
 
@@ -664,8 +657,107 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         inline constexpr void
             xxh3_accumulate_512(::std::byte* __restrict acc, ::std::byte const* __restrict input, ::std::byte const* __restrict secret) noexcept
         {
-#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__) && 0
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
+#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__)
+            using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x16simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x16simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = char;
+            using u8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int8_t;
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using u8x64simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x64simd*;
+            auto const xacc{reinterpret_cast<u8x64simd_may_alias_ptr>(acc_64aligned)};
+
+            u8x64simd data_vec;
+            ::std::memcpy(::std::addressof(data_vec), input, sizeof(u8x64simd));
+
+            u8x64simd key_vec;
+            ::std::memcpy(::std::addressof(key_vec), input, sizeof(u8x64simd));
+
+            auto const data_key{data_vec ^ key_vec};
+
+            u8x64simd data_key_lo;
+#if UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512) // Clang
+            data_key_lo = ::std::bit_cast<u8x64simd>(__builtin_ia32_psrlqi512(::std::bit_cast<i64x8simd>(data_key), 32));
+#elif UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512_mask) // GCC
+            data_key_lo = ::std::bit_cast<u8x64simd>(__builtin_ia32_psrlqi512_mask(::std::bit_cast<i64x8simd>(data_key), 32u, i64x8simd{}, UINT8_MAX));
+#else
+#error "missing instruction"
+#endif
+
+            u8x64simd product;
+#if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512) // Clang
+            product =  ::std::bit_cast<u8x64simd>(__builtin_ia32_pmuludq512(::std::bit_cast<i32x16simd>(data_key),::std::bit_cast<i32x16simd>(data_key_lo)));
+#elif UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512_mask) // GCC
+            product =  ::std::bit_cast<u8x64simd>(__builtin_ia32_pmuludq512_mask(::std::bit_cast<i32x16simd>(data_key),::std::bit_cast<i32x16simd>(data_key_lo),i64x8simd{}, UINT8_MAX));
+#else
+#error "missing instruction"
+#endif
+            
+            u8x64simd data_swap;
+#if UWVM_HAS_BUILTIN(__builtin_ia32_pshufd512) // Clang
+            data_swap = ::std::bit_cast<u8x64simd>(__builtin_ia32_pshufd512(::std::bit_cast<i32x16simd>(data_vec), static_cast<int>(1u << 6u | 0u << 4u | 3u << 2u | 2u)));
+#elif UWVM_HAS_BUILTIN(__builtin_ia32_pshufd512_mask) // GCC
+            data_swap = ::std::bit_cast<u8x64simd>(__builtin_ia32_pshufd512_mask(::std::bit_cast<i32x16simd>(data_vec), static_cast<int>(1u << 6u | 0u << 4u | 3u << 2u | 2u),i32x16simd{}, UINT16_MAX));
+#else
+#error "missing instruction"
+#endif 
+
+            auto const sum{::std::bit_cast<u8x64simd>(::std::bit_cast<u64x8simd>(*xacc) + ::std::bit_cast<u64x8simd>(data_swa))};
+            
+            *xacc = ::std::bit_cast<u8x64simd>(::std::bit_cast<u64x8simd>(product), ::std::bit_cast<u64x8simd>(sum));
+
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__)
+
+            using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = char;
+            using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
+            auto const xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
+
+            for (unsigned i{}; i != 2u; ++i) 
+            {
+                u8x32simd data_vec;
+                ::std::memcpy(::std::addressof(data_vec), input, sizeof(u8x32simd));
+                input += sizeof(u8x32simd);
+
+                u8x32simd key_vec;
+                ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u8x32simd));
+                secret += sizeof(u8x32simd);
+
+                auto const data_key{data_vec ^ key_vec};
+
+#if UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi256)
+                auto const data_key_lo{::std::bit_cast<u8x32simd>(__builtin_ia32_psrlqi256(::std::bit_cast<u64x4simd>(data_key), 32))};
+#else
+#error "missing instruction"
+#endif 
+
+#if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq256)
+                auto const product{::std::bit_cast<u8x32simd>(__builtin_ia32_pmuludq256(::std::bit_cast<i32x8simd>(data_key), ::std::bit_cast<i32x8simd>(data_key_lo)))};
+#else
+#error "missing instruction"
+#endif 
+
+#if UWVM_HAS_BUILTIN(__builtin_ia32_pshufd256)
+                auto const data_swap{::std::bit_cast<u8x32simd>(__builtin_ia32_pshufd256(::std::bit_cast<i32x8simd>(data_vec), static_cast<int>(1u << 6u | 0u << 4u | 3u << 2u | 2u)))};
+#else
+#error "missing instruction"
+#endif 
+
+                auto const sum{::std::bit_cast<u8x32simd>(::std::bit_cast<u64x4simd>(xacc[i]) + ::std::bit_cast<u64x4simd>(data_swap))};
+
+                xacc[i] = ::std::bit_cast<u8x32simd>(::std::bit_cast<u64x4simd>(product) + ::std::bit_cast<u64x4simd>(sum));
+            }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__)
             using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
             using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
@@ -807,15 +899,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                                                               ::std::byte const* __restrict secret,
                                                                               ::std::size_t secretSize) noexcept
         {
-#if __has_cpp_attribute(__gnu__::__aligned__)
-            [[__gnu__::__aligned__(64uz)]]
-#elif defined(_MSC_VER) && !defined(__clang__)
-            __declspec(align(64uz))
-#else
-            alignas(64uz)
-#endif
-            ::std::uint_least64_t
-                acc[8uz]{xxh_prime32_3, xxh_prime64_1, xxh_prime64_2, xxh_prime64_3, xxh_prime64_4, xxh_prime32_2, xxh_prime64_5, xxh_prime32_1};
+            alignas(64uz) ::std::uint_least64_t acc[8uz]{xxh_prime32_3, xxh_prime64_1, xxh_prime64_2, xxh_prime64_3, xxh_prime64_4, xxh_prime32_2, xxh_prime64_5, xxh_prime32_1};
             static_assert(sizeof(acc) == 64uz);
 
             // acc can be aliased to other types for more aggressive optimization
