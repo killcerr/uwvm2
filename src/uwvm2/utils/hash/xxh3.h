@@ -832,22 +832,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                                                                     1u)};
                 ::std::uint64_t element_count{::uwvm2::utils::intrinsics::arm_sve::svcntd()};
 
-                auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
-                            {
-                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
-                                auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
-                                auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
-                                auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
-                                auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
-                                auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
-                                acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
-                            }};
-
                 if(element_count >= 8u)
                 {
                     auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL8)};
                     auto vacc{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc)};
+                    auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                                {
+                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
+                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                    auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
+                                    auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
+                                    auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
+                                    auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
+                                    auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
+                                    acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
+                                }};
                     accrnd(vacc, 0u);
                     svst1_u64(mask, xacc, vacc);
                 }
@@ -858,6 +857,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     auto acc1{svld1_u64(mask, xacc + 2u)};
                     auto acc2{svld1_u64(mask, xacc + 4u)};
                     auto acc3{svld1_u64(mask, xacc + 6u)};
+                    auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                                {
+                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
+                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                    auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
+                                    auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
+                                    auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
+                                    auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
+                                    auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
+                                    acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
+                                }};
                     accrnd(acc0, 0u);
                     accrnd(acc1, 2u);
                     accrnd(acc2, 4u);
@@ -872,6 +882,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL4)};
                     auto acc0{svld1_u64(mask, xacc + 0u)};
                     auto acc1{svld1_u64(mask, xacc + 4u)};
+                    auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                                {
+                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
+                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                    auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
+                                    auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
+                                    auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
+                                    auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
+                                    auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
+                                    acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
+                                }};
                     accrnd(acc0, 0u);
                     accrnd(acc1, 4u);
                     ::uwvm2::utils::intrinsics::arm_sve::svst1_u64(mask, xacc + 0u, acc0);
@@ -892,22 +913,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                                                                 1u)};
             ::std::uint64_t element_count{::uwvm2::utils::intrinsics::arm_sve::svcntd()};
 
-            auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
-                        {
-                            auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                            auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
-                            auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
-                            auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
-                            auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
-                            auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
-                            auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
-                            acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
-                        }};
-
             if(element_count >= 8u)
             {
                 auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL8)};
                 auto vacc{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc)};
+                auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                            {
+                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
+                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
+                                auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
+                                auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
+                                auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
+                                auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
+                                acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
+                            }};
                 accrnd(vacc, 0u);
                 svst1_u64(mask, xacc, vacc);
             }
@@ -918,6 +938,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 2u)};
                 auto acc2{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
                 auto acc3{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 6u)};
+                auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                            {
+                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
+                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
+                                auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
+                                auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
+                                auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
+                                auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
+                                acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
+                            }};
                 accrnd(acc0, 0u);
                 accrnd(acc1, 2u);
                 accrnd(acc2, 4u);
@@ -932,6 +963,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL4)};
                 auto acc0{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 0u)};
                 auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
+                auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                            {
+                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
+                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
+                                auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
+                                auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
+                                auto const mixed_hi{::uwvm2::utils::intrinsics::arm_sve::svlsr_n_u64_x(mask, mixed, 32u)};
+                                auto const mul{::uwvm2::utils::intrinsics::arm_sve::svmad_u64_x(mask, mixed_lo, mixed_hi, swapped)};
+                                acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
+                            }};
                 accrnd(acc0, 0u);
                 accrnd(acc1, 4u);
                 ::uwvm2::utils::intrinsics::arm_sve::svst1_u64(mask, xacc + 0u, acc0);
