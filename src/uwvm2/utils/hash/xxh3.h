@@ -848,7 +848,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                     acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
                                 }};
                     accrnd(vacc, 0u);
-                    svst1_u64(mask, xacc, vacc);
+                    ::uwvm2::utils::intrinsics::arm_sve::svst1_u64(mask, xacc, vacc);
                 }
                 else if(element_count == 2u)
                 { /* sve128 */
@@ -929,7 +929,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                 acc = ::uwvm2::utils::intrinsics::arm_sve::svadd_u64_x(mask, acc, mul);
                             }};
                 accrnd(vacc, 0u);
-                svst1_u64(mask, xacc, vacc);
+                ::uwvm2::utils::intrinsics::arm_sve::svst1_u64(mask, xacc, vacc);
             }
             else if(element_count == 2u)
             { /* sve128 */

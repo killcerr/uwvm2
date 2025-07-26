@@ -138,7 +138,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svindex_u64)]]
     [[__gnu__::__always_inline__]]
     [[__gnu__::__nodebug__]]
-    extern svuint64_t svptrue_b64(::std::uint64_t, ::std::uint64_t) noexcept;
+    extern svuint64_t svindex_u64(::std::uint64_t, ::std::uint64_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svcntd)]]
     [[__gnu__::__always_inline__]]
@@ -170,11 +170,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
     [[__gnu__::__always_inline__]]
     [[__gnu__::__nodebug__]]
     extern svbool_t svptrue_pat_b64(enum svpattern) noexcept;
-
-    [[clang::__clang_arm_builtin_alias(__builtin_sve_svindex_u64)]]
-    [[__gnu__::__always_inline__]]
-    [[__gnu__::__nodebug__]]
-    extern svuint64_t svptrue_pat_b64(::std::uint64_t, ::std::uint64_t) noexcept;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svst1_u64)]]
     [[__gnu__::__always_inline__]]
