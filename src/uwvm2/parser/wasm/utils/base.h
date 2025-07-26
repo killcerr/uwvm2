@@ -49,6 +49,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
     UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I& counter_selfinc_throw_when_overflow(I & i,
                                                                                               ::std::byte const* section_curr,
                                                                                               ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+#if defined(__ARM_FEATURE_SME)
+        __arm_streaming_compatible
+#endif                                                                                          
     {
         if(i == ::std::numeric_limits<I>::max()) [[unlikely]]
         {
@@ -66,6 +69,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
                                                                                          I add,
                                                                                          ::std::byte const* section_curr,
                                                                                          ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+#if defined(__ARM_FEATURE_SME)
+        __arm_streaming_compatible
+#endif                                                                                 
     {
 #if defined(_MSC_VER) && !defined(__clang__)
         if UWVM_IF_NOT_CONSTEVAL
@@ -233,7 +239,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
     UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL inline constexpr I& counter_addass_throw_when_overflow(I & i,
                                                                                              I add,
                                                                                              ::std::byte const* section_curr,
-                                                                                             ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+                                                                                             ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS 
+#if defined(__ARM_FEATURE_SME)
+        __arm_streaming_compatible
+#endif
     {
         return i = counter_add_throw_when_overflow(i, add, section_curr, err);
     }

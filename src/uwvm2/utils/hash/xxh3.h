@@ -820,6 +820,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE))
 
+            // The always_inline attribute cannot be added here because it does not match the function call.
             [=] __arm_locally_streaming() constexpr noexcept -> void
             {
                 auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
@@ -836,7 +837,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 {
                     auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL8)};
                     auto vacc{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc)};
-                    auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                    auto accrnd{[&]  UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept __arm_streaming-> void
                                 {
                                     auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
                                     auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
@@ -853,11 +854,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 else if(element_count == 2u)
                 { /* sve128 */
                     auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL2)};
-                    auto acc0{svld1_u64(mask, xacc + 0u)};
-                    auto acc1{svld1_u64(mask, xacc + 2u)};
-                    auto acc2{svld1_u64(mask, xacc + 4u)};
-                    auto acc3{svld1_u64(mask, xacc + 6u)};
-                    auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                    auto acc0{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 0u)};
+                    auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 2u)};
+                    auto acc2{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
+                    auto acc3{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 6u)};
+                    auto accrnd{[&]  UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept __arm_streaming-> void
                                 {
                                     auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
                                     auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
@@ -880,9 +881,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 else
                 {
                     auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL4)};
-                    auto acc0{svld1_u64(mask, xacc + 0u)};
-                    auto acc1{svld1_u64(mask, xacc + 4u)};
-                    auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
+                    auto acc0{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 0u)};
+                    auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
+                    auto accrnd{[&]  UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept __arm_streaming -> void
                                 {
                                     auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
                                     auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
