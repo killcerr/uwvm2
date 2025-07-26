@@ -834,7 +834,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
                 if(element_count >= 8u)
                 {
-                    auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL8)};
+                    auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL8)};
                     auto vacc{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc)};
                     auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
                                 {
@@ -852,7 +852,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 }
                 else if(element_count == 2u)
                 { /* sve128 */
-                    auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL2)};
+                    auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL2)};
                     auto acc0{svld1_u64(mask, xacc + 0u)};
                     auto acc1{svld1_u64(mask, xacc + 2u)};
                     auto acc2{svld1_u64(mask, xacc + 4u)};
@@ -879,7 +879,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 }
                 else
                 {
-                    auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL4)};
+                    auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL4)};
                     auto acc0{svld1_u64(mask, xacc + 0u)};
                     auto acc1{svld1_u64(mask, xacc + 4u)};
                     auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
@@ -915,7 +915,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             if(element_count >= 8u)
             {
-                auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL8)};
+                auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL8)};
                 auto vacc{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc)};
                 auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
                             {
@@ -933,7 +933,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else if(element_count == 2u)
             { /* sve128 */
-                auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL2)};
+                auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL2)};
                 auto acc0{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 0u)};
                 auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 2u)};
                 auto acc2{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
@@ -960,7 +960,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-                auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::svpattern::SV_VL4)};
+                auto mask{::uwvm2::utils::intrinsics::arm_sve::svptrue_pat_b64(::uwvm2::utils::intrinsics::arm_sve::SV_VL4)};
                 auto acc0{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 0u)};
                 auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
                 auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
