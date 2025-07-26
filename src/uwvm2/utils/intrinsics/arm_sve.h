@@ -43,6 +43,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 
     using svbool_t = __SVBool_t;
     using svuint8_t = __SVUint8_t;
+    using svuint64_t = __SVUint64_t;
 
     [[clang::__clang_arm_builtin_alias(__builtin_sve_svptrue_b8)]]
     [[__gnu__::__always_inline__]]
@@ -89,6 +90,87 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
     [[__gnu__::__nodebug__]]
     extern ::std::uint64_t svcntb() noexcept;
 
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svld1_u64)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svld1_u64(svbool_t, ::std::uint64_t const *) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_sveor_u64_x)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t sveor_u64_x(svbool_t, svuint64_t, svuint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svtbl_u64)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svtbl_u64(svuint64_t, svuint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svextw_u64_x)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svextw_u64_x(svbool_t, svuint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svlsr_n_u64_x)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svlsr_n_u64_x(svbool_t, svuint64_t, ::std::uint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svmad_u64_x)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svmad_u64_x(svbool_t, svuint64_t, svuint64_t, svuint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svadd_u64_x)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svadd_u64_x(svbool_t, svuint64_t, svuint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_sveor_n_u64_z)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t sveor_n_u64_z(svbool_t, svuint64_t, ::std::uint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svptrue_b64)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svbool_t svptrue_b64() noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svindex_u64)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svptrue_b64(::std::uint64_t, ::std::uint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svcntd)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern ::std::uint64_t svcntd() noexcept;
+
+    enum class svpattern
+    {
+        SV_POW2 = 0,
+        SV_VL1 = 1,
+        SV_VL2 = 2,
+        SV_VL3 = 3,
+        SV_VL4 = 4,
+        SV_VL5 = 5,
+        SV_VL6 = 6,
+        SV_VL7 = 7,
+        SV_VL8 = 8,
+        SV_VL16 = 9,
+        SV_VL32 = 10,
+        SV_VL64 = 11,
+        SV_VL128 = 12,
+        SV_VL256 = 13,
+        SV_MUL4 = 29,
+        SV_MUL3 = 30,
+        SV_ALL = 31
+    };
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svptrue_pat_b64)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svbool_t svptrue_pat_b64(svpattern) noexcept;
+
     // clang-format on
 
 # elif defined(__GNUC__)
@@ -103,8 +185,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
 
 # else
 
-// Defined platform macros, but don't know the exact implementation
-#  error "unsupport platform"
+#  include "arm_sve.h"
 
 # endif
 }
