@@ -984,9 +984,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON)
 
 # if defined(__clang__)
-            using uint64x2_t [[clang::neon_vector_type(2)]] = ::std::uint64_t;
-            using uint32x4_t [[clang::neon_vector_type(4)]] = ::std::uint32_t;
-            using int8x16_t [[clang::neon_vector_type(16)]] = ::std::int8_t;
+            using uint64x2_t = ::std::uint64_t [[clang::neon_vector_type(2)]];
+            using uint32x4_t = ::std::uint32_t [[clang::neon_vector_type(4)]];
+            using int8x16_t = ::std::int8_t [[clang::neon_vector_type(16)]];
 # elif defined(__GNUC__)
             using uint64x2_t = __Uint64x2_t;
             using uint32x4_t = __Uint32x4_t;
