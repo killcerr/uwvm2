@@ -1024,9 +1024,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using uint64x2_t_may_alias UWVM_GNU_MAY_ALIAS = uint64x2_t*;
             auto const xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
 
-            constexpr ::std::size_t xxh3_neon_lanes{8uz};
+            constexpr ::std::size_t xxh3_neon_lanes{
+# if defined(UWVM_XXH3_NEON_LANES)
+                UWVM_XXH3_NEON_LANES
+# else
+                8uz
+# endif
+            };
 
-            static_assert(xxh3_neon_lanes <= 8uz);
+            static_assert(xxh3_neon_lanes <= 8uz && xxh3_neon_lanes != 0uz);
             if constexpr(xxh3_neon_lanes != 8uz)
             {
                 auto xinput_1{input + xxh3_neon_lanes * 8u};
