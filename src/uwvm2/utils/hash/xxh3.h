@@ -827,9 +827,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             {
                 auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
                 auto xacc{reinterpret_cast<::std::uint64_t*>(acc_64aligned)};
-                using uint64_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint64_t const*;
-                auto xinput{reinterpret_cast<uint64_t_const_may_alias_ptr>(input)};
-                auto xsecret{reinterpret_cast<uint64_t_const_may_alias_ptr>(secret)};
                 auto const kSwap{::uwvm2::utils::intrinsics::arm_sve::sveor_n_u64_z(::uwvm2::utils::intrinsics::arm_sve::svptrue_b64(),
                                                                                     ::uwvm2::utils::intrinsics::arm_sve::svindex_u64(0u, 1u),
                                                                                     1u)};
@@ -841,8 +838,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     auto vacc{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc)};
                     auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept __arm_streaming -> void
                                 {
-                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, input + offset * sizeof(::std::uint64_t))};
+                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, secret  + offset * sizeof(::std::uint64_t))};
                                     auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
                                     auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
                                     auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
@@ -863,8 +860,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     auto acc3{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 6u)};
                     auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept __arm_streaming -> void
                                 {
-                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, input + offset * sizeof(::std::uint64_t))};
+                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, secret  + offset * sizeof(::std::uint64_t))};
                                     auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
                                     auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
                                     auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
@@ -888,8 +885,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                     auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
                     auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept __arm_streaming -> void
                                 {
-                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                    auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, input + offset * sizeof(::std::uint64_t))};
+                                    auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, secret  + offset * sizeof(::std::uint64_t))};
                                     auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
                                     auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
                                     auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
@@ -911,9 +908,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
             auto xacc{reinterpret_cast<::std::uint64_t*>(acc_64aligned)};
-            using uint64_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint64_t const*;
-            auto xinput{reinterpret_cast<uint64_t_const_may_alias_ptr>(input)};
-            auto xsecret{reinterpret_cast<uint64_t_const_may_alias_ptr>(secret)};
             auto const kSwap{::uwvm2::utils::intrinsics::arm_sve::sveor_n_u64_z(::uwvm2::utils::intrinsics::arm_sve::svptrue_b64(),
                                                                                 ::uwvm2::utils::intrinsics::arm_sve::svindex_u64(0u, 1u),
                                                                                 1u)};
@@ -925,8 +919,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto vacc{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc)};
                 auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
                             {
-                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, input + offset * sizeof(::std::uint64_t))};
+                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, secret + offset * sizeof(::std::uint64_t))};
                                 auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
                                 auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
                                 auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
@@ -947,8 +941,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto acc3{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 6u)};
                 auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
                             {
-                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, input + offset * sizeof(::std::uint64_t))};
+                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, secret + offset * sizeof(::std::uint64_t))};
                                 auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
                                 auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
                                 auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
@@ -972,8 +966,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto acc1{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xacc + 4u)};
                 auto accrnd{[&] UWVM_ALWAYS_INLINE(::uwvm2::utils::intrinsics::arm_sve::svuint64_t & acc, unsigned offset) constexpr noexcept -> void
                             {
-                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xinput + offset)};
-                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, xsecret + offset)};
+                                auto const input_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, input + offset * sizeof(::std::uint64_t))};
+                                auto const secret_vec{::uwvm2::utils::intrinsics::arm_sve::svld1_u64(mask, secret + offset * sizeof(::std::uint64_t))};
                                 auto const mixed{::uwvm2::utils::intrinsics::arm_sve::sveor_u64_x(mask, secret_vec, input_vec)};
                                 auto const swapped{::uwvm2::utils::intrinsics::arm_sve::svtbl_u64(input_vec, kSwap)};
                                 auto const mixed_lo{::uwvm2::utils::intrinsics::arm_sve::svextw_u64_x(mask, mixed)};
@@ -987,7 +981,175 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ::uwvm2::utils::intrinsics::arm_sve::svst1_u64(mask, xacc + 4u, acc1);
             }
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON)
+
+# if defined(__clang__)
+            using uint64x2_t [[clang::neon_vector_type(2)]] = ::std::uint64_t;
+            using uint32x4_t [[clang::neon_vector_type(4)]] = ::std::uint32_t;
+            using int8x16_t [[clang::neon_vector_type(16)]] = ::std::int8_t;
+# elif defined(__GNUC__)
+            using uint64x2_t = __Uint64x2_t;
+            using uint32x4_t = __Uint32x4_t;
+            using int8x16_t = __Int8x16_t;
+# else
+            using uint64x2_t = ::uint64x2_t;
+            using uint32x4_t = ::uint32x4_t;
+            using int8x16_t = ::int8x16_t;
+# endif
+
+            struct uint32x4x2_t
+            {
+                uint32x4_t val[2];
+            };
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using uint64x2_t_may_alias UWVM_GNU_MAY_ALIAS = uint64x2_t*;
+            auto const xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
+
+            auto xxh_vld1q_u64{[] UWVM_ALWAYS_INLINE(::std::byte const* ptr) constexpr noexcept -> uint64x2_t
+                               {
+                                   uint64x2_t tmp;
+                                   ::std::memcpy(::std::addressof(tmp), ptr, sizeof(uint64x2_t));
+                                   return tmp;
+                               }};
+
+            constexpr ::std::size_t xxh3_neon_lanes{
+# if (defined(__aarch64__) || defined(__arm64__) || defined(_M_ARM64) || defined(_M_ARM64EC)) && !defined(__APPLE__)
+                6uz
+# else
+                8uz
+# endif
+            };
+
+            auto xinput_1{input};
+            auto xsecret_1{secret};
+            using uint_least64_t_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint_least64_t*;
+            auto xacc_1{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc_64aligned)};
+            for(::std::size_t i{xxh3_neon_lanes}; i < 8uz; i++)
+            {
+                auto const data_val{xxh_readLE64(xinput_1)};
+                xinput_1 += 8uz;
+
+                auto const data_key{data_val ^ xxh_readLE64(xsecret_1)};
+                xsecret_1 += 8uz;
+
+                xacc_1[i ^ 1u] += data_val;
+
+                xacc_1[i] = xxh_mult32to64_add64(data_key, data_key >> 32u, xacc_1[i]);
+            }
+
+            ::std::size_t i{};
+            for(; i + 1uz < xxh3_neon_lanes / 2uz; i += 2uz)
+            {
+                uint64x2_t data_vec_1{xxh_vld1q_u64(xinput + (i * 16u))};
+                uint64x2_t data_vec_2{xxh_vld1q_u64(xinput + ((i + 1u) * 16u))};
+
+                uint64x2_t key_vec_1{xxh_vld1q_u64(xsecret + (i * 16u))};
+                uint64x2_t key_vec_2{xxh_vld1q_u64(xsecret + ((i + 1u) * 16u))};
+
+# if UWVM_HAS_BUILTIN(__builtin_neon_vextq_v)  // Clang
+                uint64x2_t data_swap_1{
+                    ::std::bit_cast<uint64x2_t>(__builtin_neon_vextq_v(::std::bit_cast<int8x16_t>(data_vec_1), ::std::bit_cast<int8x16_t>(data_vec_1), 1, 51))};
+                uint64x2_t data_swap_2{
+                    ::std::bit_cast<uint64x2_t>(__builtin_neon_vextq_v(::std::bit_cast<int8x16_t>(data_vec_2), ::std::bit_cast<int8x16_t>(data_vec_2), 1, 51))};
+# elif UWVM_HAS_BUILTIN(__builtin_shuffle)     // GCC
+                uint64x2_t data_swap_1{__builtin_shuffle(data_vec_1, data_vec_1, uint64x2_t{1u, 2u})};
+                uint64x2_t data_swap_2{__builtin_shuffle(data_vec_2, data_vec_2, uint64x2_t{1u, 2u})};
+# else
+#  error "missing instruction"
+# endif
+
+                uint64x2_t data_key_1{data_vec_1 ^ key_vec_1};
+                uint64x2_t data_key_2{data_vec_2 ^ key_vec_2};
+
+                uint32x4x2_t unzipped;
+# if UWVM_HAS_BUILTIN(__builtin_neon_vuzpq_v)        // Clang
+                __builtin_neon_vuzpq_v(::std::addressof(unzipped), ::std::bit_cast<int8x16_t>(data_key_1), ::std::bit_cast<int8x16_t>(data_key_2), 50);
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_uzp1v4si)  // GCC
+                result.val[0] = __builtin_aarch64_uzp1v4si(data_key_1, data_key_2);  // even-indexed
+                result.val[1] = __builtin_aarch64_uzp2v4si(data_key_1, data_key_2);  // odd-indexed
+# else
+#  error "missing instruction"
+# endif
+
+                uint32x4_t data_key_lo{unzipped.val[0]};
+                uint32x4_t data_key_hi{unzipped.val[1]};
+
+                uint64x2_t sum_1;
+                uint64x2_t sum_2;
+# if UWVM_HAS_BUILTIN(__builtin_neon_vmull_v) && UWVM_HAS_BUILTIN(__builtin_shufflevector)              // Clang
+                sum_1 = data_swap_1 +
+                        ::std::bit_cast<uint64x2_t>(__builtin_neon_vmull_v(::std::bit_cast<int8x8_t>(__builtin_shufflevector(data_key_lo, data_key_lo, 0, 1)),
+                                                                           ::std::bit_cast<int8x8_t>(__builtin_shufflevector(data_key_hi, data_key_hi, 0, 1)),
+                                                                           51));
+                sum_2 = data_swap_2 +
+                        ::std::bit_cast<uint64x2_t>(__builtin_neon_vmull_v(::std::bit_cast<int8x8_t>(__builtin_shufflevector(data_key_lo, data_key_lo, 2, 3)),
+                                                                           ::std::bit_cast<int8x8_t>(__builtin_shufflevector(data_key_hi, data_key_hi, 2, 3)),
+                                                                           51));
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_umlalv2si_uuuu) && UWVM_HAS_BUILTIN(__builtin_shufflevector)  // GCC
+                sum_1 = __builtin_aarch64_umlalv2si_uuuu(data_swap_1,
+                                                         __builtin_shufflevector(data_key_lo, data_key_lo, 0, 1),
+                                                         __builtin_shufflevector(data_key_hi, data_key_hi, 0, 1));
+                sum_2 = __builtin_aarch64_umlalv2si_uuuu(data_swap_2,
+                                                         __builtin_shufflevector(data_key_lo, data_key_lo, 2, 3),
+                                                         __builtin_shufflevector(data_key_hi, data_key_hi, 2, 3));
+# else
+#  error "missing instruction"
+# endif
+
+                xacc[i] = xacc[i] + sum_1;
+                xacc[i + 1] = xacc[i + 1] + sum_2;
+            }
+
+            for(; i < xxh3_neon_lanes / 2uz; i++)
+            {
+                uint64x2_t data_vec{xxh_vld1q_u64(xinput + (i * 16u))};
+
+                uint64x2_t key_vec{xxh_vld1q_u64(xsecret + (i * 16u))};
+
+                uint64x2_t data_swap;
+# if UWVM_HAS_BUILTIN(__builtin_neon_vextq_v)  // Clang
+                data_swap =
+                    ::std::bit_cast<uint64x2_t>(__builtin_neon_vextq_v(::std::bit_cast<int8x16_t>(data_vec), ::std::bit_cast<int8x16_t>(data_vec), 1, 51));
+# elif UWVM_HAS_BUILTIN(__builtin_shuffle)     // GCC
+                data_swap = __builtin_shuffle(data_vec, data_vec, uint64x2_t{1u, 2u});
+# else
+#  error "missing instruction"
+# endif
+
+                uint64x2_t data_key{data_vec ^ key_vec};
+
+                uint32x2_t data_key_lo;
+# if UWVM_HAS_BUILTIN(__builtin_neon_vmovn_v)          // Clang
+                data_key_lo = ::std::bit_cast<uint32x2_t>(__builtin_neon_vmovn_v(::std::bit_cast<int8x16_t>(data_key), 18));
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_xtnv2di_uu)  // GCC
+                data_key_lo = __builtin_aarch64_xtnv2di_uu(data_key);
+# else
+#  error "missing instruction"
+# endif
+
+                uint32x2_t data_key_hi = vshrn_n_u64(data_key, 32);
+# if UWVM_HAS_BUILTIN(__builtin_neon_vshrn_n_v)            // Clang
+                ::std::bit_cast<uint32x2_t>(__builtin_neon_vshrn_n_v(::std::bit_cast<data_key>, 32, 18));
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_shrn_nv2di_uus)  // GCC
+                __builtin_aarch64_shrn_nv2di_uus(data_key, 32);
+# else
+#  error "missing instruction"
+# endif
+
+                uint64x2_t sum;
+# if UWVM_HAS_BUILTIN(__builtin_neon_vmull_v)              // Clang
+                sum = data_swap +
+                      ::std::bit_cast<uint64x2_t>(__builtin_neon_vmull_v(::std::bit_cast<int8x8_t>(data_key_lo), ::std::bit_cast<int8x8_t>(data_key_hi), 51));
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_umlalv2si_uuuu)  // GCC
+                sum = __builtin_aarch64_umlalv2si_uuuu(data_swap, data_key_lo, data_key_hi);
+# else
+#  error "missing instruction"
+# endif
+
+                xacc[i] = xacc[i] + sum;
+            }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_asx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
