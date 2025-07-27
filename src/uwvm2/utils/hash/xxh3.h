@@ -1130,11 +1130,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #  error "missing instruction"
 # endif
 
-                uint32x2_t data_key_hi = vshrn_n_u64(data_key, 32);
+                uint32x2_t data_key_hi;
 # if UWVM_HAS_BUILTIN(__builtin_neon_vshrn_n_v)            // Clang
-                ::std::bit_cast<uint32x2_t>(__builtin_neon_vshrn_n_v(::std::bit_cast<data_key>, 32, 18));
+                data_key_hi = ::std::bit_cast<uint32x2_t>(__builtin_neon_vshrn_n_v(::std::bit_cast<int8x16_t>(data_key), 32, 18));
 # elif UWVM_HAS_BUILTIN(__builtin_aarch64_shrn_nv2di_uus)  // GCC
-                __builtin_aarch64_shrn_nv2di_uus(data_key, 32);
+                data_key_hi = __builtin_aarch64_shrn_nv2di_uus(data_key, 32);
 # else
 #  error "missing instruction"
 # endif
