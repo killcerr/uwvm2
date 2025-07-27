@@ -986,15 +986,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # if defined(__clang__)
             using uint64x2_t = ::std::uint64_t [[clang::neon_vector_type(2)]];
             using uint32x4_t = ::std::uint32_t [[clang::neon_vector_type(4)]];
+            using uint32x2_t = ::std::uint32_t [[clang::neon_vector_type(2)]];
             using int8x16_t = ::std::int8_t [[clang::neon_vector_type(16)]];
+            using int8x8_t = ::std::int8_t [[clang::neon_vector_type(8)]];
 # elif defined(__GNUC__)
             using uint64x2_t = __Uint64x2_t;
             using uint32x4_t = __Uint32x4_t;
+            using uint32x2_t = __Uint32x2_t;
             using int8x16_t = __Int8x16_t;
+            using int8x8_t = __Int8x8_t;
 # else
-            using uint64x2_t = ::uint64x2_t;
-            using uint32x4_t = ::uint32x4_t;
-            using int8x16_t = ::int8x16_t;
+# error "missing instruction"
 # endif
 
             struct uint32x4x2_t
