@@ -1041,11 +1041,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             ::std::size_t i{};
             for(; i + 1uz < xxh3_neon_lanes / 2uz; i += 2uz)
             {
-                uint64x2_t data_vec_1{xxh_vld1q_u64(xinput + (i * 16u))};
-                uint64x2_t data_vec_2{xxh_vld1q_u64(xinput + ((i + 1u) * 16u))};
+                uint64x2_t data_vec_1{xxh_vld1q_u64(input + (i * 16u))};
+                uint64x2_t data_vec_2{xxh_vld1q_u64(input + ((i + 1u) * 16u))};
 
-                uint64x2_t key_vec_1{xxh_vld1q_u64(xsecret + (i * 16u))};
-                uint64x2_t key_vec_2{xxh_vld1q_u64(xsecret + ((i + 1u) * 16u))};
+                uint64x2_t key_vec_1{xxh_vld1q_u64(secret + (i * 16u))};
+                uint64x2_t key_vec_2{xxh_vld1q_u64(secret + ((i + 1u) * 16u))};
 
 # if UWVM_HAS_BUILTIN(__builtin_neon_vextq_v)  // Clang
                 uint64x2_t data_swap_1{
@@ -1103,9 +1103,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             for(; i < xxh3_neon_lanes / 2uz; i++)
             {
-                uint64x2_t data_vec{xxh_vld1q_u64(xinput + (i * 16u))};
+                uint64x2_t data_vec{xxh_vld1q_u64(input + (i * 16u))};
 
-                uint64x2_t key_vec{xxh_vld1q_u64(xsecret + (i * 16u))};
+                uint64x2_t key_vec{xxh_vld1q_u64(secret + (i * 16u))};
 
                 uint64x2_t data_swap;
 # if UWVM_HAS_BUILTIN(__builtin_neon_vextq_v)  // Clang
