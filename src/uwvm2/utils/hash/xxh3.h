@@ -668,7 +668,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
             using u8x64simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x64simd*;
-            auto const xacc{reinterpret_cast<u8x64simd_may_alias_ptr>(acc_64aligned)};
+            auto xacc{reinterpret_cast<u8x64simd_may_alias_ptr>(acc_64aligned)};
 
             u8x64simd data_vec;
             ::std::memcpy(::std::addressof(data_vec), input, sizeof(u8x64simd));
@@ -726,7 +726,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
             using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
-            auto const xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
+            auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
 
             for(unsigned i{}; i != 2u; ++i)
             {
@@ -778,7 +778,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
-            auto const xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
+            auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
             for(unsigned i{}; i != 4u; ++i)
             {
@@ -1184,7 +1184,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
             using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
-            auto const xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
+            auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
 
             for(unsigned i{}; i != 2u; ++i)
             {
@@ -1226,11 +1226,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # endif
 
 # if UWVM_HAS_BUILTIN(__builtin_lasx_xvadd_d)
-                auto const sum{::std::bit_cast<i64x4simd>(__builtin_lasx_xvadd_d(::std::bit_cast<i64x4simd>(xacc[i]), data_swap))};
-                xacc[i] = ::std::bit_cast<u8x32simd>(__builtin_lasx_xvadd_d(::std::bit_cast<i64x4simd>(product), sum));
+                auto const sum{::std::bit_cast<i64x4simd>(__builtin_lasx_xvadd_d(::std::bit_cast<i64x4simd>(*xacc), data_swap))};
+                *xacc = ::std::bit_cast<u8x32simd>(__builtin_lasx_xvadd_d(::std::bit_cast<i64x4simd>(product), sum));
 # else
 #  error "missing instruction"
 # endif
+
+                ++xacc;
             }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx)
@@ -1245,7 +1247,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
             auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
-            auto const xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
+            auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
             for(unsigned i{}; i != 4u; ++i)
             {
@@ -1284,11 +1286,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # endif
 
 # if UWVM_HAS_BUILTIN(__builtin_lsx_vadd_d)
-                auto const sum{__builtin_lsx_vadd_d(::std::bit_cast<i64x2simd>(xacc[i]), ::std::bit_cast<i64x2simd>(data_swap))};
-                xacc[i] = ::std::bit_cast<u8x16simd>(__builtin_lsx_vadd_d(::std::bit_cast<i64x2simd>(product), sum));
+                auto const sum{__builtin_lsx_vadd_d(::std::bit_cast<i64x2simd>(*xacc), ::std::bit_cast<i64x2simd>(data_swap))};
+                *xacc = ::std::bit_cast<u8x16simd>(__builtin_lsx_vadd_d(::std::bit_cast<i64x2simd>(product), sum));
 # else
 #  error "missing instruction"
 # endif
+
+                ++xacc;
             }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
