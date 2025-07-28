@@ -1164,7 +1164,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 xacc[i + 1] = xacc[i + 1] + sum_2;
             }
 
-            for(; i != xxh3_neon_lanes / 2uz; ++i)
+            for(; i < xxh3_neon_lanes / 2uz; ++i)
             {
                 uint64x2_t data_vec{xxh_vld1q_u64(input + (i * 16u))};
 
@@ -1336,7 +1336,93 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ++xacc;
             }
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__)
+
+            using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+            using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using uint64x2_t_may_alias UWVM_GNU_MAY_ALIAS = uint64x2_t*;
+            auto xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
+
+            for(unsigned i{}; i != 4u; ++i)
+            {
+                u8x16simd data_vec;
+                ::std::memcpy(::std::addressof(data_vec), input, sizeof(u8x16simd));
+                input += sizeof(u8x16simd);
+
+                u8x16simd key_vec;
+                ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u8x16simd));
+                secret += sizeof(u8x16simd);
+
+                auto data_key{data_vec ^ key_vec};
+
+# if UWVM_HAS_BUILTIN(__builtin_wasm_shuffle_i8x16)
+                auto data_key_lo{__builtin_wasm_shuffle_i8x16(::std::bit_cast<i8x16simd>(data_key),
+                                                              ::std::bit_cast<i8x16simd>(data_key),
+                                                              1 * 4,
+                                                              1 * 4 + 1,
+                                                              1 * 4 + 2,
+                                                              1 * 4 + 3,
+                                                              0 * 4,
+                                                              0 * 4 + 1,
+                                                              0 * 4 + 2,
+                                                              0 * 4 + 3,
+                                                              3 * 4,
+                                                              3 * 4 + 1,
+                                                              3 * 4 + 2,
+                                                              3 * 4 + 3,
+                                                              2 * 4,
+                                                              2 * 4 + 1,
+                                                              2 * 4 + 2,
+                                                              2 * 4 + 3)};
+# else
+#  error "missing instruction"
+# endif
+
+                ::std::uint64_t p0{static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key)[0]) *
+                                   static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key_lo)[0])};
+
+                ::std::uint64_t p1{static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key)[2]) *
+                                   static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key_lo)[2])};
+
+                u64x2simd product{p0, p1};
+
+# if UWVM_HAS_BUILTIN(__builtin_wasm_shuffle_i8x16)
+                auto data_swap{__builtin_wasm_shuffle_i8x16(::std::bit_cast<i8x16simd>(data_vec),
+                                                            ::std::bit_cast<i8x16simd>(data_vec),
+                                                            1 * 4,
+                                                            1 * 4 + 1,
+                                                            1 * 4 + 2,
+                                                            1 * 4 + 3,
+                                                            0 * 4,
+                                                            0 * 4 + 1,
+                                                            0 * 4 + 2,
+                                                            0 * 4 + 3,
+                                                            3 * 4,
+                                                            3 * 4 + 1,
+                                                            3 * 4 + 2,
+                                                            3 * 4 + 3,
+                                                            2 * 4,
+                                                            2 * 4 + 1,
+                                                            2 * 4 + 2,
+                                                            2 * 4 + 3)};
+# else
+#  error "missing instruction"
+# endif
+
+                auto sum{::std::bit_cast<u64x2simd>(*xacc) + ::std::bit_cast<u64x2simd>(data_swap)};
+
+                *xacc = ::std::bit_cast<u8x16simd>(sum + product);
+
+                ++xacc;
+            }
+
 #else
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
