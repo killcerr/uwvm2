@@ -240,7 +240,7 @@ int main()
     {
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
             0u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 2u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
@@ -307,7 +307,7 @@ int main()
     {
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 2u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
@@ -374,7 +374,7 @@ int main()
     {
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 2u};
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> curr_range_u16_2b{0u, max_u162b_in_curr_round};
@@ -443,7 +443,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
             0u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 2u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
@@ -521,7 +521,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 2u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
@@ -599,7 +599,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 2u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
@@ -677,7 +677,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
             0u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 2u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
@@ -762,7 +762,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 2u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
@@ -847,7 +847,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 2u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
@@ -931,7 +931,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
             0u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 2u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
@@ -1022,7 +1022,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 2u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
@@ -1113,7 +1113,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 2u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
@@ -1204,7 +1204,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
             0u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 2u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
@@ -1292,7 +1292,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 2u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
@@ -1380,7 +1380,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 2u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
@@ -1468,7 +1468,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u81b_in_curr_round{
             0u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u) - 2u};
 
         auto const max_u81b_in_curr_round{generate_max_u81b_in_curr_round(eng)};
         auto const typeidxmax{max_u81b_in_curr_round + 1u};
@@ -1571,7 +1571,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u82b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 7u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u) - 2u};
 
         auto const max_u82b_in_curr_round{generate_max_u82b_in_curr_round(eng)};
         auto const typeidxmax{max_u82b_in_curr_round + 1u};
@@ -1674,7 +1674,7 @@ int main()
 
         ::std::uniform_int_distribution<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> generate_max_u162b_in_curr_round{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 8u,
-            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 1u};
+            (static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u) << 14u) - 2u};
 
         auto const max_u162b_in_curr_round{generate_max_u162b_in_curr_round(eng)};
         auto const typeidxmax{max_u162b_in_curr_round + 1u};
