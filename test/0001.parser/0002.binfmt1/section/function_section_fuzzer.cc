@@ -182,7 +182,7 @@ namespace test
         char* ptr{};
         ::std::size_t n{};
 
-        inline memory_safety_checker_allocator(char const* begin, char const* end) noexcept
+        inline constexpr memory_safety_checker_allocator(char const* begin, char const* end) noexcept
         {
             if(begin > end) [[unlikely]] { ::fast_io::fast_terminate(); }
             else if(begin == end) [[unlikely]] { return; }
@@ -195,19 +195,15 @@ namespace test
             ::fast_io::freestanding::my_memcpy(ptr, begin, n * sizeof(char));
         }
 
-        inline memory_safety_checker_allocator(memory_safety_checker_allocator const&) noexcept = delete;
-        inline memory_safety_checker_allocator(memory_safety_checker_allocator&&) noexcept = delete;
-        inline memory_safety_checker_allocator& operator= (memory_safety_checker_allocator const&) noexcept = delete;
-        inline memory_safety_checker_allocator& operator= (memory_safety_checker_allocator&&) noexcept = delete;
+        inline constexpr memory_safety_checker_allocator(memory_safety_checker_allocator const&) noexcept = delete;
+        inline constexpr memory_safety_checker_allocator(memory_safety_checker_allocator&&) noexcept = delete;
+        inline constexpr memory_safety_checker_allocator& operator= (memory_safety_checker_allocator const&) noexcept = delete;
+        inline constexpr memory_safety_checker_allocator& operator= (memory_safety_checker_allocator&&) noexcept = delete;
 
-        inline ~memory_safety_checker_allocator() noexcept
+        inline constexpr ~memory_safety_checker_allocator() noexcept
         {
-            if(ptr) [[likely]]
-            {
-                ::std::free(ptr);
-                ptr = nullptr;
-            }
-            n = 0uz;
+            // Multiple calls to the destructor are ub
+            ::std::free(ptr);
         }
 
         inline constexpr char const* cbegin() const noexcept { return ptr; }
