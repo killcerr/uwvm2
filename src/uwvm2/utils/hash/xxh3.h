@@ -1011,7 +1011,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using uint32x2_t = __Uint32x2_t;
             using int8x16_t = __Int8x16_t;
             using int8x8_t = __Int8x8_t;
-# elif (defined(_MSC_VER) && !defined(__clang__)) // msvc
+# elif (defined(_MSC_VER) && !defined(__clang__))  // msvc
             using uint64x2_t = __n128;
             using uint32x4_t = __n128;
             using uint32x2_t = __n64;
@@ -1031,39 +1031,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             auto const xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
 
             /*!
-            * @ingroup tuning
-            * @brief Controls the NEON to scalar ratio for XXH3
-            *
-            * This can be set to 2, 4, 6, or 8.
-            *
-            * ARM Cortex CPUs are _very_ sensitive to how their pipelines are used.
-            *
-            * For example, the Cortex-A73 can dispatch 3 micro-ops per cycle, but only 2 of those
-            * can be NEON. If you are only using NEON instructions, you are only using 2/3 of the CPU
-            * bandwidth.
-            *
-            * This is even more noticeable on the more advanced cores like the Cortex-A76 which
-            * can dispatch 8 micro-ops per cycle, but still only 2 NEON micro-ops at once.
-            *
-            * Therefore, to make the most out of the pipeline, it is beneficial to run 6 NEON lanes
-            * and 2 scalar lanes, which is chosen by default.
-            *
-            * This does not apply to Apple processors or 32-bit processors, which run better with
-            * full NEON. These will default to 8. Additionally, size-optimized builds run 8 lanes.
-            *
-            * This change benefits CPUs with large micro-op buffers without negatively affecting
-            * most other CPUs:
-            *
-            *  | Chipset               | Dispatch type       | NEON only | 6:2 hybrid | Diff. |
-            *  |:----------------------|:--------------------|----------:|-----------:|------:|
-            *  | Snapdragon 730 (A76)  | 2 NEON/8 micro-ops  |  8.8 GB/s |  10.1 GB/s |  ~16% |
-            *  | Snapdragon 835 (A73)  | 2 NEON/3 micro-ops  |  5.1 GB/s |   5.3 GB/s |   ~5% |
-            *  | Marvell PXA1928 (A53) | In-order dual-issue |  1.9 GB/s |   1.9 GB/s |    0% |
-            *  | Apple M1              | 4 NEON/8 micro-ops  | 37.3 GB/s |  36.1 GB/s |  ~-3% |
-            *
-            * It also seems to fix some bad codegen on GCC, making it almost as fast as clang.
-            *
-            */
+             * @ingroup tuning
+             * @brief Controls the NEON to scalar ratio for XXH3
+             *
+             * This can be set to 2, 4, 6, or 8.
+             *
+             * ARM Cortex CPUs are _very_ sensitive to how their pipelines are used.
+             *
+             * For example, the Cortex-A73 can dispatch 3 micro-ops per cycle, but only 2 of those
+             * can be NEON. If you are only using NEON instructions, you are only using 2/3 of the CPU
+             * bandwidth.
+             *
+             * This is even more noticeable on the more advanced cores like the Cortex-A76 which
+             * can dispatch 8 micro-ops per cycle, but still only 2 NEON micro-ops at once.
+             *
+             * Therefore, to make the most out of the pipeline, it is beneficial to run 6 NEON lanes
+             * and 2 scalar lanes, which is chosen by default.
+             *
+             * This does not apply to Apple processors or 32-bit processors, which run better with
+             * full NEON. These will default to 8. Additionally, size-optimized builds run 8 lanes.
+             *
+             * This change benefits CPUs with large micro-op buffers without negatively affecting
+             * most other CPUs:
+             *
+             *  | Chipset               | Dispatch type       | NEON only | 6:2 hybrid | Diff. |
+             *  |:----------------------|:--------------------|----------:|-----------:|------:|
+             *  | Snapdragon 730 (A76)  | 2 NEON/8 micro-ops  |  8.8 GB/s |  10.1 GB/s |  ~16% |
+             *  | Snapdragon 835 (A73)  | 2 NEON/3 micro-ops  |  5.1 GB/s |   5.3 GB/s |   ~5% |
+             *  | Marvell PXA1928 (A53) | In-order dual-issue |  1.9 GB/s |   1.9 GB/s |    0% |
+             *  | Apple M1              | 4 NEON/8 micro-ops  | 37.3 GB/s |  36.1 GB/s |  ~-3% |
+             *
+             * It also seems to fix some bad codegen on GCC, making it almost as fast as clang.
+             *
+             */
 
             constexpr ::std::size_t xxh3_neon_lanes{
 # if defined(UWVM_XXH3_NEON_LANES)
@@ -1294,13 +1294,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             {
 # if UWVM_HAS_BUILTIN(__builtin_lsx_vldrepl_b)
                 u8x16simd const data_vec{::std::bit_cast<u8x16simd>(__builtin_lsx_vldrepl_b(input, 0))};
-                u8x16simd const key_vec{::std::bit_cast<u8x16simd>(__builtin_lsx_vldrepl_b(secert, 0))};
+                u8x16simd const key_vec{::std::bit_cast<u8x16simd>(__builtin_lsx_vldrepl_b(secret, 0))};
 # else
 #  error "missing instruction"
 # endif
 
                 input += sizeof(u8x16simd);
-                secert += sizeof(u8x16simd);
+                secret += sizeof(u8x16simd);
 
 # if UWVM_HAS_BUILTIN(__builtin_lsx_vxor_v)
                 auto const data_key{__builtin_lsx_vxor_v(data_vec, key_vec)};
