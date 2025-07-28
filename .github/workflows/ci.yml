@@ -28,10 +28,11 @@ jobs:
             "-mssse3", # SSE2 SSE3 SSSE3
             "-msse4 -mbmi -mbmi2", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 BMI BMI2
             "-mavx -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX BMI BMI2
-            "-mavx2 -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 BMI BMI2
-            "-mapxf -mbmi -mbmi2 -mprfchw",
+            "-mavx2 -mbmi -mbmi2 -mprfchw" # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 BMI BMI2
             # "-mavx512bw -mbmi -mbmi2 -mprfchw", # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW BMI BMI2
             # "-mavx512vbmi -mavx512vbmi2 -mbmi -mbmi2 -mprfchw" # SSE2 SSE3 SSSE3 SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512BW AVX512VBMI AVX512VBMI2 BMI BMI2
+            # "-mavx10.2 -mbmi -mbmi2 -mprfchw"
+            # "-mapxf -mavx10.2 -mbmi -mbmi2 -mprfchw"
           ]
     steps:
       - uses: actions/checkout@v4
