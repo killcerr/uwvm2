@@ -1215,6 +1215,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_asx)
 
+            /// @todo need test
+
             using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
             using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
             using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
@@ -1277,6 +1279,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx)
+
+            /// @todo need test
 
             using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
             using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
