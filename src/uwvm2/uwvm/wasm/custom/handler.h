@@ -29,7 +29,6 @@
 # include <concepts>
 # include <type_traits>
 # include <utility>
-# include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -61,8 +60,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
         bool is_imported_c{};
     };
 
-    inline void handle_binfmtver1_custom_section(::uwvm2::uwvm::wasm::type::wasm_file_t & wasm_file,
-                                                 ::std::map<::uwvm2::utils::container::u8string_view, handlefunc_t> const& custom_handler) noexcept
+    inline void handle_binfmtver1_custom_section(
+        ::uwvm2::uwvm::wasm::type::wasm_file_t & wasm_file,
+        ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, handlefunc_t> const& custom_handler) noexcept
     {
         if(wasm_file.binfmt_ver != 1u) [[unlikely]] { return; }
 

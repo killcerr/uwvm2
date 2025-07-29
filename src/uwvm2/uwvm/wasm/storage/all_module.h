@@ -22,8 +22,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-// std
-# include <map>  /// @todo replace
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
@@ -66,6 +64,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
         module_type_t type{};
     };
 
-    inline ::std::map<::uwvm2::utils::container::u8string_view, all_module_t> all_module{};  // [global]
+    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, all_module_t> all_module{};  // [global]
 
 }  // namespace uwvm2::uwvm::wasm::storage

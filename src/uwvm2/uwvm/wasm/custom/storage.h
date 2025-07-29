@@ -29,7 +29,6 @@
 # include <concepts>
 # include <type_traits>
 # include <utility>
-# include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -47,8 +46,9 @@
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
 {
     /// @todo use fast_io::unorder_map instead
-    inline ::std::map<::uwvm2::utils::container::u8string_view, ::uwvm2::uwvm::wasm::custom::handlefunc_t> custom_handle_funcs{
-        {u8"name", {reinterpret_cast<void*>(::std::addressof(::uwvm2::uwvm::wasm::custom::customs::name_handler)), false}}
+    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, ::uwvm2::uwvm::wasm::custom::handlefunc_t>
+        custom_handle_funcs{
+            {u8"name", {reinterpret_cast<void*>(::std::addressof(::uwvm2::uwvm::wasm::custom::customs::name_handler)), false}}
     };  // [global]
 }
 

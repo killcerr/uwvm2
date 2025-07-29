@@ -29,7 +29,6 @@ module;
 #include <concepts>
 #include <type_traits>
 #include <utility>
-#include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 

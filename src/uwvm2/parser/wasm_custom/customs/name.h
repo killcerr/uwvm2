@@ -30,7 +30,6 @@
 # include <concepts>
 # include <type_traits>
 # include <utility>
-# include <map>  /// @todo use fast_io::string_hashmap instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -52,9 +51,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
     struct name_storage_t
     {
         ::uwvm2::utils::container::u8string_view module_name{};
-        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view> function_name{};
-        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32,
-                   ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view>>
+        ::uwvm2::utils::container::unordered_flat_map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view>
+            function_name{};
+        ::uwvm2::utils::container::unordered_flat_map<
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32,
+            ::uwvm2::utils::container::unordered_flat_map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view>>
             code_local_name{};
     };
 
@@ -717,7 +718,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [                      safe                      ] unsafe (could be the map_end)
                         //                                                    ^^ curr
 
-                        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view>
+                        ::uwvm2::utils::container::unordered_flat_map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32,
+                                                                      ::uwvm2::utils::container::u8string_view>
                             ns_code_local_name_function_index{};
 
                         bool ct_2{};

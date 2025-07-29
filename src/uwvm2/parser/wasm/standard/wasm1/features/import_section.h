@@ -34,7 +34,6 @@
 # include <utility>
 # include <memory>
 # include <limits>
-# include <set>  /// @todo use fast_io::set instead
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -509,8 +508,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};  // use for reserve
         // desc counter
 
-        ::uwvm2::utils::container::array<::std::set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker> /* @todo use fast_io::set instead */,
-                                         importdesc_count>
+        ::uwvm2::utils::container::array<
+            ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker> /* @todo use fast_io::set instead */,
+            importdesc_count>
             duplicate_name_checker{};  // use for check duplicate name
 
         while(section_curr != section_end) [[likely]]
