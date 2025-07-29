@@ -29,6 +29,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
 #endif
@@ -42,11 +43,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
     //////////////////////////
     /// @brief All feature ///
     //////////////////////////
-    inline constexpr ::fast_io::tuple all_features{
+    inline constexpr ::uwvm2::utils::container::tuple all_features{
         ::uwvm2::parser::wasm::standard::wasm1::features::wasm1{}
         // Add here
     };
-    /// @brief All feature type (::fast_io::tuple)
+    /// @brief All feature type (::uwvm2::utils::container::tuple)
     using all_feature_t = decltype(all_features);
     static_assert(::fast_io::is_tuple<all_feature_t>);  // check is tuple
     static_assert(::std::is_empty_v<all_feature_t>);    // check is empty

@@ -38,6 +38,7 @@
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
+
 # include "fd.h"
 #endif
 
@@ -51,9 +52,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
     struct wasm_fd_storage_t
     {
         // Ensure that iterators can't fail during expansion
-        ::fast_io::vector<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_unique_ptr_t> opens{};
+        ::uwvm2::utils::container::vector<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_unique_ptr_t> opens{};
         // Used to record the coordinates of closure for subsequent builds
-        ::fast_io::vector<::std::size_t> closes{};
+        ::uwvm2::utils::container::vector<::std::size_t> closes{};
         ::fast_io::native_mutex fds_mutex{};  // [singleton]
         ::std::size_t fd_limit{};
     };

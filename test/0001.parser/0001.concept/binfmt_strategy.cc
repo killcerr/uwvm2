@@ -38,7 +38,7 @@
 #endif
 struct feature1
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"1"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"1"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
@@ -47,20 +47,20 @@ struct binfmt_ver1_module_storage_t
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr binfmt_ver1_module_storage_t handle_func(::fast_io::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
+inline constexpr binfmt_ver1_module_storage_t handle_func(::uwvm2::utils::container::tuple<Fs...>, ::std::byte const*, ::std::byte const*) UWVM_THROWS
 {
     return {};
 }
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<feature1>, ::fast_io::tuple<Fs...>) noexcept
+inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<feature1>, ::uwvm2::utils::container::tuple<Fs...>) noexcept
 {
     return ::std::addressof(handle_func<Fs...>);
 }
 
 struct feature2
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"2"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"2"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 

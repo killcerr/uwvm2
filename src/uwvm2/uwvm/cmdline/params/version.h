@@ -32,6 +32,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 #endif
 
@@ -43,7 +44,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     namespace details
     {
         inline bool version_is_exist{};
-        inline constexpr ::fast_io::array<::fast_io::u8string_view, 2uz> version_alias{u8"-v", u8"-ver"};
+        inline constexpr ::uwvm2::utils::container::array<::uwvm2::utils::container::u8string_view, 2uz> version_alias{u8"-v", u8"-ver"};
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type version_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                      ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                      ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;

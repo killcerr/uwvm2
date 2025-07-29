@@ -33,6 +33,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include "value_type.h"
 #endif
 
@@ -157,70 +158,70 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
         {
             switch(valtype)
             {
-                case value_type::i32: return ::fast_io::string_view{"i32"};
-                case value_type::i64: return ::fast_io::string_view{"i64"};
-                case value_type::f32: return ::fast_io::string_view{"f32"};
-                case value_type::f64: return ::fast_io::string_view{"f64"};
-                case value_type::v128: return ::fast_io::string_view{"v128"};
-                case value_type::funcref: return ::fast_io::string_view{"funcref"};
-                case value_type::externref: return ::fast_io::string_view{"externref"};
-                default: return ::fast_io::string_view{};
+                case value_type::i32: return ::uwvm2::utils::container::string_view{"i32"};
+                case value_type::i64: return ::uwvm2::utils::container::string_view{"i64"};
+                case value_type::f32: return ::uwvm2::utils::container::string_view{"f32"};
+                case value_type::f64: return ::uwvm2::utils::container::string_view{"f64"};
+                case value_type::v128: return ::uwvm2::utils::container::string_view{"v128"};
+                case value_type::funcref: return ::uwvm2::utils::container::string_view{"funcref"};
+                case value_type::externref: return ::uwvm2::utils::container::string_view{"externref"};
+                default: return ::uwvm2::utils::container::string_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, wchar_t>)
         {
             switch(valtype)
             {
-                case value_type::i32: return ::fast_io::wstring_view{L"i32"};
-                case value_type::i64: return ::fast_io::wstring_view{L"i64"};
-                case value_type::f32: return ::fast_io::wstring_view{L"f32"};
-                case value_type::f64: return ::fast_io::wstring_view{L"f64"};
-                case value_type::v128: return ::fast_io::wstring_view{L"v128"};
-                case value_type::funcref: return ::fast_io::wstring_view{L"funcref"};
-                case value_type::externref: return ::fast_io::wstring_view{L"externref"};
-                default: return ::fast_io::wstring_view{};
+                case value_type::i32: return ::uwvm2::utils::container::wstring_view{L"i32"};
+                case value_type::i64: return ::uwvm2::utils::container::wstring_view{L"i64"};
+                case value_type::f32: return ::uwvm2::utils::container::wstring_view{L"f32"};
+                case value_type::f64: return ::uwvm2::utils::container::wstring_view{L"f64"};
+                case value_type::v128: return ::uwvm2::utils::container::wstring_view{L"v128"};
+                case value_type::funcref: return ::uwvm2::utils::container::wstring_view{L"funcref"};
+                case value_type::externref: return ::uwvm2::utils::container::wstring_view{L"externref"};
+                default: return ::uwvm2::utils::container::wstring_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, char8_t>)
         {
             switch(valtype)
             {
-                case value_type::i32: return ::fast_io::u8string_view{u8"i32"};
-                case value_type::i64: return ::fast_io::u8string_view{u8"i64"};
-                case value_type::f32: return ::fast_io::u8string_view{u8"f32"};
-                case value_type::f64: return ::fast_io::u8string_view{u8"f64"};
-                case value_type::v128: return ::fast_io::u8string_view{u8"v128"};
-                case value_type::funcref: return ::fast_io::u8string_view{u8"funcref"};
-                case value_type::externref: return ::fast_io::u8string_view{u8"externref"};
-                default: return ::fast_io::u8string_view{};
+                case value_type::i32: return ::uwvm2::utils::container::u8string_view{u8"i32"};
+                case value_type::i64: return ::uwvm2::utils::container::u8string_view{u8"i64"};
+                case value_type::f32: return ::uwvm2::utils::container::u8string_view{u8"f32"};
+                case value_type::f64: return ::uwvm2::utils::container::u8string_view{u8"f64"};
+                case value_type::v128: return ::uwvm2::utils::container::u8string_view{u8"v128"};
+                case value_type::funcref: return ::uwvm2::utils::container::u8string_view{u8"funcref"};
+                case value_type::externref: return ::uwvm2::utils::container::u8string_view{u8"externref"};
+                default: return ::uwvm2::utils::container::u8string_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, char16_t>)
         {
             switch(valtype)
             {
-                case value_type::i32: return ::fast_io::u16string_view{u"i32"};
-                case value_type::i64: return ::fast_io::u16string_view{u"i64"};
-                case value_type::f32: return ::fast_io::u16string_view{u"f32"};
-                case value_type::f64: return ::fast_io::u16string_view{u"f64"};
-                case value_type::v128: return ::fast_io::u16string_view{u"v128"};
-                case value_type::funcref: return ::fast_io::u16string_view{u"funcref"};
-                case value_type::externref: return ::fast_io::u16string_view{u"externref"};
-                default: return ::fast_io::u16string_view{};
+                case value_type::i32: return ::uwvm2::utils::container::u16string_view{u"i32"};
+                case value_type::i64: return ::uwvm2::utils::container::u16string_view{u"i64"};
+                case value_type::f32: return ::uwvm2::utils::container::u16string_view{u"f32"};
+                case value_type::f64: return ::uwvm2::utils::container::u16string_view{u"f64"};
+                case value_type::v128: return ::uwvm2::utils::container::u16string_view{u"v128"};
+                case value_type::funcref: return ::uwvm2::utils::container::u16string_view{u"funcref"};
+                case value_type::externref: return ::uwvm2::utils::container::u16string_view{u"externref"};
+                default: return ::uwvm2::utils::container::u16string_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, char32_t>)
         {
             switch(valtype)
             {
-                case value_type::i32: return ::fast_io::u32string_view{U"i32"};
-                case value_type::i64: return ::fast_io::u32string_view{U"i64"};
-                case value_type::f32: return ::fast_io::u32string_view{U"f32"};
-                case value_type::f64: return ::fast_io::u32string_view{U"f64"};
-                case value_type::v128: return ::fast_io::u32string_view{U"v128"};
-                case value_type::funcref: return ::fast_io::u32string_view{U"funcref"};
-                case value_type::externref: return ::fast_io::u32string_view{U"externref"};
-                default: return ::fast_io::u32string_view{};
+                case value_type::i32: return ::uwvm2::utils::container::u32string_view{U"i32"};
+                case value_type::i64: return ::uwvm2::utils::container::u32string_view{U"i64"};
+                case value_type::f32: return ::uwvm2::utils::container::u32string_view{U"f32"};
+                case value_type::f64: return ::uwvm2::utils::container::u32string_view{U"f64"};
+                case value_type::v128: return ::uwvm2::utils::container::u32string_view{U"v128"};
+                case value_type::funcref: return ::uwvm2::utils::container::u32string_view{U"funcref"};
+                case value_type::externref: return ::uwvm2::utils::container::u32string_view{U"externref"};
+                default: return ::uwvm2::utils::container::u32string_view{};
             }
         }
     }

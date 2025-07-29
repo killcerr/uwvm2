@@ -35,6 +35,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
 # include <fast_io_dsal/array.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include "root.h"
 # include "operation.h"
@@ -80,7 +81,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     using splice_feature_parameter_t = decltype(splice_feature_parameter<Fs...>())::Type;
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline consteval auto splice_splice_feature_parameter_from_tuple(::fast_io::tuple<Fs...>) noexcept
+    inline consteval auto splice_splice_feature_parameter_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
     {
         return splice_feature_parameter<Fs...>();
     }
@@ -138,7 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     template <typename... Fs>
     struct feature_parameter_t
     {
-        using storage_t = splice_feature_parameter_t<Fs...>;  // ::fast_io::tuple
+        using storage_t = splice_feature_parameter_t<Fs...>;  // ::uwvm2::utils::container::tuple
         storage_t parameters{};
 
         // check is wasm feature
@@ -153,7 +154,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
     /// @brief get feature parameter type from wasm feature tuple
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline consteval auto get_feature_parameter_type_from_tuple(::fast_io::tuple<Fs...>) noexcept
+    inline consteval auto get_feature_parameter_type_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
     {
         check_has_duplicate_feature_parameter<Fs...>();
         return feature_parameter_t<Fs...>{};

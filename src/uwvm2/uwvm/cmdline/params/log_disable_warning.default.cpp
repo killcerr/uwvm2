@@ -31,6 +31,7 @@
 #ifndef UWVM_MODULE
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/uwvm/io/impl.h>

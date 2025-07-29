@@ -35,6 +35,7 @@
 # include <fast_io.h>
 # include <fast_io_crypto.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
@@ -132,7 +133,7 @@ namespace uwvm2::uwvm::cmdline::params::details
     }
 
     template <typename Stm, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
-    inline void version_u8print_wasm_feature_from_tuple(Stm&& stm, ::fast_io::tuple<Fs...>) noexcept
+    inline void version_u8print_wasm_feature_from_tuple(Stm&& stm, ::uwvm2::utils::container::tuple<Fs...>) noexcept
     {
         version_u8print_wasm_feature_impl<Stm, Fs...>(::std::forward<Stm>(stm));
     }

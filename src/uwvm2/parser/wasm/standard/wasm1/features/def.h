@@ -39,6 +39,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
@@ -90,7 +91,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     using final_text_format_wapper = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_text_format<Fs>())...>;
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline consteval auto get_final_text_format_wapper_from_tuple(::fast_io::tuple<Fs...>) noexcept
+    inline consteval auto get_final_text_format_wapper_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
     {
         return final_text_format_wapper<Fs...>{};
     }
@@ -285,8 +286,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         static_assert(is_valid_final_extern_type_t<Fs...>);
 
-        ::fast_io::u8string_view module_name{};
-        ::fast_io::u8string_view extern_name{};
+        ::uwvm2::utils::container::u8string_view module_name{};
+        ::uwvm2::utils::container::u8string_view extern_name{};
 
         final_extern_type_t<Fs...> imports{};
     };
@@ -378,8 +379,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief name checker
     struct name_checker
     {
-        ::fast_io::u8string_view module_name{};
-        ::fast_io::u8string_view extern_name{};
+        ::uwvm2::utils::container::u8string_view module_name{};
+        ::uwvm2::utils::container::u8string_view extern_name{};
     };
 
     inline constexpr bool operator== (name_checker const& n1, name_checker const& n2) noexcept
@@ -579,7 +580,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         static_assert(is_valid_final_export_type_t<Fs...>);
 
-        ::fast_io::u8string_view export_name{};
+        ::uwvm2::utils::container::u8string_view export_name{};
 
         final_export_type_t<Fs...> exports{};
     };

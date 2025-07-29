@@ -50,6 +50,7 @@
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/tuple.h>
 # include <uwvm2/utils/utf/impl.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/text_format/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
@@ -88,7 +89,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_id)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>; };
 
     template <typename Ty>
-    concept has_section_name_define = requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_name)>, ::fast_io::u8string_view>; };
+    concept has_section_name_define =
+        requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_name)>, ::uwvm2::utils::container::u8string_view>; };
 
     template <typename Ty, typename... Fs>
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
@@ -189,7 +191,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             static_assert(sizeof...(Sec) != 0);
 
             constexpr auto max{generate_section_max_id<Sec...>};
-            ::fast_io::array<::fast_io::u8string_view, max + 1u> res{};
+            ::uwvm2::utils::container::array<::uwvm2::utils::container::u8string_view, max + 1u> res{};
 
             [&res]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
             { ((res[Sec...[I] ::section_id] = Sec...[I] ::section_name), ...); }(::std::make_index_sequence<sizeof...(Sec)>{});

@@ -29,6 +29,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/uwvm_predefine/io/impl.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
@@ -42,7 +43,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 {
     struct timer
     {
-        ::fast_io::u8string_view s{};
+        ::uwvm2::utils::container::u8string_view s{};
         ::fast_io::unix_timestamp t0{};
 #ifdef __cpp_exceptions
         // `t0_success`: Only useful when exceptions are on, off exceptions directly crash the program.
@@ -52,7 +53,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
         // posix_clock_gettime may throw
         // Please use string literals initially to prevent dangling.
 
-        UWVM_GNU_COLD inline explicit timer(::fast_io::u8string_view strvw) noexcept : s{strvw}
+        UWVM_GNU_COLD inline explicit timer(::uwvm2::utils::container::u8string_view strvw) noexcept : s{strvw}
         {
 #ifdef __cpp_exceptions
             try

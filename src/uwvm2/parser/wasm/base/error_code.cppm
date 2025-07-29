@@ -34,6 +34,7 @@ module;
 export module uwvm2.parser.wasm.base:error_code;
 
 import fast_io;
+import uwvm2.utils.container;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

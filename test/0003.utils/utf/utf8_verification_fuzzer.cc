@@ -31,6 +31,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/utf/impl.h>
 #else
 # error "Module testing is not currently supported"
@@ -106,9 +107,9 @@ inline ::uwvm2::utils::utf::u8result reference_check_legal_utf8_rfc3629_unchecke
 }
 
 // Generate random test data
-inline ::fast_io::u8string generate_random_utf8_data(::std::size_t min_len, ::std::size_t max_len, ::std::size_t probability) noexcept
+inline ::uwvm2::utils::container::u8string generate_random_utf8_data(::std::size_t min_len, ::std::size_t max_len, ::std::size_t probability) noexcept
 {
-    ::fast_io::u8string data;
+    ::uwvm2::utils::container::u8string data;
     ::fast_io::ibuf_white_hole_engine eng;
     ::std::uniform_int_distribution<::std::size_t> len_engine{min_len, max_len};
     ::std::uniform_int_distribution<::std::size_t> probability_engine{0uz, 99uz};

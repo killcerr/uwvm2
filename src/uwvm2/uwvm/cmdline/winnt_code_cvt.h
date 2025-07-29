@@ -49,6 +49,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
@@ -63,7 +64,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
     struct nt_code_cvt_argv_storage UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        ::fast_io::vector<char8_t const*> argv{};
+        ::uwvm2::utils::container::vector<char8_t const*> argv{};
         ::fast_io::u8string parameter_sequence{};
         ::std::size_t argc{};
     };

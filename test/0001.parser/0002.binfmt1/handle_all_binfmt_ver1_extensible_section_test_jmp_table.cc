@@ -33,6 +33,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -51,7 +52,7 @@
 
 struct Sec0
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec0"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec0"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{0};
 
     // Expand on Sec1 here
@@ -73,7 +74,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec1
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec1"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec1"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{1};
 
     // Expand on Sec1 here
@@ -94,17 +95,17 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Feature1
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature1"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"Feature1"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    using binfmt_ver1_section_type = ::fast_io::tuple<Sec0, Sec1<Fs...>>;
+    using binfmt_ver1_section_type = ::uwvm2::utils::container::tuple<Sec0, Sec1<Fs...>>;
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
 struct Sec2
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec2"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec2"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{2};
 
     // Expand on Sec2 here
@@ -125,7 +126,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec3
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec3"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec3"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{3};
 
     // Unexpandable section
@@ -146,7 +147,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec4
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec4"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec4"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{4};
 
     // Unexpandable section
@@ -167,7 +168,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec5
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec5"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec5"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{5};
 
     // Unexpandable section
@@ -188,7 +189,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec6
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec6"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec6"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{6};
 
     // Unexpandable section
@@ -209,7 +210,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec7
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec7"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec7"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{7};
 
     // Unexpandable section
@@ -230,7 +231,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec8
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec8"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec8"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{8};
 
     // Unexpandable section
@@ -251,7 +252,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec9
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec9"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec9"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{9};
 
     // Unexpandable section
@@ -272,7 +273,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec10
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec10"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec10"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{10};
 
     // Unexpandable section
@@ -293,7 +294,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec11
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec11"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec11"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{11};
 
     // Unexpandable section
@@ -314,7 +315,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec12
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec12"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec12"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{12};
 
     // Unexpandable section
@@ -335,7 +336,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec13
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec13"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec13"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{13};
 
     // Unexpandable section
@@ -356,7 +357,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec14
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec14"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec14"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{14};
 
     // Unexpandable section
@@ -377,7 +378,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec15
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec15"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec15"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{15};
 
     // Unexpandable section
@@ -398,7 +399,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec16
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec16"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec16"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{16};
 
     // Unexpandable section
@@ -419,7 +420,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec17
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec17"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec17"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{17};
 
     // Unexpandable section
@@ -440,7 +441,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec18
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec18"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec18"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{18};
 
     // Unexpandable section
@@ -461,7 +462,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec19
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec19"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec19"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{19};
 
     // Unexpandable section
@@ -482,7 +483,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Sec20
 {
-    inline static constexpr ::fast_io::u8string_view section_name{u8"Sec20"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Sec20"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{20};
 
     // Unexpandable section
@@ -503,22 +504,22 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
 
 struct Feature2
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature2"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"Feature2"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using binfmt_ver1_section_type =
-        ::fast_io::tuple<Sec2<Fs...>, Sec3, Sec4, Sec5, Sec6, Sec7, Sec8, Sec9, Sec10, Sec11, Sec12, Sec13, Sec14, Sec15, Sec16, Sec17, Sec18, Sec19, Sec20>;
+        ::uwvm2::utils::container::tuple<Sec2<Fs...>, Sec3, Sec4, Sec5, Sec6, Sec7, Sec8, Sec9, Sec10, Sec11, Sec12, Sec13, Sec14, Sec15, Sec16, Sec17, Sec18, Sec19, Sec20>;
 };
 
 struct Feature3
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"Feature3"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"Feature3"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<Feature1>, ::fast_io::tuple<Fs...>) noexcept
+inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<Feature1>, ::uwvm2::utils::container::tuple<Fs...>) noexcept
 {
     return ::std::addressof(::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>);
 }
@@ -538,7 +539,7 @@ sections:      Sec1(ext) Sec2(ext) Sec3
 int main(int argc, char**)
 {
     /// @brief All feature
-    constexpr ::fast_io::tuple<Feature1, Feature2, Feature3> all_features{};
+    constexpr ::uwvm2::utils::container::tuple<Feature1, Feature2, Feature3> all_features{};
     // [[maybe_unused]] using all_feature_t = decltype(all_features);
 
     /// @brief wasm binfmt ver1 features

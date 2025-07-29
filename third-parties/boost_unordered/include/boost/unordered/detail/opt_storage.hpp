@@ -15,7 +15,14 @@ namespace boost {
     namespace detail {
       template <class T> union opt_storage
       {
-        [[no_unique_address]] T t_;
+#ifndef __INTELLISENSE__
+#if __has_cpp_attribute(msvc::no_unique_address)
+	      [[msvc::no_unique_address]]
+#elif __has_cpp_attribute(no_unique_address) >= 201803
+	      [[no_unique_address]]
+#endif
+#endif
+        T t_;
 
         opt_storage() {}
         ~opt_storage() {}

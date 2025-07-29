@@ -31,6 +31,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 #endif
 
@@ -43,7 +44,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     namespace details
     {
         inline bool help_is_exist{};
-        inline constexpr ::fast_io::u8string_view help_alias{u8"-h"};
+        inline constexpr ::uwvm2::utils::container::u8string_view help_alias{u8"-h"};
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type help_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                   ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                   ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;

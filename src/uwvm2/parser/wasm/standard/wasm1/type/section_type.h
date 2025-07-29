@@ -33,6 +33,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include "value_type.h"
 # include "value_binfmt.h"
 #endif
@@ -139,55 +140,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         {
             switch(exttype)
             {
-                case external_types::func: return ::fast_io::string_view{"func"};
-                case external_types::table: return ::fast_io::string_view{"table"};
-                case external_types::memory: return ::fast_io::string_view{"memory"};
-                case external_types::global: return ::fast_io::string_view{"global"};
-                default: return ::fast_io::string_view{};
+                case external_types::func: return ::uwvm2::utils::container::string_view{"func"};
+                case external_types::table: return ::uwvm2::utils::container::string_view{"table"};
+                case external_types::memory: return ::uwvm2::utils::container::string_view{"memory"};
+                case external_types::global: return ::uwvm2::utils::container::string_view{"global"};
+                default: return ::uwvm2::utils::container::string_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, wchar_t>)
         {
             switch(exttype)
             {
-                case external_types::func: return ::fast_io::wstring_view{L"func"};
-                case external_types::table: return ::fast_io::wstring_view{L"table"};
-                case external_types::memory: return ::fast_io::wstring_view{L"memory"};
-                case external_types::global: return ::fast_io::wstring_view{L"global"};
-                default: return ::fast_io::wstring_view{};
+                case external_types::func: return ::uwvm2::utils::container::wstring_view{L"func"};
+                case external_types::table: return ::uwvm2::utils::container::wstring_view{L"table"};
+                case external_types::memory: return ::uwvm2::utils::container::wstring_view{L"memory"};
+                case external_types::global: return ::uwvm2::utils::container::wstring_view{L"global"};
+                default: return ::uwvm2::utils::container::wstring_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, char8_t>)
         {
             switch(exttype)
             {
-                case external_types::func: return ::fast_io::u8string_view{u8"func"};
-                case external_types::table: return ::fast_io::u8string_view{u8"table"};
-                case external_types::memory: return ::fast_io::u8string_view{u8"memory"};
-                case external_types::global: return ::fast_io::u8string_view{u8"global"};
-                default: return ::fast_io::u8string_view{};
+                case external_types::func: return ::uwvm2::utils::container::u8string_view{u8"func"};
+                case external_types::table: return ::uwvm2::utils::container::u8string_view{u8"table"};
+                case external_types::memory: return ::uwvm2::utils::container::u8string_view{u8"memory"};
+                case external_types::global: return ::uwvm2::utils::container::u8string_view{u8"global"};
+                default: return ::uwvm2::utils::container::u8string_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, char16_t>)
         {
             switch(exttype)
             {
-                case external_types::func: return ::fast_io::u16string_view{u"func"};
-                case external_types::table: return ::fast_io::u16string_view{u"table"};
-                case external_types::memory: return ::fast_io::u16string_view{u"memory"};
-                case external_types::global: return ::fast_io::u16string_view{u"global"};
-                default: return ::fast_io::u16string_view{};
+                case external_types::func: return ::uwvm2::utils::container::u16string_view{u"func"};
+                case external_types::table: return ::uwvm2::utils::container::u16string_view{u"table"};
+                case external_types::memory: return ::uwvm2::utils::container::u16string_view{u"memory"};
+                case external_types::global: return ::uwvm2::utils::container::u16string_view{u"global"};
+                default: return ::uwvm2::utils::container::u16string_view{};
             }
         }
         else if constexpr(::std::same_as<char_type, char32_t>)
         {
             switch(exttype)
             {
-                case external_types::func: return ::fast_io::u32string_view{U"func"};
-                case external_types::table: return ::fast_io::u32string_view{U"table"};
-                case external_types::memory: return ::fast_io::u32string_view{U"memory"};
-                case external_types::global: return ::fast_io::u32string_view{U"global"};
-                default: return ::fast_io::u32string_view{};
+                case external_types::func: return ::uwvm2::utils::container::u32string_view{U"func"};
+                case external_types::table: return ::uwvm2::utils::container::u32string_view{U"table"};
+                case external_types::memory: return ::uwvm2::utils::container::u32string_view{U"memory"};
+                case external_types::global: return ::uwvm2::utils::container::u32string_view{U"global"};
+                default: return ::uwvm2::utils::container::u32string_view{};
             }
         }
     }

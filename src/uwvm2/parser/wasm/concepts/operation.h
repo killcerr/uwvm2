@@ -39,6 +39,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
 # include <fast_io_dsal/array.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include "root.h"
 #endif
@@ -161,7 +162,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
         /// @brief      Checking for duplicate binfmt version handler functions from tuple
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        inline consteval void check_has_duplicate_binfmt_handler_from_tuple(::fast_io::tuple<Fs...>) noexcept
+        inline consteval void check_has_duplicate_binfmt_handler_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
         {
             check_has_duplicate_binfmt_handler<Fs...>();
         }
@@ -171,7 +172,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             /// @brief Get the function type from the tuple
             template <typename module_storage_t, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
             inline consteval binfmt_handle_version_func_p_type<module_storage_t, Fs...>
-                get_binfmt_handle_version_func_p_type_from_tuple(::fast_io::tuple<Fs...>) noexcept
+                get_binfmt_handle_version_func_p_type_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
             {
                 return ::uwvm2::parser::wasm::concepts::binfmt_handle_version_func_p_type<module_storage_t, Fs...>{};
             }
@@ -201,11 +202,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             ///                 inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{2};
             ///             };
             ///
-            ///             using all_features = ::fast_io::tuple<B1F1, B1F2, B2F3>;
+            ///             using all_features = ::uwvm2::utils::container::tuple<B1F1, B1F2, B2F3>;
             ///
-            ///             using binfmt1_features = Fs_binfmt_controler_r<1, B1F1, B1F2, B2F3>; // same_as ::fast_io::tuple<B1F1, B1F2>
+            ///             using binfmt1_features = Fs_binfmt_controler_r<1, B1F1, B1F2, B2F3>; // same_as ::uwvm2::utils::container::tuple<B1F1, B1F2>
             ///
-            ///             using binfmt2_features = Fs_binfmt_controler_r<2, B1F1, B1F2, B2F3>; // same_as ::fast_io::tuple<B2F3>
+            ///             using binfmt2_features = Fs_binfmt_controler_r<2, B1F1, B1F2, B2F3>; // same_as ::uwvm2::utils::container::tuple<B2F3>
             ///
             ///             ```
 
@@ -214,9 +215,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             struct tuple_type_merger;
 
             template <typename... F1, typename... F2>
-            struct tuple_type_merger<::fast_io::tuple<F1...>, ::fast_io::tuple<F2...>>
+            struct tuple_type_merger<::uwvm2::utils::container::tuple<F1...>, ::uwvm2::utils::container::tuple<F2...>>
             {
-                using Result = ::fast_io::tuple<F1..., F2...>;
+                using Result = ::uwvm2::utils::container::tuple<F1..., F2...>;
             };
 
             /// @brief Sift out tuples of the same version
@@ -226,21 +227,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer>
             struct Fs_binfmt_controler<BinfmtVer>
             {
-                using Result = ::fast_io::tuple<>;
+                using Result = ::uwvm2::utils::container::tuple<>;
             };
 
             template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer, typename F>
             struct Fs_binfmt_controler<BinfmtVer, F>
             {
                 inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver{get_binfmt_version<F>()};
-                using Result = ::std::conditional_t<(binfmt_ver == BinfmtVer), ::fast_io::tuple<F>, ::fast_io::tuple<>>;
+                using Result = ::std::conditional_t<(binfmt_ver == BinfmtVer), ::uwvm2::utils::container::tuple<F>, ::uwvm2::utils::container::tuple<>>;
             };
 
             template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 BinfmtVer, typename F, typename... Fs>
             struct Fs_binfmt_controler<BinfmtVer, F, Fs...>
             {
                 inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver{get_binfmt_version<F>()};
-                using CurrentResult = ::std::conditional_t<(binfmt_ver == BinfmtVer), ::fast_io::tuple<F>, ::fast_io::tuple<>>;
+                using CurrentResult = ::std::conditional_t<(binfmt_ver == BinfmtVer), ::uwvm2::utils::container::tuple<F>, ::uwvm2::utils::container::tuple<>>;
                 using RestResult = Fs_binfmt_controler<BinfmtVer, Fs...>::Result;
 
                 using Result = tuple_type_merger<CurrentResult, RestResult>::Result;
@@ -268,7 +269,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         template <::uwvm2::parser::wasm::concepts::wasm_feature F,
                   ::uwvm2::parser::wasm::concepts::wasm_feature... Fs1,
                   ::uwvm2::parser::wasm::concepts::wasm_feature... AllFs>
-        inline consteval auto get_module_storage_type_from_singal_tuple(::fast_io::tuple<AllFs...> all_feature_tuple) noexcept
+        inline consteval auto get_module_storage_type_from_singal_tuple(::uwvm2::utils::container::tuple<AllFs...> all_feature_tuple) noexcept
         {
             constexpr bool can_func_get_module_storage_type{::uwvm2::parser::wasm::concepts::has_wasm_binfmt_parsering_strategy<F>};
 
@@ -289,7 +290,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         }
 
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        inline consteval auto get_module_storage_type_from_tuple(::fast_io::tuple<Fs...> t) noexcept
+        inline consteval auto get_module_storage_type_from_tuple(::uwvm2::utils::container::tuple<Fs...> t) noexcept
         {
             return get_module_storage_type_from_singal_tuple<Fs...>(t);
         }
@@ -355,7 +356,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         /// @brief      Get binfmt version handler functions from tuple
         /// @details    You can pass values directly when passing registers.
         template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        inline consteval auto get_binfmt_handler_func_p_from_tuple(::fast_io::tuple<Fs...>) noexcept
+        inline consteval auto get_binfmt_handler_func_p_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
         {
             return get_binfmt_handler_func_p<binfmt_version, Fs...>();
         }
@@ -370,7 +371,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
         /// @brief      Get binfmt version tuple type from tuple
         template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        inline consteval auto get_specified_binfmt_feature_tuple_from_all_features_tuple(::fast_io::tuple<Fs...>) noexcept
+        inline consteval auto get_specified_binfmt_feature_tuple_from_all_features_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
         {
             return get_specified_binfmt_feature_tuple_from_all_features<binfmt_version, Fs...>();
         }
@@ -432,7 +433,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
                 requires (::std::same_as<T<typename Args::superseded, typename Args::replacement>,
                                          type_replacer<typename Args::superseded, typename Args::replacement>> &&
                           ...)
-            inline consteval auto replacement_structure_followup_impl(::fast_io::array<bool, sizeof...(Args)>& repeating) noexcept
+            inline consteval auto replacement_structure_followup_impl(::uwvm2::utils::container::array<bool, sizeof...(Args)>& repeating) noexcept
             {
                 bool is_repeatable{};
                 return [&is_repeatable, &repeating]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
@@ -506,7 +507,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         inline consteval auto replacement_structure() noexcept
         {
             // repeating_table is used to detect loops, if the loop will hit an existing element, terminate it.
-            ::fast_io::array<bool, sizeof...(Args)> repeating_table{};
+            ::uwvm2::utils::container::array<bool, sizeof...(Args)> repeating_table{};
             return details::replacement_structure_followup_impl<type_replacer, root_of_replacement, Args...>(repeating_table);
         }
 
@@ -518,7 +519,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         template <typename... Fs>
         struct tuple_megger
         {
-            using Type = ::fast_io::tuple<Fs...>;
+            using Type = ::uwvm2::utils::container::tuple<Fs...>;
         };
 
         template <typename... T1, typename... T2>
@@ -529,7 +530,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
         }
 
         template <typename... Fs>
-        inline consteval tuple_megger<Fs...> get_tuple_megger_from_tuple(::fast_io::tuple<Fs...>) noexcept
+        inline consteval tuple_megger<Fs...> get_tuple_megger_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
         {
             return tuple_megger<Fs...>{};
         }
@@ -564,28 +565,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 
         /// @brief get first type in tuple
         template <typename TyGet, typename... Tys>
-        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...>& tuple) noexcept
+        inline constexpr auto&& get_first_type_in_tuple(::uwvm2::utils::container::tuple<Tys...>& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
             return get<type_index>(tuple);
         }
 
         template <typename TyGet, typename... Tys>
-        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...> const& tuple) noexcept
+        inline constexpr auto&& get_first_type_in_tuple(::uwvm2::utils::container::tuple<Tys...> const& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
             return get<type_index>(tuple);
         }
 
         template <typename TyGet, typename... Tys>
-        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...>&& tuple) noexcept
+        inline constexpr auto&& get_first_type_in_tuple(::uwvm2::utils::container::tuple<Tys...>&& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
             return get<type_index>(tuple);
         }
 
         template <typename TyGet, typename... Tys>
-        inline constexpr auto&& get_first_type_in_tuple(::fast_io::tuple<Tys...> const&& tuple) noexcept
+        inline constexpr auto&& get_first_type_in_tuple(::uwvm2::utils::container::tuple<Tys...> const&& tuple) noexcept
         {
             constexpr ::std::size_t type_index{get_first_type_index_in_tuple<TyGet, Tys...>()};
             return get<type_index>(tuple);

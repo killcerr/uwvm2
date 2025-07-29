@@ -40,6 +40,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/utils/impl.h>
@@ -63,18 +64,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct export_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::fast_io::u8string_view section_name{u8"Export"};
+        inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Export"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(::uwvm2::parser::wasm::standard::wasm1::section::section_id::export_sec)};
 
         ::uwvm2::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_export_type<Fs...>> exports{};
+        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_export_type<Fs...>> exports{};
 
         inline static constexpr ::std::size_t exportdesc_count{
             static_cast<::std::size_t>(decltype(::uwvm2::parser::wasm::standard::wasm1::features::final_export_type_t<Fs...>{}.type)::external_type_end) + 1uz};
-        ::fast_io::array<::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_export_type<Fs...> const*>, exportdesc_count>
-            exportdesc{};
+        ::uwvm2::utils::container::
+            array<::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_export_type<Fs...> const*>, exportdesc_count>
+                exportdesc{};
     };
 
     /// @brief Define function for wasm1 external_types
@@ -330,10 +332,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                                         ^^ section_curr
 
         constexpr ::std::size_t exportdesc_count{exportsec.exportdesc_count};
-        ::fast_io::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, exportdesc_count> exportdesc_counter{};  // use for reserve
+        ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, exportdesc_count> exportdesc_counter{};  // use for reserve
         // desc counter
 
-        ::fast_io::array<::std::set<::fast_io::u8string_view> /* @todo use fast_io::set instead */, exportdesc_count>
+        ::uwvm2::utils::container::array<::std::set<::uwvm2::utils::container::u8string_view> /* @todo use fast_io::set instead */, exportdesc_count>
             duplicate_name_checker{};  // use for check duplicate name
 
         while(section_curr != section_end) [[likely]]
@@ -424,7 +426,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             //                          ^^ section_curr
 
             // No access, security
-            fwet.export_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), export_namelen};
+            fwet.export_name = ::uwvm2::utils::container::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), export_namelen};
 
             // For platforms with CHAR_BIT greater than 8, the view here does not need to do any non-zero checking of non-low 8 bits within a single byte,
             // because a standards-compliant UTF-8 decoder must only care about the low 8 bits of each byte when verifying or decoding a byte sequence.

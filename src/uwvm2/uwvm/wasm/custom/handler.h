@@ -37,6 +37,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/features/impl.h>
@@ -63,7 +64,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
     };
 
     inline void handle_binfmtver1_custom_section(::uwvm2::uwvm::wasm::type::wasm_file_t & wasm_file,
-                                                 ::std::map<::fast_io::u8string_view, handlefunc_t> const& custom_handler) noexcept
+                                                 ::std::map<::uwvm2::utils::container::u8string_view, handlefunc_t> const& custom_handler) noexcept
     {
         if(wasm_file.binfmt_ver != 1u) [[unlikely]] { return; }
 

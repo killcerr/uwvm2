@@ -29,6 +29,7 @@ module;
 export module uwvm2.utils.debug:timer;
 
 import fast_io;
+import uwvm2.utils.container;
 import uwvm2.utils.ansies;
 import uwvm2.uwvm_predefine.io;
 import uwvm2.uwvm_predefine.utils.ansies;

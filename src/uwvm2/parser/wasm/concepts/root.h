@@ -35,6 +35,7 @@
 # include <fast_io_dsal/tuple.h>
 # include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/utf/impl.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/text_format/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -85,7 +86,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     ///             ```cpp
     ///             struct feature
     ///             {
-    ///                 inline static constexpr ::fast_io::u8string_view feature_name{u8"<name>"};
+    ///                 inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"<name>"};
     ///             };
     ///             ```
     ///
@@ -94,12 +95,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     ///             ```cpp
     ///             struct feature
     ///             {
-    ///                 ::fast_io::u8string_view feature_name{u8"<name>"};
+    ///                 ::uwvm2::utils::container::u8string_view feature_name{u8"<name>"};
     ///             };
     ///             ```
     template <typename FeatureType>
-    concept has_feature_name =
-        requires { requires ::std::same_as<::std::remove_cvref_t<decltype(::std::remove_cvref_t<FeatureType>::feature_name)>, ::fast_io::u8string_view>; };
+    concept has_feature_name = requires {
+        requires ::std::same_as<::std::remove_cvref_t<decltype(::std::remove_cvref_t<FeatureType>::feature_name)>, ::uwvm2::utils::container::u8string_view>;
+    };
 
     /// @brief      declaration feature parameter
     template <typename... Fs>
@@ -156,7 +158,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     ///
     ///             template <wasm_feature ... Fs>
     ///             inline constexpr binfmt_handle_version_func_p_type<Fs...> define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>,
-    ///             ::fast_io::tuple<Fs ...>) {}
+    ///             ::uwvm2::utils::container::tuple<Fs ...>) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // OK. Provide a parsing strategy where binfmt version is 1
     ///             ```
@@ -170,14 +172,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     ///
     ///             template <wasm_feature ... Fs>
     ///             inline constexpr binfmt_handle_version_func_p_type<Fs...> define_wasm_binfmt_parsering_strategy(feature_reserve_type_t<feature>,
-    ///             ::fast_io::tuple<Fs ...>) {}
+    ///             ::uwvm2::utils::container::tuple<Fs ...>) {}
     ///
     ///             static_assert(has_wasm_binfmt_parsering_strategy<feature>); // ERROR.
     ///             ```
     template <typename FeatureType>
     concept has_wasm_binfmt_parsering_strategy = requires {
         {
-            define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, {/* ::fast_io::tuple<Fs ...> */})
+            define_wasm_binfmt_parsering_strategy(feature_reserve_type<::std::remove_cvref_t<FeatureType>>, {/* ::uwvm2::utils::container::tuple<Fs ...> */})
         } /* -> binfmt_handle_version_func_p_type<Fs...> */;
     };
 

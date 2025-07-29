@@ -51,6 +51,7 @@
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/intrinsics/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
@@ -74,7 +75,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 {
     struct function_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::fast_io::u8string_view section_name{u8"Function"};
+        inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Function"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(::uwvm2::parser::wasm::standard::wasm1::section::section_id::function_sec)};
 
@@ -1197,7 +1198,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     template <::std::size_t table_size, ::std::size_t max_leb_size, ::std::uint8_t mask_zero>
         requires (::std::popcount(table_size) == 1u && ::std::popcount(max_leb_size) == 1u)  // Check to see if it is an nth power of 2
-    inline constexpr ::fast_io::array<simd128_shuffle_table_t, table_size> generate_simd128_shuffle_table() noexcept
+    inline constexpr ::uwvm2::utils::container::array<simd128_shuffle_table_t, table_size> generate_simd128_shuffle_table() noexcept
     {
         // Since all shuffles have a channel width of 128, only the 128 version can be done
         constexpr ::std::size_t vector_size{16uz};
@@ -1227,7 +1228,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             mask_zero   // 15
         };
 
-        ::fast_io::array<simd128_shuffle_table_t, table_size> ret{};
+        ::uwvm2::utils::container::array<simd128_shuffle_table_t, table_size> ret{};
 
         for(::std::size_t i{}; i != table_size; ++i)
         {
@@ -1946,7 +1947,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 {
                     check_mask_curr >>= 32u;
 
-                    auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(simd_vector_str)};
+                    auto const need_write_u8x32x2{::std::bit_cast<::uwvm2::utils::container::array<u8x32simd, 2uz>>(simd_vector_str)};
 
                     auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
 
@@ -2233,7 +2234,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                   -1   // 63
                                                                   )};
 
-                    auto const need_write_u8x32x2{::std::bit_cast<::fast_io::array<u8x32simd, 2uz>>(need_write)};
+                    auto const need_write_u8x32x2{::std::bit_cast<::uwvm2::utils::container::array<u8x32simd, 2uz>>(need_write)};
 
                     auto const need_write_u8x32x2v0{need_write_u8x32x2.front_unchecked()};
 
@@ -2466,7 +2467,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)
                 static_cast<unsigned>(__builtin_ia32_pmovmskb256(::std::bit_cast<c8x32simd>(simd_vector_str)))
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)
-                ::std::bit_cast<::fast_io::array<unsigned, 8uz>>(__builtin_lasx_xvmskltz_b(::std::bit_cast<i8x32simd>(simd_vector_str))).front_unchecked()
+                ::std::bit_cast<::uwvm2::utils::container::array<unsigned, 8uz>>(__builtin_lasx_xvmskltz_b(::std::bit_cast<i8x32simd>(simd_vector_str)))
+                    .front_unchecked()
 # else
 #  error "missing instructions"
 # endif
@@ -2577,7 +2579,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // shuffle and write
 
                         // avx2 since shuffle is in channels of 128, just splice directly
-                        ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
+                        ::uwvm2::utils::container::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
                         u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
                         u8x32simd simd_vector_str_shuffle;
@@ -2920,7 +2922,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             }
                         }
 
-                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(needwrite_u8x32)};
+                        auto const needwrite_u8x16x2{::std::bit_cast<::uwvm2::utils::container::array<u8x16simd, 2uz>>(needwrite_u8x32)};
 
                         auto const needwrite_u8x16x2v0{needwrite_u8x16x2.front_unchecked()};
 
@@ -2974,7 +2976,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // write 16 byte
                         using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
 
-                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(simd_vector_str)};
+                        auto const needwrite_u8x16x2{::std::bit_cast<::uwvm2::utils::container::array<u8x16simd, 2uz>>(simd_vector_str)};
 
                         //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
                         // [                 needwrite_u16x8x2v0           ]
@@ -3220,7 +3222,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         // shuffle and write
 
-                        ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
+                        ::uwvm2::utils::container::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
                         u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
                         u8x32simd simd_vector_str_shuffle;
@@ -3563,7 +3565,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             }
                         }
 
-                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(needwrite_u8x32)};
+                        auto const needwrite_u8x16x2{::std::bit_cast<::uwvm2::utils::container::array<u8x16simd, 2uz>>(needwrite_u8x32)};
 
                         auto const needwrite_u8x16x2v0{needwrite_u8x16x2.front_unchecked()};
 
@@ -3617,7 +3619,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // write 16 byte
                         using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
 
-                        auto const needwrite_u8x16x2{::std::bit_cast<::fast_io::array<u8x16simd, 2uz>>(third_fourth_round_simd_u8x32)};
+                        auto const needwrite_u8x16x2{::std::bit_cast<::uwvm2::utils::container::array<u8x16simd, 2uz>>(third_fourth_round_simd_u8x32)};
 
                         //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
                         // [                 needwrite_u16x8x2v0           ]
@@ -3829,7 +3831,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
                 static_cast<unsigned>(__builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(simd_vector_str)))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)
-                ::std::bit_cast<::fast_io::array<unsigned, 4uz>>(__builtin_lsx_vmskltz_b(::std::bit_cast<i8x16simd>(simd_vector_str))).front_unchecked()
+                ::std::bit_cast<::uwvm2::utils::container::array<unsigned, 4uz>>(__builtin_lsx_vmskltz_b(::std::bit_cast<i8x16simd>(simd_vector_str)))
+                    .front_unchecked()
 # else
 #  error "missing instructions"
 # endif
@@ -3889,7 +3892,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // write 8 byte
                         using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
 
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(simd_vector_str)};
+                        auto const needwrite_u8x8x2{::std::bit_cast<::uwvm2::utils::container::array<u8x8simd, 2uz>>(simd_vector_str)};
 
                         //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
                         // [   needwrite_u8x8x2v0  ]
@@ -4050,7 +4053,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                                       ))};
 
                         using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
+                        auto const needwrite_u8x8x2{::std::bit_cast<::uwvm2::utils::container::array<u8x8simd, 2uz>>(needwrite_u8x16)};
 
                         auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
 
@@ -4142,7 +4145,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // write 8 byte
                         using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
 
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(simd_vector_str_need_shf)};
+                        auto const needwrite_u8x8x2{::std::bit_cast<::uwvm2::utils::container::array<u8x8simd, 2uz>>(simd_vector_str_need_shf)};
 
                         //  XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX
                         // [       last write      ]
@@ -4300,7 +4303,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                                       ))};
 
                         using u8x8simd [[__gnu__::__vector_size__(8)]] [[maybe_unused]] = ::std::uint8_t;
-                        auto const needwrite_u8x8x2{::std::bit_cast<::fast_io::array<u8x8simd, 2uz>>(needwrite_u8x16)};
+                        auto const needwrite_u8x8x2{::std::bit_cast<::uwvm2::utils::container::array<u8x8simd, 2uz>>(needwrite_u8x16)};
 
                         auto const needwrite_u8x8x2v0{needwrite_u8x8x2.front_unchecked()};
 
@@ -5469,7 +5472,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 using u16x64multisimd2x512 [[__gnu__::__vector_size__(128)]] [[maybe_unused]] = ::std::uint16_t;
                 using u8x128multisimd2x512 [[__gnu__::__vector_size__(128)]] [[maybe_unused]] = ::std::uint8_t;
 
-                ::fast_io::array<u8x64simd, 2uz> const need_write_u8x64x2{simd_vector_str};
+                ::uwvm2::utils::container::array<u8x64simd, 2uz> const need_write_u8x64x2{simd_vector_str};
 
                 auto const need_write_u8x128{::std::bit_cast<u8x128multisimd2x512>(need_write_u8x64x2)};
 
@@ -5789,7 +5792,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)
                 static_cast<unsigned>(__builtin_ia32_pmovmskb256(::std::bit_cast<c8x32simd>(simd_vector_str)))
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvmskltz_b)
-                ::std::bit_cast<::fast_io::array<unsigned, 8uz>>(__builtin_lasx_xvmskltz_b(::std::bit_cast<i8x32simd>(simd_vector_str))).front_unchecked()
+                ::std::bit_cast<::uwvm2::utils::container::array<unsigned, 8uz>>(__builtin_lasx_xvmskltz_b(::std::bit_cast<i8x32simd>(simd_vector_str)))
+                    .front_unchecked()
 # else
 #  error "missing instructions"
 # endif
@@ -5899,7 +5903,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         // shuffle and write
 
-                        ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
+                        ::uwvm2::utils::container::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
                         u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
                         u8x32simd simd_vector_str_shuffle;
@@ -6468,7 +6472,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         // shuffle and write
 
-                        ::fast_io::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
+                        ::uwvm2::utils::container::array<u8x16simd, 2uz> const mask_table_u8x16x2{curr_table_shuffle_mask_1st, curr_table_shuffle_mask_2nd};
                         u8x32simd const mask_tableu8x32{::std::bit_cast<u8x32simd>(mask_table_u8x16x2)};
 
                         u8x32simd simd_vector_str_shuffle;
@@ -7086,7 +7090,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 # if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
                 static_cast<unsigned>(__builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(simd_vector_str)))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_vmskltz_b)
-                ::std::bit_cast<::fast_io::array<unsigned, 4uz>>(__builtin_lsx_vmskltz_b(::std::bit_cast<i8x16simd>(simd_vector_str))).front_unchecked()
+                ::std::bit_cast<::uwvm2::utils::container::array<unsigned, 4uz>>(__builtin_lsx_vmskltz_b(::std::bit_cast<i8x16simd>(simd_vector_str)))
+                    .front_unchecked()
 # else
 #  error "missing instructions"
 # endif

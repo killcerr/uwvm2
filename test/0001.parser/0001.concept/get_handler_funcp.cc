@@ -45,7 +45,7 @@
 
 struct B1F1
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"B1F1"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"B1F1"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
@@ -69,7 +69,7 @@ inline constexpr binfmt_ver1_module_storage_t binfmt_ver1_handle_func(::std::byt
 }
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<B1F1>, ::fast_io::tuple<Fs...>) noexcept
+inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<B1F1>, ::uwvm2::utils::container::tuple<Fs...>) noexcept
 {
     // Since B1F1 defines binfmt as 1 and also defines the handler function, this function is the parsing function for binfmt1
     return ::std::addressof(binfmt_ver1_handle_func<Fs...>);
@@ -77,13 +77,13 @@ inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::was
 
 struct B1F2
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"B1F2"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"B1F2"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 };
 
 struct B2F3
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"B2F3"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"B2F3"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{2u};
 };
 
@@ -108,7 +108,7 @@ inline constexpr binfmt_ver2_module_storage_t<Fs...> binfmt_ver2_handle_func(::s
 }
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<B2F3>, ::fast_io::tuple<Fs...>) noexcept
+inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<B2F3>, ::uwvm2::utils::container::tuple<Fs...>) noexcept
 {
     // Since B2F3 defines binfmt as 2 and also defines the handler function, this function is the parsing function for binfmt1
     return ::std::addressof(binfmt_ver2_handle_func<Fs...>);
@@ -116,14 +116,14 @@ inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::was
 
 int main()
 {
-    constexpr ::fast_io::tuple<B1F1, B1F2, B2F3> features{};
+    constexpr ::uwvm2::utils::container::tuple<B1F1, B1F2, B2F3> features{};
 
     ::uwvm2::parser::wasm::base::error_impl e{};
 
     constexpr auto binfmt1_funcp{::uwvm2::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(features)};
     using wasm_binfmt1_features_t =
         decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_features_tuple<1>(features));
-    static_assert(::std::same_as<wasm_binfmt1_features_t, ::fast_io::tuple<B1F1, B1F2>>, "wasm_binfmt1_features_t includes only features with a binfmt of 1");
+    static_assert(::std::same_as<wasm_binfmt1_features_t, ::uwvm2::utils::container::tuple<B1F1, B1F2>>, "wasm_binfmt1_features_t includes only features with a binfmt of 1");
     using wasm_binfmt1_storage_t = decltype(::uwvm2::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features_t{}));
     static_assert(::std::same_as<wasm_binfmt1_storage_t, binfmt_ver1_module_storage_t>,
                   "wasm_binfmt1_storage_t is the type returned by binfmt_ver1_handle_func<B1F1, B1F2>");
@@ -134,7 +134,7 @@ int main()
     constexpr auto binfmt2_funcp{::uwvm2::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<2>(features)};
     using wasm_binfmt2_features_t =
         decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_features_tuple<2>(features));
-    static_assert(::std::same_as<wasm_binfmt2_features_t, ::fast_io::tuple<B2F3>>, "wasm_binfmt2_features_t includes only features with a binfmt of 2");
+    static_assert(::std::same_as<wasm_binfmt2_features_t, ::uwvm2::utils::container::tuple<B2F3>>, "wasm_binfmt2_features_t includes only features with a binfmt of 2");
     using wasm_binfmt2_storage_t = decltype(::uwvm2::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt2_features_t{}));
     static_assert(::std::same_as<wasm_binfmt2_storage_t, binfmt_ver2_module_storage_t<B2F3>>,
                   "wasm_binfmt2_storage_t is the type of binfmt_ver2_handle_func<B2F3> return");

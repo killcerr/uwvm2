@@ -34,6 +34,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -162,22 +163,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
     /// @brief used for duplicate_imports_of_the_same_import_type
     struct duplic_imports_t
     {
-        ::fast_io::u8string_view module_name;
-        ::fast_io::u8string_view extern_name;
+        ::uwvm2::utils::container::u8string_view module_name;
+        ::uwvm2::utils::container::u8string_view extern_name;
         ::std::uint_least8_t type;
     };
 
     /// @brief used for duplicate_exports_of_the_same_export_type
     struct duplic_exports_t
     {
-        ::fast_io::u8string_view export_name;
+        ::uwvm2::utils::container::u8string_view export_name;
         ::std::uint_least8_t type;
     };
 
     /// @brief Used to set the output of module_name errors
     struct module_name_err_t
     {
-        ::fast_io::u8string_view module_name;
+        ::uwvm2::utils::container::u8string_view module_name;
         ::std::uint_least32_t type;
     };
 

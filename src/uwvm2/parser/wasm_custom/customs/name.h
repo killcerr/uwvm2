@@ -38,6 +38,7 @@
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
@@ -53,10 +54,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 {
     struct name_storage_t
     {
-        ::fast_io::u8string_view module_name{};
-        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::fast_io::u8string_view> function_name{};
+        ::uwvm2::utils::container::u8string_view module_name{};
+        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view> function_name{};
         ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32,
-                   ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::fast_io::u8string_view>>
+                   ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view>>
             code_local_name{};
     };
 
@@ -130,7 +131,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
     inline constexpr void parse_name_storage(name_storage_t & ns,
                                              ::std::byte const* const begin,
                                              ::std::byte const* const end,
-                                             ::fast_io::vector<name_err_t>& err) noexcept
+                                             ::uwvm2::utils::container::vector<name_err_t>& err) noexcept
     {
 #ifdef UWVM_TIMER
         ::uwvm2::utils::debug::timer parsing_timer{u8"parse custom section: name"};
@@ -330,7 +331,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     // [                  safe                    ] unsafe (could be the map_end)
                     //                                              ^^ module_name_end
 
-                    ::fast_io::u8string_view const module_name_tmp{module_name_begin, static_cast<::std::size_t>(module_name_end - module_name_begin)};
+                    ::uwvm2::utils::container::u8string_view const module_name_tmp{module_name_begin,
+                                                                                   static_cast<::std::size_t>(module_name_end - module_name_begin)};
 
                     // Check if it is legal utf-8
 
@@ -539,7 +541,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [                  safe                 ] unsafe (could be the map_end)
                         //                                           ^^ func_name_end
 
-                        ::fast_io::u8string_view const func_name_tmp{func_name_begin, static_cast<::std::size_t>(func_name_end - func_name_begin)};
+                        ::uwvm2::utils::container::u8string_view const func_name_tmp{func_name_begin,
+                                                                                     static_cast<::std::size_t>(func_name_end - func_name_begin)};
 
                         // Subsequent parsing will not directly skip the parsing of this map.
 
@@ -717,7 +720,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [                      safe                      ] unsafe (could be the map_end)
                         //                                                    ^^ curr
 
-                        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::fast_io::u8string_view> ns_code_local_name_function_index{};
+                        ::std::map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view>
+                            ns_code_local_name_function_index{};
 
                         bool ct_2{};
 
@@ -840,7 +844,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // [                             safe                                    ] unsafe (could be the map_end)
                             //                                                                         ^^ function_local_name_end
 
-                            ::fast_io::u8string_view const function_local_name_begin_tmp{
+                            ::uwvm2::utils::container::u8string_view const function_local_name_begin_tmp{
                                 function_local_name_begin,
                                 static_cast<::std::size_t>(function_local_name_end - function_local_name_begin)};
 

@@ -31,6 +31,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/hash/impl.h>
 #else
 # error "Module testing is not currently supported"
@@ -7539,9 +7540,9 @@ XXH3_generateSecret_fromSeed(XXH_NOESCAPE void* secretBuffer, XXH64_hash_t seed)
 # endif
 
 // Generate random test data
-inline ::fast_io::vector<unsigned char> generate_random_data(::std::size_t len) noexcept
+inline ::uwvm2::utils::container::vector<unsigned char> generate_random_data(::std::size_t len) noexcept
 {
-    ::fast_io::vector<unsigned char> data;
+    ::uwvm2::utils::container::vector<unsigned char> data;
     ::fast_io::ibuf_white_hole_engine eng;
     ::std::uniform_int_distribution<unsigned short> len_engine{::std::numeric_limits<unsigned short>::min(), ::std::numeric_limits<unsigned short>::max()};
 
@@ -7554,7 +7555,7 @@ inline ::fast_io::vector<unsigned char> generate_random_data(::std::size_t len) 
     return data;
 }
 
-inline ::fast_io::vector<unsigned char> generate_random_data_with_random_length(::std::size_t minlen, ::std::size_t maxlen) noexcept
+inline ::uwvm2::utils::container::vector<unsigned char> generate_random_data_with_random_length(::std::size_t minlen, ::std::size_t maxlen) noexcept
 {
     ::fast_io::native_white_hole_engine eng;
     ::std::uniform_int_distribution<::std::size_t> len_engine{minlen, maxlen};

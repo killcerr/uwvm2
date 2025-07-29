@@ -27,6 +27,7 @@
 // import
 #ifndef UWVM_MODULE
 # include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
@@ -91,9 +92,9 @@ namespace uwvm2::uwvm::cmdline::params::details
         // file name
         auto const currp1_str{currp1->str};
 
-        ::fast_io::u8cstring_view const file_name{currp1_str};
+        ::uwvm2::utils::container::u8cstring_view const file_name{currp1_str};
 
-        ::fast_io::u8string_view rename_module_name{};
+        ::uwvm2::utils::container::u8string_view rename_module_name{};
 
         // Check for out-of-bounds and not-argument
         if(auto currp2{para_curr + 2u}; !(currp2 == para_end || currp2->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg)) [[unlikely]]
@@ -108,7 +109,7 @@ namespace uwvm2::uwvm::cmdline::params::details
             // rename
             auto const currp2_str{currp2->str};
 
-            rename_module_name = ::fast_io::u8string_view{currp2_str};
+            rename_module_name = ::uwvm2::utils::container::u8string_view{currp2_str};
         }
 
         auto& new_preloaded_wasm{::uwvm2::uwvm::wasm::storage::preloaded_wasm.emplace_back()};

@@ -35,6 +35,7 @@ module;
 export module uwvm2.uwvm.wasm.custom:storage;
 
 import fast_io;
+import uwvm2.utils.container;
 import uwvm2.parser.wasm_custom;
 import uwvm2.uwvm.wasm.custom.customs;
 import :handler;

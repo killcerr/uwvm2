@@ -30,6 +30,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
@@ -46,7 +47,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
 # if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                               \
      ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
-    inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_dl_t> preloaded_dl{};  // [global] No global variable dependencies from other translation units
+    inline ::uwvm2::utils::container::vector<::uwvm2::uwvm::wasm::type::wasm_dl_t>
+        preloaded_dl{};  // [global] No global variable dependencies from other translation units
 # endif
 }  // namespace uwvm2::uwvm::wasm::storage
 #endif

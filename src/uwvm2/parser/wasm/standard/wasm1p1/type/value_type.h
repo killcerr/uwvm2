@@ -32,6 +32,7 @@
 # include <uwvm2/parser/wasm/feature/feature_push_macro.h>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/impl.h>
 #endif
 
@@ -93,7 +94,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
             constexpr auto space{::fast_io::char_literal_v<u8' ', char_type>};
             constexpr auto comma{::fast_io::char_literal_v<u8',', char_type>};
 
-            auto const v128_i8x16_arr{::std::bit_cast<::fast_io::array<::std::uint_least8_t, 16u>>(v128_val)};
+            auto const v128_i8x16_arr{::std::bit_cast<::uwvm2::utils::container::array<::std::uint_least8_t, 16u>>(v128_val)};
             auto const v128_i8x16{v128_i8x16_arr.cbegin()};
             char_type* curr_pos{iter};
 

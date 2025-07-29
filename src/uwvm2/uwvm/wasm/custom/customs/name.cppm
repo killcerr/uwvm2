@@ -36,6 +36,7 @@ module;
 export module uwvm2.uwvm.wasm.custom.customs:name;
 
 import fast_io;
+import uwvm2.utils.container;
 import uwvm2.utils.ansies;
 import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm_custom;

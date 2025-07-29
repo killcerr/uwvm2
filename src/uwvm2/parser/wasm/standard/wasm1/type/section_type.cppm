@@ -33,6 +33,7 @@ module;
 export module uwvm2.parser.wasm.standard.wasm1.type:section_type;
 
 import fast_io;
+import uwvm2.utils.container;
 import :value_type;
 import :value_binfmt;
 

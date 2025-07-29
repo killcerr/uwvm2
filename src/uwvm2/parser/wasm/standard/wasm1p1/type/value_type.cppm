@@ -33,6 +33,7 @@ module;
 export module uwvm2.parser.wasm.standard.wasm1p1.type:value_type;
 
 import fast_io;
+import uwvm2.utils.container;
 import uwvm2.parser.wasm.standard.wasm1;
 
 #ifndef UWVM_MODULE

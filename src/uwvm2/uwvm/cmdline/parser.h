@@ -36,10 +36,11 @@
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
-# include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/utils/debug/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include "params/impl.h"
 # include "params.h"
@@ -58,9 +59,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
     };
 
     // globals: There is no data contention because command line parsing is always done when the main thread is created.
-    inline ::fast_io::vector<::uwvm2::utils::cmdline::parameter_parsing_results> parsing_result{};  // [global]
-    inline char8_t const* argv0_dir{};                                                              // [global]
-    inline ::uwvm2::utils::cmdline::parameter_parsing_results* wasm_file_ppos{};                    // [global]
+    inline ::uwvm2::utils::container::vector<::uwvm2::utils::cmdline::parameter_parsing_results> parsing_result{};  // [global]
+    inline char8_t const* argv0_dir{};                                                                              // [global]
+    inline ::uwvm2::utils::cmdline::parameter_parsing_results* wasm_file_ppos{};                                    // [global]
 
     /// @brief parsing cmdline
     inline constexpr parsing_return_val parsing(::std::size_t argc, char8_t const* const* argv) noexcept
@@ -101,7 +102,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
         // Use argv0 as the program runtime path
         if(*curr_argv != nullptr) [[likely]]
         {
-            pr.emplace_back_unchecked(::fast_io::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
+            pr.emplace_back_unchecked(::uwvm2::utils::container::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
                                       nullptr,
                                       ::uwvm2::utils::cmdline::parameter_parsing_results_type::dir);
             // storage argv0
@@ -118,7 +119,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                 continue;
             }
 
-            if(::fast_io::u8cstring_view const argv_str{::fast_io::mnp::os_c_str(*curr_argv)}; argv_str.empty()) [[unlikely]]
+            if(::uwvm2::utils::container::u8cstring_view const argv_str{::fast_io::mnp::os_c_str(*curr_argv)}; argv_str.empty()) [[unlikely]]
             {
                 // No characters, may appear on windows, the first value of this parameter is u8'\0'
                 continue;
@@ -166,7 +167,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
                     for(++curr_argv; curr_argv != argv_end; ++curr_argv)
                     {
-                        pr.emplace_back_unchecked(::fast_io::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
+                        pr.emplace_back_unchecked(::uwvm2::utils::container::u8cstring_view{::fast_io::mnp::os_c_str(*curr_argv)},
                                                   nullptr,
                                                   ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg);  // wasm parameters
                     }
@@ -244,7 +245,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                                         curr_pr->str);
 
                     // Finding the most similar parameters
-                    ::fast_io::u8string_view f_test_str{};
+                    ::uwvm2::utils::container::u8string_view f_test_str{};
 
                     ::std::size_t const str_size{curr_pr->str.size()};
 

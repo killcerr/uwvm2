@@ -67,7 +67,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
     using u32result = result_base<char32_t>;
 
     template <::std::integral char_type2>
-    inline constexpr ::fast_io::basic_string_view<char_type2> get_utf_error_description(::uwvm2::utils::utf::utf_error_code type) noexcept
+    inline constexpr ::uwvm2::utils::container::basic_string_view<char_type2> get_utf_error_description(::uwvm2::utils::utf::utf_error_code type) noexcept
     {
         switch(type)
         {

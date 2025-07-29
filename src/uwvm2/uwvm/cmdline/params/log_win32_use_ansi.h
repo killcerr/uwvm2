@@ -31,6 +31,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
@@ -45,7 +46,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline constexpr ::fast_io::u8string_view log_win32_use_ansi_alias{u8"-log-ansi"};
+        inline constexpr ::uwvm2::utils::container::u8string_view log_win32_use_ansi_alias{u8"-log-ansi"};
     }
 
 # if defined(__clang__)

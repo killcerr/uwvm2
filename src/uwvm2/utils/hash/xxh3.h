@@ -1567,29 +1567,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 return xxh3_hash_long_64bits_internal(input, len, secret, secretLen);
             }
         }
-
-        template <xxh3_width_t Wid>
-            requires (static_cast<unsigned>(Wid) <= static_cast<unsigned>(xxh3_width_t::XX3H_128))
-        struct basic_xxh3_context
-        {
-            using digest_t = xxh3_output_struct<Wid>;
-
-            inline static constexpr ::std::size_t digest_size{sizeof(digest_t)};
-
-            inline constexpr void update([[maybe_unused]] ::std::byte const* first, [[maybe_unused]] ::std::byte const* last) noexcept {}
-
-            inline constexpr void reset() noexcept {}
-
-            inline constexpr digest_t digest_value() const noexcept {}
-
-            inline constexpr void do_final() const noexcept {}
-
-            inline constexpr void digest_to_byte_ptr([[maybe_unused]] ::std::byte* ptr) const noexcept {}
-        };
     }  // namespace details
 
-    using xxh3_64_context = details::basic_xxh3_context<details::xxh3_width_t::XX3H_64>;
-    using xxh3_128_context = details::basic_xxh3_context<details::xxh3_width_t::XX3H_128>;
+    inline constexpr ::std::uint_least64_t xxh3_64bits(::std::byte const* __restrict input, ::std::size_t len, ::std::uint_least64_t seed64 = 0u) noexcept
+    {
+        return details::xxh3_64bits_internal(input, len, seed64, details::xxh3_kSecret, sizeof(details::xxh3_kSecret));
+    }
 }
 
 #ifndef UWVM_MODULE

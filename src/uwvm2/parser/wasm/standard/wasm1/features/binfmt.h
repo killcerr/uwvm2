@@ -38,6 +38,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
@@ -70,7 +71,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     /// @brief wasm1 feature
     struct wasm1
     {
-        inline static constexpr ::fast_io::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
+        inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
         // binary format
@@ -117,24 +118,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_check>;
 
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        using binfmt_ver1_section_type = ::fast_io::tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::global_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::export_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::start_section_storage_t,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::code_section_storage_t<Fs...>,
-                                                          ::uwvm2::parser::wasm::standard::wasm1::features::data_section_storage_t<Fs...>>;
+        using binfmt_ver1_section_type = ::uwvm2::utils::container::tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::global_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::export_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::start_section_storage_t,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::element_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::code_section_storage_t<Fs...>,
+                                                                          ::uwvm2::parser::wasm::standard::wasm1::features::data_section_storage_t<Fs...>>;
     };
 
     /// @note ADL for distribution to the correct handler function
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<wasm1>,  // [adl]
-                                                                ::fast_io::tuple<Fs...>) noexcept
+                                                                ::uwvm2::utils::container::tuple<Fs...>) noexcept
     {
         return ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>;
     }

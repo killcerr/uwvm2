@@ -33,6 +33,7 @@ module;
 export module uwvm2.uwvm.wasm.loader:dl;
 
 import fast_io;
+import uwvm2.utils.container;
 import uwvm2.uwvm.io;
 import uwvm2.utils.ansies;
 import uwvm2.utils.debug;

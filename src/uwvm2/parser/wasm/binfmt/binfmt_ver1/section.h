@@ -36,6 +36,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 #endif
@@ -95,7 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     using splice_section_storage_structure_t = decltype(splice_section_storage_structure<Features...>())::Type;
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Features>
-    inline consteval auto splice_section_storage_structure_from_tuple(::fast_io::tuple<Features...>) noexcept
+    inline consteval auto splice_section_storage_structure_from_tuple(::uwvm2::utils::container::tuple<Features...>) noexcept
     {
         return splice_section_storage_structure<Features...>();
     }

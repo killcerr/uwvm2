@@ -31,6 +31,7 @@
 #ifndef UWVM_MODULE
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
@@ -42,9 +43,9 @@
 namespace uwvm2::uwvm::cmdline::params::details
 {
     template <::std::size_t N>
-    inline constexpr ::fast_io::array<char8_t, N + 1> u8nspace() noexcept
+    inline constexpr ::uwvm2::utils::container::array<char8_t, N + 1> u8nspace() noexcept
     {
-        ::fast_io::array<char8_t, N + 1> res{};
+        ::uwvm2::utils::container::array<char8_t, N + 1> res{};
 
         for(::std::size_t i{}; i != N; ++i) { res[i] = u8' '; }
 

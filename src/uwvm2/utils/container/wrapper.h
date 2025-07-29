@@ -38,7 +38,10 @@
 # include <boost/unordered/unordered_flat_set.hpp>
 // import
 # include <fast_io.h>
+# include <fast_io_dsal/tuple.h>
+# include <fast_io_dsal/array.h>
 # include <fast_io_dsal/string_view.h>
+# include <fast_io_dsal/string.h>
 # include <uwvm2/utils/hash/impl.h>
 # include "allocator.h"
 #endif
@@ -49,6 +52,16 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::utils::container
 {
+    /// @brief tuple
+    using ::fast_io::containers::forward_as_tuple;
+    using ::fast_io::containers::get;
+    using ::fast_io::containers::is_tuple;
+    using ::fast_io::containers::tuple;
+
+    /// @brief array
+    template <typename T, ::std::size_t N>
+    using array = ::fast_io::containers::array<T, N>;
+
     /// @brief string_view
     template <::std::integral chartype>
     using basic_string_view = ::fast_io::containers::basic_string_view<chartype>;
@@ -80,7 +93,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
     using u32string = ::uwvm2::utils::container::basic_string<char32_t>;
 
     template <::std::integral chartype, typename allocator = ::fast_io::native_global_allocator>
-    using basic_ostring_ref_uwvm = ::fast_io::io_strlike_reference_wrapper<chartype, ::uwvm2::utils::container::basic_string<chartype, alloctype>>;
+    using basic_ostring_ref_uwvm = ::fast_io::io_strlike_reference_wrapper<chartype, ::uwvm2::utils::container::basic_string<chartype, allocator>>;
 
     using ostring_ref_uwvm = ::uwvm2::utils::container::basic_ostring_ref_uwvm<char>;
     using wostring_ref_uwvm = ::uwvm2::utils::container::basic_ostring_ref_uwvm<wchar_t>;
@@ -100,7 +113,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         using u32string = ::uwvm2::utils::container::tlc::basic_string<char32_t>;
 
         template <::std::integral chartype, typename allocator = ::fast_io::native_thread_local_allocator>
-        using basic_ostring_ref_uwvm_tlc = ::fast_io::io_strlike_reference_wrapper<chartype, ::uwvm2::utils::container::tlc::basic_string<chartype, alloctype>>;
+        using basic_ostring_ref_uwvm_tlc = ::fast_io::io_strlike_reference_wrapper<chartype, ::uwvm2::utils::container::tlc::basic_string<chartype, allocator>>;
 
         using ostring_ref_uwvm_tlc = basic_ostring_ref_uwvm_tlc<char>;
         using wostring_ref_uwvm_tlc = basic_ostring_ref_uwvm_tlc<wchar_t>;
@@ -130,22 +143,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
     }
 
     /// @brief unordered
-    template <typename Key, typename Hash = ::std::hash<Key>, typename Pred = ::std::equal_to<Key>>
-    using unordered_flat_set = ::boost::unorder::unordered_flat_set<Key, Hash, Pred, ::uwvm2::utils::container::fast_io_global_std_allocator<Key const>>;
+    template <typename Key,
+              typename Hash = ::std::hash<Key>,
+              typename Pred = ::std::equal_to<Key>,
+              typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<Key const>>
+    using unordered_flat_set = ::boost::unordered::unordered_flat_set<Key, Hash, Pred, Alloc>;
 
-    template <typename Key, typename Val, typename Hash = ::std::hash<Key>, typename Pred = ::std::equal_to<Key>>
-    using unordered_flat_map =
-        ::boost::unorder::unordered_flat_map<Key, Val, Hash, Pred, ::uwvm2::utils::container::fast_io_global_std_allocator<::std::pair<Key const, Val>>>;
+    template <typename Key,
+              typename Val,
+              typename Hash = ::std::hash<Key>,
+              typename Pred = ::std::equal_to<Key>,
+              typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<::std::pair<Key const, Val>>>
+    using unordered_flat_map = ::boost::unordered::unordered_flat_map<Key, Val, Hash, Pred, Alloc>;
 
     namespace tlc
     {
-        template <typename Key, typename Hash = ::std::hash<Key>, typename Pred = ::std::equal_to<Key>>
-        using unordered_flat_set =
-            ::uwvm2::utils::container::unordered_flat_set<Key, Hash, Pred, ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key const>>;
+        template <typename Key,
+                  typename Hash = ::std::hash<Key>,
+                  typename Pred = ::std::equal_to<Key>,
+                  typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key const>>
+        using unordered_flat_set = ::uwvm2::utils::container::unordered_flat_set<Key, Hash, Pred, Alloc>;
 
-        template <typename Key, typename Val, typename Hash = ::std::hash<Key>, typename Pred = ::std::equal_to<Key>>
-        using unordered_flat_map = ::uwvm2::utils::container::
-            unordered_flat_map<Key, Val, Hash, Pred, ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>;
+        template <typename Key,
+                  typename Val,
+                  typename Hash = ::std::hash<Key>,
+                  typename Pred = ::std::equal_to<Key>,
+                  typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>
+        using unordered_flat_map = ::uwvm2::utils::container::unordered_flat_map<Key, Val, Hash, Pred, Alloc>;
     }  // namespace tlc
 }
 
@@ -155,8 +179,13 @@ UWVM_MODULE_EXPORT struct ::std::hash<::uwvm2::utils::container::basic_string_vi
     inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string_view<char_type> obj) const noexcept
     {
 #if CHAR_BIT == 8
-        // xxhash
-        ::fast_io::fast_terminate();
+        ::std::size_t sz;
+        if constexpr(requires { obj.size_bytes(); }) { sz = obj.size_bytes(); }
+        else
+        {
+            sz = obj.size() * sizeof(char_type);
+        }
+        return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(obj.data()), sz));
 #else
         // use std hash
         using strvw = ::std::basic_string_view<char_type>;
@@ -171,8 +200,13 @@ UWVM_MODULE_EXPORT struct ::std::hash<::uwvm2::utils::container::basic_cstring_v
     inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_cstring_view<char_type> obj) const noexcept
     {
 #if CHAR_BIT == 8
-        // xxhash
-        ::fast_io::fast_terminate();
+        ::std::size_t sz;
+        if constexpr(requires { obj.size_bytes(); }) { sz = obj.size_bytes(); }
+        else
+        {
+            sz = obj.size() * sizeof(char_type);
+        }
+        return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(obj.data()), sz));
 #else
         // use std hash
         using strvw = ::std::basic_string_view<char_type>;
@@ -187,8 +221,13 @@ UWVM_MODULE_EXPORT struct ::std::hash<::uwvm2::utils::container::basic_string<ch
     inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string<char_type, Alloc> const& obj) const noexcept
     {
 #if CHAR_BIT == 8
-        // xxhash
-        ::fast_io::fast_terminate();
+        ::std::size_t sz;
+        if constexpr(requires { obj.size_bytes(); }) { sz = obj.size_bytes(); }
+        else
+        {
+            sz = obj.size() * sizeof(char_type);
+        }
+        return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(obj.data()), sz));
 #else
         // use std hash
         using strvw = ::std::basic_string_view<char_type>;

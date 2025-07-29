@@ -32,6 +32,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/tuple.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
@@ -68,7 +69,7 @@ enum class vt5 : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
 
 struct F1
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"F1"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F1"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
     using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement, vt1>;
@@ -78,7 +79,7 @@ struct F1
 
 struct F2
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"F2"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F2"};
     inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
     using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<vt1, vt3>;

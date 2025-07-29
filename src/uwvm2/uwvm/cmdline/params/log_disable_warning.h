@@ -31,6 +31,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
@@ -44,7 +45,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline constexpr ::fast_io::u8string_view log_disable_warning_alias{u8"-log-dw"};
+        inline constexpr ::uwvm2::utils::container::u8string_view log_disable_warning_alias{u8"-log-dw"};
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type log_disable_warning_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                                  ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                                  ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;

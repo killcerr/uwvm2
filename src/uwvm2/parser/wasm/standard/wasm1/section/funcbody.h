@@ -28,6 +28,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
@@ -40,7 +41,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::section
     /// @brief function bodys, use to storage
     struct code_func_body UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::type::local_entry> locals{};
+        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::type::local_entry> locals{};
         ::uwvm2::parser::wasm::standard::wasm1::type::vec_byte body{};
     };
 }

@@ -31,6 +31,7 @@ module;
 export module uwvm2.uwvm.cmdline.params:wasm_set_main_module_name;
 
 import fast_io;
+import uwvm2.utils.container;
 import uwvm2.utils.cmdline;
 
 #ifndef UWVM_MODULE

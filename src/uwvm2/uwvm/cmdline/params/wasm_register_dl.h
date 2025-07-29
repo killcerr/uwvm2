@@ -31,6 +31,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 #endif
 
@@ -45,7 +46,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 
     namespace details
     {
-        inline constexpr ::fast_io::u8string_view wasm_register_dl_alias{u8"-Wrdl"};
+        inline constexpr ::uwvm2::utils::container::u8string_view wasm_register_dl_alias{u8"-Wrdl"};
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type wasm_register_dl_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                               ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                               ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;

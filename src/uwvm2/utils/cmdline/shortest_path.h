@@ -33,6 +33,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/array.h>
+# include <uwvm2/utils/container/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -59,7 +60,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         using Alloc = ::fast_io::native_typed_thread_local_allocator<::std::size_t>;
 
         ::std::size_t* d{};
-        [[maybe_unused]] ::fast_io::array<::std::size_t, Stack_Len> storage;
+        [[maybe_unused]] ::uwvm2::utils::container::array<::std::size_t, Stack_Len> storage;
 
         if constexpr(Stack_Len) { d = storage.data(); }
         else

@@ -34,6 +34,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm_custom/customs/impl.h>
@@ -69,9 +70,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         };
 
         // wasm file name
-        ::fast_io::u8cstring_view file_name{};
+        ::uwvm2::utils::container::u8cstring_view file_name{};
         // Accurate module names that must work
-        ::fast_io::u8string_view module_name{};
+        ::uwvm2::utils::container::u8string_view module_name{};
         // Recording the binfmt version of the wasm module
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver{};
         // Memory-mapped or memory-copy (for platforms that don't support memory mapping) open wasm files

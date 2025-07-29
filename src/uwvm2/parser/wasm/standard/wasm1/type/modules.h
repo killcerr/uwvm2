@@ -35,6 +35,7 @@
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include "value_type.h"
 # include "value_binfmt.h"
 # include "section_type.h"
@@ -79,7 +80,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.10
     struct export_type
     {
-        ::fast_io::u8string_view export_name{};
+        ::uwvm2::utils::container::u8string_view export_name{};
         indices index{};
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types kind{};
     };
@@ -90,8 +91,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.11
     struct import_type
     {
-        ::fast_io::u8string_view module_name{};
-        ::fast_io::u8string_view extern_name{};
+        ::uwvm2::utils::container::u8string_view module_name{};
+        ::uwvm2::utils::container::u8string_view extern_name{};
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types importdesc{};
     };
 
@@ -136,7 +137,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     {
         indices table{};
         initializer_exp offset{};
-        ::fast_io::vector<indices> init{};
+        ::uwvm2::utils::container::vector<indices> init{};
     };
 
     /// @brief      Data Segments

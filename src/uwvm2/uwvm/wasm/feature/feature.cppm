@@ -29,6 +29,7 @@ module;
 export module uwvm2.uwvm.wasm.feature:feature;
 
 import fast_io;
+import uwvm2.utils.container;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard;
 

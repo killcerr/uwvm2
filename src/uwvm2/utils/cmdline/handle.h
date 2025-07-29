@@ -40,6 +40,7 @@
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/array.h>
 # include <fast_io_crypto.h>
+# include <uwvm2/utils/container/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -64,9 +65,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     /// @brief Parsing results of each crtmain parameter
     struct parameter_parsing_results
     {
-        ::fast_io::u8cstring_view str{};        // Parameter content
-        parameter const* para{};                // Corresponding parameter. If it is not a parameter, it is nullptr
-        parameter_parsing_results_type type{};  // Parameter type
+        ::uwvm2::utils::container::u8cstring_view str{};  // Parameter content
+        parameter const* para{};                          // Corresponding parameter. If it is not a parameter, it is nullptr
+        parameter_parsing_results_type type{};            // Parameter type
     };
 
     /// @brief Used to indicate the return type of the parameter parser
@@ -81,7 +82,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     };
 
     /// @brief type for consecutive alias
-    using kns_u8_str_scatter_t = ::fast_io::basic_io_scatter_t<::fast_io::u8string_view>;
+    using kns_u8_str_scatter_t = ::fast_io::basic_io_scatter_t<::uwvm2::utils::container::u8string_view>;
 
     /// @brief type for handle function
     using handle_func_type =
@@ -89,7 +90,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 
     /// @brief type for pretreatment function
     using parameter_func_type =
-        void (*)(char8_t const* const*& argv_curr, char8_t const* const* argv_end, ::fast_io::vector<parameter_parsing_results>& pr) noexcept;
+        void (*)(char8_t const* const*& argv_curr, char8_t const* const* argv_end, ::uwvm2::utils::container::vector<parameter_parsing_results>& pr) noexcept;
 
     /// @brief Categorization of parameter types for help displays
     enum class categorization : unsigned
@@ -107,14 +108,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     /// @brief Command line arguments will be encoded in ascii and will not be specialized for encodings such as ebcdic.
     struct parameter
     {
-        ::fast_io::u8string_view const name{};      // parameter name
-        ::fast_io::u8string_view const describe{};  // describtion shown in help
-        ::fast_io::u8string_view const usage{};     // usage shown in help
-        kns_u8_str_scatter_t alias{};               // alias names
-        handle_func_type handle{};                  // formal processing results
-        parameter_func_type pretreatment{};         // pretreatment
-        bool* is_exist{};                           // When it is not nullptr, repeated errors will be reported
-        categorization cate{};                      // Categorization of parameter types for help displays
+        ::uwvm2::utils::container::u8string_view const name{};      // parameter name
+        ::uwvm2::utils::container::u8string_view const describe{};  // describtion shown in help
+        ::uwvm2::utils::container::u8string_view const usage{};     // usage shown in help
+        kns_u8_str_scatter_t alias{};                               // alias names
+        handle_func_type handle{};                                  // formal processing results
+        parameter_func_type pretreatment{};                         // pretreatment
+        bool* is_exist{};                                           // When it is not nullptr, repeated errors will be reported
+        categorization cate{};                                      // Categorization of parameter types for help displays
     };
 
     /// @brief      sort the parameter const* const [N]
@@ -123,7 +124,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     template <::std::size_t N>
     inline consteval auto parameter_sort(parameter const* const(&punsort)[N]) noexcept
     {
-        ::fast_io::array<parameter const*, N> res{};
+        ::uwvm2::utils::container::array<parameter const*, N> res{};
         for(::std::size_t i{}; i < N; ++i) { res.index_unchecked(i) = punsort[i]; }
         ::std::ranges::sort(res, [](parameter const* const a, parameter const* const b) constexpr noexcept -> bool { return a->name < b->name; });
         return res;
@@ -132,15 +133,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     /// @brief This structure is used to store the parameters of all aliases
     struct alias_parameter
     {
-        ::fast_io::u8string_view str{};  // raw name or alias name
-        parameter const* para{};         // Equivalent parameter
+        ::uwvm2::utils::container::u8string_view str{};  // raw name or alias name
+        parameter const* para{};                         // Equivalent parameter
     };
 
     /// @brief      Calculate all parameters sizes
     /// @details    Calculate the total number of aliases in the sorting parameter results obtained by parameter_sort
     ///             This function only allows consteval to implement.
     template <::std::size_t N>
-    inline consteval ::std::size_t calculate_alias_parameters_size(::fast_io::array<parameter const*, N> const& punsort) noexcept
+    inline consteval ::std::size_t calculate_alias_parameters_size(::uwvm2::utils::container::array<parameter const*, N> const& punsort) noexcept
     {
         ::std::size_t res{};
         for(::std::size_t i{}; i < N; ++i)
@@ -179,9 +180,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     /// @brief this function expand all parameter raw name and it alias name and check whether they are valid
     /// @details AllParaSize is the value calculate_alias_parameters_size return
     template <::std::size_t AllParaSize, ::std::size_t N>
-    inline consteval auto expand_alias_parameters_and_check(::fast_io::array<parameter const*, N> const& punsort) noexcept
+    inline consteval auto expand_alias_parameters_and_check(::uwvm2::utils::container::array<parameter const*, N> const& punsort) noexcept
     {
-        ::fast_io::array<alias_parameter, AllParaSize> res{};
+        ::uwvm2::utils::container::array<alias_parameter, AllParaSize> res{};
         ::std::size_t res_pos{};
 
         // expand all alias patameters
@@ -200,7 +201,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         ::std::ranges::sort(res, [](alias_parameter const& a, alias_parameter const& b) constexpr noexcept -> bool { return a.str < b.str; });
 
         // check is invalid
-        ::fast_io::u8string_view check{};  // Empty strings will be sorted and placed first.
+        ::uwvm2::utils::container::u8string_view check{};  // Empty strings will be sorted and placed first.
         for(auto const& i: res)
         {
 #if __cpp_contracts >= 202502L
@@ -241,7 +242,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 
     /// @brief      Calculate max parameter principal name size
     template <::std::size_t N>
-    inline consteval ::std::size_t calculate_max_principal_name_size(::fast_io::array<parameter const*, N> const& punsort) noexcept
+    inline consteval ::std::size_t calculate_max_principal_name_size(::uwvm2::utils::container::array<parameter const*, N> const& punsort) noexcept
     {
         ::std::size_t max_size{};
         for(::std::size_t i{}; i < N; ++i) { max_size = ::std::max(max_size, punsort.index_unchecked(i)->name.size()); }
@@ -251,7 +252,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     /// @brief      Calculate max parameter size
     /// @details    Maximum long distance used to provide to the shortest path
     template <::std::size_t N>
-    inline consteval ::std::size_t calculate_max_para_size(::fast_io::array<alias_parameter, N> const& punsort) noexcept
+    inline consteval ::std::size_t calculate_max_para_size(::uwvm2::utils::container::array<alias_parameter, N> const& punsort) noexcept
     {
         ::std::size_t max_size{};
         for(::std::size_t i{}; i < N; ++i) { max_size = ::std::max(max_size, punsort.index_unchecked(i).str.size()); }
@@ -274,7 +275,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 
     /// @brief      Calculate the size of the hash_table with the maximum conflict size
     template <::std::size_t N>
-    inline consteval calculate_hash_table_size_res calculate_hash_table_size(::fast_io::array<alias_parameter, N> const& ord) noexcept
+    inline consteval calculate_hash_table_size_res calculate_hash_table_size(::uwvm2::utils::container::array<alias_parameter, N> const& ord) noexcept
     {
         constexpr auto sizet_d10{static_cast<::std::size_t>(::std::numeric_limits<::std::size_t>::digits10)};
 
@@ -311,7 +312,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 
     struct ht_para_cpos
     {
-        ::fast_io::u8string_view str{};
+        ::uwvm2::utils::container::u8string_view str{};
         parameter const* para{};
     };
 
@@ -321,7 +322,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     struct conflict_table
     {
         // Add one, store the last nullptr, to reduce the number of judgments when looking up
-        ::fast_io::array<ct_para_str, real_max_conflict_size + 1uz> ctmem{};
+        ::uwvm2::utils::container::array<ct_para_str, real_max_conflict_size + 1uz> ctmem{};
     };
 
     template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
@@ -329,14 +330,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     {
         static_assert(hash_table_size > 1);
         // Hash Table
-        ::fast_io::array<ht_para_cpos, hash_table_size> ht{};
+        ::uwvm2::utils::container::array<ht_para_cpos, hash_table_size> ht{};
         // Conflict Table
-        ::std::conditional_t<static_cast<bool>(conflict_size), ::fast_io::array<conflict_table<real_max_conflict_size>, conflict_size>, ::std::in_place_t> ct{};
+        ::std::conditional_t<static_cast<bool>(conflict_size),
+                             ::uwvm2::utils::container::array<conflict_table<real_max_conflict_size>, conflict_size>,
+                             ::std::in_place_t>
+            ct{};
     };
 
     /// @brief generate hash table
     template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size, ::std::size_t N>
-    inline consteval auto generate_hash_table(::fast_io::array<alias_parameter, N> const& ord) noexcept
+    inline consteval auto generate_hash_table(::uwvm2::utils::container::array<alias_parameter, N> const& ord) noexcept
     {
         parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> res{};
 
@@ -415,7 +419,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 
     template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
     inline constexpr parameter const* find_from_hash_table(parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> const& ght,
-                                                           ::fast_io::u8string_view str) noexcept
+                                                           ::uwvm2::utils::container::u8string_view str) noexcept
     {
         ::fast_io::crc32c_context crc32c{};
 

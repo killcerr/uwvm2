@@ -32,6 +32,7 @@
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/debug/impl.h>
@@ -69,8 +70,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 
     /// @todo load dl not finished
     inline constexpr load_dl_rtl load_dl(::uwvm2::uwvm::wasm::type::wasm_dl_t & wd,
-                                         ::fast_io::u8cstring_view load_file_name,
-                                         ::fast_io::u8string_view rename_module_name,
+                                         ::uwvm2::utils::container::u8cstring_view load_file_name,
+                                         ::uwvm2::utils::container::u8string_view rename_module_name,
                                          ::uwvm2::uwvm::wasm::type::wasm_parameter_u para) noexcept
     {
         if(::uwvm2::uwvm::io::show_untrusted_dl_warning)
@@ -204,12 +205,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
             {
                 if(wd.wasm_dl_storage.capi_module_name.name_length)
                 {
-                    wd.module_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(wd.wasm_dl_storage.capi_module_name.name),
-                                                              wd.wasm_dl_storage.capi_module_name.name_length};
+                    wd.module_name =
+                        ::uwvm2::utils::container::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(wd.wasm_dl_storage.capi_module_name.name),
+                                                                 wd.wasm_dl_storage.capi_module_name.name_length};
                 }
                 else
                 {
-                    wd.module_name = ::fast_io::u8string_view{load_file_name};
+                    wd.module_name = ::uwvm2::utils::container::u8string_view{load_file_name};
                 }
             }
             else
@@ -361,8 +363,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                 for(auto handler_curr{handler_begin}; handler_curr != handler_end; ++handler_curr)
                 {
                     // check utf-8
-                    ::fast_io::u8string_view const custom_name{reinterpret_cast<char8_t_const_may_alias_ptr>(handler_curr->custom_name_ptr),
-                                                               handler_curr->custom_name_length};
+                    ::uwvm2::utils::container::u8string_view const custom_name{reinterpret_cast<char8_t_const_may_alias_ptr>(handler_curr->custom_name_ptr),
+                                                                               handler_curr->custom_name_length};
 
                     if(custom_name.empty()) [[unlikely]]
                     {
@@ -546,8 +548,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 
                 for(auto func_curr{func_begin}; func_curr != func_end; ++func_curr)
                 {
-                    ::fast_io::u8string_view const func_name{reinterpret_cast<char8_t_const_may_alias_ptr>(func_curr->func_name_ptr),
-                                                             func_curr->func_name_length};
+                    ::uwvm2::utils::container::u8string_view const func_name{reinterpret_cast<char8_t_const_may_alias_ptr>(func_curr->func_name_ptr),
+                                                                             func_curr->func_name_length};
 
                     if(func_name.empty()) [[unlikely]]
                     {

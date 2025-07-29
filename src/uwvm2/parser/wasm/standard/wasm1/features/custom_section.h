@@ -37,6 +37,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
@@ -56,11 +57,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 {
     struct custom_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::fast_io::u8string_view section_name{u8"Custom"};
+        inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Custom"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(::uwvm2::parser::wasm::standard::wasm1::section::section_id::custom_sec)};
 
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::section::custom_section> customs{};
+        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::section::custom_section> customs{};
     };
 
     /// @brief Define the handler function for type_section
@@ -143,7 +144,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // [               safe                       ] unsafe (could be the section_end)
         //                                    ^^ section_curr
 
-        cs.custom_name = ::fast_io::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), name_len};
+        cs.custom_name = ::uwvm2::utils::container::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), name_len};
 
         section_curr += name_len;
         // [before_section ... | name_len ... name ...] custom_begin ...

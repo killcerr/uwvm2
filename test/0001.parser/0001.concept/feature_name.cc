@@ -36,14 +36,14 @@
 
 struct feature1
 {
-    inline static constexpr ::fast_io::u8string_view feature_name{u8"<name>"};
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"<name>"};
 };
 
 static_assert(::uwvm2::parser::wasm::concepts::has_feature_name<feature1>);
 
 struct feature2
 {
-    ::fast_io::u8string_view feature_name{u8"<name>"};
+    ::uwvm2::utils::container::u8string_view feature_name{u8"<name>"};
 };
 
 static_assert(::uwvm2::parser::wasm::concepts::has_feature_name<feature2>);  // Satisfy the concept, but subsequent operations will be wrong:

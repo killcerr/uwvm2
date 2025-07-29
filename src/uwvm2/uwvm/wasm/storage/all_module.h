@@ -27,6 +27,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm_custom/customs/impl.h>
@@ -66,6 +67,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
         module_type_t type{};
     };
 
-    inline ::std::map<::fast_io::u8string_view, all_module_t> all_module{};  // [global]
+    inline ::std::map<::uwvm2::utils::container::u8string_view, all_module_t> all_module{};  // [global]
 
 }  // namespace uwvm2::uwvm::wasm::storage

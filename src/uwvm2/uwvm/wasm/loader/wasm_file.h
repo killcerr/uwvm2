@@ -31,6 +31,7 @@
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/debug/impl.h>
@@ -64,8 +65,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
     };
 
     inline constexpr load_wasm_file_rtl load_wasm_file(::uwvm2::uwvm::wasm::type::wasm_file_t & wf,
-                                                       ::fast_io::u8cstring_view load_file_name,
-                                                       ::fast_io::u8string_view rename_module_name,
+                                                       ::uwvm2::utils::container::u8cstring_view load_file_name,
+                                                       ::uwvm2::utils::container::u8string_view rename_module_name,
                                                        ::uwvm2::uwvm::wasm::type::wasm_parameter_u para) noexcept
     {
         wf.file_name = load_file_name;
@@ -330,7 +331,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                     // 3st: file path
 
                     auto check_module_name{
-                        [load_file_name](::fast_io::u8string_view module_name) constexpr noexcept -> bool
+                        [load_file_name](::uwvm2::utils::container::u8string_view module_name) constexpr noexcept -> bool
                         {
                             // check module_name is utf8
                             auto const [utf8pos, utf8err]{
@@ -393,7 +394,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                     {
                         if(wf.wasm_custom_name.module_name.empty())
                         {
-                            wf.module_name = ::fast_io::u8string_view{load_file_name};
+                            wf.module_name = ::uwvm2::utils::container::u8string_view{load_file_name};
                             if(!check_module_name(wf.module_name)) [[unlikely]] { return load_wasm_file_rtl::wasm_parser_error; }
                         }
                         else

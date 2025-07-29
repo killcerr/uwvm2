@@ -22,7 +22,8 @@
 
 // Without pragma once, this header file will be included in a specific code segment
 
-constexpr auto get_exported_type_name = []<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept -> ::fast_io::basic_string_view<char_type2>
+constexpr auto get_exported_type_name =
+    []<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept -> ::uwvm2::utils::container::basic_string_view<char_type2>
 {
     switch(type)
     {

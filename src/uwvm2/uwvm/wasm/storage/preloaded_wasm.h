@@ -28,6 +28,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/string_view.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
@@ -40,5 +41,6 @@
 #endif
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    inline ::fast_io::vector<::uwvm2::uwvm::wasm::type::wasm_file_t> preloaded_wasm{};  // [global] No global variable dependencies from other translation units
+    inline ::uwvm2::utils::container::vector<::uwvm2::uwvm::wasm::type::wasm_file_t>
+        preloaded_wasm{};  // [global] No global variable dependencies from other translation units
 }  // namespace uwvm2::uwvm::wasm::storage

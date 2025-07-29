@@ -39,6 +39,7 @@
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/vector.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/utils/impl.h>
@@ -61,13 +62,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct memory_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::fast_io::u8string_view section_name{u8"Memory"};
+        inline static constexpr ::uwvm2::utils::container::u8string_view section_name{u8"Memory"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte section_id{
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(::uwvm2::parser::wasm::standard::wasm1::section::section_id::memory_sec)};
 
         ::uwvm2::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
-        ::fast_io::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>> memories{};
+        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<Fs...>> memories{};
     };
 
     /// @brief define handler for ::uwvm2::parser::wasm::standard::wasm1::type::memory_type
