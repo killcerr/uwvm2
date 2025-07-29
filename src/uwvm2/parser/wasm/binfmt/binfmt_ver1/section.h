@@ -35,7 +35,6 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
-# include <fast_io_dsal/tuple.h>
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>

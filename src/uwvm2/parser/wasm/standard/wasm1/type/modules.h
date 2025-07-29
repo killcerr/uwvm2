@@ -33,8 +33,6 @@
 # include <uwvm2/parser/wasm/feature/feature_push_macro.h>
 // import
 # include <fast_io.h>
-# include <fast_io_dsal/vector.h>
-# include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/container/impl.h>
 # include "value_type.h"
 # include "value_binfmt.h"

@@ -35,8 +35,6 @@
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
-# include <fast_io_dsal/vector.h>
-# include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>

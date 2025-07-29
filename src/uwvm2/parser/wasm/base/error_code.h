@@ -33,7 +33,6 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
-# include <fast_io_dsal/string_view.h>
 # include <uwvm2/utils/container/impl.h>
 #endif
 

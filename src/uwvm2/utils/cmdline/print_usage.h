@@ -34,7 +34,6 @@
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 // import
 # include <fast_io.h>
-# include <fast_io_dsal/array.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
 # include "handle.h"
 #endif

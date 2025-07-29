@@ -42,6 +42,7 @@
 # include <fast_io_dsal/array.h>
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/string.h>
+# include <fast_io_dsal/vector.h>
 # include <uwvm2/utils/hash/impl.h>
 # include "allocator.h"
 #endif
