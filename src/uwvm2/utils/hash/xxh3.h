@@ -1365,6 +1365,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # if UWVM_HAS_BUILTIN(__builtin_wasm_shuffle_i8x16)
                 auto data_key_lo{__builtin_wasm_shuffle_i8x16(::std::bit_cast<i8x16simd>(data_key),
                                                               ::std::bit_cast<i8x16simd>(data_key),
+                                                              1 * 4,
+                                                              1 * 4 + 1,
+                                                              1 * 4 + 2,
+                                                              1 * 4 + 3,
                                                               0 * 4,
                                                               0 * 4 + 1,
                                                               0 * 4 + 2,
@@ -1373,14 +1377,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                                               3 * 4 + 1,
                                                               3 * 4 + 2,
                                                               3 * 4 + 3,
-                                                              0 * 4,
-                                                              0 * 4 + 1,
-                                                              0 * 4 + 2,
-                                                              0 * 4 + 3,
-                                                              1 * 4,
-                                                              1 * 4 + 1,
-                                                              1 * 4 + 2,
-                                                              1 * 4 + 3)};
+                                                              2 * 4,
+                                                              2 * 4 + 1,
+                                                              2 * 4 + 2,
+                                                              2 * 4 + 3)};
 # else
 #  error "missing instruction"
 # endif
@@ -1396,22 +1396,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # if UWVM_HAS_BUILTIN(__builtin_wasm_shuffle_i8x16)
                 auto data_swap{__builtin_wasm_shuffle_i8x16(::std::bit_cast<i8x16simd>(data_vec),
                                                             ::std::bit_cast<i8x16simd>(data_vec),
-                                                            1 * 4,
-                                                            1 * 4 + 1,
-                                                            1 * 4 + 2,
-                                                            1 * 4 + 3,
-                                                            0 * 4,
-                                                            0 * 4 + 1,
-                                                            0 * 4 + 2,
-                                                            0 * 4 + 3,
+                                                            2 * 4,
+                                                            2 * 4 + 1,
+                                                            2 * 4 + 2,
+                                                            2 * 4 + 3,
                                                             3 * 4,
                                                             3 * 4 + 1,
                                                             3 * 4 + 2,
                                                             3 * 4 + 3,
-                                                            2 * 4,
-                                                            2 * 4 + 1,
-                                                            2 * 4 + 2,
-                                                            2 * 4 + 3)};
+                                                            0 * 4,
+                                                            0 * 4 + 1,
+                                                            0 * 4 + 2,
+                                                            0 * 4 + 3,
+                                                            1 * 4,
+                                                            1 * 4 + 1,
+                                                            1 * 4 + 2,
+                                                            1 * 4 + 3)};
 # else
 #  error "missing instruction"
 # endif
