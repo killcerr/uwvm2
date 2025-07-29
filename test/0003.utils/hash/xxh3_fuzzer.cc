@@ -3898,14 +3898,17 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const XXH64_can
 #  endif
 #endif
 
+#ifdef __wasm_simd128__
+#define XXH_VECTOR XXH_SCALAR
+#endif
+
 #if defined(__GNUC__) || defined(__clang__)
 #  if defined(__ARM_FEATURE_SVE)
 #    include <arm_sve.h>
 #  endif
 #  if defined(__ARM_NEON__) || defined(__ARM_NEON) \
    || (defined(_M_ARM) && _M_ARM >= 7) \
-   || defined(_M_ARM64) || defined(_M_ARM64EC) \
-   || (defined(__wasm_simd128__) && XXH_HAS_INCLUDE(<arm_neon.h>)) /* WASM SIMD128 via SIMDe */
+   || defined(_M_ARM64) || defined(_M_ARM64EC)
 #    define inline __inline__  /* circumvent a clang bug */
 #    include <arm_neon.h>
 #    undef inline

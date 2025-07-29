@@ -1347,8 +1347,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
 
             auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
-            using uint64x2_t_may_alias UWVM_GNU_MAY_ALIAS = uint64x2_t*;
-            auto xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
+            using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
+            auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
             for(unsigned i{}; i != 4u; ++i)
             {
