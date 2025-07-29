@@ -31,6 +31,7 @@ module;
 export module uwvm2.utils.utf:base;
 
 import fast_io;
+import uwvm2.utils.container;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
