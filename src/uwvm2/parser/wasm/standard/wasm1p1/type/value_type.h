@@ -50,14 +50,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
 #if __has_cpp_attribute(__gnu__::__vector_size__)
     using wasm_v128 [[__gnu__::__vector_size__(16)]] = char;
 #else
-# if defined(_MSC_VER) && !defined(__clang__)
-    __declspec(align(16))
-# endif
-    union
-# if __has_cpp_attribute(__gnu__::__aligned__)
-        [[__gnu__::__aligned__(16)]]
-# endif
-        wasm_v128
+    union alignas(2uz * sizeof(wasm_u64)) wasm_v128
     {
         wasm_u8 u8x16[16];
         wasm_i8 i8x16[16];
