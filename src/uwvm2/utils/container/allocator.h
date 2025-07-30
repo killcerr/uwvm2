@@ -53,6 +53,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
 
         inline constexpr fast_io_global_std_allocator(fast_io_global_std_allocator const&) noexcept = default;
 
+        inline constexpr fast_io_global_std_allocator& operator= (fast_io_global_std_allocator const&) noexcept = default;
+
         template <typename U>
         inline constexpr fast_io_global_std_allocator(fast_io_global_std_allocator<U> const&) noexcept
         {
@@ -71,13 +73,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         inline constexpr void deallocate(T* p, ::std::size_t n) noexcept { fast_io_type_allocator::deallocate_n(p, n); }
 
         inline constexpr ::std::size_t max_size() const noexcept { return ::std::numeric_limits<::std::size_t>::max() / sizeof(T); }
-
-        template <typename U, typename V>
-        friend inline constexpr bool operator== (fast_io_global_std_allocator<U> const&, fast_io_global_std_allocator<V> const&) noexcept
-        {
-            return true;
-        }
     };
+
+    template <typename U, typename V>
+    inline constexpr bool operator== (fast_io_global_std_allocator<U> const&, fast_io_global_std_allocator<V> const&) noexcept
+    {
+        return true;
+    }
 
     template <typename T>
     struct fast_io_thread_local_std_allocator
@@ -93,6 +95,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         inline constexpr fast_io_thread_local_std_allocator() noexcept = default;
 
         inline constexpr fast_io_thread_local_std_allocator(fast_io_thread_local_std_allocator const&) noexcept = default;
+
+        inline constexpr fast_io_thread_local_std_allocator& operator= (fast_io_thread_local_std_allocator const&) noexcept = default;
 
         template <typename U>
         inline constexpr fast_io_thread_local_std_allocator(fast_io_thread_local_std_allocator<U> const&) noexcept
@@ -112,11 +116,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         inline constexpr void deallocate(T* p, ::std::size_t n) noexcept { fast_io_type_allocator::deallocate_n(p, n); }
 
         inline constexpr ::std::size_t max_size() const noexcept { return ::std::numeric_limits<::std::size_t>::max() / sizeof(T); }
-
-        template <typename U, typename V>
-        friend inline constexpr bool operator== (fast_io_thread_local_std_allocator<U> const&, fast_io_thread_local_std_allocator<V> const&) noexcept
-        {
-            return true;
-        }
     };
+
+    template <typename U, typename V>
+    inline constexpr bool operator== (fast_io_thread_local_std_allocator<U> const&, fast_io_thread_local_std_allocator<V> const&) noexcept
+    {
+        return true;
+    }
 }

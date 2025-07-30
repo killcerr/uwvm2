@@ -147,7 +147,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
     template <typename Key,
               typename Hash = ::std::hash<Key>,
               typename Pred = ::std::equal_to<Key>,
-              typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<Key const>>
+              typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<Key>>
     using unordered_flat_set = ::boost::unordered::unordered_flat_set<Key, Hash, Pred, Alloc>;
 
     template <typename Key,
@@ -162,7 +162,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         template <typename Key,
                   typename Hash = ::std::hash<Key>,
                   typename Pred = ::std::equal_to<Key>,
-                  typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key const>>
+                  typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key>>
         using unordered_flat_set = ::uwvm2::utils::container::unordered_flat_set<Key, Hash, Pred, Alloc>;
 
         template <typename Key,
