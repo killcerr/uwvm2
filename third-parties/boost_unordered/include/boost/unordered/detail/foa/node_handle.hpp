@@ -49,7 +49,14 @@ struct node_handle_base
   private:
     using node_value_type=typename type_policy::value_type;
     element_type p_;
-    [[no_unique_address]] opt_storage<Allocator> a_;
+#ifndef __INTELLISENSE__
+#if __has_cpp_attribute(msvc::no_unique_address)
+	  [[msvc::no_unique_address]]
+#elif __has_cpp_attribute(no_unique_address) >= 201803
+	  [[no_unique_address]]
+#endif
+#endif
+    opt_storage<Allocator> a_;
 
     friend struct node_handle_access;
 
