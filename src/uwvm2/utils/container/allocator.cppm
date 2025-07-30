@@ -23,6 +23,7 @@
 module;
 
 // std
+#include <version>
 #include <cstdint>
 #include <cstddef>
 #include <cstring>
