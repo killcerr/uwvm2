@@ -639,7 +639,7 @@ class deque_iterator
     {
     }
 
-    constexpr void verify(deque_iterator const &other) const noexcept
+    constexpr void verify([[maybe_unused]] deque_iterator const &other) const noexcept
     {
     }
 
