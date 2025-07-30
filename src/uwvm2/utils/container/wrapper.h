@@ -27,6 +27,7 @@
 # include <cstdint>
 # include <cstddef>
 # include <cstring>
+# include <climits>
 # include <concepts>
 # include <memory>
 # include <utility>

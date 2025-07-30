@@ -25,6 +25,7 @@
 // std
 # include <cstddef>
 # include <cstdint>
+# include <climits>
 # include <type_traits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>

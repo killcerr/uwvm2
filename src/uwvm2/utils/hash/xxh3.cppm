@@ -25,6 +25,7 @@ module;
 # include <cstddef>
 # include <cstdint>
 # include <cstring>
+# include <climits>
 # include <concepts>
 # include <bit>
 # include <limits>

@@ -26,6 +26,7 @@
 // std
 # include <cstdint>
 # include <cstddef>
+# include <climits>
 # include <concepts>
 # include <bit>
 // macro
