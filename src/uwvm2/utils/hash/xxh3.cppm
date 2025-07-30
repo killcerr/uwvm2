@@ -27,6 +27,7 @@ module;
 # include <cstring>
 # include <climits>
 # include <concepts>
+# include <memory>
 # include <bit>
 # include <limits>
 // macro

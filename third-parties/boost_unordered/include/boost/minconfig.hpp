@@ -86,14 +86,14 @@
 #define BOOST_NORETURN
 #endif
 
-#if BOOST_MSVC
+#if defined(BOOST_MSVC)
 #if !defined(_CPPUNWIND) && !defined(BOOST_NO_EXCEPTIONS)
 #define BOOST_NO_EXCEPTIONS
 #endif
 #if !defined(_CPPRTTI) && !defined(BOOST_NO_RTTI)
 #define BOOST_NO_RTTI
 #endif
-#elif BOOST_GCC
+#elif defined(BOOST_GCC)
 #if !defined(__EXCEPTIONS) && !defined(BOOST_NO_EXCEPTIONS)
 #define BOOST_NO_EXCEPTIONS
 #endif

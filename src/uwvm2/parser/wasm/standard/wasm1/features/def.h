@@ -699,39 +699,42 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     };
 }
 
-template <>
-UWVM_MODULE_EXPORT struct ::std::hash<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>
+UWVM_MODULE_EXPORT namespace std
 {
-    inline constexpr ::std::size_t operator() (::uwvm2::parser::wasm::standard::wasm1::features::name_checker const& checker) const noexcept
+    template <>
+    struct hash<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>
     {
+        inline constexpr ::std::size_t operator() (::uwvm2::parser::wasm::standard::wasm1::features::name_checker const& checker) const noexcept
+        {
 #if CHAR_BIT == 8
-        ::std::size_t module_name_sz;
-        ::std::size_t extern_name_sz;
-        if constexpr(requires { checker.module_name.size_bytes(); }) { module_name_sz = checker.module_name.size_bytes(); }
-        else
-        {
-            module_name_sz = checker.module_name.size() * sizeof(char8_t);
-        }
+            ::std::size_t module_name_sz;
+            ::std::size_t extern_name_sz;
+            if constexpr(requires { checker.module_name.size_bytes(); }) { module_name_sz = checker.module_name.size_bytes(); }
+            else
+            {
+                module_name_sz = checker.module_name.size() * sizeof(char8_t);
+            }
 
-        if constexpr(requires { checker.extern_name.size_bytes(); }) { extern_name_sz = checker.extern_name.size_bytes(); }
-        else
-        {
-            extern_name_sz = checker.extern_name.size() * sizeof(char8_t);
-        }
+            if constexpr(requires { checker.extern_name.size_bytes(); }) { extern_name_sz = checker.extern_name.size_bytes(); }
+            else
+            {
+                extern_name_sz = checker.extern_name.size() * sizeof(char8_t);
+            }
 
-        auto const seed1{::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.module_name.data()), module_name_sz)};
+            auto const seed1{::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.module_name.data()), module_name_sz)};
 
-        return static_cast<::std::size_t>(
-            ::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.extern_name.data()), extern_name_sz, seed1));
+            return static_cast<::std::size_t>(
+                ::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.extern_name.data()), extern_name_sz, seed1));
 #else
-        // use std hash
+            // use std hash
 
-        ::std::size_t h1{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.module_name)};
-        ::std::size_t h2{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.extern_name)};
-        return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
+            ::std::size_t h1{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.module_name)};
+            ::std::size_t h2{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.extern_name)};
+            return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
 #endif
-    }
-};
+        }
+    };
+}
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
