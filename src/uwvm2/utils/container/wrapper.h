@@ -36,6 +36,8 @@
 # include <bizwen/deque.hpp>
 # include <boost/unordered/unordered_flat_map.hpp>
 # include <boost/unordered/unordered_flat_set.hpp>
+# include <boost/unordered/unordered_node_map.hpp>
+# include <boost/unordered/unordered_node_set.hpp>
 // import
 # include <fast_io.h>
 # include <fast_io_dsal/tuple.h>
@@ -157,6 +159,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
               typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<::std::pair<Key const, Val>>>
     using unordered_flat_map = ::boost::unordered::unordered_flat_map<Key, Val, Hash, Pred, Alloc>;
 
+    /// @brief unordered
+    template <typename Key,
+              typename Hash = ::std::hash<Key>,
+              typename Pred = ::std::equal_to<Key>,
+              typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<Key>>
+    using unordered_node_set = ::boost::unordered::unordered_node_set<Key, Hash, Pred, Alloc>;
+
+    template <typename Key,
+              typename Val,
+              typename Hash = ::std::hash<Key>,
+              typename Pred = ::std::equal_to<Key>,
+              typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<::std::pair<Key const, Val>>>
+    using unordered_node_map = ::boost::unordered::unordered_node_map<Key, Val, Hash, Pred, Alloc>;
+
     namespace tlc
     {
         template <typename Key,
@@ -171,6 +187,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
                   typename Pred = ::std::equal_to<Key>,
                   typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>
         using unordered_flat_map = ::uwvm2::utils::container::unordered_flat_map<Key, Val, Hash, Pred, Alloc>;
+
+        template <typename Key,
+                  typename Hash = ::std::hash<Key>,
+                  typename Pred = ::std::equal_to<Key>,
+                  typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key>>
+        using unordered_node_set = ::uwvm2::utils::container::unordered_node_set<Key, Hash, Pred, Alloc>;
+
+        template <typename Key,
+                  typename Val,
+                  typename Hash = ::std::hash<Key>,
+                  typename Pred = ::std::equal_to<Key>,
+                  typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>
+        using unordered_node_map = ::uwvm2::utils::container::unordered_node_map<Key, Val, Hash, Pred, Alloc>;
     }  // namespace tlc
 }
 
