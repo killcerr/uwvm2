@@ -33,6 +33,8 @@
 # include <utility>
 # include <type_traits>
 # include <string_view>
+# include <set>  /// @todo replace with btreemap
+# include <map>  /// @todo replace with btreemap
 // platform
 # include <bizwen/deque.hpp>
 # include <boost/unordered/unordered_flat_map.hpp>
@@ -146,6 +148,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         using deque = ::uwvm2::utils::container::deque<T, Alloc>;
     }
 
+    /// @brief ordered
+    template <typename Key, typename Compare = ::std::less<Key>, typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<Key>>
+    using set = ::std::set<Key, Compare, Alloc>;  /// @todo replace with btree set
+
+    template <typename Key,
+              typename Val,
+              typename Compare = ::std::less<Key>,
+              typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<::std::pair<Key const, Val>>>
+    using map = ::std::map<Key, Val, Compare, Alloc>;  /// @todo replace with btree map
+
+    namespace tlc
+    {
+        template <typename Key, typename Compare = ::std::less<Key>, typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<Key>>
+        using set = ::uwvm2::utils::container::set<Key, Compare, Alloc>;
+
+        template <typename Key,
+                  typename Val,
+                  typename Compare = ::std::less<Key>,
+                  typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>
+        using map = ::uwvm2::utils::container::map<Key, Val, Compare, Alloc>;
+    }  // namespace tlc
+
     /// @brief unordered
     template <typename Key,
               typename Hash = ::std::hash<Key>,
@@ -160,7 +184,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
               typename Alloc = ::uwvm2::utils::container::fast_io_global_std_allocator<::std::pair<Key const, Val>>>
     using unordered_flat_map = ::boost::unordered::unordered_flat_map<Key, Val, Hash, Pred, Alloc>;
 
-    /// @brief unordered
     template <typename Key,
               typename Hash = ::std::hash<Key>,
               typename Pred = ::std::equal_to<Key>,
