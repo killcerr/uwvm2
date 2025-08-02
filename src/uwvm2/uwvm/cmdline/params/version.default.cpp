@@ -305,7 +305,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"Convex Computer"
 #elif defined(__e2k__)
                                 u8"E2K"
-#elif defined(__IA64__) || defined(_M_IA64)
+#elif defined(__IA64__) || defined(_M_IA64) || defined(__ia64__) || defined(__itanium__)
                                 u8"Intel Itanium 64"
 #elif defined(__loongarch__)
 # if defined(__loongarch64)
