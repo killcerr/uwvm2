@@ -61,6 +61,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             // log
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_output),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_disable_warning),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::log_convert_warn_to_fatal),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_verbose),
 #if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_win32_use_ansi),

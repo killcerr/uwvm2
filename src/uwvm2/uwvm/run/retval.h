@@ -46,13 +46,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         parameter_error = 1,  // Invalid parameter or handling failure
         load_error = 1,       // The specified file is not available or cannot be opened
         wasm_parser_error = 1,
-        duplicate_module_name = 1
+        duplicate_module_name = 1,
+        module_dependency_error = 1
 
 #else
         parameter_error = 126,  // Invalid parameter or handling failure
         load_error = 127,       // The specified file is not available or cannot be opened
         wasm_parser_error = 127,
-        duplicate_module_name = 127
+        duplicate_module_name = 127,
+        module_dependency_error = 127
 #endif
 
     };
