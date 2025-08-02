@@ -50,6 +50,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
     {
         // Ensure that iterators can't fail during expansion
         ::uwvm2::utils::container::vector<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_unique_ptr_t> opens{};
+        // Specialization of renumber, each extension requires a judgment of begin
         ::uwvm2::utils::container::map<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t, ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_unique_ptr_t> renumber_map{};
         // Used to record the coordinates of closure for subsequent builds
         ::uwvm2::utils::container::vector<::std::size_t> closes{};
