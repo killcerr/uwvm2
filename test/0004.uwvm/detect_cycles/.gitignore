@@ -1,0 +1,23 @@
+# Ignore all WebAssembly binary files
+*.wasm
+
+# Ignore compiled test files
+test_*.wasm
+
+# Ignore any other binary files that might be generated
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Ignore temporary files
+*.tmp
+*.temp
+*~
+
+# Ignore build artifacts
+build/
+dist/
+*.log 
