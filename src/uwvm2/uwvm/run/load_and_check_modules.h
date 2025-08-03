@@ -55,9 +55,9 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
-    /// @brief Detect cyclic dependencies.
+    /// @brief Detect cyclic dependencies with graph-level deduplication.
     /// @param adjacency_list The adjacency list of the dependency graph.
-    /// @return All cyclic dependencies.
+    /// @return All unique cyclic dependencies.
     inline constexpr auto detect_cycles(
         ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view,
                                                       ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view>> const&
@@ -69,11 +69,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
         cycles_t all_cycles{};
 
+        // Track processed nodes to avoid duplicate detection
+        ::uwvm2::utils::container::unordered_flat_set<module_name_t> processed_nodes{};
+
         for(auto const& [start_node, _]: adjacency_list)
         {
+            // Skip if this node has already been processed
+            if(processed_nodes.find(start_node) != processed_nodes.end()) { continue; }
+
             ::uwvm2::utils::container::unordered_flat_map<module_name_t, bool> blocked{};
             ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::uwvm2::utils::container::unordered_flat_set<module_name_t>> B{};
             ::uwvm2::utils::container::vector<module_name_t> stack{};
+            ::uwvm2::utils::container::unordered_flat_set<module_name_t> cycle_nodes{};
 
             for(auto const& [node, _]: adjacency_list) { blocked[node] = false; }
 
@@ -102,6 +109,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                          cycle_t cycle{stack};
                                          cycle.push_back(start_node);
                                          all_cycles.push_back(::std::move(cycle));
+
+                                         // Mark all nodes in the cycle as processed
+                                         for(auto const& node: stack) { cycle_nodes.insert(node); }
+                                         cycle_nodes.insert(start_node);
+
                                          found_cycle = true;
                                      }
                                      else if(!blocked[w])
@@ -128,6 +140,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                          }};
 
             circuit(start_node);
+
+            // Mark all nodes found in cycles as processed
+            for(auto const& node: cycle_nodes) { processed_nodes.insert(node); }
         }
 
         return all_cycles;
