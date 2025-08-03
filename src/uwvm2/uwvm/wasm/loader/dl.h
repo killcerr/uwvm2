@@ -68,7 +68,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         parse_error
     };
 
-    /// @todo load dl not finished
     inline constexpr load_dl_rtl load_dl(::uwvm2::uwvm::wasm::type::wasm_dl_t & wd,
                                          ::uwvm2::utils::container::u8cstring_view load_file_name,
                                          ::uwvm2::utils::container::u8string_view rename_module_name,

@@ -127,7 +127,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // run vm
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
         {
-            case ::uwvm2::uwvm::wasm::base::mode::objdump:
+            case ::uwvm2::uwvm::wasm::base::mode::checkobj:
             {
                 /// @todo
                 break;

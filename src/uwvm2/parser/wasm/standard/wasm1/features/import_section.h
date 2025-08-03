@@ -510,7 +510,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // desc counter
 
         ::uwvm2::utils::container::array<
-            ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker> /* @todo use fast_io::set instead */,
+            ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>,
             importdesc_count>
             duplicate_name_checker{};  // use for check duplicate name
 

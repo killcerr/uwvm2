@@ -89,9 +89,9 @@ namespace uwvm2::uwvm::cmdline::params::details
         // Setting the argument is already taken
         currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
 
-        if(auto const currp1_str{currp1->str}; currp1_str == u8"objdump")
+        if(auto const currp1_str{currp1->str}; currp1_str == u8"checkobj")
         {
-            ::uwvm2::uwvm::wasm::storage::execute_wasm_mode = ::uwvm2::uwvm::wasm::base::mode::objdump;
+            ::uwvm2::uwvm::wasm::storage::execute_wasm_mode = ::uwvm2::uwvm::wasm::base::mode::checkobj;
         }
         else [[unlikely]]
         {

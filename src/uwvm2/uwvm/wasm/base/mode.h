@@ -30,7 +30,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::base
     /// @brief wasm running mode
     enum class mode : unsigned
     {
-        objdump
+        checkobj
     };
 
 }  // namespace uwvm2::parser::wasm::base
