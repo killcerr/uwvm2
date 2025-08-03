@@ -155,9 +155,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm: [[fallthrough]];
                 case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
                 {
-                    using wasm_file_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::uwvm::wasm::type::wasm_file_t const*;
-
-                    auto const exec_wasm_ptr{reinterpret_cast<wasm_file_const_may_alias_ptr>(curr_module.second.module_storage_ptr.wf)};
+                    auto const exec_wasm_ptr{curr_module.second.module_storage_ptr.wf};
                     auto const exec_wasm_binfmt_ver{exec_wasm_ptr->binfmt_ver};
 
                     switch(exec_wasm_binfmt_ver)
@@ -221,8 +219,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm: [[fallthrough]];
                                     case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
                                     {
-                                        auto const imported_wasm_ptr{
-                                            reinterpret_cast<wasm_file_const_may_alias_ptr>(imported_module.second.module_storage_ptr.wf)};
+                                        auto const imported_wasm_ptr{imported_module.second.module_storage_ptr.wf};
                                         auto const imported_wasm_binfmt_ver{imported_wasm_ptr->binfmt_ver};
 
                                         switch(imported_wasm_binfmt_ver)
@@ -269,9 +266,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     }
                                     case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
                                     {
-                                        using wasm_dl_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::uwvm::wasm::type::wasm_dl_t const*;
-
-                                        auto const imported_dl_ptr{reinterpret_cast<wasm_dl_const_may_alias_ptr>(curr_module.second.module_storage_ptr.wd)};
+                                        auto const imported_dl_ptr{curr_module.second.module_storage_ptr.wd};
 
                                         // Check if there is an exported map. If not, build one.
                                         auto [curr_exported_module, inserted]{exported.try_emplace(import_module_name)};
