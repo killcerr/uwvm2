@@ -88,11 +88,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                      if(neighbor == start_node)
                                      {
                                          // Directly construct cycle path, avoid extra moves
-                                         cycle_t cycle(path);
+                                         cycle_t cycle{path};
                                          cycle.push_back(start_node);
                                          all_cycles.push_back(std::move(cycle));
                                      }
-                                     // Use contains for better readability (C++20)
                                      else if(!blocked.contains(neighbor)) { self(neighbor); }
                                  }
                              }
