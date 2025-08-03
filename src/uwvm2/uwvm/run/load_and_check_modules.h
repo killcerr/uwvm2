@@ -74,7 +74,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             ::uwvm2::utils::container::vector<module_name_t> path{};
             ::uwvm2::utils::container::unordered_flat_set<module_name_t> blocked{};
-            ::uwvm2::utils::container::unordered_flat_set<module_name_t> blocked_map{};
 
             auto circuit{[&](this auto const& self, module_name_t current) constexpr noexcept -> void
                          {
@@ -96,7 +95,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                  }
                              }
 
-                             path.pop_back();
+                             path.pop_back_unchecked();
                              blocked.erase(current);
                          }};
 
@@ -263,7 +262,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     {
                                         using wasm_dl_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::uwvm::wasm::type::wasm_dl_t const*;
 
-                                        auto const imported_dl_ptr{reinterpret_cast<wasm_dl_const_may_alias_ptr>(curr_module.second.module_storage_ptr.wf)};
+                                        auto const imported_dl_ptr{reinterpret_cast<wasm_dl_const_may_alias_ptr>(curr_module.second.module_storage_ptr.wd)};
 
                                         // Check if there is an exported map. If not, build one.
                                         auto [curr_exported_module, inserted]{exported.try_emplace(import_module_name)};
@@ -280,7 +279,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                                                              reinterpret_cast<char8_t_const_may_alias_ptr>(dl_func_curr->func_name_ptr),
                                                                                              dl_func_curr->func_name_length}
                                                 };
-                                                constexpr auto dl_func_type{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(0u)};
+                                                constexpr auto dl_func_type{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(0u)}; // func
                                                 curr_exported_module->second.emplace(dl_func_curr_name, dl_func_type);
                                             }
                                         }
@@ -457,6 +456,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
     /// @brief Check for duplicates or mismatched imports and exports
     inline int load_and_check_modules() noexcept
     {
+#ifdef UWVM_TIMER
+        ::uwvm2::utils::debug::timer parsing_timer{u8"load and check modules"};
+#endif
         // preload abi
         {
             if(::uwvm2::uwvm::wasm::storage::local_preload_wasip1)
