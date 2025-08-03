@@ -286,6 +286,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                 }
 
                                                 curr_exported = curr_exported_module;
+                                                
+                                                break;
                                             }
                                             [[unlikely]] default:
                                             {
@@ -375,6 +377,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"func"}; }
                                             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"func"}; }
                                             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"func"}; }
+                                            break;
                                         }
                                         case 1u:
                                         {
@@ -383,6 +386,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"table"}; }
                                             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"table"}; }
                                             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"table"}; }
+                                            break;
                                         }
                                         case 2u:
                                         {
@@ -391,6 +395,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"mem"}; }
                                             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"mem"}; }
                                             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"mem"}; }
+                                            break;
                                         }
                                         case 3u:
                                         {
@@ -399,6 +404,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"global"}; }
                                             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"global"}; }
                                             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"global"}; }
+                                            break;
                                         }
                                         case 4u:
                                         {
@@ -407,6 +413,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"tag"}; }
                                             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"tag"}; }
                                             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"tag"}; }
+                                            break;
                                         }
                                         [[unlikely]] default:
                                         {
@@ -420,6 +427,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"unknown"}; }
                                             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"unknown"}; }
                                             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"unknown"}; }
+                                            break;
                                         }
                                     }
                                 };
@@ -462,6 +470,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     return {static_cast<int>(::uwvm2::uwvm::run::retval::module_dependency_error), ::std::move(adjacency_list)};
                                 }
                             }
+                            break;
                         }
                         [[unlikely]] default:
                         {
