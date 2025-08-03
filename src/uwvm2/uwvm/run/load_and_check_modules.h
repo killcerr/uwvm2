@@ -69,7 +69,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
         cycles_t all_cycles{};
 
-        // Run Johnson's algorithm for each node
+        // 为每个节点运行 Johnson 算法
         for(auto const& [start_node, _]: adjacency_list)
         {
             ::uwvm2::utils::container::vector<module_name_t> path{};
@@ -82,14 +82,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                              if(auto const it{adjacency_list.find(current)}; it != adjacency_list.end())
                              {
-                                 for(module_name_t neighbor: it->second)
+                                 for(auto const neighbor: it->second)
                                  {
                                      if(neighbor == start_node)
                                      {
-                                         // Directly construct cycle path, avoid extra moves
+                                         // Build a complete cycle path
                                          cycle_t cycle{path};
                                          cycle.push_back(start_node);
-                                         all_cycles.push_back(std::move(cycle));
+
+                                         // Find the smallest node in the cycle
+                                         auto min_node{start_node};
+                                         for(auto const& node: cycle)
+                                         {
+                                             if(node < min_node) { min_node = node; }
+                                         }
+
+                                         // Record cycles only when the starting point is the smallest node.
+                                         if(min_node == start_node) { all_cycles.push_back(::std::move(cycle)); }
                                      }
                                      else if(!blocked.contains(neighbor)) { self(neighbor); }
                                  }
@@ -279,7 +288,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                                                              reinterpret_cast<char8_t_const_may_alias_ptr>(dl_func_curr->func_name_ptr),
                                                                                              dl_func_curr->func_name_length}
                                                 };
-                                                constexpr auto dl_func_type{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(0u)}; // func
+                                                constexpr auto dl_func_type{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(0u)};  // func
                                                 curr_exported_module->second.emplace(dl_func_curr_name, dl_func_type);
                                             }
                                         }
