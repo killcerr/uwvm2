@@ -1575,6 +1575,44 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
     {
         return details::xxh3_64bits_internal(input, len, seed64, details::xxh3_kSecret, sizeof(details::xxh3_kSecret));
     }
+
+    /// @brief xxh3 context class for incremental hashing
+    struct xxh3_64bits_context
+    {
+        ::std::uint_least64_t seed64{};
+        ::std::uint_least64_t hash64{};
+
+        static inline constexpr ::std::size_t digest_size{sizeof(::std::uint_least64_t)};
+        
+        inline constexpr void update(::std::byte const* first, ::std::byte const* last) noexcept
+        {
+            if (first > last) [[unlikely]] 
+            {
+                ::fast_io::fast_terminate(); 
+            }
+            
+            hash64 = xxh3_64bits(first, static_cast<::std::size_t>(last - first), seed64);
+        }
+        
+        inline constexpr void reset() noexcept
+        {
+            hash64 = 0u;
+        }
+        
+        inline constexpr ::std::uint_least64_t digest_value() const noexcept
+        {
+            return hash64;
+        }
+        
+        inline constexpr void do_final() const noexcept
+        {}
+        
+        inline constexpr void digest_to_byte_ptr(::std::byte* ptr) const noexcept
+        {
+            auto const digest{digest_value()};
+            ::fast_io::freestanding::nonoverlapped_bytes_copy_n(reinterpret_cast<::std::byte const*>(::std::addressof(digest)), sizeof(digest), ptr);
+        }
+    };
 }
 
 #ifndef UWVM_MODULE

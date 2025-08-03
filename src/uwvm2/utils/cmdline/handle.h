@@ -37,6 +37,7 @@
 # include <fast_io.h>
 # include <fast_io_crypto.h>
 # include <uwvm2/utils/container/impl.h>
+# include <uwvm2/utils/hash/xxh3.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -275,7 +276,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     {
         constexpr auto sizet_d10{static_cast<::std::size_t>(::std::numeric_limits<::std::size_t>::digits10)};
 
-        ::fast_io::crc32c_context crc32c{};
+        ::uwvm2::utils::hash::xxh3_64bits_context xxh3{};
         for(auto i{hash_size_base}; i < sizet_d10; ++i)
         {
             ::std::size_t const hash_size{1uz << i};
@@ -288,10 +289,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 ::std::size_t const j_str_size{j.str.size()};
                 ::std::byte* const ptr{::new ::std::byte[j_str_size]{}};
                 for(::std::size_t k{}; k < j_str_size; ++k) { ptr[k] = static_cast<::std::byte>(j.str.index_unchecked(k)); }
-                crc32c.reset();
-                crc32c.update(ptr, ptr + j_str_size);
+                xxh3.reset();
+                xxh3.update(ptr, ptr + j_str_size);
                 ::delete[] ptr;
-                auto const val{crc32c.digest_value() % hash_size};
+                auto const val{xxh3.digest_value() % hash_size};
                 ++hash_size_array[val];
                 if(hash_size_array[val] > real_max_conflict_size) { real_max_conflict_size = hash_size_array[val]; }  // Record maximum conflict size
                 if(hash_size_array[val] == 2) { ++extra_size; }                                                       // Initiate additional conflict tables
@@ -340,7 +341,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     {
         parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> res{};
 
-        ::fast_io::crc32c_context crc32c{};
+        ::uwvm2::utils::hash::xxh3_64bits_context xxh3{};
 
         // Note: conflictplace is always 1 greater than its offset, because it prevents subsequent lookups that are equal to 0 (the first element) from being
         // judged as having no content, leading to parsing failures.
@@ -351,10 +352,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             ::std::size_t const j_str_size{j.str.size()};
             ::std::byte* const ptr{::new ::std::byte[j_str_size]{}};
             for(::std::size_t k{}; k < j_str_size; ++k) { ptr[k] = static_cast<::std::byte>(j.str.index_unchecked(k)); }
-            crc32c.reset();
-            crc32c.update(ptr, ptr + j_str_size);
+            xxh3.reset();
+            xxh3.update(ptr, ptr + j_str_size);
             ::delete[] ptr;
-            auto const val{crc32c.digest_value() % hash_table_size};
+            auto const val{xxh3.digest_value() % hash_table_size};
             if constexpr(conflict_size)
             {
                 if(res.ht.index_unchecked(val).para == nullptr)
@@ -417,15 +418,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     inline constexpr parameter const* find_from_hash_table(parameters_hash_table<hash_table_size, conflict_size, real_max_conflict_size> const& ght,
                                                            ::uwvm2::utils::container::u8string_view str) noexcept
     {
-        ::fast_io::crc32c_context crc32c{};
+        ::uwvm2::utils::hash::xxh3_64bits_context xxh3{};
 
-        // calculate crc32c
+        // calculate xxh3
         if UWVM_IF_CONSTEVAL
         {
             auto const str_size{str.size()};
             ::std::byte* const ptr{::new ::std::byte[str_size]{}};
             for(::std::size_t k{}; k < str_size; ++k) { ptr[k] = static_cast<::std::byte>(str.index_unchecked(k)); }
-            crc32c.update(ptr, ptr + str_size);
+            xxh3.update(ptr, ptr + str_size);
             ::delete[] ptr;
         }
         else
@@ -434,11 +435,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             static_assert(sizeof(char8_t) == sizeof(::std::byte));
 
             auto const i{reinterpret_cast<::std::byte const*>(str.data())};
-            crc32c.update(i, i + str.size());
+            xxh3.update(i, i + str.size());
         }
 
         // get hash table
-        auto const val{crc32c.digest_value() % hash_table_size};
+        auto const val{xxh3.digest_value() % hash_table_size};
         auto const htval{ght.ht.index_unchecked(val)};
 
         if constexpr(conflict_size)
