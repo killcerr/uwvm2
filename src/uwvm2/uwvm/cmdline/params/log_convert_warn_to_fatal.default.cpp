@@ -96,11 +96,13 @@ namespace uwvm2::uwvm::cmdline::params::details
             ::uwvm2::uwvm::io::parser_warning_fatal = true;
             ::uwvm2::uwvm::io::untrusted_dl_warning_fatal = true;
             ::uwvm2::uwvm::io::dl_warning_fatal = true;
+            ::uwvm2::uwvm::io::depend_warning_fatal = true;
         }
         else if(currp1_str == u8"vm") { ::uwvm2::uwvm::io::vm_warning_fatal = true; }
         else if(currp1_str == u8"parser") { ::uwvm2::uwvm::io::parser_warning_fatal = true; }
         else if(currp1_str == u8"untrusted-dl") { ::uwvm2::uwvm::io::untrusted_dl_warning_fatal = true; }
         else if(currp1_str == u8"dl") { ::uwvm2::uwvm::io::dl_warning_fatal = true; }
+        else if(currp1_str == u8"depend") { ::uwvm2::uwvm::io::depend_warning_fatal = true; }
         else
         {
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,

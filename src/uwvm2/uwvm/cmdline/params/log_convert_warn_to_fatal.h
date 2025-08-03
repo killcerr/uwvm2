@@ -59,7 +59,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     inline constexpr ::uwvm2::utils::cmdline::parameter log_convert_warn_to_fatal{
         .name{u8"--log-convert-warn-to-fatal"},
         .describe{u8"Convert specific warnings to fatal errors."},
-        .usage{u8"[all|vm|parser|untrusted-dl|dl]"},
+        .usage{u8"[all|vm|parser|untrusted-dl|dl|depend]"},
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_convert_warn_to_fatal_alias), 1uz}},
         .handle{::std::addressof(details::log_convert_warn_to_fatal_callback)},
         .cate{::uwvm2::utils::cmdline::categorization::log}};

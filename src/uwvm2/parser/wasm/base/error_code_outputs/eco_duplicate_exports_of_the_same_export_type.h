@@ -84,7 +84,6 @@ constexpr auto get_duplicate_exports_type_name =
             else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"unknown"}; }
             else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"unknown"}; }
             else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"unknown"}; }
-            ::std::unreachable();
         }
     }
 };

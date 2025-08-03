@@ -39,12 +39,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
     inline bool show_parser_warning{true};        // [global]
     inline bool show_untrusted_dl_warning{true};  // [global]
     inline bool show_dl_warning{true};            // [global]
+    inline bool show_depend_warning{true};        // [global]
 
     /// @brief wtrap control
     inline bool vm_warning_fatal{};            // [global]
     inline bool parser_warning_fatal{};        // [global]
     inline bool untrusted_dl_warning_fatal{};  // [global]
     inline bool dl_warning_fatal{};            // [global]
+    inline bool depend_warning_fatal{};        // [global]
 
 }  // namespace uwvm2::utils
 #endif

@@ -48,6 +48,9 @@
 # include <fast_io_dsal/string_view.h>
 # include <fast_io_dsal/string.h>
 # include <fast_io_dsal/vector.h>
+# include <fast_io_dsal/list.h>
+# include <fast_io_dsal/stack.h>
+# include <fast_io_dsal/queue.h>
 # include <uwvm2/utils/hash/impl.h>
 # include "allocator.h"
 #endif
@@ -146,6 +149,36 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
     {
         template <typename T, typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<T>>
         using deque = ::uwvm2::utils::container::deque<T, Alloc>;
+    }
+
+    /// @brief list
+    template <typename T, typename Alloc = ::fast_io::native_global_allocator>
+    using list = ::fast_io::containers::list<T, Alloc>;
+
+    namespace tlc
+    {
+        template <typename T, typename Alloc = ::fast_io::native_thread_local_allocator>
+        using list = ::uwvm2::utils::container::list<T, Alloc>;
+    }
+
+    /// @brief stack
+    template <typename T, typename Container = ::uwvm2::utils::container::vector<T>>
+    using stack = ::fast_io::containers::stack<Container>;
+
+    namespace tlc
+    {
+        template <typename T, typename Container = ::uwvm2::utils::container::tlc::vector<T>>
+        using stack = ::uwvm2::utils::container::stack<Container>;
+    }
+
+    /// @brief queue
+    template <typename T, typename Container = ::uwvm2::utils::container::deque<T>>
+    using queue = ::fast_io::containers::queue<Container>;
+
+    namespace tlc
+    {
+        template <typename T, typename Container = ::uwvm2::utils::container::tlc::deque<T>>
+        using queue = ::uwvm2::utils::container::queue<Container>;
     }
 
     /// @brief ordered
