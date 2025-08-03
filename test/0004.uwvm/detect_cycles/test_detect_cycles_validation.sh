@@ -11,6 +11,10 @@ echo ""
 UWVM_PATH=""
 if command -v uwvm2 &> /dev/null; then
     UWVM_PATH="uwvm2"
+elif [[ -f "../../../build/linux/arm64/debug/uwvm" ]]; then
+    UWVM_PATH="../../../build/linux/arm64/debug/uwvm"
+elif [[ -f "../../../build/linux/x86_64/debug/uwvm" ]]; then
+    UWVM_PATH="../../../build/linux/x86_64/debug/uwvm"
 elif [[ -f "../../../build/macosx/arm64/debug/uwvm" ]]; then
     UWVM_PATH="../../../build/macosx/arm64/debug/uwvm"
 elif [[ -f "../../../build/macosx/x86_64/debug/uwvm" ]]; then
