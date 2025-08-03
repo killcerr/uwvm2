@@ -716,12 +716,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             switch(this->mode)
             {
-                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                case vectypeidx_minimize_storage_mode::null:
                 {
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
-                    ::fast_io::fast_terminate();
+                    // There should be no error here; it should just return 0.
+                    return 0uz;
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {

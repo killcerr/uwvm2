@@ -286,7 +286,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                 }
 
                                                 curr_exported = curr_exported_module;
-                                                
+
                                                 break;
                                             }
                                             [[unlikely]] default:
@@ -645,9 +645,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                         u8"(depend)\n");
 
+                    ::std::size_t counter{};
+
                     for(auto const& cycle: cycles)
                     {
-                        ::fast_io::io::perr(u8log_output_ul, u8"                ");
+                        ::fast_io::io::perr(u8log_output_ul,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"              ",
+                                            ++counter,
+                                            u8": ");
 
                         bool is_not_first{};
                         for(auto const cycle_curr: cycle)
