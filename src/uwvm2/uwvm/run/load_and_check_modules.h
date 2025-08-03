@@ -266,7 +266,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     }
                                     case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
                                     {
-                                        auto const imported_dl_ptr{curr_module.second.module_storage_ptr.wd};
+                                        auto const imported_dl_ptr{imported_module.second.module_storage_ptr.wd};
 
                                         // Check if there is an exported map. If not, build one.
                                         auto [curr_exported_module, inserted]{exported.try_emplace(import_module_name)};
