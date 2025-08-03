@@ -1582,31 +1582,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         ::std::uint_least64_t seed64{};
         ::std::uint_least64_t hash64{};
 
-        static inline constexpr ::std::size_t digest_size{sizeof(::std::uint_least64_t)};
-        
+        inline static constexpr ::std::size_t digest_size{sizeof(::std::uint_least64_t)};
+
         inline constexpr void update(::std::byte const* first, ::std::byte const* last) noexcept
         {
-            if (first > last) [[unlikely]] 
-            {
-                ::fast_io::fast_terminate(); 
-            }
-            
+            if(first > last) [[unlikely]] { ::fast_io::fast_terminate(); }
+
             hash64 = xxh3_64bits(first, static_cast<::std::size_t>(last - first), seed64);
         }
-        
-        inline constexpr void reset() noexcept
-        {
-            hash64 = 0u;
-        }
-        
-        inline constexpr ::std::uint_least64_t digest_value() const noexcept
-        {
-            return hash64;
-        }
-        
-        inline constexpr void do_final() const noexcept
-        {}
-        
+
+        inline constexpr void reset() noexcept { hash64 = 0u; }
+
+        inline constexpr ::std::uint_least64_t digest_value() const noexcept { return hash64; }
+
+        inline constexpr void do_final() const noexcept {}
+
         inline constexpr void digest_to_byte_ptr(::std::byte* ptr) const noexcept
         {
             auto const digest{digest_value()};

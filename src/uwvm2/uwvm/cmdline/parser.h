@@ -377,6 +377,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                         }
                         [[unlikely]] default:
                         {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
                             ::std::unreachable();  // A correct implementation will not show any other results, and if it does, the behavior is undefined.
                         }
                     }

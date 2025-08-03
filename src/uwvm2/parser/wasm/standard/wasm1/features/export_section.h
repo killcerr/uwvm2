@@ -228,6 +228,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
             [[unlikely]] default:
             {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
                 ::std::unreachable();  // never match, checked before
             }
         }
@@ -334,9 +337,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, exportdesc_count> exportdesc_counter{};  // use for reserve
         // desc counter
 
-        ::uwvm2::utils::container::array<
-            ::uwvm2::utils::container::unordered_flat_set<::uwvm2::utils::container::u8string_view>,
-            exportdesc_count>
+        ::uwvm2::utils::container::array<::uwvm2::utils::container::unordered_flat_set<::uwvm2::utils::container::u8string_view>, exportdesc_count>
             duplicate_name_checker{};  // use for check duplicate name
 
         while(section_curr != section_end) [[likely]]
