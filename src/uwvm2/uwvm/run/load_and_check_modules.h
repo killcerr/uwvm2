@@ -55,10 +55,10 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
-    /// @brief Use Johnson's algorithm to detect cyclic dependencies.
+    /// @brief Detect cyclic dependencies.
     /// @param adjacency_list The adjacency list of the dependency graph.
     /// @return All cyclic dependencies.
-    inline constexpr auto detect_cycles_with_johnson(
+    inline constexpr auto detect_cycles(
         ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view,
                                                       ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view>> const&
             adjacency_list) noexcept
@@ -69,43 +69,62 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
         cycles_t all_cycles{};
 
-        // 为每个节点运行 Johnson 算法
         for(auto const& [start_node, _]: adjacency_list)
         {
-            ::uwvm2::utils::container::vector<module_name_t> path{};
-            ::uwvm2::utils::container::unordered_flat_set<module_name_t> blocked{};
+            ::uwvm2::utils::container::unordered_flat_map<module_name_t, bool> blocked{};
+            ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::uwvm2::utils::container::unordered_flat_set<module_name_t>> B{};
+            ::uwvm2::utils::container::vector<module_name_t> stack{};
 
-            auto circuit{[&](this auto const& self, module_name_t current) constexpr noexcept -> void
+            for(auto const& [node, _]: adjacency_list) { blocked[node] = false; }
+
+            auto unblock{[&](this auto const& self, module_name_t u) constexpr noexcept -> void
                          {
-                             path.push_back(current);
-                             blocked.insert(current);
-
-                             if(auto const it{adjacency_list.find(current)}; it != adjacency_list.end())
+                             blocked[u] = false;
+                             for(auto w: B[u])
                              {
-                                 for(auto const neighbor: it->second)
+                                 if(blocked[w]) { self(w); }
+                             }
+                             B[u].clear();
+                         }};
+
+            auto circuit{[&](this auto const& self, module_name_t v) constexpr noexcept -> bool
+                         {
+                             bool found_cycle = false;
+                             stack.push_back(v);
+                             blocked[v] = true;
+
+                             if(auto const it{adjacency_list.find(v)}; it != adjacency_list.end())
+                             {
+                                 for(auto const w: it->second)
                                  {
-                                     if(neighbor == start_node)
+                                     if(w == start_node)
                                      {
-                                         // Build a complete cycle path
-                                         cycle_t cycle{path};
+                                         cycle_t cycle{stack};
                                          cycle.push_back(start_node);
-
-                                         // Find the smallest node in the cycle
-                                         auto min_node{start_node};
-                                         for(auto const& node: cycle)
-                                         {
-                                             if(node < min_node) { min_node = node; }
-                                         }
-
-                                         // Record cycles only when the starting point is the smallest node.
-                                         if(min_node == start_node) { all_cycles.push_back(::std::move(cycle)); }
+                                         all_cycles.push_back(::std::move(cycle));
+                                         found_cycle = true;
                                      }
-                                     else if(!blocked.contains(neighbor)) { self(neighbor); }
+                                     else if(!blocked[w])
+                                     {
+                                         if(self(w)) { found_cycle = true; }
+                                     }
                                  }
                              }
 
-                             path.pop_back_unchecked();
-                             blocked.erase(current);
+                             if(found_cycle) { unblock(v); }
+                             else
+                             {
+                                 if(auto const it{adjacency_list.find(v)}; it != adjacency_list.end())
+                                 {
+                                     for(auto const w: it->second)
+                                     {
+                                         if(B[w].find(v) == B[w].end()) { B[w].insert(v); }
+                                     }
+                                 }
+                             }
+
+                             stack.pop_back_unchecked();
+                             return found_cycle;
                          }};
 
             circuit(start_node);
@@ -570,7 +589,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // Check Cycle
         if(::uwvm2::uwvm::io::show_depend_warning)
         {
-            auto const cycles{detect_cycles_with_johnson(dependency_graph)};
+            auto const cycles{detect_cycles(dependency_graph)};
 
             // Output cyclic dependency warnings
             if(!cycles.empty()) [[unlikely]]
