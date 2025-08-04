@@ -322,7 +322,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr ::std::uint_least64_t xxh_xorshift64(::std::uint_least64_t val, unsigned shf) noexcept
         {
-            [[assume(0u <= shf && shf < 64u)]];
+            [[assume(shf < 64u)]];
 
             return val ^ (val >> shf);
         }
