@@ -1467,22 +1467,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x64simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x64simd*;
             auto xacc{reinterpret_cast<u8x64simd_may_alias_ptr>(acc_64aligned)};
 
-            constexpr u32x16simd prime32{xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1,
-                                         xxh_prime32_1};
+            constexpr u32x16simd prime32{
+                xxh_prime32_1,  // 0
+                xxh_prime32_1,  // 1
+                xxh_prime32_1,  // 2
+                xxh_prime32_1,  // 3
+                xxh_prime32_1,  // 4
+                xxh_prime32_1,  // 5
+                xxh_prime32_1,  // 6
+                xxh_prime32_1,  // 7
+                xxh_prime32_1,  // 8
+                xxh_prime32_1,  // 9
+                xxh_prime32_1,  // 10
+                xxh_prime32_1,  // 11
+                xxh_prime32_1,  // 12
+                xxh_prime32_1,  // 13
+                xxh_prime32_1,  // 14
+                xxh_prime32_1   // 15
+            };
 
             // Aligned load
             u8x64simd acc_vec{*xacc};
@@ -1511,9 +1513,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             };
 
             auto const prod_lo{
-# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512_mask)
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512_mask)  // GCC
                 __builtin_ia32_pmuludq512_mask(::std::bit_cast<i32x16simd>(data_key), ::std::bit_cast<i32x16simd>(prime32), i32x16simd{}, UINT8_MAX)
-# elif UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512)
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512)  // Clang
                 __builtin_ia32_pmuludq512(::std::bit_cast<i32x16simd>(data_key), ::std::bit_cast<i32x16simd>(prime32))
 # else
 #  error "missing instructions"
@@ -1521,9 +1523,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             };
 
             auto const prod_hi{
-# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512_mask)
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512_mask)  // GCC
                 __builtin_ia32_pmuludq512_mask(::std::bit_cast<i32x16simd>(data_key_hi), ::std::bit_cast<i32x16simd>(prime32), i32x16simd{}, UINT8_MAX)
-# elif UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512)
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512)  // Clang
                 __builtin_ia32_pmuludq512(::std::bit_cast<i32x16simd>(data_key_hi), ::std::bit_cast<i32x16simd>(prime32))
 # else
 #  error "missing instructions"
@@ -1531,9 +1533,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             };
 
             *xacc = ::std::bit_cast<u64x8simd>(prod_lo) + ::std::bit_cast<u64x8simd>(
-# if UWVM_HAS_BUILTIN(__builtin_ia32_psllqi512_mask)
+# if UWVM_HAS_BUILTIN(__builtin_ia32_psllqi512_mask)  // GCC
                                                               __builtin_ia32_psllqi512_mask(::std::bit_cast<i64x8simd>(prod_hi), 32, i64x8simd{}, UINT8_MAX)
-# elif UWVM_HAS_BUILTIN(__builtin_ia32_psllqi512)
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_psllqi512)  // Clang
                                                               __builtin_ia32_psllqi512(::std::bit_cast<i64x8simd>(prod_hi), 32)
 # else
 #  error "missing instructions"
