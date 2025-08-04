@@ -1776,6 +1776,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
     {
         ::std::uint_least64_t seed64{};
         ::std::uint_least64_t hash64{};
+        bool is_not_first{};
 
         inline static constexpr ::std::size_t digest_size{sizeof(::std::uint_least64_t)};
 
@@ -1783,10 +1784,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         {
             if(first > last) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-            hash64 = xxh3_64bits(first, static_cast<::std::size_t>(last - first), seed64);
+            if(!is_not_first)
+            {
+                hash64 = xxh3_64bits(first, static_cast<::std::size_t>(last - first), seed64);
+                is_not_first = true;
+            }
+            else
+            {
+                /// @todo not finished stream mode
+                ::fast_io::fast_terminate();
+            }
         }
 
-        inline constexpr void reset() noexcept { hash64 = 0u; }
+        inline constexpr void reset() noexcept
+        {
+            hash64 = 0u;
+            is_not_first = false;
+        }
 
         inline constexpr ::std::uint_least64_t digest_value() const noexcept { return hash64; }
 
