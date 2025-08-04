@@ -712,9 +712,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #  error "missing instruction"
 # endif
 
-            auto const sum{::std::bit_cast<u8x64simd>(::std::bit_cast<u64x8simd>(*xacc) + ::std::bit_cast<u64x8simd>(data_swa))};
+            auto const sum{::std::bit_cast<u8x64simd>(::std::bit_cast<u64x8simd>(*xacc) + ::std::bit_cast<u64x8simd>(data_swap))};
 
-            *xacc = ::std::bit_cast<u8x64simd>(::std::bit_cast<u64x8simd>(product), ::std::bit_cast<u64x8simd>(sum));
+            *xacc = ::std::bit_cast<u8x64simd>(::std::bit_cast<u64x8simd>(product) + ::std::bit_cast<u64x8simd>(sum));
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__)
 
