@@ -1498,13 +1498,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             u8x64simd key_vec;
             ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u8x64simd));
 
-            auto const data_vec{key_vec ^ acc_vec ^ shifted};
+            auto const data_key{key_vec ^ acc_vec ^ shifted};
 
             auto const data_key_hi{
 # if UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512_mask)  // GCC
-                __builtin_ia32_psrlqi512_mask(::std::bit_cast<i64x8simd>(data_vec), 32u, i64x8simd{}, UINT8_MAX)
+                __builtin_ia32_psrlqi512_mask(::std::bit_cast<i64x8simd>(data_key), 32u, i64x8simd{}, UINT8_MAX)
 # elif UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512)  // Clang
-                __builtin_ia32_psrlqi512(::std::bit_cast<i64x8simd>(data_vec), 32u)
+                __builtin_ia32_psrlqi512(::std::bit_cast<i64x8simd>(data_key), 32u)
 # else
 #  error "missing instructions"
 # endif
