@@ -1455,6 +1455,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         inline constexpr void xxh3_scramble_acc(::std::byte* __restrict acc, ::std::byte const* __restrict secret) noexcept
         {
 #if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__)
+
             using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
             using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
             using u32x16simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint32_t;
@@ -1542,7 +1543,114 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # endif
                                                           );
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__)
+
+# if 0
+{   __m256i* const xacc = (__m256i*) acc;
+    /* Unaligned. This is mainly for pointer arithmetic, and because
+     * _mm256_loadu_si256 requires a const __m256i * pointer for some reason. */
+    const         __m256i* const xsecret = (const __m256i *) secret;
+    const __m256i prime32 = _mm256_set1_epi32((int)XXH_PRIME32_1);
+
+    size_t i;
+    for (i=0; i < XXH_STRIPE_LEN/sizeof(__m256i); i++) {
+        /* xacc[i] ^= (xacc[i] >> 47) */
+        __m256i const acc_vec     = xacc[i];
+        __m256i const shifted     = _mm256_srli_epi64    (acc_vec, 47);
+        __m256i const data_vec    = _mm256_xor_si256     (acc_vec, shifted);
+        /* xacc[i] ^= xsecret; */
+        __m256i const key_vec     = _mm256_loadu_si256   (xsecret+i);
+        __m256i const data_key    = _mm256_xor_si256     (data_vec, key_vec);
+
+        /* xacc[i] *= XXH_PRIME32_1; */
+        __m256i const data_key_hi = _mm256_srli_epi64 (data_key, 32);
+        __m256i const prod_lo     = _mm256_mul_epu32     (data_key, prime32);
+        __m256i const prod_hi     = _mm256_mul_epu32     (data_key_hi, prime32);
+        xacc[i] = _mm256_add_epi64(prod_lo, _mm256_slli_epi64(prod_hi, 32));
+    }
+}
+# endif
+
+            using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = char;
+            using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
+
+            constexpr u32x8simd prime32{
+                xxh_prime32_1,  // 0
+                xxh_prime32_1,  // 1
+                xxh_prime32_1,  // 2
+                xxh_prime32_1,  // 3
+                xxh_prime32_1,  // 4
+                xxh_prime32_1,  // 5
+                xxh_prime32_1,  // 6
+                xxh_prime32_1,  // 7
+            };
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
+            auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
+
+            for(unsigned i{}; i != 2u; ++i)
+            {
+                auto const acc_vec{*xacc};
+
+                auto const shifted{
+# if UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi256)
+                    __builtin_ia32_psrlqi256(::std::bit_cast<i64x4simd>(acc_vec), 47)
+# else
+#  error "missing instructions"
+# endif
+                };
+
+                auto const data_vec{acc_vec ^ shifted};
+
+                u8x32simd key_vec;
+                ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u8x32simd));
+                secret += sizeof(u8x32simd);
+
+                auto const data_key{data_vec ^ key_vec};
+
+                auto const data_key_hi{
+# if UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi256)
+                    __builtin_ia32_psrlqi256(::std::bit_cast<i64x4simd>(data_key), 32)
+# else
+#  error "missing instructions"
+# endif
+                };
+
+                auto const prod_lo
+                {
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq256)
+                    __builtin_ia32_pmuludq256(::std::bit_cast<i32x8simd>(data_key), ::std::bit_cast<i32x8simd>(prime32));
+# else
+#  error "missing instructions"
+# endif
+                };
+
+                auto const prod_hi
+                {
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq256)
+                    __builtin_ia32_pmuludq256(::std::bit_cast<i32x8simd>(data_key_hi), ::std::bit_cast<i32x8simd>(prime32));
+# else
+#  error "missing instructions"
+# endif
+                };
+
+                *xacc = ::std::bit_cast<u64x4simd>(prod_lo) + ::std::bit_cast<u64x4simd>(
+# if UWVM_HAS_BUILTIN(__builtin_ia32_psllqi256)
+                                                                  __builtin_ia32_psllqi256(::std::bit_cast<i64x4simd>(prod_hi), 32)
+# else
+#  error "missing instructions"
+# endif
+                                                              );
+
+                ++xacc;
+            }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
     ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
