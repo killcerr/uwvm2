@@ -676,7 +676,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             ::std::memcpy(::std::addressof(data_vec), input, sizeof(u8x64simd));
 
             u8x64simd key_vec;
-            ::std::memcpy(::std::addressof(key_vec), input, sizeof(u8x64simd));
+            ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u8x64simd));
 
             auto const data_key{data_vec ^ key_vec};
 
