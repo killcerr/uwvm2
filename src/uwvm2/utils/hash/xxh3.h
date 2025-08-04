@@ -1625,7 +1625,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto const prod_lo
                 {
 # if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq256)
-                    __builtin_ia32_pmuludq256(::std::bit_cast<i32x8simd>(data_key), ::std::bit_cast<i32x8simd>(prime32));
+                    __builtin_ia32_pmuludq256(::std::bit_cast<i32x8simd>(data_key), ::std::bit_cast<i32x8simd>(prime32))
 # else
 #  error "missing instructions"
 # endif
@@ -1634,7 +1634,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto const prod_hi
                 {
 # if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq256)
-                    __builtin_ia32_pmuludq256(::std::bit_cast<i32x8simd>(data_key_hi), ::std::bit_cast<i32x8simd>(prime32));
+                    __builtin_ia32_pmuludq256(::std::bit_cast<i32x8simd>(data_key_hi), ::std::bit_cast<i32x8simd>(prime32))
 # else
 #  error "missing instructions"
 # endif
