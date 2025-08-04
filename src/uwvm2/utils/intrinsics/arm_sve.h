@@ -175,6 +175,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::arm_sve
     [[__gnu__::__always_inline__]]
     [[__gnu__::__nodebug__]]
     extern void svst1_u64(svbool_t, ::std::uint64_t *, svuint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svdup_n_u32)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint32_t svdup_n_u32(::std::uint32_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svdup_n_u64)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svdup_n_u64(::std::uint64_t) noexcept;
+
+    [[clang::__clang_arm_builtin_alias(__builtin_sve_svlsl_n_u64_x)]]
+    [[__gnu__::__always_inline__]]
+    [[__gnu__::__nodebug__]]
+    extern svuint64_t svlsl_n_u64_x(svbool_t, svuint64_t, ::std::uint64_t) noexcept;
     // clang-format on
 
 # elif defined(__GNUC__)

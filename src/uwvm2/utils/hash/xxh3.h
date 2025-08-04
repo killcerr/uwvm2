@@ -1454,7 +1454,92 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
         inline constexpr void xxh3_scramble_acc(::std::byte* __restrict acc, ::std::byte const* __restrict secret) noexcept
         {
-#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__) && 0
+#if __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX512F__)
+            using i64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x8simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x16simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x16simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = char;
+            using u8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int8_t;
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using u8x64simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x64simd*;
+            auto xacc{reinterpret_cast<u8x64simd_may_alias_ptr>(acc_64aligned)};
+
+            constexpr u32x16simd prime32{xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1,
+                                         xxh_prime32_1};
+
+            // Aligned load
+            u8x64simd acc_vec{*xacc};
+
+# if UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512_mask)  // GCC
+            auto const shifted{__builtin_ia32_psrlqi512_mask(::std::bit_cast<i64x8simd>(acc_vec), 47, i64x8simd{}, UINT8_MAX)};
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512)  // Clang
+            auto const shifted{__builtin_ia32_psrlqi512(::std::bit_cast<i64x8simd>(acc_vec), 47)};
+# else
+#  error "missing instructions"
+# endif
+
+            u8x64simd key_vec;
+            ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u8x64simd));
+
+            auto const data_vec{key_vec ^ acc_vec ^ shifted};
+
+            auto const data_key_hi{
+# if UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512_mask)  // GCC
+                __builtin_ia32_psrlqi512_mask(::std::bit_cast<i64x8simd>(data_vec), 32u, i64x8simd{}, UINT8_MAX)
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_psrlqi512)  // Clang
+                __builtin_ia32_psrlqi512(::std::bit_cast<i64x8simd>(data_vec), 32u)
+# else
+#  error "missing instructions"
+# endif
+            };
+
+            auto const prod_lo{
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512_mask)
+                __builtin_ia32_pmuludq512_mask(::std::bit_cast<i32x16simd>(data_key), ::std::bit_cast<i32x16simd>(prime32), i32x16simd{}, UINT8_MAX)
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512)
+                __builtin_ia32_pmuludq512(::std::bit_cast<i32x16simd>(data_key), ::std::bit_cast<i32x16simd>(prime32))
+# else
+#  error "missing instructions"
+# endif
+            };
+
+            auto const prod_hi{
+# if UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512_mask)
+                __builtin_ia32_pmuludq512_mask(::std::bit_cast<i32x16simd>(data_key_hi), ::std::bit_cast<i32x16simd>(prime32), i32x16simd{}, UINT8_MAX)
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_pmuludq512)
+                __builtin_ia32_pmuludq512(::std::bit_cast<i32x16simd>(data_key_hi), ::std::bit_cast<i32x16simd>(prime32))
+# else
+#  error "missing instructions"
+# endif
+            };
+
+            *xacc = ::std::bit_cast<u64x8simd>(prod_lo) + ::std::bit_cast<u64x8simd>(
+# if UWVM_HAS_BUILTIN(__builtin_ia32_psllqi512_mask)
+                                                              __builtin_ia32_psllqi512_mask(::std::bit_cast<i64x8simd>(prod_hi), 32, i64x8simd{}, UINT8_MAX)
+# elif UWVM_HAS_BUILTIN(__builtin_ia32_psllqi512)
+                                                              __builtin_ia32_psllqi512(::std::bit_cast<i64x8simd>(prod_hi), 32)
+# else
+#  error "missing instructions"
+# endif
+                                                          );
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__SSE2__) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
