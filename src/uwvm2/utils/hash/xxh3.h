@@ -1847,6 +1847,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
             auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
 
+            auto const prime32{
+# if UWVM_HAS_BUILTIN(__builtin_lasx_xvreplgr2vr_d)
+                __builtin_lasx_xvreplgr2vr_d(xxh_prime32_1)
+# else
+#  error "missing instruction"
+# endif
+            };
+
             for(unsigned i{}; i != 2u; ++i)
             {
                 auto const acc_vec{*xacc};
@@ -1865,7 +1873,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # else
 #  error "missing instruction"
 # endif
-                };  
+                };
 
                 auto const key_vec{
 # if UWVM_HAS_BUILTIN(__builtin_lasx_xvld)
@@ -1896,7 +1904,79 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ++xacc;
             }
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx)
+
+            /// @todo need test
+
+            using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+            using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
+            auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
+
+            auto const prime32{
+# if UWVM_HAS_BUILTIN(__builtin_lsx_vreplgr2vr_d)
+                __builtin_lsx_vreplgr2vr_d(xxh_prime32_1)
+# else
+#  error "missing instruction"
+# endif
+            };
+
+            for(unsigned i{}; i != 2u; ++i)
+            {
+                auto const acc_vec{*xacc};
+
+                auto const shifted{
+# if UWVM_HAS_BUILTIN(__builtin_lsx_vsrli_d)
+                    __builtin_lsx_vsrli_d(acc_vec, 47)
+# else
+#  error "missing instruction"
+# endif
+                };
+
+                auto const data_vec{
+# if UWVM_HAS_BUILTIN(__builtin_lsx_vxor_v)
+                    __builtin_lsx_vxor_v(::std::bit_cast<u8x16simd>(acc_vec), ::std::bit_cast<u8x16simd>(shifted))
+# else
+#  error "missing instruction"
+# endif
+                };
+
+                auto const key_vec{
+# if UWVM_HAS_BUILTIN(__builtin_lsx_vld)
+                    __builtin_lsx_vld(secret, 0)
+# else
+#  error "missing instruction"
+# endif
+                };
+
+                secret += sizeof(u8x16simd);
+
+                auto const data_key{
+# if UWVM_HAS_BUILTIN(__builtin_lsx_vxor_v)
+                    __builtin_lsx_vxor_v(::std::bit_cast<u8x16simd>(data_vec), ::std::bit_cast<u8x16simd>(key_vec))
+# else
+#  error "missing instruction"
+# endif
+                };
+
+                *xacc =
+# if UWVM_HAS_BUILTIN(__builtin_lsx_vmul_d)
+                    __builtin_lsx_vmul_d(::std::bit_cast<i64x2simd>(data_key), ::std::bit_cast<i64x2simd>(prime32))
+# else
+#  error "missing instruction"
+# endif
+                    ;
+
+                ++xacc;
+            }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
 #else
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
