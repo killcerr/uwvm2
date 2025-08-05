@@ -211,11 +211,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 #if __cpp_structured_bindings >= 202411L
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
         auto const& [... secs]{ret.sections};
-        check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
+        details::check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
 #else
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
         []<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr noexcept -> void
-        { check_extensible_section_is_series<Secs...>(); }(ret.sections);
+        { details::check_extensible_section_is_series<Secs...>(); }(ret.sections);
 #endif
     }
 
