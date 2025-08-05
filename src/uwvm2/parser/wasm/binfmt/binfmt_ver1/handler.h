@@ -178,8 +178,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 #else
             // for __builtin_expect_with_probability
             ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> ret{};
-            auto get_max_id_from_tuple{[]<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr noexcept
-                                           -> ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte { return generate_section_max_id<Secs...>() }};
+            constexpr auto get_max_id_from_tuple{[]<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr noexcept
+                                                 { return generate_section_max_id<Secs...>(); }};
             constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_id{get_max_id_from_tuple(ret.sections)};
             constexpr double max_id_probability{1.0 - 1.0 / static_cast<double>(max_id + 1)};
             static_assert(0.0 <= max_id_probability && max_id_probability <= 1.0);
@@ -302,19 +302,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     {
         // Note that section_begin may be equal to section_end
 
+        // check is_series
+        bool success{};
+
         // Avoid meaningless copies with references
 #if __cpp_structured_bindings >= 202411L
         auto const& [... secs]{module_storage.sections};
         details::check_extensible_section_is_series<::std::remove_cvref_t<decltype(secs)>...>();
-#else
-        []<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr noexcept -> void
-        { details::check_extensible_section_is_series<Secs...>(); }(module_storage.sections);
-#endif
-
-        bool success{};
 
         // llvm can gen jump table here
-
         details::handle_all_binfmt_ver1_extensible_section_impl<::std::remove_cvref_t<decltype(secs)>...>(success,
                                                                                                           module_storage,
                                                                                                           section_id,
@@ -323,6 +319,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                                                           err,
                                                                                                           fs_para,
                                                                                                           sec_id_module_ptr);
+#else
+        [&]<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr noexcept
+        {
+            details::check_extensible_section_is_series<Secs...>();
+            // llvm can gen jump table here
+            details::handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success,
+                                                                             module_storage,
+                                                                             section_id,
+                                                                             section_begin,
+                                                                             section_end,
+                                                                             err,
+                                                                             fs_para,
+                                                                             sec_id_module_ptr);
+        }(module_storage.sections);
+#endif
 
         if(!success) [[unlikely]]
         {
