@@ -1977,7 +1977,72 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ++xacc;
             }
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__)
+
+            using i64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int64_t;
+            using u64x2simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint64_t;
+            using u32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint32_t;
+            using i32x4simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int32_t;
+            using c8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = char;
+            using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
+            using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
+
+            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
+            auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
+
+            constexpr u32x4simd prime32{xxh_prime32_1, xxh_prime32_1, xxh_prime32_1, xxh_prime32_1};
+
+            for(unsigned i{}; i != 4u; ++i)
+            {
+                auto const acc_vec{::std::bit_cast<u64x2simd>(*xacc)};
+                auto const shifted{acc_vec >> 47u};
+                auto const data_vec{acc_vec ^ shifted};
+
+                u64x2simd key_vec;
+                ::std::memcpy(::std::addressof(key_vec), secret, sizeof(u64x2simd));
+                secret += sizeof(u64x2simd);
+
+                auto const data_key{data_vec ^ key_vec};
+
+                auto const data_key_hi{__builtin_wasm_shuffle_i8x16(::std::bit_cast<i8x16simd>(data_key),
+                                                                    ::std::bit_cast<i8x16simd>(data_key),
+                                                                    1 * 4,
+                                                                    1 * 4 + 1,
+                                                                    1 * 4 + 2,
+                                                                    1 * 4 + 3,
+                                                                    0 * 4,
+                                                                    0 * 4 + 1,
+                                                                    0 * 4 + 2,
+                                                                    0 * 4 + 3,
+                                                                    3 * 4,
+                                                                    3 * 4 + 1,
+                                                                    3 * 4 + 2,
+                                                                    3 * 4 + 3,
+                                                                    2 * 4,
+                                                                    2 * 4 + 1,
+                                                                    2 * 4 + 2,
+                                                                    2 * 4 + 3)};
+
+                ::std::uint64_t const p0{static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key)[0]) *
+                                         static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(prime32)[0])};
+
+                ::std::uint64_t const p1{static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key)[2]) *
+                                         static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(prime32)[2])};
+
+                u64x2simd const prod_lo{p0, p1};
+
+                ::std::uint64_t const p2{static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key_hi)[0]) *
+                                         static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(prime32)[0])};
+
+                ::std::uint64_t const p3{static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key_hi)[2]) *
+                                         static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(prime32)[2])};
+
+                u64x2simd const prod_hi{p2, p3};
+
+                *xacc = ::std::bit_cast<u8x16simd>(prod_lo + (prod_hi << 32u));
+                ++xacc;
+            }
 #else
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
