@@ -2005,24 +2005,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
                 auto const data_key{data_vec ^ key_vec};
 
-                auto const data_key_hi{__builtin_wasm_shuffle_i8x16(::std::bit_cast<i8x16simd>(data_key),
-                                                                    ::std::bit_cast<i8x16simd>(data_key),
-                                                                    1 * 4,
-                                                                    1 * 4 + 1,
-                                                                    1 * 4 + 2,
-                                                                    1 * 4 + 3,
-                                                                    0 * 4,
-                                                                    0 * 4 + 1,
-                                                                    0 * 4 + 2,
-                                                                    0 * 4 + 3,
-                                                                    3 * 4,
-                                                                    3 * 4 + 1,
-                                                                    3 * 4 + 2,
-                                                                    3 * 4 + 3,
-                                                                    2 * 4,
-                                                                    2 * 4 + 1,
-                                                                    2 * 4 + 2,
-                                                                    2 * 4 + 3)};
+                auto const data_key_hi{
+# if UWVM_HAS_BUILTIN(__builtin_wasm_shuffle_i8x16)
+                    __builtin_wasm_shuffle_i8x16(::std::bit_cast<i8x16simd>(data_key),
+                                                 ::std::bit_cast<i8x16simd>(data_key),
+                                                 1 * 4,
+                                                 1 * 4 + 1,
+                                                 1 * 4 + 2,
+                                                 1 * 4 + 3,
+                                                 0 * 4,
+                                                 0 * 4 + 1,
+                                                 0 * 4 + 2,
+                                                 0 * 4 + 3,
+                                                 3 * 4,
+                                                 3 * 4 + 1,
+                                                 3 * 4 + 2,
+                                                 3 * 4 + 3,
+                                                 2 * 4,
+                                                 2 * 4 + 1,
+                                                 2 * 4 + 2,
+                                                 2 * 4 + 3)
+# else
+#  error "missing instruction"
+# endif
+                };
 
                 ::std::uint64_t const p0{static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(data_key)[0]) *
                                          static_cast<::std::uint64_t>(::std::bit_cast<u32x4simd>(prime32)[0])};
