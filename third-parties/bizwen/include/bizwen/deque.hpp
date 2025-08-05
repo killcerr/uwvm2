@@ -2391,7 +2391,13 @@ class deque
         if constexpr (throw_exception)
         {
             if (!(check_block && check_elem))
+            {
+#if defined(__cpp_exceptions)
                 throw ::std::out_of_range{"bizwen::deque::at"};
+#else
+                ::std::abort();
+#endif
+            }
         }
         else
         {
