@@ -1078,8 +1078,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             static_assert(xxh3_neon_lanes <= 8uz && xxh3_neon_lanes != 0uz);
             if constexpr(xxh3_neon_lanes != 8uz)
             {
-                auto xinput_1{input + xxh3_neon_lanes * 8u};
-                auto xsecret_1{secret + xxh3_neon_lanes * 8u};
+                auto xinput_1{input + xxh3_neon_lanes * sizeof(::std::uint64_t)};
+                auto xsecret_1{secret + xxh3_neon_lanes * sizeof(::std::uint64_t)};
                 using uint64_t_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint64_t*;
                 auto xacc_1{reinterpret_cast<uint64_t_may_alias_ptr>(acc_64aligned)};
                 for(::std::size_t i{xxh3_neon_lanes}; i != 8uz; i++)
@@ -1545,32 +1545,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__AVX2__)
 
-# if 0
-{   __m256i* const xacc = (__m256i*) acc;
-    /* Unaligned. This is mainly for pointer arithmetic, and because
-     * _mm256_loadu_si256 requires a const __m256i * pointer for some reason. */
-    const         __m256i* const xsecret = (const __m256i *) secret;
-    const __m256i prime32 = _mm256_set1_epi32((int)XXH_PRIME32_1);
-
-    size_t i;
-    for (i=0; i < XXH_STRIPE_LEN/sizeof(__m256i); i++) {
-        /* xacc[i] ^= (xacc[i] >> 47) */
-        __m256i const acc_vec     = xacc[i];
-        __m256i const shifted     = _mm256_srli_epi64    (acc_vec, 47);
-        __m256i const data_vec    = _mm256_xor_si256     (acc_vec, shifted);
-        /* xacc[i] ^= xsecret; */
-        __m256i const key_vec     = _mm256_loadu_si256   (xsecret+i);
-        __m256i const data_key    = _mm256_xor_si256     (data_vec, key_vec);
-
-        /* xacc[i] *= XXH_PRIME32_1; */
-        __m256i const data_key_hi = _mm256_srli_epi64 (data_key, 32);
-        __m256i const prod_lo     = _mm256_mul_epu32     (data_key, prime32);
-        __m256i const prod_hi     = _mm256_mul_epu32     (data_key_hi, prime32);
-        xacc[i] = _mm256_add_epi64(prod_lo, _mm256_slli_epi64(prod_hi, 32));
-    }
-}
-# endif
-
             using i64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int64_t;
             using u64x4simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint64_t;
             using u32x8simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint32_t;
@@ -1725,10 +1699,139 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 ++xacc;
             }
 
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                           \
-    ((defined(UWVM_ENABLE_SME_SVE_STREAM_MODE) && defined(__ARM_FEATURE_SME)) && !defined(__ARM_FEATURE_SVE)) && 0
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE) && 0
-#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON) && 0
+#elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_NEON)
+
+# if defined(__clang__)
+    using uint64x2_t = ::std::uint64_t [[clang::neon_vector_type(2)]];
+    using uint32x4_t = ::std::uint32_t [[clang::neon_vector_type(4)]];
+    using uint32x2_t = ::std::uint32_t [[clang::neon_vector_type(2)]];
+    using int8x16_t = ::std::int8_t [[clang::neon_vector_type(16)]];
+    using int8x8_t = ::std::int8_t [[clang::neon_vector_type(8)]];
+# elif defined(__GNUC__)
+    using uint64x2_t = __Uint64x2_t;
+    using uint32x4_t = __Uint32x4_t;
+    using uint32x2_t = __Uint32x2_t;
+    using int8x16_t = __Int8x16_t;
+    using int8x8_t = __Int8x8_t;
+# elif (defined(_MSC_VER) && !defined(__clang__))  // msvc
+    using uint64x2_t = __n128;
+    using uint32x4_t = __n128;
+    using uint32x2_t = __n64;
+    using int8x16_t = __n128;
+    using int8x8_t = __n64;
+# else
+#  error "missing instruction"
+# endif
+
+    struct uint32x4x2_t
+    {
+        uint32x4_t val[2];
+    };
+
+    auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+    using uint64x2_t_may_alias UWVM_GNU_MAY_ALIAS = uint64x2_t*;
+    auto xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
+
+    constexpr ::std::size_t xxh3_neon_lanes{
+# if defined(UWVM_XXH3_NEON_LANES)
+        UWVM_XXH3_NEON_LANES
+# else
+        8uz
+# endif
+    };
+
+    static_assert(xxh3_neon_lanes <= 8uz && xxh3_neon_lanes != 0uz);
+
+    /* AArch64 uses both scalar and neon at the same time */
+    if constexpr(xxh3_neon_lanes != 8uz)
+    {
+        using uint64_t_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint64_t*;
+        auto xacc1{reinterpret_cast<uint64_t_may_alias_ptr>(acc_64aligned) + xxh3_neon_lanes};
+        auto xsecret1{secret + xxh3_neon_lanes * sizeof(::std::uint64_t)};
+        for(::std::size_t i{xxh3_neon_lanes}; i != 8uz; ++i)
+        {
+            auto const key64{xxh_readLE64(xsecret1)};
+            xsecret1 += 8uz;
+
+            auto acc64{*xacc1};
+            acc64 = xxh_xorshift64(acc64, 47u);
+            acc64 ^= key64;
+            acc64 *= xxh_prime32_1;
+            *xacc1 = acc64;
+            ++xacc1;
+        }
+    }
+
+    constexpr uint32x2_t kPrimeLo{xxh_prime32_1, xxh_prime32_1};
+    constexpr ::std::uint64_t kPrimeLo64{static_cast<::std::uint64_t>(xxh_prime32_1) << 32u};
+    constexpr uint32x4_t kPrimeHi{::std::bit_cast<uint32x4_t>(uint64x2_t{kPrimeLo64, kPrimeLo64})};
+
+    for(::std::size_t i{}; i != xxh3_neon_lanes / 2uz; ++i)
+    {
+        auto const acc_vec{*xacc};
+
+        auto const shifted{
+# if UWVM_HAS_BUILTIN(__builtin_neon_vshrq_n_v)          // Clang
+            ::std::bit_cast<uint64x2_t>(__builtin_neon_vshrq_n_v(::std::bit_cast<int8x16_t>(acc_vec), 47, 51))
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_lshrv2di_uus)  // GCC
+            __builtin_aarch64_lshrv2di_uus(::std::bit_cast<uint64x2_t>(acc_vec), 47)
+# elif defined(__MSC_VER) && !defined(__clang__)
+            // Fallback to scalar operations
+            uint64x2_t{acc_vec[0] >> 47, acc_vec[1] >> 47}
+# else
+#  error "missing instructions"
+# endif
+        };
+
+        auto const data_vec{acc_vec ^ shifted};
+
+        auto xxh_vld1q_u64{[] UWVM_ALWAYS_INLINE(::std::byte const* ptr) constexpr noexcept -> uint64x2_t
+                           {
+                               uint64x2_t tmp;
+                               ::std::memcpy(::std::addressof(tmp), ptr, sizeof(uint64x2_t));
+                               return tmp;
+                           }};
+
+        auto const key_vec{xxh_vld1q_u64(secret)};
+        secret += sizeof(uint64x2_t);
+
+        auto const data_key{data_vec ^ key_vec};
+
+        auto const prod_hi{::std::bit_cast<uint32x4_t>(data_key) * kPrimeHi};
+
+        auto const data_key_lo{
+# if UWVM_HAS_BUILTIN(__builtin_neon_vmovn_v)          // Clang
+            ::std::bit_cast<uint32x2_t>(__builtin_neon_vmovn_v(::std::bit_cast<int8x16_t>(data_key), 18))
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_xtnv2di_uu)  // GCC
+            __builtin_aarch64_xtnv2di_uu(::std::bit_cast<uint64x2_t>(data_key))
+# elif defined(__MSC_VER) && !defined(__clang__)
+            // Fallback to scalar operations
+            uint64x2_t{data_key[0] >> 32, data_key[1] >> 32}
+# else
+#  error "missing instructions"
+# endif
+        };
+
+        *xacc =
+# if UWVM_HAS_BUILTIN(__builtin_neon_vmull_v)              // Clang
+            ::std::bit_cast<uint64x2_t>(prod_hi) +
+            ::std::bit_cast<uint64x2_t>(__builtin_neon_vmull_v(::std::bit_cast<int8x8_t>(data_key_lo), ::std::bit_cast<int8x8_t>(kPrimeLo), 51))
+# elif UWVM_HAS_BUILTIN(__builtin_aarch64_umlalv2si_uuuu)  // GCC
+            __builtin_aarch64_umlalv2si_uuuu(::std::bit_cast<uint64x2_t>(prod_hi),
+                                             ::std::bit_cast<uint32x2_t>(data_key_lo),
+                                             ::std::bit_cast<uint32x2_t>(kPrimeLo))
+# elif defined(__MSC_VER) && !defined(__clang__)
+            // Fallback to scalar operations
+            ::std::bit_cast<uint64x2_t>(prod_hi) + uint64x2_t{static_cast<::std::uint64_t>(data_key_lo[0]) * static_cast<::std::uint64_t>(kPrimeLo[0]),
+                                                              static_cast<::std::uint64_t>(data_key_lo[1]) * static_cast<::std::uint64_t>(kPrimeLo[1])}
+# else
+#  error "missing instructions"
+# endif
+            ;
+
+        ++xacc;
+    }
+
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_asx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__loongarch_sx) && 0
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__wasm_simd128__) && 0
@@ -1744,12 +1847,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 auto const key64{xxh_readLE64(secret)};
                 secret += 8uz;
 
-                auto acc64{xacc[i]};
+                auto acc64{*xacc};
                 acc64 = xxh_xorshift64(acc64, 47u);
                 acc64 ^= key64;
                 acc64 *= xxh_prime32_1;
                 if constexpr(dig64 != 64) { acc64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
-                xacc[i] = acc64;
+                *xacc = acc64;
+                ++xacc;
             }
 #endif
         }

@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
         if constexpr(curr_prefetch_mode == pfc_mode::instruction)
         {
 #if (defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)) && UWVM_HAS_BUILTIN(__builtin_arm_prefetch)  // Only Clang
-            // __builtin_arm_prefetch has different function prototypes between arm64 and arm
+            // __builtin_arm_prefetch has different function prototypes between aarch64 and arm
             if constexpr(prefetch_level == pfc_level::nta) { __builtin_arm_prefetch(address, 0, 0, 1, 0); }
             else
             {
@@ -98,7 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::intrinsics::universal
         else
         {
 #if (defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)) && UWVM_HAS_BUILTIN(__builtin_arm_prefetch)  // Only Clang
-            // __builtin_arm_prefetch has different function prototypes between arm64 and arm
+            // __builtin_arm_prefetch has different function prototypes between aarch64 and arm
             if constexpr(prefetch_level == pfc_level::nta)
             {
                 // same as __builtin_prefetch(address, static_cast<int>(curr_prefetch_mode), 0)
