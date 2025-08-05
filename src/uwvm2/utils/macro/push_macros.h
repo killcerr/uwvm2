@@ -454,5 +454,28 @@
 # define UWVM_MUSTTAIL [[__gnu__::__musttail__]]
 #else
 # define UWVM_MUSTTAIL
+
+// Push warning pragmas for different platforms to suppress -Werror=cpp
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wcpp"
+#elif defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wcpp"
+#elif defined(_MSC_VER)
+# pragma warning(push)
+# pragma warning(disable: 4068) // unknown pragma
+#endif
+
 # warning "Please turn on optimization to ensure that tail calls are generated correctly, otherwise stack overflow behavior may occur."
+
+// Pop warning pragmas
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#elif defined(__GNUC__)
+# pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+# pragma warning(pop)
+#endif
+
 #endif
