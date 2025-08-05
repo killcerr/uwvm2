@@ -38,5 +38,5 @@
 
 # C++ Standard Library Support (Version is the same as the version released with the corresponding supported compiler)
 - GNU libstdc++ >= 15
-- LLVM libc++ >= 21
+- LLVM libc++ >= 21 (If `<stdfloat>` is not provided, please touch stdfloat yourself.)
 - MSVC STL >= 202501
