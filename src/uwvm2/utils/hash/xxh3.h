@@ -46,6 +46,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 {
     namespace details
     {
+        inline constexpr ::std::size_t xxh3_max_align_len{
+#if defined(__DJGPP__)
+            16uz
+#else
+            64uz
+#endif
+        };
+
         enum class xxh3_width_t : unsigned
         {
             XX3H_64,
@@ -240,7 +248,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
         }
 
-        alignas(64uz) inline constexpr ::std::byte xxh3_kSecret[192u]{
+        alignas(xxh3_max_align_len) inline constexpr ::std::byte xxh3_kSecret[192u]{
             static_cast<::std::byte>(0xb8), static_cast<::std::byte>(0xfe), static_cast<::std::byte>(0x6c), static_cast<::std::byte>(0x39),
             static_cast<::std::byte>(0x23), static_cast<::std::byte>(0xa4), static_cast<::std::byte>(0x4b), static_cast<::std::byte>(0xbe),
             static_cast<::std::byte>(0x7c), static_cast<::std::byte>(0x01), static_cast<::std::byte>(0x81), static_cast<::std::byte>(0x2c),
@@ -668,7 +676,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x64simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x64simd*;
             auto xacc{reinterpret_cast<u8x64simd_may_alias_ptr>(acc_64aligned)};
 
@@ -726,7 +734,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
             auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
 
@@ -778,7 +786,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
             auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
@@ -827,7 +835,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             // The always_inline attribute cannot be added here because it does not match the function call.
             [=] __arm_locally_streaming() constexpr noexcept -> void
             {
-                auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+                auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
                 auto xacc{reinterpret_cast<::std::uint64_t*>(acc_64aligned)};
                 auto const kSwap{::uwvm2::utils::intrinsics::arm_sve::sveor_n_u64_z(::uwvm2::utils::intrinsics::arm_sve::svptrue_b64(),
                                                                                     ::uwvm2::utils::intrinsics::arm_sve::svindex_u64(0u, 1u),
@@ -910,7 +918,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 
 #elif __has_cpp_attribute(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) && defined(__ARM_FEATURE_SVE)
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             auto xacc{reinterpret_cast<::std::uint64_t*>(acc_64aligned)};
             auto const kSwap{::uwvm2::utils::intrinsics::arm_sve::sveor_n_u64_z(::uwvm2::utils::intrinsics::arm_sve::svptrue_b64(),
                                                                                 ::uwvm2::utils::intrinsics::arm_sve::svindex_u64(0u, 1u),
@@ -1028,7 +1036,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 uint32x4_t val[2];
             };
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using uint64x2_t_may_alias UWVM_GNU_MAY_ALIAS = uint64x2_t*;
             auto const xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
 
@@ -1227,7 +1235,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
             auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1292,7 +1300,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
             auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1352,7 +1360,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
             auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1432,7 +1440,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #else
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using uint_least64_t_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint_least64_t*;
             auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc_64aligned)};
 
@@ -1464,7 +1472,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x64simd [[__gnu__::__vector_size__(64)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x64simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x64simd*;
             auto xacc{reinterpret_cast<u8x64simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1564,7 +1572,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 xxh_prime32_1,  // 7
             };
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
             auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1640,7 +1648,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 xxh_prime32_1   // 3
             };
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
             auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1728,7 +1736,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         uint32x4_t val[2];
     };
 
-    auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+    auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
     using uint64x2_t_may_alias UWVM_GNU_MAY_ALIAS = uint64x2_t*;
     auto xacc{reinterpret_cast<uint64x2_t_may_alias>(acc_64aligned)};
 
@@ -1843,7 +1851,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x32simd [[__gnu__::__vector_size__(32)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x32simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x32simd*;
             auto xacc{reinterpret_cast<u8x32simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1916,7 +1924,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
             auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
@@ -1987,7 +1995,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             using u8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::uint8_t;
             using i8x16simd [[__gnu__::__vector_size__(16)]] [[maybe_unused]] = ::std::int8_t;
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using u8x16simd_may_alias_ptr UWVM_GNU_MAY_ALIAS = u8x16simd*;
             auto xacc{reinterpret_cast<u8x16simd_may_alias_ptr>(acc_64aligned)};
 
@@ -2052,7 +2060,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #else
             constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
 
-            auto const acc_64aligned{::std::assume_aligned<64uz>(acc)};
+            auto const acc_64aligned{::std::assume_aligned<xxh3_max_align_len>(acc)};
             using uint_least64_t_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::std::uint_least64_t*;
             auto xacc{reinterpret_cast<uint_least64_t_may_alias_ptr>(acc_64aligned)};
 
@@ -2101,8 +2109,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                                                                               ::std::byte const* __restrict secret,
                                                                               ::std::size_t secretSize) noexcept
         {
-            alignas(64uz)::std::uint_least64_t
+            alignas(xxh3_max_align_len)::std::uint_least64_t
                 acc[8uz]{xxh_prime32_3, xxh_prime64_1, xxh_prime64_2, xxh_prime64_3, xxh_prime64_4, xxh_prime32_2, xxh_prime64_5, xxh_prime32_1};
+
             static_assert(sizeof(acc) == 64uz);
 
             // acc can be aliased to other types for more aggressive optimization
