@@ -36,7 +36,7 @@
 - GCC >= 16
 - (MSVC hasn't support C++26 currently, not supported at this time)
 
-# C++ Standard Library Support (Version is the same as the version released with the corresponding supported compiler)
+# C++ Standard Library Support
 - GNU libstdc++ >= 15
 - LLVM libc++ >= 21 (If `<stdfloat>` is not provided, please touch stdfloat yourself.)
-- MSVC STL >= 202501
+- MSVC STL >= 202501 (triplet: unknown-windows-msvc)
