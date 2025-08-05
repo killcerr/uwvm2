@@ -157,7 +157,7 @@ namespace uwvm2::uwvm::cmdline::params::details
         ::fast_io::io::perr(u8log_output_ul,
                                 // uwvm
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_PURPLE),
-                                u8"Ultimate WebAssembly Virtual Machine",
+                                u8"Ultimate WebAssembly Virtual Machine 2",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 // mode
                                 u8"\nMode: "
