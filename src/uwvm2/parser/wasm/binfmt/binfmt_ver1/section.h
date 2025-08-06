@@ -132,10 +132,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(secs)...);
 #else
         /// @throws maybe throw fast_io::error, see the implementation of the stream
-        [&all_sections, stream = ::std::forward<Stm>(stream)]<::std::size_t... I> UWVM_ALWAYS_INLINE(::std::index_sequence<I...>) constexpr -> void
+        [&all_sections]<::std::size_t... I>(::std::index_sequence<I...>, Stm&& stream) constexpr -> void
         {
-            ::fast_io::operations::print_freestanding<false>(::std::forward<decltype(stream)>(stream), section_details(get<I>(all_sections))...);
-        }(::std::make_index_sequence<::std::tuple_size_v<::std::remove_cvref_t<decltype(all_sections)>>>{});
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(get<I>(all_sections))...);
+        }(::std::make_index_sequence<::std::tuple_size_v<::std::remove_cvref_t<decltype(all_sections)>>>{}, ::std::forward<Stm>(stream));
 #endif
     }
 }
