@@ -26,6 +26,7 @@
 // #pragma once
 
 /// @brief      uwvm's macros
+#pragma pop_macro("UWVM_HAS_FEATURE")
 #pragma pop_macro("UWVM_MUSTTAIL")
 #pragma pop_macro("UWVM_GNU_NODEBUG")
 #pragma pop_macro("UWVM_GNU_USED")

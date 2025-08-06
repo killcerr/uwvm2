@@ -778,12 +778,15 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"\n"
                                 // Feature
                                 u8"Feature:\n"
+                                // detailed checker
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 u8"    Detailed Debug Check Mode \n"
 #endif
+                                // fno-exceptions
 #if !(defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE))
                                 u8"    Error Direct Crash Mode (fno-exceptions)\n"
 #endif
+                                // command line hash
                                 u8"    CMDLHash: "
                                 u8"HT=",
                                 ::uwvm2::uwvm::cmdline::hash_table_size.hash_table_size,
@@ -793,6 +796,22 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::uwvm2::uwvm::cmdline::hash_table_size.real_max_conflict_size,
                                 u8", SZ=",
                                 ::uwvm2::uwvm::cmdline::hash_table_byte_sz,
+                                // sanitizer
+#if UWVM_HAS_FEATURE(address_sanitizer) || UWVM_HAS_FEATURE(thread_sanitizer) || UWVM_HAS_FEATURE(memory_sanitizer) || UWVM_HAS_FEATURE(leak_sanitizer) || UWVM_HAS_FEATURE(undefined_sanitizer)
+                                u8"\n    Sanitizer: "
+# if UWVM_HAS_FEATURE(address_sanitizer)
+                                u8"Address "
+# elif UWVM_HAS_FEATURE(thread_sanitizer)
+                                u8"Thread "
+# elif UWVM_HAS_FEATURE(memory_sanitizer)
+                                u8"Memory "
+# elif UWVM_HAS_FEATURE(leak_sanitizer)
+                                u8"Leak "
+# elif UWVM_HAS_FEATURE(undefined_sanitizer)
+                                u8"Undefined "
+# endif
+#endif
+                                // wasm feature
                                 u8"\n"
                                 u8"    WebAssembly Features Supported: "
                                 u8"\n"

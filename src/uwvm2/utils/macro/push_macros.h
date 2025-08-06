@@ -479,3 +479,13 @@
 # endif
 
 #endif
+
+/// @brief        __has_feature
+/// @details      __has_feature is not provided by standard cpp, avoid using __has_feature on unsupport compiler
+#pragma push_macro("UWVM_HAS_FEATURE")
+#undef UWVM_HAS_FEATURE
+#ifdef __has_feature
+# define UWVM_HAS_FEATURE(...) __has_feature(__VA_ARGS__)
+#else
+# define UWVM_HAS_FEATURE(...) 0
+#endif
