@@ -49,7 +49,7 @@
 namespace uwvm2::uwvm::cmdline::params::details
 {
     template <typename Stm>
-    inline void logo_u8print_not_rst_impl(Stm&& stm) noexcept
+    inline constexpr void logo_u8print_not_rst_impl(Stm&& stm) noexcept
     {
         // Preventing the wasm32-wasi-uwvm stack from being too small and causing an overflow requires limiting the size of the contents of each print
         ::fast_io::io::perr(::std::forward<Stm>(stm),
@@ -125,14 +125,14 @@ namespace uwvm2::uwvm::cmdline::params::details
     }
 
     template <typename Stm, ::uwvm2::parser::wasm::concepts::has_feature_name F0, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
-    inline void version_u8print_wasm_feature_impl(Stm&& stm) noexcept
+    inline constexpr void version_u8print_wasm_feature_impl(Stm&& stm) noexcept
     {
         ::fast_io::io::perrln(::std::forward<Stm>(stm), u8"        ", F0::feature_name);
         if constexpr(sizeof...(Fs) != 0) { version_u8print_wasm_feature_impl<Stm, Fs...>(::std::forward<Stm>(stm)); }
     }
 
     template <typename Stm, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
-    inline void version_u8print_wasm_feature_from_tuple(Stm&& stm, ::uwvm2::utils::container::tuple<Fs...>) noexcept
+    inline constexpr void version_u8print_wasm_feature_from_tuple(Stm&& stm, ::uwvm2::utils::container::tuple<Fs...>) noexcept
     {
         version_u8print_wasm_feature_impl<Stm, Fs...>(::std::forward<Stm>(stm));
     }
