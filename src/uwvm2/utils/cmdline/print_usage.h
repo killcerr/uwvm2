@@ -51,9 +51,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             ::uwvm2::utils::cmdline::parameter const* para{};
         };
 
-        // Currently only char8_t is supported
+        /// @brief Print the usage
+        /// @details Currently only char8_t is supported
+        /// @throws maybe throw fast_io::error, see the implementation of the stream
         template <typename Stm>
-        inline constexpr void print_define(::fast_io::io_reserve_type_t<char8_t, usage_printer>, Stm&& stream, usage_printer const uspt) noexcept
+        inline constexpr void print_define(::fast_io::io_reserve_type_t<char8_t, usage_printer>, Stm&& stream, usage_printer const uspt)
         {
             auto const p{uspt.para};
             if(p == nullptr) [[unlikely]] { return; }

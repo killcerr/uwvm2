@@ -52,8 +52,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::memory
         ::std::size_t back{12uz};
     };
 
+    /// @brief Print the memory
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
     template <::std::integral char_type, typename Stm>
-    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, print_memory>, Stm && stream, print_memory const& mem) noexcept
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, print_memory>, Stm && stream, print_memory const& mem)
     {
         auto err_begin{mem.err_begin};
         auto err_curr{mem.err_curr};

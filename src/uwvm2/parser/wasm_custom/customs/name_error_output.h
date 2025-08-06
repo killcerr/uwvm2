@@ -64,8 +64,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
     };
 
     /// @brief Output, support: char, wchar_t, char8_t, char16_t, char32_t
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
     template <::std::integral char_type, typename Stm>
-    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, name_error_output_t>, Stm && stream, name_error_output_t const& errout) noexcept
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, name_error_output_t>, Stm && stream, name_error_output_t const& errout)
     {
         bool const enable_ansi{static_cast<bool>(errout.flag.enable_ansi)};
         switch(errout.name_err.type)
