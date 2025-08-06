@@ -31,6 +31,7 @@
 # include <concepts>
 # include <type_traits>
 # include <utility>
+# include <memory>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -61,6 +62,96 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
         static_assert(::fast_io::is_tuple<::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...>>);  // check sections is tuple
     };
+
+    /// @brief Wrapper for the module storage structure
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm_binfmt_ver1_module_extensible_storage_section_details_wrapper_t
+    {
+        wasm_binfmt_ver1_module_extensible_storage_t<Fs...> const* module_storage_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr wasm_binfmt_ver1_module_extensible_storage_section_details_wrapper_t<Fs...> section_details(
+        wasm_binfmt_ver1_module_extensible_storage_t<Fs...> const& module_storage) noexcept
+    {
+        return {::std::addressof(module_storage)};
+    }
+
+    /// @brief Print the module section details
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, wasm_binfmt_ver1_module_extensible_storage_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       wasm_binfmt_ver1_module_extensible_storage_section_details_wrapper_t<Fs...> const section_details_wrapper)
+    {
+        if(section_details_wrapper.module_storage_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             "Module span: ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             " - ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_end),
+                                                             " (length=",
+                                                             static_cast<::std::size_t>(section_details_wrapper.module_storage_ptr->module_span.module_end -
+                                                                                        section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             ")\nSection Details:\n",
+                                                             section_details<Fs...>(section_details_wrapper.module_storage_ptr->sections));
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             L"Module span: ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             L" - ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_end),
+                                                             L" (length=",
+                                                             static_cast<::std::size_t>(section_details_wrapper.module_storage_ptr->module_span.module_end -
+                                                                                        section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             L")\nSection Details:\n",
+                                                             section_details<Fs...>(section_details_wrapper.module_storage_ptr->sections));
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u8"Module span: ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             u8" - ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_end),
+                                                             u8" (length=",
+                                                             static_cast<::std::size_t>(section_details_wrapper.module_storage_ptr->module_span.module_end -
+                                                                                        section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             u8")\nSection Details:\n",
+                                                             section_details<Fs...>(section_details_wrapper.module_storage_ptr->sections));
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u"Module span: ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             u" - ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_end),
+                                                             u" (length=",
+                                                             static_cast<::std::size_t>(section_details_wrapper.module_storage_ptr->module_span.module_end -
+                                                                                        section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             u")\nSection Details:\n",
+                                                             section_details<Fs...>(section_details_wrapper.module_storage_ptr->sections));
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             U"Module span: ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             U" - ",
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_end),
+                                                             U" (length=",
+                                                             static_cast<::std::size_t>(section_details_wrapper.module_storage_ptr->module_span.module_end -
+                                                                                        section_details_wrapper.module_storage_ptr->module_span.module_begin),
+                                                             U")\nSection Details:\n",
+                                                             section_details<Fs...>(section_details_wrapper.module_storage_ptr->sections));
+        }
+    }
 }
 
 /// @brief Define container optimization operations for use with fast_io

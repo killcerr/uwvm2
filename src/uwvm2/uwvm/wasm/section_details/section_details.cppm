@@ -1,15 +1,12 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
- * @brief       WebAssembly Release 1.0 (2019-07-20)
- * @details     antecedent dependency: null
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-12
  * @copyright   APL-2.0 License
  */
 
@@ -25,22 +22,27 @@
 module;
 
 // std
-#include <cstddef>
-#include <cstdint>
-#include <concepts>
-#include <type_traits>
-#include <utility>
-#include <memory>
-#include <tuple>
+# include <cstddef>
+# include <cstdint>
+# include <concepts>
+# include <type_traits>
+# include <utility>
+# include <memory>
+# include <tuple>
 // macro
-#include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.parser.wasm.binfmt.binfmt_ver1:section;
+export module uwvm2.uwvm.wasm.section_details:section_details;
 
 import fast_io;
 import uwvm2.utils.container;
 import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.parser.wasm.standard;
+import uwvm2.parser.wasm_custom.customs;
+import uwvm2.uwvm.wasm.base;
+import uwvm2.uwvm.wasm.feature;
+import uwvm2.uwvm.wasm.type;
+import uwvm2.uwvm.wasm.storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -49,4 +51,4 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "section.h"
+#include "section_details.h"

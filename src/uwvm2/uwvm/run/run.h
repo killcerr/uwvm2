@@ -129,7 +129,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             case ::uwvm2::uwvm::wasm::base::mode::section_details:
             {
-                /// @todo
+                ::uwvm2::uwvm::wasm::section_details::print_section_details();
                 break;
             }
             [[unlikely]] default:

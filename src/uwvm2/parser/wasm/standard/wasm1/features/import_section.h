@@ -827,6 +827,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         define_imported_and_defined_exceeding_checker(sec_adl, final_extern_type_adl, module_storage, importsec_importdesc_begin, section_curr, err, fs_para);
 #endif
     }
+
+    /// @brief Wrapper for the import section storage structure
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct import_section_storage_section_details_wrapper_t
+    {
+        import_section_storage_t<Fs...> const* import_section_storage_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr import_section_storage_section_details_wrapper_t<Fs...> section_details(
+        import_section_storage_t<Fs...> const& import_section_storage) noexcept
+    {
+        return {::std::addressof(import_section_storage)};
+    }
+
+    /// @brief Print the import section details
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, import_section_storage_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       import_section_storage_section_details_wrapper_t<Fs...> const import_section_details_wrapper)
+    {
+        /// @todo
+        (void)stream;
+        (void)import_section_details_wrapper;
+    }
 }
 
 /// @brief Define container optimization operations for use with fast_io

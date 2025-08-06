@@ -26,6 +26,7 @@
 # include "base/impl.h"
 # include "feature/impl.h"
 # include "type/impl.h"
+# include "section_details/impl.h"
 # include "storage/impl.h"
 # include "custom/impl.h"
 # include "loader/impl.h"

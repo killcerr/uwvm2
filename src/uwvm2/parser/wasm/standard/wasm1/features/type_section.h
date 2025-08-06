@@ -479,6 +479,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
+
+    /// @brief Wrapper for the section storage structure
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct type_section_storage_section_details_wrapper_t
+    {
+        type_section_storage_t<Fs...> const* type_section_storage_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr type_section_storage_section_details_wrapper_t<Fs...> section_details(type_section_storage_t<Fs...> const& type_section_storage) noexcept
+    {
+        return {::std::addressof(type_section_storage)};
+    }
+
+    /// @brief Print the type section details
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, type_section_storage_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       type_section_storage_section_details_wrapper_t<Fs...> const type_section_details_wrapper)
+    {
+        /// @todo
+        (void)stream;
+        (void)type_section_details_wrapper;
+    }
 }
 
 /// @brief Define container optimization operations for use with fast_io

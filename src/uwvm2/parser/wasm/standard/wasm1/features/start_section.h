@@ -200,6 +200,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
     }
+
+    /// @brief Wrapper for the start section storage structure
+    struct start_section_storage_section_details_wrapper_t
+    {
+        start_section_storage_t const* start_section_storage_ptr{};
+    };
+
+    inline constexpr start_section_storage_section_details_wrapper_t section_details(start_section_storage_t const& start_section_storage) noexcept
+    {
+        return {::std::addressof(start_section_storage)};
+    }
+
+    /// @brief Print the start section details
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
+    template <::std::integral char_type, typename Stm>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, start_section_storage_section_details_wrapper_t>,
+                                       Stm && stream,
+                                       start_section_storage_section_details_wrapper_t const start_section_details_wrapper)
+    {
+        /// @todo
+        (void)stream;
+        (void)start_section_details_wrapper;
+    }
 }
 
 /// @brief Define container optimization operations for use with fast_io

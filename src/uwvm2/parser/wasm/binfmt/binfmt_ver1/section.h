@@ -31,6 +31,8 @@
 # include <concepts>
 # include <type_traits>
 # include <utility>
+# include <memory>
+# include <tuple>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -98,6 +100,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     inline consteval auto splice_section_storage_structure_from_tuple(::uwvm2::utils::container::tuple<Features...>) noexcept
     {
         return splice_section_storage_structure<Features...>();
+    }
+
+    /// @brief Wrapper for the section storage structure
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct splice_section_storage_structure_section_details_wrapper_t
+    {
+        splice_section_storage_structure_t<Fs...> const* section_storage_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr splice_section_storage_structure_section_details_wrapper_t<Fs...> section_details(
+        splice_section_storage_structure_t<Fs...> const& section_storage) noexcept
+    {
+        return {::std::addressof(section_storage)};
+    }
+
+    /// @brief Print the module section details
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, splice_section_storage_structure_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       splice_section_storage_structure_section_details_wrapper_t<Fs...> const section_details_wrapper)
+    {
+        if(section_details_wrapper.section_storage_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        auto const& all_sections{*section_details_wrapper.section_storage_ptr};
+
+#if __cpp_structured_bindings >= 202411L
+        auto const& [... secs]{all_sections};
+        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(secs)...);
+#else
+        /// @throws maybe throw fast_io::error, see the implementation of the stream
+        [&all_sections, stream = ::std::forward<Stm>(stream)]<::std::size_t... I> UWVM_ALWAYS_INLINE(::std::index_sequence<I...>) constexpr -> void
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<decltype(stream)>(stream), section_details(get<I>(all_sections))...);
+        }(::std::make_index_sequence<::std::tuple_size_v<::std::remove_cvref_t<decltype(all_sections)>>>{});
+#endif
     }
 }
 

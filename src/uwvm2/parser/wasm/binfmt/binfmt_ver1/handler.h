@@ -323,7 +323,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         [&]<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr UWVM_THROWS
         {
             details::check_extensible_section_is_series<Secs...>();
-            
+
             // llvm can gen jump table here
             details::handle_all_binfmt_ver1_extensible_section_impl<Secs...>(success,
                                                                              module_storage,

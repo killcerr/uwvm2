@@ -160,6 +160,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // storage
         customsec.customs.push_back(::std::move(cs));
     }
+
+    /// @brief Wrapper for the custom section storage structure
+    struct custom_section_storage_section_details_wrapper_t
+    {
+        custom_section_storage_t const* custom_section_storage_ptr{};
+    };
+
+    inline constexpr custom_section_storage_section_details_wrapper_t section_details(custom_section_storage_t const& custom_section_storage) noexcept
+    {
+        return {::std::addressof(custom_section_storage)};
+    }
+
+    /// @brief Print the custom section details
+    /// @throws maybe throw fast_io::error, see the implementation of the stream
+    template <::std::integral char_type, typename Stm>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, custom_section_storage_section_details_wrapper_t>,
+                                       Stm && stream,
+                                       custom_section_storage_section_details_wrapper_t const custom_section_details_wrapper)
+    {
+        /// @todo
+        (void)stream;
+        (void)custom_section_details_wrapper;
+    }
 }
 
 /// @brief Define container optimization operations for use with fast_io

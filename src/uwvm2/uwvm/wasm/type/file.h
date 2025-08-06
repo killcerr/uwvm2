@@ -196,6 +196,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
             }
         }
+
+        template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver>
+        inline constexpr auto& get_curr_binfmt_version_wasm_storage() noexcept
+        {
+            static_assert(binfmt_ver == 1u, "Unsupported binfmt version");
+            if constexpr(binfmt_ver == 1u) { return this->wasm_module_storage.wasm_binfmt_ver1_storage; }
+        }
+
+        template <::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver>
+        inline constexpr auto const& get_curr_binfmt_version_wasm_storage() const noexcept
+        {
+            static_assert(binfmt_ver == 1u, "Unsupported binfmt version");
+            if constexpr(binfmt_ver == 1u) { return this->wasm_module_storage.wasm_binfmt_ver1_storage; }
+        }
     };
 }  // namespace uwvm2::uwvm::wasm::storage
 
