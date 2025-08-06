@@ -1,5 +1,4 @@
-﻿
-// Copyright 2025 YexuanXiao
+﻿// Copyright 2025 YexuanXiao
 // Distributed under the MIT License.
 // https://github.com/YexuanXiao/deque
 
@@ -34,6 +33,11 @@
 #include <version>
 // polymorphic_allocator
 #include <memory_resource>
+
+#if defined(__cpp_exceptions)
+// terminate
+#include <exception>
+#endif
 
 #if !defined(__cpp_pack_indexing)
 // tuple/get
@@ -600,7 +604,7 @@ class deque_iterator
 #if !defined(NDEBUG)
     buckets_type<T const, Block> buckets_{};
 
-    constexpr void verify() const noexcept
+    constexpr bool verify() const noexcept
     {
         assert(block_elem_curr_ >= buckets_.block_elem_begin_);
         assert(block_elem_end_ == buckets_.block_elem_end_);
@@ -615,17 +619,8 @@ class deque_iterator
             assert(elem_curr_ <= buckets_.elem_end_end_);
         else if (block_elem_curr_ == buckets_.block_elem_begin_)
             assert(elem_curr_ >= buckets_.elem_begin_begin_);
-    }
 
-    constexpr void verify(deque_iterator const &other) const noexcept
-    {
-        auto const &rhs = other.buckets_;
-        assert(rhs.block_elem_begin_ == buckets_.block_elem_begin_);
-        assert(rhs.block_elem_end_ == buckets_.block_elem_end_);
-        assert(rhs.elem_begin_begin_ == buckets_.elem_begin_begin_);
-        assert(rhs.elem_begin_end_ == buckets_.elem_begin_end_);
-        assert(rhs.elem_end_begin_ == buckets_.elem_end_begin_);
-        assert(rhs.elem_end_end_ == buckets_.elem_end_end_);
+        return true;
     }
 
     constexpr deque_iterator(Block *block_curr, Block *block_end, RConstT *const begin, RConstT *const pos,
@@ -635,14 +630,6 @@ class deque_iterator
     {
     }
 #else
-    constexpr void verify() const noexcept
-    {
-    }
-
-    constexpr void verify([[maybe_unused]] deque_iterator const &other) const noexcept
-    {
-    }
-
     constexpr deque_iterator(Block *block_curr, Block *block_end, RConstT *const begin, RConstT *const pos) noexcept
         : block_elem_curr_(block_curr), block_elem_end_(block_end), elem_begin_(deque_detail::to_address(begin)),
           elem_curr_(deque_detail::to_address(pos))
@@ -662,7 +649,7 @@ class deque_iterator
 
     constexpr T &at_impl_(::std::ptrdiff_t const pos) const noexcept
     {
-        verify();
+        assert(verify());
         auto const [block_step, elem_step] = deque_detail::calc_pos<T>(elem_curr_ - elem_begin_, pos);
         auto const target_block = block_elem_curr_ + block_step;
         assert(target_block < block_elem_end_);
@@ -671,7 +658,7 @@ class deque_iterator
 
     constexpr deque_iterator &plus_and_assign_(::std::ptrdiff_t const pos) noexcept
     {
-        verify();
+        assert(verify());
         if (pos != ::std::ptrdiff_t(0))
         {
             auto const [block_step, elem_step] = deque_detail::calc_pos<T>(elem_curr_ - elem_begin_, pos);
@@ -691,6 +678,7 @@ class deque_iterator
                 elem_curr_ = elem_begin_ + deque_detail::block_elements_v<T>;
             }
         }
+        assert(verify());
         return *this;
     }
 
@@ -716,7 +704,6 @@ class deque_iterator
 
     constexpr ::std::strong_ordering operator<=>(deque_iterator const &other) const noexcept
     {
-        verify(other);
         assert(block_elem_end_ == other.block_elem_end_);
         if (block_elem_curr_ < other.block_elem_curr_)
             return ::std::strong_ordering::less;
@@ -743,7 +730,7 @@ class deque_iterator
 
     constexpr deque_iterator &operator++() noexcept
     {
-        verify();
+        assert(verify());
         // 空deque的迭代器不能自增，不需要考虑
         assert(elem_curr_ != elem_begin_ + deque_detail::block_elements_v<T>);
         ++elem_curr_;
@@ -756,6 +743,7 @@ class deque_iterator
                 elem_curr_ = elem_begin_;
             }
         }
+        assert(verify());
         return *this;
     }
 
@@ -772,7 +760,7 @@ class deque_iterator
 
     constexpr deque_iterator &operator--() noexcept
     {
-        verify();
+        assert(verify());
         if (elem_curr_ == elem_begin_)
         {
             --block_elem_curr_;
@@ -780,6 +768,7 @@ class deque_iterator
             elem_curr_ = elem_begin_ + deque_detail::block_elements_v<T>;
         }
         --elem_curr_;
+        assert(verify());
         return *this;
     }
 
@@ -806,7 +795,6 @@ class deque_iterator
 
     friend constexpr ::std::ptrdiff_t operator-(deque_iterator const &lhs, deque_iterator const &rhs) noexcept
     {
-        lhs.verify(rhs);
         assert(lhs.block_elem_end_ == rhs.block_elem_end_);
         auto const block_size = lhs.block_elem_curr_ - rhs.block_elem_curr_;
         return block_size * static_cast<::std::ptrdiff_t>(block_elements_v<T>) + lhs.elem_curr_ - lhs.elem_begin_ -
@@ -883,7 +871,7 @@ class repeat_iterator
 
     constexpr reference operator*() const noexcept
     {
-        assert(value_ptr_);
+        assert(value_ptr_ != nullptr);
         return *value_ptr_;
     }
 
@@ -1495,7 +1483,7 @@ class deque
     constexpr void extent_block_front_uncond_(::std::size_t const block_size)
     {
         assert(block_alloc_begin_ != block_ctrl_begin_());
-        assert(block_alloc_begin_);
+        assert(block_alloc_begin_ != nullptr);
         for (auto i = ::std::size_t(0); i != block_size; ++i)
         {
             auto const block = block_alloc_begin_ - ::std::size_t(1);
@@ -1509,7 +1497,7 @@ class deque
     constexpr void extent_block_back_uncond_(::std::size_t const block_size)
     {
         assert(block_alloc_end_ != block_ctrl_end_);
-        assert(block_alloc_end_);
+        assert(block_alloc_end_ != nullptr);
         for (auto i = ::std::size_t(0); i != block_size; ++i)
         {
             *block_alloc_end_ = alloc_block_();
@@ -2395,7 +2383,7 @@ class deque
 #if defined(__cpp_exceptions)
                 throw ::std::out_of_range{"bizwen::deque::at"};
 #else
-                ::std::abort();
+                ::std::terminate();
 #endif
             }
         }
