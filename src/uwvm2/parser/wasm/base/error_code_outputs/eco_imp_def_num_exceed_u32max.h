@@ -22,66 +22,66 @@
 
 // Without pragma once, this header file will be included in a specific code segment
 
-constexpr auto get_exceeding_imported_type_name =
+constexpr auto get_exceeding_imported_type_name{
     []<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept -> ::uwvm2::utils::container::basic_string_view<char_type2>
-{
-    switch(type)
     {
-        case 0u:
+        switch(type)
         {
-            if constexpr(::std::same_as<char_type2, char>) { return {"func"}; }
-            else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"func"}; }
-            else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"func"}; }
-            else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"func"}; }
-            else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"func"}; }
-        }
-        case 1u:
-        {
-            if constexpr(::std::same_as<char_type2, char>) { return {"table"}; }
-            else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"table"}; }
-            else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"table"}; }
-            else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"table"}; }
-            else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"table"}; }
-        }
-        case 2u:
-        {
-            if constexpr(::std::same_as<char_type2, char>) { return {"mem"}; }
-            else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"mem"}; }
-            else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"mem"}; }
-            else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"mem"}; }
-            else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"mem"}; }
-        }
-        case 3u:
-        {
-            if constexpr(::std::same_as<char_type2, char>) { return {"global"}; }
-            else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"global"}; }
-            else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"global"}; }
-            else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"global"}; }
-            else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"global"}; }
-        }
-        case 4u:
-        {
-            if constexpr(::std::same_as<char_type2, char>) { return {"tag"}; }
-            else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"tag"}; }
-            else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"tag"}; }
-            else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"tag"}; }
-            else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"tag"}; }
-        }
-        [[unlikely]] default:
-        {
+            case 0u:
+            {
+                if constexpr(::std::same_as<char_type2, char>) { return {"func"}; }
+                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"func"}; }
+                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"func"}; }
+                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"func"}; }
+                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"func"}; }
+            }
+            case 1u:
+            {
+                if constexpr(::std::same_as<char_type2, char>) { return {"table"}; }
+                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"table"}; }
+                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"table"}; }
+                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"table"}; }
+                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"table"}; }
+            }
+            case 2u:
+            {
+                if constexpr(::std::same_as<char_type2, char>) { return {"mem"}; }
+                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"mem"}; }
+                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"mem"}; }
+                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"mem"}; }
+                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"mem"}; }
+            }
+            case 3u:
+            {
+                if constexpr(::std::same_as<char_type2, char>) { return {"global"}; }
+                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"global"}; }
+                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"global"}; }
+                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"global"}; }
+                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"global"}; }
+            }
+            case 4u:
+            {
+                if constexpr(::std::same_as<char_type2, char>) { return {"tag"}; }
+                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"tag"}; }
+                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"tag"}; }
+                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"tag"}; }
+                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"tag"}; }
+            }
+            [[unlikely]] default:
+            {
             /// @todo Maybe I forgot to realize it.
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
 
-            if constexpr(::std::same_as<char_type2, char>) { return {"unknown"}; }
-            else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"unknown"}; }
-            else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"unknown"}; }
-            else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"unknown"}; }
-            else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"unknown"}; }
+                if constexpr(::std::same_as<char_type2, char>) { return {"unknown"}; }
+                else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"unknown"}; }
+                else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"unknown"}; }
+                else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"unknown"}; }
+                else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"unknown"}; }
+            }
         }
-    }
-};
+    }};
 
 if constexpr(::std::same_as<char_type, char>)
 {
