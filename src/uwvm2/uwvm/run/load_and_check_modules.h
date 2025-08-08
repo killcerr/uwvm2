@@ -55,9 +55,12 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
-    /// @brief Detect cyclic dependencies with graph-level deduplication.
-    /// @param adjacency_list The adjacency list of the dependency graph.
-    /// @return All unique cyclic dependencies.
+    /// @brief Detect all cycles in dependency graph (deduplicated and efficient).
+    ///        Based on "SCC decomposition + ordered DFS (Johnson's idea)": first decompose the graph into strongly connected components,
+    ///        then perform restricted DFS within each SCC, only starting enumeration from the minimum id vertex on the cycle,
+    ///        thus avoiding rotation duplicates like A->B->A and B->A->B.
+    /// @param adjacency_list The adjacency list of the dependency graph
+    /// @return All unique cycles (each cycle has same start and end: v0 -> ... -> v0)
     inline constexpr auto detect_cycles(
         ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view,
                                                       ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view>> const&
@@ -68,81 +71,197 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         using cycles_t = ::uwvm2::utils::container::vector<cycle_t>;
 
         cycles_t all_cycles{};
+        if(adjacency_list.empty()) [[unlikely]] { return all_cycles; }
 
-        // Track processed nodes to avoid duplicate detection
-        ::uwvm2::utils::container::unordered_flat_set<module_name_t> processed_nodes{};
-
-        for(auto const& [start_node, _]: adjacency_list)
+        // 1) Compress names to integer ids for efficient computation (avoid frequent hashing of string_view)
+        ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::std::uint32_t> name_to_id{};
+        ::uwvm2::utils::container::vector<module_name_t> id_to_name{};
+        id_to_name.reserve(adjacency_list.size());
+        name_to_id.reserve(adjacency_list.size());
+        for(auto const& [name, _] : adjacency_list)
         {
-            // Skip if this node has already been processed
-            if(processed_nodes.find(start_node) != processed_nodes.end()) { continue; }
+            auto const id = static_cast<::std::uint32_t>(id_to_name.size());
+            id_to_name.push_back(name);
+            name_to_id.emplace(name, id);
+        }
 
-            ::uwvm2::utils::container::unordered_flat_map<module_name_t, bool> blocked{};
-            ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::uwvm2::utils::container::unordered_flat_set<module_name_t>> B{};
-            ::uwvm2::utils::container::vector<module_name_t> stack{};
-            ::uwvm2::utils::container::unordered_flat_set<module_name_t> cycle_nodes{};
+        // 2) Build compact adjacency list (by id)
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::uint32_t>> graph{};
+        graph.resize(id_to_name.size());
+        for(auto const& [u_name, outs] : adjacency_list)
+        {
+            auto const u_id = name_to_id[u_name];
+            auto& u_out = graph[u_id];
+            u_out.reserve(outs.size());
+            for(auto const v_name : outs)
+            {
+                auto const it = name_to_id.find(v_name);
+                if(it != name_to_id.end()) { u_out.push_back(it->second); }
+            }
+        }
 
-            for(auto const& [node, _]: adjacency_list) { blocked[node] = false; }
+        // 3) Tarjan's algorithm to find strongly connected components (O(V+E))
+        ::uwvm2::utils::container::vector<int> index(graph.size(), -1);
+        ::uwvm2::utils::container::vector<int> low(graph.size(), 0);
+        ::uwvm2::utils::container::vector<::std::uint8_t> on_stack(graph.size(), 0);
+        ::uwvm2::utils::container::vector<::std::uint32_t> st{};
+        st.reserve(graph.size());
+        int dfs_idx{};
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::uint32_t>> sccs{};
 
-            auto unblock{[&](this auto const& self, module_name_t u) constexpr noexcept -> void
-                         {
-                             blocked[u] = false;
-                             for(auto w: B[u])
-                             {
-                                 if(blocked[w]) { self(w); }
-                             }
-                             B[u].clear();
-                         }};
+        auto strongconnect = [&](this auto const& self, ::std::uint32_t v) noexcept -> void
+        {
+            index[v] = low[v] = dfs_idx++;
+            st.push_back(v);
+            on_stack[v] = 1;
 
-            auto circuit{[&](this auto const& self, module_name_t v) constexpr noexcept -> bool
-                         {
-                             bool found_cycle{};
-                             stack.push_back(v);
-                             blocked[v] = true;
+            for(auto const w : graph[v])
+            {
+                if(index[w] == -1)
+                {
+                    self(w);
+                    low[v] = (low[v] < low[w] ? low[v] : low[w]);
+                }
+                else if(on_stack[w])
+                {
+                    low[v] = (low[v] < index[w] ? low[v] : index[w]);
+                }
+            }
 
-                             if(auto const it{adjacency_list.find(v)}; it != adjacency_list.end())
-                             {
-                                 for(auto const w: it->second)
-                                 {
-                                     if(w == start_node)
-                                     {
-                                         cycle_t cycle{stack};
-                                         cycle.push_back(start_node);
-                                         all_cycles.push_back(::std::move(cycle));
+            if(low[v] == index[v])
+            {
+                ::uwvm2::utils::container::vector<::std::uint32_t> comp{};
+                for(;;)
+                {
+                    auto const w = st.back();
+                    st.pop_back_unchecked();
+                    on_stack[w] = 0;
+                    comp.push_back(w);
+                    if(w == v) { break; }
+                }
+                sccs.push_back(::std::move(comp));
+            }
+        };
 
-                                         // Mark all nodes in the cycle as processed
-                                         for(auto const& node: stack) { cycle_nodes.insert(node); }
-                                         cycle_nodes.insert(start_node);
+        for(::std::uint32_t v{}; v < graph.size(); ++v)
+        {
+            if(index[v] == -1) { strongconnect(v); }
+        }
 
-                                         found_cycle = true;
-                                     }
-                                     else if(!blocked[w])
-                                     {
-                                         if(self(w)) { found_cycle = true; }
-                                     }
-                                 }
-                             }
+        // 4) Perform ordered DFS within each SCC, only starting from the minimum id vertex on the cycle, avoiding rotation duplicates
+        //    Additionally maintain a 64-bit signature set for safe deduplication (based on xxh3), with extremely low collision probability
+        ::uwvm2::utils::container::unordered_flat_set<::std::uint64_t> seen_signatures{};
 
-                             if(found_cycle) { unblock(v); }
-                             else
-                             {
-                                 if(auto const it{adjacency_list.find(v)}; it != adjacency_list.end())
-                                 {
-                                     for(auto const w: it->second)
-                                     {
-                                         if(B[w].find(v) == B[w].end()) { B[w].insert(v); }
-                                     }
-                                 }
-                             }
+        // Temporary buffer for signatures (avoid repeated allocation)
+        ::uwvm2::utils::container::vector<::std::uint32_t> temp_cycle_ids{};
+        temp_cycle_ids.reserve(256);
 
-                             stack.pop_back_unchecked();
-                             return found_cycle;
-                         }};
+        auto emit_cycle = [&](::uwvm2::utils::container::vector<::std::uint32_t> const& path_ids,
+                              ::std::uint32_t start_id) noexcept -> void
+        {
+            // Normalize to cycle representation starting with minimum id (i.e., start_id): start, ..., start
+            temp_cycle_ids.clear();
+            temp_cycle_ids.reserve(path_ids.size() + 1);
+            for(auto const id : path_ids) { temp_cycle_ids.push_back(id); }
+            temp_cycle_ids.push_back(start_id);
 
-            circuit(start_node);
+            // Calculate hash signature
+            auto const bytes_ptr = reinterpret_cast<::std::byte const*>(temp_cycle_ids.data());
+            auto const bytes_len = temp_cycle_ids.size() * sizeof(::std::uint32_t);
+            auto const sig = ::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len);
+            if(seen_signatures.contains(sig)) { return; }
+            seen_signatures.insert(sig);
 
-            // Mark all nodes found in cycles as processed
-            for(auto const& node: cycle_nodes) { processed_nodes.insert(node); }
+            // Convert back to names and write to result
+            cycle_t cyc{};
+            cyc.reserve(temp_cycle_ids.size());
+            for(auto const id : temp_cycle_ids) { cyc.push_back(id_to_name[id]); }
+            all_cycles.push_back(::std::move(cyc));
+        };
+
+        // DFS (restricted to only visit points >= start_id, ensuring minimum id is start_id)
+        ::uwvm2::utils::container::vector<::std::uint8_t> in_scc(graph.size(), 0);
+        ::uwvm2::utils::container::vector<::std::uint8_t> on_path(graph.size(), 0);
+        ::uwvm2::utils::container::vector<::std::uint32_t> path{};
+        path.reserve(graph.size());
+
+        auto dfs_cycle = [&](this auto const& self, ::std::uint32_t v, ::std::uint32_t start_id) noexcept -> void
+        {
+            on_path[v] = 1;
+            path.push_back(v);
+            for(auto const w : graph[v])
+            {
+                if(!in_scc[w]) { continue; }
+                if(w < start_id) { continue; }
+                if(w == start_id)
+                {
+                    emit_cycle(path, start_id);
+                }
+                else if(!on_path[w])
+                {
+                    self(w, start_id);
+                }
+            }
+            path.pop_back_unchecked();
+            on_path[v] = 0;
+        };
+
+        for(auto& comp : sccs)
+        {
+            // Skip single-node SCCs without cycles (no self-loops)
+            if(comp.size() == 1)
+            {
+                auto const u = comp.front();
+                bool self_loop{};
+                for(auto const w : graph[u])
+                {
+                    if(w == u) { self_loop = true; break; }
+                }
+                if(self_loop)
+                {
+                    // A -> A
+                    temp_cycle_ids.clear();
+                    temp_cycle_ids.push_back(u);
+                    temp_cycle_ids.push_back(u);
+
+                    auto const bytes_ptr = reinterpret_cast<::std::byte const*>(temp_cycle_ids.data());
+                    auto const bytes_len = temp_cycle_ids.size() * sizeof(::std::uint32_t);
+                    auto const sig = ::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len);
+                    if(!seen_signatures.contains(sig))
+                    {
+                        seen_signatures.insert(sig);
+                        cycle_t cyc{};
+                        cyc.reserve(2);
+                        cyc.push_back(id_to_name[u]);
+                        cyc.push_back(id_to_name[u]);
+                        all_cycles.push_back(::std::move(cyc));
+                    }
+                }
+                continue;
+            }
+
+            // Mark nodes in this SCC
+            for(auto const v : comp) { in_scc[v] = 1; }
+
+            // Sort by id ascending to ensure cycles starting from minimum id vertex are only enumerated once
+            // (comp order is Tarjan's pop order, not guaranteed to be sorted, no forced sorting here to save overhead,
+            //  only sort when stability is needed:
+            //  std::sort(comp.begin(), comp.end());)
+
+            // If stronger deduplication stability is needed, uncomment the following sort:
+            // ::std::sort(comp.begin(), comp.end());
+
+            for(auto const start_id : comp)
+            {
+                // Clear path state
+                for(auto const v : comp) { on_path[v] = 0; }
+                path.clear();
+
+                dfs_cycle(start_id, start_id);
+            }
+
+            // Clear marks
+            for(auto const v : comp) { in_scc[v] = 0; }
         }
 
         return all_cycles;
