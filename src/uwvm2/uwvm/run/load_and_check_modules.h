@@ -81,10 +81,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         if(adjacency_list.empty()) [[unlikely]] { return all_cycles; }
 
         // Check dependency count limit
-        auto const dependency_count{adjacency_list.size()};
-
         // The number of recursions is greater than or equal to the number of dependencies, so it can be checked in advance.
-        if(dependency_count > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz)
+        if(auto const dependency_count{adjacency_list.size()};
+           dependency_count > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz)
         {
             // Output warning about dependency count exceeding limit
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -170,7 +169,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         using signed_size_t = ::std::make_signed_t<::std::size_t>;
         constexpr auto signed_size_max{::std::numeric_limits<signed_size_t>::max()};
 
-        if(graph.size() > static_cast<::std::size_t>(signed_size_max)) [[unlikely]]
+        auto const graph_size{graph.size()};
+
+        if(graph_size > static_cast<::std::size_t>(signed_size_max)) [[unlikely]]
         {
             // Output warning about cycle detection being impossible due to graph size
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -181,7 +182,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Graph size \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                graph.size(),
+                                graph_size,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" exceeds maximum signed size \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
@@ -210,7 +211,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             return all_cycles;
         }
 
-        auto const graph_size{graph.size()};
         ::uwvm2::utils::container::vector<signed_size_t> index(graph_size, static_cast<signed_size_t>(-1));
         ::uwvm2::utils::container::vector<signed_size_t> low(graph_size, signed_size_t{});
         ::uwvm2::utils::container::vector<bool> on_stack(graph_size, false);
@@ -220,34 +220,35 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         signed_size_t dfs_idx{};
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::size_t>> sccs{};
 
-        // Iterative implementation to avoid stack overflow with recursion depth limit
-        struct StackFrame
-        {
-            ::std::size_t v;
-            ::std::size_t neighbor_idx;
-            bool is_initial_call;
-            ::std::size_t depth;
-
-            inline constexpr StackFrame(::std::size_t vertex, ::std::size_t current_depth, bool initial = true) noexcept :
-                v{vertex}, neighbor_idx{0uz}, is_initial_call{initial}, depth{current_depth}
-            {
-            }
-        };
-
         for(::std::size_t v{}; v != graph_size; ++v)
         {
             // Safe: v is guaranteed to be < graph.size() because we iterate over graph.size()
             if(index.index_unchecked(v) != static_cast<signed_size_t>(-1)) { continue; }
 
-            // Use explicit stack to avoid recursion with depth limit
-            ::uwvm2::utils::container::vector<StackFrame> call_stack{};
-            call_stack.reserve(graph_size);  // Reserve maximum possible depth
-
-            call_stack.emplace_back(v, 0uz, true);
-
-            while(!call_stack.empty())
+            // Iterative implementation to avoid stack overflow with recursion depth limit
+            struct stack_frame_t
             {
-                auto& frame{call_stack.back()};
+                ::std::size_t v;
+                ::std::size_t neighbor_idx;
+                bool is_initial_call;
+                ::std::size_t depth;
+
+                inline constexpr stack_frame_t(::std::size_t vertex, ::std::size_t current_depth, bool initial = true) noexcept :
+                    v{vertex}, neighbor_idx{0uz}, is_initial_call{initial}, depth{current_depth}
+                {
+                }
+            };
+
+            // Use explicit stack to avoid recursion with depth limit
+            ::uwvm2::utils::container::vector<stack_frame_t> call_stack{};
+            call_stack.reserve(graph_size);  // Reserve maximum possible depth, so we can use push_back_unchecked
+
+            // size of graph_size != 0
+            call_stack.emplace_back_unchecked(v, 0uz, true);
+
+            while(!call_stack.empty()) [[likely]]
+            {
+                auto& frame{call_stack.back_unchecked()};
 
                 // Check recursion depth limit
                 if(frame.depth > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz) [[unlikely]]
@@ -295,19 +296,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     // But first, update parent's low value if this is not the root call
                     if(call_stack.size() > 1uz) [[likely]]
                     {
-                        auto& parent_frame{call_stack[call_stack.size() - 2uz]};
+                        auto& parent_frame{call_stack.index_unchecked(call_stack.size() - 2uz)};
                         low.index_unchecked(parent_frame.v) = ::std::min(low.index_unchecked(parent_frame.v), low.index_unchecked(frame.v));
                     }
 
-                    call_stack.pop_back();
-                    continue;
+                    call_stack.pop_back_unchecked();
+                    break;
                 }
 
-                if(frame.is_initial_call)
+                if(frame.is_initial_call) [[unlikely]]
                 {
                     // Initial call - set up the vertex
                     index.index_unchecked(frame.v) = low.index_unchecked(frame.v) = dfs_idx++;
-                    st.push_back(frame.v);
+                    // st size < graph_size, so push_back_unchecked is safe
+                    st.push_back_unchecked(frame.v);
                     on_stack.index_unchecked(frame.v) = true;
                     frame.is_initial_call = false;
                 }
@@ -317,14 +319,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 if(frame.neighbor_idx < neighbors.size()) [[likely]]
                 {
                     auto const w{neighbors.index_unchecked(frame.neighbor_idx)};
-                    frame.neighbor_idx++;
+                    ++frame.neighbor_idx;
 
                     // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
                     if(index.index_unchecked(w) == static_cast<signed_size_t>(-1))
                     {
                         // Recursive call - push new frame with increased depth
-                        call_stack.emplace_back(w, frame.depth + 1, true);
-                        continue;  // Process the new frame first
+                        call_stack.emplace_back_unchecked(w, frame.depth + 1uz, true);
                     }
                     else if(on_stack.index_unchecked(w)) { low.index_unchecked(frame.v) = ::std::min(low.index_unchecked(frame.v), index.index_unchecked(w)); }
                 }
@@ -349,12 +350,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     // Update parent's low value if this is not the root call
                     if(call_stack.size() > 1uz) [[likely]]
                     {
-                        auto& parent_frame{call_stack[call_stack.size() - 2uz]};
+                        auto& parent_frame{call_stack.index_unchecked(call_stack.size() - 2uz)};
                         low.index_unchecked(parent_frame.v) = ::std::min(low.index_unchecked(parent_frame.v), low.index_unchecked(frame.v));
                     }
 
                     // Pop this frame
-                    call_stack.pop_back();
+                    call_stack.pop_back_unchecked();
                 }
             }
         }
@@ -395,7 +396,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             // Skip single-node SCCs without cycles (no self-loops)
             if(comp.size() == 1uz)
             {
-                auto const u{comp.front()};
+                auto const u{comp.front_unchecked()};
                 bool self_loop{};
                 // Safe: u is guaranteed to be < graph.size() because it comes from our graph
                 for(auto const w: graph.index_unchecked(u))
@@ -410,8 +411,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 {
                     // A -> A
                     temp_cycle_ids.clear();
-                    temp_cycle_ids.push_back(u);
-                    temp_cycle_ids.push_back(u);
+                    temp_cycle_ids.push_back_unchecked(u);
+                    temp_cycle_ids.push_back_unchecked(u);
 
                     auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
                     auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
@@ -422,8 +423,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         cycle_t cyc{};
                         cyc.reserve(2uz);
                         // Safe: u is guaranteed to be < id_to_name.size() because it comes from our graph
-                        cyc.push_back(id_to_name.index_unchecked(u));
-                        cyc.push_back(id_to_name.index_unchecked(u));
+                        cyc.push_back_unchecked(id_to_name.index_unchecked(u));
+                        cyc.push_back_unchecked(id_to_name.index_unchecked(u));
+                        // Unknown size Use version with checks
                         all_cycles.push_back(::std::move(cyc));
                     }
                 }
@@ -460,11 +462,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 ::uwvm2::utils::container::vector<DfsStackFrame> dfs_stack{};
                 dfs_stack.reserve(graph_size);  // Reserve maximum possible depth
 
-                dfs_stack.emplace_back(start_v, start_id, 0uz, true);
+                dfs_stack.emplace_back_unchecked(start_v, start_id, 0uz, true);
 
-                while(!dfs_stack.empty())
+                while(!dfs_stack.empty()) [[likely]]
                 {
-                    auto& frame{dfs_stack.back()};
+                    auto& frame{dfs_stack.back_unchecked()};
 
                     // Check recursion depth limit
                     if(frame.depth > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz)
@@ -510,8 +512,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         }
 
                         // Pop this frame and continue with next
-                        dfs_stack.pop_back();
-                        continue;
+                        dfs_stack.pop_back_unchecked();
+                        break;
                     }
 
                     if(frame.is_initial_call)
@@ -523,30 +525,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     }
 
                     // Process neighbors
-                    auto const& neighbors = graph.index_unchecked(frame.v);
-                    if(frame.neighbor_idx < neighbors.size())
+                    auto const& neighbors{graph.index_unchecked(frame.v)};
+                    if(frame.neighbor_idx < neighbors.size()) [[likely]]
                     {
-                        auto const w = neighbors[frame.neighbor_idx];
-                        frame.neighbor_idx++;
+                        auto const w{neighbors.index_unchecked(frame.neighbor_idx)};
+                        ++frame.neighbor_idx;
 
                         // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
                         if(!in_scc.index_unchecked(w)) { continue; }
                         if(w < frame.start_id) { continue; }
                         if(w == frame.start_id)
                         {
-                            ::uwvm2::utils::container::vector<::std::size_t> const& path_ids { path };
-                            ::std::size_t start_id{frame.start_id};
+                            ::uwvm2::utils::container::vector<::std::size_t> const& path_ids{path};
                             // Normalize to cycle representation starting with minimum id (i.e., start_id): start, ..., start
                             temp_cycle_ids.clear();
                             temp_cycle_ids.reserve(path_ids.size() + 1uz);
-                            for(auto const id: path_ids) { temp_cycle_ids.push_back(id); }
-                            temp_cycle_ids.push_back(start_id);
+                            for(auto const id: path_ids) { temp_cycle_ids.push_back_unchecked(id); }
+                            temp_cycle_ids.push_back_unchecked(frame.start_id);
 
                             // Calculate hash signature
                             auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
                             auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
                             auto const sig{::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len)};
-                            
+
                             if(seen_signatures.contains(sig)) { continue; }
                             seen_signatures.insert(sig);
 
@@ -563,7 +564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         else if(!on_path.index_unchecked(w))
                         {
                             // Recursive call - push new frame with increased depth
-                            dfs_stack.emplace_back(w, frame.start_id, frame.depth + 1, true);
+                            dfs_stack.emplace_back_unchecked(w, frame.start_id, frame.depth + 1, true);
                             continue;  // Process the new frame first
                         }
                     }
@@ -574,7 +575,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         on_path.index_unchecked(frame.v) = false;
 
                         // Pop this frame
-                        dfs_stack.pop_back();
+                        dfs_stack.pop_back_unchecked();
                     }
                 }
             }
