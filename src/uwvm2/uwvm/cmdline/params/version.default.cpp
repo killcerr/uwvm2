@@ -778,11 +778,11 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"\n"
                                 // Feature
                                 u8"Feature:\n"
-                                // detailed checker
+        // detailed checker
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                                 u8"    Detailed Debug Check Mode \n"
 #endif
-                                // fno-exceptions
+        // fno-exceptions
 #if !(defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE))
                                 u8"    Error Direct Crash Mode (fno-exceptions)\n"
 #endif
@@ -796,8 +796,9 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::uwvm2::uwvm::cmdline::hash_table_size.real_max_conflict_size,
                                 u8", SZ=",
                                 ::uwvm2::uwvm::cmdline::hash_table_byte_sz,
-                                // sanitizer
-#if UWVM_HAS_FEATURE(address_sanitizer) || UWVM_HAS_FEATURE(thread_sanitizer) || UWVM_HAS_FEATURE(memory_sanitizer) || UWVM_HAS_FEATURE(leak_sanitizer) || UWVM_HAS_FEATURE(undefined_sanitizer)
+        // sanitizer
+#if UWVM_HAS_FEATURE(address_sanitizer) || UWVM_HAS_FEATURE(thread_sanitizer) || UWVM_HAS_FEATURE(memory_sanitizer) || UWVM_HAS_FEATURE(leak_sanitizer) ||     \
+    UWVM_HAS_FEATURE(undefined_sanitizer)
                                 u8"\n    Sanitizer: "
 # if UWVM_HAS_FEATURE(address_sanitizer)
                                 u8"Address "

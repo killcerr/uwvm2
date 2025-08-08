@@ -48,12 +48,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 #endif
     inline constexpr ::uwvm2::utils::cmdline::parameter wasm_force_check_depend{
         .name{u8"--wasm-force-check-depend"},
-        .describe{u8"Force dependency check even when dependency count exceeds limit (1024)."},
+        .describe{u8"Force dependency check even when dependency count exceeds limit (512)."},
         .is_exist{::std::addressof(::uwvm2::uwvm::utils::depend::force_check_depend)},
         .cate{::uwvm2::utils::cmdline::categorization::wasm}};
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif
+
+    static_assert(::uwvm2::uwvm::utils::depend::dependency_limit == 512uz);
 }
 
 #ifndef UWVM_MODULE

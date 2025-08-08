@@ -81,10 +81,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         if(adjacency_list.empty()) [[unlikely]] { return all_cycles; }
 
         // Check dependency count limit
-        constexpr ::std::size_t dependency_limit{1024uz};
         auto const dependency_count{adjacency_list.size()};
 
-        if(dependency_count > dependency_limit && !::uwvm2::uwvm::utils::depend::force_check_depend)
+        if(dependency_count > ::uwvm2::uwvm::utils::depend::dependency_limit && !::uwvm2::uwvm::utils::depend::force_check_depend)
         {
             // Output warning about dependency count exceeding limit
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -99,7 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" exceeds limit \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                dependency_limit,
+                                ::uwvm2::uwvm::utils::depend::dependency_limit,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\". Dependency check skipped. Use \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),

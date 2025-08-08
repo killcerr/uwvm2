@@ -19,9 +19,8 @@
  *                                      *
  ****************************************/
 
- #pragma once
+#pragma once
 
- #ifndef UWVM_MODULE
- # include "depend_check.h"
- #endif
- 
+#ifndef UWVM_MODULE
+# include "depend_check.h"
+#endif
