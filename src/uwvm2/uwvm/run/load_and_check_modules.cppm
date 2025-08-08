@@ -47,6 +47,7 @@ import uwvm2.parser.wasm.standard;
 import uwvm2.parser.wasm.binfmt.base;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.utils.memory;
+import uwvm2.uwvm.utils.depend;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.wasm;
 import :retval;

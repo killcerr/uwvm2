@@ -48,5 +48,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
     inline bool dl_warning_fatal{};            // [global]
     inline bool depend_warning_fatal{};        // [global]
 
-}  // namespace uwvm2::utils
+}  // namespace uwvm2::uwvm::io
 #endif

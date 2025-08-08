@@ -57,6 +57,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_register_dl),
 #endif
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_force_check_depend),
 
             // log
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_output),
