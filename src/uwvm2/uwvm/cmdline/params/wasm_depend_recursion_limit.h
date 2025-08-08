@@ -41,21 +41,31 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
+    namespace details
+    {
+        inline bool wasm_depend_recursion_limit_is_exist{};
+        inline constexpr ::uwvm2::utils::container::u8string_view wasm_depend_recursion_limit_alias{u8"-Wdeplmt"};
+        extern "C++" ::uwvm2::utils::cmdline::parameter_return_type
+            wasm_depend_recursion_limit_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                 ::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                 ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
+    }  // namespace details
 
 #if defined(__clang__)
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wbraced-scalar-init"
 #endif
-    inline constexpr ::uwvm2::utils::cmdline::parameter wasm_force_check_depend{
-        .name{u8"--wasm-force-check-depend"},
-        .describe{u8"Force dependency check even when dependency count exceeds limit (512)."},
-        .is_exist{::std::addressof(::uwvm2::uwvm::utils::depend::force_check_depend)},
+    inline constexpr ::uwvm2::utils::cmdline::parameter wasm_depend_recursion_limit{
+        .name{u8"--wasm-depend-recursion-limit"},
+        .describe{u8"Set recursion depth limit for dependency check (0 = unlimited, default = 2048)."},
+        .usage{u8"<depth>"},
+        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_depend_recursion_limit_alias), 1uz}},
+        .handle{::std::addressof(details::wasm_depend_recursion_limit_callback)},
+        .is_exist{::std::addressof(details::wasm_depend_recursion_limit_is_exist)},
         .cate{::uwvm2::utils::cmdline::categorization::wasm}};
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif
-
-    static_assert(::uwvm2::uwvm::utils::depend::dependency_limit == 512uz);
 }
 
 #ifndef UWVM_MODULE

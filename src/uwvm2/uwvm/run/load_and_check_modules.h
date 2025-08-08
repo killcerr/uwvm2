@@ -83,7 +83,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // Check dependency count limit
         auto const dependency_count{adjacency_list.size()};
 
-        if(dependency_count > ::uwvm2::uwvm::utils::depend::dependency_limit && !::uwvm2::uwvm::utils::depend::force_check_depend)
+        // The number of recursions is greater than or equal to the number of dependencies, so it can be checked in advance.
+        if(dependency_count > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz)
         {
             // Output warning about dependency count exceeding limit
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -98,11 +99,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" exceeds limit \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                ::uwvm2::uwvm::utils::depend::dependency_limit,
+                                ::uwvm2::uwvm::utils::depend::recursion_depth_limit,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\". Dependency check skipped. Use \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
-                                u8"--wasm-force-check-depend",
+                                u8"--wasm-depend-recursion-limit",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" to force check. ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
@@ -219,48 +220,136 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         signed_size_t dfs_idx{};
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::size_t>> sccs{};
 
-        auto strongconnect{[&](this auto const& self, ::std::size_t v) noexcept -> void
-                           {
-                               // Safe: v is guaranteed to be < graph.size() because we iterate over graph.size()
-                               index.index_unchecked(v) = low.index_unchecked(v) = dfs_idx++;
-                               st.push_back(v);
-                               on_stack.index_unchecked(v) = true;
+        // Iterative implementation to avoid stack overflow with recursion depth limit
+        struct StackFrame
+        {
+            ::std::size_t v;
+            ::std::size_t neighbor_idx;
+            bool is_initial_call;
+            ::std::size_t depth;
 
-                               // Safe: v is guaranteed to be < graph.size()
-                               for(auto const w: graph.index_unchecked(v))
-                               {
-                                   // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
-                                   if(index.index_unchecked(w) == static_cast<signed_size_t>(-1))
-                                   {
-                                       self(w);
-                                       low.index_unchecked(v) = ::std::min(low.index_unchecked(v), low.index_unchecked(w));
-                                   }
-                                   else if(on_stack.index_unchecked(w))
-                                   {
-                                       low.index_unchecked(v) = ::std::min(low.index_unchecked(v), index.index_unchecked(w));
-                                   }
-                               }
-
-                               if(low.index_unchecked(v) == index.index_unchecked(v))
-                               {
-                                   ::uwvm2::utils::container::vector<::std::size_t> comp{};
-                                   for(;;)
-                                   {
-                                       auto const w{st.back()};
-                                       st.pop_back_unchecked();
-                                       // Safe: w is guaranteed to be < graph.size() because it came from st
-                                       on_stack.index_unchecked(w) = false;
-                                       comp.push_back(w);
-                                       if(w == v) { break; }
-                                   }
-                                   sccs.push_back(::std::move(comp));
-                               }
-                           }};
+            inline constexpr StackFrame(::std::size_t vertex, ::std::size_t current_depth, bool initial = true) noexcept :
+                v{vertex}, neighbor_idx{0uz}, is_initial_call{initial}, depth{current_depth}
+            {
+            }
+        };
 
         for(::std::size_t v{}; v != graph_size; ++v)
         {
             // Safe: v is guaranteed to be < graph.size() because we iterate over graph.size()
-            if(index.index_unchecked(v) == static_cast<signed_size_t>(-1)) { strongconnect(v); }
+            if(index.index_unchecked(v) != static_cast<signed_size_t>(-1)) { continue; }
+
+            // Use explicit stack to avoid recursion with depth limit
+            ::uwvm2::utils::container::vector<StackFrame> call_stack{};
+            call_stack.reserve(graph_size);  // Reserve maximum possible depth
+
+            call_stack.emplace_back(v, 0uz, true);
+
+            while(!call_stack.empty())
+            {
+                auto& frame{call_stack.back()};
+
+                // Check recursion depth limit
+                if(frame.depth > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz) [[unlikely]]
+                {
+                    // Output warning about recursion depth limit exceeded
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                        u8"[warn]  ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"Recursion depth limit \"",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        ::uwvm2::uwvm::utils::depend::recursion_depth_limit,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"\" exceeded at vertex \"",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        frame.v,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"\". Skipping further checks. Use \"",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                        u8"--wasm-depend-recursion-limit",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"\" to force check. ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                        u8"(depend)\n",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                    if(::uwvm2::uwvm::io::depend_warning_fatal) [[unlikely]]
+                    {
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                            u8"[fatal] ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Convert warnings to fatal errors. ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(depend)\n\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        ::fast_io::fast_terminate();
+                    }
+
+                    // Pop this frame and continue with next
+                    call_stack.pop_back();
+                    continue;
+                }
+
+                if(frame.is_initial_call)
+                {
+                    // Initial call - set up the vertex
+                    index.index_unchecked(frame.v) = low.index_unchecked(frame.v) = dfs_idx++;
+                    st.push_back(frame.v);
+                    on_stack.index_unchecked(frame.v) = true;
+                    frame.is_initial_call = false;
+                }
+
+                // Process neighbors
+                auto const& neighbors = graph.index_unchecked(frame.v);
+                if(frame.neighbor_idx < neighbors.size())
+                {
+                    auto const w = neighbors[frame.neighbor_idx];
+                    frame.neighbor_idx++;
+
+                    // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
+                    if(index.index_unchecked(w) == static_cast<signed_size_t>(-1))
+                    {
+                        // Recursive call - push new frame with increased depth
+                        call_stack.emplace_back(w, frame.depth + 1, true);
+                        continue;  // Process the new frame first
+                    }
+                    else if(on_stack.index_unchecked(w)) { low.index_unchecked(frame.v) = ::std::min(low.index_unchecked(frame.v), index.index_unchecked(w)); }
+                }
+                else
+                {
+                    // All neighbors processed - check if this is a root of SCC
+                    if(low.index_unchecked(frame.v) == index.index_unchecked(frame.v))
+                    {
+                        ::uwvm2::utils::container::vector<::std::size_t> comp{};
+                        for(;;)
+                        {
+                            auto const w{st.back()};
+                            st.pop_back_unchecked();
+                            // Safe: w is guaranteed to be < graph.size() because it came from st
+                            on_stack.index_unchecked(w) = false;
+                            comp.push_back(w);
+                            if(w == frame.v) { break; }
+                        }
+                        sccs.push_back(::std::move(comp));
+                    }
+
+                    // Update parent's low value if this is not the root call
+                    if(call_stack.size() > 1)
+                    {
+                        auto& parent_frame = call_stack[call_stack.size() - 2];
+                        low.index_unchecked(parent_frame.v) = ::std::min(low.index_unchecked(parent_frame.v), low.index_unchecked(frame.v));
+                    }
+
+                    // Pop this frame
+                    call_stack.pop_back();
+                }
+            }
         }
 
         // 4) Perform ordered DFS within each SCC, only starting from the minimum id vertex on the cycle, avoiding rotation duplicates

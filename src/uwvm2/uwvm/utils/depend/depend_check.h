@@ -27,11 +27,8 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::utils::depend
 {
-    /// @brief dependency check control
-    inline bool force_check_depend{};  // [global]
-
-    // In WASM mode, 1024 will cause a stack overflow, so choose 512 instead.
-    inline constexpr ::std::size_t dependency_limit{512uz};
-
+    /// @brief recursion depth limit for dependency check
+    /// @details 0 means unlimited, default is 2048
+    inline ::std::size_t recursion_depth_limit{2048uz};  // [global]
 }  // namespace uwvm2::uwvm::utils::depend
 
