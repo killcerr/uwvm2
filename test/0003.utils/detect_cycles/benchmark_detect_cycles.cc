@@ -55,10 +55,10 @@ GraphBuilder build_disjoint_cycles(std::size_t k, std::size_t L)
         {
             u8string name;
             name.append(u8string_view{u8"N_", 2});
-            auto is = std::to_string(i);
-            name.append(u8string_view{reinterpret_cast<char8_t const*>(is.data()), is.size()});
-            name.push_back_unchecked(u8'_');
-            auto js = std::to_string(j);
+            auto is = ::fast_io::u8to<u8string>(i);
+            name.append(is);
+            name.push_back(u8'_');
+            auto js = ::fast_io::u8to<u8string>(j);
             name.append(u8string_view{reinterpret_cast<char8_t const*>(js.data()), js.size()});
             auto v = gb.add_node(std::move(name));
             groups[i].push_back(v);
