@@ -292,6 +292,48 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         final_extern_type_t<Fs...> imports{};
     };
 
+    /// @brief      No duplicate import items allowed
+    /// @details    Currently, the WebAssembly core specification does not prohibit the existence of identical import items (same module name + function name +
+    ///             type) in a module, but some host environments require that import object keys be unique when instantiating, causing duplicate imports to
+    ///             fail during actual runtime. Here is a concept that can prohibit duplicate import items.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool check_duplicate_imports{true};
+    ///             };
+    ///             ```
+    /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.11
+    /// @note       Unlike export names, import names are not necessarily unique. It is possible to import the same module/name pair multiple times; such
+    ///             imports may even have different type descriptions, including different kinds of entities. A module with such imports can still be
+    ///             instantiated depending on the specifics of how an embedder allows resolving and supplying imports. However, embedders are not required to
+    ///             support such overloading, and a WebAssembly module itself cannot implement an overloaded name
+    template <typename FsCurr>
+    concept has_check_duplicate_imports = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::check_duplicate_imports)>, bool>; };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool check_duplicate_imports() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_check_duplicate_imports<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::check_duplicate_imports};
+                                                                            return tallow;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
+
     /// @brief      has table_type
     /// @details
     ///             ```cpp

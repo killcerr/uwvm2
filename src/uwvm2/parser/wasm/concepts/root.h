@@ -45,6 +45,10 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 {
+    struct empty_t
+    {
+    };
+
     /// @brief Prevent inheritance effects when adl matching
     template <typename FeatureType>
     struct feature_reserve_type_t

@@ -512,8 +512,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};  // use for reserve
         // desc counter
 
-        ::uwvm2::utils::container::array<::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>,
-                                         importdesc_count>
+        /// Unlike export names, import names are not necessarily unique. It is possible to import the same module/name pair multiple times; such
+        /// imports may even have different type descriptions, including different kinds of entities. A module with such imports can still be
+        /// instantiated depending on the specifics of how an embedder allows resolving and supplying imports. However, embedders are not required
+        /// to support such overloading, and a WebAssembly module itself cannot implement an overloaded name
+        constexpr bool curr_wasm_check_duplicate_imports{::uwvm2::parser::wasm::standard::wasm1::features::check_duplicate_imports<Fs...>()};
+        ::std::conditional_t<
+            curr_wasm_check_duplicate_imports,
+            ::uwvm2::utils::container::array<::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>,
+                                             importdesc_count>,
+            ::uwvm2::parser::wasm::concepts::empty_t>
             duplicate_name_checker{};  // use for check duplicate name
 
         // Each type is of unknown size, so it cannot be reserved.
@@ -748,22 +756,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // counter
             ++importdesc_counter.index_unchecked(fit_import_type);
 
-            // check duplicate name
-            auto& curr_name_set{duplicate_name_checker.index_unchecked(fit_import_type)};
-
-            ::uwvm2::parser::wasm::standard::wasm1::features::name_checker const curr_name_check{fit.module_name, fit.extern_name};
-
-            if(curr_name_set.contains(curr_name_check)) [[unlikely]]
+            // Unlike export names, import names are not necessarily unique. It is possible to import the same module/name pair multiple times;
+            // such imports may even have different type descriptions, including different kinds of entities. A module with such imports can still
+            // be instantiated depending on the specifics of how an embedder allows resolving and supplying imports. However, embedders are not
+            // required to support such overloading, and a WebAssembly module itself cannot implement an overloaded name
+            if constexpr(curr_wasm_check_duplicate_imports)
             {
-                err.err_curr = section_curr;
-                err.err_selectable.duplic_imports.module_name = fit.module_name;
-                err.err_selectable.duplic_imports.extern_name = fit.extern_name;
-                err.err_selectable.duplic_imports.type = static_cast<::std::uint_least8_t>(fit_import_type);
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
+                // check duplicate name
+                auto& curr_name_set{duplicate_name_checker.index_unchecked(fit_import_type)};
 
-            curr_name_set.insert(curr_name_check);  // std::set never throw (Disregarding new failures)
+                // Use the return value of emplace to combine the lookup and insertion operations, avoiding two hash lookups.
+                if(!curr_name_set.emplace(fit.module_name, fit.extern_name).second) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.duplic_imports.module_name = fit.module_name;
+                    err.err_selectable.duplic_imports.extern_name = fit.extern_name;
+                    err.err_selectable.duplic_imports.type = static_cast<::std::uint_least8_t>(fit_import_type);
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
 
             ++section_curr;
 

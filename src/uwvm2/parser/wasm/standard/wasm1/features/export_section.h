@@ -337,8 +337,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, exportdesc_count> exportdesc_counter{};  // use for reserve
         // desc counter
 
-        ::uwvm2::utils::container::array<::uwvm2::utils::container::unordered_flat_set<::uwvm2::utils::container::u8string_view>, exportdesc_count>
-            duplicate_name_checker{};  // use for check duplicate name
+        // Each export is labeled by a unique name. Exportable definitions are functions, tables, memories, and globals, which are referenced through a
+        // respective descriptor.
+        // @see: WebAssembly Release 1.0 (2019-07-20) § 2.5.10
+        ::uwvm2::utils::container::unordered_flat_set<::uwvm2::utils::container::u8string_view> duplicate_name_checker{};  // use for check duplicate name
+        duplicate_name_checker.reserve(export_count);
 
         // Each type is of unknown size, so it cannot be reserved.
 
@@ -492,9 +495,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ++exportdesc_counter.index_unchecked(fwet_export_type);
 
             // check duplicate name
-            auto& curr_name_set{duplicate_name_checker.index_unchecked(fwet_export_type)};
-
-            if(curr_name_set.contains(fwet.export_name)) [[unlikely]]
+            // Each export is labeled by a unique name. Exportable definitions are functions, tables, memories, and globals, which are referenced through a
+            // respective descriptor.
+            // @see: WebAssembly Release 1.0 (2019-07-20) § 2.5.10
+            // Use the return value of emplace to combine the lookup and insertion operations, avoiding two hash lookups
+            if(!duplicate_name_checker.emplace(fwet.export_name).second) [[unlikely]]
             {
                 err.err_curr = section_curr;
                 err.err_selectable.duplic_exports.export_name = fwet.export_name;
@@ -502,8 +507,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_exports_of_the_same_export_type;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
-
-            curr_name_set.insert(fwet.export_name);  // std::set never throw (Disregarding new failures)
 
             ++section_curr;
 
