@@ -292,6 +292,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     }
 
                     // Pop this frame and continue with next
+                    // But first, update parent's low value if this is not the root call
+                    if(call_stack.size() > 1uz) [[likely]]
+                    {
+                        auto& parent_frame{call_stack[call_stack.size() - 2uz]};
+                        low.index_unchecked(parent_frame.v) = ::std::min(low.index_unchecked(parent_frame.v), low.index_unchecked(frame.v));
+                    }
+
                     call_stack.pop_back();
                     continue;
                 }
@@ -306,10 +313,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 }
 
                 // Process neighbors
-                auto const& neighbors = graph.index_unchecked(frame.v);
-                if(frame.neighbor_idx < neighbors.size())
+                auto const& neighbors{graph.index_unchecked(frame.v)};
+                if(frame.neighbor_idx < neighbors.size()) [[likely]]
                 {
-                    auto const w = neighbors[frame.neighbor_idx];
+                    auto const w{neighbors.index_unchecked(frame.neighbor_idx)};
                     frame.neighbor_idx++;
 
                     // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
@@ -340,9 +347,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     }
 
                     // Update parent's low value if this is not the root call
-                    if(call_stack.size() > 1)
+                    if(call_stack.size() > 1uz) [[likely]]
                     {
-                        auto& parent_frame = call_stack[call_stack.size() - 2];
+                        auto& parent_frame{call_stack[call_stack.size() - 2uz]};
                         low.index_unchecked(parent_frame.v) = ::std::min(low.index_unchecked(parent_frame.v), low.index_unchecked(frame.v));
                     }
 

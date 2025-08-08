@@ -92,12 +92,12 @@ int main()
         for(std::size_t L: {3uz, 8uz, 16uz, 32uz})
         {
             u8string label;
-            label.append(u8string_view{u8"detect_cycles k=", 17});
-            auto ks = std::to_string(k);
-            label.append(u8string_view{reinterpret_cast<char8_t const*>(ks.data()), ks.size()});
-            label.append(u8string_view{u8" L=", 3});
-            auto Ls = std::to_string(L);
-            label.append(u8string_view{reinterpret_cast<char8_t const*>(Ls.data()), Ls.size()});
+            label.append(u8string_view{u8"detect_cycles k="});
+            auto ks = ::fast_io::u8to<u8string>(k);
+            label.append(ks);
+            label.append(u8string_view{u8" L="});
+            auto Ls = ::fast_io::u8to<u8string>(L);
+            label.append(Ls);
             timer t{
                 u8string_view{label.data(), label.size()}
             };
