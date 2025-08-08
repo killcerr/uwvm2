@@ -218,7 +218,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         ::uwvm2::utils::container::vector<::std::size_t> st{};
         st.reserve(graph_size);
         // index, low, on_stack, st are all of size graph_size
-        signed_size_t dfs_idx{};
+
+        // The reason for using size_t and converting it to signed_size_t is that the maximum number of times this function can be called is signed_size_t_max.
+        // When dfs_idx++ is called later, even if the value before the UB occurred is used, UB still cannot be avoided. Therefore, unsigned storage is used
+        // here to ensure that UB will never occur during subsequent increments, while also ensuring that all returns are signed. Converting unsigned to signed
+        // also does not cause any UB.
+
+        ::std::size_t dfs_idx{};
+
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::size_t>> sccs{};
 
         for(::std::size_t v{}; v != graph_size; ++v)
@@ -308,7 +315,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 if(frame.is_initial_call) [[unlikely]]
                 {
                     // Initial call - set up the vertex
-                    index.index_unchecked(frame.v) = low.index_unchecked(frame.v) = dfs_idx++;
+
+                    // The reason for using size_t and converting it to signed_size_t is that the maximum number of times this function can be called is
+                    // signed_size_t_max. When dfs_idx++ is called later, even if the value before the UB occurred is used, UB still cannot be avoided.
+                    // Therefore, unsigned storage is used here to ensure that UB will never occur during subsequent increments, while also ensuring that all
+                    // returns are signed. Converting unsigned to signed also does not cause any UB.
+
+                    index.index_unchecked(frame.v) = low.index_unchecked(frame.v) = static_cast<signed_size_t>(dfs_idx++);
                     // st size < graph_size, so push_back_unchecked is safe
                     st.push_back_unchecked(frame.v);
                     on_stack.index_unchecked(frame.v) = true;
@@ -326,6 +339,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     if(index.index_unchecked(w) == static_cast<signed_size_t>(-1))
                     {
                         // Recursive call - push new frame with increased depth
+                        // size_t operations never wrap around, because the maximum size is signed size_t max.
                         call_stack.emplace_back_unchecked(w, frame.depth + 1uz, true);
                     }
                     else if(on_stack.index_unchecked(w)) { low.index_unchecked(frame.v) = ::std::min(low.index_unchecked(frame.v), index.index_unchecked(w)); }
@@ -539,12 +553,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                             ::uwvm2::utils::container::vector<::std::size_t> const& path_ids{path};
                             // Normalize to cycle representation starting with minimum id (i.e., start_id): start, ..., start
                             temp_cycle_ids.clear();
+                            // size_t operations never wrap around, because the maximum size is signed size_t max.
                             temp_cycle_ids.reserve(path_ids.size() + 1uz);
                             for(auto const id: path_ids) { temp_cycle_ids.push_back_unchecked(id); }
                             temp_cycle_ids.push_back_unchecked(frame.start_id);
 
                             // Calculate hash signature
                             auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
+                            // Never overflow, the vector container ensures that the storage size of its contents is always less than the maximum storage
+                            // capacity.
+                            [[assume(temp_cycle_ids.size() <= ::std::numeric_limits<std::size_t>::max() / sizeof(::std::size_t))]];
                             auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
                             auto const sig{::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len)};
 
@@ -564,7 +582,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         else if(!on_path.index_unchecked(w))
                         {
                             // Recursive call - push new frame with increased depth
-                            dfs_stack.emplace_back_unchecked(w, frame.start_id, frame.depth + 1, true);
+                            // size_t operations never wrap around, because the maximum size is signed size_t max.
+                            dfs_stack.emplace_back_unchecked(w, frame.start_id, frame.depth + 1uz, true);
                             continue;  // Process the new frame first
                         }
                     }
