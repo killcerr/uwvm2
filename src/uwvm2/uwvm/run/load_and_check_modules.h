@@ -77,13 +77,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         using cycle_t = ::uwvm2::utils::container::vector<module_name_t>;
         using cycles_t = ::uwvm2::utils::container::vector<cycle_t>;
 
+        auto const curr_recursion_depth_limit{::uwvm2::uwvm::utils::depend::recursion_depth_limit};
+
         cycles_t all_cycles{};
         if(adjacency_list.empty()) [[unlikely]] { return all_cycles; }
 
         // Check dependency count limit
         // The number of recursions is greater than or equal to the number of dependencies, so it can be checked in advance.
-        if(auto const dependency_count{adjacency_list.size()};
-           dependency_count > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz)
+        if(auto const dependency_count{adjacency_list.size()}; dependency_count > curr_recursion_depth_limit && curr_recursion_depth_limit != 0uz)
         {
             // Output warning about dependency count exceeding limit
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -98,7 +99,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" exceeds limit \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
-                                ::uwvm2::uwvm::utils::depend::recursion_depth_limit,
+                                curr_recursion_depth_limit,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\". Dependency check skipped. Use \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
@@ -251,7 +252,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 auto& frame{call_stack.back_unchecked()};
 
                 // Check recursion depth limit
-                if(frame.depth > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz) [[unlikely]]
+                if(frame.depth > curr_recursion_depth_limit && curr_recursion_depth_limit != 0uz) [[unlikely]]
                 {
                     // Output warning about recursion depth limit exceeded
                     ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -262,7 +263,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"Recursion depth limit \"",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        ::uwvm2::uwvm::utils::depend::recursion_depth_limit,
+                                        curr_recursion_depth_limit,
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"\" exceeded at vertex \"",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
@@ -469,8 +470,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     auto& frame{dfs_stack.back_unchecked()};
 
                     // Check recursion depth limit
-                    if(frame.depth > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz)
-                        [[unlikely]]
+                    if(frame.depth > curr_recursion_depth_limit && curr_recursion_depth_limit != 0uz) [[unlikely]]
                     {
                         // Output warning about recursion depth limit exceeded
                         ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -481,7 +481,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"DFS recursion depth limit \"",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                            ::uwvm2::uwvm::utils::depend::recursion_depth_limit,
+                                            curr_recursion_depth_limit,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"\" exceeded at vertex \"",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
