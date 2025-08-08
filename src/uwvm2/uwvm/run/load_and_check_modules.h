@@ -560,10 +560,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                             // Calculate hash signature
                             auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
+                            auto const temp_cycle_ids_size{temp_cycle_ids.size()};
+
                             // Never overflow, the vector container ensures that the storage size of its contents is always less than the maximum storage
                             // capacity.
-                            [[assume(temp_cycle_ids.size() <= ::std::numeric_limits<std::size_t>::max() / sizeof(::std::size_t))]];
-                            auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
+                            constexpr auto max_size_dev_size_t{::std::numeric_limits<std::size_t>::max() / sizeof(::std::size_t)};
+                            [[assume(temp_cycle_ids_size <= max_size_dev_size_t)]];
+
+                            auto const bytes_len{temp_cycle_ids_size * sizeof(::std::size_t)};
                             auto const sig{::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len)};
 
                             if(seen_signatures.contains(sig)) { continue; }
@@ -571,7 +575,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                             // Convert back to names and write to result
                             cycle_t cyc{};
-                            cyc.reserve(temp_cycle_ids.size());
+                            cyc.reserve(temp_cycle_ids_size);
                             for(auto const id: temp_cycle_ids)
                             {
                                 // Safe: id is guaranteed to be < id_to_name.size() because it comes from our graph
