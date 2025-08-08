@@ -29,6 +29,8 @@
 # include <type_traits>
 # include <utility>
 # include <memory>
+# include <limits>
+# include <algorithm>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -66,6 +68,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                       ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view>> const&
             adjacency_list) noexcept
     {
+#ifdef UWVM_TIMER
+        ::uwvm2::utils::debug::timer detect_cycles_timer{u8"detect cycles"};
+#endif
+
         using module_name_t = ::uwvm2::utils::container::u8string_view;
         using cycle_t = ::uwvm2::utils::container::vector<module_name_t>;
         using cycles_t = ::uwvm2::utils::container::vector<cycle_t>;
@@ -74,148 +80,216 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         if(adjacency_list.empty()) [[unlikely]] { return all_cycles; }
 
         // 1) Compress names to integer ids for efficient computation (avoid frequent hashing of string_view)
-        ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::std::uint32_t> name_to_id{};
+        // unordered_flat_map use xxh3 hash
+        ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::std::size_t> name_to_id{};
         ::uwvm2::utils::container::vector<module_name_t> id_to_name{};
-        id_to_name.reserve(adjacency_list.size());
-        name_to_id.reserve(adjacency_list.size());
-        for(auto const& [name, _] : adjacency_list)
+        auto const adjacency_list_size{adjacency_list.size()};
+        id_to_name.reserve(adjacency_list_size);
+        name_to_id.reserve(adjacency_list_size);
+        // id_to_name, name_to_id are all of size adjacency_list_size
+        for(auto const& [name, _]: adjacency_list)
         {
-            auto const id = static_cast<::std::uint32_t>(id_to_name.size());
-            id_to_name.push_back(name);
+            auto const id{id_to_name.size()};
+            // Safe: we just reserved space for id_to_name.size() elements
+            id_to_name.push_back_unchecked(name);
             name_to_id.emplace(name, id);
         }
 
         // 2) Build compact adjacency list (by id)
-        ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::uint32_t>> graph{};
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::size_t>> graph{};
         graph.resize(id_to_name.size());
-        for(auto const& [u_name, outs] : adjacency_list)
+        for(auto const& [u_name, outs]: adjacency_list)
         {
-            auto const u_id = name_to_id[u_name];
-            auto& u_out = graph[u_id];
+            auto const u_id{name_to_id[u_name]};
+            // Safe: u_id is guaranteed to be < graph.size() because we just built name_to_id
+            auto& u_out{graph.index_unchecked(u_id)};
             u_out.reserve(outs.size());
-            for(auto const v_name : outs)
+            for(auto const v_name: outs)
             {
-                auto const it = name_to_id.find(v_name);
-                if(it != name_to_id.end()) { u_out.push_back(it->second); }
+                auto const it{name_to_id.find(v_name)};
+                if(it != name_to_id.end())
+                {
+                    // Safe: we just reserved space for outs.size() elements
+                    u_out.push_back_unchecked(it->second);
+                }
             }
         }
 
         // 3) Tarjan's algorithm to find strongly connected components (O(V+E))
-        ::uwvm2::utils::container::vector<int> index(graph.size(), -1);
-        ::uwvm2::utils::container::vector<int> low(graph.size(), 0);
-        ::uwvm2::utils::container::vector<::std::uint8_t> on_stack(graph.size(), 0);
-        ::uwvm2::utils::container::vector<::std::uint32_t> st{};
-        st.reserve(graph.size());
-        int dfs_idx{};
-        ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::uint32_t>> sccs{};
+        // Use std::make_signed_t<std::size_t> for index/low to ensure type compatibility with size_t
+        // Check for overflow when graph size exceeds signed type maximum
+        using signed_size_t = ::std::make_signed_t<::std::size_t>;
+        constexpr auto signed_size_max{::std::numeric_limits<signed_size_t>::max()};
 
-        auto strongconnect = [&](this auto const& self, ::std::uint32_t v) noexcept -> void
+        if(graph.size() > static_cast<::std::size_t>(signed_size_max)) [[unlikely]]
         {
-            index[v] = low[v] = dfs_idx++;
-            st.push_back(v);
-            on_stack[v] = 1;
+            // Output warning about cycle detection being impossible due to graph size
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                u8"[warn]  ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Graph size \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                graph.size(),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\" exceeds maximum signed size \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                signed_size_max,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\". Cycle detection skipped. ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                u8"(depend)\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 
-            for(auto const w : graph[v])
+            if(::uwvm2::uwvm::io::depend_warning_fatal) [[unlikely]]
             {
-                if(index[w] == -1)
-                {
-                    self(w);
-                    low[v] = (low[v] < low[w] ? low[v] : low[w]);
-                }
-                else if(on_stack[w])
-                {
-                    low[v] = (low[v] < index[w] ? low[v] : index[w]);
-                }
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                    u8"[fatal] ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Convert warnings to fatal errors. ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8"(depend)\n\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                ::fast_io::fast_terminate();
             }
 
-            if(low[v] == index[v])
-            {
-                ::uwvm2::utils::container::vector<::std::uint32_t> comp{};
-                for(;;)
-                {
-                    auto const w = st.back();
-                    st.pop_back_unchecked();
-                    on_stack[w] = 0;
-                    comp.push_back(w);
-                    if(w == v) { break; }
-                }
-                sccs.push_back(::std::move(comp));
-            }
-        };
+            return all_cycles;
+        }
 
-        for(::std::uint32_t v{}; v < graph.size(); ++v)
+        auto const graph_size{graph.size()};
+        ::uwvm2::utils::container::vector<signed_size_t> index(graph_size, static_cast<signed_size_t>(-1));
+        ::uwvm2::utils::container::vector<signed_size_t> low(graph_size, signed_size_t{});
+        ::uwvm2::utils::container::vector<bool> on_stack(graph_size, false);
+        ::uwvm2::utils::container::vector<::std::size_t> st{};
+        st.reserve(graph_size);
+        // index, low, on_stack, st are all of size graph_size
+        signed_size_t dfs_idx{};
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::size_t>> sccs{};
+
+        auto strongconnect{[&](this auto const& self, ::std::size_t v) noexcept -> void
+                           {
+                               // Safe: v is guaranteed to be < graph.size() because we iterate over graph.size()
+                               index.index_unchecked(v) = low.index_unchecked(v) = dfs_idx++;
+                               st.push_back(v);
+                               on_stack.index_unchecked(v) = true;
+
+                               // Safe: v is guaranteed to be < graph.size()
+                               for(auto const w: graph.index_unchecked(v))
+                               {
+                                   // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
+                                   if(index.index_unchecked(w) == static_cast<signed_size_t>(-1))
+                                   {
+                                       self(w);
+                                       low.index_unchecked(v) = ::std::min(low.index_unchecked(v), low.index_unchecked(w));
+                                   }
+                                   else if(on_stack.index_unchecked(w))
+                                   {
+                                       low.index_unchecked(v) = ::std::min(low.index_unchecked(v), index.index_unchecked(w));
+                                   }
+                               }
+
+                               if(low.index_unchecked(v) == index.index_unchecked(v))
+                               {
+                                   ::uwvm2::utils::container::vector<::std::size_t> comp{};
+                                   for(;;)
+                                   {
+                                       auto const w{st.back()};
+                                       st.pop_back_unchecked();
+                                       // Safe: w is guaranteed to be < graph.size() because it came from st
+                                       on_stack.index_unchecked(w) = false;
+                                       comp.push_back(w);
+                                       if(w == v) { break; }
+                                   }
+                                   sccs.push_back(::std::move(comp));
+                               }
+                           }};
+
+        for(::std::size_t v{}; v != graph_size; ++v)
         {
-            if(index[v] == -1) { strongconnect(v); }
+            // Safe: v is guaranteed to be < graph.size() because we iterate over graph.size()
+            if(index.index_unchecked(v) == static_cast<signed_size_t>(-1)) { strongconnect(v); }
         }
 
         // 4) Perform ordered DFS within each SCC, only starting from the minimum id vertex on the cycle, avoiding rotation duplicates
         //    Additionally maintain a 64-bit signature set for safe deduplication (based on xxh3), with extremely low collision probability
-        ::uwvm2::utils::container::unordered_flat_set<::std::uint64_t> seen_signatures{};
+        ::uwvm2::utils::container::unordered_flat_set<::std::uint_least64_t> seen_signatures{};
+        seen_signatures.reserve(256uz);  // Reserve space for cycle signatures to avoid reallocations
 
         // Temporary buffer for signatures (avoid repeated allocation)
-        ::uwvm2::utils::container::vector<::std::uint32_t> temp_cycle_ids{};
-        temp_cycle_ids.reserve(256);
+        ::uwvm2::utils::container::vector<::std::size_t> temp_cycle_ids{};
+        temp_cycle_ids.reserve(256uz);
 
-        auto emit_cycle = [&](::uwvm2::utils::container::vector<::std::uint32_t> const& path_ids,
-                              ::std::uint32_t start_id) noexcept -> void
-        {
-            // Normalize to cycle representation starting with minimum id (i.e., start_id): start, ..., start
-            temp_cycle_ids.clear();
-            temp_cycle_ids.reserve(path_ids.size() + 1);
-            for(auto const id : path_ids) { temp_cycle_ids.push_back(id); }
-            temp_cycle_ids.push_back(start_id);
+        auto emit_cycle{[&](::uwvm2::utils::container::vector<::std::size_t> const& path_ids, ::std::size_t start_id) noexcept -> void
+                        {
+                            // Normalize to cycle representation starting with minimum id (i.e., start_id): start, ..., start
+                            temp_cycle_ids.clear();
+                            temp_cycle_ids.reserve(path_ids.size() + 1uz);
+                            for(auto const id: path_ids) { temp_cycle_ids.push_back(id); }
+                            temp_cycle_ids.push_back(start_id);
 
-            // Calculate hash signature
-            auto const bytes_ptr = reinterpret_cast<::std::byte const*>(temp_cycle_ids.data());
-            auto const bytes_len = temp_cycle_ids.size() * sizeof(::std::uint32_t);
-            auto const sig = ::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len);
-            if(seen_signatures.contains(sig)) { return; }
-            seen_signatures.insert(sig);
+                            // Calculate hash signature
+                            auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
+                            auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
+                            auto const sig{::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len)};
+                            if(seen_signatures.contains(sig)) { return; }
+                            seen_signatures.insert(sig);
 
-            // Convert back to names and write to result
-            cycle_t cyc{};
-            cyc.reserve(temp_cycle_ids.size());
-            for(auto const id : temp_cycle_ids) { cyc.push_back(id_to_name[id]); }
-            all_cycles.push_back(::std::move(cyc));
-        };
+                            // Convert back to names and write to result
+                            cycle_t cyc{};
+                            cyc.reserve(temp_cycle_ids.size());
+                            for(auto const id: temp_cycle_ids)
+                            {
+                                // Safe: id is guaranteed to be < id_to_name.size() because it comes from our graph
+                                cyc.push_back_unchecked(id_to_name.index_unchecked(id));
+                            }
+                            all_cycles.push_back(::std::move(cyc));
+                        }};
 
         // DFS (restricted to only visit points >= start_id, ensuring minimum id is start_id)
-        ::uwvm2::utils::container::vector<::std::uint8_t> in_scc(graph.size(), 0);
-        ::uwvm2::utils::container::vector<::std::uint8_t> on_path(graph.size(), 0);
-        ::uwvm2::utils::container::vector<::std::uint32_t> path{};
-        path.reserve(graph.size());
+        // Use bool for boolean flags to save memory and improve cache locality
+        ::uwvm2::utils::container::vector<bool> in_scc(graph_size, false);
+        ::uwvm2::utils::container::vector<bool> on_path(graph_size, false);
+        ::uwvm2::utils::container::vector<::std::size_t> path{};
+        path.reserve(graph_size);
 
-        auto dfs_cycle = [&](this auto const& self, ::std::uint32_t v, ::std::uint32_t start_id) noexcept -> void
-        {
-            on_path[v] = 1;
-            path.push_back(v);
-            for(auto const w : graph[v])
-            {
-                if(!in_scc[w]) { continue; }
-                if(w < start_id) { continue; }
-                if(w == start_id)
-                {
-                    emit_cycle(path, start_id);
-                }
-                else if(!on_path[w])
-                {
-                    self(w, start_id);
-                }
-            }
-            path.pop_back_unchecked();
-            on_path[v] = 0;
-        };
+        auto dfs_cycle{[&](this auto const& self, ::std::size_t v, ::std::size_t start_id) noexcept -> void
+                       {
+                           // Safe: v is guaranteed to be < graph.size() because it comes from our graph
+                           on_path.index_unchecked(v) = true;
+                           path.push_back_unchecked(v);
+                           // Safe: v is guaranteed to be < graph.size()
+                           for(auto const w: graph.index_unchecked(v))
+                           {
+                               // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
+                               if(!in_scc.index_unchecked(w)) { continue; }
+                               if(w < start_id) { continue; }
+                               if(w == start_id) { emit_cycle(path, start_id); }
+                               else if(!on_path.index_unchecked(w)) { self(w, start_id); }
+                           }
+                           path.pop_back_unchecked();
+                           on_path.index_unchecked(v) = false;
+                       }};
 
-        for(auto& comp : sccs)
+        for(auto& comp: sccs)
         {
             // Skip single-node SCCs without cycles (no self-loops)
-            if(comp.size() == 1)
+            if(comp.size() == 1uz)
             {
-                auto const u = comp.front();
+                auto const u{comp.front()};
                 bool self_loop{};
-                for(auto const w : graph[u])
+                // Safe: u is guaranteed to be < graph.size() because it comes from our graph
+                for(auto const w: graph.index_unchecked(u))
                 {
-                    if(w == u) { self_loop = true; break; }
+                    if(w == u)
+                    {
+                        self_loop = true;
+                        break;
+                    }
                 }
                 if(self_loop)
                 {
@@ -224,16 +298,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                     temp_cycle_ids.push_back(u);
                     temp_cycle_ids.push_back(u);
 
-                    auto const bytes_ptr = reinterpret_cast<::std::byte const*>(temp_cycle_ids.data());
-                    auto const bytes_len = temp_cycle_ids.size() * sizeof(::std::uint32_t);
-                    auto const sig = ::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len);
+                    auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
+                    auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
+                    auto const sig{::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len)};
                     if(!seen_signatures.contains(sig))
                     {
                         seen_signatures.insert(sig);
                         cycle_t cyc{};
-                        cyc.reserve(2);
-                        cyc.push_back(id_to_name[u]);
-                        cyc.push_back(id_to_name[u]);
+                        cyc.reserve(2uz);
+                        // Safe: u is guaranteed to be < id_to_name.size() because it comes from our graph
+                        cyc.push_back(id_to_name.index_unchecked(u));
+                        cyc.push_back(id_to_name.index_unchecked(u));
                         all_cycles.push_back(::std::move(cyc));
                     }
                 }
@@ -241,7 +316,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             }
 
             // Mark nodes in this SCC
-            for(auto const v : comp) { in_scc[v] = 1; }
+            for(auto const v: comp)
+            {
+                // Safe: v is guaranteed to be < graph.size() because it comes from our graph
+                in_scc.index_unchecked(v) = true;
+            }
 
             // Sort by id ascending to ensure cycles starting from minimum id vertex are only enumerated once
             // (comp order is Tarjan's pop order, not guaranteed to be sorted, no forced sorting here to save overhead,
@@ -251,17 +330,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             // If stronger deduplication stability is needed, uncomment the following sort:
             // ::std::sort(comp.begin(), comp.end());
 
-            for(auto const start_id : comp)
+            for(auto const start_id: comp)
             {
                 // Clear path state
-                for(auto const v : comp) { on_path[v] = 0; }
+                for(auto const v: comp)
+                {
+                    // Safe: v is guaranteed to be < graph.size() because it comes from our graph
+                    on_path.index_unchecked(v) = false;
+                }
                 path.clear();
 
                 dfs_cycle(start_id, start_id);
             }
 
             // Clear marks
-            for(auto const v : comp) { in_scc[v] = 0; }
+            for(auto const v: comp)
+            {
+                // Safe: v is guaranteed to be < graph.size() because it comes from our graph
+                in_scc.index_unchecked(v) = false;
+            }
         }
 
         return all_cycles;
@@ -280,11 +367,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
     /// @return Adjacency list representation of the dependency graph
     inline constexpr build_dependency_graph_and_check_import_exist_ret_t build_dependency_graph_and_check_import_exist() noexcept
     {
+#ifdef UWVM_TIMER
+        ::uwvm2::utils::debug::timer build_dependency_graph_and_check_import_exist_timer{u8"build dependency graph and check import exist"};
+#endif
+
         using module_name_t = ::uwvm2::utils::container::u8string_view;
         using import_export_name_t = ::uwvm2::utils::container::u8string_view;
         using adjacency_list_t = ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::uwvm2::utils::container::vector<module_name_t>>;
 
         adjacency_list_t adjacency_list{};
+        adjacency_list.reserve(::uwvm2::uwvm::wasm::storage::all_module.size());  // Reserve space for all modules
 
         // Initialize all module nodes
         for(auto const& module: ::uwvm2::uwvm::wasm::storage::all_module)
@@ -297,6 +389,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             module_name_t,
             ::uwvm2::utils::container::unordered_flat_map<import_export_name_t, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>>
             exported{};
+        exported.reserve(adjacency_list.size());  // Reserve space for all modules to avoid reallocations
 
         // Build dependency relationships
         for(auto const& curr_module: ::uwvm2::uwvm::wasm::storage::all_module)
@@ -333,7 +426,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 auto const import_imports_type{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(imports.imports.type)};
 
                                 // Add dependency edge
-                                if(adjacency_list.contains(import_module_name)) { adjacency_list[curr_module_name].push_back(import_module_name); }
+                                if(adjacency_list.contains(import_module_name))
+                                {
+                                    auto& deps = adjacency_list[curr_module_name];
+                                    if(deps.empty())
+                                    {
+                                        deps.reserve(exec_wasm_module_storage_importsec.imports.size());  // Reserve space for all imports
+                                    }
+                                    // Safe: we just reserved space for all imports
+                                    deps.push_back_unchecked(import_module_name);
+                                }
 
                                 // Check dependencies
                                 auto const import_module{::uwvm2::uwvm::wasm::storage::all_module.find(import_module_name)};
@@ -395,6 +497,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                                 auto [curr_exported_module, inserted]{exported.try_emplace(import_module_name)};
                                                 if(inserted) [[unlikely]]
                                                 {
+                                                    curr_exported_module->second.reserve(
+                                                        imported_wasm_module_storage_exportsec.exports.size());  // Reserve space for exports
                                                     for(auto const& exports: imported_wasm_module_storage_exportsec.exports)
                                                     {
                                                         auto const export_name{exports.export_name};
@@ -432,6 +536,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                             auto const dl_func{imported_dl_ptr->wasm_dl_storage.capi_function_vec};
                                             auto const dl_func_ptr{dl_func.function_begin};
                                             auto const dl_func_sz{dl_func.function_size};
+                                            curr_exported_module->second.reserve(dl_func_sz);  // Reserve space for dl functions
                                             for(auto dl_func_curr{dl_func_ptr}; dl_func_curr != dl_func_ptr + dl_func_sz; ++dl_func_curr)
                                             {
                                                 using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;

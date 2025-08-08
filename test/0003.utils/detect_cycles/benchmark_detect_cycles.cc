@@ -84,16 +84,13 @@ int main()
         (void)detect_cycles(gb.adj);
     }
 
-#ifdef UWVM_TIMER
     using uwvm2::utils::debug::timer;
-#endif
 
     // Scale k (number of cycles) and L (cycle length) to observe growth
     for(std::size_t k: {1uz, 4uz, 16uz, 64uz})
     {
         for(std::size_t L: {3uz, 8uz, 16uz, 32uz})
         {
-#ifdef UWVM_TIMER
             u8string label;
             label.append(u8string_view{u8"detect_cycles k=", 17});
             auto ks = std::to_string(k);
@@ -104,7 +101,7 @@ int main()
             timer t{
                 u8string_view{label.data(), label.size()}
             };
-#endif
+
             auto gb = build_disjoint_cycles(k, L);
             auto res = detect_cycles(gb.adj);
             // Basic sanity: expect exactly k cycles

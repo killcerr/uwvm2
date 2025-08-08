@@ -516,6 +516,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                          importdesc_count>
             duplicate_name_checker{};  // use for check duplicate name
 
+        // Each type is of unknown size, so it cannot be reserved.
+
         while(section_curr != section_end) [[likely]]
         {
             // get final utf8-checker

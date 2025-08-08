@@ -412,6 +412,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         }
                     }
 
+                    ns.function_name.reserve(name_count);
+
                     curr = reinterpret_cast<::std::byte const*>(name_count_next);
 
                     // [...  name_count ...] ... (map_end)
@@ -640,6 +642,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         }
                     }
 
+                    ns.code_local_name.reserve(local_count);
+
                     curr = reinterpret_cast<::std::byte const*>(local_count_next);
                     // [...  local_count ...] ... (map_end)
                     // [        safe        ] unsafe (could be the map_end)
@@ -723,6 +727,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         ::uwvm2::utils::container::unordered_flat_map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32,
                                                                       ::uwvm2::utils::container::u8string_view>
                             ns_code_local_name_function_index{};
+
+                        ns_code_local_name_function_index.reserve(function_local_count);
 
                         bool ct_2{};
 
