@@ -361,32 +361,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         ::uwvm2::utils::container::vector<::std::size_t> temp_cycle_ids{};
         temp_cycle_ids.reserve(256uz);
 
-        auto emit_cycle{[&](::uwvm2::utils::container::vector<::std::size_t> const& path_ids, ::std::size_t start_id) noexcept -> void
-                        {
-                            // Normalize to cycle representation starting with minimum id (i.e., start_id): start, ..., start
-                            temp_cycle_ids.clear();
-                            temp_cycle_ids.reserve(path_ids.size() + 1uz);
-                            for(auto const id: path_ids) { temp_cycle_ids.push_back(id); }
-                            temp_cycle_ids.push_back(start_id);
-
-                            // Calculate hash signature
-                            auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
-                            auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
-                            auto const sig{::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len)};
-                            if(seen_signatures.contains(sig)) { return; }
-                            seen_signatures.insert(sig);
-
-                            // Convert back to names and write to result
-                            cycle_t cyc{};
-                            cyc.reserve(temp_cycle_ids.size());
-                            for(auto const id: temp_cycle_ids)
-                            {
-                                // Safe: id is guaranteed to be < id_to_name.size() because it comes from our graph
-                                cyc.push_back_unchecked(id_to_name.index_unchecked(id));
-                            }
-                            all_cycles.push_back(::std::move(cyc));
-                        }};
-
         // DFS (restricted to only visit points >= start_id, ensuring minimum id is start_id)
         // Use bool for boolean flags to save memory and improve cache locality
         ::uwvm2::utils::container::vector<bool> in_scc(graph_size, false);
@@ -394,23 +368,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         ::uwvm2::utils::container::vector<::std::size_t> path{};
         path.reserve(graph_size);
 
-        auto dfs_cycle{[&](this auto const& self, ::std::size_t v, ::std::size_t start_id) noexcept -> void
-                       {
-                           // Safe: v is guaranteed to be < graph.size() because it comes from our graph
-                           on_path.index_unchecked(v) = true;
-                           path.push_back_unchecked(v);
-                           // Safe: v is guaranteed to be < graph.size()
-                           for(auto const w: graph.index_unchecked(v))
-                           {
-                               // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
-                               if(!in_scc.index_unchecked(w)) { continue; }
-                               if(w < start_id) { continue; }
-                               if(w == start_id) { emit_cycle(path, start_id); }
-                               else if(!on_path.index_unchecked(w)) { self(w, start_id); }
-                           }
-                           path.pop_back_unchecked();
-                           on_path.index_unchecked(v) = false;
-                       }};
+        // Iterative DFS implementation with recursion depth limit
+        struct DfsStackFrame
+        {
+            ::std::size_t v;
+            ::std::size_t start_id;
+            ::std::size_t neighbor_idx;
+            ::std::size_t depth;
+            bool is_initial_call;
+
+            inline constexpr DfsStackFrame(::std::size_t vertex, ::std::size_t start, ::std::size_t current_depth, bool initial = true) noexcept :
+                v{vertex}, start_id{start}, neighbor_idx{0uz}, depth{current_depth}, is_initial_call{initial}
+            {
+            }
+        };
 
         for(auto& comp: sccs)
         {
@@ -477,7 +448,128 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 }
                 path.clear();
 
-                dfs_cycle(start_id, start_id);
+                auto start_v{start_id};
+                // Use explicit stack to avoid recursion with depth limit
+                ::uwvm2::utils::container::vector<DfsStackFrame> dfs_stack{};
+                dfs_stack.reserve(graph_size);  // Reserve maximum possible depth
+
+                dfs_stack.emplace_back(start_v, start_id, 0uz, true);
+
+                while(!dfs_stack.empty())
+                {
+                    auto& frame{dfs_stack.back()};
+
+                    // Check recursion depth limit
+                    if(frame.depth > ::uwvm2::uwvm::utils::depend::recursion_depth_limit && ::uwvm2::uwvm::utils::depend::recursion_depth_limit != 0uz)
+                        [[unlikely]]
+                    {
+                        // Output warning about recursion depth limit exceeded
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            u8"[warn]  ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"DFS recursion depth limit \"",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                            ::uwvm2::uwvm::utils::depend::recursion_depth_limit,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\" exceeded at vertex \"",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                            frame.v,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\". Skipping further checks. Use \"",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            u8"--wasm-depend-recursion-limit",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\" to force check. ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(depend)\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                        if(::uwvm2::uwvm::io::depend_warning_fatal) [[unlikely]]
+                        {
+                            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                                u8"[fatal] ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Convert warnings to fatal errors. ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                u8"(depend)\n\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                            ::fast_io::fast_terminate();
+                        }
+
+                        // Pop this frame and continue with next
+                        dfs_stack.pop_back();
+                        continue;
+                    }
+
+                    if(frame.is_initial_call)
+                    {
+                        // Initial call - set up the vertex
+                        on_path.index_unchecked(frame.v) = true;
+                        path.push_back_unchecked(frame.v);
+                        frame.is_initial_call = false;
+                    }
+
+                    // Process neighbors
+                    auto const& neighbors = graph.index_unchecked(frame.v);
+                    if(frame.neighbor_idx < neighbors.size())
+                    {
+                        auto const w = neighbors[frame.neighbor_idx];
+                        frame.neighbor_idx++;
+
+                        // Safe: w is guaranteed to be < graph.size() because it comes from graph[v]
+                        if(!in_scc.index_unchecked(w)) { continue; }
+                        if(w < frame.start_id) { continue; }
+                        if(w == frame.start_id)
+                        {
+                            ::uwvm2::utils::container::vector<::std::size_t> const& path_ids { path };
+                            ::std::size_t start_id{frame.start_id};
+                            // Normalize to cycle representation starting with minimum id (i.e., start_id): start, ..., start
+                            temp_cycle_ids.clear();
+                            temp_cycle_ids.reserve(path_ids.size() + 1uz);
+                            for(auto const id: path_ids) { temp_cycle_ids.push_back(id); }
+                            temp_cycle_ids.push_back(start_id);
+
+                            // Calculate hash signature
+                            auto const bytes_ptr{reinterpret_cast<::std::byte const*>(temp_cycle_ids.data())};
+                            auto const bytes_len{temp_cycle_ids.size() * sizeof(::std::size_t)};
+                            auto const sig{::uwvm2::utils::hash::xxh3_64bits(bytes_ptr, bytes_len)};
+                            
+                            if(seen_signatures.contains(sig)) { continue; }
+                            seen_signatures.insert(sig);
+
+                            // Convert back to names and write to result
+                            cycle_t cyc{};
+                            cyc.reserve(temp_cycle_ids.size());
+                            for(auto const id: temp_cycle_ids)
+                            {
+                                // Safe: id is guaranteed to be < id_to_name.size() because it comes from our graph
+                                cyc.push_back_unchecked(id_to_name.index_unchecked(id));
+                            }
+                            all_cycles.push_back(::std::move(cyc));
+                        }
+                        else if(!on_path.index_unchecked(w))
+                        {
+                            // Recursive call - push new frame with increased depth
+                            dfs_stack.emplace_back(w, frame.start_id, frame.depth + 1, true);
+                            continue;  // Process the new frame first
+                        }
+                    }
+                    else
+                    {
+                        // All neighbors processed - cleanup
+                        path.pop_back_unchecked();
+                        on_path.index_unchecked(frame.v) = false;
+
+                        // Pop this frame
+                        dfs_stack.pop_back();
+                    }
+                }
             }
 
             // Clear marks
