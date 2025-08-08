@@ -502,7 +502,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                         continue;
                     }
 
-                    if(::uwvm2::uwvm::wasm::custom::custom_handle_funcs.contains(custom_name)) [[unlikely]]
+                    // Use try_emplace to combine lookup and insertion operations, avoiding two hash lookups
+                    if(!::uwvm2::uwvm::wasm::custom::custom_handle_funcs
+                            .try_emplace(custom_name,
+                                         ::uwvm2::uwvm::wasm::custom::handlefunc_t{reinterpret_cast<void*>(handler_curr->custom_handle_func), true})
+                            .second) [[unlikely]]
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
                         if(::uwvm2::uwvm::io::show_dl_warning)
@@ -551,14 +555,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                             }
                         }
 # endif
-
-                        // Just skip here, no need to disable
-                        continue;
                     }
-
-                    ::uwvm2::uwvm::wasm::custom::custom_handle_funcs.emplace(
-                        custom_name,
-                        ::uwvm2::uwvm::wasm::custom::handlefunc_t{reinterpret_cast<void*>(handler_curr->custom_handle_func), true});
                 }
             }
         }

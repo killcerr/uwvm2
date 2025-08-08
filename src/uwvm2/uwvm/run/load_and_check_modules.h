@@ -688,7 +688,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                 // Add dependency edge
                                 if(adjacency_list.contains(import_module_name))
                                 {
-                                    auto& deps = adjacency_list[curr_module_name];
+                                    auto& deps{adjacency_list[curr_module_name]};
                                     if(deps.empty())
                                     {
                                         deps.reserve(exec_wasm_module_storage_importsec.imports.size());  // Reserve space for all imports
@@ -1095,7 +1095,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // preloaded wasm
         for(auto const& lwc: ::uwvm2::uwvm::wasm::storage::preloaded_wasm)
         {
-            if(::uwvm2::uwvm::wasm::storage::all_module.contains(lwc.module_name)) [[unlikely]]
+            if(!::uwvm2::uwvm::wasm::storage::all_module
+                    .try_emplace(lwc.module_name,
+                                 ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(lwc)},
+                                                                            .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm})
+                    .second) [[unlikely]]
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
@@ -1111,11 +1115,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                 return static_cast<int>(::uwvm2::uwvm::run::retval::duplicate_module_name);
             }
-
-            ::uwvm2::uwvm::wasm::storage::all_module.emplace(
-                lwc.module_name,
-                ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(lwc)},
-                                                           .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm});
         }
 
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
@@ -1124,7 +1123,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // preloaded dl
         for(auto const& ldc: ::uwvm2::uwvm::wasm::storage::preloaded_dl)
         {
-            if(::uwvm2::uwvm::wasm::storage::all_module.contains(ldc.module_name)) [[unlikely]]
+            if(!::uwvm2::uwvm::wasm::storage::all_module
+                    .try_emplace(ldc.module_name,
+                                 ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wd = ::std::addressof(ldc)},
+                                                                            .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl})
+                    .second) [[unlikely]]
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
@@ -1140,17 +1143,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                 return static_cast<int>(::uwvm2::uwvm::run::retval::duplicate_module_name);
             }
-
-            ::uwvm2::uwvm::wasm::storage::all_module.emplace(
-                ldc.module_name,
-                ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wd = ::std::addressof(ldc)},
-                                                           .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl});
         }
 #endif
 
         // exec wasm
         {
-            if(::uwvm2::uwvm::wasm::storage::all_module.contains(::uwvm2::uwvm::wasm::storage::execute_wasm.module_name)) [[unlikely]]
+            if(!::uwvm2::uwvm::wasm::storage::all_module
+                    .try_emplace(
+                        ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name,
+                        ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(::uwvm2::uwvm::wasm::storage::execute_wasm)},
+                                                                   .type = ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm})
+                    .second) [[unlikely]]
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
@@ -1166,11 +1169,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                 return static_cast<int>(::uwvm2::uwvm::run::retval::duplicate_module_name);
             }
-
-            ::uwvm2::uwvm::wasm::storage::all_module.emplace(
-                ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name,
-                ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(::uwvm2::uwvm::wasm::storage::execute_wasm)},
-                                                           .type = ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm});
         }
 
         // Build dependency graph and detect cyclic dependencies

@@ -548,14 +548,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         // Subsequent parsing will not directly skip the parsing of this map.
 
-                        if(ns.function_name.contains(func_index)) [[unlikely]]
-                        {
-                            err.emplace_back(func_index_ptr, name_err_type_t::duplicate_func_idx, name_err_storage_t{.u32 = func_index});
-                            curr = map_end;
-                            // End of current paragraph
-                            continue;
-                        }
-
                         // Check if it is legal utf-8
 
                         auto const [utf8pos, utf8err]{
@@ -573,7 +565,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             continue;
                         }
 
-                        ns.function_name.emplace(func_index, func_name_tmp);
+                        // check if unique index
+                        // Use try_emplace to combine lookup and insertion operations, avoiding two hash lookups
+                        if(!ns.function_name.try_emplace(func_index, func_name_tmp).second) [[unlikely]]
+                        {
+                            err.emplace_back(func_index_ptr, name_err_type_t::duplicate_func_idx, name_err_storage_t{.u32 = func_index});
+                            curr = map_end;
+                            // End of current paragraph
+                            continue;
+                        }
                     }
 
                     if(ct_1) [[unlikely]]
@@ -857,16 +857,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                             // Subsequent parsing will not directly skip the parsing of this map.
 
-                            if(ns_code_local_name_function_index.contains(function_local_index)) [[unlikely]]
-                            {
-                                err.emplace_back(function_local_index_ptr,
-                                                 name_err_type_t::duplicate_code_local_name_function_index,
-                                                 name_err_storage_t{.u32 = function_local_index});
-                                curr = map_end;
-                                // End of current paragraph
-                                continue;
-                            }
-
                             // Check if it is legal utf-8
 
                             auto const [utf8pos, utf8err]{
@@ -884,7 +874,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                                 continue;
                             }
 
-                            ns_code_local_name_function_index.emplace(function_local_index, function_local_name_begin_tmp);
+                            // check has unique index
+                            // Use try_emplace to combine lookup and insertion operations, avoiding two hash lookups
+                            if(!ns_code_local_name_function_index.try_emplace(function_local_index, function_local_name_begin_tmp).second) [[unlikely]]
+                            {
+                                err.emplace_back(function_local_index_ptr,
+                                                 name_err_type_t::duplicate_code_local_name_function_index,
+                                                 name_err_storage_t{.u32 = function_local_index});
+                                curr = map_end;
+                                // End of current paragraph
+                                continue;
+                            }
                         }
 
                         if(ct_2) [[unlikely]]
@@ -895,15 +895,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         // Subsequent parsing will not directly skip the parsing of this map.
 
-                        if(ns.code_local_name.contains(function_index)) [[unlikely]]
+                        // Use try_emplace to combine lookup and insertion operations, avoiding two hash lookups
+                        if(!ns.code_local_name.try_emplace(function_index, ::std::move(ns_code_local_name_function_index)).second) [[unlikely]]
                         {
                             err.emplace_back(function_index_ptr, name_err_type_t::duplicate_code_function_index, name_err_storage_t{.u32 = function_index});
                             curr = map_end;
                             // End of current paragraph
                             continue;
                         }
-
-                        ns.code_local_name.emplace(function_index, ::std::move(ns_code_local_name_function_index));
                     }
 
                     if(ct_1) [[unlikely]]
