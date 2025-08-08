@@ -623,8 +623,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         adjacency_list_t adj;
     };
 
-    /// @brief Build module dependency graph
-    /// @return Adjacency list representation of the dependency graph
+    /// @brief  Build module dependency graph
+    /// @details    In the WASM standard, importing module A name B type C and importing module A name B type D simultaneously satisfies syntactic validity
+    ///             (binary format validity) but fails validation.
+    /// @return     Adjacency list representation of the dependency graph
     inline constexpr build_dependency_graph_and_check_import_exist_ret_t build_dependency_graph_and_check_import_exist() noexcept
     {
 #ifdef UWVM_TIMER

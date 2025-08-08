@@ -297,6 +297,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             type) in a module, but some host environments require that import object keys be unique when instantiating, causing duplicate imports to
     ///             fail during actual runtime. Here is a concept that can prohibit duplicate import items.
     ///
+    ///             Here, modules and names are bound together for duplicate checks. It is permissible to import different modules with the same name or
+    ///             different names within the same module.
+    ///
     ///             ```cpp
     ///             struct F
     ///             {
