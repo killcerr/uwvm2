@@ -236,188 +236,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return section_curr;
     }
 
-    /// @brief Define a function for wasm1 to check for utf8 sequences.
-    /// @note  ADL for distribution to the correct handler function
+    /// @brief      Define a function for wasm1 to check for utf8 sequences.
+    /// @details    wasm1.0 specifies that name is a byte sequence with no encoding format requirements.
+    /// @note       ADL for distribution to the correct handler function
     inline constexpr void check_import_export_text_format(
-        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl]
-        ::std::byte const* begin,
-        ::std::byte const* end,
-        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::null>,  // [adl]
+        [[maybe_unused]] ::std::byte const* begin,
+        [[maybe_unused]] ::std::byte const* end,
+        [[maybe_unused]] ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
     {
-        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
-
-        auto const [utf8pos, utf8err]{::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
-            reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
-            reinterpret_cast<char8_t_const_may_alias_ptr>(end))};
-
-        if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
-        {
-            err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
-            err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
+        // wasm1.0 specifies that name is a byte sequence with no encoding format requirements.
+        // do nothing
     }
-
-    /// @deprecated The wasm standard states that the standard sections follow a sequence, which can never happen
-#if 0
-    /// @brief Define a function for wasm1 to check for the number of imported
-    ///        items plus the number of defined items does not exceed u32 max.
-    /// @note  ADL for distribution to the correct handler function
-    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr void define_imported_and_defined_exceeding_checker(
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<import_section_storage_t<Fs...>> sec_adl,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<
-            ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...>> extern_adl,  // [adl]
-        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...> const*> const* importdesc_begin,
-        ::std::byte const* const section_curr,
-        ::uwvm2::parser::wasm::base::error_impl& err,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
-    {
-        constexpr auto wasm_u32_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
-
-        // In the current wasm standard, which doesn't have a tag yet, importdesc has a total of 4 items.
-
-        // [func table mem global] (end)
-        // [         safe        ]
-        //  ^^importdesc_begin     ^^importdesc_begin + 4u
-
-        {
-            // function section
-            auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
-            auto const defined_funcsec_funcs_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
-
-            // [func table mem global] (end)
-            // [         safe        ]
-            //  ^^importdesc_begin[0uz]
-
-            // check imported_func_count
-            auto const imported_func_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[0uz].size())};
-
-            if(imported_func_count > wasm_u32_max - defined_funcsec_funcs_size) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_selectable.imp_def_num_exceed_u32max.type = 0x00;
-                err.err_selectable.imp_def_num_exceed_u32max.defined = defined_funcsec_funcs_size;
-                err.err_selectable.imp_def_num_exceed_u32max.imported = imported_func_count;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
-        }
-
-        {
-            // table section
-            auto const& tablesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<table_section_storage_t<Fs...>>(module_storage.sections)};
-            auto const defined_tablesec_tables_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(tablesec.tables.size())};
-
-            // [func table mem global] (end)
-            // [         safe        ]
-            //       ^^importdesc_begin[1uz]
-
-            // check imported_table_count
-            auto const imported_table_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[1uz].size())};
-
-            constexpr bool allow_multi_table{::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_table<Fs...>()};
-            if constexpr(!allow_multi_table)
-            {
-                /// @details    In the current version of WebAssembly, at most one table may be defined or imported in a single module,
-                ///             and all constructs implicitly reference this table 0. This restriction may be lifted in future versions.
-                /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.4
-
-                [[assume(defined_tablesec_tables_size <= 1u)]];
-
-                if(imported_table_count > wasm_u32_max - defined_tablesec_tables_size ||
-                   imported_table_count + defined_tablesec_tables_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_table;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-            }
-            else
-            {
-                if(imported_table_count > wasm_u32_max - defined_tablesec_tables_size) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.imp_def_num_exceed_u32max.type = 0x01;
-                    err.err_selectable.imp_def_num_exceed_u32max.defined = defined_tablesec_tables_size;
-                    err.err_selectable.imp_def_num_exceed_u32max.imported = imported_table_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-            }
-        }
-
-        {
-            // memory section
-            auto const& memorysec{
-                ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<memory_section_storage_t<Fs...>>(module_storage.sections)};
-            auto const defined_memorysec_memories_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(memorysec.memories.size())};
-
-            // [func table mem global] (end)
-            // [         safe        ]
-            //             ^^importdesc_begin[2uz]
-
-            // check imported_memory_count
-            auto const imported_memory_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[2uz].size())};
-
-            constexpr bool allow_multi_memory{::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_memory<Fs...>()};
-            if constexpr(!allow_multi_memory)
-            {
-                /// @details    In the current version of WebAssembly, at most one memory may be defined or imported in a single module,
-                ///             and all constructs implicitly reference this memory 0. This restriction may be lifted in future versions
-                /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.5
-
-                [[assume(defined_memorysec_memories_size <= 1u)]];
-
-                if(imported_memory_count > wasm_u32_max - defined_memorysec_memories_size || 
-                   imported_memory_count + defined_memorysec_memories_size > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_memory;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-            }
-            else
-            {
-                if(imported_memory_count > wasm_u32_max - defined_memorysec_memories_size) [[unlikely]]
-                {
-                    err.err_curr = section_curr;
-                    err.err_selectable.imp_def_num_exceed_u32max.type = 0x02;
-                    err.err_selectable.imp_def_num_exceed_u32max.defined = defined_memorysec_memories_size;
-                    err.err_selectable.imp_def_num_exceed_u32max.imported = imported_memory_count;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-            }
-        }
-
-        {
-            // global section
-            auto const& globalsec{
-                ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<global_section_storage_t<Fs...>>(module_storage.sections)};
-            auto const defined_globalsec_globals_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(globalsec.local_globals.size())};
-
-            // [func table mem global] (end)
-            // [         safe        ]
-            //                 ^^importdesc_begin[3uz]
-
-            // check imported_global_count
-            auto const imported_global_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importdesc_begin[3uz].size())};
-
-            if(imported_global_count > wasm_u32_max - defined_globalsec_globals_size) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_selectable.imp_def_num_exceed_u32max.type = 0x03;
-                err.err_selectable.imp_def_num_exceed_u32max.defined = defined_globalsec_globals_size;
-                err.err_selectable.imp_def_num_exceed_u32max.imported = imported_global_count;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::imp_def_num_exceed_u32max;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
-        }
-    }
-#endif
 
     /// @brief Define the handler function for type_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -579,12 +409,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
             }
 
-            if(module_namelen == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_module_name_length_cannot_be_zero;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
+            // wasm1.0 standard permits empty module name; no rejection here
 
             auto const import_module_name_too_length_ptr{section_curr};
             // [...  module_namelen ...] module_name ... extern_namelen ... extern_name ... import_type extern_func ...
@@ -661,12 +486,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
             }
 
-            if(extern_namelen == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
+            // wasm1.0 standard permits empty extern name; no rejection here
 
             auto const import_extern_name_too_length_ptr{section_curr};
             // [...  module_namelen ... module_name ... extern_namelen ...] extern_name ... import_type extern_func ...

@@ -48,6 +48,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
         return ::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(begin, end);
     }
 
+    // Report an error directly when an incorrect file name is detected.
+    // true = error, false = warning
+    inline constexpr bool report_error_directly_when_incorrect_file_name_detected{false};
+
     template <typename Wrp>
     concept can_handle_text_format = requires(Wrp wrapper_adl, char8_t const* begin, char8_t const* end) {
         { handle_text_format(wrapper_adl, begin, end) } -> ::std::same_as<::uwvm2::utils::utf::u8result>;

@@ -39,6 +39,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::text_format
 {
     enum class text_format
     {
+        null,  // There are no encoding specifications defined in WASM 1.0.
+        zero_illegal,
         utf8_rfc3629,
         utf8_rfc3629_with_zero_illegal
     };
