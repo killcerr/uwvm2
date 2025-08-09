@@ -235,13 +235,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ///             at most 1. This restriction may be removed in future versions.
             /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.3
             constexpr bool allow_multi_value{::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<Fs...>()};
-            if constexpr(!allow_multi_value)
+            if constexpr(allow_multi_value)
             {
+                // When compile-time allows multi results, the runtime parameter can re-enable the single-result check
                 constexpr bool has_controllable_allow_multi_value{
                     ::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<Fs...>};
                 if constexpr(has_controllable_allow_multi_value)
                 {
-                    // Provides a version that can be controlled by features parameters (fs_para).
                     if(get_feature_parameter_controllable_allow_multi_result_vector_from_paras(fs_para))
                     {
                         if(result_len > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
@@ -252,14 +252,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         }
                     }
                 }
-                else
+            }
+            else
+            {
+                // WebAssembly 1.0: result vector length must be at most 1
+                if(result_len > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                 {
-                    if(result_len > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
-                    {
-                        err.err_curr = section_curr;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
-                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                    }
+                    err.err_curr = section_curr;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
             }
 
