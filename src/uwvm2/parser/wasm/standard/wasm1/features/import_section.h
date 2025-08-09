@@ -517,11 +517,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         /// instantiated depending on the specifics of how an embedder allows resolving and supplying imports. However, embedders are not required
         /// to support such overloading, and a WebAssembly module itself cannot implement an overloaded name
         constexpr bool curr_wasm_check_duplicate_imports{::uwvm2::parser::wasm::standard::wasm1::features::check_duplicate_imports<Fs...>()};
-        ::std::conditional_t<
-            curr_wasm_check_duplicate_imports,
-            ::uwvm2::utils::container::array<::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>,
-                                             importdesc_count>,
-            ::uwvm2::parser::wasm::concepts::empty_t>
+        ::std::conditional_t<curr_wasm_check_duplicate_imports,
+                             ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>,
+                             ::uwvm2::parser::wasm::concepts::empty_t>
             duplicate_name_checker{};  // use for check duplicate name
 
         // Each type is of unknown size, so it cannot be reserved.
@@ -762,11 +760,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // required to support such overloading, and a WebAssembly module itself cannot implement an overloaded name
             if constexpr(curr_wasm_check_duplicate_imports)
             {
-                // check duplicate name
-                auto& curr_name_set{duplicate_name_checker.index_unchecked(fit_import_type)};
-
                 // Use the return value of emplace to combine the lookup and insertion operations, avoiding two hash lookups.
-                if(!curr_name_set.emplace(fit.module_name, fit.extern_name).second) [[unlikely]]
+                if(!duplicate_name_checker.emplace(fit.module_name, fit.extern_name).second) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_selectable.duplic_imports.module_name = fit.module_name;
