@@ -238,11 +238,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             if constexpr(!allow_multi_value)
             {
                 constexpr bool has_controllable_allow_multi_value{
-                    ::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<Fs...>};
+                    ::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<Fs...>};
                 if constexpr(has_controllable_allow_multi_value)
                 {
                     // Provides a version that can be controlled by features parameters (fs_para).
-                    if(get_feature_parameter_controllable_allow_multi_result_vector<Fs...>(fs_para))
+                    if(get_feature_parameter_controllable_allow_multi_result_vector_from_paras(fs_para))
                     {
                         if(result_len > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
                         {

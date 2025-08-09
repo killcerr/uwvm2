@@ -24,6 +24,10 @@
 
 #pragma once
 
+#if !(__cpp_pack_indexing >= 202311L)
+# error "UWVM requires at least C++26 standard compiler. See https://en.cppreference.com/w/cpp/feature_test#cpp_pack_indexing"
+#endif
+
 #ifndef UWVM_MODULE
 // std
 # include <cstddef>
@@ -226,59 +230,92 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             - allow_multi_result_vector<Fs...>
     ///
     /// @see        allow_multi_result_vector
+    /// @see        test/0001.parser/0002.binfmt1/section/type_section.cc
     template <typename FsCurr>
     concept has_curr_feature_parameter_controllable_allow_multi_result_vector = requires(FsCurr const& curr_feature_para) {
         requires ::std::same_as<::std::remove_cvref_t<decltype(curr_feature_para.controllable_allow_multi_result_vector)>, bool>;
     };
 
-    template <typename Para0, typename... Paras>
-    inline constexpr void has_feature_parameter_controllable_allow_multi_result_vector_from_paras_impl(bool& has, Para0 const&, Paras const&... paras) noexcept
+    template <typename... Para>
+    inline consteval bool has_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters(
+        ::uwvm2::utils::container::tuple<Para...> const&) noexcept
     {
-        if constexpr(has_curr_feature_parameter_controllable_allow_multi_result_vector<Para0>)
+        // e.g.
+        // tuple<struct{bool controllable_allow_multi_result_vector{};}, ...> -> true
+        // tuple<struct{bool controllable_allow_multi_result_vector{};}, struct{bool controllable_allow_multi_result_vector{};}, ...> -> contract_assert(false)
+
+        bool has{};
+
+        // Using double lambdas in consteval does not affect performance.
+        [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
         {
+            ((
+                 [&]<typename CurrParaType>() constexpr noexcept
+                 {
+                     if constexpr(has_curr_feature_parameter_controllable_allow_multi_result_vector<CurrParaType>)
+                     {
 #if __cpp_contracts >= 202502L
-            contract_assert(!has);
+                         contract_assert(!has);
 #else
-            if(has) { ::fast_io::fast_terminate(); }
+                         if(has) { ::fast_io::fast_terminate(); }
 #endif
-            has = true;
-        }
-        if constexpr(sizeof...(Paras) != 0) { has_feature_parameter_controllable_allow_multi_result_vector_from_paras_impl(has, paras...); }
+                         has = true;
+                     }
+                 }.template operator()<Para...[I]>()),
+             ...);
+        }(::std::make_index_sequence<sizeof...(Para)>{});
+
+        return has;
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline consteval bool has_feature_parameter_controllable_allow_multi_result_vector_from_paras(
         ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& paras) noexcept
     {
-        bool has{};
-        has_feature_parameter_controllable_allow_multi_result_vector_from_paras_impl(has, paras);
-        return has;
+        return has_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters(paras.parameters);
     }
 
     template <typename... Fs>
-    concept has_feature_parameter_controllable_allow_multi_result_vector =
+    concept has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c =
         has_feature_parameter_controllable_allow_multi_result_vector_from_paras<Fs...>(::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...>{});
 
-    template <typename Para0, typename... Paras>
-    inline constexpr bool get_feature_parameter_controllable_allow_multi_result_vector_impl(Para0 const& para0, Paras const&... paras) noexcept
+    /// @brief      get controllable allow multi value
+    /// @details    Get the first controllable allow multi value from the parameters.
+    /// @see        has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c
+    /// @see        test/0001.parser/0002.binfmt1/section/type_section.cc
+    template <::std::size_t N, typename... Paras>
+    inline constexpr bool get_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters_impl(
+        ::uwvm2::utils::container::tuple<Paras...> const& paras) noexcept
     {
-        if constexpr(has_curr_feature_parameter_controllable_allow_multi_result_vector<Para0>) { return para0.controllable_allow_multi_result_vector; }
+        if constexpr(N >= sizeof...(Paras)) { return false; }
         else
         {
-            if constexpr(sizeof...(Paras) == 0) { return false; }
+            auto const& curr_para{get<N>(paras)};
+            using curr_para_t = ::std::remove_cvref_t<decltype(curr_para)>;
+            if constexpr(has_curr_feature_parameter_controllable_allow_multi_result_vector<curr_para_t>)
+            {
+                return curr_para.controllable_allow_multi_result_vector;
+            }
             else
             {
-                return get_feature_parameter_controllable_allow_multi_result_vector_impl(paras...);
+                return get_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters_impl<N + 1uz>(paras);
             }
         }
     }
 
+    template <typename... Para>
+    inline constexpr bool get_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters(
+        ::uwvm2::utils::container::tuple<Para...> const& paras) noexcept
+    {
+        return get_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters_impl<0uz>(paras);
+    }
+
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-        requires (has_feature_parameter_controllable_allow_multi_result_vector<Fs...>)
-    inline constexpr bool get_feature_parameter_controllable_allow_multi_result_vector(
+        requires (has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<Fs...>)
+    inline constexpr bool get_feature_parameter_controllable_allow_multi_result_vector_from_paras(
         ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& paras) noexcept
     {
-        return get_feature_parameter_controllable_allow_multi_result_vector_impl(paras);
+        return get_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters(paras.parameters);
     }
 
     /////////////////////////////

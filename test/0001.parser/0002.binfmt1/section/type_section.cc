@@ -114,6 +114,20 @@ struct F5
     // No parameter struct defined
 };
 
+struct F6
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F6"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    inline static constexpr bool allow_multi_result_vector{false};
+
+    // Define parameter struct for controllable allow_multi_result_vector
+    struct parameter
+    {
+        bool controllable_allow_multi_result_vector{true};
+    };
+};
+
 int main()
 {
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<F1>, vt1>);
@@ -132,10 +146,50 @@ int main()
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2, F3>() == true);
 
     // Test has_controllable_allow_multi_result_vector concept
-    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F4>);
-    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F5>);
-    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F1, F4>);
-    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F1, F5>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F4>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F5>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F6>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F1, F4>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F1, F5>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F1, F6>);
+
+    // Test runtime get_feature_parameter_controllable_allow_multi_result_vector
+
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F4> para_F4{};
+    auto const test_can_allow_multi_result_vector_F4{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_allow_multi_result_vector_from_paras(para_F4)};
+    if(test_can_allow_multi_result_vector_F4 != false)
+    {
+        ::fast_io::print("test_can_allow_multi_result_vector_F4 is not false\n");
+        ::fast_io::fast_terminate();
+    }
+
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F6> para_F6{};
+    auto const test_can_allow_multi_result_vector_F6{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_allow_multi_result_vector_from_paras(para_F6)};
+    if(test_can_allow_multi_result_vector_F6 != true)
+    {
+        ::fast_io::print("test_can_allow_multi_result_vector_F6 is not true\n");
+        ::fast_io::fast_terminate();
+    }
+
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F1, F4> para_F1F4{};
+    auto const test_can_allow_multi_result_vector_F1F4{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_allow_multi_result_vector_from_paras(para_F1F4)};
+    if(test_can_allow_multi_result_vector_F1F4 != false)
+    {
+        ::fast_io::print("test_can_allow_multi_result_vector_F1F4 is not false\n");
+        ::fast_io::fast_terminate();
+    }
+
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F1, F6> para_F1F6{};
+    auto const test_can_allow_multi_result_vector_F1F6{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_allow_multi_result_vector_from_paras(para_F1F6)};
+    if(test_can_allow_multi_result_vector_F1F6 != true)
+    {
+        ::fast_io::print("test_can_allow_multi_result_vector_F1F6 is not true\n");
+        ::fast_io::fast_terminate();
+    }
 }
 
 // macro
