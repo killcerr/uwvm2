@@ -153,6 +153,9 @@ int main()
     static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F1, F5>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F1, F6>);
 
+    // note: F4 and F6 cannot be combined because the parameters are duplicated, which will cause a compilation error.
+    // static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector_from_paras_c<F4, F6>);
+
     // Test runtime get_feature_parameter_controllable_allow_multi_result_vector
 
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<F4> para_F4{};
