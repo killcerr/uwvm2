@@ -760,15 +760,35 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // required to support such overloading, and a WebAssembly module itself cannot implement an overloaded name
             if constexpr(curr_wasm_check_duplicate_imports)
             {
-                // Use the return value of emplace to combine the lookup and insertion operations, avoiding two hash lookups.
-                if(!duplicate_name_checker.emplace(fit.module_name, fit.extern_name).second) [[unlikely]]
+                constexpr bool has_controllable_check_duplicate_imports{
+                    ::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<Fs...>};
+                if constexpr(has_controllable_check_duplicate_imports)
                 {
-                    err.err_curr = section_curr;
-                    err.err_selectable.duplic_imports.module_name = fit.module_name;
-                    err.err_selectable.duplic_imports.extern_name = fit.extern_name;
-                    err.err_selectable.duplic_imports.type = static_cast<::std::uint_least8_t>(fit_import_type);
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    // Provides a version that can be controlled by features parameters (fs_para).
+                    if(get_feature_parameter_controllable_check_duplicate_imports_from_paras(fs_para))
+                    {
+                        if(!duplicate_name_checker.emplace(fit.module_name, fit.extern_name).second) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.duplic_imports.module_name = fit.module_name;
+                            err.err_selectable.duplic_imports.extern_name = fit.extern_name;
+                            err.err_selectable.duplic_imports.type = static_cast<::std::uint_least8_t>(fit_import_type);
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+                    }
+                }
+                else
+                {
+                    if(!duplicate_name_checker.emplace(fit.module_name, fit.extern_name).second) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.duplic_imports.module_name = fit.module_name;
+                        err.err_selectable.duplic_imports.extern_name = fit.extern_name;
+                        err.err_selectable.duplic_imports.type = static_cast<::std::uint_least8_t>(fit_import_type);
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_imports_of_the_same_import_type;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
                 }
             }
 

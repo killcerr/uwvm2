@@ -87,6 +87,41 @@ struct F2
     using memory_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<vt1, vt5>;
 };
 
+// Feature with controllable check_duplicate_imports parameter
+struct F3
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F3"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    // Define parameter struct for controllable check_duplicate_imports
+    struct parameter
+    {
+        bool controllable_check_duplicate_imports{false};
+    };
+};
+
+// Feature without controllable check_duplicate_imports parameter
+struct F4
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F4"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    // No parameter struct defined
+};
+
+// Feature with controllable check_duplicate_imports parameter set to true
+struct F5
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F5"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    // Define parameter struct for controllable check_duplicate_imports
+    struct parameter
+    {
+        bool controllable_check_duplicate_imports{true};
+    };
+};
+
 int main()
 {
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<F1>, vt1>);
@@ -96,6 +131,51 @@ int main()
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<F1, F2>, vt3>);
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_table_type<F1, F2>, vt4>);
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_memory_type<F1, F2>, vt5>);
+
+    // Test has_feature_parameter_controllable_check_duplicate_imports concept
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<F3>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<F4>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<F5>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<F1, F3>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<F1, F4>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<F1, F5>);
+
+    // Test runtime get_feature_parameter_controllable_check_duplicate_imports_from_paras
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F3> para_F3{};
+    auto const test_controllable_check_duplicate_imports_F3{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_check_duplicate_imports_from_paras(para_F3)};
+    if(test_controllable_check_duplicate_imports_F3 != false)
+    {
+        ::fast_io::print("test_controllable_check_duplicate_imports_F3 is not false\n");
+        ::fast_io::fast_terminate();
+    }
+
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F5> para_F5{};
+    auto const test_controllable_check_duplicate_imports_F5{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_check_duplicate_imports_from_paras(para_F5)};
+    if(test_controllable_check_duplicate_imports_F5 != true)
+    {
+        ::fast_io::print("test_controllable_check_duplicate_imports_F5 is not true\n");
+        ::fast_io::fast_terminate();
+    }
+
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F1, F3> para_F1F3{};
+    auto const test_controllable_check_duplicate_imports_F1F3{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_check_duplicate_imports_from_paras(para_F1F3)};
+    if(test_controllable_check_duplicate_imports_F1F3 != false)
+    {
+        ::fast_io::print("test_controllable_check_duplicate_imports_F1F3 is not false\n");
+        ::fast_io::fast_terminate();
+    }
+
+    ::uwvm2::parser::wasm::concepts::feature_parameter_t<F1, F5> para_F1F5{};
+    auto const test_controllable_check_duplicate_imports_F1F5{
+        ::uwvm2::parser::wasm::standard::wasm1::features::get_feature_parameter_controllable_check_duplicate_imports_from_paras(para_F1F5)};
+    if(test_controllable_check_duplicate_imports_F1F5 != true)
+    {
+        ::fast_io::print("test_controllable_check_duplicate_imports_F1F5 is not true\n");
+        ::fast_io::fast_terminate();
+    }
 }
 
 // macro

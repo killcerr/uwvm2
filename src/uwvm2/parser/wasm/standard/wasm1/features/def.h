@@ -436,6 +436,101 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
 
+    /// @brief      controllable check duplicate imports
+    /// @details    Use a runtime boolean variable to control whether to start the check.
+    ///
+    ///             Prerequisites, satisfied:
+    ///             - check_duplicate_imports<Fs...>
+    ///
+    /// @see        check_duplicate_imports
+    /// @see        test/0001.parser/0002.binfmt1/section/import_section.cc
+    template <typename FsCurr>
+    concept has_curr_feature_parameter_controllable_check_duplicate_imports = requires(FsCurr const& curr_feature_para) {
+        requires ::std::same_as<::std::remove_cvref_t<decltype(curr_feature_para.controllable_check_duplicate_imports)>, bool>;
+    };
+
+    template <typename... Para>
+    inline consteval bool has_feature_parameter_controllable_check_duplicate_imports_from_paras_parameters(
+        ::uwvm2::utils::container::tuple<Para...> const&) noexcept
+    {
+        // e.g.
+        // tuple<struct{bool controllable_check_duplicate_imports{};}, ...> -> true
+        // tuple<struct{bool controllable_check_duplicate_imports{};}, struct{bool controllable_check_duplicate_imports{};}, ...> -> contract_assert(false)
+
+        bool has{};
+
+        // Using double lambdas in consteval does not affect performance.
+        [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            ((
+                 [&]<typename CurrParaType>() constexpr noexcept
+                 {
+                     if constexpr(has_curr_feature_parameter_controllable_check_duplicate_imports<CurrParaType>)
+                     {
+#if __cpp_contracts >= 202502L
+                         contract_assert(!has);
+#else
+                         if(has) { ::fast_io::fast_terminate(); }
+#endif
+                         has = true;
+                     }
+                 }.template operator()<Para...[I]>()),
+             ...);
+        }(::std::make_index_sequence<sizeof...(Para)>{});
+
+        return has;
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool has_feature_parameter_controllable_check_duplicate_imports_from_paras(
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& paras) noexcept
+    {
+        return has_feature_parameter_controllable_check_duplicate_imports_from_paras_parameters(paras.parameters);
+    }
+
+    template <typename... Fs>
+    concept has_feature_parameter_controllable_check_duplicate_imports_from_paras_c =
+        has_feature_parameter_controllable_check_duplicate_imports_from_paras<Fs...>(::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...>{});
+
+    /// @brief      get controllable check duplicate imports
+    /// @details    Get the first controllable check duplicate imports from the parameters.
+    /// @see        has_feature_parameter_controllable_check_duplicate_imports_from_paras_c
+    /// @see        test/0001.parser/0002.binfmt1/section/import_section.cc
+    template <::std::size_t N, typename... Paras>
+    inline constexpr bool get_feature_parameter_controllable_check_duplicate_imports_from_paras_parameters_impl(
+        ::uwvm2::utils::container::tuple<Paras...> const& paras) noexcept
+    {
+        if constexpr(N >= sizeof...(Paras)) { return false; }
+        else
+        {
+            auto const& curr_para{get<N>(paras)};
+            using curr_para_t = ::std::remove_cvref_t<decltype(curr_para)>;
+            if constexpr(has_curr_feature_parameter_controllable_check_duplicate_imports<curr_para_t>)
+            {
+                return curr_para.controllable_check_duplicate_imports;
+            }
+            else
+            {
+                return get_feature_parameter_controllable_check_duplicate_imports_from_paras_parameters_impl<N + 1uz>(paras);
+            }
+        }
+    }
+
+    template <typename... Para>
+    inline constexpr bool get_feature_parameter_controllable_check_duplicate_imports_from_paras_parameters(
+        ::uwvm2::utils::container::tuple<Para...> const& paras) noexcept
+    {
+        return get_feature_parameter_controllable_check_duplicate_imports_from_paras_parameters_impl<0uz>(paras);
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        requires (has_feature_parameter_controllable_check_duplicate_imports_from_paras_c<Fs...>)
+    inline constexpr bool get_feature_parameter_controllable_check_duplicate_imports_from_paras(
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& paras) noexcept
+    {
+        return get_feature_parameter_controllable_check_duplicate_imports_from_paras_parameters(paras.parameters);
+    }
+
     /// @brief      has table_type
     /// @details
     ///             ```cpp
