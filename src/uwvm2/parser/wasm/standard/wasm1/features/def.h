@@ -219,6 +219,68 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
 
+    /// @brief      controllable allow multi value
+    /// @details    Use a runtime boolean variable to control whether to start the check.
+    ///
+    ///             Prerequisites, satisfied:
+    ///             - allow_multi_result_vector<Fs...>
+    ///
+    /// @see        allow_multi_result_vector
+    template <typename FsCurr>
+    concept has_curr_feature_parameter_controllable_allow_multi_result_vector = requires(FsCurr const& curr_feature_para) {
+        requires ::std::same_as<::std::remove_cvref_t<decltype(curr_feature_para.controllable_allow_multi_result_vector)>, bool>;
+    };
+
+    template <typename Para0, typename... Paras>
+    inline constexpr void has_feature_parameter_controllable_allow_multi_result_vector_from_paras_impl(bool& has, Para0 const&, Paras const&... paras) noexcept
+    {
+        if constexpr(has_curr_feature_parameter_controllable_allow_multi_result_vector<Para0>)
+        {
+#if __cpp_contracts >= 202502L
+            contract_assert(!has);
+#else
+            if(has) { ::fast_io::fast_terminate(); }
+#endif
+            has = true;
+        }
+        if constexpr(sizeof...(Paras) != 0) { has_feature_parameter_controllable_allow_multi_result_vector_from_paras_impl(has, paras...); }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool has_feature_parameter_controllable_allow_multi_result_vector_from_paras(
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& paras) noexcept
+    {
+        bool has{};
+        has_feature_parameter_controllable_allow_multi_result_vector_from_paras_impl(has, paras);
+        return has;
+    }
+
+    template <typename... Fs>
+    concept has_feature_parameter_controllable_allow_multi_result_vector =
+        has_feature_parameter_controllable_allow_multi_result_vector_from_paras<Fs...>(::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...>{});
+
+    template <typename Para0, typename... Paras>
+    inline constexpr bool get_feature_parameter_controllable_allow_multi_result_vector_impl(Para0 const& para0, Paras const&... paras) noexcept
+    {
+        if constexpr(has_curr_feature_parameter_controllable_allow_multi_result_vector<Para0>) { return para0.controllable_allow_multi_result_vector; }
+        else
+        {
+            if constexpr(sizeof...(Paras) == 0) { return false; }
+            else
+            {
+                return get_feature_parameter_controllable_allow_multi_result_vector_impl(paras...);
+            }
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        requires (has_feature_parameter_controllable_allow_multi_result_vector<Fs...>)
+    inline constexpr bool get_feature_parameter_controllable_allow_multi_result_vector(
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& paras) noexcept
+    {
+        return get_feature_parameter_controllable_allow_multi_result_vector_impl(paras);
+    }
+
     /////////////////////////////
     //      Import Section     //
     /////////////////////////////

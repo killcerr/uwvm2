@@ -89,6 +89,31 @@ struct F3
     inline static constexpr bool allow_multi_result_vector{true};
 };
 
+// Feature with controllable allow_multi_result_vector parameter
+struct F4
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F4"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    inline static constexpr bool allow_multi_result_vector{false};
+
+    // Define parameter struct for controllable allow_multi_result_vector
+    struct parameter
+    {
+        bool controllable_allow_multi_result_vector{};
+    };
+};
+
+// Feature without controllable allow_multi_result_vector parameter
+struct F5
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F5"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    inline static constexpr bool allow_multi_result_vector{false};
+    // No parameter struct defined
+};
+
 int main()
 {
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<F1>, vt1>);
@@ -105,6 +130,12 @@ int main()
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2>() == false);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F3>() == true);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<F1, F2, F3>() == true);
+
+    // Test has_controllable_allow_multi_result_vector concept
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F4>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F5>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F1, F4>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<F1, F5>);
 }
 
 // macro

@@ -237,11 +237,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             constexpr bool allow_multi_value{::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<Fs...>()};
             if constexpr(!allow_multi_value)
             {
-                if(result_len > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
+                constexpr bool has_controllable_allow_multi_value{
+                    ::uwvm2::parser::wasm::standard::wasm1::features::has_feature_parameter_controllable_allow_multi_result_vector<Fs...>};
+                if constexpr(has_controllable_allow_multi_value)
                 {
-                    err.err_curr = section_curr;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    // Provides a version that can be controlled by features parameters (fs_para).
+                    if(get_feature_parameter_controllable_allow_multi_result_vector<Fs...>(fs_para))
+                    {
+                        if(result_len > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+                    }
+                }
+                else
+                {
+                    if(result_len > static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(1u)) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::wasm1_not_allow_multi_value;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
                 }
             }
 
