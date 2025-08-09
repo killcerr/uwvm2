@@ -694,6 +694,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
 
+    // Since multi-table changes the parsing behavior, wasm1.1 uses the features of wasm1.0 for extension, so a freely controllable version is not provided here.
+
     /////////////////////////////
     //      Memory Section     //
     /////////////////////////////
@@ -737,6 +739,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ...);
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
+
+    // Since multi-memory changes the parsing behavior, wasm1.1 uses the features of wasm1.0 for extension, so a freely controllable version is not provided here.
 
     /////////////////////////////
     //      Global Section     //
