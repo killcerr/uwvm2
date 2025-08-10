@@ -65,6 +65,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 #ifdef UWVM_TIMER
         ::uwvm2::utils::debug::timer parsing_timer{u8"show warning for binfmt ver1"};
 #endif
+        // The warning path should be determined in advance.
+        UWVM_ASSERT(::uwvm2::uwvm::io::show_parser_warning == true);
 
         ::uwvm2::uwvm::wasm::warning::show_wasm_type_section_warning(wasm);
         ::uwvm2::uwvm::wasm::warning::show_wasm_import_section_warning(wasm);

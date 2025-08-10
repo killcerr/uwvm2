@@ -80,9 +80,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 
             if(!duplicate_type_function_checker.emplace(tmp).second) [[unlikely]]
             {
-                // The warning path should be determined in advance.
-                UWVM_ASSERT(::uwvm2::uwvm::io::show_parser_warning == true);
-
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     // 1
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),

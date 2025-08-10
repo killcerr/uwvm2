@@ -60,8 +60,331 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
     inline constexpr void show_wasm_import_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
     {
-        auto const& wasm_module_storage{wasm.get_curr_binfmt_version_wasm_storage<1u>()};
-        [[maybe_unused]] auto const& import_section{wasm_module_storage};
+        // get wasm module storage
+        auto const& wasm_module_storage{wasm.template get_curr_binfmt_version_wasm_storage<1u>()};
+
+        // get import section
+        constexpr auto get_importsec_from_features_tuple{
+            []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(auto const& section,
+                                                                                       ::uwvm2::utils::container::tuple<Fs...>) constexpr noexcept
+            {
+                return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+                    ::uwvm2::parser::wasm::standard::wasm1::features::import_section_storage_t<Fs...>>(section);
+            }};
+
+        auto const& import_section{get_importsec_from_features_tuple(wasm_module_storage.sections, ::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features)};
+
+        // check duplicate imports
+        constexpr auto get_check_duplicate_imports_from_features_tuple{
+            []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Fs...>) consteval noexcept -> bool
+            { return ::uwvm2::parser::wasm::standard::wasm1::features::check_duplicate_imports<Fs...>(); }};
+
+        constexpr bool check_duplicate_imports{get_check_duplicate_imports_from_features_tuple(::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features)};
+
+        // If the parser does not check, a warning is issued here.
+        ::std::conditional_t<!check_duplicate_imports,
+                             ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>,
+                             ::uwvm2::parser::wasm::concepts::empty_t>
+            duplicate_name_checker{};  // use for check duplicate name
+
+        // check zero length
+        constexpr auto get_disable_zero_length_string_from_features_tuple{
+            []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Fs...>) consteval noexcept -> bool
+            { return ::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<Fs...>(); }};
+
+        constexpr bool disable_zero_length_string{get_disable_zero_length_string_from_features_tuple(::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features)};
+
+        // import type name
+        constexpr auto get_duplicate_imports_type_name{
+            []<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept -> ::uwvm2::utils::container::basic_string_view<char_type2>
+            {
+                switch(type)
+                {
+                    case 0u:
+                    {
+                        if constexpr(::std::same_as<char_type2, char>) { return {"func"}; }
+                        else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"func"}; }
+                        else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"func"}; }
+                        else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"func"}; }
+                        else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"func"}; }
+                        ::std::unreachable();
+                    }
+                    case 1u:
+                    {
+                        if constexpr(::std::same_as<char_type2, char>) { return {"table"}; }
+                        else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"table"}; }
+                        else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"table"}; }
+                        else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"table"}; }
+                        else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"table"}; }
+                        ::std::unreachable();
+                    }
+                    case 2u:
+                    {
+                        if constexpr(::std::same_as<char_type2, char>) { return {"mem"}; }
+                        else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"mem"}; }
+                        else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"mem"}; }
+                        else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"mem"}; }
+                        else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"mem"}; }
+                        ::std::unreachable();
+                    }
+                    case 3u:
+                    {
+                        if constexpr(::std::same_as<char_type2, char>) { return {"global"}; }
+                        else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"global"}; }
+                        else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"global"}; }
+                        else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"global"}; }
+                        else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"global"}; }
+                        ::std::unreachable();
+                    }
+                    case 4u:
+                    {
+                        if constexpr(::std::same_as<char_type2, char>) { return {"tag"}; }
+                        else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"tag"}; }
+                        else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"tag"}; }
+                        else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"tag"}; }
+                        else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"tag"}; }
+                        ::std::unreachable();
+                    }
+                    [[unlikely]] default:
+                    {
+/// @todo Maybe I forgot to realize it.
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+
+                        if constexpr(::std::same_as<char_type2, char>) { return {"unknown"}; }
+                        else if constexpr(::std::same_as<char_type2, wchar_t>) { return {L"unknown"}; }
+                        else if constexpr(::std::same_as<char_type2, char8_t>) { return {u8"unknown"}; }
+                        else if constexpr(::std::same_as<char_type2, char16_t>) { return {u"unknown"}; }
+                        else if constexpr(::std::same_as<char_type2, char32_t>) { return {U"unknown"}; }
+                    }
+                }
+            }};
+
+        for(auto const& curr_import: import_section.imports)
+        {
+            // check duplicate imports
+            if constexpr(!check_duplicate_imports)
+            {
+                // No runtime control is required here.
+                if(!duplicate_name_checker.emplace(curr_import.module_name, curr_import.extern_name).second) [[unlikely]]
+                {
+                    ::fast_io::io::perr(
+                        ::uwvm2::uwvm::io::u8log_output,
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                        u8"uwvm: ",
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                        u8"[warn]  ",
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        u8"Duplicate imports of the same import type (",
+                        get_duplicate_imports_type_name.template operator()<char8_t>(static_cast<::std::uint_least8_t>(curr_import.imports.type)),
+                        u8"): \"",
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                        curr_import.module_name,
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        u8".",
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                        curr_import.extern_name,
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                        u8"\".",
+                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                    if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
+                    {
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                            u8"[fatal] ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Convert warnings to fatal errors. ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(parser)\n\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        ::fast_io::fast_terminate();
+                    }
+                }
+            }
+
+            // check zero length
+            if constexpr(!disable_zero_length_string)
+            {
+                if(curr_import.module_name.empty()) [[unlikely]]
+                {
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                        u8"[warn]  ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"Imported module name should not have strings of length 0.",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                    if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
+                    {
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                            u8"[fatal] ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Convert warnings to fatal errors. ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(parser)\n\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        ::fast_io::fast_terminate();
+                    }
+                }
+
+                if(curr_import.extern_name.empty()) [[unlikely]]
+                {
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                        u8"[warn]  ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"Imported extern name should not have strings of length 0.",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                    if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
+                    {
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                            u8"[fatal] ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Convert warnings to fatal errors. ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(parser)\n\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        ::fast_io::fast_terminate();
+                    }
+                }
+            }
+
+            // check utf8
+            // Checks opposite to those of the parser:
+            // null -> utf8+zero
+            // zero -> utf8
+            // utf8 -> zero
+            // utf8+zero -> null
+
+            auto const [module_utf8pos, module_utf8err]{
+                ::uwvm2::uwvm::wasm::feature::warn_unchecked_text_format_error(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_text_format_wapper,
+                                                                               curr_import.module_name.cbegin(),
+                                                                               curr_import.module_name.cend())};
+
+            if(module_utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+            {
+                // default print_memory
+                ::uwvm2::uwvm::utils::memory::print_memory const memory_printer{reinterpret_cast<::std::byte const*>(curr_import.module_name.cbegin()),
+                                                                                reinterpret_cast<::std::byte const*>(module_utf8pos),
+                                                                                reinterpret_cast<::std::byte const*>(curr_import.module_name.cend())};
+
+                // Output the main information and memory indication
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    // 1
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(module_utf8pos - curr_import.module_name.cbegin()),
+                                    u8") Imported module name contains invalid UTF-8 characters. Details: \"",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                    ::uwvm2::utils::utf::get_utf_error_description<char8_t>(module_utf8err),
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"\". ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8"(parser)\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    u8"\n"
+                                    // 2
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                    u8"[info]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Parser Memory Indication: ",
+                                    memory_printer,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    u8"\n");
+
+                if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
+                {
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                        u8"[fatal] ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"Convert warnings to fatal errors. ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                        u8"(parser)\n\n",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                    ::fast_io::fast_terminate();
+                }
+            }
+
+            auto const [extern_utf8pos, extern_utf8err]{
+                ::uwvm2::uwvm::wasm::feature::warn_unchecked_text_format_error(::uwvm2::uwvm::wasm::feature::wasm_binfmt_ver1_text_format_wapper,
+                                                                               curr_import.extern_name.cbegin(),
+                                                                               curr_import.extern_name.cend())};
+
+            if(extern_utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+            {
+                // default print_memory
+                ::uwvm2::uwvm::utils::memory::print_memory const memory_printer{reinterpret_cast<::std::byte const*>(curr_import.extern_name.cbegin()),
+                                                                                reinterpret_cast<::std::byte const*>(extern_utf8pos),
+                                                                                reinterpret_cast<::std::byte const*>(curr_import.extern_name.cend())};
+
+                // Output the main information and memory indication
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    // 1
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"(offset=",
+                                    ::fast_io::mnp::addrvw(extern_utf8pos - curr_import.extern_name.cbegin()),
+                                    u8") Imported extern name contains invalid UTF-8 characters. Details: \"",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                    ::uwvm2::utils::utf::get_utf_error_description<char8_t>(extern_utf8err),
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"\". ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8"(parser)\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    u8"\n"
+                                    // 2
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                    u8"[info]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Parser Memory Indication: ",
+                                    memory_printer,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                    u8"\n");
+
+                if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
+                {
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                        u8"[fatal] ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"Convert warnings to fatal errors. ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                        u8"(parser)\n\n",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                    ::fast_io::fast_terminate();
+                }
+            }
+        }
     }
 }
 
