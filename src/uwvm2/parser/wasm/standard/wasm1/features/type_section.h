@@ -573,10 +573,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         if(type_section_details_wrapper.type_section_storage_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
-        for(auto const& curr_type: type_section_details_wrapper.type_section_storage_ptr->types)
+        auto const type_section_size{type_section_details_wrapper.type_section_storage_ptr->types.size()};
+
+        if(type_section_size)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), u8"type[", type_counter, u8"]: ", section_details(curr_type));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nType[", type_section_size, u8"]:\n");
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
+            for(auto const& curr_type: type_section_details_wrapper.type_section_storage_ptr->types)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), u8" - type[", type_counter, u8"]: ", section_details(curr_type));
+                ++type_counter;
+            }
         }
     }
 }

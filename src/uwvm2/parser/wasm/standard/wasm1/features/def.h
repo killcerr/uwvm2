@@ -216,6 +216,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(");
             for(auto curr_value_type{para.begin}; curr_value_type != para.end; ++curr_value_type)
             {
+                if (curr_value_type != para.begin)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8", ");
+                }
+                
                 ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*curr_value_type));
             }
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")");
@@ -235,6 +240,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(");
                 for(auto curr_value_type{res.begin}; curr_value_type != res.end; ++curr_value_type)
                 {
+                    if (curr_value_type != res.begin)
+                    {
+                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8", ");
+                    }
+
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*curr_value_type));
                 }
                 ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")");
