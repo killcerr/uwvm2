@@ -58,7 +58,89 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
-    inline constexpr void show_wasm_type_section_warning([[maybe_unused]] ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept {}
+    /// @brief Define a function to show warning for the type section
+    /// @details Depends on adl, adl type is ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_type_type_t<Fs...>>
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void define_type_show_warning(
+        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> /*[adl]*/> const& types) noexcept
+    {
+        ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker>
+            duplicate_type_function_checker{};
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
+        for(auto const& curr_type: types)
+        {
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker tmp{};
+            tmp.parameter.begin = reinterpret_cast<::std::byte const*>(curr_type.parameter.begin);
+            tmp.parameter.end = reinterpret_cast<::std::byte const*>(curr_type.parameter.end);
+            tmp.result.begin = reinterpret_cast<::std::byte const*>(curr_type.result.begin);
+            tmp.result.end = reinterpret_cast<::std::byte const*>(curr_type.result.end);
+
+            if(!duplicate_type_function_checker.emplace(tmp).second) [[unlikely]]
+            {
+                // The warning path should be determined in advance.
+                UWVM_ASSERT(::uwvm2::uwvm::io::show_parser_warning == true);
+
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    // 1
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                    u8"[warn]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Function type[",
+                                    type_counter,
+                                    u8"] in Type Section is duplicated. ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8"(parser)\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
+                {
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                        u8"[fatal] ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"Convert warnings to fatal errors. ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                        u8"(parser)\n\n",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                    ::fast_io::fast_terminate();
+                }
+            }
+
+            ++type_counter;
+        }
+    }
+
+    inline constexpr void show_wasm_type_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
+    {
+        constexpr auto get_prohibit_duplicate_types_from_features_tuple{
+            []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Fs...>) consteval noexcept -> bool
+            { return ::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<Fs...>(); }};
+
+        constexpr bool prohibit_duplicate_types{get_prohibit_duplicate_types_from_features_tuple(::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features)};
+
+        // If no checks are performed under the parser, then a warning mechanism must be provided.
+        if constexpr(!prohibit_duplicate_types)
+        {
+            auto const& binfmt_ver1_storage{wasm.get_curr_binfmt_version_wasm_storage<1u>()};
+
+            constexpr auto get_typesec_from_features_tuple{
+                []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(auto const& section,
+                                                                                           ::uwvm2::utils::container::tuple<Fs...>) constexpr noexcept
+                {
+                    return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+                        ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>>(section);
+                }};
+
+            auto const& typesec{get_typesec_from_features_tuple(binfmt_ver1_storage.sections, ::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features)};
+
+            define_type_show_warning(typesec.types);
+        }
+    }
 }
 
 #ifndef UWVM_MODULE

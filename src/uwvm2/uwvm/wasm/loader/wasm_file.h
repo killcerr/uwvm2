@@ -606,8 +606,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
             }
         }
 
-        // Output warnings in the wasm module
-        ::uwvm2::uwvm::wasm::warning::show_wasm_binfmt_ver1_warning(wf);
+// Output warnings in the wasm module
+#ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+        if(::uwvm2::uwvm::io::show_parser_warning) { ::uwvm2::uwvm::wasm::warning::show_wasm_binfmt_ver1_warning(wf); }
+#endif
 
         return load_wasm_file_rtl::ok;
     }
