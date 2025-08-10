@@ -182,11 +182,65 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct final_function_type
     {
-        inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix type{::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix::functype};
+        inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix type{
+            ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix::functype};
 
         final_result_type<Fs...> parameter{};
         final_result_type<Fs...> result{};
     };
+
+    /// @brief Wrapper for the section storage structure
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_function_type_section_details_wrapper_t
+    {
+        final_function_type<Fs...> const* function_type_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr final_function_type_section_details_wrapper_t<Fs...> section_details(final_function_type<Fs...> const& function_type) noexcept
+    {
+        return {::std::addressof(function_type)};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, final_function_type_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       final_function_type_section_details_wrapper_t<Fs...> const function_type_details_wrapper)
+    {
+        if(function_type_details_wrapper.function_type_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        {
+            // output para
+            auto const para{function_type_details_wrapper.function_type_ptr->parameter};
+
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(");
+            for(auto curr_value_type{para.begin}; curr_value_type != para.end; ++curr_value_type)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*curr_value_type));
+            }
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")");
+        }
+
+        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8" -> ");
+
+        {
+            // output res
+            auto const res{function_type_details_wrapper.function_type_ptr->result};
+
+            auto const res_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(res.end - res.begin)};
+            if(res_size == 0uz) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"nil"); }
+            else if(res_size == 1uz) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*res.begin)); }
+            else
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(");
+                for(auto curr_value_type{res.begin}; curr_value_type != res.end; ++curr_value_type)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*curr_value_type));
+                }
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")");
+            }
+        }
+    }
 
     /// @brief      has type prefie
     /// @details

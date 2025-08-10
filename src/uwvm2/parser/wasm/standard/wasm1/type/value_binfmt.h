@@ -55,6 +55,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         f64 = 0x7C,
     };
 
+    /// @brief Wrapper for the value type
+    struct value_type_section_details_wrapper_t
+    {
+        value_type type{};
+    };
+
+    inline constexpr value_type_section_details_wrapper_t section_details(value_type type) noexcept { return {type}; }
+
     /// @brief      Result Types
     /// @details    The only result types occurring in the binary format are the types of blocks. These are encoded in special com
     ///             pressed form, by either the byte 0x40 indicating the empty type or as a single value type.
@@ -108,8 +116,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     };
 
     template <::std::integral char_type>
-    inline constexpr auto get_value_name(value_type valtype) noexcept
+    inline constexpr auto get_value_name(value_type_section_details_wrapper_t valtype_wrapper) noexcept
     {
+        auto const valtype{valtype_wrapper.type};
         if constexpr(::std::same_as<char_type, char>)
         {
             switch(valtype)
@@ -168,7 +177,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     }
 
     template <::std::integral char_type>
-    inline constexpr ::std::size_t print_reserve_size(::fast_io::io_reserve_type_t<char_type, value_type>) noexcept
+    inline constexpr ::std::size_t print_reserve_size(::fast_io::io_reserve_type_t<char_type, value_type_section_details_wrapper_t>) noexcept
     {
         return 3u;  // max
     }
@@ -176,8 +185,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     namespace details
     {
         template <::std::integral char_type>
-        inline constexpr char_type* print_reserve_value_type_impl(char_type* iter, value_type valtype) noexcept
+        inline constexpr char_type* print_reserve_value_type_impl(char_type* iter, value_type_section_details_wrapper_t valtype_wrapper) noexcept
         {
+            auto const valtype{valtype_wrapper.type};
             if constexpr(::std::same_as<char_type, char>)
             {
                 switch(valtype)
@@ -237,9 +247,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     }  // namespace details
 
     template <::std::integral char_type>
-    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, value_type>, char_type * iter, value_type valtype) noexcept
+    inline constexpr char_type* print_reserve_define(::fast_io::io_reserve_type_t<char_type, value_type_section_details_wrapper_t>,
+                                                     char_type * iter,
+                                                     value_type_section_details_wrapper_t valtype_wrapper) noexcept
     {
-        return details::print_reserve_value_type_impl(iter, valtype);
+        return details::print_reserve_value_type_impl(iter, valtype_wrapper);
     }
 }
 

@@ -571,9 +571,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        Stm && stream,
                                        type_section_storage_section_details_wrapper_t<Fs...> const type_section_details_wrapper)
     {
-        /// @todo
-        (void)stream;
-        (void)type_section_details_wrapper;
+        if(type_section_details_wrapper.type_section_storage_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
+        for(auto const& curr_type: type_section_details_wrapper.type_section_storage_ptr->types)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), u8"type[", type_counter, u8"]: ", section_details(curr_type));
+        }
     }
 }
 
