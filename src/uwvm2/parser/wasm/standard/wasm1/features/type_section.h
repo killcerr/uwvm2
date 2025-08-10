@@ -365,6 +365,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker>
             duplicate_type_function_checker{};
 
+        duplicate_type_function_checker.reserve(typesec.types.size());
+
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
         for(auto& type: typesec.types)
         {

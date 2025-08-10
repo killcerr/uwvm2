@@ -67,6 +67,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
         ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker>
             duplicate_type_function_checker{};
 
+        duplicate_type_function_checker.reserve(types.size());
+
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
         for(auto const& curr_type: types)
         {
