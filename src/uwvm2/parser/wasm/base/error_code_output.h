@@ -636,6 +636,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_counter_overflows.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_type:
+            {
+#include "error_code_outputs/eco_duplicate_type.h"
+                return;
+            }
         }
     }
 }

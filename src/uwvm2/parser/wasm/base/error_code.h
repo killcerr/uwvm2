@@ -156,7 +156,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_elem_kind,
         invalid_data_kind,
         limit_type_max_lt_min,
-        counter_overflows
+        counter_overflows,
+        duplicate_type
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type

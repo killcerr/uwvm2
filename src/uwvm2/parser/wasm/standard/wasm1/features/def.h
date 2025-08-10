@@ -38,6 +38,8 @@
 # include <utility>
 # include <memory>
 # include <compare>
+# include <algorithm>
+# include <compare>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -318,21 +320,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return get_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters(paras.parameters);
     }
 
-    /// @brief      Prohibited use of strings with a length of 0
-    /// @details    The WASM specification does not prohibit zero strings; this is a reserved concept.
+    /// @brief      Prohibit duplicate types
+    /// @details    The WASM specification does not prohibit duplicate types; this is a reserved concept.
     ///
     ///             ```cpp
     ///             struct F
     ///             {
-    ///                 inline static constexpr bool disable_zero_length_string{true};
+    ///                 inline static constexpr bool prohibit_duplicate_types{true};
     ///             };
     ///             ```
     /// @see        test\0001.parser\0002.binfmt1\section\import_section.cc
     template <typename FsCurr>
-    concept has_disable_zero_length_string = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::disable_zero_length_string)>, bool>; };
+    concept has_prohibit_duplicate_types = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::prohibit_duplicate_types)>, bool>; };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline consteval bool disable_zero_length_string() noexcept
+    inline consteval bool prohibit_duplicate_types() noexcept
     {
         return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
         {
@@ -340,9 +342,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         []<typename FsCurr>() constexpr noexcept -> bool
                                                                     {
                                                                         // check irreplaceable
-                                                                        if constexpr(has_disable_zero_length_string<FsCurr>)
+                                                                        if constexpr(has_prohibit_duplicate_types<FsCurr>)
                                                                         {
-                                                                            constexpr bool tallow{FsCurr::disable_zero_length_string};
+                                                                            constexpr bool tallow{FsCurr::prohibit_duplicate_types};
                                                                             return tallow;
                                                                         }
                                                                         else
@@ -353,7 +355,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ...);
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
-
 
     /////////////////////////////
     //      Import Section     //
@@ -427,6 +428,42 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         final_extern_type_t<Fs...> imports{};
     };
+
+    /// @brief      Prohibited use of strings with a length of 0
+    /// @details    The WASM specification does not prohibit zero strings; this is a reserved concept.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool disable_zero_length_string{true};
+    ///             };
+    ///             ```
+    /// @see        test\0001.parser\0002.binfmt1\section\import_section.cc
+    template <typename FsCurr>
+    concept has_disable_zero_length_string = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::disable_zero_length_string)>, bool>; };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool disable_zero_length_string() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_disable_zero_length_string<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::disable_zero_length_string};
+                                                                            return tallow;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
 
     /// @brief      No duplicate import items allowed
     /// @details    Currently, the WebAssembly core specification does not prohibit the existence of identical import items (same module name + function name +
@@ -652,27 +689,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     using final_global_type = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_global_type<Fs>())...>;
 
-    /// @brief name checker
-    struct name_checker
-    {
-        ::uwvm2::utils::container::u8string_view module_name{};
-        ::uwvm2::utils::container::u8string_view extern_name{};
-    };
-
-    inline constexpr bool operator== (name_checker const& n1, name_checker const& n2) noexcept
-    {
-        return n1.module_name == n2.module_name && n1.extern_name == n2.extern_name;
-    }
-
-    inline constexpr ::std::strong_ordering operator<=> (name_checker const& n1, name_checker const& n2) noexcept
-    {
-        ::std::strong_ordering const module_name_check{n1.module_name <=> n2.module_name};
-
-        if(module_name_check != ::std::strong_ordering::equal) { return module_name_check; }
-
-        return n1.extern_name <=> n2.extern_name;
-    }
-
     /////////////////////////////
     //     Function Section    //
     /////////////////////////////
@@ -731,7 +747,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
 
-    // Since multi-table changes the parsing behavior, wasm1.1 uses the features of wasm1.0 for extension, so a freely controllable version is not provided here.
+    // Since multi-table changes the parsing behavior, wasm1.1 uses the features of wasm1.0 for extension, so a freely controllable version is not provided
+    // here.
 
     /////////////////////////////
     //      Memory Section     //
@@ -777,7 +794,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }(::std::make_index_sequence<sizeof...(Fs)>{});
     }
 
-    // Since multi-memory changes the parsing behavior, wasm1.1 uses the features of wasm1.0 for extension, so a freely controllable version is not provided here.
+    // Since multi-memory changes the parsing behavior, wasm1.1 uses the features of wasm1.0 for extension, so a freely controllable version is not provided
+    // here.
 
     /////////////////////////////
     //      Global Section     //
@@ -977,43 +995,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         requires ::std::is_enum_v<decltype(ext.type)>;
         requires ::std::same_as<::std::underlying_type_t<decltype(ext.type)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>;
         requires ::std::is_union_v<decltype(ext.storage)>;
-    };
-}
-
-UWVM_MODULE_EXPORT namespace std
-{
-    template <>
-    struct hash<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>
-    {
-        inline constexpr ::std::size_t operator() (::uwvm2::parser::wasm::standard::wasm1::features::name_checker const& checker) const noexcept
-        {
-#if CHAR_BIT == 8
-            ::std::size_t module_name_sz;
-            ::std::size_t extern_name_sz;
-            if constexpr(requires { checker.module_name.size_bytes(); }) { module_name_sz = checker.module_name.size_bytes(); }
-            else
-            {
-                module_name_sz = checker.module_name.size() * sizeof(char8_t);
-            }
-
-            if constexpr(requires { checker.extern_name.size_bytes(); }) { extern_name_sz = checker.extern_name.size_bytes(); }
-            else
-            {
-                extern_name_sz = checker.extern_name.size() * sizeof(char8_t);
-            }
-
-            auto const seed1{::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.module_name.data()), module_name_sz)};
-
-            return static_cast<::std::size_t>(
-                ::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.extern_name.data()), extern_name_sz, seed1));
-#else
-            // use std hash
-
-            ::std::size_t h1{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.module_name)};
-            ::std::size_t h2{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.extern_name)};
-            return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
-#endif
-        }
     };
 }
 

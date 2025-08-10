@@ -33,6 +33,8 @@ module;
 #include <utility>
 #include <memory>
 #include <compare>
+#include <algorithm>
+#include <compare>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 

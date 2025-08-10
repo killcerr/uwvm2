@@ -128,6 +128,41 @@ struct F6
     };
 };
 
+// Feature with prohibit_duplicate_types set to true
+struct F7
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F7"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    inline static constexpr bool allow_multi_result_vector{false};
+    
+    // Enable duplicate type checking
+    inline static constexpr bool prohibit_duplicate_types{true};
+};
+
+// Feature with prohibit_duplicate_types set to false
+struct F8
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F8"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    inline static constexpr bool allow_multi_result_vector{false};
+    
+    // Disable duplicate type checking
+    inline static constexpr bool prohibit_duplicate_types{false};
+};
+
+// Feature without prohibit_duplicate_types (should default to false)
+struct F9
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F9"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+
+    inline static constexpr bool allow_multi_result_vector{false};
+    
+    // No prohibit_duplicate_types defined
+};
+
 int main()
 {
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<F1>, vt1>);
@@ -193,6 +228,28 @@ int main()
         ::fast_io::print("test_can_allow_multi_result_vector_F1F6 is not true\n");
         ::fast_io::fast_terminate();
     }
+
+    // Test prohibit_duplicate_types concept and function
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_prohibit_duplicate_types<F7>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_prohibit_duplicate_types<F8>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_prohibit_duplicate_types<F9>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_prohibit_duplicate_types<F1>);
+
+    // Test prohibit_duplicate_types function results
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F7>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F8>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F9>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F1>());
+
+    // Test combinations
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F1, F7>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F1, F8>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F1, F9>());
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F7, F8>());
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F7, F9>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<F8, F9>());
+
+    ::fast_io::print("All prohibit_duplicate_types tests passed!\n");
 }
 
 // macro

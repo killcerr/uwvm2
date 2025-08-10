@@ -58,11 +58,11 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
-    inline constexpr void show_wasm_import_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept 
-    { 
-      auto const& wasm_module_storage{wasm.get_curr_binfmt_version_wasm_storage<1u>()};
-      auto const& import_section{wasm_module_storage}; 
-   }
+    inline constexpr void show_wasm_import_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
+    {
+        auto const& wasm_module_storage{wasm.get_curr_binfmt_version_wasm_storage<1u>()};
+        [[maybe_unused]] auto const& import_section{wasm_module_storage};
+    }
 }
 
 #ifndef UWVM_MODULE

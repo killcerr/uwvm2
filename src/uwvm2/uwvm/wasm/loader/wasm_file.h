@@ -475,6 +475,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                         if(!check_module_name(wf.module_name)) [[unlikely]] { return load_wasm_file_rtl::wasm_parser_error; }
                     }
 
+                    // Check whether the final result is an empty module. Whether this is an error is determined by conceptual manipulation.
                     if(wf.module_name.empty()) [[unlikely]]
                     {
                         constexpr auto get_disable_zero_length_string_from_tuple{

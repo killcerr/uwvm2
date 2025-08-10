@@ -347,6 +347,44 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
     }
 
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void define_check_duplicate_types(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix>
+            preifx_adl,  // [adl]
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
+        ::std::byte const* section_curr,
+        [[maybe_unused]] ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
+    {
+        auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
+
+        ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker>
+            duplicate_type_function_checker{};
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
+        for(auto& type: typesec.types)
+        {
+
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker tmp{};
+            tmp.parameter.begin = reinterpret_cast<::std::byte const*>(type.parameter.begin);
+            tmp.parameter.end = reinterpret_cast<::std::byte const*>(type.parameter.end);
+            tmp.result.begin = reinterpret_cast<::std::byte const*>(type.result.begin);
+            tmp.result.end = reinterpret_cast<::std::byte const*>(type.result.end);
+
+            if(!duplicate_type_function_checker.emplace(tmp).second) [[unlikely]]
+            {
+                err.err_curr = section_curr;
+                err.err_selectable.u32 = type_counter;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_type;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            ++type_counter;
+        }
+    }
+
     /// @brief Define the handler function for type_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(
@@ -496,6 +534,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             err.err_selectable.u32arr[1] = type_count;
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::type_section_resolved_not_match_the_actual_number;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        constexpr bool prohibit_duplicate_types{::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<Fs...>()};
+        if constexpr(prohibit_duplicate_types)
+        {
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_duplicate_types_handler<Fs...>);
+            ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...>> prefix_adl{};
+            define_check_duplicate_types(sec_adl, prefix_adl, module_storage, section_curr, section_end, err, fs_para);
         }
     }
 

@@ -88,6 +88,56 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         } -> ::std::same_as<::std::byte const*>;
     };
 
+    /// @brief Define functions to handle type prefix
+    template <typename... Fs>
+    concept has_check_duplicate_types_handler = requires(
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...>> preifx_adl,
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+        { define_check_duplicate_types(sec_adl, preifx_adl, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<void>;
+    };
+
+    /// @brief name checker
+    struct type_function_checker_base_t
+    {
+        ::std::byte const* begin{};
+        ::std::byte const* end{};
+    };
+
+    inline constexpr bool operator== (type_function_checker_base_t n1, type_function_checker_base_t n2) noexcept
+    {
+        return ::std::equal(n1.begin, n1.end, n2.begin, n2.end);
+    }
+
+    inline constexpr ::std::strong_ordering operator<=> (type_function_checker_base_t n1, type_function_checker_base_t n2) noexcept
+    {
+        return ::fast_io::freestanding::lexicographical_compare_three_way(n1.begin, n1.end, n2.begin, n2.end, ::std::compare_three_way{});
+    }
+
+    struct type_function_checker
+    {
+        type_function_checker_base_t parameter{};
+        type_function_checker_base_t result{};
+    };
+
+    inline constexpr bool operator== (type_function_checker const& n1, type_function_checker const& n2) noexcept
+    {
+        return n1.parameter == n2.parameter && n1.result == n2.result;
+    }
+
+    inline constexpr ::std::strong_ordering operator<=> (type_function_checker const& n1, type_function_checker const& n2) noexcept
+    {
+        ::std::strong_ordering const parameter_check{n1.parameter <=> n2.parameter};
+
+        if(parameter_check != ::std::strong_ordering::equal) { return parameter_check; }
+
+        return n1.result <=> n2.result;
+    }
+
     /////////////////////////////
     /// @brief import section ///
     /////////////////////////////
@@ -206,6 +256,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                            ::uwvm2::parser::wasm::base::error_impl& err) {
         { check_import_export_text_format(adl, begin, end, err) } -> ::std::same_as<void>;
     };
+
+    /// @brief name checker
+    struct name_checker
+    {
+        ::uwvm2::utils::container::u8string_view module_name{};
+        ::uwvm2::utils::container::u8string_view extern_name{};
+    };
+
+    inline constexpr bool operator== (name_checker const& n1, name_checker const& n2) noexcept
+    {
+        return n1.module_name == n2.module_name && n1.extern_name == n2.extern_name;
+    }
+
+    inline constexpr ::std::strong_ordering operator<=> (name_checker const& n1, name_checker const& n2) noexcept
+    {
+        ::std::strong_ordering const module_name_check{n1.module_name <=> n2.module_name};
+
+        if(module_name_check != ::std::strong_ordering::equal) { return module_name_check; }
+
+        return n1.extern_name <=> n2.extern_name;
+    }
 
     ///////////////////////////////
     /// @brief function section ///
@@ -1109,6 +1180,70 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     //////////////////////////
 
     struct wasm1_final_check;
+}
+
+UWVM_MODULE_EXPORT namespace std
+{
+    template <>
+    struct hash<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker>
+    {
+        inline constexpr ::std::size_t operator() (::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker const& checker) const noexcept
+        {
+#if CHAR_BIT == 8
+            ::std::size_t const parameter_sz{static_cast<::std::size_t>(checker.parameter.end - checker.parameter.begin)};
+            ::std::size_t const result_sz{static_cast<::std::size_t>(checker.result.end - checker.result.begin)};
+
+            auto const seed1{::uwvm2::utils::hash::xxh3_64bits(checker.parameter.begin, parameter_sz)};
+
+            return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(checker.result.begin, result_sz, seed1));
+#else
+            // use std hash
+
+            using char_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+            ::uwvm2::utils::container::string_view const tmp_para{reinterpret_cast<char_const_may_alias_ptr>(checker.parameter.begin),
+                                                                  static_cast<::std::size_t>(checker.parameter.end - checker.parameter.begin)};
+            ::uwvm2::utils::container::string_view const tmp_res{reinterpret_cast<char_const_may_alias_ptr>(checker.result.begin),
+                                                                 static_cast<::std::size_t>(checker.result.end - checker.result.begin)};
+            ::std::size_t const h1{::std::hash<::uwvm2::utils::container::string_view>{}(tmp_para)};
+            ::std::size_t const h2{::std::hash<::uwvm2::utils::container::string_view>{}(tmp_res)};
+            return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
+#endif
+        }
+    };
+
+    template <>
+    struct hash<::uwvm2::parser::wasm::standard::wasm1::features::name_checker>
+    {
+        inline constexpr ::std::size_t operator() (::uwvm2::parser::wasm::standard::wasm1::features::name_checker const& checker) const noexcept
+        {
+#if CHAR_BIT == 8
+            ::std::size_t module_name_sz;
+            ::std::size_t extern_name_sz;
+            if constexpr(requires { checker.module_name.size_bytes(); }) { module_name_sz = checker.module_name.size_bytes(); }
+            else
+            {
+                module_name_sz = checker.module_name.size() * sizeof(char8_t);
+            }
+
+            if constexpr(requires { checker.extern_name.size_bytes(); }) { extern_name_sz = checker.extern_name.size_bytes(); }
+            else
+            {
+                extern_name_sz = checker.extern_name.size() * sizeof(char8_t);
+            }
+
+            auto const seed1{::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.module_name.data()), module_name_sz)};
+
+            return static_cast<::std::size_t>(
+                ::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.extern_name.data()), extern_name_sz, seed1));
+#else
+            // use std hash
+
+            ::std::size_t h1{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.module_name)};
+            ::std::size_t h2{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.extern_name)};
+            return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
+#endif
+        }
+    };
 }
 
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
