@@ -138,6 +138,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 
             auto const& typesec{get_typesec_from_features_tuple(binfmt_ver1_storage.sections, ::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features)};
 
+            // Call using simple ADL (without complex concept control)
             define_type_show_warning(typesec.types);
         }
     }

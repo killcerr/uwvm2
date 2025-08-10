@@ -62,6 +62,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
     inline constexpr void show_wasm_binfmt_ver1_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
     {
+#ifdef UWVM_TIMER
+        ::uwvm2::utils::debug::timer parsing_timer{u8"show warning for binfmt ver1"};
+#endif
+
         ::uwvm2::uwvm::wasm::warning::show_wasm_type_section_warning(wasm);
         ::uwvm2::uwvm::wasm::warning::show_wasm_import_section_warning(wasm);
         /// @todo
