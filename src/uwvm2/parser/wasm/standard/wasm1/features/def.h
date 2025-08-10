@@ -115,6 +115,36 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///             };
     ///             ```
     /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
+
+    /// @brief      has type type
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using type_type = type_replacer<root_of_replacement, type_type>;
+    ///             };
+    ///             ```
+    /// @see        test\0001.parser\0002.binfmt1\section\type_section.cc
+    template <typename FeatureType, typename... Fs>
+    concept has_type_type = requires {
+        typename FeatureType::template type_type<Fs...>;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::template type_type<Fs...>>;
+    };
+
+    template <typename FeatureType, typename... Fs>
+    inline consteval auto get_type_type() noexcept
+    {
+        if constexpr(has_type_type<FeatureType, Fs...>) { return typename FeatureType::template type_type<Fs...>{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_type_type_t = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_type_type<Fs, Fs...>())...>;
+
     template <typename FeatureType>
     concept has_value_type = requires {
         typename FeatureType::value_type;

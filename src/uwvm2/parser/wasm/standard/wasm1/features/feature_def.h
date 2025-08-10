@@ -75,31 +75,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @brief Define functions to handle type prefix
     template <typename... Fs>
-    concept has_type_prefix_handler = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-                                               ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
-                                               ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-                                               ::std::byte const* section_curr,
-                                               ::std::byte const* const section_end,
-                                               ::uwvm2::parser::wasm::base::error_impl& err,
-                                               ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
-                                               ::std::byte const* const prefix_module_ptr) {
-        {
-            define_type_prefix_handler(sec_adl, preifx, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr)
-        } -> ::std::same_as<::std::byte const*>;
-    };
+    concept has_type_prefix_handler =
+        requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_type_t<Fs...>> type_adl,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
+                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+                 ::std::byte const* const prefix_module_ptr) {
+            {
+                define_type_prefix_handler(sec_adl, type_adl, preifx, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr)
+            } -> ::std::same_as<::std::byte const*>;
+        };
 
     /// @brief Define functions to handle type prefix
     template <typename... Fs>
-    concept has_check_duplicate_types_handler = requires(
-        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...>> preifx_adl,
-        ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
-        ::std::byte const* section_curr,
-        ::std::byte const* const section_end,
-        ::uwvm2::parser::wasm::base::error_impl& err,
-        ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
-        { define_check_duplicate_types(sec_adl, preifx_adl, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<void>;
-    };
+    concept has_check_duplicate_types_handler =
+        requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+                 ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_type_t<Fs...>> type_adl,
+                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+            { define_check_duplicate_types(sec_adl, type_adl, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<void>;
+        };
 
     /// @brief name checker
     struct type_function_checker_base_t

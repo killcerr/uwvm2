@@ -68,7 +68,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         ::uwvm2::parser::wasm::standard::wasm1::section::section_span_view sec_span{};
 
-        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...>> types{};
+        ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_type_type_t<Fs...>> types{};
     };
 
     /// @brief Define functions for value_type against wasm1 for checking value_type
@@ -315,6 +315,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* define_type_prefix_handler(
         ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...>>
+            type_adl,                                                               // [adl]
         ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix prefix,  // [adl] can be replaced
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
@@ -350,8 +352,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void define_check_duplicate_types(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
-        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix>
-            preifx_adl,  // [adl]
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...>>
+            type_adl,  // [adl]
         ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
         ::std::byte const* section_curr,
         [[maybe_unused]] ::std::byte const* const section_end,
@@ -519,7 +521,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix_handler<Fs...>, "define_type_prefix_handler(...) not found");
 
             // handle it
-            section_curr = define_type_prefix_handler(sec_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr);
+            ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_type_t<Fs...>> type_adl{};
+            section_curr = define_type_prefix_handler(sec_adl, type_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr);
         }
 
         // [... ] (section_end)
@@ -540,8 +543,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         if constexpr(prohibit_duplicate_types)
         {
             static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_check_duplicate_types_handler<Fs...>);
-            ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...>> prefix_adl{};
-            define_check_duplicate_types(sec_adl, prefix_adl, module_storage, section_curr, section_end, err, fs_para);
+            ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_type_t<Fs...>> type_adl{};
+            define_check_duplicate_types(sec_adl, type_adl, module_storage, section_curr, section_end, err, fs_para);
         }
     }
 

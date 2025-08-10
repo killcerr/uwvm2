@@ -78,6 +78,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::null>>;
 
         // type section
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        using type_type =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...>>;
         using value_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                      ::uwvm2::parser::wasm::standard::wasm1::type::value_type>;
         using type_prefix = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
@@ -144,6 +148,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     // binary format
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_text_format<wasm1>);
     // type section
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_value_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_type_prefix<wasm1>);
     // import section
