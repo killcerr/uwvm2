@@ -352,6 +352,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                              ::uwvm2::parser::wasm::concepts::empty_t>
             duplicate_name_checker{};  // use for check duplicate name
 
+        if constexpr(curr_wasm_check_duplicate_imports)
+        {
+            duplicate_name_checker.reserve(import_count);
+        }
+
         // Each type is of unknown size, so it cannot be reserved.
 
         while(section_curr != section_end) [[likely]]

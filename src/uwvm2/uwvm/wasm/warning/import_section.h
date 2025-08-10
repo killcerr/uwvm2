@@ -87,6 +87,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                              ::uwvm2::parser::wasm::concepts::empty_t>
             duplicate_name_checker{};  // use for check duplicate name
 
+        if constexpr(!check_duplicate_imports) { duplicate_name_checker.reserve(import_section.imports.size()); }
+
         // check zero length
         constexpr auto get_disable_zero_length_string_from_features_tuple{
             []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Fs...>) consteval noexcept -> bool
@@ -167,6 +169,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
             if constexpr(!check_duplicate_imports)
             {
                 // No runtime control is required here.
+                // Runtime control can directly shut down errors and not output warnings.
                 if(!duplicate_name_checker.emplace(curr_import.module_name, curr_import.extern_name).second) [[unlikely]]
                 {
                     ::fast_io::io::perr(
