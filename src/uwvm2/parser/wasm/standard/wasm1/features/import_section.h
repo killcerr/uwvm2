@@ -411,6 +411,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // wasm1.0 standard permits empty module name; no rejection here
 
+            constexpr bool disable_zero_length_string{::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<Fs...>()};
+            if constexpr(disable_zero_length_string)
+            {
+                if(module_namelen == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_module_name_length_cannot_be_zero;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
+
             auto const import_module_name_too_length_ptr{section_curr};
             // [...  module_namelen ...] module_name ... extern_namelen ... extern_name ... import_type extern_func ...
             // [         safe          ] unsafe (could be the section_end)
@@ -487,6 +498,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
 
             // wasm1.0 standard permits empty extern name; no rejection here
+            if constexpr(disable_zero_length_string)
+            {
+                if(extern_namelen == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::import_extern_name_length_cannot_be_zero;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+            }
 
             auto const import_extern_name_too_length_ptr{section_curr};
             // [...  module_namelen ... module_name ... extern_namelen ...] extern_name ... import_type extern_func ...

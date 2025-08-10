@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-05-31
+ * @date        2025-04-05
  * @copyright   APL-2.0 License
  */
 
@@ -23,7 +23,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "base.h"
-# include "utf8.h"
-# include "zero_illegal.h"
+# include "type_section.h"
+# include "import_section.h"
+# include "binfmt_ver1.h"
 #endif

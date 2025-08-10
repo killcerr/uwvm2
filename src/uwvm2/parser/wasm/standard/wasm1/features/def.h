@@ -318,6 +318,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return get_feature_parameter_controllable_allow_multi_result_vector_from_paras_parameters(paras.parameters);
     }
 
+    /// @brief      Prohibited use of strings with a length of 0
+    /// @details    The WASM specification does not prohibit zero strings; this is a reserved concept.
+    ///
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 inline static constexpr bool disable_zero_length_string{true};
+    ///             };
+    ///             ```
+    /// @see        test\0001.parser\0002.binfmt1\section\import_section.cc
+    template <typename FsCurr>
+    concept has_disable_zero_length_string = requires { requires ::std::same_as<::std::remove_cvref_t<decltype(FsCurr::disable_zero_length_string)>, bool>; };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval bool disable_zero_length_string() noexcept
+    {
+        return []<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+        {
+            return ((
+                        []<typename FsCurr>() constexpr noexcept -> bool
+                                                                    {
+                                                                        // check irreplaceable
+                                                                        if constexpr(has_disable_zero_length_string<FsCurr>)
+                                                                        {
+                                                                            constexpr bool tallow{FsCurr::disable_zero_length_string};
+                                                                            return tallow;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return false;
+                                                                        }
+                                                                    }.template operator()<Fs...[I]>()) ||
+                    ...);
+        }(::std::make_index_sequence<sizeof...(Fs)>{});
+    }
+
+
     /////////////////////////////
     //      Import Section     //
     /////////////////////////////

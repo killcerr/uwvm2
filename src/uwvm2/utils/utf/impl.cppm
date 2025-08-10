@@ -26,6 +26,7 @@ export module uwvm2.utils.utf;
 
 export import :base;
 export import :utf8;
+export import :zero_illegal;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

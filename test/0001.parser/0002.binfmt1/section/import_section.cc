@@ -122,6 +122,35 @@ struct F5
     };
 };
 
+// Feature with disable_zero_length_string set to true
+struct F6
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F6"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    
+    // Enable zero length string checking
+    inline static constexpr bool disable_zero_length_string{true};
+};
+
+// Feature with disable_zero_length_string set to false
+struct F7
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F7"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    
+    // Disable zero length string checking
+    inline static constexpr bool disable_zero_length_string{false};
+};
+
+// Feature without disable_zero_length_string (should default to false)
+struct F8
+{
+    inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"F8"};
+    inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
+    
+    // No disable_zero_length_string defined
+};
+
 int main()
 {
     static_assert(::std::same_as<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<F1>, vt1>);
@@ -176,6 +205,28 @@ int main()
         ::fast_io::print("test_controllable_check_duplicate_imports_F1F5 is not true\n");
         ::fast_io::fast_terminate();
     }
+
+    // Test disable_zero_length_string concept and function
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_disable_zero_length_string<F6>);
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_disable_zero_length_string<F7>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_disable_zero_length_string<F8>);
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::has_disable_zero_length_string<F1>);
+
+    // Test disable_zero_length_string function results
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F6>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F7>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F8>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F1>());
+
+    // Test combinations
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F1, F6>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F1, F7>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F1, F8>());
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F6, F7>());
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F6, F8>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<F7, F8>());
+
+    ::fast_io::print("All disable_zero_length_string tests passed!\n");
 }
 
 // macro

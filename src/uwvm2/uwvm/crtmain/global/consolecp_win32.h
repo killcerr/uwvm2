@@ -43,7 +43,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::global
 {
     /// @brief      The ConsoleCP of Windows is affected by system environment variables.
     ///             By setting SetConsoleCP and SetConsoleOutputCP, it can be unified to UTF-8.
-    ///             No need to restore, the console is automatically restored at the end of the program
+    ///             No need to restore, the console is automatically restored at the end of the program.
+    ///
+    ///             Since wasi requires a utf-8 environment, everything here needs to be unified to utf-8.
+    ///
     /// @see        https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
     struct set_win32_console_io_cp_to_utf8
     {

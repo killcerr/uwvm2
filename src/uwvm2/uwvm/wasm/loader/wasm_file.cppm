@@ -51,6 +51,7 @@ import uwvm2.uwvm.wasm.type;
 import uwvm2.uwvm.wasm.storage;
 import uwvm2.uwvm.wasm.feature;
 import uwvm2.uwvm.wasm.custom;
+import uwvm2.uwvm.wasm.warning;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
