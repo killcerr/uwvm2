@@ -379,7 +379,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 err.err_curr = section_curr;
                 err.err_selectable.u32 = type_counter;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_type;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_type_function;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
@@ -539,6 +539,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
+        // A conceptual interface is reserved here for checks that may be added later.
         constexpr bool prohibit_duplicate_types{::uwvm2::parser::wasm::standard::wasm1::features::prohibit_duplicate_types<Fs...>()};
         if constexpr(prohibit_duplicate_types)
         {

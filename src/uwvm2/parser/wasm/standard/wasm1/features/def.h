@@ -182,6 +182,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct final_function_type
     {
+        inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix type{::uwvm2::parser::wasm::standard::wasm1::type::function_type_prefix::functype};
+
         final_result_type<Fs...> parameter{};
         final_result_type<Fs...> result{};
     };
