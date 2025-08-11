@@ -100,6 +100,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     ///                 * LoongArch LSX: 128-bit vector processing
     ///                 * WebAssembly SIMD128: 128-bit WebAssembly SIMD instructions
 
+    /// @see WebAssembly Release 1.0 (2019-07-20) § 5.2.2
+    /// Note: The side conditions N > 7 in the productions for non-terminal bytes of the u and s encodings restrict
+    /// the encoding's length. However, “trailing zeros” are still allowed within these bounds. For example, 0x03 and
+    /// 0x83 0x00 are both well-formed encodings for the value 3 as a u8 . Similarly, either of 0x7e and 0xFE 0x7F and
+    /// 0xFE 0xFF 0x7F are well-formed encodings of the value -2 as a s16 .
+    ///
+    /// The side conditions on the value N of terminal bytes further enforce that any unused bits in these bytes must be 0
+    /// for positive values and 1 for negative ones. For example, 0x83 0x10 is malformed as a u8 encoding. Similarly,
+    /// both 0x83 0x3E and 0xFF 0x7B are malformed as s8 encodings.
+
     /// @brief      Convert view to vec
     /// @param      func_counter The correct u8 size has been processed
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
@@ -8275,6 +8285,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // check has typesec
         auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
+        // The WASM standard does not require that the type segment must appear before the function segment is parsed. Assuming that there is no type segment,
+        // if the function segment contains a non-zero number of func, an illegal type error will definitely be reported.
+#if 0
         if(!typesec.sec_span.sec_begin) [[unlikely]]
         {
             err.err_curr = sec_id_module_ptr;
@@ -8283,6 +8296,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::forward_dependency_missing;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
+#endif
 
         using wasm_byte_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const*;
 

@@ -1,4 +1,5 @@
-﻿/*************************************************************
+
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -50,9 +51,6 @@
 # include <uwvm2/uwvm/wasm/storage/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 # include <uwvm2/uwvm/wasm/custom/impl.h>
-# include "type_section.h"
-# include "import_section.h"
-# include "warn_storage.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -61,20 +59,26 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
-    inline constexpr void show_wasm_binfmt_ver1_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
+    struct binfmt_ver1_warning_storage_t
     {
-#ifdef UWVM_TIMER
-        ::uwvm2::utils::debug::timer parsing_timer{u8"show warning for binfmt ver1"};
-#endif
-        // The warning path should be determined in advance.
-        UWVM_ASSERT(::uwvm2::uwvm::io::show_parser_warning == true);
+        ::uwvm2::utils::container::vector<bool> unused_type_checker{};
+    };
 
-        ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t warn_storage{};
-        ::uwvm2::uwvm::wasm::warning::init_binfmt_ver1_warning_storage(warn_storage, wasm);
+    inline constexpr void init_binfmt_ver1_warning_storage(binfmt_ver1_warning_storage_t & storage, ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
+    {
+        auto const& binfmt_ver1_storage{wasm.get_curr_binfmt_version_wasm_storage<1u>()};
 
-        ::uwvm2::uwvm::wasm::warning::show_wasm_type_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_import_section_warning(wasm, warn_storage);
-        /// @todo
+        constexpr auto get_typesec_from_features_tuple{
+            []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(auto const& section,
+                                                                                       ::uwvm2::utils::container::tuple<Fs...>) constexpr noexcept
+            {
+                return ::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+                    ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>>(section);
+            }};
+        auto const& typesec{get_typesec_from_features_tuple(binfmt_ver1_storage.sections, ::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features)};
+        auto const type_size{typesec.types.size()};
+
+        storage.unused_type_checker.resize(type_size, false);
     }
 }
 

@@ -22,15 +22,15 @@
 module;
 
 // std
-# include <cstddef>
-# include <cstdint>
-# include <concepts>
-# include <type_traits>
-# include <utility>
-# include <memory>
-# include <tuple>
+#include <cstddef>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <memory>
+#include <tuple>
 // macro
-# include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.uwvm.wasm.section_details:section_details;
 

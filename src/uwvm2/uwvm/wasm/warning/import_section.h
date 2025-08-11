@@ -50,6 +50,7 @@
 # include <uwvm2/uwvm/wasm/storage/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 # include <uwvm2/uwvm/wasm/custom/impl.h>
+# include "warn_storage.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -58,10 +59,48 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
-    inline constexpr void show_wasm_import_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void check_unused_type(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_extern_type<Fs...> const& curr_import,  // [adl]
+                                            ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
+                                            ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
     {
         // get wasm module storage
-        auto const& wasm_module_storage{wasm.template get_curr_binfmt_version_wasm_storage<1u>()};
+        auto const& wasm_module_storage{wasm.get_curr_binfmt_version_wasm_storage<1u>()};
+
+        auto const& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<
+            ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>>(wasm_module_storage.sections)};
+        auto const type_cbegin{typesec.types.cbegin()};
+
+        switch(curr_import.type)
+        {
+            case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::func:
+            {
+                auto const type_index{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_import.storage.function - type_cbegin)};
+
+                auto& curr_type_unused_checker{
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    warn_storage.unused_type_checker[type_index]
+#else
+                    warn_storage.unused_type_checker.index_unchecked(type_index)
+#endif
+                };
+
+                curr_type_unused_checker = true;
+
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+
+    inline constexpr void show_wasm_import_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
+                                                           ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
+    {
+        // get wasm module storage
+        auto const& wasm_module_storage{wasm.get_curr_binfmt_version_wasm_storage<1u>()};
 
         // get import section
         constexpr auto get_importsec_from_features_tuple{
@@ -165,6 +204,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 
         for(auto const& curr_import: import_section.imports)
         {
+            check_unused_type(curr_import.imports, wasm, warn_storage);
+
             // check duplicate imports
             if constexpr(!check_duplicate_imports)
             {

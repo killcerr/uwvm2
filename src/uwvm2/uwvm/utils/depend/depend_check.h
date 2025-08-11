@@ -21,6 +21,12 @@
 
 #pragma once
 
+#ifndef UWVM_MODULE
+// std
+# include <cstddef>
+# include <cstdint>
+#endif
+
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif

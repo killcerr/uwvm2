@@ -21,6 +21,10 @@
 
 module;
 
+// std
+#include <cstddef>
+#include <cstdint>
+
 export module uwvm2.uwvm.utils.depend:depend_check;
 
 #ifndef UWVM_MODULE

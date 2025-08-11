@@ -50,6 +50,7 @@
 # include <uwvm2/uwvm/wasm/storage/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 # include <uwvm2/uwvm/wasm/custom/impl.h>
+# include "warn_storage.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -122,7 +123,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
         }
     }
 
-    inline constexpr void show_wasm_type_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
+    inline constexpr void show_wasm_type_section_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
+                                                         [[maybe_unused]] ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
     {
         constexpr auto get_prohibit_duplicate_types_from_features_tuple{
             []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Fs...>) consteval noexcept -> bool
