@@ -162,6 +162,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
                 return;
             }
 #endif
+
+            ::fast_io::iso8601_timestamp local_realtime{};
+
+#ifdef __cpp_exceptions
+            try
+#endif
+            {
+                local_realtime = ::fast_io::local(::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::realtime));
+            }
+#ifdef __cpp_exceptions
+            catch(::fast_io::error)
+            {
+                // do nothing
+            }
+#endif
+
             // Output correct time
 #ifdef UWVM
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -176,10 +192,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\": ",
                                 t1 - t0,
-                                u8"s\n",
+                                u8"s ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                u8"[",
+                                local_realtime,
+                                u8"]\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [debug] timer \"", s, u8"\": ", t1 - t0, u8"s\n");
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [debug] timer \"", s, u8"\": ", t1 - t0, u8"s [", local_realtime, u8"]\n");
 #endif
         }
     };
