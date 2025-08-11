@@ -442,6 +442,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        Stm && stream,
                                        data_section_storage_section_details_wrapper_t<Fs...> const data_section_details_wrapper)
     {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(data_section_details_wrapper.data_section_storage_ptr == nullptr || data_section_details_wrapper.all_sections_ptr == nullptr) [[unlikely]] 
+        { 
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos(); 
+        }
+#endif
         /// @todo
         (void)stream;
         (void)data_section_details_wrapper;

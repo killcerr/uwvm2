@@ -84,8 +84,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                        Stm && stream,
                                        wasm_binfmt_ver1_module_extensible_storage_section_details_wrapper_t<Fs...> const section_details_wrapper)
     {
-        if(section_details_wrapper.module_storage_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
-
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(section_details_wrapper.module_storage_ptr == nullptr) [[unlikely]] 
+        { 
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos(); 
+        }
+#endif
         if constexpr(::std::same_as<char_type, char>)
         {
             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
@@ -118,7 +122,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                              u8"Module span: ",
                                                              ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_begin),
                                                              u8" - ",
-                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_end),
+                                                             ::fast_io::mnp::pointervw(section_details_wrapper.module_storage_ptr->module_span.module_span.module_end),
                                                              u8" (length=",
                                                              static_cast<::std::size_t>(section_details_wrapper.module_storage_ptr->module_span.module_end -
                                                                                         section_details_wrapper.module_storage_ptr->module_span.module_begin),

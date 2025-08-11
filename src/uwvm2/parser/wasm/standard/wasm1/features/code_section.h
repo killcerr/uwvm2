@@ -452,13 +452,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return {::std::addressof(code_section_storage), ::std::addressof(all_sections)};
     }
 
-    /// @brief Print the type section details
+    /// @brief Print the code section details
     /// @throws maybe throw fast_io::error, see the implementation of the stream
     template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, code_section_storage_section_details_wrapper_t<Fs...>>,
                                        Stm && stream,
                                        code_section_storage_section_details_wrapper_t<Fs...> const code_section_details_wrapper)
     {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(code_section_details_wrapper.code_section_storage_ptr == nullptr || code_section_details_wrapper.all_sections_ptr == nullptr) [[unlikely]] 
+        { 
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos(); 
+        }
+#endif
         /// @todo
         (void)stream;
         (void)code_section_details_wrapper;
