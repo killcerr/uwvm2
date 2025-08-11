@@ -64,7 +64,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
     inline constexpr void define_type_show_warning(
         ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> /*[adl]*/> const& types) noexcept
     {
-        ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker>
+        ::uwvm2::utils::container::unordered_flat_map<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker,
+                                                      ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>
             duplicate_type_function_checker{};
 
         duplicate_type_function_checker.reserve(types.size());
@@ -78,7 +79,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
             tmp.result.begin = reinterpret_cast<::std::byte const*>(curr_type.result.begin);
             tmp.result.end = reinterpret_cast<::std::byte const*>(curr_type.result.end);
 
-            if(!duplicate_type_function_checker.emplace(tmp).second) [[unlikely]]
+            auto const [it, is_inserted]{duplicate_type_function_checker.try_emplace(tmp, type_counter)};
+            if(!is_inserted) [[unlikely]]
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                     // 1
@@ -88,8 +90,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                                     u8"[warn]  ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Function type[",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
                                     type_counter,
-                                    u8"] in Type Section is duplicated. ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"] in Type Section is duplicated, previous definition in type[",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                    it->second,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"]. ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                     u8"(parser)\n",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));

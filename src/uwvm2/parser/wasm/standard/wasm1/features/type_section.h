@@ -362,7 +362,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         auto& typesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(module_storage.sections)};
 
-        ::uwvm2::utils::container::unordered_flat_set<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker>
+        ::uwvm2::utils::container::unordered_flat_map<::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker,
+                                                      ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>
             duplicate_type_function_checker{};
 
         duplicate_type_function_checker.reserve(typesec.types.size());
@@ -377,10 +378,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             tmp.result.begin = reinterpret_cast<::std::byte const*>(type.result.begin);
             tmp.result.end = reinterpret_cast<::std::byte const*>(type.result.end);
 
-            if(!duplicate_type_function_checker.emplace(tmp).second) [[unlikely]]
+            auto const [it, is_inserted]{duplicate_type_function_checker.try_emplace(tmp, type_counter)};
+            if(!is_inserted) [[unlikely]]
             {
                 err.err_curr = section_curr;
-                err.err_selectable.u32 = type_counter;
+                err.err_selectable.u32arr[0] = type_counter;  // Current repetition
+                err.err_selectable.u32arr[1] = it->second;    // Previously existing
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::duplicate_type_function;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
