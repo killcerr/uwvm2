@@ -205,6 +205,293 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};
     };
 
+    /// @brief Wrapper for the final_import_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm1_final_extern_type_section_details_wrapper_t
+    {
+        wasm1_final_extern_type<Fs...> const* extern_type_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32* importdesc_counter_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr wasm1_final_extern_type_section_details_wrapper_t<Fs...> section_details(
+        wasm1_final_extern_type<Fs...> const& extern_type,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections,
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32* importdesc_counter_ptr) noexcept
+    {
+        return {::std::addressof(extern_type), ::std::addressof(all_sections), importdesc_counter_ptr};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, wasm1_final_extern_type_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       wasm1_final_extern_type_section_details_wrapper_t<Fs...> const extern_type_details_wrapper)
+    {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(extern_type_details_wrapper.extern_type_ptr == nullptr || extern_type_details_wrapper.all_sections_ptr == nullptr ||
+           extern_type_details_wrapper.importdesc_counter_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+
+        auto const& all_sections{*extern_type_details_wrapper.all_sections_ptr};
+
+        switch(extern_type_details_wrapper.extern_type_ptr->type)
+        {
+            case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::func:
+            {
+                // After ADL degradation, pointer access is safe.
+                auto& curr_importdesc_counter{extern_type_details_wrapper.importdesc_counter_ptr[0u]};
+                auto const curr_functype_ptr{extern_type_details_wrapper.extern_type_ptr->storage.function};
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(curr_functype_ptr == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
+
+                auto const& type_section{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<type_section_storage_t<Fs...>>(all_sections)};
+
+                auto const type_section_cbegin{type_section.types.cbegin()};
+
+                auto const sign{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(curr_functype_ptr - type_section_cbegin)};
+
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     "func[",
+                                                                     curr_importdesc_counter,
+                                                                     "]: {sig = type[",
+                                                                     sign,
+                                                                     "]}");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L"func[",
+                                                                     curr_importdesc_counter,
+                                                                     L"]: {sig = type[",
+                                                                     sign,
+                                                                     L"]}");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8"func[",
+                                                                     curr_importdesc_counter,
+                                                                     u8"]: {sig = type[",
+                                                                     sign,
+                                                                     u8"]}");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u"func[",
+                                                                     curr_importdesc_counter,
+                                                                     u"]: {sig = type[",
+                                                                     sign,
+                                                                     u"]}");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U"func[",
+                                                                     curr_importdesc_counter,
+                                                                     U"]: {sig = type[",
+                                                                     sign,
+                                                                     U"]}");
+                }
+
+                ++curr_importdesc_counter;
+
+                break;
+            }
+            case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::table:
+            {
+                // After ADL degradation, pointer access is safe.
+                auto& curr_importdesc_counter{extern_type_details_wrapper.importdesc_counter_ptr[1u]};
+
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     "table[",
+                                                                     curr_importdesc_counter,
+                                                                     "]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.table),
+                                                                     "}");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L"table[",
+                                                                     curr_importdesc_counter,
+                                                                     L"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.table),
+                                                                     L"}");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8"table[",
+                                                                     curr_importdesc_counter,
+                                                                     u8"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.table),
+                                                                     u8"}");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u"table[",
+                                                                     curr_importdesc_counter,
+                                                                     u"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.table),
+                                                                     u"}");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U"table[",
+                                                                     curr_importdesc_counter,
+                                                                     U"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.table),
+                                                                     U"}");
+                }
+
+                ++curr_importdesc_counter;
+                break;
+            }
+            case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::memory:
+            {
+                // After ADL degradation, pointer access is safe.
+                auto& curr_importdesc_counter{extern_type_details_wrapper.importdesc_counter_ptr[2u]};
+
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     "memory[",
+                                                                     curr_importdesc_counter,
+                                                                     "]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.memory),
+                                                                     "}");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L"memory[",
+                                                                     curr_importdesc_counter,
+                                                                     L"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.memory),
+                                                                     L"}");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8"memory[",
+                                                                     curr_importdesc_counter,
+                                                                     u8"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.memory),
+                                                                     u8"}");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u"memory[",
+                                                                     curr_importdesc_counter,
+                                                                     u"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.memory),
+                                                                     u"}");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U"memory[",
+                                                                     curr_importdesc_counter,
+                                                                     U"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.memory),
+                                                                     U"}");
+                }
+
+                ++curr_importdesc_counter;
+                break;
+            }
+            case ::uwvm2::parser::wasm::standard::wasm1::type::external_types::global:
+            {
+                // After ADL degradation, pointer access is safe.
+                auto& curr_importdesc_counter{extern_type_details_wrapper.importdesc_counter_ptr[3u]};
+
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     "global[",
+                                                                     curr_importdesc_counter,
+                                                                     "]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.global),
+                                                                     "}");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L"global[",
+                                                                     curr_importdesc_counter,
+                                                                     L"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.global),
+                                                                     L"}");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8"global[",
+                                                                     curr_importdesc_counter,
+                                                                     u8"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.global),
+                                                                     u8"}");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u"global[",
+                                                                     curr_importdesc_counter,
+                                                                     u"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.global),
+                                                                     u"}");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U"global[",
+                                                                     curr_importdesc_counter,
+                                                                     U"]: {",
+                                                                     section_details(extern_type_details_wrapper.extern_type_ptr->storage.global),
+                                                                     U"}");
+                }
+
+                ++curr_importdesc_counter;
+                break;
+            }
+            [[unlikely]] default:
+            {
+                if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "unknown"); }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"unknown");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"unknown");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"unknown");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"unknown");
+                }
+                break;
+            }
+        }
+    }
+
     /// @brief Define functions for handle imports table
     template <typename... Fs>
     concept has_extern_imports_table_handler =

@@ -54,6 +54,104 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         bool present_max{};
     };
 
+    /// @brief Wrapper for the section storage structure
+    struct limits_type_section_details_wrapper_t
+    {
+        limits_type limits{};
+    };
+
+    inline constexpr limits_type_section_details_wrapper_t section_details(limits_type limits) noexcept { return {limits}; }
+
+    template <::std::integral char_type, typename Stm>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, limits_type_section_details_wrapper_t>,
+                                       Stm && stream,
+                                       limits_type_section_details_wrapper_t const limits_section_details_wrapper)
+    {
+        if(limits_section_details_wrapper.limits.present_max)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                "limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                ", max = ",
+                                                                limits_section_details_wrapper.limits.max,
+                                                                "}");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                L"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                L", max = ",
+                                                                limits_section_details_wrapper.limits.max,
+                                                                L"}");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u8"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                u8", max = ",
+                                                                limits_section_details_wrapper.limits.max,
+                                                                u8"}");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                u", max = ",
+                                                                limits_section_details_wrapper.limits.max,
+                                                                u"}");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                U"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                U", max = ",
+                                                                limits_section_details_wrapper.limits.max,
+                                                                U"}");
+            }
+        }
+        else
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), "limits: {min = ", limits_section_details_wrapper.limits.min, "}");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                L"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                L"}");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u8"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                u8"}");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                u"}");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                U"limits: {min = ",
+                                                                limits_section_details_wrapper.limits.min,
+                                                                U"}");
+            }
+        }
+    }
+
     /// @brief      Function Types
     /// @details    Function types are encoded by the byte 0x60 followed by the respective vectors of parameter and result types.
     /// @details    New feature
@@ -73,6 +171,56 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         limits_type limits{};
     };
 
+    /// @brief Wrapper for the memory_type storage structure
+    struct memory_type_section_details_wrapper_t
+    {
+        memory_type memory{};
+    };
+
+    inline constexpr memory_type_section_details_wrapper_t section_details(memory_type memory) noexcept { return {memory}; }
+
+    template <::std::integral char_type, typename Stm>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, memory_type_section_details_wrapper_t>,
+                                       Stm && stream,
+                                       memory_type_section_details_wrapper_t const memory_section_details_wrapper)
+    {
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            "pages: {",
+                                                            section_details(memory_section_details_wrapper.memory.limits),
+                                                            "}");
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            L"pages: {",
+                                                            section_details(memory_section_details_wrapper.memory.limits),
+                                                            L"}");
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u8"pages: {",
+                                                            section_details(memory_section_details_wrapper.memory.limits),
+                                                            u8"}");
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u"pages: {",
+                                                            section_details(memory_section_details_wrapper.memory.limits),
+                                                            u"}");
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            U"pages: {",
+                                                            section_details(memory_section_details_wrapper.memory.limits),
+                                                            U"}");
+        }
+    }
+
     /// @brief      Table Types
     /// @details    Memory types classify linear memories and their size range.
     /// @details    New feature
@@ -85,6 +233,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(0x70)};
     };
 
+    struct table_type_section_details_wrapper_t
+    {
+        table_type table{};
+    };
+
+    inline constexpr table_type_section_details_wrapper_t section_details(table_type table) noexcept { return {table}; }
+
+    template <::std::integral char_type, typename Stm>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, table_type_section_details_wrapper_t>,
+                                       Stm && stream,
+                                       table_type_section_details_wrapper_t const table_section_details_wrapper)
+    {
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            "type: funcref, ",
+                                                            section_details(table_section_details_wrapper.table.limits));
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            L"type: funcref, ",
+                                                            section_details(table_section_details_wrapper.table.limits));
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u8"type: funcref, ",
+                                                            section_details(table_section_details_wrapper.table.limits));
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u"type: funcref, ",
+                                                            section_details(table_section_details_wrapper.table.limits));
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            U"type: funcref, ",
+                                                            section_details(table_section_details_wrapper.table.limits));
+        }
+    }
+
     /// @brief      Global Types
     /// @details    Global types classify global variables, which hold a value and can either be mutable or immutable
     /// @details    New feature
@@ -94,6 +286,60 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         ::uwvm2::parser::wasm::standard::wasm1::type::value_type type{};
         bool is_mutable{};
     };
+
+    struct global_type_section_details_wrapper_t
+    {
+        global_type global{};
+    };
+
+    inline constexpr global_type_section_details_wrapper_t section_details(global_type global) noexcept { return {global}; }
+
+    template <::std::integral char_type, typename Stm>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, global_type_section_details_wrapper_t>,
+                                       Stm && stream,
+                                       global_type_section_details_wrapper_t const global_section_details_wrapper)
+    {
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            "mutable: ",
+                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                            ", ",
+                                                            section_details(global_section_details_wrapper.global.type));
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            L"mutable: ",
+                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                            L", ",
+                                                            section_details(global_section_details_wrapper.global.type));
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u8"mutable: ",
+                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                            u8", ",
+                                                            section_details(global_section_details_wrapper.global.type));
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u"mutable: ",
+                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                            u", ",
+                                                            section_details(global_section_details_wrapper.global.type));
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            U"mutable: ",
+                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                            U", ",
+                                                            section_details(global_section_details_wrapper.global.type));
+        }
+    }
 
     /// @brief      External Types
     /// @details    External types classify imports and external values with their respective types
@@ -108,6 +354,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         // extern_type_end: for concept, not standard
         external_type_end = global
     };
+
+    inline constexpr external_types section_details(external_types type) noexcept { return type; }
 
     /// @brief      Imports
     /// @details    The imports component of a module defines a set of imports that are required for instantiation

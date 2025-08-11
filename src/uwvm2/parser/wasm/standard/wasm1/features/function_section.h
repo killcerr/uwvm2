@@ -8410,22 +8410,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     }
 
     /// @brief Wrapper for the section storage structure
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct function_section_storage_section_details_wrapper_t
     {
         function_section_storage_t const* function_section_storage_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
     };
 
-    inline constexpr function_section_storage_section_details_wrapper_t section_details(function_section_storage_t const& function_section_storage) noexcept
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr function_section_storage_section_details_wrapper_t<Fs...> section_details(
+        function_section_storage_t const& function_section_storage,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
     {
-        return {::std::addressof(function_section_storage)};
+        return {::std::addressof(function_section_storage), ::std::addressof(all_sections)};
     }
 
     /// @brief Print the function section details
     /// @throws maybe throw fast_io::error, see the implementation of the stream
-    template <::std::integral char_type, typename Stm>
-    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, function_section_storage_section_details_wrapper_t>,
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, function_section_storage_section_details_wrapper_t<Fs...>>,
                                        Stm && stream,
-                                       function_section_storage_section_details_wrapper_t const function_section_details_wrapper)
+                                       function_section_storage_section_details_wrapper_t<Fs...> const function_section_details_wrapper)
     {
         /// @todo
         (void)stream;

@@ -73,6 +73,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
         {
             case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm:
             {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(module_storage.module_storage_ptr.wf == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
+
                 switch(module_storage.module_storage_ptr.wf->binfmt_ver)
                 {
                     case 1u:
@@ -82,8 +86,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                "======================\n"
-                                "Executed Module Name: ",
+                                "======================\n" "Executed Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 "\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -98,8 +101,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                L"======================\n"
-                                L"Executed Module Name: ",
+                                L"======================\n" L"Executed Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 L"\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -114,8 +116,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                u8"======================\n"
-                                u8"Executed Module Name: ",
+                                u8"======================\n" u8"Executed Module Name: ",
                                 module_storage.module_storage_ptr.wf->module_name,
                                 u8"\nFile Path: ",
                                 module_storage.module_storage_ptr.wf->file_name,
@@ -130,8 +131,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                u"======================\n"
-                                u"Executed Module Name: ",
+                                u"======================\n" u"Executed Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 u"\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -146,8 +146,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                U"======================\n"
-                                U"Executed Module Name: ",
+                                U"======================\n" U"Executed Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 U"\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -175,6 +174,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
             }
             case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
             {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(module_storage.module_storage_ptr.wf == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
                 switch(module_storage.module_storage_ptr.wf->binfmt_ver)
                 {
                     // binfmt ver 1
@@ -184,8 +186,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                "======================\n"
-                                "Preloaded Module Name: ",
+                                "======================\n" "Preloaded Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 "\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -200,8 +201,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                L"======================\n"
-                                L"Preloaded Module Name: ",
+                                L"======================\n" L"Preloaded Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 L"\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -216,8 +216,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                u8"======================\n"
-                                u8"Preloaded Module Name: ",
+                                u8"======================\n" u8"Preloaded Module Name: ",
                                 module_storage.module_storage_ptr.wf->module_name,
                                 u8"\nFile Path: ",
                                 module_storage.module_storage_ptr.wf->file_name,
@@ -232,8 +231,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                u"======================\n"
-                                u"Preloaded Module Name: ",
+                                u"======================\n" u"Preloaded Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 u"\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -248,8 +246,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                         {
                             ::fast_io::operations::print_freestanding<false>(
                                 ::std::forward<Stm>(stream),
-                                U"======================\n"
-                                U"Preloaded Module Name: ",
+                                U"======================\n" U"Preloaded Module Name: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->module_name),
                                 U"\nFile Path: ",
                                 ::fast_io::mnp::code_cvt(module_storage.module_storage_ptr.wf->file_name),
@@ -277,6 +274,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
             }
             case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
             {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(module_storage.module_storage_ptr.wd == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
                 /// @todo
                 break;
             }

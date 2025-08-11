@@ -352,10 +352,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                              ::uwvm2::parser::wasm::concepts::empty_t>
             duplicate_name_checker{};  // use for check duplicate name
 
-        if constexpr(curr_wasm_check_duplicate_imports)
-        {
-            duplicate_name_checker.reserve(import_count);
-        }
+        if constexpr(curr_wasm_check_duplicate_imports) { duplicate_name_checker.reserve(import_count); }
 
         // Each type is of unknown size, so it cannot be reserved.
 
@@ -707,13 +704,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     struct import_section_storage_section_details_wrapper_t
     {
         import_section_storage_t<Fs...> const* import_section_storage_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr import_section_storage_section_details_wrapper_t<Fs...> section_details(
-        import_section_storage_t<Fs...> const& import_section_storage) noexcept
+        import_section_storage_t<Fs...> const& import_section_storage,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
     {
-        return {::std::addressof(import_section_storage)};
+        return {::std::addressof(import_section_storage), ::std::addressof(all_sections)};
     }
 
     /// @brief Print the import section details
@@ -723,9 +722,95 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        Stm && stream,
                                        import_section_storage_section_details_wrapper_t<Fs...> const import_section_details_wrapper)
     {
-        /// @todo
-        (void)stream;
-        (void)import_section_details_wrapper;
+        if(import_section_details_wrapper.import_section_storage_ptr == nullptr || import_section_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::fast_io::fast_terminate();
+        }
+
+        auto const import_section_size{import_section_details_wrapper.import_section_storage_ptr->imports.size()};
+
+        if(import_section_size)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nImport[", import_section_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nImport[", import_section_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nImport[", import_section_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nImport[", import_section_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nImport[", import_section_size, U"]:\n");
+            }
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 import_counter{};
+            constexpr auto importdesc_count{::std::remove_cvref_t<decltype(*import_section_details_wrapper.import_section_storage_ptr)>::importdesc_count};
+            ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, importdesc_count> importdesc_counter{};
+
+            for(auto const& curr_import: import_section_details_wrapper.import_section_storage_ptr->imports)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        " - import[",
+                        import_counter,
+                        "]: {",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
+                        "}");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        L" - import[",
+                        import_counter,
+                        L"]: {",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
+                        L"}");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        u8" - import[",
+                        import_counter,
+                        u8"]: {",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
+                        u8"}");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        u" - import[",
+                        import_counter,
+                        u"]: {",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
+                        u"}");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        U" - import[",
+                        import_counter,
+                        U"]: {",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
+                        U"}");
+                }
+                ++import_counter;
+            }
+        }
     }
 }
 

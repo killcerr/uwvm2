@@ -207,47 +207,126 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        Stm && stream,
                                        final_function_type_section_details_wrapper_t<Fs...> const function_type_details_wrapper)
     {
-        if(function_type_details_wrapper.function_type_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(function_type_details_wrapper.function_type_ptr == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
 
         {
             // output para
             auto const para{function_type_details_wrapper.function_type_ptr->parameter};
 
-            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(");
+            // output '('
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "("); }
+            else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"("); }
+            else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"("); }
+            else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"("); }
+            else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"("); }
+
             for(auto curr_value_type{para.begin}; curr_value_type != para.end; ++curr_value_type)
             {
-                if (curr_value_type != para.begin)
+                // print ','
+                if(curr_value_type != para.begin)
                 {
-                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8", ");
+                    if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), ", "); }
+                    else if constexpr(::std::same_as<char_type, wchar_t>)
+                    {
+                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L", ");
+                    }
+                    else if constexpr(::std::same_as<char_type, char8_t>)
+                    {
+                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8", ");
+                    }
+                    else if constexpr(::std::same_as<char_type, char16_t>)
+                    {
+                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u", ");
+                    }
+                    else if constexpr(::std::same_as<char_type, char32_t>)
+                    {
+                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U", ");
+                    }
                 }
-                
+
+                // print value type
                 ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*curr_value_type));
             }
-            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")");
+
+            // output ')'
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), ")"); }
+            else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L")"); }
+            else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")"); }
+            else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u")"); }
+            else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U")"); }
         }
 
-        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8" -> ");
+        // output '->'
+        if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), " -> "); }
+        else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L" -> "); }
+        else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8" -> "); }
+        else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u" -> "); }
+        else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U" -> "); }
 
         {
             // output res
             auto const res{function_type_details_wrapper.function_type_ptr->result};
 
             auto const res_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(res.end - res.begin)};
-            if(res_size == 0uz) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"nil"); }
+            if(res_size == 0uz)
+            {
+                if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "nil"); }
+                else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"nil"); }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"nil");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"nil");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"nil");
+                }
+            }
             else if(res_size == 1uz) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*res.begin)); }
             else
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"(");
+                if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "("); }
+                else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"("); }
+                else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"("); }
+                else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"("); }
+                else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"("); }
+
                 for(auto curr_value_type{res.begin}; curr_value_type != res.end; ++curr_value_type)
                 {
-                    if (curr_value_type != res.begin)
+                    if(curr_value_type != res.begin)
                     {
-                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8", ");
+                        if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), ", "); }
+                        else if constexpr(::std::same_as<char_type, wchar_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L", ");
+                        }
+                        else if constexpr(::std::same_as<char_type, char8_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8", ");
+                        }
+                        else if constexpr(::std::same_as<char_type, char16_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u", ");
+                        }
+                        else if constexpr(::std::same_as<char_type, char32_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U", ");
+                        }
                     }
 
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), section_details(*curr_value_type));
                 }
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")");
+
+                if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), ")"); }
+                else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L")"); }
+                else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8")"); }
+                else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u")"); }
+                else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U")"); }
             }
         }
     }
@@ -524,6 +603,100 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         final_extern_type_t<Fs...> imports{};
     };
+
+    /// @brief Wrapper for the final_import_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_import_type_section_details_wrapper_t
+    {
+        final_import_type<Fs...> const* import_type_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32* importdesc_counter_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr final_import_type_section_details_wrapper_t<Fs...> section_details(
+        final_import_type<Fs...> const& import_type,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections,
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32* importdesc_counter_ptr) noexcept
+    {
+        return {::std::addressof(import_type), ::std::addressof(all_sections), importdesc_counter_ptr};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, final_import_type_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       final_import_type_section_details_wrapper_t<Fs...> const import_type_details_wrapper)
+    {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(import_type_details_wrapper.import_type_ptr == nullptr || import_type_details_wrapper.all_sections_ptr == nullptr ||
+           import_type_details_wrapper.importdesc_counter_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             section_details(import_type_details_wrapper.import_type_ptr->imports,
+                                                                             *import_type_details_wrapper.all_sections_ptr,
+                                                                             import_type_details_wrapper.importdesc_counter_ptr),
+                                                             ", Module Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->module_name),
+                                                             "\", Extern Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->extern_name),
+                                                             "\"");
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             section_details(import_type_details_wrapper.import_type_ptr->imports,
+                                                                             *import_type_details_wrapper.all_sections_ptr,
+                                                                             import_type_details_wrapper.importdesc_counter_ptr),
+                                                             L", Module Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->module_name),
+                                                             L"\", Extern Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->extern_name),
+                                                             L"\"");
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            // All are u8string_view, no transcoding required.
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             section_details(import_type_details_wrapper.import_type_ptr->imports,
+                                                                             *import_type_details_wrapper.all_sections_ptr,
+                                                                             import_type_details_wrapper.importdesc_counter_ptr),
+                                                             u8", Module Name: \"",
+                                                             import_type_details_wrapper.import_type_ptr->module_name,
+                                                             u8"\", Extern Name: \"",
+                                                             import_type_details_wrapper.import_type_ptr->extern_name,
+                                                             u8"\"");
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             section_details(import_type_details_wrapper.import_type_ptr->imports,
+                                                                             *import_type_details_wrapper.all_sections_ptr,
+                                                                             import_type_details_wrapper.importdesc_counter_ptr),
+                                                             u", Module Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->module_name),
+                                                             u"\", Extern Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->extern_name),
+                                                             u"\"");
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             section_details(import_type_details_wrapper.import_type_ptr->imports,
+                                                                             *import_type_details_wrapper.all_sections_ptr,
+                                                                             import_type_details_wrapper.importdesc_counter_ptr),
+                                                             U", Module Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->module_name),
+                                                             U"\", Extern Name: \"",
+                                                             ::fast_io::mnp::code_cvt(import_type_details_wrapper.import_type_ptr->extern_name),
+                                                             U"\"");
+        }
+    }
 
     /// @brief      Prohibited use of strings with a length of 0
     /// @details    The WASM specification does not prohibit zero strings; this is a reserved concept.

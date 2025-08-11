@@ -275,13 +275,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     struct table_section_storage_section_details_wrapper_t
     {
         table_section_storage_t<Fs...> const* table_section_storage_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr table_section_storage_section_details_wrapper_t<Fs...> section_details(
-        table_section_storage_t<Fs...> const& table_section_storage) noexcept
+        table_section_storage_t<Fs...> const& table_section_storage,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
     {
-        return {::std::addressof(table_section_storage)};
+        return {::std::addressof(table_section_storage), ::std::addressof(all_sections)};
     }
 
     /// @brief Print the table section details

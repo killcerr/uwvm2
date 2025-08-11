@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::type::value_type value_type  // [adl] can be replaced
         ) noexcept
     {
-        return uwvm2::parser::wasm::standard::wasm1::features::is_valid_value_type(value_type);
+        return ::uwvm2::parser::wasm::standard::wasm1::features::is_valid_value_type(value_type);
     }
 
     /// @brief      handle type_prefix: "functype"
@@ -559,12 +559,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     struct type_section_storage_section_details_wrapper_t
     {
         type_section_storage_t<Fs...> const* type_section_storage_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    inline constexpr type_section_storage_section_details_wrapper_t<Fs...> section_details(type_section_storage_t<Fs...> const& type_section_storage) noexcept
+    inline constexpr type_section_storage_section_details_wrapper_t<Fs...> section_details(
+        type_section_storage_t<Fs...> const& type_section_storage,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
     {
-        return {::std::addressof(type_section_storage)};
+        return {::std::addressof(type_section_storage), ::std::addressof(all_sections)};
     }
 
     /// @brief Print the type section details
@@ -574,18 +577,86 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        Stm && stream,
                                        type_section_storage_section_details_wrapper_t<Fs...> const type_section_details_wrapper)
     {
-        if(type_section_details_wrapper.type_section_storage_ptr == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(type_section_details_wrapper.type_section_storage_ptr == nullptr || type_section_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
 
         auto const type_section_size{type_section_details_wrapper.type_section_storage_ptr->types.size()};
 
         if(type_section_size)
         {
-            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nType[", type_section_size, u8"]:\n");
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nType[", type_section_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nType[", type_section_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nType[", type_section_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nType[", type_section_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nType[", type_section_size, U"]:\n");
+            }
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};
             for(auto const& curr_type: type_section_details_wrapper.type_section_storage_ptr->types)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), u8" - type[", type_counter, u8"]: ", section_details(curr_type));
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    " - type[",
+                                                                    type_counter,
+                                                                    "]: {",
+                                                                    section_details(curr_type),
+                                                                    "}");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    L" - type[",
+                                                                    type_counter,
+                                                                    L"]: {",
+                                                                    section_details(curr_type),
+                                                                    L"}");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u8" - type[",
+                                                                    type_counter,
+                                                                    u8"]: {",
+                                                                    section_details(curr_type),
+                                                                    u8"}");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u" - type[",
+                                                                    type_counter,
+                                                                    u"]: {",
+                                                                    section_details(curr_type),
+                                                                    u"}");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    U" - type[",
+                                                                    type_counter,
+                                                                    U"]: {",
+                                                                    section_details(curr_type),
+                                                                    U"}");
+                }
                 ++type_counter;
             }
         }
