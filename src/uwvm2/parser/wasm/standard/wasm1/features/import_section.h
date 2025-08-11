@@ -249,6 +249,68 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // do nothing
     }
 
+    inline constexpr void check_import_export_text_format(
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::zero_illegal>,  // [adl]
+        ::std::byte const* begin,
+        ::std::byte const* end,
+        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        auto const [utf8pos, utf8err]{::uwvm2::utils::utf::check_has_zero_illegal_unchecked(reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
+                                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(end))};
+
+        if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+        {
+            err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
+            err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+    }
+
+    inline constexpr void check_import_export_text_format(
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629>,  // [adl]
+        ::std::byte const* begin,
+        ::std::byte const* end,
+        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        auto const [utf8pos, utf8err]{::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629>(
+            reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
+            reinterpret_cast<char8_t_const_may_alias_ptr>(end))};
+
+        if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+        {
+            err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
+            err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+    }
+
+    inline constexpr void check_import_export_text_format(
+        ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629_with_zero_illegal>,  // [adl]
+        ::std::byte const* begin,
+        ::std::byte const* end,
+        ::uwvm2::parser::wasm::base::error_impl& err) UWVM_THROWS
+    {
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        auto const [utf8pos, utf8err]{::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
+            reinterpret_cast<char8_t_const_may_alias_ptr>(begin),
+            reinterpret_cast<char8_t_const_may_alias_ptr>(end))};
+
+        if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+        {
+            err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
+            err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+    }
+
     /// @brief Define the handler function for type_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(

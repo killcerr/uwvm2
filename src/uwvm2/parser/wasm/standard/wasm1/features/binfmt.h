@@ -72,10 +72,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         inline static constexpr ::uwvm2::utils::container::u8string_view feature_name{u8"WebAssembly Release 1.0 (2019-07-20)"};
         inline static constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_version{1u};
 
-        // binary format
+        /// @brief      text format of Name
+        /// @see        WebAssembly Release 1.0 (2019-07-20) § 5.2.4
+        /// @details    Names are encoded as a vector of bytes containing the Unicode34 (Section 3.9) UTF-8 encoding of the name’s character sequence.
+        ///             The name field can contain null characters (byte 0x00).
         using text_format = ::uwvm2::parser::wasm::concepts::operation::type_replacer<
             ::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
-            ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::null>>;
+            ::uwvm2::parser::wasm::concepts::text_format_wapper<::uwvm2::parser::wasm::text_format::text_format::utf8_rfc3629>>;
 
         // type section
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
