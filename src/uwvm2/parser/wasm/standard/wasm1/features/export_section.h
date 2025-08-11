@@ -599,9 +599,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        export_section_storage_section_details_wrapper_t<Fs...> const export_section_details_wrapper)
     {
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-        if(export_section_details_wrapper.export_section_storage_ptr == nullptr || export_section_details_wrapper.all_sections_ptr == nullptr) [[unlikely]] 
-        { 
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos(); 
+        if(export_section_details_wrapper.export_section_storage_ptr == nullptr || export_section_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
         /// @todo
