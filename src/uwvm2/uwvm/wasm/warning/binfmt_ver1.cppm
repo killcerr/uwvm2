@@ -52,9 +52,11 @@ import uwvm2.uwvm.wasm.type;
 import uwvm2.uwvm.wasm.storage;
 import uwvm2.uwvm.wasm.feature;
 import uwvm2.uwvm.wasm.custom;
+import :warn_storage;
 import :type_section;
 import :import_section;
-import :warn_storage;
+import :function_section;
+import :final_check;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

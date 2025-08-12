@@ -50,9 +50,11 @@
 # include <uwvm2/uwvm/wasm/storage/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 # include <uwvm2/uwvm/wasm/custom/impl.h>
+# include "warn_storage.h"
 # include "type_section.h"
 # include "import_section.h"
-# include "warn_storage.h"
+# include "function_section.h"
+# include "final_check.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -74,7 +76,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 
         ::uwvm2::uwvm::wasm::warning::show_wasm_type_section_warning(wasm, warn_storage);
         ::uwvm2::uwvm::wasm::warning::show_wasm_import_section_warning(wasm, warn_storage);
+        ::uwvm2::uwvm::wasm::warning::show_wasm_function_section_warning(wasm, warn_storage);
         /// @todo
+
+        ::uwvm2::uwvm::wasm::warning::show_wasm_final_check_warning(wasm, warn_storage);
     }
 }
 

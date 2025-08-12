@@ -61,6 +61,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
     struct binfmt_ver1_warning_storage_t
     {
+        // This is not a bitmap, but vec(bool), because the number of types is usually not too large to require bool. Instead, access efficiency is what is most
+        // needed.
         ::uwvm2::utils::container::vector<bool> unused_type_checker{};
     };
 
