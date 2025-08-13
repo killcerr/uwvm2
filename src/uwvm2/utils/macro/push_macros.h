@@ -383,6 +383,7 @@
 /// @brief        You can specify the may_alias type attribute for a type so that lvalues of
 ///               the type can alias objects of any type, similar to a char type.
 /// @details      on gcc, clang: [[__gnu__::__may_alias__]]
+///               on msvc: MSVC does not enable strict aliasing rules by default, so aliasing between pointers of different types is usually allowed.
 #pragma push_macro("UWVM_GNU_MAY_ALIAS")
 #undef UWVM_GNU_MAY_ALIAS
 #if __has_cpp_attribute(__gnu__::__may_alias__)
@@ -488,4 +489,13 @@
 # define UWVM_HAS_FEATURE(...) __has_feature(__VA_ARGS__)
 #else
 # define UWVM_HAS_FEATURE(...) 0
+#endif
+
+/// @brief        Suppress All Sanitizers for a function
+#pragma push_macro("UWVM_NO_SANITIZE")
+#undef UWVM_NO_SANITIZE
+#if __has_cpp_attribute(__gnu__::__no_sanitize__)  // Clang, GCC
+# define UWVM_NO_SANITIZE [[__gnu__::__no_sanitize__("all")]]
+#else
+# define UWVM_NO_SANITIZE
 #endif
