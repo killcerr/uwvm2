@@ -28,6 +28,7 @@
 # include <cstddef>
 # include <concepts>
 # include <bit>
+# include <limits>
 // macro
 # include <uwvm2/parser/wasm/feature/feature_push_macro.h>
 // import
@@ -49,8 +50,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
     struct limits_type
     {
+        inline constexpr auto default_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 min{};
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 max{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 max{default_max};
         bool present_max{};
     };
 
