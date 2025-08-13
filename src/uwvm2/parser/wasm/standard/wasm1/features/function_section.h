@@ -8508,55 +8508,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              " - def[",
                                                                              localdef_counter,
-                                                                             "]: {func[",
+                                                                             "] -> func[",
                                                                              func_counter,
                                                                              "]: {sig = type[",
                                                                              type_index,
-                                                                             "]}}\n");
+                                                                             "]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              L" - def[",
                                                                              localdef_counter,
-                                                                             L"]: {func[",
+                                                                             L"] -> func[",
                                                                              func_counter,
                                                                              L"]: {sig = type[",
                                                                              type_index,
-                                                                             L"]}}\n");
+                                                                             L"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u8" - def[",
                                                                              localdef_counter,
-                                                                             u8"]: {func[",
+                                                                             u8"] -> func[",
                                                                              func_counter,
                                                                              u8"]: {sig = type[",
                                                                              type_index,
-                                                                             u8"]}}\n");
+                                                                             u8"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u" - def[",
                                                                              localdef_counter,
-                                                                             u"]: {func[",
+                                                                             u"] -> func[",
                                                                              func_counter,
                                                                              u"]: {sig = type[",
                                                                              type_index,
-                                                                             u"]}}\n");
+                                                                             u"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              U" - def[",
                                                                              localdef_counter,
-                                                                             U"]: {func[",
+                                                                             U"] -> func[",
                                                                              func_counter,
                                                                              U"]: {sig = type[",
                                                                              type_index,
-                                                                             U"]}}\n");
+                                                                             U"]}\n");
                         }
 
                         ++func_counter;
@@ -8576,55 +8576,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              " - def[",
                                                                              localdef_counter,
-                                                                             "]: {func[",
+                                                                             "] -> func[",
                                                                              func_counter,
                                                                              "]: {sig = type[",
                                                                              type_index,
-                                                                             "]}}\n");
+                                                                             "]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              L" - def[",
                                                                              localdef_counter,
-                                                                             L"]: {func[",
+                                                                             L"] -> func[",
                                                                              func_counter,
                                                                              L"]: {sig = type[",
                                                                              type_index,
-                                                                             L"]}}\n");
+                                                                             L"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u8" - def[",
                                                                              localdef_counter,
-                                                                             u8"]: {func[",
+                                                                             u8"] -> func[",
                                                                              func_counter,
                                                                              u8"]: {sig = type[",
                                                                              type_index,
-                                                                             u8"]}}\n");
+                                                                             u8"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u" - def[",
                                                                              localdef_counter,
-                                                                             u"]: {func[",
+                                                                             u"] -> func[",
                                                                              func_counter,
                                                                              u"]: {sig = type[",
                                                                              type_index,
-                                                                             u"]}}\n");
+                                                                             u"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              U" - def[",
                                                                              localdef_counter,
-                                                                             U"]: {func[",
+                                                                             U"] -> func[",
                                                                              func_counter,
                                                                              U"]: {sig = type[",
                                                                              type_index,
-                                                                             U"]}}\n");
+                                                                             U"]}\n");
                         }
 
                         ++func_counter;
@@ -8644,55 +8644,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              " - def[",
                                                                              localdef_counter,
-                                                                             "]: {func[",
+                                                                             "] -> func[",
                                                                              func_counter,
                                                                              "]: {sig = type[",
                                                                              type_index,
-                                                                             "]}}\n");
+                                                                             "]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              L" - def[",
                                                                              localdef_counter,
-                                                                             L"]: {func[",
+                                                                             L"] -> func[",
                                                                              func_counter,
                                                                              L"]: {sig = type[",
                                                                              type_index,
-                                                                             L"]}}\n");
+                                                                             L"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u8" - def[",
                                                                              localdef_counter,
-                                                                             u8"]: {func[",
+                                                                             u8"] -> func[",
                                                                              func_counter,
                                                                              u8"]: {sig = type[",
                                                                              type_index,
-                                                                             u8"]}}\n");
+                                                                             u8"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u" - def[",
                                                                              localdef_counter,
-                                                                             u"]: {func[",
+                                                                             u"] -> func[",
                                                                              func_counter,
                                                                              u"]: {sig = type[",
                                                                              type_index,
-                                                                             u"]}}\n");
+                                                                             u"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              U" - def[",
                                                                              localdef_counter,
-                                                                             U"]: {func[",
+                                                                             U"] -> func[",
                                                                              func_counter,
                                                                              U"]: {sig = type[",
                                                                              type_index,
-                                                                             U"]}}\n");
+                                                                             U"]}\n");
                         }
 
                         ++func_counter;
@@ -8712,55 +8712,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              " - def[",
                                                                              localdef_counter,
-                                                                             "]: {func[",
+                                                                             "] -> func[",
                                                                              func_counter,
                                                                              "]: {sig = type[",
                                                                              type_index,
-                                                                             "]}}\n");
+                                                                             "]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              L" - def[",
                                                                              localdef_counter,
-                                                                             L"]: {func[",
+                                                                             L"] -> func[",
                                                                              func_counter,
                                                                              L"]: {sig = type[",
                                                                              type_index,
-                                                                             L"]}}\n");
+                                                                             L"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u8" - def[",
                                                                              localdef_counter,
-                                                                             u8"]: {func[",
+                                                                             u8"] -> func[",
                                                                              func_counter,
                                                                              u8"]: {sig = type[",
                                                                              type_index,
-                                                                             u8"]}}\n");
+                                                                             u8"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              u" - def[",
                                                                              localdef_counter,
-                                                                             u"]: {func[",
+                                                                             u"] -> func[",
                                                                              func_counter,
                                                                              u"]: {sig = type[",
                                                                              type_index,
-                                                                             u"]}}\n");
+                                                                             u"]}\n");
                         }
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                              U" - def[",
                                                                              localdef_counter,
-                                                                             U"]: {func[",
+                                                                             U"] -> func[",
                                                                              func_counter,
                                                                              U"]: {sig = type[",
                                                                              type_index,
-                                                                             U"]}}\n");
+                                                                             U"]}\n");
                         }
 
                         ++func_counter;
