@@ -731,7 +731,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto importsec_importdesc_curr{importsec_importdesc_begin};
         for(auto importdesc_curr{importdesc_counter.begin()}; importdesc_curr != importdesc_counter.end(); ++importdesc_curr)
         {
-            importsec_importdesc_curr->reserve(*importdesc_curr);
+            importsec_importdesc_curr->reserve(static_cast<::std::size_t>(*importdesc_curr));
             ++importsec_importdesc_curr;
         }
 
