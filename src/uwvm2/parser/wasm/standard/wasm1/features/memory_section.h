@@ -300,9 +300,100 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)memory_section_details_wrapper;
+        auto const memory_section_size{memory_section_details_wrapper.memory_section_storage_ptr->memories.size()};
+
+        if(memory_section_size)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nMemory[", memory_section_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nMemory[", memory_section_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nMemory[", memory_section_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nMemory[", memory_section_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nMemory[", memory_section_size, U"]:\n");
+            }
+
+            auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(
+                *memory_section_details_wrapper.all_sections_ptr)};
+            static_assert(importsec.importdesc_count > 2uz);
+            auto memory_counter{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(2uz).size())};
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 localdef_counter{};
+
+            for(auto const& curr_memory: memory_section_details_wrapper.memory_section_storage_ptr->memories)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     " - localmemory[",
+                                                                     localdef_counter,
+                                                                     "] -> memory[",
+                                                                     memory_counter,
+                                                                     "]: {",
+                                                                     section_details(curr_memory),
+                                                                     "}\n");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L" - localmemory[",
+                                                                     localdef_counter,
+                                                                     L"] -> memory[",
+                                                                     memory_counter,
+                                                                     L"]: {",
+                                                                     section_details(curr_memory),
+                                                                     L"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8" - localmemory[",
+                                                                     localdef_counter,
+                                                                     u8"] -> memory[",
+                                                                     memory_counter,
+                                                                     u8"]: {",
+                                                                     section_details(curr_memory),
+                                                                     u8"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u" - localmemory[",
+                                                                     localdef_counter,
+                                                                     u"] -> memory[",
+                                                                     memory_counter,
+                                                                     u"]: {",
+                                                                     section_details(curr_memory),
+                                                                     u"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U" - localmemory[",
+                                                                     localdef_counter,
+                                                                     U"] -> memory[",
+                                                                     memory_counter,
+                                                                     U"]: {",
+                                                                     section_details(curr_memory),
+                                                                     U"}\n");
+                }
+
+                ++memory_counter;
+                ++localdef_counter;
+            }
+        }
     }
 }
 
