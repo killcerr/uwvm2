@@ -60,8 +60,7 @@ enum class sock_protocol
 	tp,      /* SO Transport Protocol Class 4.  */
 	udp,     /* User Datagram Protocol.  */
 	udplite, /* UDP-Lite protocol.  */
-	vrrp,
-	quic     /* QUIC protocol */
+	vrrp
 };
 
 } // namespace fast_io

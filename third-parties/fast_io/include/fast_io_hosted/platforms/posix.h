@@ -61,7 +61,7 @@
 
 namespace fast_io
 {
-	
+
 #if ((!defined(_WIN32) || defined(__WINE__)) || defined(__CYGWIN__))
 namespace posix
 {
@@ -905,7 +905,7 @@ inline constexpr my_dos_concat_tlc_path_common_result my_dos_concat_tlc_path_com
 template <bool always_terminate = true>
 inline constexpr dos_path_tlc_string my_dos_concat_tlc_path(int dirfd, char const *pathname) noexcept(always_terminate)
 {
-	auto [failed, path] {my_dos_concat_tlc_path_common(dirfd, pathname)};
+	auto [failed, path]{my_dos_concat_tlc_path_common(dirfd, pathname)};
 	if (failed) [[unlikely]]
 	{
 		::fast_io::system_call_throw_error<always_terminate>(-1);

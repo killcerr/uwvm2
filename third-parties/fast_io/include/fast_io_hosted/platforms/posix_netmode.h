@@ -556,10 +556,6 @@ inline constexpr int to_posix_sock_protocol(sock_protocol dom) noexcept
 	case sock_protocol::vrrp:
 		return IPPROTO_VRRP;
 #endif
-#ifdef IPPROTO_QUIC
-	case sock_protocol::quic:
-		return IPPROTO_QUIC;
-#endif
 	default:
 		return -1;
 	}
