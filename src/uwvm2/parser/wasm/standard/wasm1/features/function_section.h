@@ -8506,7 +8506,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if constexpr(::std::same_as<char_type, char>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             " - def[",
+                                                                             " - localfunc[",
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
@@ -8517,7 +8517,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             L" - def[",
+                                                                             L" - localfunc[",
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
@@ -8528,7 +8528,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u8" - def[",
+                                                                             u8" - localfunc[",
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
@@ -8539,7 +8539,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u" - def[",
+                                                                             u" - localfunc[",
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
@@ -8550,7 +8550,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             U" - def[",
+                                                                             U" - localfunc[",
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,
@@ -8574,7 +8574,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if constexpr(::std::same_as<char_type, char>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             " - def[",
+                                                                             " - localfunc[",
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
@@ -8585,7 +8585,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             L" - def[",
+                                                                             L" - localfunc[",
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
@@ -8596,7 +8596,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u8" - def[",
+                                                                             u8" - localfunc[",
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
@@ -8607,7 +8607,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u" - def[",
+                                                                             u" - localfunc[",
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
@@ -8618,7 +8618,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             U" - def[",
+                                                                             U" - localfunc[",
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,
@@ -8642,7 +8642,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if constexpr(::std::same_as<char_type, char>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             " - def[",
+                                                                             " - localfunc[",
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
@@ -8653,7 +8653,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             L" - def[",
+                                                                             L" - localfunc[",
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
@@ -8664,7 +8664,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u8" - def[",
+                                                                             u8" - localfunc[",
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
@@ -8675,7 +8675,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u" - def[",
+                                                                             u" - localfunc[",
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
@@ -8686,7 +8686,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             U" - def[",
+                                                                             U" - localfunc[",
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,
@@ -8710,7 +8710,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if constexpr(::std::same_as<char_type, char>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             " - def[",
+                                                                             " - localfunc[",
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
@@ -8721,7 +8721,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, wchar_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             L" - def[",
+                                                                             L" - localfunc[",
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
@@ -8732,7 +8732,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char8_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u8" - def[",
+                                                                             u8" - localfunc[",
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
@@ -8743,7 +8743,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char16_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             u" - def[",
+                                                                             u" - localfunc[",
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
@@ -8754,7 +8754,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         else if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                             U" - def[",
+                                                                             U" - localfunc[",
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,

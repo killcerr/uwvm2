@@ -337,7 +337,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 if constexpr(::std::same_as<char_type, char>)
                 {
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                     " - def[",
+                                                                     " - localtable[",
                                                                      localdef_counter,
                                                                      "] -> table[",
                                                                      table_counter,
@@ -348,7 +348,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 else if constexpr(::std::same_as<char_type, wchar_t>)
                 {
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                     L" - def[",
+                                                                     L" - localtable[",
                                                                      localdef_counter,
                                                                      L"] -> table[",
                                                                      table_counter,
@@ -359,7 +359,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 else if constexpr(::std::same_as<char_type, char8_t>)
                 {
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                     u8" - def[",
+                                                                     u8" - localtable[",
                                                                      localdef_counter,
                                                                      u8"] -> table[",
                                                                      table_counter,
@@ -370,7 +370,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 else if constexpr(::std::same_as<char_type, char16_t>)
                 {
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                     u" - def[",
+                                                                     u" - localtable[",
                                                                      localdef_counter,
                                                                      u"] -> table[",
                                                                      table_counter,
@@ -381,7 +381,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 else if constexpr(::std::same_as<char_type, char32_t>)
                 {
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
-                                                                     U" - def[",
+                                                                     U" - localtable[",
                                                                      localdef_counter,
                                                                      U"] -> table[",
                                                                      table_counter,
