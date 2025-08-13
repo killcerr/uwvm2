@@ -56,6 +56,8 @@ import :warn_storage;
 import :type_section;
 import :import_section;
 import :function_section;
+import :table_section;
+import :memory_section;
 import :final_check;
 
 #ifndef UWVM_MODULE

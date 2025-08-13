@@ -26,6 +26,8 @@
 # include "type_section.h"
 # include "import_section.h"
 # include "function_section.h"
+# include "table_section.h"
+# include "memory_section.h"
 # include "final_check.h"
 # include "binfmt_ver1.h"
 #endif
