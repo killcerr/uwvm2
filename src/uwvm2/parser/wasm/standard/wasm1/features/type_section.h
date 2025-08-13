@@ -659,6 +659,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                     section_details(curr_type),
                                                                     U"}");
                 }
+                
                 ++type_counter;
             }
         }

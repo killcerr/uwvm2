@@ -299,9 +299,101 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)table_section_details_wrapper;
+
+        auto const table_section_size{table_section_details_wrapper.table_section_storage_ptr->tables.size()};
+
+        if(table_section_size)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nTable[", table_section_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nTable[", table_section_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nTable[", table_section_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nTable[", table_section_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nTable[", table_section_size, U"]:\n");
+            }
+
+            auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(
+                *table_section_details_wrapper.all_sections_ptr)};
+            static_assert(importsec.importdesc_count > 1uz);
+            auto table_counter{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(1uz).size())};
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 localdef_counter{};
+
+            for(auto const& curr_table: table_section_details_wrapper.table_section_storage_ptr->tables)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     " - def[",
+                                                                     localdef_counter,
+                                                                     "] -> table[",
+                                                                     table_counter,
+                                                                     "]: {",
+                                                                     section_details(curr_table),
+                                                                     "}\n");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L" - def[",
+                                                                     localdef_counter,
+                                                                     L"] -> table[",
+                                                                     table_counter,
+                                                                     L"]: {",
+                                                                     section_details(curr_table),
+                                                                     L"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8" - def[",
+                                                                     localdef_counter,
+                                                                     u8"] -> table[",
+                                                                     table_counter,
+                                                                     u8"]: {",
+                                                                     section_details(curr_table),
+                                                                     u8"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u" - def[",
+                                                                     localdef_counter,
+                                                                     u"] -> table[",
+                                                                     table_counter,
+                                                                     u"]: {",
+                                                                     section_details(curr_table),
+                                                                     u"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U" - def[",
+                                                                     localdef_counter,
+                                                                     U"] -> table[",
+                                                                     table_counter,
+                                                                     U"]: {",
+                                                                     section_details(curr_table),
+                                                                     U"}\n");
+                }
+
+                ++table_counter;
+                ++localdef_counter;
+            }
+        }
     }
 }
 
