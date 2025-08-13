@@ -51,7 +51,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     struct limits_type
     {
         // Provide a default maximum value guarantee that min is always less than or equal to max.
-        inline constexpr auto default_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+        inline static constexpr auto default_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
 
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 min{};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 max{default_max};
@@ -308,7 +308,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
                                                             "mutable: ",
                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            ", ",
+                                                            ", type: ",
                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, wchar_t>)
@@ -316,7 +316,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
                                                             L"mutable: ",
                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            L", ",
+                                                            L", type: ",
                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, char8_t>)
@@ -324,7 +324,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
                                                             u8"mutable: ",
                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            u8", ",
+                                                            u8", type: ",
                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, char16_t>)
@@ -332,7 +332,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
                                                             u"mutable: ",
                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            u", ",
+                                                            u", type: ",
                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, char32_t>)
@@ -340,7 +340,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
                                                             U"mutable: ",
                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            U", ",
+                                                            U", type: ",
                                                             section_details(global_section_details_wrapper.global.type));
         }
     }

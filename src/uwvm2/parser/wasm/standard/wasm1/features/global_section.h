@@ -237,6 +237,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [   safe            ] unsafe (could be the section_end)
             //                       ^^ local_global.expr.begin
 
+            // The calculation of constant expressions will be parsed during the initialization phase.
+
             for(;; ++section_curr)
             {
                 if(section_curr == section_end) [[unlikely]]
@@ -327,9 +329,101 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)global_section_details_wrapper;
+
+        auto const global_section_size{global_section_details_wrapper.global_section_storage_ptr->local_globals.size()};
+
+        if(global_section_size)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nGlobal[", global_section_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nGlobal[", global_section_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nGlobal[", global_section_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nGlobal[", global_section_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nGlobal[", global_section_size, U"]:\n");
+            }
+
+            auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(
+                *global_section_details_wrapper.all_sections_ptr)};
+            static_assert(importsec.importdesc_count > 3uz);
+            auto global_counter{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(3uz).size())};
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 localdef_counter{};
+
+            for(auto const& curr_global: global_section_details_wrapper.global_section_storage_ptr->local_globals)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     " - localglobal[",
+                                                                     localdef_counter,
+                                                                     "] -> global[",
+                                                                     global_counter,
+                                                                     "]: {",
+                                                                     section_details(curr_global.global),
+                                                                     "}\n");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L" - localglobal[",
+                                                                     localdef_counter,
+                                                                     L"] -> global[",
+                                                                     global_counter,
+                                                                     L"]: {",
+                                                                     section_details(curr_global.global),
+                                                                     L"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8" - localglobal[",
+                                                                     localdef_counter,
+                                                                     u8"] -> global[",
+                                                                     global_counter,
+                                                                     u8"]: {",
+                                                                     section_details(curr_global.global),
+                                                                     u8"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u" - localglobal[",
+                                                                     localdef_counter,
+                                                                     u"] -> global[",
+                                                                     global_counter,
+                                                                     u"]: {",
+                                                                     section_details(curr_global.global),
+                                                                     u"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U" - localglobal[",
+                                                                     localdef_counter,
+                                                                     U"] -> global[",
+                                                                     global_counter,
+                                                                     U"]: {",
+                                                                     section_details(curr_global.global),
+                                                                     U"}\n");
+                }
+
+                ++global_counter;
+                ++localdef_counter;
+            }
+        }
     }
 }
 
