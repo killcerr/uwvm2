@@ -50,7 +50,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
     /// @see        WebAssembly Release 1.1 (Draft 2021-11-16) § 2.3.2
 #if __has_cpp_attribute(__gnu__::__vector_size__)
     using wasm_v128 [[__gnu__::__vector_size__(16)]] = char;
-#elif CHAR_BIT == 8
+#elif CHAR_BIT > 8
+    struct alignas(16uz) wasm_v128
+    {
+        char c8x16[16];
+    };
+#else
     union alignas(16uz) wasm_v128
     {
         wasm_u8 u8x16[16];
@@ -66,11 +71,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1p1::type
         wasm_u64 u64x2[2];
         wasm_i64 i64x2[2];
         wasm_f64 f64x2[2];
-    };
-#else
-    struct alignas(16uz) wasm_v128
-    {
-        char c8x16[16];
     };
 #endif
 

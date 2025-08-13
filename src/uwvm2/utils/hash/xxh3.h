@@ -122,7 +122,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-#if CHAR_BIT != 8
+#if CHAR_BIT > 8
                 auto res{::std::to_integer<::std::uint_least8_t>(*ptr)};
                 res &= 0xFFu;
                 return res;
@@ -152,7 +152,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-#if CHAR_BIT != 8
+#if CHAR_BIT > 8
                 ::std::uint_least16_t res{};
                 unsigned shf{};
                 for(unsigned i{}; i != 2u; ++i)
@@ -190,7 +190,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-#if CHAR_BIT != 8
+#if CHAR_BIT > 8
                 ::std::uint_least32_t res{};
                 unsigned shf{};
                 for(unsigned i{}; i != 4u; ++i)
@@ -228,7 +228,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
             else
             {
-#if CHAR_BIT != 8
+#if CHAR_BIT > 8
                 ::std::uint_least64_t res{};
                 unsigned shf{};
                 for(unsigned i{}; i != 8u; ++i)

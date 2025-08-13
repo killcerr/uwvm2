@@ -50,7 +50,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.3.4
     struct limits_type
     {
+        // Provide a default maximum value guarantee that min is always less than or equal to max.
         inline constexpr auto default_max{::std::numeric_limits<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>::max()};
+
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 min{};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 max{default_max};
         bool present_max{};

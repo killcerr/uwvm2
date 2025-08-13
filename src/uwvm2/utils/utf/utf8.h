@@ -98,7 +98,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 // Subsequent judgment is required for < static_cast<char8_t>(0b1000'0000u), so for platforms where CHAR_BIT is not equal to 8 the high bit
                 // needs to be cleared.
 
-                // support CHAR_BIT != 8
+                // support CHAR_BIT > 8
                 str_curr_val &= 0xFFu;
 
                 if(str_curr_val < static_cast<char8_t>(0b1000'0000u))

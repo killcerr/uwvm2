@@ -267,7 +267,11 @@ UWVM_MODULE_EXPORT namespace std
     {
         inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string_view<char_type> obj) const noexcept
         {
-#if CHAR_BIT == 8
+#if CHAR_BIT > 8
+            // use std hash
+            using strvw = ::std::basic_string_view<char_type>;
+            return ::std::hash<strvw>{}(strvw{obj});
+#else
             ::std::size_t sz;
             if constexpr(requires { obj.size_bytes(); }) { sz = obj.size_bytes(); }
             else
@@ -275,10 +279,6 @@ UWVM_MODULE_EXPORT namespace std
                 sz = obj.size() * sizeof(char_type);
             }
             return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(obj.data()), sz));
-#else
-            // use std hash
-            using strvw = ::std::basic_string_view<char_type>;
-            return ::std::hash<strvw>{}(strvw{obj});
 #endif
         }
     };
@@ -288,7 +288,11 @@ UWVM_MODULE_EXPORT namespace std
     {
         inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_cstring_view<char_type> obj) const noexcept
         {
-#if CHAR_BIT == 8
+#if CHAR_BIT > 8
+            // use std hash
+            using strvw = ::std::basic_string_view<char_type>;
+            return ::std::hash<strvw>{}(strvw{obj});
+#else
             ::std::size_t sz;
             if constexpr(requires { obj.size_bytes(); }) { sz = obj.size_bytes(); }
             else
@@ -296,10 +300,6 @@ UWVM_MODULE_EXPORT namespace std
                 sz = obj.size() * sizeof(char_type);
             }
             return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(obj.data()), sz));
-#else
-            // use std hash
-            using strvw = ::std::basic_string_view<char_type>;
-            return ::std::hash<strvw>{}(strvw{obj});
 #endif
         }
     };
@@ -309,7 +309,11 @@ UWVM_MODULE_EXPORT namespace std
     {
         inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string<char_type, Alloc> const& obj) const noexcept
         {
-#if CHAR_BIT == 8
+#if CHAR_BIT > 8
+            // use std hash
+            using strvw = ::std::basic_string_view<char_type>;
+            return ::std::hash<strvw>{}(strvw{obj});
+#else
             ::std::size_t sz;
             if constexpr(requires { obj.size_bytes(); }) { sz = obj.size_bytes(); }
             else
@@ -317,10 +321,6 @@ UWVM_MODULE_EXPORT namespace std
                 sz = obj.size() * sizeof(char_type);
             }
             return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(obj.data()), sz));
-#else
-            // use std hash
-            using strvw = ::std::basic_string_view<char_type>;
-            return ::std::hash<strvw>{}(strvw{obj});
 #endif
         }
     };

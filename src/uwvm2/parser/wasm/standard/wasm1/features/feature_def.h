@@ -29,6 +29,7 @@
 # include <cstddef>
 # include <cstdint>
 # include <cstring>
+# include <climits>
 # include <concepts>
 # include <type_traits>
 # include <utility>
@@ -1478,16 +1479,8 @@ UWVM_MODULE_EXPORT namespace std
     {
         inline constexpr ::std::size_t operator() (::uwvm2::parser::wasm::standard::wasm1::features::type_function_checker const& checker) const noexcept
         {
-#if CHAR_BIT == 8
-            ::std::size_t const parameter_sz{static_cast<::std::size_t>(checker.parameter.end - checker.parameter.begin)};
-            ::std::size_t const result_sz{static_cast<::std::size_t>(checker.result.end - checker.result.begin)};
-
-            auto const seed1{::uwvm2::utils::hash::xxh3_64bits(checker.parameter.begin, parameter_sz)};
-
-            return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(checker.result.begin, result_sz, seed1));
-#else
+#if CHAR_BIT > 8
             // use std hash
-
             using char_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
             ::uwvm2::utils::container::string_view const tmp_para{reinterpret_cast<char_const_may_alias_ptr>(checker.parameter.begin),
                                                                   static_cast<::std::size_t>(checker.parameter.end - checker.parameter.begin)};
@@ -1496,6 +1489,11 @@ UWVM_MODULE_EXPORT namespace std
             ::std::size_t const h1{::std::hash<::uwvm2::utils::container::string_view>{}(tmp_para)};
             ::std::size_t const h2{::std::hash<::uwvm2::utils::container::string_view>{}(tmp_res)};
             return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
+#else
+            ::std::size_t const parameter_sz{static_cast<::std::size_t>(checker.parameter.end - checker.parameter.begin)};
+            ::std::size_t const result_sz{static_cast<::std::size_t>(checker.result.end - checker.result.begin)};
+            auto const seed1{::uwvm2::utils::hash::xxh3_64bits(checker.parameter.begin, parameter_sz)};
+            return static_cast<::std::size_t>(::uwvm2::utils::hash::xxh3_64bits(checker.result.begin, result_sz, seed1));
 #endif
         }
     };
@@ -1505,7 +1503,12 @@ UWVM_MODULE_EXPORT namespace std
     {
         inline constexpr ::std::size_t operator() (::uwvm2::parser::wasm::standard::wasm1::features::name_checker const& checker) const noexcept
         {
-#if CHAR_BIT == 8
+#if CHAR_BIT > 8
+            // use std hash
+            ::std::size_t h1{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.module_name)};
+            ::std::size_t h2{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.extern_name)};
+            return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
+#else
             ::std::size_t module_name_sz;
             ::std::size_t extern_name_sz;
             if constexpr(requires { checker.module_name.size_bytes(); }) { module_name_sz = checker.module_name.size_bytes(); }
@@ -1524,12 +1527,6 @@ UWVM_MODULE_EXPORT namespace std
 
             return static_cast<::std::size_t>(
                 ::uwvm2::utils::hash::xxh3_64bits(reinterpret_cast<::std::byte const*>(checker.extern_name.data()), extern_name_sz, seed1));
-#else
-            // use std hash
-
-            ::std::size_t h1{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.module_name)};
-            ::std::size_t h2{::std::hash<::uwvm2::utils::container::u8string_view>{}(checker.extern_name)};
-            return static_cast<::std::size_t>(h1 ^ (h2 + 0x9e3779b9u + (h1 << 6u) + (h1 >> 2u) + (h2 << 16u)));
 #endif
         }
     };

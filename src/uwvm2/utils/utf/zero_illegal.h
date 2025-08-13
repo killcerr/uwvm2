@@ -49,7 +49,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 {
     inline constexpr ::uwvm2::utils::utf::u8result check_has_zero_illegal_unchecked(char8_t const* const str_begin, char8_t const* const str_end) noexcept
     {
-#if CHAR_BIT != 8
+#if CHAR_BIT > 8
         auto const section_curr{str_begin};
 
         for(; section_curr != str_end; ++section_curr)

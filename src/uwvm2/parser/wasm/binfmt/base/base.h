@@ -65,19 +65,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
     inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 detect_wasm_binfmt_version_unchecked(::std::byte const* module_curr) noexcept
     {
 
-#if CHAR_BIT == 8
-        // [00 61 73 6D Version ...] (end)
-        // [         safe (assume) ] unsafe
-        //              ^^ module_curr
-
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp;
-        ::std::memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
-        // Size of temp greater than one requires little-endian conversion
-        // supported: big-endian, little-endian, pdp-endian
-        temp = ::fast_io::little_endian(temp);
-        return temp;
-
-#else
+#if CHAR_BIT > 8
         // CHAR_BIT > 8: The number of bits per byte is greater than 8, when only the lower eight bits of information are valid.
 
         // assuming:
@@ -108,6 +96,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt
             temp |= c_val;
         }
 
+        return temp;
+
+#else
+        // [00 61 73 6D Version ...] (end)
+        // [         safe (assume) ] unsafe
+        //              ^^ module_curr
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 temp;
+        ::std::memcpy(::std::addressof(temp), module_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32));
+        // Size of temp greater than one requires little-endian conversion
+        // supported: big-endian, little-endian, pdp-endian
+        temp = ::fast_io::little_endian(temp);
         return temp;
 
 #endif
