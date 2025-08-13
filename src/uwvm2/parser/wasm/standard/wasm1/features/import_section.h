@@ -826,9 +826,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::std::forward<Stm>(stream),
                         " - import[",
                         import_counter,
-                        "]: {",
-                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
-                        "}");
+                        "] -> ",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()));
                 }
                 else if constexpr(::std::same_as<char_type, wchar_t>)
                 {
@@ -836,9 +835,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::std::forward<Stm>(stream),
                         L" - import[",
                         import_counter,
-                        L"]: {",
-                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
-                        L"}");
+                        L"] -> ",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()));
                 }
                 else if constexpr(::std::same_as<char_type, char8_t>)
                 {
@@ -846,9 +844,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::std::forward<Stm>(stream),
                         u8" - import[",
                         import_counter,
-                        u8"]: {",
-                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
-                        u8"}");
+                        u8"] -> ",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()));
                 }
                 else if constexpr(::std::same_as<char_type, char16_t>)
                 {
@@ -856,9 +853,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::std::forward<Stm>(stream),
                         u" - import[",
                         import_counter,
-                        u"]: {",
-                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
-                        u"}");
+                        u"] -> ",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()));
                 }
                 else if constexpr(::std::same_as<char_type, char32_t>)
                 {
@@ -866,9 +862,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::std::forward<Stm>(stream),
                         U" - import[",
                         import_counter,
-                        U"]: {",
-                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()),
-                        U"}");
+                        U"] -> ",
+                        section_details(curr_import, *import_section_details_wrapper.all_sections_ptr, importdesc_counter.begin()));
                 }
                 ++import_counter;
             }
