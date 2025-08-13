@@ -383,8 +383,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 if(!define_check_codesec_value_type(sec_adl, fvt)) [[unlikely]]
                 {
                     err.err_curr = section_curr;
-                    err.err_selectable.u8 =
-                        static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(fvt);
+                    err.err_selectable.u8 = static_cast<::std::uint_least8_t>(
+                        static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(fvt));
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_value_type;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }

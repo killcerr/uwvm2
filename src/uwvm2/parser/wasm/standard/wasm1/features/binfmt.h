@@ -168,6 +168,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_final_check<wasm1>);
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
+
+    // Stronger MVP invariants (WebAssembly 1.0):
+    // - Disallow multiple results in function types
+    // - Disallow multiple tables
+    // - Disallow multiple memories
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_result_vector<wasm1>(),
+                  "WebAssembly 1.0 (MVP) forbids multiple results in function types");
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_table<wasm1>(), "WebAssembly 1.0 (MVP) forbids multiple tables");
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_memory<wasm1>(), "WebAssembly 1.0 (MVP) forbids multiple memories");
 }
 
 #ifndef UWVM_MODULE

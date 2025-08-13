@@ -103,6 +103,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
         using value_type_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...> const*;
 
+        static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>) == 1uz);
+
         ::uwvm2::parser::wasm::standard::wasm1::features::final_function_type<Fs...> ft{};
 
         // Add scope space to prevent subsequent access to variables that should not be accessed
@@ -180,8 +182,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 if(!define_check_typesec_value_type(sec_adl, *parameter_curr)) [[unlikely]]
                 {
                     err.err_curr = reinterpret_cast<::std::byte const*>(parameter_curr);
-                    err.err_selectable.u8 =
-                        static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*parameter_curr);
+                    err.err_selectable.u8 = static_cast<::std::uint_least8_t>(
+                        static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*parameter_curr));
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_value_type;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
@@ -295,8 +297,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 if(!define_check_typesec_value_type(sec_adl, *result_curr)) [[unlikely]]
                 {
                     err.err_curr = reinterpret_cast<::std::byte const*>(result_curr);
-                    err.err_selectable.u8 =
-                        static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*result_curr);
+                    err.err_selectable.u8 = static_cast<::std::uint_least8_t>(
+                        static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(*result_curr));
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_value_type;
                     ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                 }
@@ -341,8 +343,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             [[unlikely]] default:
             {
                 err.err_curr = prefix_module_ptr;
-                err.err_selectable.u8 =
-                    static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix);
+                err.err_selectable.u8 = static_cast<::std::uint_least8_t>(
+                    static_cast<::std::underlying_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>>>(prefix));
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_prefix;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
