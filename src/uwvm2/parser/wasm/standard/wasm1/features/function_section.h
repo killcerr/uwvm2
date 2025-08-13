@@ -8446,9 +8446,338 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        Stm && stream,
                                        function_section_storage_section_details_wrapper_t<Fs...> const function_section_details_wrapper)
     {
-        /// @todo
-        (void)stream;
-        (void)function_section_details_wrapper;
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(function_section_details_wrapper.function_section_storage_ptr == nullptr || function_section_details_wrapper.all_sections_ptr == nullptr)
+            [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+        auto const func_section_size{function_section_details_wrapper.function_section_storage_ptr->funcs.size()};
+
+        if(func_section_size)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nFunction[", func_section_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nFunction[", func_section_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nFunction[", func_section_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nFunction[", func_section_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nFunction[", func_section_size, U"]:\n");
+            }
+
+            auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(
+                *function_section_details_wrapper.all_sections_ptr)};
+            static_assert(importsec.importdesc_count > 0uz);
+            auto func_counter{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 localdef_counter{};
+
+            auto const& function_section{*function_section_details_wrapper.function_section_storage_ptr};
+
+            switch(function_section.funcs.mode)
+            {
+                case ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_mode::null:
+                {
+                    // do nothing, no element
+                    break;
+                }
+                case ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    auto const u8_view_begin{function_section.funcs.storage.typeidx_u8_view.begin};
+                    auto const u8_view_end{function_section.funcs.storage.typeidx_u8_view.end};
+
+                    for(auto u8_view_curr{u8_view_begin}; u8_view_curr != u8_view_end; ++u8_view_curr)
+                    {
+                        auto const type_index{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(*u8_view_curr)};
+
+                        if constexpr(::std::same_as<char_type, char>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             " - def[",
+                                                                             localdef_counter,
+                                                                             "]: {func[",
+                                                                             func_counter,
+                                                                             "]: {sig = type[",
+                                                                             type_index,
+                                                                             "]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, wchar_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             L" - def[",
+                                                                             localdef_counter,
+                                                                             L"]: {func[",
+                                                                             func_counter,
+                                                                             L"]: {sig = type[",
+                                                                             type_index,
+                                                                             L"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char8_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u8" - def[",
+                                                                             localdef_counter,
+                                                                             u8"]: {func[",
+                                                                             func_counter,
+                                                                             u8"]: {sig = type[",
+                                                                             type_index,
+                                                                             u8"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char16_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u" - def[",
+                                                                             localdef_counter,
+                                                                             u"]: {func[",
+                                                                             func_counter,
+                                                                             u"]: {sig = type[",
+                                                                             type_index,
+                                                                             u"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char32_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             U" - def[",
+                                                                             localdef_counter,
+                                                                             U"]: {func[",
+                                                                             func_counter,
+                                                                             U"]: {sig = type[",
+                                                                             type_index,
+                                                                             U"]}}\n");
+                        }
+
+                        ++func_counter;
+                        ++localdef_counter;
+                    }
+
+                    break;
+                }
+                case ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    for(auto const u8_vec_curr: function_section.funcs.storage.typeidx_u8_vector)
+                    {
+                        auto const type_index{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(u8_vec_curr)};
+
+                        if constexpr(::std::same_as<char_type, char>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             " - def[",
+                                                                             localdef_counter,
+                                                                             "]: {func[",
+                                                                             func_counter,
+                                                                             "]: {sig = type[",
+                                                                             type_index,
+                                                                             "]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, wchar_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             L" - def[",
+                                                                             localdef_counter,
+                                                                             L"]: {func[",
+                                                                             func_counter,
+                                                                             L"]: {sig = type[",
+                                                                             type_index,
+                                                                             L"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char8_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u8" - def[",
+                                                                             localdef_counter,
+                                                                             u8"]: {func[",
+                                                                             func_counter,
+                                                                             u8"]: {sig = type[",
+                                                                             type_index,
+                                                                             u8"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char16_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u" - def[",
+                                                                             localdef_counter,
+                                                                             u"]: {func[",
+                                                                             func_counter,
+                                                                             u"]: {sig = type[",
+                                                                             type_index,
+                                                                             u"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char32_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             U" - def[",
+                                                                             localdef_counter,
+                                                                             U"]: {func[",
+                                                                             func_counter,
+                                                                             U"]: {sig = type[",
+                                                                             type_index,
+                                                                             U"]}}\n");
+                        }
+
+                        ++func_counter;
+                        ++localdef_counter;
+                    }
+
+                    break;
+                }
+                case ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    for(auto const u16_vec_curr: function_section.funcs.storage.typeidx_u16_vector)
+                    {
+                        auto const type_index{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(u16_vec_curr)};
+
+                        if constexpr(::std::same_as<char_type, char>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             " - def[",
+                                                                             localdef_counter,
+                                                                             "]: {func[",
+                                                                             func_counter,
+                                                                             "]: {sig = type[",
+                                                                             type_index,
+                                                                             "]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, wchar_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             L" - def[",
+                                                                             localdef_counter,
+                                                                             L"]: {func[",
+                                                                             func_counter,
+                                                                             L"]: {sig = type[",
+                                                                             type_index,
+                                                                             L"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char8_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u8" - def[",
+                                                                             localdef_counter,
+                                                                             u8"]: {func[",
+                                                                             func_counter,
+                                                                             u8"]: {sig = type[",
+                                                                             type_index,
+                                                                             u8"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char16_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u" - def[",
+                                                                             localdef_counter,
+                                                                             u"]: {func[",
+                                                                             func_counter,
+                                                                             u"]: {sig = type[",
+                                                                             type_index,
+                                                                             u"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char32_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             U" - def[",
+                                                                             localdef_counter,
+                                                                             U"]: {func[",
+                                                                             func_counter,
+                                                                             U"]: {sig = type[",
+                                                                             type_index,
+                                                                             U"]}}\n");
+                        }
+
+                        ++func_counter;
+                        ++localdef_counter;
+                    }
+
+                    break;
+                }
+                case ::uwvm2::parser::wasm::standard::wasm1::features::vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    for(auto const u32_vec_curr: function_section.funcs.storage.typeidx_u32_vector)
+                    {
+                        auto const type_index{u32_vec_curr};
+
+                        if constexpr(::std::same_as<char_type, char>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             " - def[",
+                                                                             localdef_counter,
+                                                                             "]: {func[",
+                                                                             func_counter,
+                                                                             "]: {sig = type[",
+                                                                             type_index,
+                                                                             "]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, wchar_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             L" - def[",
+                                                                             localdef_counter,
+                                                                             L"]: {func[",
+                                                                             func_counter,
+                                                                             L"]: {sig = type[",
+                                                                             type_index,
+                                                                             L"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char8_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u8" - def[",
+                                                                             localdef_counter,
+                                                                             u8"]: {func[",
+                                                                             func_counter,
+                                                                             u8"]: {sig = type[",
+                                                                             type_index,
+                                                                             u8"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char16_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             u" - def[",
+                                                                             localdef_counter,
+                                                                             u"]: {func[",
+                                                                             func_counter,
+                                                                             u"]: {sig = type[",
+                                                                             type_index,
+                                                                             u"]}}\n");
+                        }
+                        else if constexpr(::std::same_as<char_type, char32_t>)
+                        {
+                            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                             U" - def[",
+                                                                             localdef_counter,
+                                                                             U"]: {func[",
+                                                                             func_counter,
+                                                                             U"]: {sig = type[",
+                                                                             type_index,
+                                                                             U"]}}\n");
+                        }
+
+                        ++func_counter;
+                        ++localdef_counter;
+                    }
+
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::std::unreachable();
+                }
+            }
+        }
     }
 }
 

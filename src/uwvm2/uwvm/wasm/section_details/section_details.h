@@ -300,6 +300,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
     {
         ::fast_io::basic_obuf<::fast_io::u8native_io_observer> u8out_obuf{::fast_io::u8out()};
 
+#ifdef UWVM_TIMER
+        ::uwvm2::utils::debug::timer parsing_timer{u8"print section details"};
+#endif
+
         ::fast_io::io::print(u8out_obuf, u8"All Module Section Details:\n\n");
 
         for(auto const& curr_module: ::uwvm2::uwvm::wasm::storage::all_module) { ::fast_io::io::print(u8out_obuf, section_details(curr_module.second)); }
