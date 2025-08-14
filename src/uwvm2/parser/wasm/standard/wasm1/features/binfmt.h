@@ -177,6 +177,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                   "WebAssembly 1.0 (MVP) forbids multiple results in function types");
     static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_table<wasm1>(), "WebAssembly 1.0 (MVP) forbids multiple tables");
     static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::allow_multi_memory<wasm1>(), "WebAssembly 1.0 (MVP) forbids multiple memories");
+
+    // Some reserved concepts
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::check_duplicate_imports<wasm1>());
+    static_assert(!::uwvm2::parser::wasm::standard::wasm1::features::disable_zero_length_string<wasm1>());
 }
 
 #ifndef UWVM_MODULE
