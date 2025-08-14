@@ -242,7 +242,8 @@ option("apple-platform", function()
     set_description
     (
         "Apple platform target and minimum version. Sets -mtargetos and -m*-version-min options.",
-        [[    default: Use the default compiler behavior.]],
+        [[    default:]],
+        [[        Use the default compiler behavior.]],
         [[]],
         [[    macOS versions:]],
         [[        MACOS_SEQUOIA: macOS 15.0 Sequoia]],
@@ -286,7 +287,8 @@ option("apple-platform", function()
         [[        VISIONOS_2: visionOS 2.0]],
         [[        VISIONOS_1: visionOS 1.0]],
         [[]],
-        [[    Custom format: "platform:version" (e.g., "macos:10.15", "ios:13.0")]]
+        [[    Custom format:]],
+        [[        "platform:version" (e.g., "macos:10.15", "ios:13.0")]]
     )
     set_default("default")
     set_values
