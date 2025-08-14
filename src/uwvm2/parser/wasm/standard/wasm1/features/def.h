@@ -1152,6 +1152,82 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         final_export_type_t<Fs...> exports{};
     };
 
+    /// @brief Wrapper for the final_import_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct final_export_type_section_details_wrapper_t
+    {
+        final_wasm_export_type<Fs...> const* export_type_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr final_export_type_section_details_wrapper_t<Fs...> section_details(
+        final_wasm_export_type<Fs...> const& export_type,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
+    {
+        return {::std::addressof(export_type), ::std::addressof(all_sections)};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, final_export_type_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       final_export_type_section_details_wrapper_t<Fs...> const export_type_details_wrapper)
+    {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(export_type_details_wrapper.export_type_ptr == nullptr || export_type_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                section_details(export_type_details_wrapper.export_type_ptr->exports, *export_type_details_wrapper.all_sections_ptr),
+                ", Export Name: \"",
+                ::fast_io::mnp::code_cvt(export_type_details_wrapper.export_type_ptr->export_name),
+                "\"");
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                section_details(export_type_details_wrapper.export_type_ptr->exports, *export_type_details_wrapper.all_sections_ptr),
+                L", Export Name: \"",
+                ::fast_io::mnp::code_cvt(export_type_details_wrapper.export_type_ptr->export_name),
+                L"\"");
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            // All are u8string_view, no transcoding required.
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                section_details(export_type_details_wrapper.export_type_ptr->exports, *export_type_details_wrapper.all_sections_ptr),
+                u8", Export Name: \"",
+                export_type_details_wrapper.export_type_ptr->export_name,
+                u8"\"");
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                section_details(export_type_details_wrapper.export_type_ptr->exports, *export_type_details_wrapper.all_sections_ptr),
+                u", Export Name: \"",
+                ::fast_io::mnp::code_cvt(export_type_details_wrapper.export_type_ptr->export_name),
+                u"\"");
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                section_details(export_type_details_wrapper.export_type_ptr->exports, *export_type_details_wrapper.all_sections_ptr),
+                U", Export Name: \"",
+                ::fast_io::mnp::code_cvt(export_type_details_wrapper.export_type_ptr->export_name),
+                U"\"");
+        }
+    }
+
     //////////////////////////////
     //      Element Section     //
     //////////////////////////////

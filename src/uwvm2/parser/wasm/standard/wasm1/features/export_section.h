@@ -610,9 +610,84 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)export_section_details_wrapper;
+
+        auto const export_section_size{export_section_details_wrapper.export_section_storage_ptr->exports.size()};
+
+        if(export_section_size)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nExport[", export_section_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nExport[", export_section_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nExport[", export_section_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nExport[", export_section_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nExport[", export_section_size, U"]:\n");
+            }
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 export_counter{};
+
+            for(auto const& curr_export: export_section_details_wrapper.export_section_storage_ptr->exports)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        " - export[",
+                        export_counter,
+                        "] -> ",
+                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        L" - export[",
+                        export_counter,
+                        L"] -> ",
+                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        u8" - export[",
+                        export_counter,
+                        u8"] -> ",
+                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        u" - export[",
+                        export_counter,
+                        u"] -> ",
+                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(
+                        ::std::forward<Stm>(stream),
+                        U" - export[",
+                        export_counter,
+                        U"] -> ",
+                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                }
+                ++export_counter;
+            }
+        }
     }
 }
 

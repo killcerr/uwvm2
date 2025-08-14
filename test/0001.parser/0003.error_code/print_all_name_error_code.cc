@@ -56,7 +56,7 @@ int main()
         {
             switch(static_cast<::uwvm2::parser::wasm_custom::customs::name_err_type_t>(i))
             {
-                case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_utf8_sequence:
+                case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence:
                 {
                     errout.name_err.err.u32 = 0x00;
                     break;

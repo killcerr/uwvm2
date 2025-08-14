@@ -68,7 +68,7 @@ int main()
                     errout.err.err_selectable.duplic_imports.type = 0u;  // func
                     break;
                 }
-                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence:
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_char_sequence:
                 {
                     errout.err.err_selectable.u32 = 0x00;
                     break;
