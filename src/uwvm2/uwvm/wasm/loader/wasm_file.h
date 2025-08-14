@@ -415,7 +415,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                                         u8"(offset=",
                                                         ::fast_io::mnp::addrvw(utf8pos - module_name.cbegin()),
-                                                        u8") Module name contains invalid Character characters. Details: \"",
+                                                        u8") Module Name contains characters that are not recommended. Details: \"",
                                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                                         ::uwvm2::utils::utf::get_utf_error_description<char8_t>(utf8err),
                                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),

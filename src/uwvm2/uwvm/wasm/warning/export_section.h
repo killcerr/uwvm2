@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                         u8"[warn]  ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"Export name should not have strings of length 0.",
+                                        u8"It is not recommended that the length of Export Name is 0.",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 
                     if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
@@ -145,7 +145,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(export_utf8pos - curr_export.export_name.cbegin()),
-                                    u8") Export name contains invalid Character characters. Details: \"",
+                                    u8") Export Name contains characters that are not recommended. Details: \"",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     ::uwvm2::utils::utf::get_utf_error_description<char8_t>(export_utf8err),
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),

@@ -261,7 +261,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                         u8"[warn]  ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"Imported module name should not have strings of length 0.",
+                                        u8"It is not recommended that the length of Imported Module Name is 0.",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 
                     if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
@@ -288,7 +288,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                         u8"[warn]  ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"Imported extern name should not have strings of length 0.",
+                                        u8"It is not recommended that the length of Imported Extern Name is 0.",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 
                     if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]
@@ -337,7 +337,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(module_utf8pos - curr_import.module_name.cbegin()),
-                                    u8") Imported module name contains invalid Character characters. Details: \"",
+                                    u8") Imported Module Name contains characters that are not recommended. Details: \"",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     ::uwvm2::utils::utf::get_utf_error_description<char8_t>(module_utf8err),
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
@@ -394,7 +394,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"(offset=",
                                     ::fast_io::mnp::addrvw(extern_utf8pos - curr_import.extern_name.cbegin()),
-                                    u8") Imported extern name contains invalid Character characters. Details: \"",
+                                    u8") Imported Extern Name contains characters that are not recommended. Details: \"",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     ::uwvm2::utils::utf::get_utf_error_description<char8_t>(extern_utf8err),
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
