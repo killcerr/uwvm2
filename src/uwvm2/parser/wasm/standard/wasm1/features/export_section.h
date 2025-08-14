@@ -642,48 +642,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 if constexpr(::std::same_as<char_type, char>)
                 {
-                    ::fast_io::operations::print_freestanding<true>(
-                        ::std::forward<Stm>(stream),
-                        " - export[",
-                        export_counter,
-                        "] -> ",
-                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    " - export[",
+                                                                    export_counter,
+                                                                    "] -> ",
+                                                                    section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
                 }
                 else if constexpr(::std::same_as<char_type, wchar_t>)
                 {
-                    ::fast_io::operations::print_freestanding<true>(
-                        ::std::forward<Stm>(stream),
-                        L" - export[",
-                        export_counter,
-                        L"] -> ",
-                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    L" - export[",
+                                                                    export_counter,
+                                                                    L"] -> ",
+                                                                    section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
                 }
                 else if constexpr(::std::same_as<char_type, char8_t>)
                 {
-                    ::fast_io::operations::print_freestanding<true>(
-                        ::std::forward<Stm>(stream),
-                        u8" - export[",
-                        export_counter,
-                        u8"] -> ",
-                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u8" - export[",
+                                                                    export_counter,
+                                                                    u8"] -> ",
+                                                                    section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
                 }
                 else if constexpr(::std::same_as<char_type, char16_t>)
                 {
-                    ::fast_io::operations::print_freestanding<true>(
-                        ::std::forward<Stm>(stream),
-                        u" - export[",
-                        export_counter,
-                        u"] -> ",
-                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u" - export[",
+                                                                    export_counter,
+                                                                    u"] -> ",
+                                                                    section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
                 }
                 else if constexpr(::std::same_as<char_type, char32_t>)
                 {
-                    ::fast_io::operations::print_freestanding<true>(
-                        ::std::forward<Stm>(stream),
-                        U" - export[",
-                        export_counter,
-                        U"] -> ",
-                        section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    U" - export[",
+                                                                    export_counter,
+                                                                    U"] -> ",
+                                                                    section_details(curr_export, *export_section_details_wrapper.all_sections_ptr));
                 }
                 ++export_counter;
             }
