@@ -197,10 +197,10 @@ option("winmin", function()
         [[    WINME: Windows ME, -D_WIN32_WINDOWS=0x0490]],
         [[    WIN98: Windows 98, -D_WIN32_WINDOWS=0x0410]],
         [[    WIN95: Windows 95, -D_WIN32_WINDOWS=0x0400]],
-        [[    NT400: Windows NT 4.0, -D_WINNT=0x0400]],
-        [[    NT351: Windows NT 3.51, -D_WINNT=0x0351]],
-        [[    NT350: Windows NT 3.5, -D_WINNT=0x0350]],
-        [[    NT310: Windows NT 3.1, -D_WINNT=0x0310]],
+        [[    NT400: Windows NT 4.0, -D_WIN32_WINNT=0x0400]],
+        [[    NT351: Windows NT 3.51, -D_WIN32_WINNT=0x0351]],
+        [[    NT350: Windows NT 3.5, -D_WIN32_WINNT=0x0350]],
+        [[    NT310: Windows NT 3.1, -D_WIN32_WINNT=0x0310]],
         [[Errors may be reported as "version not recognized: Windows Version not recognized".]]
     )
     set_default("default")
