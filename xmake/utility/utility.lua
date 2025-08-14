@@ -242,6 +242,92 @@ function get_unwindlib_option()
     return (common.is_clang() and (force or get_config("rtlib") == "compiler-rt")) and option or nil
 end
 
+---Getting Apple platform options
+---@return table<string, string | string[]> | nil --Apple platform options
+function get_apple_platform_options()
+    local config = get_config("apple-platform")
+    if config == "default" or not config then
+        return nil -- Use default compiler behavior
+    end
+    
+    ---@type map_t
+    local version_table = {
+        -- macOS versions
+        MACOS_SEQUOIA = "15.0",
+        MACOS_SONOMA = "14.0", 
+        MACOS_VENTURA = "13.0",
+        MACOS_MONTEREY = "12.0",
+        MACOS_BIG_SUR = "11.0",
+        MACOS_CATALINA = "10.15",
+        MACOS_MOJAVE = "10.14",
+        MACOS_HIGH_SIERRA = "10.13",
+        MACOS_SIERRA = "10.12",
+        MACOS_EL_CAPITAN = "10.11",
+        MACOS_YOSEMITE = "10.10",
+        -- iOS versions
+        IOS_18 = "18.0",
+        IOS_17 = "17.0",
+        IOS_16 = "16.0",
+        IOS_15 = "15.0",
+        IOS_14 = "14.0",
+        IOS_13 = "13.0",
+        IOS_12 = "12.0",
+        IOS_11 = "11.0",
+        -- tvOS versions
+        TVOS_18 = "18.0",
+        TVOS_17 = "17.0",
+        TVOS_16 = "16.0",
+        TVOS_15 = "15.0",
+        TVOS_14 = "14.0",
+        TVOS_13 = "13.0",
+        -- watchOS versions
+        WATCHOS_11 = "11.0",
+        WATCHOS_10 = "10.0",
+        WATCHOS_9 = "9.0",
+        WATCHOS_8 = "8.0",
+        WATCHOS_7 = "7.0",
+        -- visionOS versions
+        VISIONOS_2 = "2.0",
+        VISIONOS_1 = "1.0"
+    }
+    
+    local platform, version = config:match("^([^_]+)_(.+)$")
+    if not platform or not version then
+        -- Custom version format like "macos:10.15" or "ios:13.0"
+        platform, version = config:match("^([^:]+):(.+)$")
+        if not platform or not version then
+            return nil
+        end
+    end
+    
+    -- Resolve version from predefined constants
+    local resolved_version = version_table[config] or version
+    
+    local options = {}
+    
+    -- Set target OS and minimum version based on platform
+    if platform:upper() == "MACOS" then
+        options.cxflags = { "-mtargetos=macos", "-mmacos-version-min=" .. resolved_version }
+        options.ldflags = "-mmacos-version-min=" .. resolved_version
+    elseif platform:upper() == "IOS" then
+        options.cxflags = { "-mtargetos=ios", "-mios-version-min=" .. resolved_version }
+        options.ldflags = "-mios-version-min=" .. resolved_version
+    elseif platform:upper() == "TVOS" then
+        options.cxflags = { "-mtargetos=tvos", "-mtvos-version-min=" .. resolved_version }
+        options.ldflags = "-mtvos-version-min=" .. resolved_version
+    elseif platform:upper() == "WATCHOS" then
+        options.cxflags = { "-mtargetos=watchos", "-mwatchos-version-min=" .. resolved_version }
+        options.ldflags = "-mwatchos-version-min=" .. resolved_version
+    elseif platform:upper() == "VISIONOS" then
+        options.cxflags = { "-mtargetos=visionos", "-mvisionos-version-min=" .. resolved_version }
+        options.ldflags = "-mvisionos-version-min=" .. resolved_version
+    else
+        return nil
+    end
+    
+    return options
+end
+
 ---Mapping mode to cmake style
 ---@param mode string --xmake style compilation mode
 ---@return string | nil --cmake style compilation mode
