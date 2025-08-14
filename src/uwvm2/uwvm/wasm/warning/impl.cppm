@@ -28,6 +28,7 @@ export import :import_section;
 export import :function_section;
 export import :table_section;
 export import :memory_section;
+export import :global_section;
 export import :final_check;
 export import :binfmt_ver1;
 
