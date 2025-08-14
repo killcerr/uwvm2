@@ -331,9 +331,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_duplicate_imports_of_the_same_import_type.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_char_sequence:
             {
-#include "error_code_outputs/eco_invalid_utf8_sequence.h"
+#include "error_code_outputs/eco_invalid_char_sequence.h"
                 return;
             }
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_table_count:

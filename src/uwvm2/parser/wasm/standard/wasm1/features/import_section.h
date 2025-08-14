@@ -264,7 +264,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
             err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_char_sequence;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
@@ -285,7 +285,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
             err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_char_sequence;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }
@@ -306,7 +306,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             err.err_curr = reinterpret_cast<::std::byte const*>(utf8pos);
             err.err_selectable.u32 = static_cast<::std::uint_least32_t>(utf8err);
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_utf8_sequence;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_char_sequence;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
     }

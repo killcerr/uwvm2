@@ -57,6 +57,7 @@
 # include "table_section.h"
 # include "memory_section.h"
 # include "global_section.h"
+# include "export_section.h"
 # include "final_check.h"
 #endif
 
@@ -83,7 +84,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
         ::uwvm2::uwvm::wasm::warning::show_wasm_table_section_warning(wasm, warn_storage);
         ::uwvm2::uwvm::wasm::warning::show_wasm_memory_section_warning(wasm, warn_storage);
         ::uwvm2::uwvm::wasm::warning::show_wasm_global_section_warning(wasm, warn_storage);
+        ::uwvm2::uwvm::wasm::warning::show_wasm_export_section_warning(wasm, warn_storage);
 
+        /// @todo
         ::uwvm2::uwvm::wasm::warning::show_wasm_final_check_warning(wasm, warn_storage);
     }
 }

@@ -68,7 +68,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
         illegal_name_map_length,
         invalid_module_name_length,
         illegal_module_name_length,
-        illegal_utf8_sequence,
+        illegal_char_sequence,
         duplicate_module_name,
         duplicate_function_name,
         invalid_data_exists,
@@ -344,7 +344,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                     {
                         err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
-                                         name_err_type_t::illegal_utf8_sequence,
+                                         name_err_type_t::illegal_char_sequence,
                                          name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                         curr = map_end;
                         // End of current paragraph
@@ -558,7 +558,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                         {
                             err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
-                                             name_err_type_t::illegal_utf8_sequence,
+                                             name_err_type_t::illegal_char_sequence,
                                              name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                             curr = map_end;
                             // End of current paragraph
@@ -867,7 +867,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                             {
                                 err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
-                                                 name_err_type_t::illegal_utf8_sequence,
+                                                 name_err_type_t::illegal_char_sequence,
                                                  name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                                 curr = map_end;
                                 // End of current paragraph

@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         func_section_resolved_not_match_the_actual_number,
         size_exceeds_the_maximum_value_of_size_t,
         duplicate_imports_of_the_same_import_type,
-        invalid_utf8_sequence,
+        invalid_char_sequence,
         invalid_table_count,
         wasm1_not_allow_multi_table,
         table_section_resolved_exceeded_the_actual_number,

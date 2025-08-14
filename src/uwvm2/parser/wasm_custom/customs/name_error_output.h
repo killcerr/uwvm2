@@ -101,9 +101,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 #include "name_error_code_outputs/name_eco_illegal_module_name_length.h"
                 return;
             }
-            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_utf8_sequence:
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence:
             {
-#include "name_error_code_outputs/name_eco_illegal_utf8_sequence.h"
+#include "name_error_code_outputs/name_eco_illegal_char_sequence.h"
                 return;
             }
             case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_module_name:
