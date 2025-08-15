@@ -634,6 +634,42 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline constexpr vectypeidx_minimize_storage_t() noexcept = default;  // all-zero
 
+        inline constexpr explicit vectypeidx_minimize_storage_t(vectypeidx_minimize_storage_mode new_mode) noexcept : mode{new_mode}
+        {
+            switch(this->mode)
+            {
+                case vectypeidx_minimize_storage_mode::null:
+                {
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_view)) decltype(this->storage.typeidx_u8_view){};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_vector)) decltype(this->storage.typeidx_u8_vector){};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u16_vector)) decltype(this->storage.typeidx_u16_vector){};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u32_vector)) decltype(this->storage.typeidx_u32_vector){};
+                    break;
+                }
+                [[unlikely]] default:
+                {
+                    // new_mode is external input and needs to be checked.
+                    ::fast_io::fast_terminate();
+                }
+            }
+        }
+
         inline constexpr vectypeidx_minimize_storage_t(vectypeidx_minimize_storage_t const& other) noexcept : mode{other.mode}
         {
             switch(this->mode)
@@ -1037,7 +1073,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     // trivial, nothing to do
                     static_assert(::std::is_trivially_copyable_v<decltype(this->storage.typeidx_u8_view)>);
                     static_assert(::std::is_trivially_destructible_v<decltype(this->storage.typeidx_u8_view)>);
-                    
+
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
@@ -1095,10 +1131,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 [[unlikely]] default:
                 {
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
-                    ::std::unreachable();
+                    // new_mode is external input and needs to be checked.
+                    ::fast_io::fast_terminate();
                 }
             }
         }
