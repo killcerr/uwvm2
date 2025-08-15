@@ -158,7 +158,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         limit_type_max_lt_min,
         counter_overflows,
         duplicate_type_function,
-        unexpected_section_data
+        unexpected_section_data,
+        global_init_stack_should_be_only_one_element,
+        global_init_illegal_instruction,
+        global_init_type_mismatch,
+        global_init_stack_empty,
+        global_init_illegal_data,
+        global_init_ref_illegal_imported_global,
+        global_init_ref_mutable_imported_global
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type

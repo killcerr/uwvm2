@@ -48,6 +48,8 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 {
+    /// @brief Structured error handling is independent of the parser concept system, allowing for modular use.
+
     /// @brief Define the flag used for output
     struct error_output_flag_t
     {
@@ -644,6 +646,41 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::unexpected_section_data:
             {
 #include "error_code_outputs/eco_unexpected_section_data.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element:
+            {
+#include "error_code_outputs/eco_global_init_stack_should_be_only_one_element.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_instruction:
+            {
+#include "error_code_outputs/eco_global_init_illegal_instruction.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch:
+            {
+#include "error_code_outputs/eco_global_init_type_mismatch.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_empty:
+            {
+#include "error_code_outputs/eco_global_init_stack_empty.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data:
+            {
+#include "error_code_outputs/eco_global_init_illegal_data.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_illegal_imported_global:
+            {
+#include "error_code_outputs/eco_global_init_ref_illegal_imported_global.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_mutable_imported_global:
+            {
+#include "error_code_outputs/eco_global_init_ref_mutable_imported_global.h"
                 return;
             }
         }

@@ -1269,6 +1269,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             { global_section_global_handler(sec_adl, global_r, module_storage, section_curr, section_end, err, fs_para) } -> ::std::same_as<::std::byte const*>;
         };
 
+    /// @brief Used to check for type errors when parsing initialization expressions.
+    template <typename... Fs>
+    concept has_parse_and_check_global_expr_valid =
+        requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<global_section_storage_t<Fs...>> sec_adl,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> const& global_r,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::global_expr& global_expr,
+                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+                 ::std::byte const* section_curr,
+                 ::std::byte const* const section_end,
+                 ::uwvm2::parser::wasm::base::error_impl& err,
+                 ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) {
+            {
+                parse_and_check_global_expr_valid(sec_adl, global_r, global_expr, module_storage, section_curr, section_end, err, fs_para)
+            } -> ::std::same_as<::std::byte const*>;
+        };
+        
     /////////////////////////////
     /// @brief export section ///
     /////////////////////////////

@@ -623,7 +623,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         adjacency_list_t adj;
     };
 
-    /// @brief  Build module dependency graph
+    /// @brief      Build module dependency graph
     /// @details    In the WASM standard, importing module A name B type C and importing module A name B type D simultaneously satisfies syntactic validity
     ///             (binary format validity) but fails validation.
     /// @return     Adjacency list representation of the dependency graph
@@ -1036,6 +1036,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                                     return {static_cast<int>(::uwvm2::uwvm::run::retval::module_dependency_error), ::std::move(adjacency_list)};
                                 }
+
+                                /// @todo Check more detailed types, such as function matching, global matching, etc.
                             }
                             break;
                         }

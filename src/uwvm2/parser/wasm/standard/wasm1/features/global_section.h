@@ -92,6 +92,449 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         return ::uwvm2::parser::wasm::standard::wasm1::features::scan_global_type(global_r, section_curr, section_end, err);
     }
 
+    /// @brief This function only performs type stack matching, not computation.
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr ::std::byte const* parse_and_check_global_expr_valid(
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<global_section_storage_t<Fs...>> sec_adl,
+        ::uwvm2::parser::wasm::standard::wasm1::type::global_type const& global_r,  // [adl] can be replaced
+        ::uwvm2::parser::wasm::standard::wasm1::features::global_expr& global_expr,
+        [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
+        ::std::byte const* section_curr,
+        ::std::byte const* const section_end,
+        ::uwvm2::parser::wasm::base::error_impl& err,
+        [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
+    {
+        // import section
+        auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(module_storage.sections)};
+        // importdesc[3]: global
+        constexpr ::std::size_t importdesc_count{importsec.importdesc_count};
+        static_assert(importdesc_count > 3uz);  // Ensure that subsequent index visits do not cross boundaries
+        auto const& imported_global{importsec.importdesc.index_unchecked(3uz)};
+        auto const imported_global_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(imported_global.size())};
+
+        // Since global initialization expressions in wasm1.0 only allow instructions that “increment the data stack,” a simple check for whether an instruction
+        // already exists can be used here to detect this.
+        bool has_data_on_type_stack{};
+
+        auto const curr_global_type{global_r.type};
+
+        for(;;)
+        {
+            if(section_curr == section_end) [[unlikely]]
+            {
+                // [... global_curr ... section_curr ...] (end) ...
+                // [                   safe             ] unsafe (could be the section_end)
+                //                                        ^^ section_curr
+
+                err.err_curr = section_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [... curr] ...
+            // [  safe  ] unsafe (could be the section_end)
+            //      ^^ section_curr
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type section_curr_c8;
+            ::std::memcpy(::std::addressof(section_curr_c8), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type));
+
+            // Size equal to one does not need to do little-endian conversion
+            static_assert(sizeof(section_curr_c8) == 1uz);
+
+#if CHAR_BIT > 8
+            section_curr_c8 &= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0xFFu);
+#endif
+
+            if(section_curr_c8 ==
+               static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::end))
+            {
+                // [... global_curr ... section_curr ... 0x0B] global_next ...
+                // [                   safe                  ] unsafe (could be the section_end)
+                //                                       ^^ section_curr
+
+                ++section_curr;
+
+                // [... global_curr ... section_curr ... 0x0B] global_next ...
+                // [                   safe                  ] unsafe (could be the section_end)
+                //                                             ^^ section_curr
+
+                break;
+            }
+            else
+            {
+                switch(section_curr_c8)
+                {
+                    [[unlikely]] case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
+                        ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::end):
+                    {
+                        // checked before
+                        ::std::unreachable();
+                    }
+                    case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
+                        ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::i32_const):
+                    {
+                        // Check the type stack. Since only will increase the type stack, only one bool check is needed.
+                        if(has_data_on_type_stack) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        has_data_on_type_stack = true;
+
+                        if(curr_global_type != ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i32) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
+                            err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
+                                ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i32);
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // [... curr] ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //      ^^ section_curr
+
+                        ++section_curr;
+
+                        // [... curr] i32 ... ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //            ^^ section_curr
+
+                        // parse_by_scan comes with built-in memory safety checks.
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32 test_i32;
+
+                        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                        auto const [test_i32_next, test_i32_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                          reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                          ::fast_io::mnp::leb128_get(test_i32))};
+
+                        if(test_i32_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(test_i32_err);
+                        }
+
+                        // [... curr i32 ...] ...
+                        // [       safe     ] unsafe (could be the section_end)
+                        //           ^^ section_curr
+
+                        section_curr = reinterpret_cast<::std::byte const*>(test_i32_next);
+
+                        // [... curr i32 ...] ...
+                        // [       safe     ] unsafe (could be the section_end)
+                        //                    ^^ section_curr
+
+                        break;
+                    }
+                    case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
+                        ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::i64_const):
+                    {
+                        // Check the type stack. Since only will increase the type stack, only one bool check is needed.
+                        if(has_data_on_type_stack) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        has_data_on_type_stack = true;
+
+                        if(curr_global_type != ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i64) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
+                            err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
+                                ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i64);
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // [... curr] ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //      ^^ section_curr
+
+                        ++section_curr;
+
+                        // [... curr] i64 ... ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //            ^^ section_curr
+
+                        // parse_by_scan comes with built-in memory safety checks.
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64 test_i64;
+
+                        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                        auto const [test_i64_next, test_i64_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                          reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                          ::fast_io::mnp::leb128_get(test_i64))};
+
+                        if(test_i64_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(test_i64_err);
+                        }
+
+                        // [... curr i64 ...] ...
+                        // [       safe     ] unsafe (could be the section_end)
+                        //           ^^ section_curr
+
+                        section_curr = reinterpret_cast<::std::byte const*>(test_i64_next);
+
+                        // [... curr i64 ...] ...
+                        // [       safe     ] unsafe (could be the section_end)
+                        //                    ^^ section_curr
+
+                        break;
+                    }
+                    case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
+                        ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::f32_const):
+                    {
+                        // Check the type stack. Since only will increase the type stack, only one bool check is needed.
+                        if(has_data_on_type_stack) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        has_data_on_type_stack = true;
+
+                        if(curr_global_type != ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f32) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
+                            err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
+                                ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f32);
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // [... curr] ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //      ^^ section_curr
+
+                        ++section_curr;
+
+                        // [... curr] f32 xx xx xx ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //            ^^ section_curr
+
+                        if(static_cast<::std::size_t>(section_end - section_curr) < 4uz) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // [... curr f32 xx xx xx ] ...
+                        // [       safe           ] unsafe (could be the section_end)
+                        //           ^^ section_curr
+
+                        // There is no need to perform little-endian capture here, because 4 bytes of space is sufficient to obtain fp32.
+                        // On platforms where charbit is not equal to 8, only cyclic reading is allowed.
+
+                        section_curr += 4uz;
+
+                        // [... curr f32 xx xx xx ] ...
+                        // [       safe           ] unsafe (could be the section_end)
+                        //                          ^^ section_curr
+
+                        break;
+                    }
+                    case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
+                        ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::f64_const):
+                    {
+                        // Check the type stack. Since only will increase the type stack, only one bool check is needed.
+                        if(has_data_on_type_stack) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        has_data_on_type_stack = true;
+
+                        if(curr_global_type != ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
+                            err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
+                                ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64);
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // [... curr] ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //      ^^ section_curr
+
+                        ++section_curr;
+
+                        // [... curr] f64 xx xx xx xx xx xx xx ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //            ^^ section_curr
+
+                        if(static_cast<::std::size_t>(section_end - section_curr) < 8uz) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // [... curr f64 xx xx xx xx xx xx xx ] ...
+                        // [       safe                       ] unsafe (could be the section_end)
+                        //           ^^ section_curr
+
+                        // There is no need to perform little-endian capture here, because 8 bytes of space is sufficient to obtain fp64.
+                        // On platforms where charbit is not equal to 8, only cyclic reading is allowed.
+
+                        section_curr += 8uz;
+
+                        // [... curr f64 xx xx xx xx xx xx xx ] ...
+                        // [       safe                       ] unsafe (could be the section_end)
+                        //                                      ^^ section_curr
+
+                        break;
+                    }
+                    case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
+                        ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::global_get):
+                    {
+                        /// @see WebAssembly Release 1.0 (2019-07-20) § 3.4.10
+                        ///      Globals, however, are not recursive. The effect of defining the limited context C's for validating the module's globals is that
+                        ///      their initialization expressions can only access imported globals and nothing else.
+
+                        // Check the type stack. Since only will increase the type stack, only one bool check is needed.
+                        if(has_data_on_type_stack) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        has_data_on_type_stack = true;
+
+                        // [... curr] ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //      ^^ section_curr
+
+                        ++section_curr;
+
+                        // [... curr] global_idx(u32) ... ...
+                        // [  safe  ] unsafe (could be the section_end)
+                        //            ^^ section_curr
+
+                        // parse_by_scan comes with built-in memory safety checks.
+
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 test_global_idx;
+
+                        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                        auto const [test_global_idx_next,
+                                    test_global_idx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                  reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                  ::fast_io::mnp::leb128_get(test_global_idx))};
+
+                        if(test_global_idx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(test_global_idx_err);
+                        }
+
+                        // [... curr global_idx(u32) ...] ...
+                        // [       safe                 ] unsafe (could be the section_end)
+                        //           ^^ section_curr
+
+                        // check test_global_idx
+
+                        if(test_global_idx >= imported_global_size) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32arr[0] = imported_global_size;
+                            err.err_selectable.u32arr[1] = test_global_idx;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_illegal_imported_global;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // check imported global type and mutability
+                        auto const curr_imported_global_ptr{imported_global.index_unchecked(test_global_idx)};
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        if(curr_imported_global_ptr == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
+
+                        auto const& curr_imported_global{curr_imported_global_ptr->imports.storage.global};
+
+                        // Check if imported global type matches current global type
+                        if(curr_imported_global.type != curr_global_type) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
+                            err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_imported_global.type);
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        // Check if imported global is immutable (mutable globals cannot be referenced in init expressions)
+                        if(curr_imported_global.is_mutable) [[unlikely]]
+                        {
+                            err.err_curr = section_curr;
+                            err.err_selectable.u32 = test_global_idx;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_mutable_imported_global;
+                            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                        }
+
+                        section_curr = reinterpret_cast<::std::byte const*>(test_global_idx_next);
+                        // [... curr global_idx(u32) ...] ...
+                        // [       safe                 ] unsafe (could be the section_end)
+                        //                                ^^ section_curr
+
+                        break;
+                    }
+                    [[unlikely]] default:
+                    {
+                        err.err_curr = section_curr;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_instruction;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+                }
+            }
+        }
+
+        if(!has_data_on_type_stack) [[unlikely]]
+        {
+            err.err_curr = section_curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_empty;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
+
+        // [... global_curr ... section_curr ... 0x0B] global_next ...
+        // [                   safe               ] unsafe (could be the section_end)
+        //                                    ^^ section_curr
+
+        ++section_curr;
+
+        // [... global_curr ... section_curr ... 0x0B] global_next ...
+        // [                   safe               ] unsafe (could be the section_end)
+        //                                          ^^ section_curr
+
+        global_expr.end = section_curr;
+
+        // [... global_curr ... section_curr ... 0x0B] global_next ...
+        // [                   safe               ] unsafe (could be the section_end)
+        //                                          ^^ global_expr.end
+
+        return section_curr;
+    }
+
     /// @brief Define the handler function for global_section
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void handle_binfmt_ver1_extensible_section_define(
@@ -228,59 +671,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             // [   safe            ] unsafe (could be the section_end)
             //                       ^^ section_curr
 
-            // The initialization of global is not done here, its initialization constant expression contains the imported global, which can only be initialized
-            // after all modules have been imported, so it will be initialized before the execution of the wasm module.
-
-            local_global.expr.begin = section_curr;
-
-            // [... global_curr ...] expr_curr ... 0x0B global_next ...
-            // [   safe            ] unsafe (could be the section_end)
-            //                       ^^ local_global.expr.begin
-
-            // The calculation of constant expressions will be parsed during the initialization phase.
-
-            for(;; ++section_curr)
-            {
-                if(section_curr == section_end) [[unlikely]]
-                {
-                    // [... global_curr ... expr_curr ...] (end) ...
-                    // [                   safe          ] unsafe (could be the section_end)
-                    //                                     ^^ section_curr
-
-                    err.err_curr = section_curr;
-                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found;
-                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-                }
-
-                // [... curr] ...
-                // [  safe  ] unsafe (could be the section_end)
-                //      ^^ section_curr
-
-                ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type section_curr_c8;
-                ::std::memcpy(::std::addressof(section_curr_c8), section_curr, sizeof(::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type));
-
-                // Size equal to one does not need to do little-endian conversion
-                static_assert(sizeof(section_curr_c8) == 1uz);
-
-#if CHAR_BIT > 8
-                section_curr_c8 &= static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0xFFu);
-#endif
-
-                if(section_curr_c8 == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)) { break; }
-            }
-
-            // [... global_curr ... expr_curr ... 0x0B] global_next ...
-            // [                   safe               ] unsafe (could be the section_end)
-            //                                    ^^ section_curr
-
-            ++section_curr;
+            static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_parse_and_check_global_expr_valid<Fs...>);
+            section_curr =
+                parse_and_check_global_expr_valid(sec_adl, local_global.global, local_global.expr, module_storage, section_curr, section_end, err, fs_para);
 
             // [... global_curr ... expr_curr ... 0x0B] global_next ...
             // [                   safe               ] unsafe (could be the section_end)
             //                                          ^^ section_curr
-            //                                          ^^ local_global.expr.end
-
-            local_global.expr.end = section_curr;
 
             globalsec.local_globals.push_back_unchecked(::std::move(local_global));
         }
