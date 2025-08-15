@@ -1020,10 +1020,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
-        inline constexpr void change_mode(vectypeidx_minimize_storage_mode mode) noexcept
+        inline constexpr void change_mode(vectypeidx_minimize_storage_mode new_mode) noexcept
         {
-            // chang mode need destroy first
+            // fast path: no-op when mode unchanged
+            if(this->mode == new_mode) [[unlikely]] { return; }
 
+            // 1) Destroy currently active member if needed
             switch(this->mode)
             {
                 [[unlikely]] case vectypeidx_minimize_storage_mode::null:
@@ -1032,8 +1034,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
                 case vectypeidx_minimize_storage_mode::u8_view:
                 {
-                    // Multiple destructuring is ub in the standard, so mundane types don't need to do any operations
-                    // this->storage.typeidx_u8_view = {};
+                    // trivial, nothing to do
+                    static_assert(::std::is_trivially_copyable_v<decltype(this->storage.typeidx_u8_view)>);
+                    static_assert(::std::is_trivially_destructible_v<decltype(this->storage.typeidx_u8_view)>);
+                    
                     break;
                 }
                 case vectypeidx_minimize_storage_mode::u8_vector:
@@ -1060,17 +1064,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 }
             }
 
-            this->mode = mode;
+            // 2) Activate new member via placement-new
+            this->mode = new_mode;
 
-            // Because the fast_io vector is constructed with all zeros, there is no need to do any constructor operations
-            static_assert(::std::is_trivially_copyable_v<decltype(this->storage.typeidx_u8_view)> &&
-                          ::std::is_trivially_destructible_v<decltype(this->storage.typeidx_u8_view)>);
-            static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u8_vector)>);
-            static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u16_vector)>);
-            static_assert(::fast_io::freestanding::is_zero_default_constructible_v<decltype(this->storage.typeidx_u32_vector)>);
-
-            // The union behavior is equivalent to the constructor
-            ::std::memset(this->storage.vectypeidx_minimize_storage_u_reserve, 0, sizeof(this->storage.vectypeidx_minimize_storage_u_reserve));
+            switch(this->mode)
+            {
+                [[unlikely]] case vectypeidx_minimize_storage_mode::null:
+                {
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_view:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_view)) decltype(this->storage.typeidx_u8_view){};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u8_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u8_vector)) decltype(this->storage.typeidx_u8_vector){};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u16_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u16_vector)) decltype(this->storage.typeidx_u16_vector){};
+                    break;
+                }
+                case vectypeidx_minimize_storage_mode::u32_vector:
+                {
+                    ::new(::std::addressof(this->storage.typeidx_u32_vector)) decltype(this->storage.typeidx_u32_vector){};
+                    break;
+                }
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    ::std::unreachable();
+                }
+            }
         }
 
         inline constexpr ::std::size_t size() const noexcept
