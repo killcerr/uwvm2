@@ -101,14 +101,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
         auto const defined_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
         auto const imported_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
-        // Addition does not overflow
+        // Addition does not overflow, Dependency Pre-Fill Pre-Check
         auto const all_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_func_size + imported_func_size)};
 
         // get table_section_storage_t from storages
         auto const& tablesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<table_section_storage_t<Fs...>>(module_storage.sections)};
         auto const defined_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(tablesec.tables.size())};
         auto const imported_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(1uz).size())};
-        // Addition does not overflow
+        // Addition does not overflow, Dependency Pre-Fill Pre-Check
         auto const all_table_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_table_size + imported_table_size)};
 
         // check table index

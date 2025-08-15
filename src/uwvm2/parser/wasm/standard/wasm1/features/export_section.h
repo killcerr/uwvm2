@@ -137,7 +137,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 auto const defined_funcsec_funcs_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
                 auto const imported_func_size{
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
-                // Addition does not overflow, pre-checked.
+                // Addition does not overflow, Dependency Pre-Fill Pre-Check
                 auto const all_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_funcsec_funcs_size + imported_func_size)};
 
                 if(auto const index{fwet_exports_storage.func_idx}; index >= all_func_size) [[unlikely]]
@@ -161,7 +161,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 auto const defined_tablesec_tables_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(tablesec.tables.size())};
                 auto const imported_table_size{
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(1uz).size())};
-                // Addition does not overflow, pre-checked.
+                // Addition does not overflow, Dependency Pre-Fill Pre-Check
                 auto const all_table_size{
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_tablesec_tables_size + imported_table_size)};
 
@@ -186,7 +186,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 auto const defined_memorysec_memories_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(memorysec.memories.size())};
                 auto const imported_memory_size{
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(2uz).size())};
-                // Addition does not overflow, pre-checked.
+                // Addition does not overflow, Dependency Pre-Fill Pre-Check
                 auto const all_memory_size{
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_memorysec_memories_size + imported_memory_size)};
 
@@ -211,7 +211,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 auto const defined_globalsec_globals_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(globalsec.local_globals.size())};
                 auto const imported_global_size{
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(3uz).size())};
-                // Addition does not overflow, pre-checked.
+                // Addition does not overflow, Dependency Pre-Fill Pre-Check
                 auto const all_global_size{
                     static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_globalsec_globals_size + imported_global_size)};
 
@@ -611,29 +611,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 #endif
 
-        auto const export_section_size{export_section_details_wrapper.export_section_storage_ptr->exports.size()};
+        auto const export_section_span{export_section_details_wrapper.export_section_storage_ptr->sec_span};
+        auto const export_section_size{static_cast<::std::size_t>(export_section_span.sec_end - export_section_span.sec_begin)};
 
         if(export_section_size)
         {
+            auto const export_size{export_section_details_wrapper.export_section_storage_ptr->exports.size()};
+
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nExport[", export_section_size, "]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nExport[", export_size, "]:\n");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nExport[", export_section_size, L"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nExport[", export_size, L"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nExport[", export_section_size, u8"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nExport[", export_size, u8"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nExport[", export_section_size, u"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nExport[", export_size, u"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nExport[", export_section_size, U"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nExport[", export_size, U"]:\n");
             }
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 export_counter{};

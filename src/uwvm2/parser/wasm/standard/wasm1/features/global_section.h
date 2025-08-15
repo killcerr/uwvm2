@@ -330,29 +330,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 #endif
 
-        auto const global_section_size{global_section_details_wrapper.global_section_storage_ptr->local_globals.size()};
+        auto const global_section_span{global_section_details_wrapper.global_section_storage_ptr->sec_span};
+        auto const global_section_size{static_cast<::std::size_t>(global_section_span.sec_end - global_section_span.sec_begin)};
 
         if(global_section_size)
         {
+            auto const global_size{global_section_details_wrapper.global_section_storage_ptr->local_globals.size()};
+
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nGlobal[", global_section_size, "]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nGlobal[", global_size, "]:\n");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nGlobal[", global_section_size, L"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nGlobal[", global_size, L"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nGlobal[", global_section_size, u8"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nGlobal[", global_size, u8"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nGlobal[", global_section_size, u"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nGlobal[", global_size, u"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nGlobal[", global_section_size, U"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nGlobal[", global_size, U"]:\n");
             }
 
             auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(

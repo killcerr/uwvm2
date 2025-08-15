@@ -8453,29 +8453,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        auto const func_section_size{function_section_details_wrapper.function_section_storage_ptr->funcs.size()};
 
-        if(func_section_size)
+        auto const function_section_span{function_section_details_wrapper.function_section_storage_ptr->sec_span};
+        auto const function_section_size{static_cast<::std::size_t>(function_section_span.sec_end - function_section_span.sec_begin)};
+
+        if(function_section_size)
         {
+            auto const function_size{function_section_details_wrapper.function_section_storage_ptr->funcs.size()};
+
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nFunction[", func_section_size, "]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nFunction[", function_size, "]:\n");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nFunction[", func_section_size, L"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nFunction[", function_size, L"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nFunction[", func_section_size, u8"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nFunction[", function_size, u8"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nFunction[", func_section_size, u"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nFunction[", function_size, u"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nFunction[", func_section_size, U"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nFunction[", function_size, U"]:\n");
             }
 
             auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(

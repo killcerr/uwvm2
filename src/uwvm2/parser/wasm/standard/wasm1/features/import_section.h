@@ -784,34 +784,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                        Stm && stream,
                                        import_section_storage_section_details_wrapper_t<Fs...> const import_section_details_wrapper)
     {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
         if(import_section_details_wrapper.import_section_storage_ptr == nullptr || import_section_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
         {
             ::fast_io::fast_terminate();
         }
+#endif
 
-        auto const import_section_size{import_section_details_wrapper.import_section_storage_ptr->imports.size()};
+        auto const& import_section_span{import_section_details_wrapper.import_section_storage_ptr->sec_span};
+        auto const import_section_size{static_cast<::std::size_t>(import_section_span.sec_end - import_section_span.sec_begin)};
 
         if(import_section_size)
         {
+            auto const import_size{import_section_details_wrapper.import_section_storage_ptr->imports.size()};
+
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nImport[", import_section_size, "]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nImport[", import_size, "]:\n");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nImport[", import_section_size, L"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nImport[", import_size, L"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nImport[", import_section_size, u8"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nImport[", import_size, u8"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nImport[", import_section_size, u"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nImport[", import_size, u"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nImport[", import_section_size, U"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nImport[", import_size, U"]:\n");
             }
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 import_counter{};

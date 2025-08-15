@@ -139,7 +139,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // function section
         auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
         auto const defined_funcsec_funcs_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
-        // Addition does not overflow, pre-checked.
+        // Addition does not overflow, Dependency Pre-Fill Pre-Check.
         auto const all_func_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_funcsec_funcs_size + imported_func_size)};
 
         if(start_idx >= all_func_size) [[unlikely]]
@@ -199,6 +199,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
         }
+
+        // [before_section ... ] | start_idx ...] (end)
+        // [        safe                        ] unsafe (could be the section_end)
+        //                                        ^^ section_curr
+
+        // Fixed count loop (here it is once), need to determine whether there are extra bytes at the end.
+
+        if(section_curr != section_end) [[unlikely]]
+        {
+            err.err_curr = section_curr;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::unexpected_section_data;
+            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+        }
     }
 
     /// @brief Wrapper for the start section storage structure
@@ -230,9 +243,53 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)start_section_details_wrapper;
+
+        auto const start_section_span{start_section_details_wrapper.start_section_storage_ptr->sec_span};
+        auto const start_section_size{static_cast<::std::size_t>(start_section_span.sec_end - start_section_span.sec_begin)};
+
+        if(start_section_size)
+        {
+            if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nStart]:\n"); }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nStart:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nStart:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nStart:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nStart:\n");
+            }
+
+            auto const start_idx{start_section_details_wrapper.start_section_storage_ptr->start_idx};
+
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "func[", start_idx, "]\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"func[", start_idx, L"]\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"func[", start_idx, u8"]\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"func[", start_idx, u"]\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"func[", start_idx, U"]\n");
+            }
+        }
     }
 }
 

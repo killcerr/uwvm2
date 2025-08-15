@@ -586,29 +586,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 #endif
 
-        auto const type_section_size{type_section_details_wrapper.type_section_storage_ptr->types.size()};
+        auto const type_section_span{type_section_details_wrapper.type_section_storage_ptr->sec_span};
+        auto const type_section_size{static_cast<::std::size_t>(type_section_span.sec_end - type_section_span.sec_begin)};
 
         if(type_section_size)
         {
+            auto const type_size{type_section_details_wrapper.type_section_storage_ptr->types.size()};
+
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nType[", type_section_size, "]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nType[", type_size, "]:\n");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nType[", type_section_size, L"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nType[", type_size, L"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nType[", type_section_size, u8"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nType[", type_size, u8"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nType[", type_section_size, u"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nType[", type_size, u"]:\n");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nType[", type_section_size, U"]:\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nType[", type_size, U"]:\n");
             }
 
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 type_counter{};

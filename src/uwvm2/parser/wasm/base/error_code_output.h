@@ -641,6 +641,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_duplicate_type_function.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::unexpected_section_data:
+            {
+#include "error_code_outputs/eco_unexpected_section_data.h"
+                return;
+            }
         }
     }
 }

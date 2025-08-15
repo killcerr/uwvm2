@@ -101,7 +101,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& memorysec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<memory_section_storage_t<Fs...>>(module_storage.sections)};
         auto const defined_memory_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(memorysec.memories.size())};
         auto const imported_memory_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(2uz).size())};
-        // Addition does not overflow
+        // Addition does not overflow, Dependency Pre-Fill Pre-Check
         auto const all_memory_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(defined_memory_size + imported_memory_size)};
 
         // check table index
