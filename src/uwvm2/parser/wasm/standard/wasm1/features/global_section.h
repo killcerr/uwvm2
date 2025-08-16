@@ -96,8 +96,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr ::std::byte const* parse_and_check_global_expr_valid(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<global_section_storage_t<Fs...>> sec_adl,
-        ::uwvm2::parser::wasm::standard::wasm1::type::global_type const& global_r,  // [adl] can be replaced
-        ::uwvm2::parser::wasm::standard::wasm1::features::global_expr& global_expr,
+        ::uwvm2::parser::wasm::standard::wasm1::type::global_type const& global_r,                    // [adl] can be replaced
+        ::uwvm2::parser::wasm::standard::wasm1::const_expr::wasm1_const_expr_storage_t& global_expr,  // [adl] can be replaced
         [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
@@ -230,6 +230,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [       safe     ] unsafe (could be the section_end)
                         //                    ^^ section_curr
 
+                        global_expr.opcodes.emplace_back(::uwvm2::parser::wasm::standard::wasm1::const_expr::base_const_expr_opcode_storage_u{.i32 = test_i32},
+                                                         ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::i32_const);
+
                         break;
                     }
                     case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
@@ -292,6 +295,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [       safe     ] unsafe (could be the section_end)
                         //                    ^^ section_curr
 
+                        global_expr.opcodes.emplace_back(::uwvm2::parser::wasm::standard::wasm1::const_expr::base_const_expr_opcode_storage_u{.i64 = test_i64},
+                                                         ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::i64_const);
+
                         break;
                     }
                     case static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(
@@ -338,14 +344,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [       safe           ] unsafe (could be the section_end)
                         //           ^^ section_curr
 
-                        // There is no need to perform little-endian capture here, because 4 bytes of space is sufficient to obtain fp32.
-                        // On platforms where charbit is not equal to 8, only cyclic reading is allowed.
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32 test_f32;
 
-                        section_curr += 4uz;
+#if CHAR_BIT > 8
+                        ::std::uint_least32_t temp_ul32{};
+                        for(unsigned i{}; i != 4u; ++i)
+                        {
+                            auto curr_byte{::std::to_integer<::std::uint_least8_t>(*section_curr)};
+                            curr_byte &= 0xFFu;
+                            temp_ul32 |= curr_byte << (i * 8u);
+                            ++section_curr;
+                        }
+                        test_f32 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32>(temp_ul32);
+#else
+                        static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32) == 4uz);
+                        static_assert(sizeof(::std::uint_least32_t) == 4uz);
+
+                        ::std::uint_least32_t temp_ul32;
+                        ::std::memcpy(::std::addressof(temp_ul32), section_curr, 4uz);
+                        // to little endian
+                        temp_ul32 = ::fast_io::little_endian(temp_ul32);
+                        test_f32 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32>(temp_ul32);
+
+                        section_curr += 4u;
+#endif
 
                         // [... curr f32 xx xx xx ] ...
                         // [       safe           ] unsafe (could be the section_end)
                         //                          ^^ section_curr
+
+                        global_expr.opcodes.emplace_back(::uwvm2::parser::wasm::standard::wasm1::const_expr::base_const_expr_opcode_storage_u{.f32 = test_f32},
+                                                         ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::f32_const);
 
                         break;
                     }
@@ -398,9 +427,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
                         section_curr += 8uz;
 
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64 test_f64;
+
+#if CHAR_BIT > 8
+                        ::std::uint_least64_t temp_ul64{};
+                        for(unsigned i{}; i != 8u; ++i)
+                        {
+                            auto curr_byte{::std::to_integer<::std::uint_least8_t>(*section_curr)};
+                            curr_byte &= 0xFFu;
+                            temp_ul64 |= curr_byte << (i * 8u);
+                            ++section_curr;
+                        }
+                        test_f64 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64>(temp_ul64);
+#else
+                        static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64) == 8uz);
+                        static_assert(sizeof(::std::uint_least64_t) == 8uz);
+
+                        ::std::uint_least64_t temp_ul64;
+                        ::std::memcpy(::std::addressof(temp_ul64), section_curr, 8uz);
+                        // to little endian
+                        temp_ul64 = ::fast_io::little_endian(temp_ul64);
+                        test_f64 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64>(temp_ul64);
+
+                        section_curr += 8u;
+#endif
+
                         // [... curr f64 xx xx xx xx xx xx xx ] ...
                         // [       safe                       ] unsafe (could be the section_end)
                         //                                      ^^ section_curr
+
+                        global_expr.opcodes.emplace_back(::uwvm2::parser::wasm::standard::wasm1::const_expr::base_const_expr_opcode_storage_u{.f64 = test_f64},
+                                                         ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::f64_const);
 
                         break;
                     }
@@ -496,6 +553,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // [... curr global_idx(u32) ...] ...
                         // [       safe                 ] unsafe (could be the section_end)
                         //                                ^^ section_curr
+
+                        global_expr.opcodes.emplace_back(
+                            ::uwvm2::parser::wasm::standard::wasm1::const_expr::base_const_expr_opcode_storage_u{.imported_global_idx = test_global_idx},
+                            ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::global_get);
 
                         break;
                     }

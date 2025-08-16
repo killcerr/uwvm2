@@ -1274,7 +1274,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     concept has_parse_and_check_global_expr_valid =
         requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<global_section_storage_t<Fs...>> sec_adl,
                  ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> const& global_r,
-                 ::uwvm2::parser::wasm::standard::wasm1::features::global_expr& global_expr,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_const_expr<Fs...>& global_expr,
                  ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                  ::std::byte const* section_curr,
                  ::std::byte const* const section_end,
@@ -1284,7 +1284,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                 parse_and_check_global_expr_valid(sec_adl, global_r, global_expr, module_storage, section_curr, section_end, err, fs_para)
             } -> ::std::same_as<::std::byte const*>;
         };
-        
+
     /////////////////////////////
     /// @brief export section ///
     /////////////////////////////

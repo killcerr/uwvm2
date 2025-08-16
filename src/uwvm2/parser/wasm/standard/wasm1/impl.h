@@ -28,5 +28,6 @@
 # include "type/impl.h"
 # include "section/impl.h"
 # include "opcode/impl.h"
+# include "const_expr/impl.h"
 # include "features/impl.h"
 #endif

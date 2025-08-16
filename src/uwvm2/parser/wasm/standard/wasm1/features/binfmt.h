@@ -41,6 +41,7 @@
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/opcode/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/const_expr/impl.h>
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include <uwvm2/parser/wasm/text_format/impl.h>
 # include "def.h"
@@ -102,6 +103,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using global_type = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::type::global_type>;
 
+        // global section
+        using wasm_const_expr =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::const_expr::wasm1_const_expr_storage_t>;
+
         // export section
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
         using export_type =
@@ -159,6 +165,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_table_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_memory_type<wasm1>);
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_global_type<wasm1>);
+    // global section
+    static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_wasm_const_expr<wasm1>);
     // export section
     static_assert(::uwvm2::parser::wasm::standard::wasm1::features::has_export_type<wasm1>);
     // element setcion

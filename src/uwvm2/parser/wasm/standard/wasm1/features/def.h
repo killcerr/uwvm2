@@ -1070,20 +1070,40 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     //      Global Section     //
     /////////////////////////////
 
-    struct global_expr
-    {
-        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
-        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
-
-        ::std::byte const* begin;
-        ::std::byte const* end;  // The pointer to end is after 0x0b.
+    /// @brief      has wasm_const_expr
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 using wasm_const_expr = type_replacer<root_of_replacement, wasm_const_expr>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_wasm_const_expr = requires {
+        typename FeatureType::wasm_const_expr;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::wasm_const_expr>;
     };
 
+    template <typename FeatureType>
+    inline consteval auto get_wasm_const_expr() noexcept
+    {
+        if constexpr(has_wasm_const_expr<FeatureType>) { return typename FeatureType::wasm_const_expr{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_wasm_const_expr = ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_wasm_const_expr<Fs>())...>;
+
+    /// @brief final local global type
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct final_local_global_type
     {
-        final_global_type<Fs...> global;  // Types used to store global
-        global_expr expr;                 // Expressions used to initialize global
+        final_global_type<Fs...> global;    // Types used to store global
+        final_wasm_const_expr<Fs...> expr;  // Expressions used to initialize global
     };
 
     /////////////////////////////
@@ -1360,12 +1380,6 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>>
-    {
-        inline static constexpr bool value = true;
-    };
-
-    template <>
-    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::global_expr>
     {
         inline static constexpr bool value = true;
     };

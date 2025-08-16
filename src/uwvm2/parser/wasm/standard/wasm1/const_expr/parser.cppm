@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -34,7 +34,7 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.parser.wasm.standard.wasm1.features:binfmt;
+export module uwvm2.parser.wasm.standard.wasm1.const_expr:parser;
 
 import fast_io;
 import uwvm2.utils.container;
@@ -42,24 +42,9 @@ import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm.standard.wasm1.section;
 import uwvm2.parser.wasm.standard.wasm1.opcode;
-import uwvm2.parser.wasm.standard.wasm1.const_expr;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import uwvm2.parser.wasm.text_format;
-import :def;
-import :feature_def;
-import :custom_section;
-import :type_section;
-import :import_section;
-import :function_section;
-import :table_section;
-import :memory_section;
-import :global_section;
-import :export_section;
-import :start_section;
-import :element_section;
-import :code_section;
-import :data_section;
-import :final_check;
+import :storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -68,4 +53,4 @@ import :final_check;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "binfmt.h"
+#include "parser.h"
