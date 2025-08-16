@@ -112,7 +112,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& imported_global{importsec.importdesc.index_unchecked(3uz)};
         auto const imported_global_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(imported_global.size())};
 
-        // Since global initialization expressions in wasm1.0 only allow instructions that “increment the data stack,” a simple check for whether an instruction
+        // Since global initialization expressions in wasm1.0 only allow instructions that “increment the data stack”, a simple check for whether an instruction
         // already exists can be used here to detect this.
         bool has_data_on_type_stack{};
 

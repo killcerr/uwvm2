@@ -88,7 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
         ::uwvm2::uwvm::wasm::warning::show_wasm_export_section_warning(wasm, warn_storage);
         ::uwvm2::uwvm::wasm::warning::show_wasm_start_section_warning(wasm, warn_storage);
 
-        /// @todo
+        /// @todo Change warning to a loop based on section+adl
         ::uwvm2::uwvm::wasm::warning::show_wasm_final_check_warning(wasm, warn_storage);
     }
 }
