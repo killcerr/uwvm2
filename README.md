@@ -25,7 +25,7 @@ Ultimate WebAssembly Virtual Machine 2
 
 ## Features
 ### WASM Feature Extensions
-Most wasm standards are supported. See [feature.md](documents/features.md)
+Most wasm standards are supported. See [feature.md](documents/features.md). For detailed changes in each WebAssembly release, see [wasm-release.md](documents/wasm-release.md).
 
 ### Supports multiple platforms
 Supports over 100 triplet platforms, including DOS series, POSIX series, Windows 9x series, Windows NT series, and the Host C Library Series. Supports interpretation execution (INT), just-in-time compilation (JIT), and tiered compilation (TC). See [support.md](documents/support.md) for details.

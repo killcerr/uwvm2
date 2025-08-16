@@ -1,4 +1,4 @@
-# WebASSembly Specifaction
+# WebAssembly Specifaction Release
 
 ## Changes by Release
 
