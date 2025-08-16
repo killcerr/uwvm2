@@ -353,8 +353,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             auto curr_byte{::std::to_integer<::std::uint_least8_t>(*section_curr)};
                             curr_byte &= 0xFFu;
                             temp_ul32 |= curr_byte << (i * 8u);
+
+                            // [... xx ...] ...
+                            // [  safe    ] unsafe (could be the section_end)
+                            //      ^^ section_curr
+
                             ++section_curr;
+
+                            // [... xx ]...] ...
+                            // [  safe ]...] unsafe (could be the section_end)
+                            //          ^^ section_curr
                         }
+
                         test_f32 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32>(temp_ul32);
 #else
                         static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32) == 4uz);
@@ -364,6 +374,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::std::memcpy(::std::addressof(temp_ul32), section_curr, 4uz);
                         // to little endian
                         temp_ul32 = ::fast_io::little_endian(temp_ul32);
+
                         test_f32 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32>(temp_ul32);
 
                         section_curr += 4u;
@@ -425,8 +436,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         // There is no need to perform little-endian capture here, because 8 bytes of space is sufficient to obtain fp64.
                         // On platforms where charbit is not equal to 8, only cyclic reading is allowed.
 
-                        section_curr += 8uz;
-
                         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64 test_f64;
 
 #if CHAR_BIT > 8
@@ -436,8 +445,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             auto curr_byte{::std::to_integer<::std::uint_least8_t>(*section_curr)};
                             curr_byte &= 0xFFu;
                             temp_ul64 |= curr_byte << (i * 8u);
+
+                            // [... xx ...] ...
+                            // [  safe    ] unsafe (could be the section_end)
+                            //      ^^ section_curr
+
                             ++section_curr;
+
+                            // [... xx ]...] ...
+                            // [  safe ]...] unsafe (could be the section_end)
+                            //          ^^ section_curr
                         }
+
                         test_f64 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64>(temp_ul64);
 #else
                         static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64) == 8uz);
@@ -447,6 +466,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         ::std::memcpy(::std::addressof(temp_ul64), section_curr, 8uz);
                         // to little endian
                         temp_ul64 = ::fast_io::little_endian(temp_ul64);
+
                         test_f64 = ::std::bit_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64>(temp_ul64);
 
                         section_curr += 8u;
@@ -578,20 +598,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 
         // [... global_curr ... section_curr ... 0x0B] global_next ...
-        // [                   safe               ] unsafe (could be the section_end)
-        //                                    ^^ section_curr
-
-        ++section_curr;
-
-        // [... global_curr ... section_curr ... 0x0B] global_next ...
-        // [                   safe               ] unsafe (could be the section_end)
-        //                                          ^^ section_curr
+        // [                   safe                  ] unsafe (could be the section_end)
+        //                                             ^^ section_curr
 
         global_expr.end = section_curr;
 
         // [... global_curr ... section_curr ... 0x0B] global_next ...
-        // [                   safe               ] unsafe (could be the section_end)
-        //                                          ^^ global_expr.end
+        // [                   safe                  ] unsafe (could be the section_end)
+        //                                             ^^ global_expr.end
 
         return section_curr;
     }
