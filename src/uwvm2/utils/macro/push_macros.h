@@ -307,6 +307,17 @@
 # define UWVM_ASSERT(x) ((void)0)
 #endif
 
+/// @brief        Specify that a type is replaceable if it meets certain conditions.
+/// @see          replaceable_if_eligible
+#pragma push_macro("UWVM_REPLACEABLE_IF_ELIGIBLE")
+#undef UWVM_REPLACEABLE_IF_ELIGIBLE
+#if defined(__cpp_trivial_relocatability)
+# undef UWVM_REPLACEABLE_IF_ELIGIBLE
+# define UWVM_REPLACEABLE_IF_ELIGIBLE replaceable_if_eligible
+#else
+# define UWVM_REPLACEABLE_IF_ELIGIBLE
+#endif
+
 /// @brief        Specify that a type is trivially relocatable if it meets certain conditions.
 /// @see          trivially_relocatable_if_eligible
 #pragma push_macro("UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE")
