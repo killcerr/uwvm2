@@ -8514,7 +8514,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
-                                                                             "]: {sig = type[",
+                                                                             "]: {sig: type[",
                                                                              type_index,
                                                                              "]}\n");
                         }
@@ -8525,7 +8525,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
-                                                                             L"]: {sig = type[",
+                                                                             L"]: {sig: type[",
                                                                              type_index,
                                                                              L"]}\n");
                         }
@@ -8536,7 +8536,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
-                                                                             u8"]: {sig = type[",
+                                                                             u8"]: {sig: type[",
                                                                              type_index,
                                                                              u8"]}\n");
                         }
@@ -8547,7 +8547,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
-                                                                             u"]: {sig = type[",
+                                                                             u"]: {sig: type[",
                                                                              type_index,
                                                                              u"]}\n");
                         }
@@ -8558,7 +8558,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,
-                                                                             U"]: {sig = type[",
+                                                                             U"]: {sig: type[",
                                                                              type_index,
                                                                              U"]}\n");
                         }
@@ -8582,7 +8582,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
-                                                                             "]: {sig = type[",
+                                                                             "]: {sig: type[",
                                                                              type_index,
                                                                              "]}\n");
                         }
@@ -8593,7 +8593,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
-                                                                             L"]: {sig = type[",
+                                                                             L"]: {sig: type[",
                                                                              type_index,
                                                                              L"]}\n");
                         }
@@ -8604,7 +8604,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
-                                                                             u8"]: {sig = type[",
+                                                                             u8"]: {sig: type[",
                                                                              type_index,
                                                                              u8"]}\n");
                         }
@@ -8615,7 +8615,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
-                                                                             u"]: {sig = type[",
+                                                                             u"]: {sig: type[",
                                                                              type_index,
                                                                              u"]}\n");
                         }
@@ -8626,7 +8626,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,
-                                                                             U"]: {sig = type[",
+                                                                             U"]: {sig: type[",
                                                                              type_index,
                                                                              U"]}\n");
                         }
@@ -8650,7 +8650,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
-                                                                             "]: {sig = type[",
+                                                                             "]: {sig: type[",
                                                                              type_index,
                                                                              "]}\n");
                         }
@@ -8661,7 +8661,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
-                                                                             L"]: {sig = type[",
+                                                                             L"]: {sig: type[",
                                                                              type_index,
                                                                              L"]}\n");
                         }
@@ -8672,7 +8672,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
-                                                                             u8"]: {sig = type[",
+                                                                             u8"]: {sig: type[",
                                                                              type_index,
                                                                              u8"]}\n");
                         }
@@ -8683,7 +8683,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
-                                                                             u"]: {sig = type[",
+                                                                             u"]: {sig: type[",
                                                                              type_index,
                                                                              u"]}\n");
                         }
@@ -8694,7 +8694,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,
-                                                                             U"]: {sig = type[",
+                                                                             U"]: {sig: type[",
                                                                              type_index,
                                                                              U"]}\n");
                         }
@@ -8718,7 +8718,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              "] -> func[",
                                                                              func_counter,
-                                                                             "]: {sig = type[",
+                                                                             "]: {sig: type[",
                                                                              type_index,
                                                                              "]}\n");
                         }
@@ -8729,7 +8729,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              L"] -> func[",
                                                                              func_counter,
-                                                                             L"]: {sig = type[",
+                                                                             L"]: {sig: type[",
                                                                              type_index,
                                                                              L"]}\n");
                         }
@@ -8740,7 +8740,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u8"] -> func[",
                                                                              func_counter,
-                                                                             u8"]: {sig = type[",
+                                                                             u8"]: {sig: type[",
                                                                              type_index,
                                                                              u8"]}\n");
                         }
@@ -8751,7 +8751,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              u"] -> func[",
                                                                              func_counter,
-                                                                             u"]: {sig = type[",
+                                                                             u"]: {sig: type[",
                                                                              type_index,
                                                                              u"]}\n");
                         }
@@ -8762,7 +8762,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                                                                              localdef_counter,
                                                                              U"] -> func[",
                                                                              func_counter,
-                                                                             U"]: {sig = type[",
+                                                                             U"]: {sig: type[",
                                                                              type_index,
                                                                              U"]}\n");
                         }

@@ -75,83 +75,83 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
         {
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                "limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                ", max = ",
-                                                                limits_section_details_wrapper.limits.max,
-                                                                "}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 "limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 ", max: ",
+                                                                 limits_section_details_wrapper.limits.max,
+                                                                 "}");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                L"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                L", max = ",
-                                                                limits_section_details_wrapper.limits.max,
-                                                                L"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 L"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 L", max: ",
+                                                                 limits_section_details_wrapper.limits.max,
+                                                                 L"}");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u8"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                u8", max = ",
-                                                                limits_section_details_wrapper.limits.max,
-                                                                u8"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 u8"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 u8", max: ",
+                                                                 limits_section_details_wrapper.limits.max,
+                                                                 u8"}");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                u", max = ",
-                                                                limits_section_details_wrapper.limits.max,
-                                                                u"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 u"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 u", max: ",
+                                                                 limits_section_details_wrapper.limits.max,
+                                                                 u"}");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                U"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                U", max = ",
-                                                                limits_section_details_wrapper.limits.max,
-                                                                U"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 U"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 U", max: ",
+                                                                 limits_section_details_wrapper.limits.max,
+                                                                 U"}");
             }
         }
         else
         {
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), "limits: {min = ", limits_section_details_wrapper.limits.min, "}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "limits: {min: ", limits_section_details_wrapper.limits.min, "}");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                L"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                L"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 L"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 L"}");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u8"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                u8"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 u8"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 u8"}");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                u"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 u"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 u"}");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                U"limits: {min = ",
-                                                                limits_section_details_wrapper.limits.min,
-                                                                U"}");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 U"limits: {min: ",
+                                                                 limits_section_details_wrapper.limits.min,
+                                                                 U"}");
             }
         }
     }
@@ -190,38 +190,38 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     {
         if constexpr(::std::same_as<char_type, char>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            "pages: {",
-                                                            section_details(memory_section_details_wrapper.memory.limits),
-                                                            "}");
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             "pages: {",
+                                                             section_details(memory_section_details_wrapper.memory.limits),
+                                                             "}");
         }
         else if constexpr(::std::same_as<char_type, wchar_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            L"pages: {",
-                                                            section_details(memory_section_details_wrapper.memory.limits),
-                                                            L"}");
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             L"pages: {",
+                                                             section_details(memory_section_details_wrapper.memory.limits),
+                                                             L"}");
         }
         else if constexpr(::std::same_as<char_type, char8_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            u8"pages: {",
-                                                            section_details(memory_section_details_wrapper.memory.limits),
-                                                            u8"}");
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u8"pages: {",
+                                                             section_details(memory_section_details_wrapper.memory.limits),
+                                                             u8"}");
         }
         else if constexpr(::std::same_as<char_type, char16_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            u"pages: {",
-                                                            section_details(memory_section_details_wrapper.memory.limits),
-                                                            u"}");
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u"pages: {",
+                                                             section_details(memory_section_details_wrapper.memory.limits),
+                                                             u"}");
         }
         else if constexpr(::std::same_as<char_type, char32_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            U"pages: {",
-                                                            section_details(memory_section_details_wrapper.memory.limits),
-                                                            U"}");
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             U"pages: {",
+                                                             section_details(memory_section_details_wrapper.memory.limits),
+                                                             U"}");
         }
     }
 
@@ -251,33 +251,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     {
         if constexpr(::std::same_as<char_type, char>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            "type: funcref, ",
-                                                            section_details(table_section_details_wrapper.table.limits));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             "type: funcref, ",
+                                                             section_details(table_section_details_wrapper.table.limits));
         }
         else if constexpr(::std::same_as<char_type, wchar_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            L"type: funcref, ",
-                                                            section_details(table_section_details_wrapper.table.limits));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             L"type: funcref, ",
+                                                             section_details(table_section_details_wrapper.table.limits));
         }
         else if constexpr(::std::same_as<char_type, char8_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            u8"type: funcref, ",
-                                                            section_details(table_section_details_wrapper.table.limits));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u8"type: funcref, ",
+                                                             section_details(table_section_details_wrapper.table.limits));
         }
         else if constexpr(::std::same_as<char_type, char16_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            u"type: funcref, ",
-                                                            section_details(table_section_details_wrapper.table.limits));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u"type: funcref, ",
+                                                             section_details(table_section_details_wrapper.table.limits));
         }
         else if constexpr(::std::same_as<char_type, char32_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            U"type: funcref, ",
-                                                            section_details(table_section_details_wrapper.table.limits));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             U"type: funcref, ",
+                                                             section_details(table_section_details_wrapper.table.limits));
         }
     }
 
@@ -305,43 +305,43 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     {
         if constexpr(::std::same_as<char_type, char>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            "mutable: ",
-                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            ", type: ",
-                                                            section_details(global_section_details_wrapper.global.type));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             "mutable: ",
+                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                             ", type: ",
+                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, wchar_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            L"mutable: ",
-                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            L", type: ",
-                                                            section_details(global_section_details_wrapper.global.type));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             L"mutable: ",
+                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                             L", type: ",
+                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, char8_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            u8"mutable: ",
-                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            u8", type: ",
-                                                            section_details(global_section_details_wrapper.global.type));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u8"mutable: ",
+                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                             u8", type: ",
+                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, char16_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            u"mutable: ",
-                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            u", type: ",
-                                                            section_details(global_section_details_wrapper.global.type));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             u"mutable: ",
+                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                             u", type: ",
+                                                             section_details(global_section_details_wrapper.global.type));
         }
         else if constexpr(::std::same_as<char_type, char32_t>)
         {
-            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                            U"mutable: ",
-                                                            ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
-                                                            U", type: ",
-                                                            section_details(global_section_details_wrapper.global.type));
+            ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                             U"mutable: ",
+                                                             ::fast_io::mnp::boolalpha(global_section_details_wrapper.global.is_mutable),
+                                                             U", type: ",
+                                                             section_details(global_section_details_wrapper.global.type));
         }
     }
 

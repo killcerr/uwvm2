@@ -79,7 +79,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     concept has_type_prefix_handler =
         requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<type_section_storage_t<Fs...>> sec_adl,
                  ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::final_type_type_t<Fs...>> type_adl,
-                 ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> preifx,
+                 ::uwvm2::parser::wasm::standard::wasm1::features::final_type_prefix_t<Fs...> prefix,
                  ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
                  ::std::byte const* section_curr,
                  ::std::byte const* const section_end,
@@ -87,7 +87,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                  ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
                  ::std::byte const* const prefix_module_ptr) {
             {
-                define_type_prefix_handler(sec_adl, type_adl, preifx, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr)
+                define_type_prefix_handler(sec_adl, type_adl, prefix, module_storage, section_curr, section_end, err, fs_para, prefix_module_ptr)
             } -> ::std::same_as<::std::byte const*>;
         };
 
@@ -262,7 +262,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                      "func[",
                                                                      curr_importdesc_counter,
-                                                                     "]: {sig = type[",
+                                                                     "]: {sig: type[",
                                                                      sign,
                                                                      "]}");
                 }
@@ -271,7 +271,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                      L"func[",
                                                                      curr_importdesc_counter,
-                                                                     L"]: {sig = type[",
+                                                                     L"]: {sig: type[",
                                                                      sign,
                                                                      L"]}");
                 }
@@ -280,7 +280,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                      u8"func[",
                                                                      curr_importdesc_counter,
-                                                                     u8"]: {sig = type[",
+                                                                     u8"]: {sig: type[",
                                                                      sign,
                                                                      u8"]}");
                 }
@@ -289,7 +289,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                      u"func[",
                                                                      curr_importdesc_counter,
-                                                                     u"]: {sig = type[",
+                                                                     u"]: {sig: type[",
                                                                      sign,
                                                                      u"]}");
                 }
@@ -298,7 +298,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
                                                                      U"func[",
                                                                      curr_importdesc_counter,
-                                                                     U"]: {sig = type[",
+                                                                     U"]: {sig: type[",
                                                                      sign,
                                                                      U"]}");
                 }
@@ -1577,48 +1577,48 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             if constexpr(::std::same_as<char_type, char>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                "  - elem[",
-                                                                curr_elem_counter,
-                                                                "] -> ref.func[",
-                                                                curr_func_idx,
-                                                                "]\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 "  - ref[",
+                                                                 curr_elem_counter,
+                                                                 "] -> func[",
+                                                                 curr_func_idx,
+                                                                 "]\n");
             }
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                L"  - elem[",
-                                                                curr_elem_counter,
-                                                                L"] -> ref.func[",
-                                                                curr_func_idx,
-                                                                L"]\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 L"  - ref[",
+                                                                 curr_elem_counter,
+                                                                 L"] -> func[",
+                                                                 curr_func_idx,
+                                                                 L"]\n");
             }
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u8"  - elem[",
-                                                                curr_elem_counter,
-                                                                u8"] -> ref.func[",
-                                                                curr_func_idx,
-                                                                u8"]\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 u8"  - ref[",
+                                                                 curr_elem_counter,
+                                                                 u8"] -> func[",
+                                                                 curr_func_idx,
+                                                                 u8"]\n");
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u"  - elem[",
-                                                                curr_elem_counter,
-                                                                u"] -> ref.func[",
-                                                                curr_func_idx,
-                                                                u"]\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 u"  - ref[",
+                                                                 curr_elem_counter,
+                                                                 u"] -> func[",
+                                                                 curr_func_idx,
+                                                                 u"]\n");
             }
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                U"  - elem[",
-                                                                curr_elem_counter,
-                                                                U"] -> ref.func[",
-                                                                curr_func_idx,
-                                                                U"]\n");
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                 U"  - ref[",
+                                                                 curr_elem_counter,
+                                                                 U"] -> func[",
+                                                                 curr_func_idx,
+                                                                 U"]\n");
             }
 
             ++curr_elem_counter;
