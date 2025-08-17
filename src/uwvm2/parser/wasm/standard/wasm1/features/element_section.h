@@ -750,9 +750,83 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)element_section_details_wrapper;
+
+        auto const element_section_span{element_section_details_wrapper.element_section_storage_ptr->sec_span};
+        auto const element_section_size{static_cast<::std::size_t>(element_section_span.sec_end - element_section_span.sec_begin)};
+
+        if(element_section_size)
+        {
+            auto const element_size{element_section_details_wrapper.element_section_storage_ptr->elems.size()};
+
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nElement[", element_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nElement[", element_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nElement[", element_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nElement[", element_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nElement[", element_size, U"]:\n");
+            }
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 element_counter{};
+
+            for(auto const& curr_element: element_section_details_wrapper.element_section_storage_ptr->elems)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    " - element[",
+                                                                    element_counter,
+                                                                    "]: ",
+                                                                    section_details(curr_element, *element_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    L" - element[",
+                                                                    element_counter,
+                                                                    L"]: ",
+                                                                    section_details(curr_element, *element_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u8" - element[",
+                                                                    element_counter,
+                                                                    u8"]: ",
+                                                                    section_details(curr_element, *element_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u" - element[",
+                                                                    element_counter,
+                                                                    u"]: ",
+                                                                    section_details(curr_element, *element_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    U" - element[",
+                                                                    element_counter,
+                                                                    U"]: ",
+                                                                    section_details(curr_element, *element_section_details_wrapper.all_sections_ptr));
+                }
+
+                ++element_counter;
+            }
+        }
     }
 }
 

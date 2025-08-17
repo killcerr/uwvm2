@@ -1501,6 +1501,129 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_const_expr<Fs...> expr{};
         ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> vec_funcidx{};
     };
+
+    /// @brief Wrapper for the final_import_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm1_elem_storage_t_section_details_wrapper_t
+    {
+        wasm1_elem_storage_t<Fs...> const* element_storage_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr wasm1_elem_storage_t_section_details_wrapper_t<Fs...> section_details(
+        wasm1_elem_storage_t<Fs...> const& element_storage,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
+    {
+        return {::std::addressof(element_storage), ::std::addressof(all_sections)};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, wasm1_elem_storage_t_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       wasm1_elem_storage_t_section_details_wrapper_t<Fs...> const element_storage_details_wrapper)
+    {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(element_storage_details_wrapper.element_storage_ptr == nullptr || element_storage_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            "table_idx: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->table_idx,
+                                                            ", count: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->vec_funcidx.size());
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            L"table_idx: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->table_idx,
+                                                            L", count: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->vec_funcidx.size());
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u8"table_idx: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->table_idx,
+                                                            u8", count: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->vec_funcidx.size());
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            u"table_idx: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->table_idx,
+                                                            u", count: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->vec_funcidx.size());
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                            U"table_idx: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->table_idx,
+                                                            U", count: ",
+                                                            element_storage_details_wrapper.element_storage_ptr->vec_funcidx.size());
+        }
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 curr_elem_counter{};
+
+        for(auto const curr_func_idx: element_storage_details_wrapper.element_storage_ptr->vec_funcidx)
+        {
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                "  - elem[",
+                                                                curr_elem_counter,
+                                                                "] -> ref.func[",
+                                                                curr_func_idx,
+                                                                "]\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                L"  - elem[",
+                                                                curr_elem_counter,
+                                                                L"] -> ref.func[",
+                                                                curr_func_idx,
+                                                                L"]\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u8"  - elem[",
+                                                                curr_elem_counter,
+                                                                u8"] -> ref.func[",
+                                                                curr_func_idx,
+                                                                u8"]\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u"  - elem[",
+                                                                curr_elem_counter,
+                                                                u"] -> ref.func[",
+                                                                curr_func_idx,
+                                                                u"]\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                U"  - elem[",
+                                                                curr_elem_counter,
+                                                                U"] -> ref.func[",
+                                                                curr_func_idx,
+                                                                U"]\n");
+            }
+
+            ++curr_elem_counter;
+        }
+    }
 }
 
 // Subsequent specifications of union must include this information, so it has to be declared here.
@@ -1554,7 +1677,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         wasm1_element_type_t type{};
 
-        inline constexpr wasm1_element_t() noexcept = default;  // all-zero
+        inline constexpr wasm1_element_t() noexcept { ::new(::std::addressof(this->storage.table_idx)) decltype(this->storage.table_idx){}; }
 
         inline constexpr wasm1_element_t(wasm1_element_t const& other) noexcept : type{other.type}
         {
@@ -1594,6 +1717,71 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline constexpr ~wasm1_element_t() { ::std::destroy_at(::std::addressof(this->storage.table_idx)); }
     };
+
+    /// @brief Wrapper for the final_import_type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm1_element_t_section_details_wrapper_t
+    {
+        wasm1_element_t<Fs...> const* element_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr wasm1_element_t_section_details_wrapper_t<Fs...> section_details(
+        wasm1_element_t<Fs...> const& element,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
+    {
+        return {::std::addressof(element), ::std::addressof(all_sections)};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, wasm1_element_t_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       wasm1_element_t_section_details_wrapper_t<Fs...> const element_details_wrapper)
+    {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(element_details_wrapper.element_ptr == nullptr || element_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                "flag: 0, ",
+                section_details(element_details_wrapper.element_ptr->storage.table_idx, *element_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                L"flag: 0, ",
+                section_details(element_details_wrapper.element_ptr->storage.table_idx, *element_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                u8"flag: 0, ",
+                section_details(element_details_wrapper.element_ptr->storage.table_idx, *element_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                u"flag: 0, ",
+                section_details(element_details_wrapper.element_ptr->storage.table_idx, *element_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                U"flag: 0, ",
+                section_details(element_details_wrapper.element_ptr->storage.table_idx, *element_details_wrapper.all_sections_ptr));
+        }
+    }
 
     template <typename... Fs>
     concept has_handle_element_type = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<element_section_storage_t<Fs...>> sec_adl,

@@ -61,6 +61,7 @@ import :memory_section;
 import :global_section;
 import :export_section;
 import :start_section;
+import :element_section;
 import :final_check;
 
 #ifndef UWVM_MODULE

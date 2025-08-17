@@ -122,9 +122,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // check for Check for duplicate modulename
         // Since vector expansion invalidates the iterator, the build map operation will not be performed on change here
 
-        if(auto const ret{::uwvm2::uwvm::run::load_and_check_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }
+        if(auto const ret{::uwvm2::uwvm::run::load_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }
 
-        // run vm
+        // section details Occurs before dependency checks
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
         {
             case ::uwvm2::uwvm::wasm::base::mode::section_details:
@@ -132,6 +132,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 ::uwvm2::uwvm::wasm::section_details::print_section_details();
                 break;
             }
+            default:
+            {
+                break;
+            }
+        }
+
+        // check modules
+        if(auto const ret{::uwvm2::uwvm::run::check_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }
+
+        // run vm
+        switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
+        {
+            case ::uwvm2::uwvm::wasm::base::mode::section_details:
+            {
+                // section details Occurs before dependency checks
+                break;
+            }
+            /// @todo
             [[unlikely]] default:
             {
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)

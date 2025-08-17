@@ -86,6 +86,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         // Since the default is to initialize to binfmt 0, there is no need to do any constructs
         inline constexpr wasm_file_t() noexcept = default;
 
+        inline explicit constexpr wasm_file_t(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 new_binfmt_ver) noexcept : binfmt_ver{new_binfmt_ver}
+        {
+            switch(this->binfmt_ver)
+            {
+                case 1u:
+                {
+                    ::new(::std::addressof(this->wasm_module_storage.wasm_binfmt_ver1_storage)) decltype(this->wasm_module_storage.wasm_binfmt_ver1_storage){};
+                    break;
+                }
+                [[unlikely]] default:
+                {
+                    break;
+                }
+            }
+        }
+
         inline constexpr wasm_file_t(wasm_file_t const& other) noexcept = delete;
 
         inline constexpr wasm_file_t(wasm_file_t&& other) noexcept :

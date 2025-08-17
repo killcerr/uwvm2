@@ -1072,8 +1072,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         return {static_cast<int>(::uwvm2::uwvm::run::retval::ok), ::std::move(adjacency_list)};
     }
 
-    /// @brief Check for duplicates or mismatched imports and exports
-    inline int load_and_check_modules() noexcept
+    inline int load_modules() noexcept
     {
 #ifdef UWVM_TIMER
         ::uwvm2::utils::debug::timer parsing_timer{u8"load and check modules"};
@@ -1175,6 +1174,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             }
         }
 
+        // All modules loaded
+        if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+        {
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                u8"[info]  ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"All modules have been loaded. ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                u8"(verbose)\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+        }
+
+        return static_cast<int>(::uwvm2::uwvm::run::retval::ok);
+    }
+
+    inline int check_modules() noexcept
+    {
         // Build dependency graph and detect cyclic dependencies
         // verbose
         if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
