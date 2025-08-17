@@ -398,9 +398,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_global_section_resolved_not_match_the_actual_number.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_terminator_not_found:
             {
-#include "error_code_outputs/eco_global_init_terminator_not_found.h"
+#include "error_code_outputs/eco_init_const_expr_terminator_not_found.h"
                 return;
             }
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_export_count:
@@ -491,11 +491,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_table_index_exceeds_maxvul:
             {
 #include "error_code_outputs/eco_elem_table_index_exceeds_maxvul.h"
-                return;
-            }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::elem_init_terminator_not_found:
-            {
-#include "error_code_outputs/eco_elem_init_terminator_not_found.h"
                 return;
             }
             case ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_elem_funcidx_count:
@@ -648,39 +643,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_unexpected_section_data.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_should_be_only_one_element:
             {
-#include "error_code_outputs/eco_global_init_stack_should_be_only_one_element.h"
+#include "error_code_outputs/eco_init_const_expr_stack_should_be_only_one_element.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_instruction:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_instruction:
             {
-#include "error_code_outputs/eco_global_init_illegal_instruction.h"
+#include "error_code_outputs/eco_init_const_expr_illegal_instruction.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_type_mismatch:
             {
-#include "error_code_outputs/eco_global_init_type_mismatch.h"
+#include "error_code_outputs/eco_init_const_expr_type_mismatch.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_empty:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_empty:
             {
-#include "error_code_outputs/eco_global_init_stack_empty.h"
+#include "error_code_outputs/eco_init_const_expr_stack_empty.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_data:
             {
-#include "error_code_outputs/eco_global_init_illegal_data.h"
+#include "error_code_outputs/eco_init_const_expr_illegal_data.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_illegal_imported_global:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_ref_illegal_imported_global:
             {
-#include "error_code_outputs/eco_global_init_ref_illegal_imported_global.h"
+#include "error_code_outputs/eco_init_const_expr_ref_illegal_imported_global.h"
                 return;
             }
-            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_mutable_imported_global:
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_ref_mutable_imported_global:
             {
-#include "error_code_outputs/eco_global_init_ref_mutable_imported_global.h"
+#include "error_code_outputs/eco_init_const_expr_ref_mutable_imported_global.h"
                 return;
             }
         }

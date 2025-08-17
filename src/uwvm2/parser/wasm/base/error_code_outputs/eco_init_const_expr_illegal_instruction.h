@@ -40,7 +40,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              "(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             ") Global item initialization has illegal data.",
+                                                             ") Constant initialization expression has illegal instruction.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -54,7 +54,7 @@ if constexpr(::std::same_as<char_type, char>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                      "(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     ") Global item initialization has illegal data.",
+                                                     ") Constant initialization expression has illegal instruction.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
     return;
 }
@@ -76,7 +76,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              L"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             L") Global item initialization has illegal data.",
+                                                             L") Constant initialization expression has illegal instruction.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -90,7 +90,7 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                      L"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     L") Global item initialization has illegal data.",
+                                                     L") Constant initialization expression has illegal instruction.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
 }
@@ -112,7 +112,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u8"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u8") Global item initialization has illegal data.",
+                                                             u8") Constant initialization expression has illegal instruction.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -126,7 +126,7 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                      u8"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u8") Global item initialization has illegal data.",
+                                                     u8") Constant initialization expression has illegal instruction.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
     return;
 }
@@ -148,7 +148,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u") Global item initialization has illegal data.",
+                                                             u") Constant initialization expression has illegal instruction.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -162,7 +162,7 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                      u"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u") Global item initialization has illegal data.",
+                                                     u") Constant initialization expression has illegal instruction.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
     return;
 }
@@ -184,7 +184,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              U"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             U") Global item initialization has illegal data.",
+                                                             U") Constant initialization expression has illegal instruction.",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -198,7 +198,7 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                      U"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     U") Global item initialization has illegal data.",
+                                                     U") Constant initialization expression has illegal instruction.",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
     return;
 }

@@ -109,7 +109,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         invalid_global_count,
         global_section_resolved_exceeded_the_actual_number,
         global_section_resolved_not_match_the_actual_number,
-        global_init_terminator_not_found,
+        init_const_expr_terminator_not_found,
         invalid_export_count,
         export_section_resolved_exceeded_the_actual_number,
         export_name_length_cannot_be_zero,
@@ -128,7 +128,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         elem_section_resolved_exceeded_the_actual_number,
         invalid_elem_table_idx,
         elem_table_index_exceeds_maxvul,
-        elem_init_terminator_not_found,
         invalid_elem_funcidx_count,
         invalid_elem_funcidx,
         elem_func_index_exceeds_maxvul,
@@ -159,13 +158,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         counter_overflows,
         duplicate_type_function,
         unexpected_section_data,
-        global_init_stack_should_be_only_one_element,
-        global_init_illegal_instruction,
-        global_init_type_mismatch,
-        global_init_stack_empty,
-        global_init_illegal_data,
-        global_init_ref_illegal_imported_global,
-        global_init_ref_mutable_imported_global
+        init_const_expr_stack_should_be_only_one_element,
+        init_const_expr_illegal_instruction,
+        init_const_expr_type_mismatch,
+        init_const_expr_stack_empty,
+        init_const_expr_illegal_data,
+        init_const_expr_ref_illegal_imported_global,
+        init_const_expr_ref_mutable_imported_global
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type

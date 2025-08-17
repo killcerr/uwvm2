@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-07-04
+ * @date        2025-01-27
  * @copyright   APL-2.0 License
  */
 
@@ -40,7 +40,15 @@ if constexpr(::std::same_as<char_type, char>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              "(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             ") Global item initialization has empty stack.",
+                                                             ") Constant initialization expression type mismatch. Expected ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[1],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             ", got ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[0],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             ".",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -54,7 +62,15 @@ if constexpr(::std::same_as<char_type, char>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
                                                      "(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     ") Global item initialization has empty stack.",
+                                                     ") Constant initialization expression type mismatch. Expected ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+                                                     errout.err.err_selectable.u8arr[1],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                     ", got ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_CYAN),
+                                                     errout.err.err_selectable.u8arr[0],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_WHITE),
+                                                     ".",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_RST_ALL));
     return;
 }
@@ -76,7 +92,15 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              L"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             L") Global item initialization has empty stack.",
+                                                             L") Constant initialization expression type mismatch. Expected ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[1],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             L", got ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[0],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             L".",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -90,7 +114,15 @@ else if constexpr(::std::same_as<char_type, wchar_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
                                                      L"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     L") Global item initialization has empty stack.",
+                                                     L") Constant initialization expression type mismatch. Expected ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
+                                                     errout.err.err_selectable.u8arr[1],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                     L", got ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_CYAN),
+                                                     errout.err.err_selectable.u8arr[0],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_WHITE),
+                                                     L".",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_W_RST_ALL));
     return;
 }
@@ -112,7 +144,15 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u8"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u8") Global item initialization has empty stack.",
+                                                             u8") Constant initialization expression type mismatch. Expected ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[1],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             u8", got ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[0],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             u8".",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -126,7 +166,15 @@ else if constexpr(::std::same_as<char_type, char8_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
                                                      u8"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u8") Global item initialization has empty stack.",
+                                                     u8") Constant initialization expression type mismatch. Expected ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+                                                     errout.err.err_selectable.u8arr[1],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                     u8", got ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_CYAN),
+                                                     errout.err.err_selectable.u8arr[0],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_WHITE),
+                                                     u8".",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U8_RST_ALL));
     return;
 }
@@ -148,7 +196,15 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              u"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             u") Global item initialization has empty stack.",
+                                                             u") Constant initialization expression type mismatch. Expected ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[1],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             u", got ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[0],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             u".",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -162,7 +218,15 @@ else if constexpr(::std::same_as<char_type, char16_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
                                                      u"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     u") Global item initialization has empty stack.",
+                                                     u") Constant initialization expression type mismatch. Expected ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
+                                                     errout.err.err_selectable.u8arr[1],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                     u", got ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_CYAN),
+                                                     errout.err.err_selectable.u8arr[0],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_WHITE),
+                                                     u".",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U16_RST_ALL));
     return;
 }
@@ -184,7 +248,15 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                              UWVM_WIN32_TEXTATTR_WHITE,
                                                              U"(offset=",
                                                              ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                             U") Global item initialization has empty stack.",
+                                                             U") Constant initialization expression type mismatch. Expected ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[1],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             U", got ",
+                                                             UWVM_WIN32_TEXTATTR_CYAN,
+                                                             errout.err.err_selectable.u8arr[0],
+                                                             UWVM_WIN32_TEXTATTR_WHITE,
+                                                             U".",
                                                              UWVM_WIN32_TEXTATTR_RST_ALL);
             return;
         }
@@ -198,7 +270,15 @@ else if constexpr(::std::same_as<char_type, char32_t>)
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
                                                      U"(offset=",
                                                      ::fast_io::mnp::addrvw(errout.err.err_curr - errout.module_begin),
-                                                     U") Global item initialization has empty stack.",
+                                                     U") Constant initialization expression type mismatch. Expected ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
+                                                     errout.err.err_selectable.u8arr[1],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                     U", got ",
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_CYAN),
+                                                     errout.err.err_selectable.u8arr[0],
+                                                     ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_WHITE),
+                                                     U".",
                                                      ::fast_io::mnp::cond(enable_ansi, UWVM_AES_U32_RST_ALL));
     return;
 }

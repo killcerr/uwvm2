@@ -1494,19 +1494,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct element_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
-    struct wasm1_elem_expr_t
-    {
-        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
-        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
-
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};  // The pointer to end is after 0x0b.
-    };
-
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct wasm1_elem_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 table_idx{};
-        wasm1_elem_expr_t expr{};
+        ::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_const_expr<Fs...> expr{};
         ::uwvm2::utils::container::vector<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32> vec_funcidx{};
     };
 }
@@ -1514,14 +1506,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 // Subsequent specifications of union must include this information, so it has to be declared here.
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
-    template <>
-    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t>
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t<Fs...>>
     {
         inline static constexpr bool value = true;
     };
 
-    template <>
-    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t>
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t<Fs...>>
     {
         inline static constexpr bool value = true;
     };
@@ -1534,15 +1526,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         tableidx = 0u,
     };
 
-    template <typename... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
     struct wasm1_element_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        inline static constexpr ::std::size_t sizeof_storage_u{sizeof(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t)};
+        inline static constexpr ::std::size_t sizeof_storage_u{sizeof(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t<Fs...>)};
 
         union storage_u UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
         {
             // This type can be initialized with all zeros
-            ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t table_idx;
+            ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_elem_storage_t<Fs...> table_idx;
             static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<decltype(table_idx)> &&
                           ::fast_io::freestanding::is_zero_default_constructible_v<decltype(table_idx)>);
 
@@ -1686,7 +1678,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         memoryidx = 0u,
     };
 
-    template <typename... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
     struct wasm1_data_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         union storage_u

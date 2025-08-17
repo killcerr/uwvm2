@@ -112,6 +112,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         auto const& imported_global{importsec.importdesc.index_unchecked(3uz)};
         auto const imported_global_size{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(imported_global.size())};
 
+        // [... global_curr ...] expr_curr ... 0x0B global_next ...
+        // [   safe            ] unsafe (could be the section_end)
+        //                       ^^ section_curr
+
+        global_expr.begin = section_curr;
+
+        // [... global_curr ...] expr_curr ... 0x0B global_next ...
+        // [   safe            ] unsafe (could be the section_end)
+        //                       ^^ global_expr.begin
+
         // Since global initialization expressions in wasm1.0 only allow instructions that “increment the data stack”, a simple check for whether an instruction
         // already exists can be used here to detect this.
         bool has_data_on_type_stack{};
@@ -122,12 +132,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         {
             if(section_curr == section_end) [[unlikely]]
             {
-                // [... global_curr ... section_curr ...] (end) ...
-                // [                   safe             ] unsafe (could be the section_end)
-                //                                        ^^ section_curr
+                // [... global_curr ... expr_curr ...] (end) ...
+                // [                   safe          ] unsafe (could be the section_end)
+                //                                     ^^ section_curr
 
                 err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_terminator_not_found;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_terminator_not_found;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
             }
 
@@ -177,7 +187,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(has_data_on_type_stack) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_should_be_only_one_element;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -189,7 +199,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
                             err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
                                 ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i32);
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_type_mismatch;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -216,7 +226,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(test_i32_err != ::fast_io::parse_code::ok) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_data;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(test_i32_err);
                         }
 
@@ -242,7 +252,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(has_data_on_type_stack) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_should_be_only_one_element;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -254,7 +264,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
                             err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
                                 ::uwvm2::parser::wasm::standard::wasm1::type::value_type::i64);
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_type_mismatch;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -281,7 +291,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(test_i64_err != ::fast_io::parse_code::ok) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_data;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(test_i64_err);
                         }
 
@@ -307,7 +317,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(has_data_on_type_stack) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_should_be_only_one_element;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -319,7 +329,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
                             err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
                                 ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f32);
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_type_mismatch;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -336,7 +346,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(static_cast<::std::size_t>(section_end - section_curr) < 4uz) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_data;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -396,7 +406,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(has_data_on_type_stack) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_should_be_only_one_element;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -408,7 +418,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
                             err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(
                                 ::uwvm2::parser::wasm::standard::wasm1::type::value_type::f64);
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_type_mismatch;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -425,7 +435,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(static_cast<::std::size_t>(section_end - section_curr) < 8uz) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_data;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -492,7 +502,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(has_data_on_type_stack) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_should_be_only_one_element;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_should_be_only_one_element;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -522,7 +532,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         if(test_global_idx_err != ::fast_io::parse_code::ok) [[unlikely]]
                         {
                             err.err_curr = section_curr;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_data;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_data;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(test_global_idx_err);
                         }
 
@@ -537,7 +547,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             err.err_curr = section_curr;
                             err.err_selectable.u32arr[0] = imported_global_size;
                             err.err_selectable.u32arr[1] = test_global_idx;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_illegal_imported_global;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_ref_illegal_imported_global;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -556,7 +566,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                             err.err_curr = section_curr;
                             err.err_selectable.u8arr[0] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_global_type);
                             err.err_selectable.u8arr[1] = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(curr_imported_global.type);
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_type_mismatch;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_type_mismatch;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -565,7 +575,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         {
                             err.err_curr = section_curr;
                             err.err_selectable.u32 = test_global_idx;
-                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_ref_mutable_imported_global;
+                            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_ref_mutable_imported_global;
                             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                         }
 
@@ -583,7 +593,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                     [[unlikely]] default:
                     {
                         err.err_curr = section_curr;
-                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_illegal_instruction;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_illegal_instruction;
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
                 }
@@ -593,7 +603,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         if(!has_data_on_type_stack) [[unlikely]]
         {
             err.err_curr = section_curr;
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::global_init_stack_empty;
+            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_stack_empty;
             ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
         }
 
