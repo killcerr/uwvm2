@@ -27,11 +27,6 @@ export module uwvm2.parser.wasm.standard;
 export import uwvm2.parser.wasm.standard.wasm1;
 export import uwvm2.parser.wasm.standard.wasm1p1;
 export import uwvm2.parser.wasm.standard.wasm2;
-export import uwvm2.parser.wasm.standard.wasm2_MultiMemory;
-export import uwvm2.parser.wasm.standard.wasm2_TailCalls;
-export import uwvm2.parser.wasm.standard.wasm2_TailCalls_FunctionReference;
-export import uwvm2.parser.wasm.standard.wasm2_TailCalls_FunctionReference_GC;
-export import uwvm2.parser.wasm.standard.wasm2_thread;
 export import uwvm2.parser.wasm.standard.wasm3;
 
 #ifndef UWVM_MODULE

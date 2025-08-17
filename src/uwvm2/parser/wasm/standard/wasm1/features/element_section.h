@@ -381,6 +381,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             }
         }
 
+        // The result type i32 is implicitly guaranteed by branch constraints.
+
         if(!has_data_on_type_stack) [[unlikely]]
         {
             err.err_curr = section_curr;
