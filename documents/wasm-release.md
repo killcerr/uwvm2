@@ -65,20 +65,20 @@
 
 ### WebAssembly 2.0 + tracks — Deltas relative to 2.0 core
 
-- 2.0 + multi_memory (Draft 2024-09-04)
-  - Multiple linear memories per module (define/import/export)
-  - Memory index immediates for memory instructions: `memory.size`, `memory.grow`, `memory.fill`, `memory.copy`, `memory.init`
-  - Data segments carry a memory index; loads/stores use memory index immediates
-- 2.0 + threads (Draft 2023-10-10)
+- 2.0 + threads (Draft 2023-10-10) (Phase 4 - Standardize the Feature)
   - Shared memories; memory is declared `shared`
   - Atomic instructions: `memory.atomic.wait32/wait64`, `memory.atomic.notify`, `atomic.fence`
   - Atomic loads/stores and RMW ops: `i32/64.atomic.load/store`, `atomic.rmw.add/sub/and/or/xor/xchg/cmpxchg`
-- 2.0 + tail_calls (Draft 2023-03-01)
+- 2.0 + multi_memory (Draft 2024-09-04) (Phase 5 - The Feature is Standardized, merged into wasm3.0)
+  - Multiple linear memories per module (define/import/export)
+  - Memory index immediates for memory instructions: `memory.size`, `memory.grow`, `memory.fill`, `memory.copy`, `memory.init`
+  - Data segments carry a memory index; loads/stores use memory index immediates
+- 2.0 + tail_calls (Draft 2023-03-01) (Phase 5 - The Feature is Standardized, merged into wasm3.0)
   - New control instructions: `return_call`, `return_call_indirect`
-- 2.0 + tail_calls + function_references (Draft 2024-12-09)
+- 2.0 + tail_calls + function_references (Draft 2024-12-09) (Phase 5 - The Feature is Standardized, merged into wasm3.0)
   - Typed function references and `call_ref`; refined typing of `ref.func`
   - `br_on_null`/`br_on_non_null`; tracking initialization of non-defaultable locals
-- 2.0 + tail_calls + function_references + gc (Draft 2024-12-09)
+- 2.0 + tail_calls + function_references + gc (Draft 2024-12-09) (Phase 5 - The Feature is Standardized, merged into wasm3.0)
   - Integration with managed reference types and subtyping introduced by GC
 
 ### WebAssembly 3.0 (Draft 2024-09-21) — Changes
