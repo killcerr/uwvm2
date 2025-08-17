@@ -146,7 +146,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                       ^^ section_curr
 
         // Check that the number of codes is the same as the number of defined functions
-
+        // Since the wasm section is sequential, the function must appear before or not appear in the global section. Here, only one verification is required.
         if(code_count != defined_func_count) [[unlikely]]
         {
             err.err_curr = section_curr;
@@ -465,9 +465,124 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)code_section_details_wrapper;
+
+        auto const code_section_span{code_section_details_wrapper.code_section_storage_ptr->sec_span};
+        auto const code_section_size{static_cast<::std::size_t>(code_section_span.sec_end - code_section_span.sec_begin)};
+
+        if(code_section_size)
+        {
+            auto const code_size{code_section_details_wrapper.code_section_storage_ptr->codes.size()};
+
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nCode[", code_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nCode[", code_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nCode[", code_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nCode[", code_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nCode[", code_size, U"]:\n");
+            }
+
+            auto const& importsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<import_section_storage_t<Fs...>>(
+                *code_section_details_wrapper.all_sections_ptr)};
+            static_assert(importsec.importdesc_count > 0uz);
+            auto func_counter{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(importsec.importdesc.index_unchecked(0uz).size())};
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 code_counter{};
+
+            for(auto const& curr_code: code_section_details_wrapper.code_section_storage_ptr->codes)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     " - code[",
+                                                                     code_counter,
+                                                                     "] -> func[",
+                                                                     func_counter,
+                                                                     "]: {all size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.code_begin),
+                                                                     ", local count: ",
+                                                                     curr_code.all_local_count,
+                                                                     ", expr size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.expr_begin),
+                                                                     "}\n");
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     L" - code[",
+                                                                     code_counter,
+                                                                     L"] -> func[",
+                                                                     func_counter,
+                                                                     L"]: {all size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.code_begin),
+                                                                     L", local count: ",
+                                                                     curr_code.all_local_count,
+                                                                     L", expr size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.expr_begin),
+                                                                     L"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u8" - code[",
+                                                                     code_counter,
+                                                                     u8"] -> func[",
+                                                                     func_counter,
+                                                                     u8"]: {all size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.code_begin),
+                                                                     u8", local count: ",
+                                                                     curr_code.all_local_count,
+                                                                     u8", expr size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.expr_begin),
+                                                                     u8"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     u" - code[",
+                                                                     code_counter,
+                                                                     u"] -> func[",
+                                                                     func_counter,
+                                                                     u"]: {all size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.code_begin),
+                                                                     u", local count: ",
+                                                                     curr_code.all_local_count,
+                                                                     u", expr size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.expr_begin),
+                                                                     u"}\n");
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                     U" - code[",
+                                                                     code_counter,
+                                                                     U"] -> func[",
+                                                                     func_counter,
+                                                                     U"]: {all size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.code_begin),
+                                                                     U", local count: ",
+                                                                     curr_code.all_local_count,
+                                                                     U", expr size: ",
+                                                                     static_cast<::std::size_t>(curr_code.body.code_end - curr_code.body.expr_begin),
+                                                                     U"}\n");
+                }
+
+                ++func_counter;
+                ++code_counter;
+            }
+        }
     }
 }
 

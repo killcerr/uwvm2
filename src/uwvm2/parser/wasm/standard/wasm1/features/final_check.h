@@ -62,27 +62,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void define_final_check([[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<wasm1_final_check> final_adl,
-                                             ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> & module_storage,
-                                             ::std::byte const* const module_end,
-                                             ::uwvm2::parser::wasm::base::error_impl& err,
+                                             [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...> &
+                                                 module_storage,
+                                             [[maybe_unused]] ::std::byte const* const module_end,
+                                             [[maybe_unused]] ::uwvm2::parser::wasm::base::error_impl& err,
                                              [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para) UWVM_THROWS
     {
-        // function section
-        auto const& funcsec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<function_section_storage_t>(module_storage.sections)};
-        auto const defined_func_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(funcsec.funcs.size())};
-
-        // code section
-        auto const& codesec{::uwvm2::parser::wasm::concepts::operation::get_first_type_in_tuple<code_section_storage_t<Fs...>>(module_storage.sections)};
-        auto const defined_code_count{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(codesec.codes.size())};
-
-        if(defined_func_count != defined_code_count) [[unlikely]]
-        {
-            err.err_curr = module_end;
-            err.err_selectable.u32arr[0] = defined_code_count;
-            err.err_selectable.u32arr[1] = defined_func_count;
-            err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::code_ne_defined_func;
-            ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-        }
+        // There is no need to verify def_func_count == def_code_count here, because the WASM section is sequential, and the function must appear before or not
+        // appear in the global section. It is only necessary to verify once in the code_section.
     }
 }
 

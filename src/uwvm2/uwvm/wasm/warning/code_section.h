@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -51,17 +51,6 @@
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 # include <uwvm2/uwvm/wasm/custom/impl.h>
 # include "warn_storage.h"
-# include "type_section.h"
-# include "import_section.h"
-# include "function_section.h"
-# include "table_section.h"
-# include "memory_section.h"
-# include "global_section.h"
-# include "export_section.h"
-# include "start_section.h"
-# include "element_section.h"
-# include "code_section.h"
-# include "final_check.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -70,29 +59,9 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
-    inline constexpr void show_wasm_binfmt_ver1_warning(::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm) noexcept
+    inline constexpr void show_wasm_code_section_warning([[maybe_unused]] ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
+                                                            [[maybe_unused]] ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
     {
-#ifdef UWVM_TIMER
-        ::uwvm2::utils::debug::timer parsing_timer{u8"show warning for binfmt ver1"};
-#endif
-        // The warning path should be determined in advance.
-        UWVM_ASSERT(::uwvm2::uwvm::io::show_parser_warning == true);
-
-        ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t warn_storage{};
-        ::uwvm2::uwvm::wasm::warning::init_binfmt_ver1_warning_storage(warn_storage, wasm);
-
-        ::uwvm2::uwvm::wasm::warning::show_wasm_type_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_import_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_function_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_table_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_memory_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_global_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_export_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_start_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_element_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_code_section_warning(wasm, warn_storage);
-        /// @todo Change warning to a loop based on section+adl
-        ::uwvm2::uwvm::wasm::warning::show_wasm_final_check_warning(wasm, warn_storage);
     }
 }
 
