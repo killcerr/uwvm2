@@ -47,7 +47,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
     namespace details
     {
         inline constexpr ::std::size_t xxh3_max_align_len{
-#if defined(__DJGPP__)
+#if (defined(__DJGPP__) || defined(__MSDOS__))
             16uz
 #else
             64uz
