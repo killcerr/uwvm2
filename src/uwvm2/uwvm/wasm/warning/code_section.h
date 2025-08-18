@@ -60,7 +60,7 @@
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
     inline constexpr void show_wasm_code_section_warning([[maybe_unused]] ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
-                                                            [[maybe_unused]] ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
+                                                         [[maybe_unused]] ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
     {
     }
 }
