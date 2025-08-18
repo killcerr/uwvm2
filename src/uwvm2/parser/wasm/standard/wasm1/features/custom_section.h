@@ -200,7 +200,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             if constexpr(::std::same_as<char_type, char>)
             {
                 ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                "\nCustom (",
+                                                                "Custom (",
                                                                 ::fast_io::mnp::code_cvt(curr_custom_name),
                                                                 "): size = ",
                                                                 curr_custom_size);
@@ -208,7 +208,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             else if constexpr(::std::same_as<char_type, wchar_t>)
             {
                 ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                L"\nCustom (",
+                                                                L"Custom (",
                                                                 ::fast_io::mnp::code_cvt(curr_custom_name),
                                                                 L"): size = ",
                                                                 curr_custom_size);
@@ -217,7 +217,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             {
                 // No need to convert to UTF-8
                 ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u8"\nCustom (",
+                                                                u8"Custom (",
                                                                 curr_custom_name,
                                                                 u8"): size = ",
                                                                 curr_custom_size);
@@ -225,7 +225,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             else if constexpr(::std::same_as<char_type, char16_t>)
             {
                 ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                u"\nCustom (",
+                                                                u"Custom (",
                                                                 ::fast_io::mnp::code_cvt(curr_custom_name),
                                                                 u"): size = ",
                                                                 curr_custom_size);
@@ -233,7 +233,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             else if constexpr(::std::same_as<char_type, char32_t>)
             {
                 ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
-                                                                U"\nCustom (",
+                                                                U"Custom (",
                                                                 ::fast_io::mnp::code_cvt(curr_custom_name),
                                                                 U"): size = ",
                                                                 curr_custom_size);
