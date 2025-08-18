@@ -71,11 +71,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                 if constexpr(has_binfmt_ver1_extensible_section_define<FeatureCurr, Features...>)
                                 {
                                     using extensible_section_t = typename FeatureCurr::template binfmt_ver1_section_type<Features...>;
+
+                                    static_assert(
+                                        ::uwvm2::parser::wasm::concepts::operation::is_trivially_copyable_or_relocatable_tuple(extensible_section_t{}),
+                                        "extensible_section_t is not trivially copyable or relocatable");
+
                                     return ::uwvm2::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(extensible_section_t{});
                                 }
                                 else if constexpr(has_binfmt_ver1_section_define<FeatureCurr>)
                                 {
                                     using section_t = typename FeatureCurr::binfmt_ver1_section_type;
+
+                                    static_assert(::uwvm2::parser::wasm::concepts::operation::is_trivially_copyable_or_relocatable_tuple(section_t{}),
+                                                  "section_t is not trivially copyable or relocatable");
+
                                     return ::uwvm2::parser::wasm::concepts::operation::get_tuple_megger_from_tuple(section_t{});
                                 }
                                 else

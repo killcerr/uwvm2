@@ -25,6 +25,7 @@ module;
 // std
 #include <cstddef>
 #include <cstdint>
+#include <climits>
 #include <type_traits>
 #include <concepts>
 // macro

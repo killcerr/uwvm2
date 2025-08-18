@@ -524,6 +524,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::limits_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::function_type>
     {
         inline static constexpr bool value = true;
@@ -537,6 +543,12 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::memory_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::global_type>
     {
         inline static constexpr bool value = true;
     };

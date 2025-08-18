@@ -26,6 +26,7 @@
 // std
 # include <cstddef>
 # include <cstdint>
+# include <climits>
 # include <type_traits>
 # include <concepts>
 // macro
@@ -45,6 +46,13 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
 {
+#if CHAR_BIT > 8
+# error                                                                                                                                                        \
+     "Although the design of the uwvm2 component takes into account cases where CHAR_BIT is not equal to 8, " \
+     "gcc llvm currently does not support any platforms where CHAR_BIT is not equal to 8. Therefore, support for this feature is not provided here. " \
+     "If you have a specific need for this functionality, you may remove the error message, test it yourself, and submit a pull request."
+#endif
+
     struct empty_t
     {
     };

@@ -76,7 +76,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline constexpr ::std::byte const* parse_and_check_data_expr_valid(
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<data_section_storage_t<Fs...>> sec_adl,
         [[maybe_unused]] ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_data_storage_t<Fs...> const& wdt,  // [adl] can be replaced
-        ::uwvm2::parser::wasm::standard::wasm1::const_expr::wasm1_const_expr_storage_t& data_expr,               // [adl] can be replaced
+        ::uwvm2::parser::wasm::standard::wasm1::const_expr::wasm1_const_expr_storage_t& data_expr,                  // [adl] can be replaced
         [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_module_extensible_storage_t<Fs...>& module_storage,
         ::std::byte const* section_curr,
         ::std::byte const* const section_end,
@@ -210,7 +210,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
                         //                    ^^ section_curr
 
                         data_expr.opcodes.emplace_back(::uwvm2::parser::wasm::standard::wasm1::const_expr::base_const_expr_opcode_storage_u{.i32 = test_i32},
-                                                          ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::i32_const);
+                                                       ::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::i32_const);
 
                         break;
                     }

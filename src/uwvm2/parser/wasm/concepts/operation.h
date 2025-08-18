@@ -599,5 +599,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             { ((max_size = ::std::max(max_size, sizeof(Ty...[I]))), ...); }(::std::make_index_sequence<sizeof...(Ty)>{});
             return max_size;
         }
+
+        /// @brief check if tuple is trivially copyable or relocatable
+        template <typename... Ty>
+        inline consteval bool is_trivially_copyable_or_relocatable_tuple(::uwvm2::utils::container::tuple<Ty...>) noexcept
+        {
+            // According to the C++ standard, an empty tuple is true.
+            return (::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<Ty> && ...);
+        }
     }  // namespace operation
 }

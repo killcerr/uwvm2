@@ -594,7 +594,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    struct final_import_type
+    struct final_import_type UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         static_assert(is_valid_final_extern_type_t<Fs...>);
 
@@ -602,6 +602,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::uwvm2::utils::container::u8string_view extern_name{};
 
         final_extern_type_t<Fs...> imports{};
+
+        // check
+        static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<final_extern_type_t<Fs...>>);
+        static_assert(::fast_io::freestanding::is_zero_default_constructible_v<final_extern_type_t<Fs...>>);
     };
 
     /// @brief Wrapper for the final_import_type
@@ -1104,6 +1108,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     {
         final_global_type<Fs...> global;    // Types used to store global
         final_wasm_const_expr<Fs...> expr;  // Expressions used to initialize global
+
+        // check
+        static_assert(::fast_io::freestanding::is_zero_default_constructible_v<final_global_type<Fs...>>);
+        static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<final_global_type<Fs...>>);
+        static_assert(::fast_io::freestanding::is_zero_default_constructible_v<final_wasm_const_expr<Fs...>>);
+        static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<final_wasm_const_expr<Fs...>>);
     };
 
     /////////////////////////////
@@ -1163,13 +1173,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    struct final_wasm_export_type
+    struct final_wasm_export_type UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         static_assert(is_valid_final_export_type_t<Fs...>);
 
         ::uwvm2::utils::container::u8string_view export_name{};
 
         final_export_type_t<Fs...> exports{};
+
+        // check
+        static_assert(::fast_io::freestanding::is_zero_default_constructible_v<final_export_type_t<Fs...>>);
+        static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<final_export_type_t<Fs...>>);
     };
 
     /// @brief Wrapper for the final_import_type
@@ -1373,6 +1387,12 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
     };
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_import_type<Fs...>>
     {
         inline static constexpr bool value = true;
@@ -1392,6 +1412,12 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_local_global_type<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_export_type<Fs...>>
     {
         inline static constexpr bool value = true;
     };
