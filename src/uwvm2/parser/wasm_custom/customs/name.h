@@ -42,6 +42,7 @@
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
+# include "name_error.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -59,92 +60,47 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
             ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32,
             ::uwvm2::utils::container::unordered_flat_map<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32, ::uwvm2::utils::container::u8string_view>>
             code_local_name{};
-    };
 
-    enum class name_err_type_t : unsigned
-    {
-        invalid_name_map_length,
-        size_exceeds_the_maximum_value_of_size_t,
-        illegal_name_map_length,
-        invalid_module_name_length,
-        illegal_module_name_length,
-        illegal_char_sequence,
-        duplicate_module_name,
-        duplicate_function_name,
-        invalid_data_exists,
-        invalid_function_name_count,
-        invalid_function_index,
-        invalid_function_name_length,
-        illegal_section_id,
-        illegal_function_name_length,
-        duplicate_func_idx,
-        duplicate_local_name,
-        invalid_local_count,
-        invalid_function_local_count,
-        invalid_function_local_index,
-        invalid_function_local_name_length,
-        illegal_function_local_name_length,
-        duplicate_code_function_index,
-        duplicate_code_local_name_function_index
-    };
-
-    union name_err_storage_t
-    {
-        ::std::byte const* err_end;
-        ::std::size_t err_uz;
-        ::std::ptrdiff_t err_pdt;
-
-        ::std::uint_least64_t u64;
-        ::std::int_least64_t i64;
-        ::std::uint_least32_t u32;
-        ::std::int_least32_t i32;
-        ::std::uint_least16_t u16;
-        ::std::int_least16_t i16;
-        ::std::uint_least8_t u8;
-        ::std::int_least8_t i8;
-
-        ::uwvm2::parser::wasm::base::error_f64 f64;
-        ::uwvm2::parser::wasm::base::error_f32 f32;
-        bool boolean;
-
-        ::std::uint_least64_t u64arr[1];
-        ::std::int_least64_t i64arr[1];
-        ::std::uint_least32_t u32arr[2];
-        ::std::int_least32_t i32arr[2];
-        ::std::uint_least16_t u16arr[4];
-        ::std::int_least16_t i16arr[4];
-        ::std::uint_least8_t u8arr[8];
-        ::std::int_least8_t i8arr[8];
-
-        ::uwvm2::parser::wasm::base::error_f64 f64arr[1];
-        ::uwvm2::parser::wasm::base::error_f32 f32arr[2];
-        bool booleanarr[8];
-    };
-
-    struct name_err_t
-    {
-        ::std::byte const* curr{};
-        name_err_type_t type{};
-        name_err_storage_t err{};
+        bool has_analyzed{};
     };
 
     inline constexpr void parse_name_storage(name_storage_t & ns,
                                              ::std::byte const* const begin,
                                              ::std::byte const* const end,
-                                             ::uwvm2::utils::container::vector<name_err_t>& err) noexcept
+                                             ::uwvm2::utils::container::vector<::uwvm2::parser::wasm_custom::customs::name_err_t>& err) noexcept
     {
 #ifdef UWVM_TIMER
         ::uwvm2::utils::debug::timer parsing_timer{u8"parse custom section: name"};
 #endif
+
+        // The name section should appear only once in a module
+
+        if(ns.has_analyzed)
+        {
+            err.emplace_back(begin, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_name_section);
+            return;
+        }
+
+        ns.has_analyzed = true;
 
         // Since wasm specifies that custom section processing failures should not throw exceptions
         // The custom section is not as strict as the standard section, so there is no need to extend the template type with variable parameters.
 
         auto curr{begin};
 
+        // State machine and invariants:
+        // - has_analyzed: module-level "only once". Ensures the name section is parsed at most once.
+        // - max_section_id: subsection canonical order (0 -> 1 -> 2, non-decreasing).
+        // - ct_1 / ct_2: non-structural error short-circuit flags at subsection / sub-map scopes (jump curr to map_end and stop current scope to avoid cascading errors).
+        
         // [... ] section_id ...
         // [safe] unsafe (could be the end)
         //        ^^ curr
+
+        // "Only after the data section" is the transition check for the WASM 1.0 standard, and to my knowledge, even after adding the data count and tag
+        // section in WASM 3.0, this has not been changed. Therefore, no check is performed here.
+
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_section_id{};
 
         while(curr != end)
         {
@@ -167,6 +123,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
             auto const section_id_ptr{curr};
 
+            // Each subsection may occur at most once, and in order of increasing id.
+            if(section_id < max_section_id) [[unlikely]]
+            {
+                err.emplace_back(curr,
+                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_section_canonical_order,
+                                 name_err_storage_t{
+                                     .u8arr{section_id, max_section_id}
+                });
+                // This only provides a warning and does not prevent further parsing.
+            }
+
+            max_section_id = section_id;
+
             ++curr;
 
             // [...  section_id] name_map_length ...
@@ -184,7 +153,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
             if(name_map_length_err != ::fast_io::parse_code::ok) [[unlikely]]
             {
-                err.emplace_back(curr, name_err_type_t::invalid_name_map_length);
+                err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_name_map_length);
+                // The outermost structure has an error and cannot be parsed further, so everything must be terminated.
                 return;
             }
 
@@ -202,8 +172,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                 {
                     // name map exceeds the platform maximum length (size_t), then pointer addition may have overflow undefined behavior and exit directly.
                     err.emplace_back(curr,
-                                     name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                     ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
                                      name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_map_length)});
+                    // The outermost layer has a structural error, which may cause an overflow and prevent further parsing, resulting in termination of the
+                    // entire process.
                     return;
                 }
             }
@@ -217,7 +189,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
             if(static_cast<::std::size_t>(end - curr) < static_cast<::std::size_t>(name_map_length)) [[unlikely]]
             {
                 // name map exceeds the end - curr, then pointer addition may have overflow undefined behavior and exit directly.
-                err.emplace_back(curr, name_err_type_t::illegal_name_map_length, name_err_storage_t{.u32 = name_map_length});
+                err.emplace_back(curr,
+                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_name_map_length,
+                                 name_err_storage_t{.u32 = name_map_length});
+                // The outermost layer has a structural error, which may cause an overflow and prevent further parsing, resulting in termination of the entire
+                // process.
                 return;
             }
 
@@ -242,8 +218,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(!ns.module_name.empty()) [[unlikely]]
                     {
-                        err.emplace_back(section_id_ptr, name_err_type_t::duplicate_module_name);
+                        err.emplace_back(section_id_ptr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_module_name);
                         curr = map_end;
+                        // Duplicate content, skip
                         // End of current map
                         continue;
                     }
@@ -262,8 +239,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(module_name_length_err != ::fast_io::parse_code::ok) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::invalid_module_name_length);
+                        err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_module_name_length);
                         curr = map_end;
+                        // Structural error, unable to continue parsing
                         // End of current map
                         continue;
                     }
@@ -279,9 +257,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         if(module_name_length > size_t_max) [[unlikely]]
                         {
                             err.emplace_back(curr,
-                                             name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
                                              name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(module_name_length)});
                             curr = map_end;
+                            // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                             // End of current map
                             continue;
                         }
@@ -293,18 +272,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     // [           safe            ] unsafe (could be the map_end)
                     //                               ^^ curr
 
-                    // The length of name cannot be 0
-                    if(module_name_length == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
-                    {
-                        err.emplace_back(curr, name_err_type_t::illegal_module_name_length, name_err_storage_t{.u32 = module_name_length});
-                        // End of current map
-                        continue;
-                    }
-
                     if(static_cast<::std::size_t>(map_end - curr) < static_cast<::std::size_t>(module_name_length)) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::illegal_module_name_length, name_err_storage_t{.u32 = module_name_length});
+                        err.emplace_back(curr,
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_module_name_length,
+                                         name_err_storage_t{.u32 = module_name_length});
                         curr = map_end;
+                        // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                         // End of current map
                         continue;
                     }
@@ -337,17 +311,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     // Check if it is legal utf-8
 
                     auto const [utf8pos, utf8err]{
-                        ::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
-                            module_name_tmp.cbegin(),
-                            module_name_tmp.cend())};
+                        ::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629>(module_name_tmp.cbegin(),
+                                                                                                                               module_name_tmp.cend())};
 
                     if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                     {
                         err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
-                                         name_err_type_t::illegal_char_sequence,
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence,
                                          name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                         curr = map_end;
-                        // End of current paragraph
+                        // This is a non-structural error, so parsing can continue. However, this map only has one entry, so we can move directly to the next
+                        // map. End of current paragraph
                         continue;
                     }
 
@@ -356,9 +330,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(curr != map_end) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::invalid_data_exists, name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
+                        err.emplace_back(curr,
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_data_exists,
+                                         name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
                         curr = map_end;
-                        // End of current map
+                        // This is a non-structural error, so parsing can continue. However, this map only has one entry, so we can move directly to the next
+                        // map. End of current map
                         continue;
                     }
 
@@ -370,8 +347,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(!ns.function_name.empty()) [[unlikely]]
                     {
-                        err.emplace_back(section_id_ptr, name_err_type_t::duplicate_function_name);
+                        err.emplace_back(section_id_ptr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_function_name);
                         curr = map_end;
+                        // Duplicate content, skip
                         // End of current map
                         continue;
                     }
@@ -387,8 +365,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(name_count_err != ::fast_io::parse_code::ok) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::invalid_function_name_count);
+                        err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_name_count);
                         curr = map_end;
+                        // Structural error, unable to continue parsing
                         // End of current map
                         continue;
                     }
@@ -404,9 +383,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         if(name_count > size_t_max) [[unlikely]]
                         {
                             err.emplace_back(curr,
-                                             name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
                                              name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_count)});
                             curr = map_end;
+                            // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                             // End of current map
                             continue;
                         }
@@ -421,6 +401,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     //                       ^^ curr
 
                     bool ct_1{};
+
+                    ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 last_func_idx{};
 
                     for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 name_counter{}; name_counter != name_count; ++name_counter)
                     {
@@ -437,11 +419,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         if(func_index_err != ::fast_io::parse_code::ok) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::invalid_function_index);
+                            err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index);
                             // Encountered error leb128, could not continue parsing, don't know if there is a problem with subsequent bytes
                             curr = map_end;
                             // End of current map
                             // Implementation of ct_1 via state variables
+                            // Non-structural error -> skip this subsection to avoid cascading errors
                             ct_1 = true;
                             break;
                         }
@@ -449,6 +432,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [...  func_idx ...] name_len ... ... (map_end)
                         // [        safe     ] unsafe (could be the map_end)
                         //       ^^ curr
+
+                        if(func_index < last_func_idx) [[unlikely]]
+                        {
+                            err.emplace_back(curr,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index_order,
+                                             name_err_storage_t{
+                                                 .u32arr{func_index, last_func_idx}
+                            });
+
+                            curr = map_end;
+                            // This is not a structural error, but subsequent content cannot be parsed, which may lead to subsequent structural errors, so
+                            // parsing cannot continue.
+                            // End of current map
+                            // Implementation of ct_1 via state variables
+                            ct_1 = true;
+                            break;
+                        }
+
+                        last_func_idx = func_index;
 
                         auto const func_index_ptr{curr};
 
@@ -468,11 +470,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         if(func_name_length_err != ::fast_io::parse_code::ok) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::invalid_function_name_length);
+                            err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_name_length);
                             // Encountered error leb128, could not continue parsing, don't know if there is a problem with subsequent bytes
                             curr = map_end;
                             // End of current map
                             // Implementation of ct_1 via state variables
+                            // Non-structural error -> skip this subsection to avoid cascading errors
                             ct_1 = true;
                             break;
                         }
@@ -487,11 +490,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             if(func_name_length > size_t_max) [[unlikely]]
                             {
                                 err.emplace_back(curr,
-                                                 name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
                                                  name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(func_name_length)});
                                 curr = map_end;
                                 // End of current map
                                 // Implementation of ct_1 via state variables
+                                // Non-structural error -> skip this subsection to avoid cascading errors
                                 ct_1 = true;
                                 break;
                             }
@@ -503,20 +507,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [             safe             ] unsafe (could be the map_end)
                         //                                  ^^ curr
 
-                        // The length of name cannot be 0
-                        if(func_name_length == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
-                        {
-                            err.emplace_back(curr, name_err_type_t::illegal_function_name_length, name_err_storage_t{.u32 = func_name_length});
-                            // End of current paragraph
-                            continue;
-                        }
-
                         if(static_cast<::std::size_t>(map_end - curr) < static_cast<::std::size_t>(func_name_length)) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::illegal_function_name_length, name_err_storage_t{.u32 = func_name_length});
+                            err.emplace_back(curr,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_function_name_length,
+                                             name_err_storage_t{.u32 = func_name_length});
                             curr = map_end;
                             // End of current map
                             // Implementation of ct_1 via state variables
+                            // Non-structural error -> skip this subsection to avoid cascading errors
                             ct_1 = true;
                             break;
                         }
@@ -551,14 +550,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // Check if it is legal utf-8
 
                         auto const [utf8pos, utf8err]{
-                            ::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
-                                func_name_tmp.cbegin(),
-                                func_name_tmp.cend())};
+                            ::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629>(func_name_tmp.cbegin(),
+                                                                                                                                   func_name_tmp.cend())};
 
                         if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                         {
                             err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
-                                             name_err_type_t::illegal_char_sequence,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence,
                                              name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                             curr = map_end;
                             // End of current paragraph
@@ -569,7 +567,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // Use try_emplace to combine lookup and insertion operations, avoiding two hash lookups
                         if(!ns.function_name.try_emplace(func_index, func_name_tmp).second) [[unlikely]]
                         {
-                            err.emplace_back(func_index_ptr, name_err_type_t::duplicate_func_idx, name_err_storage_t{.u32 = func_index});
+                            err.emplace_back(func_index_ptr,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_func_idx,
+                                             name_err_storage_t{.u32 = func_index});
                             curr = map_end;
                             // End of current paragraph
                             continue;
@@ -581,12 +581,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // End of current map
                         // ct_1 is just a state variable that only controls the jumps
                         // already set "curr = map_end"
+                        // Non-structural error -> skip this subsection to avoid cascading errors
                         continue;
                     }
 
                     if(curr != map_end) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::invalid_data_exists, name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
+                        err.emplace_back(curr,
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_data_exists,
+                                         name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
                         curr = map_end;
                         // End of current map
                         continue;
@@ -600,7 +603,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(!ns.code_local_name.empty()) [[unlikely]]
                     {
-                        err.emplace_back(section_id_ptr, name_err_type_t::duplicate_local_name);
+                        err.emplace_back(section_id_ptr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_local_name);
                         curr = map_end;
                         // End of current map
                         continue;
@@ -617,7 +620,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     if(local_count_err != ::fast_io::parse_code::ok) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::invalid_local_count);
+                        err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_local_count);
                         curr = map_end;
                         // End of current map
                         continue;
@@ -634,7 +637,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         if(local_count > size_t_max) [[unlikely]]
                         {
                             err.emplace_back(curr,
-                                             name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
                                              name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(local_count)});
                             curr = map_end;
                             // End of current map
@@ -651,6 +654,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                     bool ct_1{};
 
+                    ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 last_function_idx{};
+
                     for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 local_counter{}; local_counter != local_count; ++local_counter)
                     {
                         // [... ] function_index ... ... (map_end)
@@ -664,9 +669,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         if(function_index_err != ::fast_io::parse_code::ok) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::invalid_function_index);
+                            err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index);
                             curr = map_end;
                             // End of current map
+                            // Non-structural error -> skip this subsection to avoid cascading errors
                             ct_1 = true;
                             break;
                         }
@@ -674,6 +680,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // [...  function_index ...] ... (map_end)
                         // [         safe          ] unsafe (could be the map_end)
                         //       ^^ curr
+
+                        if(function_index < last_function_idx) [[unlikely]]
+                        {
+                            err.emplace_back(curr,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index_order,
+                                             name_err_storage_t{
+                                                 .u32arr{function_index, last_function_idx}
+                            });
+
+                            curr = map_end;
+                            // End of current map
+                            ct_1 = true;
+                            break;
+                        }
+
+                        last_function_idx = function_index;
 
                         auto const function_index_ptr{curr};
 
@@ -691,9 +713,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         if(function_local_count_err != ::fast_io::parse_code::ok) [[unlikely]]
                         {
-                            err.emplace_back(curr, name_err_type_t::invalid_function_local_count);
+                            err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_count);
                             curr = map_end;
                             // End of current map
+                            // Non-structural error -> skip this subsection to avoid cascading errors
                             ct_1 = true;
                             break;
                         }
@@ -709,10 +732,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             if(function_local_count > size_t_max) [[unlikely]]
                             {
                                 err.emplace_back(curr,
-                                                 name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
                                                  name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(function_local_count)});
                                 curr = map_end;
                                 // End of current map
+                                // Non-structural error -> skip this subsection to avoid cascading errors
                                 ct_1 = true;
                                 break;
                             }
@@ -732,6 +756,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                         bool ct_2{};
 
+                        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 last_function_local_index{};
+
                         for(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 function_local_counter{}; function_local_counter != function_local_count;
                             ++function_local_counter)
                         {
@@ -747,9 +773,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                             if(function_local_index_err != ::fast_io::parse_code::ok) [[unlikely]]
                             {
-                                err.emplace_back(curr, name_err_type_t::invalid_function_local_index);
+                                err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_index);
                                 curr = map_end;
+                                // Structural error, unable to continue parsing
                                 // End of current map
+                                // Non-structural error -> skip this subsection to avoid cascading errors
                                 ct_2 = true;
                                 break;
                             }
@@ -757,6 +785,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // [...  function_local_index ...] ... (map_end)
                             // [            safe             ] unsafe (could be the map_end)
                             //       ^^ curr
+
+                            if(function_local_index < last_function_local_index) [[unlikely]]
+                            {
+                                err.emplace_back(curr,
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_index_order,
+                                                 name_err_storage_t{
+                                                     .u32arr{function_local_index, last_function_local_index}
+                                });
+                                curr = map_end;
+                                // This is not a structural error, but subsequent content cannot be parsed, which may lead to subsequent structural errors, so
+                                // parsing cannot continue.
+                                // End of current map
+                                ct_2 = true;
+                                break;
+                            }
+
+                            last_function_local_index = function_local_index;
 
                             auto const function_local_index_ptr{curr};
 
@@ -774,9 +819,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                             if(function_local_name_length_err != ::fast_io::parse_code::ok) [[unlikely]]
                             {
-                                err.emplace_back(curr, name_err_type_t::invalid_function_local_name_length);
+                                err.emplace_back(curr, ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_name_length);
                                 curr = map_end;
+                                // Structural error, unable to continue parsing
                                 // End of current map
+                                // Non-structural error -> skip this subsection to avoid cascading errors
                                 ct_2 = true;
                                 break;
                             }
@@ -791,11 +838,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                                 if(function_local_name_length > size_t_max) [[unlikely]]
                                 {
                                     err.emplace_back(curr,
-                                                     name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                                     ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
                                                      name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(function_local_name_length)});
                                     curr = map_end;
+                                    // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                                     // End of current map
-                                    // Implementation of ct_2 via state variables
+                                    // Non-structural error -> skip this subsection to avoid cascading errors
                                     ct_2 = true;
                                     break;
                                 }
@@ -807,24 +855,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // [                             safe                           ] unsafe (could be the map_end)
                             //                                                                ^^ curr
 
-                            // The length of name cannot be 0
-                            if(function_local_name_length == static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(0u)) [[unlikely]]
-                            {
-                                err.emplace_back(curr,
-                                                 name_err_type_t::illegal_function_local_name_length,
-                                                 name_err_storage_t{.u32 = function_local_name_length});
-                                // End of current paragraph
-                                continue;
-                            }
-
                             if(static_cast<::std::size_t>(map_end - curr) < static_cast<::std::size_t>(function_local_name_length)) [[unlikely]]
                             {
                                 err.emplace_back(curr,
-                                                 name_err_type_t::illegal_function_local_name_length,
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_function_local_name_length,
                                                  name_err_storage_t{.u32 = function_local_name_length});
                                 curr = map_end;
+                                // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                                 // End of current map
-                                // Implementation of ct_2 via state variables
+                                // Non-structural error -> skip this subsection to avoid cascading errors
                                 ct_2 = true;
                                 break;
                             }
@@ -859,17 +898,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 
                             // Check if it is legal utf-8
 
-                            auto const [utf8pos, utf8err]{
-                                ::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(
-                                    function_local_name_begin_tmp.cbegin(),
-                                    function_local_name_begin_tmp.cend())};
+                            auto const [utf8pos,
+                                        utf8err]{::uwvm2::utils::utf::check_legal_utf8_unchecked<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629>(
+                                function_local_name_begin_tmp.cbegin(),
+                                function_local_name_begin_tmp.cend())};
 
                             if(utf8err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
                             {
                                 err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
-                                                 name_err_type_t::illegal_char_sequence,
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence,
                                                  name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                                 curr = map_end;
+                                // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                                 // End of current paragraph
                                 continue;
                             }
@@ -879,9 +919,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             if(!ns_code_local_name_function_index.try_emplace(function_local_index, function_local_name_begin_tmp).second) [[unlikely]]
                             {
                                 err.emplace_back(function_local_index_ptr,
-                                                 name_err_type_t::duplicate_code_local_name_function_index,
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_code_local_name_function_index,
                                                  name_err_storage_t{.u32 = function_local_index});
                                 curr = map_end;
+                                // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                                 // End of current paragraph
                                 continue;
                             }
@@ -890,6 +931,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         if(ct_2) [[unlikely]]
                         {
                             ct_1 = true;
+                            // Non-structural error -> skip this subsection to avoid cascading errors
                             break;
                         }
 
@@ -898,8 +940,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // Use try_emplace to combine lookup and insertion operations, avoiding two hash lookups
                         if(!ns.code_local_name.try_emplace(function_index, ::std::move(ns_code_local_name_function_index)).second) [[unlikely]]
                         {
-                            err.emplace_back(function_index_ptr, name_err_type_t::duplicate_code_function_index, name_err_storage_t{.u32 = function_index});
+                            err.emplace_back(function_index_ptr,
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_code_function_index,
+                                             name_err_storage_t{.u32 = function_index});
                             curr = map_end;
+                            // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                             // End of current paragraph
                             continue;
                         }
@@ -910,13 +955,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // End of current map
                         // ct_1 is just a state variable that only controls the jumps
                         // already set "curr = map_end"
+                        // Non-structural error -> skip this subsection to avoid cascading errors
                         continue;
                     }
 
                     if(curr != map_end) [[unlikely]]
                     {
-                        err.emplace_back(curr, name_err_type_t::invalid_data_exists, name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
+                        err.emplace_back(curr,
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_data_exists,
+                                         name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
                         curr = map_end;
+                        // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                         // End of current map
                         continue;
                     }
@@ -942,7 +991,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 #endif
                 [[unlikely]] default:
                 {
-                    err.emplace_back(section_id_ptr, name_err_type_t::illegal_section_id, name_err_storage_t{.u8 = section_id});
+                    err.emplace_back(section_id_ptr,
+                                     ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_section_id,
+                                     name_err_storage_t{.u8 = section_id});
 
                     // Jump directly to the next loop
                     curr = map_end;

@@ -51,7 +51,7 @@ int main()
         ::uwvm2::parser::wasm_custom::customs::name_error_output_t errout{};
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_code_local_name_function_index) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_index_order) + 1u;
             ++i)
         {
             switch(static_cast<::uwvm2::parser::wasm_custom::customs::name_err_type_t>(i))

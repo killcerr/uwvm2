@@ -191,6 +191,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 #include "name_error_code_outputs/name_eco_duplicate_code_local_name_function_index.h"
                 return;
             }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_section_canonical_order:
+            {
+#include "name_error_code_outputs/name_eco_invalid_section_canonical_order.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_name_section:
+            {
+#include "name_error_code_outputs/name_eco_duplicate_name_section.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index_order:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_index_order.h"
+                return;
+            }
+            case ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_index_order:
+            {
+#include "name_error_code_outputs/name_eco_invalid_function_local_index_order.h"
+                return;
+            }
         }
     }
 }
