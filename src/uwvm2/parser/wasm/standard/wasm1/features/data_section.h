@@ -734,9 +734,83 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)data_section_details_wrapper;
+
+        auto const data_section_span{data_section_details_wrapper.data_section_storage_ptr->sec_span};
+        auto const data_section_size{static_cast<::std::size_t>(data_section_span.sec_end - data_section_span.sec_begin)};
+
+        if(data_section_size)
+        {
+            auto const data_size{data_section_details_wrapper.data_section_storage_ptr->datas.size()};
+
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "\nData[", data_size, "]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"\nData[", data_size, L"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"\nData[", data_size, u8"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"\nData[", data_size, u"]:\n");
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"\nData[", data_size, U"]:\n");
+            }
+
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 data_counter{};
+
+            for(auto const& curr_data: data_section_details_wrapper.data_section_storage_ptr->datas)
+            {
+                if constexpr(::std::same_as<char_type, char>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    " - data[",
+                                                                    data_counter,
+                                                                    "]: ",
+                                                                    section_details(curr_data, *data_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, wchar_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    L" - data[",
+                                                                    data_counter,
+                                                                    L"]: ",
+                                                                    section_details(curr_data, *data_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char8_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u8" - data[",
+                                                                    data_counter,
+                                                                    u8"]: ",
+                                                                    section_details(curr_data, *data_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char16_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    u" - data[",
+                                                                    data_counter,
+                                                                    u"]: ",
+                                                                    section_details(curr_data, *data_section_details_wrapper.all_sections_ptr));
+                }
+                else if constexpr(::std::same_as<char_type, char32_t>)
+                {
+                    ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                    U" - data[",
+                                                                    data_counter,
+                                                                    U"]: ",
+                                                                    section_details(curr_data, *data_section_details_wrapper.all_sections_ptr));
+                }
+
+                ++data_counter;
+            }
+        }
     }
 }
 

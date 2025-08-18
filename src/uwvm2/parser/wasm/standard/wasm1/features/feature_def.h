@@ -1855,6 +1855,81 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // trivially copyable or relocatable
         static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<final_wasm_const_expr<Fs...>>);
     };
+
+    /// @brief Wrapper for the wasm1_data_storage_t
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm1_data_storage_t_section_details_wrapper_t
+    {
+        wasm1_data_storage_t<Fs...> const* data_storage_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr wasm1_data_storage_t_section_details_wrapper_t<Fs...> section_details(
+        wasm1_data_storage_t<Fs...> const& data_storage,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
+    {
+        return {::std::addressof(data_storage), ::std::addressof(all_sections)};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, wasm1_data_storage_t_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       wasm1_data_storage_t_section_details_wrapper_t<Fs...> const data_details_wrapper)
+    {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(data_details_wrapper.data_storage_ptr == nullptr || data_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                "memory_idx: ",
+                data_details_wrapper.data_storage_ptr->memory_idx,
+                ", size: ",
+                static_cast<::std::size_t>(data_details_wrapper.data_storage_ptr->byte.end - data_details_wrapper.data_storage_ptr->byte.begin));
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                L"memory_idx: ",
+                data_details_wrapper.data_storage_ptr->memory_idx,
+                L", size: ",
+                static_cast<::std::size_t>(data_details_wrapper.data_storage_ptr->byte.end - data_details_wrapper.data_storage_ptr->byte.begin));
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                u8"memory_idx: ",
+                data_details_wrapper.data_storage_ptr->memory_idx,
+                u8", size: ",
+                static_cast<::std::size_t>(data_details_wrapper.data_storage_ptr->byte.end - data_details_wrapper.data_storage_ptr->byte.begin));
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                u"memory_idx: ",
+                data_details_wrapper.data_storage_ptr->memory_idx,
+                u", size: ",
+                static_cast<::std::size_t>(data_details_wrapper.data_storage_ptr->byte.end - data_details_wrapper.data_storage_ptr->byte.begin));
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                U"memory_idx: ",
+                data_details_wrapper.data_storage_ptr->memory_idx,
+                U", size: ",
+                static_cast<::std::size_t>(data_details_wrapper.data_storage_ptr->byte.end - data_details_wrapper.data_storage_ptr->byte.begin));
+        }
+    }
 }
 
 // Subsequent specifications of union must include this information, so it has to be declared here.
@@ -1947,6 +2022,71 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
         inline constexpr ~wasm1_data_t() { ::std::destroy_at(::std::addressof(this->storage.memory_idx)); }
     };
+
+    /// @brief Wrapper for the wasm1_data_t
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm1_data_t_section_details_wrapper_t
+    {
+        wasm1_data_t<Fs...> const* data_ptr{};
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const* all_sections_ptr{};
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr wasm1_data_t_section_details_wrapper_t<Fs...> section_details(
+        wasm1_data_t<Fs...> const& data,
+        ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
+    {
+        return {::std::addressof(data), ::std::addressof(all_sections)};
+    }
+
+    template <::std::integral char_type, typename Stm, ::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void print_define(::fast_io::io_reserve_type_t<char_type, wasm1_data_t_section_details_wrapper_t<Fs...>>,
+                                       Stm && stream,
+                                       wasm1_data_t_section_details_wrapper_t<Fs...> const data_details_wrapper)
+    {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(data_details_wrapper.data_ptr == nullptr || data_details_wrapper.all_sections_ptr == nullptr) [[unlikely]]
+        {
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+
+        if constexpr(::std::same_as<char_type, char>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                "flag: 0, ",
+                section_details(data_details_wrapper.data_ptr->storage.memory_idx, *data_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, wchar_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                L"flag: 0, ",
+                section_details(data_details_wrapper.data_ptr->storage.memory_idx, *data_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, char8_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                u8"flag: 0, ",
+                section_details(data_details_wrapper.data_ptr->storage.memory_idx, *data_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, char16_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                u"flag: 0, ",
+                section_details(data_details_wrapper.data_ptr->storage.memory_idx, *data_details_wrapper.all_sections_ptr));
+        }
+        else if constexpr(::std::same_as<char_type, char32_t>)
+        {
+            ::fast_io::operations::print_freestanding<false>(
+                ::std::forward<Stm>(stream),
+                U"flag: 0, ",
+                section_details(data_details_wrapper.data_ptr->storage.memory_idx, *data_details_wrapper.all_sections_ptr));
+        }
+    }
 
     template <typename... Fs>
     concept has_handle_data_type = requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<data_section_storage_t<Fs...>> sec_adl,
