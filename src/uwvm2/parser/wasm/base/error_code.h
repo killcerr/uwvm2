@@ -147,7 +147,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         data_section_resolved_exceeded_the_actual_number,
         invalid_data_memory_idx,
         data_memory_index_exceeds_maxvul,
-        data_init_terminator_not_found,
         invalid_data_byte_size_count,
         illegal_data_byte_size_count,
         data_section_resolved_not_match_the_actual_number,

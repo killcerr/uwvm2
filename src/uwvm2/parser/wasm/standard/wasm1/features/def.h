@@ -1100,7 +1100,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
     /// @brief final local global type
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-    struct final_local_global_type
+    struct final_local_global_type UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         final_global_type<Fs...> global;    // Types used to store global
         final_wasm_const_expr<Fs...> expr;  // Expressions used to initialize global
@@ -1380,6 +1380,12 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::final_local_function_type<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::final_local_global_type<Fs...>>
     {
         inline static constexpr bool value = true;
     };

@@ -1839,28 +1839,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct data_section_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE;
 
-    struct wasm1_data_expr_t
-    {
-        // Expressions are encoded by their instruction sequence terminated with an explicit 0x0B opcode for end.
-        inline static constexpr auto end_opcode{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type>(0x0Bu)};
-
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};  // The pointer to end is after 0x0b.
-    };
-
     struct wasm1_data_init_t
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* begin{};
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte const* end{};
     };
 
-    struct wasm1_data_storage_t
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct wasm1_data_storage_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 memory_idx{};
-        wasm1_data_expr_t expr{};
+        ::uwvm2::parser::wasm::standard::wasm1::features::final_wasm_const_expr<Fs...> expr{};
         wasm1_data_init_t byte{};
     };
+}
 
+// Subsequent specifications of union must include this information, so it has to be declared here.
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_data_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::features::wasm1_data_storage_t<Fs...>>
+    {
+        inline static constexpr bool value = true;
+    };
+}
+
+UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
+{
     enum class wasm1_data_type_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
     {
         memoryidx = 0u,
@@ -1869,14 +1880,69 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>  // Fs is used as an extension to an existing type, but does not extend the type
     struct wasm1_data_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
+        inline static constexpr ::std::size_t sizeof_storage_u{sizeof(::uwvm2::parser::wasm::standard::wasm1::features::wasm1_data_storage_t<Fs...>)};
+
         union storage_u
         {
-            wasm1_data_storage_t memory_idx;
-            static_assert(::std::is_trivially_copyable_v<wasm1_data_storage_t> && ::std::is_trivially_destructible_v<wasm1_data_storage_t>);
+            ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_data_storage_t<Fs...> memory_idx;
+            static_assert(::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<decltype(memory_idx)> &&
+                          ::fast_io::freestanding::is_zero_default_constructible_v<decltype(memory_idx)>);
 
+            // Full occupancy is used to initialize the union, set the union to all zero.
+            [[maybe_unused]] ::std::byte sizeof_storage_u_reserve[sizeof_storage_u]{};
+
+            // destructor of 'storage_u' is implicitly deleted because variant field 'typeidx_u8_vector' has a non-trivial destructor
+            inline constexpr ~storage_u() {}
+
+            // The release of memory_idx is managed by struct wasm1_data_t, there is no issue of raii resources being unreleased.
         } storage;
 
+        static_assert(sizeof(storage_u) == sizeof_storage_u, "sizeof(storage_t) not equal to sizeof_storage_u");
+
+        // In wasm1, type stands for memory index, which conceptually can be any value, but since the standard specifies only 1 memory, it can only be 0.
+        // Here union does not need to make any type-safe judgments since there is only one type.
+
         wasm1_data_type_t type{};
+
+        inline constexpr wasm1_data_t() noexcept { ::new(::std::addressof(this->storage.memory_idx)) decltype(this->storage.memory_idx){}; }
+
+        inline constexpr wasm1_data_t(wasm1_data_t const& other) noexcept : type{other.type}
+        {
+            ::new(::std::addressof(this->storage.memory_idx)) decltype(this->storage.memory_idx){other.storage.memory_idx};
+        }
+
+        inline constexpr wasm1_data_t(wasm1_data_t&& other) noexcept : type{other.type}
+        {
+            ::new(::std::addressof(this->storage.memory_idx)) decltype(this->storage.memory_idx){::std::move(other.storage.memory_idx)};
+        }
+
+        inline constexpr wasm1_data_t& operator= (wasm1_data_t const& other) noexcept
+        {
+            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
+
+            // The memory_idx type in union is always valid regardless of the value of type.
+
+            this->type = other.type;
+
+            this->storage.memory_idx = other.storage.memory_idx;
+
+            return *this;
+        }
+
+        inline constexpr wasm1_data_t& operator= (wasm1_data_t&& other) noexcept
+        {
+            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
+
+            // The memory_idx type in union is always valid regardless of the value of type.
+
+            this->type = other.type;
+
+            this->storage.memory_idx = ::std::move(other.storage.memory_idx);
+
+            return *this;
+        }
+
+        inline constexpr ~wasm1_data_t() { ::std::destroy_at(::std::addressof(this->storage.memory_idx)); }
     };
 
     template <typename... Fs>
