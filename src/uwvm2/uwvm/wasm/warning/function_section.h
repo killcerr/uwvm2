@@ -164,6 +164,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
             }
         }
     }
+
+    inline constexpr void show_wasm_section_warning(
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::function_section_storage_t>,
+        ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
+        ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
+    {
+        return show_wasm_function_section_warning(wasm, warn_storage);
+    }
 }
 
 #ifndef UWVM_MODULE

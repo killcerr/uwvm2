@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -59,18 +59,18 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 {
-    inline constexpr void show_wasm_table_section_warning([[maybe_unused]] ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
-                                                          [[maybe_unused]] ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
+    inline constexpr void show_wasm_data_section_warning([[maybe_unused]] ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
+                                                         [[maybe_unused]] ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
     {
     }
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline constexpr void show_wasm_section_warning(
-        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::table_section_storage_t<Fs...>>,
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::data_section_storage_t<Fs...>>,
         ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
         ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
     {
-        return show_wasm_table_section_warning(wasm, warn_storage);
+        return show_wasm_data_section_warning(wasm, warn_storage);
     }
 }
 

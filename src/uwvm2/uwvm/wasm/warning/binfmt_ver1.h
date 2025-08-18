@@ -61,6 +61,8 @@
 # include "start_section.h"
 # include "element_section.h"
 # include "code_section.h"
+# include "data_section.h"
+# include "custom_section.h"
 # include "final_check.h"
 #endif
 
@@ -81,17 +83,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
         ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t warn_storage{};
         ::uwvm2::uwvm::wasm::warning::init_binfmt_ver1_warning_storage(warn_storage, wasm);
 
-        ::uwvm2::uwvm::wasm::warning::show_wasm_type_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_import_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_function_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_table_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_memory_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_global_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_export_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_start_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_element_section_warning(wasm, warn_storage);
-        ::uwvm2::uwvm::wasm::warning::show_wasm_code_section_warning(wasm, warn_storage);
-        /// @todo Change warning to a loop based on section+adl
+        // for __builtin_expect_with_probability
+
+        [&]<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr noexcept -> void
+        {
+            (::uwvm2::uwvm::wasm::warning::show_wasm_section_warning(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<Secs>{}, wasm, warn_storage), ...);
+        }(wasm.get_curr_binfmt_version_wasm_storage<1u>().sections);
+
         ::uwvm2::uwvm::wasm::warning::show_wasm_final_check_warning(wasm, warn_storage);
     }
 }

@@ -146,6 +146,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::warning
 
         for(auto const& curr_memory: memory_section.memories) { check_memory(curr_memory, wasm, warn_storage); }
     }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline constexpr void show_wasm_section_warning(
+        ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::uwvm2::parser::wasm::standard::wasm1::features::memory_section_storage_t<Fs...>>,
+        ::uwvm2::uwvm::wasm::type::wasm_file_t const& wasm,
+        ::uwvm2::uwvm::wasm::warning::binfmt_ver1_warning_storage_t& warn_storage) noexcept
+    {
+        return show_wasm_memory_section_warning(wasm, warn_storage);
+    }
 }
 
 #ifndef UWVM_MODULE
