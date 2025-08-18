@@ -190,9 +190,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
 #endif
-        /// @todo
-        (void)stream;
-        (void)custom_section_details_wrapper;
+
+        for(auto const& curr_custom: custom_section_details_wrapper.custom_section_storage_ptr->customs)
+        {
+            auto const curr_custom_name{curr_custom.custom_name};
+
+            auto const curr_custom_size{static_cast<::std::size_t>(curr_custom.sec_span.sec_end - curr_custom.custom_begin)};
+
+            if constexpr(::std::same_as<char_type, char>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                "\nCustom (",
+                                                                ::fast_io::mnp::code_cvt(curr_custom_name),
+                                                                "): size = ",
+                                                                curr_custom_size);
+            }
+            else if constexpr(::std::same_as<char_type, wchar_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                L"\nCustom (",
+                                                                ::fast_io::mnp::code_cvt(curr_custom_name),
+                                                                L"): size = ",
+                                                                curr_custom_size);
+            }
+            else if constexpr(::std::same_as<char_type, char8_t>)
+            {
+                // No need to convert to UTF-8
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u8"\nCustom (",
+                                                                curr_custom_name,
+                                                                u8"): size = ",
+                                                                curr_custom_size);
+            }
+            else if constexpr(::std::same_as<char_type, char16_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u"\nCustom (",
+                                                                ::fast_io::mnp::code_cvt(curr_custom_name),
+                                                                u"): size = ",
+                                                                curr_custom_size);
+            }
+            else if constexpr(::std::same_as<char_type, char32_t>)
+            {
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                U"\nCustom (",
+                                                                ::fast_io::mnp::code_cvt(curr_custom_name),
+                                                                U"): size = ",
+                                                                curr_custom_size);
+            }
+        }
     }
 }
 
