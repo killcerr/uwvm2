@@ -51,6 +51,8 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
 {
+    // WebAssembly 1.0 does not specify that the index in the name segment must fall within the upper limit of the module's actual definition; it only requires
+    // that the index be unique and appear in ascending order. Therefore, a map is used here.
     struct name_storage_t
     {
         ::uwvm2::utils::container::u8string_view module_name{};
@@ -91,8 +93,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
         // State machine and invariants:
         // - has_analyzed: module-level "only once". Ensures the name section is parsed at most once.
         // - max_section_id: subsection canonical order (0 -> 1 -> 2, non-decreasing).
-        // - ct_1 / ct_2: non-structural error short-circuit flags at subsection / sub-map scopes (jump curr to map_end and stop current scope to avoid cascading errors).
-        
+        // - ct_1 / ct_2: non-structural error short-circuit flags at subsection / sub-map scopes (jump curr to map_end and stop current scope to avoid
+        // cascading errors).
+
         // [... ] section_id ...
         // [safe] unsafe (could be the end)
         //        ^^ curr
