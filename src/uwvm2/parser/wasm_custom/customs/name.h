@@ -131,7 +131,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
             {
                 err.emplace_back(curr,
                                  ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_section_canonical_order,
-                                 name_err_storage_t{
+                                 ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{
                                      .u8arr{section_id, max_section_id}
                 });
                 // This only provides a warning and does not prevent further parsing.
@@ -176,7 +176,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     // name map exceeds the platform maximum length (size_t), then pointer addition may have overflow undefined behavior and exit directly.
                     err.emplace_back(curr,
                                      ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                     name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_map_length)});
+                                     ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_map_length)});
                     // The outermost layer has a structural error, which may cause an overflow and prevent further parsing, resulting in termination of the
                     // entire process.
                     return;
@@ -194,7 +194,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                 // name map exceeds the end - curr, then pointer addition may have overflow undefined behavior and exit directly.
                 err.emplace_back(curr,
                                  ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_name_map_length,
-                                 name_err_storage_t{.u32 = name_map_length});
+                                 ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = name_map_length});
                 // The outermost layer has a structural error, which may cause an overflow and prevent further parsing, resulting in termination of the entire
                 // process.
                 return;
@@ -259,9 +259,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
                         if(module_name_length > size_t_max) [[unlikely]]
                         {
-                            err.emplace_back(curr,
-                                             ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                             name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(module_name_length)});
+                            err.emplace_back(
+                                curr,
+                                ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(module_name_length)});
                             curr = map_end;
                             // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                             // End of current map
@@ -279,7 +280,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     {
                         err.emplace_back(curr,
                                          ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_module_name_length,
-                                         name_err_storage_t{.u32 = module_name_length});
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = module_name_length});
                         curr = map_end;
                         // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                         // End of current map
@@ -321,7 +322,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     {
                         err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
                                          ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence,
-                                         name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                         curr = map_end;
                         // This is a non-structural error, so parsing can continue. However, this map only has one entry, so we can move directly to the next
                         // map. End of current paragraph
@@ -335,7 +336,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     {
                         err.emplace_back(curr,
                                          ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_data_exists,
-                                         name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
                         curr = map_end;
                         // This is a non-structural error, so parsing can continue. However, this map only has one entry, so we can move directly to the next
                         // map. End of current map
@@ -387,7 +388,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(curr,
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                             name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_count)});
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(name_count)});
                             curr = map_end;
                             // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                             // End of current map
@@ -440,7 +441,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(curr,
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index_order,
-                                             name_err_storage_t{
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{
                                                  .u32arr{func_index, last_func_idx}
                             });
 
@@ -492,9 +493,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
                             if(func_name_length > size_t_max) [[unlikely]]
                             {
-                                err.emplace_back(curr,
-                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                                 name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(func_name_length)});
+                                err.emplace_back(
+                                    curr,
+                                    ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                    ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(func_name_length)});
                                 curr = map_end;
                                 // End of current map
                                 // Implementation of ct_1 via state variables
@@ -514,7 +516,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(curr,
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_function_name_length,
-                                             name_err_storage_t{.u32 = func_name_length});
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = func_name_length});
                             curr = map_end;
                             // End of current map
                             // Implementation of ct_1 via state variables
@@ -560,7 +562,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence,
-                                             name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                             curr = map_end;
                             // End of current paragraph
                             continue;
@@ -572,7 +574,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(func_index_ptr,
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_func_idx,
-                                             name_err_storage_t{.u32 = func_index});
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = func_index});
                             curr = map_end;
                             // End of current paragraph
                             continue;
@@ -592,7 +594,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     {
                         err.emplace_back(curr,
                                          ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_data_exists,
-                                         name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
                         curr = map_end;
                         // End of current map
                         continue;
@@ -641,7 +643,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(curr,
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                             name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(local_count)});
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(local_count)});
                             curr = map_end;
                             // End of current map
                             continue;
@@ -688,7 +690,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(curr,
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_index_order,
-                                             name_err_storage_t{
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{
                                                  .u32arr{function_index, last_function_idx}
                             });
 
@@ -734,9 +736,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             // The size_t of current platforms is smaller than u32, in these platforms you need to do a size check before conversion
                             if(function_local_count > size_t_max) [[unlikely]]
                             {
-                                err.emplace_back(curr,
-                                                 ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                                 name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(function_local_count)});
+                                err.emplace_back(
+                                    curr,
+                                    ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
+                                    ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(function_local_count)});
                                 curr = map_end;
                                 // End of current map
                                 // Non-structural error -> skip this subsection to avoid cascading errors
@@ -793,7 +796,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             {
                                 err.emplace_back(curr,
                                                  ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_function_local_index_order,
-                                                 name_err_storage_t{
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{
                                                      .u32arr{function_local_index, last_function_local_index}
                                 });
                                 curr = map_end;
@@ -842,7 +845,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                                 {
                                     err.emplace_back(curr,
                                                      ::uwvm2::parser::wasm_custom::customs::name_err_type_t::size_exceeds_the_maximum_value_of_size_t,
-                                                     name_err_storage_t{.u64 = static_cast<::std::uint_least64_t>(function_local_name_length)});
+                                                     ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{
+                                                         .u64 = static_cast<::std::uint_least64_t>(function_local_name_length)});
                                     curr = map_end;
                                     // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                                     // End of current map
@@ -862,7 +866,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             {
                                 err.emplace_back(curr,
                                                  ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_function_local_name_length,
-                                                 name_err_storage_t{.u32 = function_local_name_length});
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = function_local_name_length});
                                 curr = map_end;
                                 // Exceeding the architectural limits may cause subsequent overflows and other issues, making further parsing impossible.
                                 // End of current map
@@ -910,7 +914,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             {
                                 err.emplace_back(reinterpret_cast<::std::byte const*>(utf8pos),
                                                  ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_char_sequence,
-                                                 name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = static_cast<::std::uint_least32_t>(utf8err)});
                                 curr = map_end;
                                 // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                                 // End of current paragraph
@@ -923,7 +927,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                             {
                                 err.emplace_back(function_local_index_ptr,
                                                  ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_code_local_name_function_index,
-                                                 name_err_storage_t{.u32 = function_local_index});
+                                                 ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = function_local_index});
                                 curr = map_end;
                                 // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                                 // End of current paragraph
@@ -945,7 +949,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                         {
                             err.emplace_back(function_index_ptr,
                                              ::uwvm2::parser::wasm_custom::customs::name_err_type_t::duplicate_code_function_index,
-                                             name_err_storage_t{.u32 = function_index});
+                                             ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u32 = function_index});
                             curr = map_end;
                             // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                             // End of current paragraph
@@ -966,7 +970,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                     {
                         err.emplace_back(curr,
                                          ::uwvm2::parser::wasm_custom::customs::name_err_type_t::invalid_data_exists,
-                                         name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
+                                         ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.err_uz = static_cast<::std::size_t>(map_end - curr)});
                         curr = map_end;
                         // Non-structural error, all structures are intact, discard this content, and continue parsing subsequent content.
                         // End of current map
@@ -996,7 +1000,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
                 {
                     err.emplace_back(section_id_ptr,
                                      ::uwvm2::parser::wasm_custom::customs::name_err_type_t::illegal_section_id,
-                                     name_err_storage_t{.u8 = section_id});
+                                     ::uwvm2::parser::wasm_custom::customs::name_err_storage_t{.u8 = section_id});
 
                     // Jump directly to the next loop
                     curr = map_end;
