@@ -22,7 +22,7 @@ function linux_target()
     end
 
     local debug_strip = get_config("debug-strip")
-    if debug_strip == "all" or is_mode("release", "releasedbg") then
+    if debug_strip == "all" or is_mode("release", "releasedbg", "minsizerel") then
         add_cxflags("-fno-ident") -- also strip ident data
     end
 

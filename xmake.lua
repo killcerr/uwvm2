@@ -194,6 +194,7 @@ function def_build()
 	)
 
 end
+
 target("uwvm")
 	set_kind("binary")
 	def_build()
