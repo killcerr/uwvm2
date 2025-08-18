@@ -34,8 +34,11 @@ function wasm_wasi_target()
     end
 
     add_cxflags("-fno-rtti") -- disable rtti
-    add_cxflags("-fno-unwind-tables") -- disable unwind tables
-    --add_cxflags("-fno-asynchronous-unwind-tables") -- disable asynchronous unwind tables
+	
+    if not is_mode("debug") then
+        add_cxflags("-fno-unwind-tables") -- disable unwind tables
+        add_cxflags("-fno-asynchronous-unwind-tables") -- disable asynchronous unwind tables
+    end
 
     local march = get_config("march")
     if not (not march or march == "none" or march == "default") then

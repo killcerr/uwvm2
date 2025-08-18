@@ -43,8 +43,11 @@ function windows_target()
         end
 
         add_cxflags("-fno-rtti") -- disable rtti
-        add_cxflags("-fno-unwind-tables") -- disable unwind tables
-        --add_cxflags("-fno-asynchronous-unwind-tables") -- disable asynchronous unwind tables
+        
+        if not is_mode("debug") then
+            add_cxflags("-fno-unwind-tables") -- disable unwind tables
+            add_cxflags("-fno-asynchronous-unwind-tables") -- disable asynchronous unwind tables
+        end
     
         if is_kind("binary") then
             set_extension(".exe")
