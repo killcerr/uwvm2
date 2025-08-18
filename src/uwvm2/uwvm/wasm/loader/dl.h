@@ -133,7 +133,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
         }
 
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
         try
 # endif
         {
@@ -143,7 +143,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 
             wd.import_dll_file = ::fast_io::native_dll_file{load_file_name, ::fast_io::dll_mode::posix_rtld_lazy};
         }
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error e)
         {
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -174,7 +174,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         {
             bool can_get_module_name{};
 
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
             try
 # endif
             {
@@ -182,7 +182,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                     ::fast_io::dll_load_symbol(wd.import_dll_file, u8"uwvm_get_module_name"));
                 can_get_module_name = true;
             }
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
             {
             }
@@ -335,7 +335,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         {
             bool can_get_custom_handler_vec{};
 
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
             try
 # endif
             {
@@ -343,7 +343,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                     ::fast_io::dll_load_symbol(wd.import_dll_file, u8"uwvm_get_custom_handler"));
                 can_get_custom_handler_vec = true;
             }
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
             {
             }
@@ -563,7 +563,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         {
             bool can_get_function_vec{};
 
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
             try
 # endif
             {
@@ -571,7 +571,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                     reinterpret_cast<::uwvm2::uwvm::wasm::type::capi_get_function_vec_t>(::fast_io::dll_load_symbol(wd.import_dll_file, u8"uwvm_function"));
                 can_get_function_vec = true;
             }
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
             {
             }

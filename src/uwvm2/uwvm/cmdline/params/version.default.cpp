@@ -871,7 +871,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"    Detailed Debug Check Mode \n"
 #endif
         // fno-exceptions
-#if !(defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE))
+#if !(defined(UWVM_CPP_EXCEPTIONS) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE))
                                 u8"    Error Direct Crash Mode (fno-exceptions)\n"
 #endif
                                 // command line hash

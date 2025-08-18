@@ -146,13 +146,13 @@ namespace uwvm2::uwvm::cmdline::params::details
 
             auto currp2_str{currp2->str};
 
-# if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
+# if defined(UWVM_CPP_EXCEPTIONS) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
             try
 # endif
             {
                 ::uwvm2::uwvm::io::u8log_output.reopen(currp2_str, ::fast_io::open_mode::out);
             }
-# if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
+# if defined(UWVM_CPP_EXCEPTIONS) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
             catch(::fast_io::error e)
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,

@@ -44,7 +44,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
     {
         ::uwvm2::utils::container::u8string_view s{};
         ::fast_io::unix_timestamp t0{};
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
         // `t0_success`: Only useful when exceptions are on, off exceptions directly crash the program.
         bool t0_success{true};
 #endif
@@ -54,13 +54,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 
         UWVM_GNU_COLD inline explicit timer(::uwvm2::utils::container::u8string_view strvw) noexcept : s{strvw}
         {
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
             try
 #endif
             {
                 t0 = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
             }
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
             {
 # ifdef UWVM
@@ -107,7 +107,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 
         UWVM_GNU_COLD inline ~timer()
         {
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
             if(!t0_success) [[unlikely]]
             {
                 // If the t0 fetch fails, processing is not continued to prevent outputting the wrong time.
@@ -118,13 +118,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
             // `t1` no initialization is required, even if subsequent exceptions are not used, there is no ub.
             ::fast_io::unix_timestamp t1;
 
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
             try
 #endif
             {
                 t1 = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
             }
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
             {
 # ifdef UWVM
@@ -165,13 +165,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 
             ::fast_io::iso8601_timestamp local_realtime{};
 
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
             try
 #endif
             {
                 local_realtime = ::fast_io::local(::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::realtime));
             }
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
             {
                 // do nothing

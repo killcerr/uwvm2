@@ -94,7 +94,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
         }
 
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
         try
 #endif
         {
@@ -105,7 +105,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
             // On platforms where CHAR_BIT is greater than 8, there is no need to clear the utf-8 non-low 8 bits here
             wf.wasm_file = ::fast_io::native_file_loader{load_file_name};
         }
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error e)
         {
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -229,7 +229,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                     }
 
-#if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
+#if defined(UWVM_CPP_EXCEPTIONS) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     try
 #endif
                     {
@@ -244,7 +244,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                                                               execute_wasm_binfmt_ver1_storage_wasm_err,
                                                                               wf.wasm_parameter.binfmt1_para);
                     }
-#if defined(__cpp_exceptions) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
+#if defined(UWVM_CPP_EXCEPTIONS) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     catch(::fast_io::error)
                     {
 # ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE

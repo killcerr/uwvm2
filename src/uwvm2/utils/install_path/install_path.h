@@ -46,13 +46,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::install_path
     inline ::fast_io::install_path get_module_install_path_noexcept() noexcept
     {
         ::fast_io::install_path ret{};
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
         try
 # endif
         {
             ret = ::fast_io::get_module_install_path();
         }
-# ifdef __cpp_exceptions
+# ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error)
         {
 #  ifdef UWVM

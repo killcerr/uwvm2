@@ -43,12 +43,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #ifdef UWVM_TERMINATE_IMME_WHEN_PARSE
         ::fast_io::fast_terminate();
 #else
-# ifdef __cpp_exceptions
-#  if defined(_MSC_VER) && (!defined(_HAS_EXCEPTIONS) || _HAS_EXCEPTIONS == 0)
-        ::fast_io::fast_terminate();
-#  else
+# ifdef UWVM_CPP_EXCEPTIONS
         throw ::fast_io::error{::fast_io::parse_domain_value, static_cast<::std::size_t>(static_cast<char8_t>(code))};
-#  endif
 # else
         ::fast_io::fast_terminate();
 # endif

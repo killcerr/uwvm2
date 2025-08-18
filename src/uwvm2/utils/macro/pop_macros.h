@@ -26,6 +26,8 @@
 // #pragma once
 
 /// @brief      uwvm's macros
+#pragma pop_macro("UWVM_CPP_EXCEPTIONS")
+#pragma pop_macro("UWVM_CPP_RTTI")
 #pragma pop_macro("UWVM_NO_SANITIZE")
 #pragma pop_macro("UWVM_HAS_FEATURE")
 #pragma pop_macro("UWVM_MUSTTAIL")

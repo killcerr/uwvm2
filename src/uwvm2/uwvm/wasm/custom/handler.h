@@ -103,7 +103,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
 
                 if(curr_custom_handler->second.is_imported_c)
                 {
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
                     try
 #endif
                     {
@@ -111,7 +111,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom
                         reinterpret_cast<imported_c_handlefunc_may_alias_ptr_t>(
                             curr_custom_handler->second.handler)(cs.custom_begin, reinterpret_cast<wasm_byte_const_may_alias_ptr>(cs.sec_span.sec_end));
                     }
-#ifdef __cpp_exceptions
+#ifdef UWVM_CPP_EXCEPTIONS
                     catch(...)
                     {
                         if(::uwvm2::uwvm::io::show_vm_warning)

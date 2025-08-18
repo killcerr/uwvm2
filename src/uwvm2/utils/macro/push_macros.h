@@ -510,3 +510,27 @@
 #else
 # define UWVM_NO_SANITIZE
 #endif
+
+#pragma push_macro("UWVM_CPP_RTTI")
+#undef UWVM_CPP_RTTI
+#if defined(_MSC_VER) && !defined(__clang__)
+#if __cpp_rtti >= 199711L && _HAS_RTTI != 0
+#define UWVM_CPP_RTTI
+#endif
+#else
+#if __cpp_rtti >= 199711L
+#define UWVM_CPP_RTTI
+#endif
+#endif
+
+#pragma push_macro("UWVM_CPP_EXCEPTIONS")
+#undef UWVM_CPP_EXCEPTIONS
+#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(UWVM_CPP_RTTI) && __cpp_exceptions >= 199711L && _HAS_EXCEPTIONS != 0
+#define UWVM_CPP_EXCEPTIONS
+#endif
+#else
+#if defined(UWVM_CPP_RTTI) && __cpp_exceptions >= 199711L
+#define UWVM_CPP_EXCEPTIONS
+#endif
+#endif
