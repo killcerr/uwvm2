@@ -35,8 +35,9 @@ module;
 export module uwvm2.uwvm.crtmain:uwvm;
 
 import fast_io;
-import uwvm2.uwvm.io;
 import uwvm2.utils.ansies;
+import uwvm2.utils.debug;
+import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.run;

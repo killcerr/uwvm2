@@ -35,8 +35,10 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
+# include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
+# include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include <uwvm2/parser/wasm_custom/customs/impl.h>
 # include <uwvm2/uwvm/wasm/base/impl.h>
 # include <uwvm2/uwvm/wasm/feature/impl.h>

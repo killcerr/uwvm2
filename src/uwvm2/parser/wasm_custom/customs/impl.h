@@ -24,5 +24,6 @@
 
 #ifndef UWVM_MODULE
 # include "name.h"
+# include "name_error.h"
 # include "name_error_output.h"
 #endif

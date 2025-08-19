@@ -24,6 +24,7 @@ module;
 
 export module uwvm2.parser.wasm_custom.customs;
 export import :name;
+export import :name_error;
 export import :name_error_output;
 
 #ifndef UWVM_MODULE

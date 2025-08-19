@@ -33,7 +33,6 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
-# include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/madvise/impl.h>
@@ -42,6 +41,7 @@
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>
 # include <uwvm2/parser/wasm/binfmt/base/impl.h>
+# include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/utils/memory/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>

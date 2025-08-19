@@ -47,6 +47,7 @@
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/section/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/opcode/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/const_expr/impl.h>
 # include <uwvm2/parser/wasm/binfmt/binfmt_ver1/impl.h>
 # include "def.h"
 # include "feature_def.h"

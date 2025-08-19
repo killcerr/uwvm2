@@ -34,6 +34,7 @@ module;
 #include <utility>
 #include <memory>
 #include <limits>
+#include <bit>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
@@ -48,6 +49,7 @@ import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.parser.wasm.standard.wasm1.section;
 import uwvm2.parser.wasm.standard.wasm1.opcode;
+import uwvm2.parser.wasm.standard.wasm1.const_expr;
 import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import :def;
 import :feature_def;

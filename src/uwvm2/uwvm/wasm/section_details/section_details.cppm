@@ -36,8 +36,10 @@ export module uwvm2.uwvm.wasm.section_details:section_details;
 
 import fast_io;
 import uwvm2.utils.container;
+import uwvm2.utils.debug;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard;
+import uwvm2.parser.wasm.binfmt.binfmt_ver1;
 import uwvm2.parser.wasm_custom.customs;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.feature;

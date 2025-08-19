@@ -34,10 +34,11 @@
 // import
 #ifndef UWVM_MODULE
 # include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
+# include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/utils/depend/impl.h>
-# include <uwvm2/utils/cmdline/impl.h>
 #endif
 
 namespace uwvm2::uwvm::cmdline::params::details
