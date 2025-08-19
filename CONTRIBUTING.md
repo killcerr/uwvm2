@@ -256,7 +256,6 @@ namespace A {
 
 ### Containers and strings
 - Prefer `uwvm2::utils::container::string` instead of `std::string` in core layers for deterministic behavior and portability.
-- Avoid `std::vector` and other heap-centric STL containers in freestanding code. If required in hosted layers, isolate the usage and document failure modes.
 
 ### Integers and character types
 - Default to `::std::size_t` for sizes and indices.
