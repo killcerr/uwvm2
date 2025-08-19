@@ -37,7 +37,8 @@
 # include <fast_io.h>
 # include <fast_io_crypto.h>
 # include <uwvm2/utils/container/impl.h>
-# include <uwvm2/utils/hash/xxh3.h>
+# include <uwvm2/utils/hash/impl.h>
+# include <uwvm2/utils/debug/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -295,7 +296,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 auto const val{xxh3.digest_value() % hash_size};
                 ++hash_size_array[val];
                 if(hash_size_array[val] > real_max_conflict_size) { real_max_conflict_size = hash_size_array[val]; }  // Record maximum conflict size
-                if(hash_size_array[val] == 2) { ++extra_size; }                                                       // Initiate additional conflict tables
+                if(hash_size_array[val] == 2uz) { ++extra_size; }                                                       // Initiate additional conflict tables
                 if(hash_size_array[val] > max_conflict_size) { c = true; }  // Maximum allowed conflict value exceeded, expanding hash_table
             }
 
@@ -318,6 +319,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
     template <::std::size_t real_max_conflict_size>
     struct conflict_table
     {
+        static_assert(real_max_conflict_size <= ::std::numeric_limits<::std::size_t>::max() - 1uz);
+
         // Add one, store the last nullptr, to reduce the number of judgments when looking up
         ::uwvm2::utils::container::array<ct_para_str, real_max_conflict_size + 1uz> ctmem{};
     };
@@ -399,8 +402,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                     // from being judged as having no content, leading to parsing failures.
 
                     // Setting the current content
-                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).para = j.para;
-                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1).str = j.str;
+                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1uz).para = j.para;
+                    res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1uz).str = j.str;
                     ++conflictplace;
                 }
             }
@@ -460,7 +463,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                         if(curr_conflict->str == str) { return curr_conflict->para; }
                         else if(curr_conflict->para == nullptr) [[unlikely]] { return nullptr; }
                     }
+
                     // If the above scenario is defined, there will never be a hit here.
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
                     ::std::unreachable();
                 }
                 else [[unlikely]]

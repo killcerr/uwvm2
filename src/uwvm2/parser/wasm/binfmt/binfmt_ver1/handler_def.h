@@ -34,12 +34,14 @@
 # include <type_traits>
 # include <utility>
 # include <vector>
+# include <initializer_list>
 # include <algorithm>
 # include <memory>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/hash/impl.h>
 # include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/text_format/impl.h>
@@ -218,6 +220,248 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         { details::check_extensible_section_is_series<Secs...>(); }(ret.sections);
 #endif
     }
+
+    /// @brief Sequential mapping table, mapping to 0 is any position
+    template <typename Ty>
+    concept has_section_id_sequential_mapping_table_define = requires(Ty const& ty) {
+        requires ::std::same_as<::std::remove_cvref_t<decltype(ty.section_id_sequential_mapping_table)>,
+                                ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte,
+                                                                 ::std::tuple_size_v<::std::remove_cvref_t<decltype(ty.sections)>>>>;
+    };
+
+    // Custom Section: compile-time name -> wasm_byte hash table
+    namespace details
+    {
+        using wasm_order_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
+
+        struct mapping_entry
+        {
+            ::uwvm2::utils::container::u8string_view name{};
+            wasm_order_t order{};
+        };
+
+        // Minimum hash table size exponent (2 ^ hash_size_base)
+        inline constexpr ::std::size_t hash_size_base{4uz};
+        // Expand when any bucket exceeds this conflict size
+        inline constexpr ::std::size_t max_conflict_size{8uz};
+
+        struct calculate_hash_table_size_res
+        {
+            ::std::size_t hash_table_size{};
+            ::std::size_t extra_size{};
+            ::std::size_t real_max_conflict_size{};
+        };
+
+        inline consteval calculate_hash_table_size_res calculate_hash_table_size(::std::initializer_list<mapping_entry> entries) noexcept
+        {
+            constexpr auto sizet_d10{static_cast<::std::size_t>(::std::numeric_limits<::std::size_t>::digits10)};
+
+            ::uwvm2::utils::hash::xxh3_64bits_context xxh3{};
+            for(auto i{hash_size_base}; i < sizet_d10; ++i)
+            {
+                ::std::size_t const hash_size{1uz << i};
+                bool need_expand{};
+                ::std::size_t extra_size{};
+                ::std::size_t real_max_conflict_size{};
+                ::std::size_t* const hash_size_array{::new ::std::size_t[hash_size]{}};
+                for(auto const& j: entries)
+                {
+                    ::std::size_t const j_str_size{j.name.size()};
+                    ::std::byte* const ptr{::new ::std::byte[j_str_size]{}};
+                    for(::std::size_t k{}; k < j_str_size; ++k) { ptr[k] = static_cast<::std::byte>(j.name.index_unchecked(k)); }
+                    xxh3.reset();
+                    xxh3.update(ptr, ptr + j_str_size);
+                    ::delete[] ptr;
+                    auto const val{xxh3.digest_value() % hash_size};
+                    ++hash_size_array[val];
+                    if(hash_size_array[val] > real_max_conflict_size) { real_max_conflict_size = hash_size_array[val]; }
+                    if(hash_size_array[val] == 2uz) { ++extra_size; }
+                    if(hash_size_array[val] > max_conflict_size) { need_expand = true; }
+                }
+
+                ::delete[] hash_size_array;
+                if(!need_expand) { return {hash_size, extra_size, real_max_conflict_size}; }
+            }
+            ::fast_io::fast_terminate();
+        }
+
+        struct ht_entry
+        {
+            ::uwvm2::utils::container::u8string_view name{};
+            wasm_order_t order{};  // 0 means empty/not-set
+        };
+
+        template <::std::size_t real_max_conflict_size>
+        struct conflict_table
+        {
+            static_assert(real_max_conflict_size <= ::std::numeric_limits<::std::size_t>::max() - 1uz);
+
+            // Add one sentinel slot at the end with order==0 to stop lookup loop
+            ::uwvm2::utils::container::array<mapping_entry, real_max_conflict_size + 1uz> ctmem{};
+        };
+
+        template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
+        struct hash_table
+        {
+            ::uwvm2::utils::container::array<ht_entry, hash_table_size> ht{};
+            ::std::conditional_t<static_cast<bool>(conflict_size),
+                                 ::uwvm2::utils::container::array<conflict_table<real_max_conflict_size>, conflict_size>,
+                                 ::std::in_place_t>
+                ct{};
+        };
+
+        template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
+        inline consteval auto generate_custom_section_sequential_mapping_table(::std::initializer_list<mapping_entry> entries) noexcept
+        {
+            hash_table<hash_table_size, conflict_size, real_max_conflict_size> res{};
+
+            ::uwvm2::utils::hash::xxh3_64bits_context xxh3{};
+            // conflictplace always 1 greater than its offset
+            ::std::size_t conflictplace{1uz};
+
+            for(auto const& j: entries)
+            {
+                ::std::size_t const j_str_size{j.name.size()};
+                ::std::byte* const ptr{::new ::std::byte[j_str_size]{}};
+                for(::std::size_t k{}; k < j_str_size; ++k) { ptr[k] = static_cast<::std::byte>(j.name.index_unchecked(k)); }
+                xxh3.reset();
+                xxh3.update(ptr, ptr + j_str_size);
+                ::delete[] ptr;
+                auto const val{xxh3.digest_value() % hash_table_size};
+
+                if constexpr(conflict_size)
+                {
+                    if(res.ht.index_unchecked(val).order == 0u)
+                    {
+                        if(!res.ht.index_unchecked(val).name.empty())
+                        {
+                            // Write a conflict table backward.
+                            for(auto& i: res.ct.index_unchecked(res.ht.index_unchecked(val).name.size() - 1uz).ctmem)
+                            {
+                                if(i.order == 0u)
+                                {
+                                    i.name = j.name;
+                                    i.order = j.order;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Without any conflict, this is the first
+                            res.ht.index_unchecked(val).name = j.name;
+                            res.ht.index_unchecked(val).order = j.order;
+                        }
+                    }
+                    else
+                    {
+                        // When a hash conflict occurs, move the original data to the conflict table.
+                        res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().name = res.ht.index_unchecked(val).name;
+                        res.ct.index_unchecked(conflictplace - 1uz).ctmem.front_unchecked().order = res.ht.index_unchecked(val).order;
+
+                        // Marking hash tables as having conflicting patterns
+                        res.ht.index_unchecked(val).order = 0;               // Mark this as no available
+                        res.ht.index_unchecked(val).name.ptr = nullptr;      // Mark this as no available
+                        res.ht.index_unchecked(val).name.n = conflictplace;  // Conflict Table Location
+
+                        // Setting the current content
+                        res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1uz).name = j.name;
+                        res.ct.index_unchecked(conflictplace - 1uz).ctmem.index_unchecked(1uz).order = j.order;
+                        ++conflictplace;
+                    }
+                }
+                else
+                {
+                    // No conflicts of any kind
+                    res.ht.index_unchecked(val).name = j.name;
+                    res.ht.index_unchecked(val).order = j.order;
+                }
+            }
+            return res;
+        }
+
+        template <::std::size_t hash_table_size, ::std::size_t conflict_size, ::std::size_t real_max_conflict_size>
+        inline constexpr wasm_order_t
+            find_from_custom_section_sequential_mapping_table(hash_table<hash_table_size, conflict_size, real_max_conflict_size> const& table,
+                                                              ::uwvm2::utils::container::u8string_view name) noexcept
+        {
+            ::uwvm2::utils::hash::xxh3_64bits_context xxh3{};
+
+            // calculate xxh3
+            if UWVM_IF_CONSTEVAL
+            {
+                auto const str_size{name.size()};
+                ::std::byte* const ptr{::new ::std::byte[str_size]{}};
+                for(::std::size_t k{}; k < str_size; ++k) { ptr[k] = static_cast<::std::byte>(name.index_unchecked(k)); }
+                xxh3.update(ptr, ptr + str_size);
+                ::delete[] ptr;
+            }
+            else
+            {
+                // Because the char8_t size is always equal to ::std::byte
+                static_assert(sizeof(char8_t) == sizeof(::std::byte));
+
+                auto const i{reinterpret_cast<::std::byte const*>(name.data())};
+                xxh3.update(i, i + name.size());
+            }
+
+            auto const val{xxh3.digest_value() % hash_table_size};
+            auto const htval{table.ht.index_unchecked(val)};
+
+            if constexpr(conflict_size)
+            {
+                if(htval.order == 0u)
+                {
+                    if(!htval.name.empty()) [[likely]]
+                    {
+                        // Get Conflict Table
+                        // htval.name.size() is created at compile time and is always greater than or equal to 1
+                        // Note: htval.name.size() is always 1 greater than its offset
+                        // index == htval.name.size() - 1uz
+                        auto const& ct{table.ct.index_unchecked(htval.name.size() - 1uz).ctmem};
+
+                        // Conflict table is always the last one is order==0, here no longer judge cend, improve speed
+                        for(auto curr_conflict{ct.cbegin()};; ++curr_conflict)
+                        {
+                            if(curr_conflict->name == name) { return curr_conflict->order; }
+                            else if(curr_conflict->order == 0u) [[unlikely]] { return static_cast<wasm_order_t>(0u); }
+                        }
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+
+                        ::std::unreachable();
+                    }
+                    else [[unlikely]]
+                    {
+                        return static_cast<wasm_order_t>(0u);
+                    }
+                }
+                else
+                {
+                    if(name == htval.name) [[likely]] { return htval.order; }
+                    else [[unlikely]]
+                    {
+                        return static_cast<wasm_order_t>(0u);
+                    }
+                }
+            }
+            else
+            {
+                if(name == htval.name) [[likely]] { return htval.order; }
+                else [[unlikely]]
+                {
+                    return static_cast<wasm_order_t>(0u);
+                }
+            }
+        }
+    }  // namespace details
+
+    /// @brief Custom Section: compile-time name -> wasm_byte hash table
+    template <typename Ty>
+    concept has_custom_section_sequential_mapping_table_define =
+        requires(Ty const& ty) { details::find_from_custom_section_sequential_mapping_table(ty.custom_section_sequential_mapping_table, {}); };
 }
 
 #ifndef UWVM_MODULE

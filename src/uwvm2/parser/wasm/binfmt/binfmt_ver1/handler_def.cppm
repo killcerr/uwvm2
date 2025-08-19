@@ -33,6 +33,7 @@ module;
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <initializer_list>
 #include <algorithm>
 #include <memory>
 // macro
