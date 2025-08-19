@@ -22,11 +22,42 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <climits>
+#include <concepts>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <algorithm>
+#include <memory>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+
+export module uwvm2.parser.wasm.binfmt.binfmt_ver1:handler;
+
+import fast_io;
+import uwvm2.utils.utf;
+import uwvm2.utils.container;
+import uwvm2.parser.wasm.text_format;
+import uwvm2.parser.wasm.base;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.standard.wasm1.type;
+import uwvm2.parser.wasm.standard.wasm1.section;
+import uwvm2.parser.wasm.binfmt.base;
+import :section;
+import :def;
+import :handler_def;
 
 #ifndef UWVM_MODULE
-# include "section.h"
-# include "def.h"
-# include "handler_def.h"
-# include "handler.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "handler.h"
