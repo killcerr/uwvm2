@@ -280,14 +280,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                     ::delete[] ptr;
                     auto const val{xxh3.digest_value() % hash_size};
                     ++hash_size_array[val];
-                    if(hash_size_array[val] > real_max_conflict_size) { real_max_conflict_size = hash_size_array[val]; }
-                    if(hash_size_array[val] == 2uz) { ++extra_size; }
-                    if(hash_size_array[val] > max_conflict_size) { need_expand = true; }
+                    if(hash_size_array[val] > real_max_conflict_size) { real_max_conflict_size = hash_size_array[val]; }  // Record maximum conflict size
+                    if(hash_size_array[val] == 2uz) { ++extra_size; }                                                     // Initiate additional conflict tables
+                    if(hash_size_array[val] > max_conflict_size) { need_expand = true; }  // Maximum allowed conflict value exceeded, expanding hash_table
                 }
 
                 ::delete[] hash_size_array;
                 if(!need_expand) { return {hash_size, extra_size, real_max_conflict_size}; }
             }
+            
+            // The conflict size has not been able to stay within the maximum conflict size, try changing the initial seed.
+            // The consteval function reports an error if the memory is not properly freed.
             ::fast_io::fast_terminate();
         }
 

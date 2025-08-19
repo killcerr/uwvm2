@@ -281,7 +281,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         for(auto i{hash_size_base}; i < sizet_d10; ++i)
         {
             ::std::size_t const hash_size{1uz << i};
-            bool c{};
+            bool need_expand{};
             ::std::size_t extra_size{};
             ::std::size_t real_max_conflict_size{};
             ::std::size_t* const hash_size_array{::new ::std::size_t[hash_size]{}};
@@ -301,7 +301,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             }
 
             ::delete[] hash_size_array;
-            if(!c) { return {hash_size, extra_size, real_max_conflict_size}; }
+            if(!need_expand) { return {hash_size, extra_size, real_max_conflict_size}; }
         }
         // The conflict size has not been able to stay within the maximum conflict size, try changing the initial seed.
         // The consteval function reports an error if the memory is not properly freed.
