@@ -673,6 +673,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_init_const_expr_ref_mutable_imported_global.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_custom_section_order:
+            {
+#include "error_code_outputs/eco_illegal_custom_section_order.h"
+                return;
+            }
         }
     }
 }

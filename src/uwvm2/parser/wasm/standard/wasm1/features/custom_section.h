@@ -72,7 +72,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
-        [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t & wasm_order,
+        ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
         [[maybe_unused]] ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
@@ -145,6 +145,39 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                                    ^^ section_curr
 
         cs.custom_name = ::uwvm2::utils::container::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr), name_len};
+
+        // check custom order
+        if constexpr(::uwvm2::parser::wasm::binfmt::ver1::has_custom_section_sequential_mapping_table_define<Fs...>)
+        {
+            constexpr auto& custom_order_sec_id_hash_table{
+                ::uwvm2::parser::wasm::binfmt::ver1::final_section_sequential_packer_t<Fs...>::custom_section_sequential_mapping_table};
+            auto const curr_section_order{
+                ::uwvm2::parser::wasm::binfmt::ver1::details::find_from_custom_section_sequential_mapping_table(custom_order_sec_id_hash_table,
+                                                                                                                cs.custom_name)};
+
+            if(curr_section_order != 0u)
+            {
+                // There is no need to check for duplicate (sec_id <= max_section_id) sections here,
+                // duplicate sections are checked inside the section parsing.
+
+                if(curr_section_order < wasm_order) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    // Enter the original section ID here for easy identification.
+                    err.err_selectable.illegal_custom_section_order.custom_name = cs.custom_name;
+                    err.err_selectable.illegal_custom_section_order.custom_order = curr_section_order;
+                    err.err_selectable.illegal_custom_section_order.wasm_order = wasm_order;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_custom_section_order;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                wasm_order = curr_section_order;
+            }
+        }
+
+        // [before_section ... | name_len ... name ...] custom_begin ...
+        // [               safe                       ] unsafe (could be the section_end)
+        //                                    ^^ section_curr
 
         section_curr += name_len;
         // [before_section ... | name_len ... name ...] custom_begin ...
@@ -219,7 +252,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             else if constexpr(::std::same_as<char_type, char8_t>)
             {
                 // No need to convert to UTF-8
-                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), u8" - custom (", curr_custom_name, u8"): size = ", curr_custom_size);
+                ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream),
+                                                                u8" - custom (",
+                                                                curr_custom_name,
+                                                                u8"): size = ",
+                                                                curr_custom_size);
             }
             else if constexpr(::std::same_as<char_type, char16_t>)
             {

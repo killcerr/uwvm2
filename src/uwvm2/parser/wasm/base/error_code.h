@@ -163,7 +163,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         init_const_expr_stack_empty,
         init_const_expr_illegal_data,
         init_const_expr_ref_illegal_imported_global,
-        init_const_expr_ref_mutable_imported_global
+        init_const_expr_ref_mutable_imported_global,
+        illegal_custom_section_order
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type
@@ -225,6 +226,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::std::uint_least32_t maxval;
     };
 
+    /// @brief Used to set the output of illegal_custom_section_order errors
+    struct illegal_custom_section_order_t
+    {
+        ::uwvm2::utils::container::u8string_view custom_name;
+        ::std::uint_least8_t custom_order;
+        ::std::uint_least8_t wasm_order;
+    };
+
     /// @brief define IEEE 754 F32 and F64
 #ifdef __STDCPP_FLOAT32_T__
     using error_f32 = ::std::float32_t;  // IEEE 754-2008
@@ -264,6 +273,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
                       ::std::is_trivially_destructible_v<elem_table_index_exceeds_maxvul_t>);
         elem_func_index_exceeds_maxvul_t elem_func_index_exceeds_maxvul;
         static_assert(::std::is_trivially_copyable_v<elem_func_index_exceeds_maxvul_t> && ::std::is_trivially_destructible_v<elem_func_index_exceeds_maxvul_t>);
+        illegal_custom_section_order_t illegal_custom_section_order;
+        static_assert(::std::is_trivially_copyable_v<illegal_custom_section_order_t> && ::std::is_trivially_destructible_v<illegal_custom_section_order_t>);
 
         ::std::byte const* err_end;
         ::std::size_t err_uz;

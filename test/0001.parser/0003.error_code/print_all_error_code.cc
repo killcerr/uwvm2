@@ -55,7 +55,7 @@ int main()
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
         for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::init_const_expr_ref_mutable_imported_global) + 1u;
+            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_custom_section_order) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -109,6 +109,13 @@ int main()
                 {
                     errout.err.err_selectable.elem_func_index_exceeds_maxvul.idx = 114514;
                     errout.err.err_selectable.elem_func_index_exceeds_maxvul.maxval = 1919810;
+                    break;
+                }
+                case ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_custom_section_order:
+                {
+                    errout.err.err_selectable.illegal_custom_section_order.custom_name = u8"custom_name";
+                    errout.err.err_selectable.illegal_custom_section_order.custom_order = 0u;
+                    errout.err.err_selectable.illegal_custom_section_order.wasm_order = 0u;
                     break;
                 }
                 default:

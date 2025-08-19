@@ -332,12 +332,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
                 ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t order_sec_id;  // No initialization necessary
 
-                if constexpr(::uwvm2::parser::wasm::binfmt::ver1::has_section_id_sequential_mapping_table_define<
-                                 ::uwvm2::parser::wasm::binfmt::ver1::final_section_sequential_packer_feature_t<Fs...>,
-                                 Fs...>)
+                if constexpr(::uwvm2::parser::wasm::binfmt::ver1::has_section_id_sequential_mapping_table_define<Fs...>)
                 {
                     constexpr auto& order_sec_id_table{
-                        ::uwvm2::parser::wasm::binfmt::ver1::final_section_sequential_packer_feature_t<Fs...>::section_id_sequential_mapping_table};
+                        ::uwvm2::parser::wasm::binfmt::ver1::final_section_sequential_packer_t<Fs...>::section_id_sequential_mapping_table};
                     constexpr auto order_sec_id_table_size{order_sec_id_table.size()};
                     if(sec_id >= order_sec_id_table_size) [[unlikely]] { order_sec_id = 0u; }
                     else

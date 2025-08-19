@@ -58,6 +58,7 @@
 # include "element_section.h"
 # include "code_section.h"
 # include "data_section.h"
+# include "sequence.h"
 # include "final_check.h"
 #endif
 
@@ -128,6 +129,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         using final_check = ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
                                                                                       ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_final_check>;
 
+        // order
+        using section_sequential_packer =
+            ::uwvm2::parser::wasm::concepts::operation::type_replacer<::uwvm2::parser::wasm::concepts::operation::root_of_replacement,
+                                                                      ::uwvm2::parser::wasm::standard::wasm1::features::wasm1_sequence_storage_t>;
+
+        // section
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
         using binfmt_ver1_section_type = ::uwvm2::utils::container::tuple<::uwvm2::parser::wasm::standard::wasm1::features::custom_section_storage_t,
                                                                           ::uwvm2::parser::wasm::standard::wasm1::features::type_section_storage_t<Fs...>,
@@ -176,6 +183,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     // binfmt ver1
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_final_check<wasm1>);
     static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_binfmt_ver1_extensible_section_define<wasm1>);
+
+    // order
+    static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_section_sequential_packer<wasm1>);
+    static_assert(!::uwvm2::parser::wasm::binfmt::ver1::has_section_id_sequential_mapping_table_define<wasm1>);
+    static_assert(::uwvm2::parser::wasm::binfmt::ver1::has_custom_section_sequential_mapping_table_define<wasm1>);
 
     // Stronger MVP invariants (WebAssembly 1.0):
     // - Disallow multiple results in function types
