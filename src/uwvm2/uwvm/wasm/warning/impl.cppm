@@ -33,7 +33,7 @@ export import :export_section;
 export import :start_section;
 export import :element_section;
 export import :code_section;
-export import :data_section;    
+export import :data_section;
 export import :custom_section;
 export import :final_check;
 export import :binfmt_ver1;

@@ -34,7 +34,6 @@ module;
 export module uwvm2.uwvm.run:run;
 
 import fast_io;
-import uwvm2.uwvm.io;
 import uwvm2.utils.ansies;
 import uwvm2.utils.debug;
 import uwvm2.utils.madvise;
@@ -42,6 +41,7 @@ import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard;
 import uwvm2.parser.wasm.binfmt.base;
+import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.utils.memory;
 import uwvm2.uwvm.cmdline;

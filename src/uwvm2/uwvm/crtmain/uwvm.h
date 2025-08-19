@@ -41,7 +41,7 @@
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/run/impl.h>
-# include "global/impl.h"
+# include <uwvm2/uwvm/crtmain/global/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

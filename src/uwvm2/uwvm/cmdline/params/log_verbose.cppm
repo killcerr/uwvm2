@@ -34,8 +34,8 @@ import fast_io;
 import uwvm2.utils.container;
 import uwvm2.utils.cmdline;
 import uwvm2.utils.ansies;
-import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.io;
+import uwvm2.uwvm.utils.ansies;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

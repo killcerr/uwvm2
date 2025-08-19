@@ -33,6 +33,7 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/impl.h>
 # include "value_type.h"
 #endif
 

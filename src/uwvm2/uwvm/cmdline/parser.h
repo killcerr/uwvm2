@@ -40,7 +40,7 @@
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
-# include "params/impl.h"
+# include <uwvm2/uwvm/cmdline/params/impl.h>
 # include "params.h"
 #endif
 

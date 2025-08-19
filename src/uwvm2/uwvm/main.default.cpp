@@ -27,7 +27,7 @@
 #include <uwvm2/utils/macro/push_macros.h>
 #ifndef UWVM_MODULE
 // import
-# include "crtmain/impl.h"
+# include <uwvm2/uwvm/crtmain/impl.h>
 #endif
 
 /// @brief      (crt) main func. The main function is a special function, but there are still meaningless [[gnu::used]].

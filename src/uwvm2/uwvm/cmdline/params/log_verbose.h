@@ -33,8 +33,8 @@
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
-# include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
+# include <uwvm2/uwvm/utils/ansies/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

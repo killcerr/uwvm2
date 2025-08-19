@@ -50,8 +50,8 @@ module;
 export module uwvm2.parser.wasm.standard.wasm1.features:function_section;
 
 import fast_io;
-import uwvm2.utils.container;
 import uwvm2.utils.debug;
+import uwvm2.utils.container;
 import uwvm2.utils.intrinsics;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.utils;

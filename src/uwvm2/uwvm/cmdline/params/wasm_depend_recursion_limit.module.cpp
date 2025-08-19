@@ -33,5 +33,4 @@ import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.storage;
 import uwvm2.uwvm.wasm.loader;
 
-
 #include "wasm_depend_recursion_limit.default.cpp"

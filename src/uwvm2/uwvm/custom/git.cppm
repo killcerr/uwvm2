@@ -31,6 +31,7 @@ export module uwvm2.uwvm.custom:git;
 export import uwvm2.utils.version;  // print defined method should be export
 import fast_io;
 import uwvm2.utils.container;
+import uwvm2.utils.version;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

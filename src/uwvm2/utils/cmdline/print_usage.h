@@ -30,8 +30,8 @@
 # include <new>
 # include <memory>
 // macro
-# include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
@@ -103,6 +103,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
 
 #ifndef UWVM_MODULE
 // macro
-# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
 #endif

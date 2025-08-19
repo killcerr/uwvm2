@@ -35,7 +35,7 @@
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm_custom/impl.h>
-# include "customs/impl.h"
+# include <uwvm2/uwvm/wasm/custom/customs/impl.h>
 # include "handler.h"
 #endif
 
