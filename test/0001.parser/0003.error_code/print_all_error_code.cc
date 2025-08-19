@@ -116,6 +116,7 @@ int main()
                     errout.err.err_selectable.illegal_custom_section_order.custom_name = u8"custom_name";
                     errout.err.err_selectable.illegal_custom_section_order.custom_order = 0u;
                     errout.err.err_selectable.illegal_custom_section_order.wasm_order = 0u;
+                    errout.err.err_selectable.illegal_custom_section_order.wasm_sec = 0u;
                     break;
                 }
                 default:

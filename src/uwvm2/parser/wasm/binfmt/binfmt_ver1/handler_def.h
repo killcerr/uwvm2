@@ -64,6 +64,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
     using wasm_order_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
 
+    struct max_section_id_map_sec_id_t
+    {
+        wasm_order_t max_section_id{};
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_section_id_map_sec_id{};
+    };
+
     template <typename Sec, typename... Fs>
     concept has_handle_binfmt_ver1_extensible_section_define =
         requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec>> ref,
@@ -72,7 +78,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                  ::std::byte const* const section_end,
                  ::uwvm2::parser::wasm::base::error_impl& err,
                  ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
-                 wasm_order_t& wasm_order,
+                 max_section_id_map_sec_id_t& wasm_order,
                  ::std::byte const* const sec_id_module_ptr) {
             {
                 handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, fs_para, wasm_order, sec_id_module_ptr)
@@ -498,8 +504,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 
     /// @brief Custom Section: compile-time name -> wasm_byte hash table
     template <typename... Fs>
-    concept has_custom_section_sequential_mapping_table_define =
-        requires { details::find_from_custom_section_sequential_mapping_table(final_section_sequential_packer_t<Fs...>::custom_section_sequential_mapping_table, {}); };
+    concept has_custom_section_sequential_mapping_table_define = requires {
+        details::find_from_custom_section_sequential_mapping_table(final_section_sequential_packer_t<Fs...>::custom_section_sequential_mapping_table, {});
+    };
 }
 
 #ifndef UWVM_MODULE

@@ -232,6 +232,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         ::uwvm2::utils::container::u8string_view custom_name;
         ::std::uint_least8_t custom_order;
         ::std::uint_least8_t wasm_order;
+        ::std::uint_least8_t wasm_sec;
     };
 
     /// @brief define IEEE 754 F32 and F64

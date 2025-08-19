@@ -44,7 +44,7 @@ namespace csdt = ::uwvm2::parser::wasm::binfmt::ver1::details;
 // Test subject that exposes the required member for concept checking
 struct custom_section_test_holder
 {
-    using wasm_order_t = csdt::wasm_order_t;
+    using wasm_order_t = ver1::wasm_order_t;
 
     inline static constexpr ::std::initializer_list<csdt::mapping_entry> custom_section_sequential_mapping_table_entries{
         {u8"section1", 1},
@@ -60,19 +60,16 @@ struct custom_section_test_holder
             custom_section_sequential_mapping_table_entries);
 };
 
-// 1) Concept test
-static_assert(has_custom_section_sequential_mapping_table_define<custom_section_test_holder>);
-
-// 2) Compile-time generation and lookup tests
+// 1) Compile-time generation and lookup tests
 static_assert(csdt::find_from_custom_section_sequential_mapping_table(custom_section_test_holder::custom_section_sequential_mapping_table, u8"section1") == 1u);
 static_assert(csdt::find_from_custom_section_sequential_mapping_table(custom_section_test_holder::custom_section_sequential_mapping_table, u8"section2") == 2u);
 static_assert(csdt::find_from_custom_section_sequential_mapping_table(custom_section_test_holder::custom_section_sequential_mapping_table, u8"section3") == 3u);
 static_assert(csdt::find_from_custom_section_sequential_mapping_table(custom_section_test_holder::custom_section_sequential_mapping_table, u8"sectionX") == 0u);
 
-// 3) Runtime lookup tests
+// 2) Runtime lookup tests
 int main()
 {
-    using wasm_order_t = csdt::wasm_order_t;
+    using wasm_order_t = ver1::wasm_order_t;
     auto const& table = custom_section_test_holder::custom_section_sequential_mapping_table;
 
     auto const v1{csdt::find_from_custom_section_sequential_mapping_table(table, u8"section1")};

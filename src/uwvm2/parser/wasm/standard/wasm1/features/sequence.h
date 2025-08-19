@@ -58,23 +58,28 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 {
-    struct wasm1_sequence_storage_t 
+    struct wasm1_sequence_storage_t
     {
         // custom order
+
+        // The name section should appear only once in a module, and only after the data section.
+        // After the data section is checked by the parser.
+        // appear only once in a module is checked by the custom name parser.
+
         inline static constexpr ::std::initializer_list<::uwvm2::parser::wasm::binfmt::ver1::details::mapping_entry>
             custom_section_sequential_mapping_table_entries{
-                {u8"name", 12}
+                {u8"name", 12u}
         };
+
         inline static constexpr auto custom_section_sequential_mapping_table_size{
             ::uwvm2::parser::wasm::binfmt::ver1::details::calculate_hash_table_size(custom_section_sequential_mapping_table_entries)};
+
         inline static constexpr auto custom_section_sequential_mapping_table{
             ::uwvm2::parser::wasm::binfmt::ver1::details::generate_custom_section_sequential_mapping_table<
                 custom_section_sequential_mapping_table_size.hash_table_size,
                 custom_section_sequential_mapping_table_size.extra_size,
                 custom_section_sequential_mapping_table_size.real_max_conflict_size>(custom_section_sequential_mapping_table_entries)};
     };
-
-    
 }
 
 #ifndef UWVM_MODULE

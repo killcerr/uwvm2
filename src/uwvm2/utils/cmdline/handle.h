@@ -296,7 +296,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
                 auto const val{xxh3.digest_value() % hash_size};
                 ++hash_size_array[val];
                 if(hash_size_array[val] > real_max_conflict_size) { real_max_conflict_size = hash_size_array[val]; }  // Record maximum conflict size
-                if(hash_size_array[val] == 2uz) { ++extra_size; }                                                       // Initiate additional conflict tables
+                if(hash_size_array[val] == 2uz) { ++extra_size; }                                                     // Initiate additional conflict tables
                 if(hash_size_array[val] > max_conflict_size) { c = true; }  // Maximum allowed conflict value exceeded, expanding hash_table
             }
 

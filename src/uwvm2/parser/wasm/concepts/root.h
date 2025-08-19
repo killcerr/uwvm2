@@ -62,7 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
     struct feature_reserve_type_t
     {
         using feature_type = FeatureType;
-        
+
         static_assert(::std::is_same_v<::std::remove_cvref_t<FeatureType>, FeatureType>,
                       "feature_reserve_type_t: typename 'FeatureType' cannot have refer and const attributes");
         explicit constexpr feature_reserve_type_t() noexcept = default;

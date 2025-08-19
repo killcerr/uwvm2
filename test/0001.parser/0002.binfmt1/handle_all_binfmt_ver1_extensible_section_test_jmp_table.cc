@@ -66,7 +66,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test0\n");
@@ -89,7 +89,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test1\n");
@@ -121,7 +121,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test2\n");
@@ -143,7 +143,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test3\n");
@@ -165,7 +165,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test4\n");
@@ -187,7 +187,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test5\n");
@@ -209,7 +209,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test6\n");
@@ -231,7 +231,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test7\n");
@@ -253,7 +253,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test8\n");
@@ -275,7 +275,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test9\n");
@@ -297,7 +297,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test10\n");
@@ -319,7 +319,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test11\n");
@@ -341,7 +341,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test12\n");
@@ -363,7 +363,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test13\n");
@@ -385,7 +385,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test14\n");
@@ -407,7 +407,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test15\n");
@@ -429,7 +429,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test16\n");
@@ -451,7 +451,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test17\n");
@@ -473,7 +473,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test18\n");
@@ -495,7 +495,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test19\n");
@@ -517,7 +517,7 @@ GNU_NOINLINE inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
-    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test20\n");
@@ -577,6 +577,8 @@ int main(int argc, char**)
 
     wasm_binfmt_ver1_module_storage_t wasm_module1{};
 
+    ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t wasm_order{};
+
     ::uwvm2::parser::wasm::base::error_impl e{};
 
     ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output, u8"sec", argc, u8":\n");
@@ -588,6 +590,7 @@ int main(int argc, char**)
                                                                                        nullptr,
                                                                                        e,
                                                                                        wasm_binfmt1_feature_parameter,
+                                                                                       wasm_order,
                                                                                        nullptr);
     }
     catch(::fast_io::error e)

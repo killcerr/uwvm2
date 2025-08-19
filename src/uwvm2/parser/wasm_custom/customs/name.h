@@ -75,6 +75,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
         ::uwvm2::utils::debug::timer parsing_timer{u8"parse custom section: name"};
 #endif
 
+        // The name section should appear only once in a module, and only after the data section.
+        // Here, check that only one remains.
+        // After the data section is checked by the parser.
+
         // The name section should appear only once in a module
 
         if(ns.has_analyzed)

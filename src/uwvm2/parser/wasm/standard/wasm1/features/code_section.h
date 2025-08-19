@@ -91,7 +91,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         ::std::byte const* const section_end,
         ::uwvm2::parser::wasm::base::error_impl& err,
         [[maybe_unused]] ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
-        [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t & wasm_order,
+        [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::max_section_id_map_sec_id_t& wasm_order,
         ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
 #ifdef UWVM_TIMER
