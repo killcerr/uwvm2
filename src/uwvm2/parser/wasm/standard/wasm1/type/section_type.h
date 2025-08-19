@@ -29,6 +29,7 @@
 # include <concepts>
 # include <bit>
 # include <limits>
+# include <type_traits>
 // macro
 # include <uwvm2/parser/wasm/feature/feature_push_macro.h>
 // import

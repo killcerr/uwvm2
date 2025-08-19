@@ -348,6 +348,10 @@ using ::fast_io::win32_timestamp;
 using ::fast_io::csharp_timestamp;
 using ::fast_io::year0_timestamp;
 using ::fast_io::universe_timestamp;
+using ::fast_io::iso8601_timestamp;
+
+using ::fast_io::local;
+using ::fast_io::utc;
 
 using ::fast_io::operator==;
 using ::fast_io::operator!=;

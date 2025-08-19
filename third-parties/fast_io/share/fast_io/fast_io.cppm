@@ -7,6 +7,9 @@
 #include <fast_io_dsal/vector.h>
 #include <fast_io_dsal/string_view.h>
 #include <fast_io_dsal/string.h>
+#include <fast_io_dsal/list.h>
+#include <fast_io_dsal/queue.h>
+#include <fast_io_dsal/stack.h>
 
 #if !(((__STDC_HOSTED__ == 1 && (!defined(_GLIBCXX_HOSTED) || _GLIBCXX_HOSTED == 1) && !defined(_LIBCPP_FREESTANDING)) ||                                      \
        defined(FAST_IO_ENABLE_HOSTED_FEATURES)))
@@ -50,6 +53,9 @@ containers
 #include "fast_io_inc/dsal/vector.inc"
 #include "fast_io_inc/dsal/string_view.inc"
 #include "fast_io_inc/dsal/string.inc"
+#include "fast_io_inc/dsal/list.inc"
+#include "fast_io_inc/dsal/queue.inc"
+#include "fast_io_inc/dsal/stack.inc"
 
 /*
 details

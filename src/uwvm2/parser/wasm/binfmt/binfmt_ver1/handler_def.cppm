@@ -42,6 +42,7 @@ module;
 export module uwvm2.parser.wasm.binfmt.binfmt_ver1:handler_def;
 
 import fast_io;
+import uwvm2.utils.hash;
 import uwvm2.utils.utf;
 import uwvm2.utils.container;
 import uwvm2.parser.wasm.text_format;
