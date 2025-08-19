@@ -20,8 +20,6 @@
  *                                      *
  ****************************************/
 
-#include "wasm_depend_recursion_limit.h"
-
 // std
 #include <cstddef>
 #include <cstdint>
@@ -35,10 +33,16 @@
 #ifndef UWVM_MODULE
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
+# include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/utils/depend/impl.h>
+# include <uwvm2/uwvm/cmdline/impl.h>
+# include <uwvm2/uwvm/cmdline/params/impl.h>
+# include <uwvm2/uwvm/wasm/base/impl.h>
+# include <uwvm2/uwvm/wasm/storage/impl.h>
+# include <uwvm2/uwvm/wasm/loader/impl.h>
 #endif
 
 namespace uwvm2::uwvm::cmdline::params::details
