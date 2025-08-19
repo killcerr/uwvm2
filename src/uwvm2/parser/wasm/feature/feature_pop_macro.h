@@ -22,10 +22,5 @@
 
 // #pragma once
 
-#pragma pop_macro("UWVM_WASM_SUPPORT_FP128")
-#pragma pop_macro("UWVM_WASM_SUPPORT_BF16")
-#pragma pop_macro("UWVM_WASM_SUPPORT_FP16")
-
-#pragma pop_macro("UWVM_WASM_SUPPORT_WASM3")
-#pragma pop_macro("UWVM_WASM_SUPPORT_WASM2")
+/// @todo add more features here
 #pragma pop_macro("UWVM_WASM_SUPPORT_WASM1")

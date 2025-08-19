@@ -26,28 +26,4 @@
 #undef UWVM_WASM_SUPPORT_WASM1
 #define UWVM_WASM_SUPPORT_WASM1
 
-#pragma push_macro("UWVM_WASM_SUPPORT_WASM2")
-#undef UWVM_WASM_SUPPORT_WASM2
-#define UWVM_WASM_SUPPORT_WASM2
-
-#pragma push_macro("UWVM_WASM_SUPPORT_WASM3")
-#undef UWVM_WASM_SUPPORT_WASM3
-#define UWVM_WASM_SUPPORT_WASM3
-
-#pragma push_macro("UWVM_WASM_SUPPORT_FP16")
-#undef UWVM_WASM_SUPPORT_FP16
-#if defined(__SIZEOF_FLOAT16__) || defined(__FLOAT16__)
-# define UWVM_WASM_SUPPORT_FP16
-#endif
-
-#pragma push_macro("UWVM_WASM_SUPPORT_BF16")
-#undef UWVM_WASM_SUPPORT_BF16
-#if defined(__STDCPP_BFLOAT16_T__)
-# define UWVM_WASM_SUPPORT_BF16
-#endif
-
-#pragma push_macro("UWVM_WASM_SUPPORT_FP128")
-#undef UWVM_WASM_SUPPORT_FP128
-#if defined(__SIZEOF_FLOAT128__) || defined(__FLOAT128__)
-# define UWVM_WASM_SUPPORT_FP128
-#endif
+/// @todo add more features here
