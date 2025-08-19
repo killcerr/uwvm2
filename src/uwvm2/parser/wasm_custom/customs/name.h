@@ -100,9 +100,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm_custom::customs
         // [safe] unsafe (could be the end)
         //        ^^ curr
 
-        // "Only after the data section" is the transition check for the WASM 1.0 standard, and to my knowledge, even after adding the data count and tag
-        // section in WASM 3.0, this has not been changed. Therefore, no check is performed here.
-
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_section_id{};
 
         while(curr != end)

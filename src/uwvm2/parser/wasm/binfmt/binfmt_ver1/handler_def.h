@@ -62,6 +62,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 {
     // size of char8_t is equal to the size of ::std::byte.
 
+    using wasm_order_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
+
     template <typename Sec, typename... Fs>
     concept has_handle_binfmt_ver1_extensible_section_define =
         requires(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<::std::remove_cvref_t<Sec>> ref,
@@ -70,24 +72,25 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                  ::std::byte const* const section_end,
                  ::uwvm2::parser::wasm::base::error_impl& err,
                  ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+                 wasm_order_t& wasm_order,
                  ::std::byte const* const sec_id_module_ptr) {
             {
-                handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, fs_para, sec_id_module_ptr)
+                handle_binfmt_ver1_extensible_section_define(ref, module_storage, section_begin, section_end, err, fs_para, wasm_order, sec_id_module_ptr)
             } -> ::std::same_as<void>;
         };
 
     /// @see WebAssembly Release 1.0 (2019-07-20) § 5.5.2
-    template <typename Ty>
+    template <typename Sec>
     concept has_section_id_define =
-        requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_id)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>; };
+        requires { requires std::same_as<std::remove_cvref_t<decltype(Sec::section_id)>, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>; };
 
-    template <typename Ty>
+    template <typename Sec>
     concept has_section_name_define =
-        requires { requires std::same_as<std::remove_cvref_t<decltype(Ty::section_name)>, ::uwvm2::utils::container::u8string_view>; };
+        requires { requires std::same_as<std::remove_cvref_t<decltype(Sec::section_name)>, ::uwvm2::utils::container::u8string_view>; };
 
-    template <typename Ty, typename... Fs>
+    template <typename Sec, typename... Fs>
     concept has_section_id_and_handle_binfmt_ver1_extensible_section_define =
-        has_handle_binfmt_ver1_extensible_section_define<Ty, Fs...> && has_section_id_define<Ty>;
+        has_handle_binfmt_ver1_extensible_section_define<Sec, Fs...> && has_section_id_define<Sec>;
 
     /// @brief      has final_check type
     /// @details
@@ -166,6 +169,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             return max;
         }
 
+        template <typename... Sec>
+        inline consteval ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte
+            generate_section_max_id_from_tuple(::uwvm2::utils::container::tuple<Sec...> const&) noexcept
+        {
+            return generate_section_max_id<Sec...>();
+        }
+
         template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
         inline consteval double generate_section_probability_from_Fs() noexcept
         {
@@ -221,19 +231,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
 #endif
     }
 
-    /// @brief Sequential mapping table, mapping to 0 is any position
-    template <typename Ty>
-    concept has_section_id_sequential_mapping_table_define = requires(Ty const& ty) {
-        requires ::std::same_as<::std::remove_cvref_t<decltype(ty.section_id_sequential_mapping_table)>,
-                                ::uwvm2::utils::container::array<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte,
-                                                                 ::std::tuple_size_v<::std::remove_cvref_t<decltype(ty.sections)>>>>;
-    };
-
     // Custom Section: compile-time name -> wasm_byte hash table
     namespace details
     {
-        using wasm_order_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
-
         struct mapping_entry
         {
             ::uwvm2::utils::container::u8string_view name{};
@@ -458,10 +458,73 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
         }
     }  // namespace details
 
+    /// @brief Package and replace features, select the final features for section sequential processing.
+    template <::uwvm2::parser::wasm::concepts::wasm_feature CurrFeature>
+    struct section_sequential_packer_t
+    {
+        using curr_feature = CurrFeature;
+        using curr_feature_reserve_t = ::uwvm2::parser::wasm::concepts::feature_reserve_type_t<curr_feature>;
+    };
+
+    /// @brief      has section sequential packer
+    /// @details
+    ///             ```cpp
+    ///             struct F
+    ///             {
+    ///                 template <typename ... Fs>
+    ///                 using section_sequential_packer = type_replacer<root_of_replacement, section_sequential_packer_t<F>>;
+    ///             };
+    ///             ```
+    template <typename FeatureType>
+    concept has_section_sequential_packer = requires {
+        typename FeatureType::section_sequential_packer;
+        requires ::uwvm2::parser::wasm::concepts::operation::details::check_is_type_replacer<::uwvm2::parser::wasm::concepts::operation::type_replacer,
+                                                                                             typename FeatureType::section_sequential_packer>;
+    };
+
+    template <typename FeatureType>
+    inline consteval auto get_section_sequential_packer() noexcept
+    {
+        if constexpr(has_section_sequential_packer<FeatureType>) { return typename FeatureType::section_sequential_packer{}; }
+        else
+        {
+            return ::uwvm2::parser::wasm::concepts::operation::irreplaceable_t{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_section_sequential_packer_t =
+        ::uwvm2::parser::wasm::concepts::operation::replacement_structure_t<decltype(get_section_sequential_packer<Fs>())...>;
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    inline consteval auto getfinal_section_sequential_packer_feature() noexcept
+    {
+        if constexpr(::std::same_as<final_section_sequential_packer_t<Fs...>, ::uwvm2::parser::wasm::concepts::operation::root_of_replacement>)
+        {
+            return ::uwvm2::parser::wasm::concepts::empty_t{};
+        }
+        else
+        {
+            return typename final_section_sequential_packer_t<Fs...>::curr_feature{};
+        }
+    }
+
+    template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+    using final_section_sequential_packer_feature_t = decltype(getfinal_section_sequential_packer_feature<Fs...>());
+
+    /// @brief   Sequential mapping table, mapping to 0 is any position
+    /// @details The size must be the same as the array size of the entire section.
+    template <typename CurrFeature, typename... Fs>
+    concept has_section_id_sequential_mapping_table_define = requires {
+        requires ::std::same_as<::std::remove_cvref_t<decltype(CurrFeature::section_id_sequential_mapping_table)>,
+                                ::uwvm2::utils::container::
+                                    array<wasm_order_t, ::std::tuple_size_v<::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...>>>>;
+    };
+
     /// @brief Custom Section: compile-time name -> wasm_byte hash table
-    template <typename Ty>
+    template <typename CurrFeature>
     concept has_custom_section_sequential_mapping_table_define =
-        requires(Ty const& ty) { details::find_from_custom_section_sequential_mapping_table(ty.custom_section_sequential_mapping_table, {}); };
+        requires { details::find_from_custom_section_sequential_mapping_table(CurrFeature::custom_section_sequential_mapping_table, {}); };
 }
 
 #ifndef UWVM_MODULE

@@ -70,6 +70,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                            ::std::byte const* const,
                                                            ::uwvm2::parser::wasm::base::error_impl&,
                                                            ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
+                                                           ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t&,
                                                            ::std::byte const* const) noexcept
         {
             // Note that section_begin may be equal to section_end
@@ -88,6 +89,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             ::std::byte const* const section_end,
             ::uwvm2::parser::wasm::base::error_impl& err,
             ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+            ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
             ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
         {
             // Note that section_begin may be equal to section_end
@@ -106,6 +108,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                              section_end,
                                                              err,
                                                              fs_para,
+                                                             wasm_order,
                                                              sec_id_module_ptr);
                 success = true;
             }
@@ -120,6 +123,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                             section_end,
                                                                             err,
                                                                             fs_para,
+                                                                            wasm_order,
                                                                             sec_id_module_ptr);
                 }
             }
@@ -138,6 +142,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                     ::std::byte const* const section_end,
                                                                     ::uwvm2::parser::wasm::base::error_impl& err,
                                                                     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const& fs_para,
+                                                                    ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
                                                                     ::std::byte const* const sec_id_module_ptr) UWVM_THROWS
     {
         // Note that section_begin may be equal to section_end
@@ -158,6 +163,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                                                           section_end,
                                                                                                           err,
                                                                                                           fs_para,
+                                                                                                          wasm_order,
                                                                                                           sec_id_module_ptr);
 #else
         [&]<typename... Secs> UWVM_ALWAYS_INLINE(::uwvm2::utils::container::tuple<Secs...> const&) constexpr UWVM_THROWS
@@ -172,6 +178,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                                                                              section_end,
                                                                              err,
                                                                              fs_para,
+                                                                             wasm_order,
                                                                              sec_id_module_ptr);
         }(module_storage.sections);
 #endif
@@ -289,7 +296,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
             // [         safe                 ] unsafe (could be the module_end)
             //                          ^^ module_curr
 
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_section_id{};
+            ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t max_order_sec_id{};
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte max_order_sec_id_map_sec_id{};
 
             // First loop with module_curr != module_end, so can use do-while.
 
@@ -321,21 +329,44 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 // Size equal to one does not need to do little-endian conversion
 
                 // All standard sections (except custom sections, id: 0) must be in canonical order.
-                if(sec_id != 0u)
+
+                ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t order_sec_id;  // No initialization necessary
+
+                if constexpr(::uwvm2::parser::wasm::binfmt::ver1::has_section_id_sequential_mapping_table_define<
+                                 ::uwvm2::parser::wasm::binfmt::ver1::final_section_sequential_packer_feature_t<Fs...>,
+                                 Fs...>)
+                {
+                    constexpr auto& order_sec_id_table{
+                        ::uwvm2::parser::wasm::binfmt::ver1::final_section_sequential_packer_feature_t<Fs...>::section_id_sequential_mapping_table};
+                    constexpr auto order_sec_id_table_size{order_sec_id_table.size()};
+                    if(sec_id >= order_sec_id_table_size) [[unlikely]] { order_sec_id = 0u; }
+                    else
+                    {
+                        order_sec_id = order_sec_id_table.index_unchecked(sec_id);
+                    }
+                }
+                else
+                {
+                    order_sec_id = sec_id;
+                }
+
+                if(order_sec_id != 0u)
                 {
                     // There is no need to check for duplicate (sec_id <= max_section_id) sections here,
                     // duplicate sections are checked inside the section parsing.
 
-                    if(sec_id < max_section_id) [[unlikely]]
+                    if(order_sec_id < max_order_sec_id) [[unlikely]]
                     {
                         err.err_curr = module_curr;
+                        // Enter the original section ID here for easy identification.
                         err.err_selectable.u8arr[0] = sec_id;
-                        err.err_selectable.u8arr[1] = max_section_id;
+                        err.err_selectable.u8arr[1] = max_order_sec_id_map_sec_id;
                         err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_section_canonical_order;
                         ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
                     }
 
-                    max_section_id = sec_id;
+                    max_order_sec_id = order_sec_id;
+                    max_order_sec_id_map_sec_id = sec_id;
                 }
 
                 // get section length
@@ -406,7 +437,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
                 //                                        ^^ sec_len
 
                 // Note that module_curr may be equal to sec_end (sec_len == 0), need check after call handle_all_binfmt_ver1_extensible_section
-                handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, fs_para, sec_id_module_ptr);
+                handle_all_binfmt_ver1_extensible_section(ret, sec_id, module_curr, sec_end, err, fs_para, max_order_sec_id, sec_id_module_ptr);
 
                 module_curr = sec_end;
 

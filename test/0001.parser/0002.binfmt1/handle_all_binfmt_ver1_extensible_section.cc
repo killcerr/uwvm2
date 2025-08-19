@@ -59,6 +59,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test0\n");
@@ -81,6 +82,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test1\n");
@@ -112,6 +114,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test2\n");
@@ -133,6 +136,7 @@ inline constexpr void handle_binfmt_ver1_extensible_section_define(
     [[maybe_unused]] ::std::byte const* section_end,
     ::uwvm2::parser::wasm::base::error_impl&,
     ::uwvm2::parser::wasm::concepts::feature_parameter_t<Fs...> const&,
+    [[maybe_unused]] ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t& wasm_order,
     ::std::byte const* const)
 {
     ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output, u8"test3\n");
@@ -154,7 +158,8 @@ struct Feature3
 };
 
 template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
-inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<Feature1>, ::uwvm2::utils::container::tuple<Fs...>) noexcept
+inline constexpr auto define_wasm_binfmt_parsering_strategy(::uwvm2::parser::wasm::concepts::feature_reserve_type_t<Feature1>,
+                                                            ::uwvm2::utils::container::tuple<Fs...>) noexcept
 {
     return ::std::addressof(::uwvm2::parser::wasm::binfmt::ver1::wasm_binfmt_ver1_handle_func<Fs...>);
 }
