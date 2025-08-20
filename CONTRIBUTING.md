@@ -255,7 +255,7 @@ namespace A {
 - Track standard and vendor support before relying on newly freestanding-marked headers.
 
 ### Containers and strings
-- Prefer `uwvm2::utils::container::string` instead of `std::string` in core layers for deterministic behavior and portability.
+- Prefer `::uwvm2::utils::container::string` instead of `::std::string` in core layers for deterministic behavior and portability.
 
 ### Integers and character types
 - Default to `::std::size_t` for sizes and indices.
@@ -268,7 +268,7 @@ namespace A {
 
 ### Heaps are not universal
 - Do not assume a default heap exists or behaves uniformly. Some targets expose multiple heaps; some expose none.
-- Avoid `std::nothrow`/`std::nothrow_t`; library implementations typically route through throwing paths internally.
+- Avoid `::std::nothrow`/`::std::nothrow_t`; library implementations typically route through throwing paths internally.
 
 ### Allocation failure
 - Prefer fail-fast at appropriate boundaries (e.g., `std::abort`) rather than attempting universal recovery from OOM.
