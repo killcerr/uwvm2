@@ -141,13 +141,7 @@ inline void dos_symlinkat_impl(char const *oldpath, int newdirfd, char const *ne
 #if defined(FAST_IO_USE_DJGPP_SYMLINK)
 	::fast_io::system_call_throw_error(::fast_io::posix::my_dos_symlink(oldpath, ::fast_io::details::my_dos_concat_tlc_path(newdirfd, newpath).c_str()));
 #else
-	throw_posix_error(
-#ifdef ENOSYS
-		ENOSYS
-#else
-		40
-#endif
-	);
+	throw_posix_error(ENOSYS);
 #endif
 }
 
@@ -213,7 +207,6 @@ inline
 		[[fallthrough]];
 	case utime_flags::omit:
 		throw_posix_error(EINVAL);
-		::fast_io::unreachable();
 	default:
 		return ::fast_io::details::unix_timestamp_to_time_t(opt.timestamp);
 	}
