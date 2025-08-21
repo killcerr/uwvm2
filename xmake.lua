@@ -40,7 +40,7 @@ function def_build()
 	if enable_cxx_module then
 		add_defines("UWVM_MODULE")
 		set_policy("build.c++.modules", true)
-		set_policy("build.c++.modules.std", true)
+		-- set_policy("build.c++.modules.std", true)
 	end 
 
 	local disable_cpp_exceptions = get_config("fno-exceptions")
