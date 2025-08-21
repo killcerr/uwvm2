@@ -302,16 +302,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         ::fast_io::fast_terminate();
                     }
 
-                    // Pop this frame and continue with next
-                    // But first, update parent's low value if this is not the root call
-                    if(call_stack.size() > 1uz) [[likely]]
-                    {
-                        auto& parent_frame{call_stack.index_unchecked(call_stack.size() - 2uz)};
-                        low.index_unchecked(parent_frame.v) = ::std::min(low.index_unchecked(parent_frame.v), low.index_unchecked(frame.v));
-                    }
-
-                    call_stack.pop_back_unchecked();
-                    break;
+                    // Unified early return to avoid inconsistent Tarjan state
+                    return all_cycles;
                 }
 
                 if(frame.is_initial_call) [[unlikely]]
@@ -464,6 +456,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             // If stronger deduplication stability is needed, uncomment the following sort:
             // ::std::sort(comp.begin(), comp.end());
 
+            bool abort_comp{};
+
             for(auto const start_id: comp)
             {
                 // Clear path state
@@ -527,8 +521,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                             ::fast_io::fast_terminate();
                         }
 
-                        // Pop this frame and continue with next
-                        dfs_stack.pop_back_unchecked();
+                        // Abort current SCC enumeration: cleanup on_path/path and drain stack
+                        for(auto const id_in_path: path) { on_path.index_unchecked(id_in_path) = false; }
+                        path.clear();
+                        dfs_stack.clear();
+                        abort_comp = true;
+
                         break;
                     }
 
@@ -603,6 +601,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                         dfs_stack.pop_back_unchecked();
                     }
                 }
+
+                if(abort_comp) [[unlikely]] { break; }
             }
 
             // Clear marks
