@@ -34,7 +34,7 @@ function def_build()
     set_languages("c23", "cxx26")
 
 	set_encodings("utf-8")
-	set_warnings("all", "extra", "error")
+	set_warnings("all", "extra", "pedantic", "error")
 
 	local enable_cxx_module = get_config("use-cxx-module")
 	if enable_cxx_module then
