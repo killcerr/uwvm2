@@ -1039,7 +1039,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     return {static_cast<int>(::uwvm2::uwvm::run::retval::module_dependency_error), ::std::move(adjacency_list)};
                                 }
 
-                                /// @todo Check more detailed types, such as function matching, global matching, etc.
+                                // The check here only checks for common types in the module. Subsequent internal state checks are left to the initializer.
                             }
                             break;
                         }
@@ -1292,6 +1292,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                         ::fast_io::io::perrln(u8log_output_ul, ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                     }
+                    
+                    // Here, guard will perform destructors.
                 }
 
                 if(::uwvm2::uwvm::io::depend_warning_fatal) [[unlikely]]

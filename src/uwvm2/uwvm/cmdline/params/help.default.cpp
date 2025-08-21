@@ -191,6 +191,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                 u8"\n\n");
 
+            // Here, guard will perform destructors.
             return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
         }
 
@@ -278,9 +279,11 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 // print_usage comes with UWVM_COLOR_U8_RST_ALL
                                 u8"\n\n");
 
+            // Here, guard will perform destructors.
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
+        // Here, guard will perform destructors.
         return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
     }
 

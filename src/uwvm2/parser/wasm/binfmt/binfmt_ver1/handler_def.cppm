@@ -36,6 +36,7 @@ module;
 #include <initializer_list>
 #include <algorithm>
 #include <memory>
+#include <limits>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 

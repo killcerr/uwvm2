@@ -910,6 +910,7 @@ namespace uwvm2::uwvm::cmdline::params::details
         // end ln
         ::fast_io::io::perrln(u8log_output_ul);
 
+        // Here, guard will perform destructors.
         return ::uwvm2::utils::cmdline::parameter_return_type::return_imme;
     }
 

@@ -324,6 +324,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                 ::fast_io::io::perrln(u8log_output_ul);
                 return parsing_return_val::returnm1;
             }
+
+            // Here, guard will perform destructors.
         }
 
         // Call the function corresponding to each parameter

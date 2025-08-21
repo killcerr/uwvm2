@@ -120,6 +120,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::custom::customs
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
                                             u8"\n");
                     }
+
+                    // Here, guard will perform destructors.
                 }
 
                 if(::uwvm2::uwvm::io::parser_warning_fatal) [[unlikely]]

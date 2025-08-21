@@ -66,9 +66,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         // After the data section is checked by the parser.
         // appear only once in a module is checked by the custom name parser.
 
+        inline static constexpr ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_t custom_name_order{
+            ::uwvm2::parser::wasm::binfmt::ver1::wasm_order_add_or_overflow_die_chain(
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(::uwvm2::parser::wasm::standard::wasm1::section::section_id::data_sec),
+                static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(1u))};
+
         inline static constexpr ::std::initializer_list<::uwvm2::parser::wasm::binfmt::ver1::details::mapping_entry>
             custom_section_sequential_mapping_table_entries{
-                {u8"name", 12u}
+                {u8"name", custom_name_order}
         };
 
         inline static constexpr auto custom_section_sequential_mapping_table_size{

@@ -37,6 +37,7 @@
 # include <initializer_list>
 # include <algorithm>
 # include <memory>
+# include <limits>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -63,6 +64,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     // size of char8_t is equal to the size of ::std::byte.
 
     using wasm_order_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
+
+    inline constexpr wasm_order_t wasm_order_add_or_overflow_die_chain(wasm_order_t a, wasm_order_t b) noexcept
+    {
+        constexpr auto wasm_order_max{::std::numeric_limits<wasm_order_t>::max()};
+        if(a > wasm_order_max - b) [[unlikely]] { ::fast_io::fast_terminate(); }
+        return a + b;
+    }
 
     struct max_section_id_map_sec_id_t
     {
@@ -475,6 +483,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::binfmt::ver1
     ///                 using section_sequential_packer = type_replacer<root_of_replacement, section_sequential_packer_t>;
     ///             };
     ///             ```
+    ///
+    /// @note        0 indicates no participation in judgment; subsequent repetition of content indicates that the order priority is the same.
     template <typename FeatureType>
     concept has_section_sequential_packer = requires {
         typename FeatureType::section_sequential_packer;
