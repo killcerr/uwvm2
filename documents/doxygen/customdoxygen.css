@@ -67,3 +67,154 @@ a.el {
 }
 
 
+/* =====================================
+   uwvm2 brand-aligned modern refinements
+   ===================================== */
+
+:root {
+    --uwvm2-accent: #c21734;   /* from logo .cls-7 */
+    --uwvm2-accent-2: #7c157f; /* from logo .cls-4 */
+    --uwvm2-accent-3: #bd2f39; /* from logo .cls-3 */
+    --uwvm2-bg: #f6f1de;       /* from logo .cls-5 */
+    --uwvm2-bg-contrast: #ffffff;
+    --uwvm2-text: #131415;     /* from logo .cls-6 */
+    --uwvm2-border: #e5e1d4;
+    --uwvm2-muted-text: #5a5d60;
+    --uwvm2-link: var(--uwvm2-accent);
+    --uwvm2-link-hover: var(--uwvm2-accent-2);
+    --uwvm2-code-bg: #faf8f2;
+    --uwvm2-code-border: #e8e2d3;
+}
+
+.dark-mode {
+    --uwvm2-bg: #0f1011;
+    --uwvm2-bg-contrast: #151618;
+    --uwvm2-text: #ece7d9; /* warm off-white to match brand */
+    --uwvm2-border: #2a2c2f;
+    --uwvm2-muted-text: #b7b2a7;
+    --uwvm2-link: #ff4a5f;      /* brightened accent */
+    --uwvm2-link-hover: #d57bf0;/* brightened secondary */
+    --uwvm2-code-bg: #17181a;
+    --uwvm2-code-border: #2a2c2f;
+}
+
+html, body {
+    background: var(--uwvm2-bg);
+    color: var(--uwvm2-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Cantarell, Noto Sans, Ubuntu, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Header area */
+#titlearea {
+    background: var(--uwvm2-bg-contrast);
+    border-bottom: 1px solid var(--uwvm2-border);
+}
+
+#projectname { color: var(--uwvm2-text); }
+#projectnumber { color: var(--uwvm2-accent); font-weight: 600; margin-left: .25rem; }
+
+/* Links */
+a, a:visited { color: var(--uwvm2-link); }
+a:hover, a:focus { color: var(--uwvm2-link-hover); }
+
+/* Tabs / top nav */
+.tabs, .tablist {
+    background: var(--uwvm2-bg-contrast);
+    border-bottom: 1px solid var(--uwvm2-border);
+}
+.tablist li a { color: var(--uwvm2-text); }
+.tablist li.current a {
+    background: var(--uwvm2-accent);
+    color: #fff !important;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Sidebar */
+#side-nav {
+    background: var(--uwvm2-bg-contrast);
+    border-right: 1px solid var(--uwvm2-border);
+}
+
+/* Search */
+#MSearchBox, #MSearchSelectWindow, #MSearchResultsWindow {
+    background: var(--uwvm2-bg-contrast);
+    border: 1px solid var(--uwvm2-border);
+    border-radius: 8px;
+}
+input.searchField {
+    background: var(--uwvm2-bg-contrast);
+    color: var(--uwvm2-text);
+}
+
+/* Member blocks */
+.memtitle {
+    background: color-mix(in oklab, var(--uwvm2-accent) 8%, transparent);
+    border: 1px solid var(--uwvm2-border);
+    border-radius: 8px 8px 0 0;
+}
+.memproto {
+    background: var(--uwvm2-code-bg);
+    border: 1px solid var(--uwvm2-code-border);
+    border-top: none;
+}
+.memdoc {
+    background: var(--uwvm2-bg-contrast);
+    border: 1px solid var(--uwvm2-border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Code blocks */
+div.fragment {
+    background: var(--uwvm2-code-bg);
+    border: 1px solid var(--uwvm2-code-border);
+}
+pre.fragment, code, tt { color: var(--uwvm2-text); }
+code, tt { background: color-mix(in oklab, var(--uwvm2-text) 6%, transparent); padding: 0.1rem 0.25rem; border-radius: 4px; }
+
+/* Tables */
+table.doxtable th { background: color-mix(in oklab, var(--uwvm2-accent) 14%, var(--uwvm2-bg-contrast)); color: var(--uwvm2-text); }
+table.doxtable { border: 1px solid var(--uwvm2-border); border-radius: 8px; overflow: hidden; }
+table.doxtable tr:nth-child(even) td { background: color-mix(in oklab, var(--uwvm2-text) 2%, transparent); }
+
+/* Badges */
+span.mlabel { background: var(--uwvm2-accent-2); color: #fff; border-radius: 4px; }
+
+/* Footer */
+.navpath { border-top: 1px solid var(--uwvm2-border); }
+
+/* ============================
+   Graphviz SVG hover animation
+   ============================ */
+svg[id^="graph_"], svg[id^="inherit_graph_"], svg[id^="coll_graph_"], svg[id^="dir_"], svg[id^="class_"], svg[id^="namespace_"] {
+    /* smoother hover animations */
+}
+
+svg g.node polygon,
+svg g.node ellipse,
+svg g.node rect {
+    transition: transform 180ms ease, fill 180ms ease, stroke 180ms ease, filter 180ms ease;
+    transform-origin: center center;
+}
+svg g.node:hover polygon,
+svg g.node:hover ellipse,
+svg g.node:hover rect {
+    transform: scale(1.03);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.15));
+    stroke: var(--uwvm2-link);
+}
+svg g.edge path,
+svg g.edge polygon {
+    transition: stroke 180ms ease, opacity 180ms ease;
+}
+svg g.edge:hover path,
+svg g.edge:hover polygon {
+    stroke: var(--uwvm2-link-hover);
+    opacity: .9;
+}
+svg a:hover text, svg g.node:hover text {
+    fill: var(--uwvm2-link-hover);
+}
+
