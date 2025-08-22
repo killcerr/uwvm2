@@ -502,6 +502,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                         continue;
                     }
 
+                    // There is no need to perform duplicate checks here, as checks will be performed globally.
+
                     // Use try_emplace to combine lookup and insertion operations, avoiding two hash lookups
                     if(!::uwvm2::uwvm::wasm::custom::custom_handle_funcs
                             .try_emplace(custom_name,
@@ -601,6 +603,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 
                 auto const func_begin{wd.wasm_dl_storage.capi_function_vec.function_begin};
                 auto const func_end{func_begin + wd.wasm_dl_storage.capi_function_vec.function_size};
+
+                // Ensure that no function names are duplicated in dl.
+
+                ::uwvm2::utils::container::unordered_flat_set<::uwvm2::utils::container::u8string_view> duplicate_name_checker{};
+                duplicate_name_checker.reserve(wd.wasm_dl_storage.capi_function_vec.function_size);
 
                 for(auto func_curr{func_begin}; func_curr != func_end; ++func_curr)
                 {
@@ -726,6 +733,56 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 # endif
 
                         // Just skip here, no need to disable
+                        continue;
+                    }
+
+                    // duplicate check in this dl
+                    if(!duplicate_name_checker.emplace(func_name).second) [[unlikely]]
+                    {
+# ifndef UWVM_DISABLE_OUTPUT_WHEN_PARSE
+                        if(::uwvm2::uwvm::io::show_dl_warning)
+                        {
+                            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                u8"[warn]  ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Parsing error in DL \"",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                load_file_name,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"\".",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                u8" (dl)\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                u8"[warn]  ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Duplicate function: \"",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                func_name,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"\".\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                            if(::uwvm2::uwvm::io::dl_warning_fatal) [[unlikely]]
+                            {
+                                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                                                    u8"[fatal] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"Convert warnings to fatal errors. ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                    u8"(dl)\n\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                ::fast_io::fast_terminate();
+                            }
+                        }
+# endif
                         continue;
                     }
 

@@ -192,14 +192,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
     ///             (binary format validity) but fails validation.
     /// @return     Adjacency list representation of the dependency graph
     /// @todo       construct ::uwvm2::uwvm::wasm::storage::all_module_export
-    inline constexpr build_dependency_graph_and_check_import_exist_ret_t build_dependency_graph_and_check_import_exist() noexcept
+    inline constexpr build_dependency_graph_and_check_import_exist_ret_t build_dependency_graph_and_check_import_exist_and_construct_all_module_export() noexcept
     {
 #ifdef UWVM_TIMER
         ::uwvm2::utils::debug::timer build_dependency_graph_and_check_import_exist_timer{u8"build dependency graph and check import exist"};
 #endif
 
         using module_name_t = ::uwvm2::utils::container::u8string_view;
-        using import_export_name_t = ::uwvm2::utils::container::u8string_view;
         using adjacency_list_t = ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::uwvm2::utils::container::vector<module_name_t>>;
 
         adjacency_list_t adjacency_list{};
@@ -211,12 +210,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
             adjacency_list.emplace(module.first, ::uwvm2::utils::container::vector<module_name_t>{});
         }
 
-        // Used to record the contents exported by each module.
-        ::uwvm2::utils::container::unordered_flat_map<
-            module_name_t,
-            ::uwvm2::utils::container::unordered_flat_map<import_export_name_t, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>>
-            exported{};
-        exported.reserve(adjacency_list.size());  // Reserve space for all modules to avoid reallocations
+        // Used to record the contents exported by each module. Persist globally.
+        ::uwvm2::uwvm::wasm::storage::all_module_export.reserve(adjacency_list.size());  // Reserve space for all modules to avoid reallocations
 
         // Build dependency relationships
         for(auto const& curr_module: ::uwvm2::uwvm::wasm::storage::all_module)
@@ -250,7 +245,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                             {
                                 auto const import_module_name{imports.module_name};
                                 auto const import_extern_name{imports.extern_name};
-                                auto const import_imports_type{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(imports.imports.type)};
 
                                 // Add dependency edge
                                 if(adjacency_list.contains(import_module_name))
@@ -292,7 +286,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 // export -> import
                                 auto const& imported_module{*import_module};
 
-                                using exported_iterator = decltype(exported)::iterator;
+                                using exported_iterator = decltype(::uwvm2::uwvm::wasm::storage::all_module_export)::iterator;
 
                                 exported_iterator curr_exported;  // No init
 
@@ -321,17 +315,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                                     get_imported_wasm_module_storage_exportsec_from_feature_tuple(::uwvm2::uwvm::wasm::feature::all_features)};
 
                                                 // Check if there is an exported map. If not, build one.
-                                                auto [curr_exported_module, inserted]{exported.try_emplace(import_module_name)};
+                                                auto [curr_exported_module,
+                                                      inserted]{::uwvm2::uwvm::wasm::storage::all_module_export.try_emplace(import_module_name)};
                                                 if(inserted) [[unlikely]]
                                                 {
                                                     curr_exported_module->second.reserve(
                                                         imported_wasm_module_storage_exportsec.exports.size());  // Reserve space for exports
                                                     for(auto const& exports: imported_wasm_module_storage_exportsec.exports)
                                                     {
-                                                        auto const export_name{exports.export_name};
-                                                        auto const export_type{
-                                                            static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(exports.exports.type)};
-                                                        curr_exported_module->second.emplace(export_name, export_type);
+                                                        ::uwvm2::uwvm::wasm::type::all_module_export_t export_record{};
+                                                        export_record.type = imported_module.second.type;
+                                                        auto& file_export{export_record.storage.wasm_file_export_storage_ptr};
+                                                        file_export.binfmt_ver = imported_wasm_binfmt_ver;
+                                                        file_export.storage.wasm_binfmt_ver1_export_storage_ptr = ::std::addressof(exports.exports);
+                                                        static_assert(::std::is_trivially_copy_constructible_v<decltype(export_record)>);
+                                                        // No duplication, because a check was performed during loading.
+                                                        curr_exported_module->second.emplace(exports.export_name, export_record);
                                                     }
                                                 }
 
@@ -357,7 +356,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                         auto const imported_dl_ptr{imported_module.second.module_storage_ptr.wd};
 
                                         // Check if there is an exported map. If not, build one.
-                                        auto [curr_exported_module, inserted]{exported.try_emplace(import_module_name)};
+                                        auto [curr_exported_module, inserted]{::uwvm2::uwvm::wasm::storage::all_module_export.try_emplace(import_module_name)};
                                         if(inserted) [[unlikely]]
                                         {
                                             auto const dl_func{imported_dl_ptr->wasm_dl_storage.capi_function_vec};
@@ -372,8 +371,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                                                                              reinterpret_cast<char8_t_const_may_alias_ptr>(dl_func_curr->func_name_ptr),
                                                                                              dl_func_curr->func_name_length}
                                                 };
-                                                constexpr auto dl_func_type{static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>(0u)};  // func
-                                                curr_exported_module->second.emplace(dl_func_curr_name, dl_func_type);
+                                                ::uwvm2::uwvm::wasm::type::all_module_export_t export_record{};
+                                                export_record.type = ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_dl;
+                                                export_record.storage.wasm_dl_export_storage_ptr.storage = dl_func_curr;
+                                                static_assert(::std::is_trivially_copy_constructible_v<decltype(export_record)>);
+                                                // No duplication, because a check was performed during loading.
+                                                curr_exported_module->second.emplace(dl_func_curr_name, export_record);
                                             }
                                         }
 
@@ -419,191 +422,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                     return {load_and_check_modules_rtl::module_dependency_error, ::std::move(adjacency_list)};
                                 }
 
-                                constexpr auto get_exceeding_imported_type_name{[]<::std::integral char_type2>(::std::uint_least8_t type) constexpr noexcept
-                                                                                    -> ::uwvm2::utils::container::basic_string_view<char_type2>
-                                                                                {
-                                                                                    switch(type)
-                                                                                    {
-                                                                                        case 0u:
-                                                                                        {
-                                                                                            if constexpr(::std::same_as<char_type2, char>) { return {"func"}; }
-                                                                                            else if constexpr(::std::same_as<char_type2, wchar_t>)
-                                                                                            {
-                                                                                                return {L"func"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char8_t>)
-                                                                                            {
-                                                                                                return {u8"func"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char16_t>)
-                                                                                            {
-                                                                                                return {u"func"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char32_t>)
-                                                                                            {
-                                                                                                return {U"func"};
-                                                                                            }
-                                                                                            break;
-                                                                                        }
-                                                                                        case 1u:
-                                                                                        {
-                                                                                            if constexpr(::std::same_as<char_type2, char>) { return {"table"}; }
-                                                                                            else if constexpr(::std::same_as<char_type2, wchar_t>)
-                                                                                            {
-                                                                                                return {L"table"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char8_t>)
-                                                                                            {
-                                                                                                return {u8"table"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char16_t>)
-                                                                                            {
-                                                                                                return {u"table"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char32_t>)
-                                                                                            {
-                                                                                                return {U"table"};
-                                                                                            }
-                                                                                            break;
-                                                                                        }
-                                                                                        case 2u:
-                                                                                        {
-                                                                                            if constexpr(::std::same_as<char_type2, char>) { return {"mem"}; }
-                                                                                            else if constexpr(::std::same_as<char_type2, wchar_t>)
-                                                                                            {
-                                                                                                return {L"mem"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char8_t>)
-                                                                                            {
-                                                                                                return {u8"mem"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char16_t>)
-                                                                                            {
-                                                                                                return {u"mem"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char32_t>)
-                                                                                            {
-                                                                                                return {U"mem"};
-                                                                                            }
-                                                                                            break;
-                                                                                        }
-                                                                                        case 3u:
-                                                                                        {
-                                                                                            if constexpr(::std::same_as<char_type2, char>)
-                                                                                            {
-                                                                                                return {"global"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, wchar_t>)
-                                                                                            {
-                                                                                                return {L"global"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char8_t>)
-                                                                                            {
-                                                                                                return {u8"global"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char16_t>)
-                                                                                            {
-                                                                                                return {u"global"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char32_t>)
-                                                                                            {
-                                                                                                return {U"global"};
-                                                                                            }
-                                                                                            break;
-                                                                                        }
-                                                                                        case 4u:
-                                                                                        {
-                                                                                            if constexpr(::std::same_as<char_type2, char>) { return {"tag"}; }
-                                                                                            else if constexpr(::std::same_as<char_type2, wchar_t>)
-                                                                                            {
-                                                                                                return {L"tag"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char8_t>)
-                                                                                            {
-                                                                                                return {u8"tag"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char16_t>)
-                                                                                            {
-                                                                                                return {u"tag"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char32_t>)
-                                                                                            {
-                                                                                                return {U"tag"};
-                                                                                            }
-                                                                                            break;
-                                                                                        }
-                                                                                        [[unlikely]] default:
-                                                                                        {
-                                            /// @todo Maybe I forgot to realize it.
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                                                                                            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
-
-                                                                                            if constexpr(::std::same_as<char_type2, char>)
-                                                                                            {
-                                                                                                return {"unknown"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, wchar_t>)
-                                                                                            {
-                                                                                                return {L"unknown"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char8_t>)
-                                                                                            {
-                                                                                                return {u8"unknown"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char16_t>)
-                                                                                            {
-                                                                                                return {u"unknown"};
-                                                                                            }
-                                                                                            else if constexpr(::std::same_as<char_type2, char32_t>)
-                                                                                            {
-                                                                                                return {U"unknown"};
-                                                                                            }
-                                                                                            break;
-                                                                                        }
-                                                                                    }
-                                                                                }};
-
-                                auto const curr_exported_module_exported_type{curr_exported_module_exported->second};
-                                if(curr_exported_module_exported_type != import_imports_type) [[unlikely]]
-                                {
-                                    // Output type mismatch error between import and export
-                                    ::fast_io::io::perr(
-                                        ::uwvm2::uwvm::io::u8log_output,
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                        u8"uwvm: ",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                        u8"[error] ",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"Type mismatch: import \"",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        import_extern_name,
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"\" in module \"",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        curr_module_name,
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"\" expects type ",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        get_exceeding_imported_type_name.template operator()<char8_t>(static_cast<::std::uint_least8_t>(import_imports_type)),
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8" but \"",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        import_module_name,
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8"\" exports type ",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        get_exceeding_imported_type_name.template operator()<char8_t>(
-                                            static_cast<::std::uint_least8_t>(curr_exported_module_exported_type)),
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                        u8".\n\n",
-                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
-
-                                    return {load_and_check_modules_rtl::module_dependency_error, ::std::move(adjacency_list)};
-                                }
-
-                                // The check here only checks for common types in the module. Subsequent internal state checks are left to the initializer.
+                                // Subsequent internal state checks are left to the initializer.
                             }
+                            
                             break;
                         }
                         [[unlikely]] default:
@@ -655,7 +476,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
         }
 
-        auto const [ok, dependency_graph]{build_dependency_graph_and_check_import_exist()};
+        auto const [ok, dependency_graph]{build_dependency_graph_and_check_import_exist_and_construct_all_module_export()};
 
         if(ok != load_and_check_modules_rtl::ok) [[unlikely]] { return ok; }
 
