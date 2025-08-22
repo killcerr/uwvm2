@@ -201,8 +201,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         using module_name_t = ::uwvm2::utils::container::u8string_view;
         using adjacency_list_t = ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::uwvm2::utils::container::vector<module_name_t>>;
 
+        auto const all_module_size{::uwvm2::uwvm::wasm::storage::all_module.size()};
+
         adjacency_list_t adjacency_list{};
-        adjacency_list.reserve(::uwvm2::uwvm::wasm::storage::all_module.size());  // Reserve space for all modules
+        adjacency_list.reserve(all_module_size);  // Reserve space for all modules
 
         // Initialize all module nodes
         for(auto const& module: ::uwvm2::uwvm::wasm::storage::all_module)
@@ -211,7 +213,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         }
 
         // Used to record the contents exported by each module. Persist globally.
-        ::uwvm2::uwvm::wasm::storage::all_module_export.reserve(adjacency_list.size());  // Reserve space for all modules to avoid reallocations
+        ::uwvm2::uwvm::wasm::storage::all_module_export.reserve(all_module_size);  // Reserve space for all modules to avoid reallocations
 
         // Build dependency relationships
         for(auto const& curr_module: ::uwvm2::uwvm::wasm::storage::all_module)
@@ -424,7 +426,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 
                                 // Subsequent internal state checks are left to the initializer.
                             }
-                            
+
                             break;
                         }
                         [[unlikely]] default:
