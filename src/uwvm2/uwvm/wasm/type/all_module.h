@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -95,7 +95,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         };
 
         wasm_file_export_storage_u storage{};
-        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver{1u}; 
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 binfmt_ver{1u};
 
         // wasm only supported binfmt version 1 currently
         static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");

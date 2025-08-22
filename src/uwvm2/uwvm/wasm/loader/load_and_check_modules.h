@@ -191,6 +191,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
     /// @details    In the WASM standard, importing module A name B type C and importing module A name B type D simultaneously satisfies syntactic validity
     ///             (binary format validity) but fails validation.
     /// @return     Adjacency list representation of the dependency graph
+    /// @todo       construct ::uwvm2::uwvm::wasm::storage::all_module_export
     inline constexpr build_dependency_graph_and_check_import_exist_ret_t build_dependency_graph_and_check_import_exist() noexcept
     {
 #ifdef UWVM_TIMER

@@ -21,10 +21,11 @@
 
 #include <uwvm2/utils/container/impl.h>
 #include <uwvm2/uwvm/utils/depend/depend_check.h>
-#include <uwvm2/uwvm/run/load_and_check_modules.h>
+#include <uwvm2/uwvm/wasm/loader/detect_cycle.h>
+#include <uwvm2/uwvm/wasm/loader/load_and_check_modules.h>
 
 using namespace uwvm2::utils::container;
-using uwvm2::uwvm::run::detect_cycles;
+using uwvm2::uwvm::wasm::loader::detect_cycles;
 
 namespace
 {

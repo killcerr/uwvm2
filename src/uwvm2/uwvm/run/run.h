@@ -57,20 +57,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
     inline int run() noexcept
     {
+        // already preload wasm module
+
+        // already bind dl
+
         // load main module
         if(auto const ret{::uwvm2::uwvm::run::load_exec_wasm_module()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) [[unlikely]] { return ret; }
 
         // load local modules
         if(auto const ret{::uwvm2::uwvm::run::load_local_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) [[unlikely]] { return ret; }
 
-        // check duplicate module
+        // check duplicate module and construct ::uwvm2::uwvm::wasm::storage::all_module
         if(auto const ret{::uwvm2::uwvm::wasm::loader::contruct_all_module_and_check_duplicate_module()};
            ret != ::uwvm2::uwvm::wasm::loader::load_and_check_modules_rtl::ok) [[unlikely]]
         {
             return static_cast<int>(::uwvm2::uwvm::run::retval::check_module_error);
         }
 
-        // section details Occurs before dependency checks
+        // section details occurs before dependency checks
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
         {
             case ::uwvm2::uwvm::wasm::base::mode::section_details:
@@ -103,7 +107,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
         // run vm
 
-        // check import exist
+        // check import exist and detect cycles
+        /// @todo construct ::uwvm2::uwvm::wasm::storage::all_module_export in ::uwvm2::uwvm::wasm::loader::check_import_exist_and_detect_cycles
         if(auto const ret{::uwvm2::uwvm::wasm::loader::check_import_exist_and_detect_cycles()};
            ret != ::uwvm2::uwvm::wasm::loader::load_and_check_modules_rtl::ok) [[unlikely]]
         {
