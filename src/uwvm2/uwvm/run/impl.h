@@ -24,6 +24,6 @@
 
 #ifndef UWVM_MODULE
 # include "retval.h"
-# include "load_and_check_modules.h"
+# include "loader.h"
 # include "run.h"
 #endif

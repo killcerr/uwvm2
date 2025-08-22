@@ -24,7 +24,7 @@ module;
 
 export module uwvm2.uwvm.run;
 export import :retval;
-export import :load_and_check_modules;
+export import :loader;
 export import :run;
 
 #ifndef UWVM_MODULE

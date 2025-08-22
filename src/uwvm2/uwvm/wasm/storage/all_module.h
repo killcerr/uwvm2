@@ -39,8 +39,14 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
+    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, ::uwvm2::uwvm::wasm::type::all_module_t>
+        all_module{};  // [global]
 
+    using wasm_module_name_t = ::uwvm2::utils::container::u8string_view;
+    using wasm_import_export_name_t = ::uwvm2::utils::container::u8string_view;
 
-    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, ::uwvm2::uwvm::wasm::type::all_module_t> all_module{};  // [global]
-
+    inline ::uwvm2::utils::container::unordered_flat_map<
+        wasm_module_name_t,
+        ::uwvm2::utils::container::unordered_flat_map<wasm_import_export_name_t, ::uwvm2::uwvm::wasm::type::all_module_export_t>>
+        all_module_export{};  // [global]
 }  // namespace uwvm2::uwvm::wasm::storage

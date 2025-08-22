@@ -607,5 +607,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::concepts
             // According to the C++ standard, an empty tuple is true.
             return (::fast_io::freestanding::is_trivially_copyable_or_relocatable_v<Ty> && ...);
         }
+
+        //////////////////////////////////////////
+        /// @brief get all wasm binfmt version ///
+        //////////////////////////////////////////
+
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        inline consteval ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 get_max_binfmt_version() noexcept
+        {
+            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 max_binfmt_ver{};
+
+            [&max_binfmt_ver]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+            { ((max_binfmt_ver = ::std::max(max_binfmt_ver, get_binfmt_version<Fs...[I]>())), ...); }(::std::make_index_sequence<sizeof...(Fs)>{});
+
+            return max_binfmt_ver;
+        }
+
+        template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
+        inline consteval ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
+            get_max_binfmt_version_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
+        {
+            return get_max_binfmt_version<Fs...>();
+        }
     }  // namespace operation
 }

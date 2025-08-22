@@ -46,7 +46,7 @@
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/wasm/impl.h>
 # include "retval.h"
-# include "load_and_check_modules.h"
+# include "loader.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -57,72 +57,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 {
     inline int run() noexcept
     {
-        // The wasm preload has been fully parsed
-        // The dl preload has been fully registered
-
-        if(!::uwvm2::uwvm::cmdline::wasm_file_ppos) [[unlikely]]
-        {
-            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                // 1
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"No execution of WASM files.\n"
-                                // 2
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
-                                u8"[info]  ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"Try \"",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"uwvm ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
-                                u8"--help",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"\" for more information.\n\n",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
-            return static_cast<int>(::uwvm2::uwvm::run::retval::load_error);
-        }
-
-        // get main module path
-        auto const module_file_name{::uwvm2::uwvm::cmdline::wasm_file_ppos->str};
-
         // load main module
+        if(auto const ret{::uwvm2::uwvm::run::load_exec_wasm_module()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) [[unlikely]] { return ret; }
 
-        auto const load_wasm_file_rtl{::uwvm2::uwvm::wasm::loader::load_wasm_file(::uwvm2::uwvm::wasm::storage::execute_wasm,
-                                                                                  module_file_name,
-                                                                                  ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name,
-                                                                                  ::uwvm2::uwvm::wasm::storage::wasm_parameter)};
+        // load local modules
+        if(auto const ret{::uwvm2::uwvm::run::load_local_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) [[unlikely]] { return ret; }
 
-        switch(load_wasm_file_rtl)
+        // check duplicate module
+        if(auto const ret{::uwvm2::uwvm::wasm::loader::contruct_all_module_and_check_duplicate_module()};
+           ret != ::uwvm2::uwvm::wasm::loader::load_and_check_modules_rtl::ok) [[unlikely]]
         {
-            [[likely]] case ::uwvm2::uwvm::wasm::loader::load_wasm_file_rtl::ok:
-            {
-                break;
-            }
-            case ::uwvm2::uwvm::wasm::loader::load_wasm_file_rtl::load_error:
-            {
-                return static_cast<int>(::uwvm2::uwvm::run::retval::load_error);
-            }
-            case ::uwvm2::uwvm::wasm::loader::load_wasm_file_rtl::wasm_parser_error:
-            {
-                return static_cast<int>(::uwvm2::uwvm::run::retval::wasm_parser_error);
-            }
-            [[unlikely]] default:
-            {
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
-                ::std::unreachable();
-            }
+            return static_cast<int>(::uwvm2::uwvm::run::retval::check_module_error);
         }
-
-        // check for Check for duplicate modulename
-        // Since vector expansion invalidates the iterator, the build map operation will not be performed on change here
-
-        if(auto const ret{::uwvm2::uwvm::run::load_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }
 
         // section details Occurs before dependency checks
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
@@ -157,8 +103,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
         // run vm
 
-        // check modules
-        if(auto const ret{::uwvm2::uwvm::run::check_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }
+        // check import exist
+        if(auto const ret{::uwvm2::uwvm::wasm::loader::check_import_exist_and_detect_cycles()};
+           ret != ::uwvm2::uwvm::wasm::loader::load_and_check_modules_rtl::ok) [[unlikely]]
+        {
+            return static_cast<int>(::uwvm2::uwvm::run::retval::check_module_error);
+        }
 
         /// @todo initialization
 

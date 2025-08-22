@@ -51,6 +51,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
     static_assert(::fast_io::is_tuple<all_feature_t>);  // check is tuple
     static_assert(::std::is_empty_v<all_feature_t>);    // check is empty
 
+    inline constexpr ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 max_binfmt_version{
+        ::uwvm2::parser::wasm::concepts::operation::get_max_binfmt_version_from_tuple(all_features)};
+
+    static_assert(max_binfmt_version == 1u, "missing implementation of other binfmt version");
+
     ////////////////////////////////////////
     /// @brief wasm binfmt ver1 features ///
     ////////////////////////////////////////
