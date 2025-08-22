@@ -39,31 +39,8 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    enum class module_type_t : unsigned
-    {
-        exec_wasm,       // wasm_file
-        preloaded_wasm,  // wasm_file
-        preloaded_dl,    // wasm_dl
-        local_import     /// @todo
-    };
 
-    union module_storage_ptr_u
-    {
-        ::uwvm2::uwvm::wasm::type::wasm_file_t const* wf;
-        /// @todo local_import
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
-        ::uwvm2::uwvm::wasm::type::wasm_dl_t const* wd;
-#endif
-    };
-
-    struct all_module_t
-    {
-        module_storage_ptr_u module_storage_ptr{};
-        module_type_t type{};
-    };
-
-    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, all_module_t> all_module{};  // [global]
+    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, ::uwvm2::uwvm::wasm::type::all_module_t> all_module{};  // [global]
 
 }  // namespace uwvm2::uwvm::wasm::storage

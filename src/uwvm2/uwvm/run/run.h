@@ -146,13 +146,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                 ::uwvm2::uwvm::wasm::section_details::print_section_details();
 
-                break;
+                // Return directly
+                return static_cast<int>(::uwvm2::uwvm::run::retval::ok);
             }
             default:
             {
                 break;
             }
         }
+
+        // run vm
 
         // check modules
         if(auto const ret{::uwvm2::uwvm::run::check_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) { return ret; }

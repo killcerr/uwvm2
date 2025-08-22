@@ -27,4 +27,5 @@
 # include "para.h"
 # include "file.h"
 # include "dl.h"
+# include "all_module.h"
 #endif

@@ -35,7 +35,7 @@
 
 void test_build()
 {
-    ::uwvm2::uwvm::wasm::storage::all_module_t s{};
+    ::uwvm2::uwvm::wasm::type::all_module_t s{};
 
     ::fast_io::black_hole dev_null{};
     ::fast_io::io::print(dev_null, ::uwvm2::uwvm::wasm::section_details::section_details(s));

@@ -54,10 +54,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
 {
     struct section_details_t
     {
-        ::uwvm2::uwvm::wasm::storage::all_module_t const* all_module_ptr{};
+        ::uwvm2::uwvm::wasm::type::all_module_t const* all_module_ptr{};
     };
 
-    inline constexpr section_details_t section_details(::uwvm2::uwvm::wasm::storage::all_module_t const& module_storage) noexcept
+    inline constexpr section_details_t section_details(::uwvm2::uwvm::wasm::type::all_module_t const& module_storage) noexcept
     {
         return {::std::addressof(module_storage)};
     }
@@ -73,7 +73,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
 
         switch(module_storage.type)
         {
-            case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm:
+            case ::uwvm2::uwvm::wasm::type::module_type_t::exec_wasm:
             {
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 if(module_storage.module_storage_ptr.wf == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
@@ -174,7 +174,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
 
                 break;
             }
-            case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
+            case ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_wasm:
             {
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 if(module_storage.module_storage_ptr.wf == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
@@ -274,7 +274,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
 
                 break;
             }
-            case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
+            case ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_dl:
             {
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 if(module_storage.module_storage_ptr.wd == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
@@ -282,7 +282,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
                 /// @todo
                 break;
             }
-            case ::uwvm2::uwvm::wasm::storage::module_type_t::local_import:
+            case ::uwvm2::uwvm::wasm::type::module_type_t::local_import:
             {
                 /// @todo
                 break;

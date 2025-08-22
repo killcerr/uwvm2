@@ -1,0 +1,82 @@
+/*************************************************************
+ * Ultimate WebAssembly Virtual Machine (Version 2)          *
+ * Copyright (c) 2025-present UlteSoft. All rights reserved. *
+ * Licensed under the APL-2.0 License (see LICENSE file).    *
+ *************************************************************/
+
+/**
+ * @author      MacroModel
+ * @version     2.0.0
+ * @copyright   APL-2.0 License
+ */
+
+/****************************************
+ *  _   _ __        ____     __ __  __  *
+ * | | | |\ \      / /\ \   / /|  \/  | *
+ * | | | | \ \ /\ / /  \ \ / / | |\/| | *
+ * | |_| |  \ V  V /    \ V /  | |  | | *
+ *  \___/    \_/\_/      \_/   |_|  |_| *
+ *                                      *
+ ****************************************/
+
+#pragma once
+
+#ifndef UWVM_MODULE
+// std
+# include <cstdint>
+# include <cstddef>
+# include <cstring>
+# include <new>
+# include <memory>
+# include <type_traits>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
+// import
+# include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/parser/wasm_custom/customs/impl.h>
+# include <uwvm2/uwvm/wasm/base/impl.h>
+# include <uwvm2/uwvm/wasm/feature/impl.h>
+# include "para.h"
+# include "file.h"
+# include "dl.h"
+#endif
+
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
+{
+    enum class module_type_t : unsigned
+    {
+        exec_wasm,       // wasm_file
+        preloaded_wasm,  // wasm_file
+        preloaded_dl,    // wasm_dl
+        local_import     /// @todo
+    };
+
+    union module_storage_ptr_u
+    {
+        ::uwvm2::uwvm::wasm::type::wasm_file_t const* wf;
+        /// @todo local_import
+
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+        ::uwvm2::uwvm::wasm::type::wasm_dl_t const* wd;
+#endif
+    };
+
+    struct all_module_t
+    {
+        module_storage_ptr_u module_storage_ptr{};
+        module_type_t type{};
+    };
+}  // namespace uwvm2::uwvm::wasm::type
+
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif

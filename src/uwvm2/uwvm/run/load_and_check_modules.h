@@ -619,7 +619,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
     struct build_dependency_graph_and_check_import_exist_ret_t
     {
         using module_name_t = ::uwvm2::utils::container::u8string_view;
+        using import_export_name_t = ::uwvm2::utils::container::u8string_view;
         using adjacency_list_t = ::uwvm2::utils::container::unordered_flat_map<module_name_t, ::uwvm2::utils::container::vector<module_name_t>>;
+        using all_module_exported_t = ::uwvm2::utils::container::unordered_flat_map<
+            module_name_t,
+            ::uwvm2::utils::container::unordered_flat_map<import_export_name_t, ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte>>;
 
         int ok;
         adjacency_list_t adj;
@@ -662,8 +666,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
             switch(curr_module.second.type)
             {
-                case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm: [[fallthrough]];
-                case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
+                case ::uwvm2::uwvm::wasm::type::module_type_t::exec_wasm: [[fallthrough]];
+                case ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_wasm:
                 {
                     auto const exec_wasm_ptr{curr_module.second.module_storage_ptr.wf};
                     auto const exec_wasm_binfmt_ver{exec_wasm_ptr->binfmt_ver};
@@ -735,8 +739,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                                 switch(imported_module.second.type)
                                 {
-                                    case ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm: [[fallthrough]];
-                                    case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm:
+                                    case ::uwvm2::uwvm::wasm::type::module_type_t::exec_wasm: [[fallthrough]];
+                                    case ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_wasm:
                                     {
                                         auto const imported_wasm_ptr{imported_module.second.module_storage_ptr.wf};
                                         auto const imported_wasm_binfmt_ver{imported_wasm_ptr->binfmt_ver};
@@ -789,7 +793,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                     }
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
-                                    case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
+                                    case ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_dl:
                                     {
                                         auto const imported_dl_ptr{imported_module.second.module_storage_ptr.wd};
 
@@ -1055,7 +1059,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                 }
 #if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
     ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
-                case ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl:
+                case ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_dl:
                 {
                     // Since dl only allows importing functions, there is no possibility of cyclic dependencies or similar issues, so no check is needed
                     break;
@@ -1102,8 +1106,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             if(!::uwvm2::uwvm::wasm::storage::all_module
                     .try_emplace(lwc.module_name,
-                                 ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(lwc)},
-                                                                            .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_wasm})
+                                 ::uwvm2::uwvm::wasm::type::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(lwc)},
+                                                                         .type = ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_wasm})
                     .second) [[unlikely]]
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -1130,8 +1134,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         {
             if(!::uwvm2::uwvm::wasm::storage::all_module
                     .try_emplace(ldc.module_name,
-                                 ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wd = ::std::addressof(ldc)},
-                                                                            .type = ::uwvm2::uwvm::wasm::storage::module_type_t::preloaded_dl})
+                                 ::uwvm2::uwvm::wasm::type::all_module_t{.module_storage_ptr = {.wd = ::std::addressof(ldc)},
+                                                                         .type = ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_dl})
                     .second) [[unlikely]]
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -1156,8 +1160,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             if(!::uwvm2::uwvm::wasm::storage::all_module
                     .try_emplace(
                         ::uwvm2::uwvm::wasm::storage::execute_wasm.module_name,
-                        ::uwvm2::uwvm::wasm::storage::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(::uwvm2::uwvm::wasm::storage::execute_wasm)},
-                                                                   .type = ::uwvm2::uwvm::wasm::storage::module_type_t::exec_wasm})
+                        ::uwvm2::uwvm::wasm::type::all_module_t{.module_storage_ptr = {.wf = ::std::addressof(::uwvm2::uwvm::wasm::storage::execute_wasm)},
+                                                                .type = ::uwvm2::uwvm::wasm::type::module_type_t::exec_wasm})
                     .second) [[unlikely]]
             {
                 ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -1292,7 +1296,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
 
                         ::fast_io::io::perrln(u8log_output_ul, ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                     }
-                    
+
                     // Here, guard will perform destructors.
                 }
 
