@@ -1253,7 +1253,7 @@ public:
 		}
 		else
 		{
-			auto newres{alloc::allocate_zero_aligned_at_least(alignof(T), n * sizeof(T))};
+			auto newres{alloc::allocate_aligned_zero_at_least(alignof(T), n * sizeof(T))};
 			return {reinterpret_cast<T *>(newres.ptr), newres.count / sizeof(T)};
 		}
 	}
