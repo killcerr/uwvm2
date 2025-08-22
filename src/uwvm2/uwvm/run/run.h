@@ -108,7 +108,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // run vm
 
         // check import exist and detect cycles
-        /// @todo construct ::uwvm2::uwvm::wasm::storage::all_module_export in ::uwvm2::uwvm::wasm::loader::check_import_exist_and_detect_cycles
         if(auto const ret{::uwvm2::uwvm::wasm::loader::check_import_exist_and_detect_cycles()};
            ret != ::uwvm2::uwvm::wasm::loader::load_and_check_modules_rtl::ok) [[unlikely]]
         {

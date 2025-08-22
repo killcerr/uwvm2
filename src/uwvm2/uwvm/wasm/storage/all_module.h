@@ -45,7 +45,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
     using wasm_module_name_t = ::uwvm2::utils::container::u8string_view;
     using wasm_import_export_name_t = ::uwvm2::utils::container::u8string_view;
 
-    /// @todo construct all_module_export in src/uwvm2/uwvm/wasm/loader/load_and_check_modules.h
     inline ::uwvm2::utils::container::unordered_flat_map<
         wasm_module_name_t,
         ::uwvm2::utils::container::unordered_flat_map<wasm_import_export_name_t, ::uwvm2::uwvm::wasm::type::all_module_export_t>>

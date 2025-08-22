@@ -191,8 +191,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
     /// @details    In the WASM standard, importing module A name B type C and importing module A name B type D simultaneously satisfies syntactic validity
     ///             (binary format validity) but fails validation.
     /// @return     Adjacency list representation of the dependency graph
-    /// @todo       construct ::uwvm2::uwvm::wasm::storage::all_module_export
-    inline constexpr build_dependency_graph_and_check_import_exist_ret_t build_dependency_graph_and_check_import_exist_and_construct_all_module_export() noexcept
+    inline constexpr build_dependency_graph_and_check_import_exist_ret_t
+        build_dependency_graph_and_check_import_exist_and_construct_all_module_export() noexcept
     {
 #ifdef UWVM_TIMER
         ::uwvm2::utils::debug::timer build_dependency_graph_and_check_import_exist_timer{u8"build dependency graph and check import exist"};
@@ -395,6 +395,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                         ::std::unreachable();
                                     }
                                 }
+
+// curr_exported should never be end() here
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                if(curr_exported == ::uwvm2::uwvm::wasm::storage::all_module_export.end()) [[unlikely]]
+                                {
+                                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+                                }
+#endif
 
                                 auto const curr_exported_module_exported{curr_exported->second.find(import_extern_name)};
                                 if(curr_exported_module_exported == curr_exported->second.end()) [[unlikely]]
