@@ -8,12 +8,16 @@
   function ready(fn){ if(document.readyState!=='loading'){ fn(); } else { document.addEventListener('DOMContentLoaded', fn); } }
 
   function distance(a,b){ var dx=a.x-b.x, dy=a.y-b.y; return Math.sqrt(dx*dx+dy*dy); }
-  function lerp(a,b,t){ return a+(b-a)*t; }
-
-  function applyGravity(svg){
+  function applyLens(svg){
     if(!svg) return;
     var nodes = Array.from(svg.querySelectorAll('g.node'));
     if(nodes.length===0) return;
+    // Tunables (gentle, global lens)
+    var SIGMA = 180;       // Gaussian radius
+    var MAX_T = 5;         // max translation in px
+    var MAX_S = 1.05;      // max scale
+    var ALPHA = 0.15;      // easing toward target per frame
+
     // cache centers once per svg render
     var centers = new Map();
     nodes.forEach(function(n){
@@ -21,46 +25,62 @@
         var bb = n.getBBox();
         centers.set(n, { x: bb.x + bb.width/2, y: bb.y + bb.height/2 });
       } catch(e) {}
+      n.style.transformOrigin = 'center';
+      n.style.transform = 'translate(0px,0px) scale(1)';
     });
 
-    nodes.forEach(function(n){
-      n.addEventListener('mouseenter', function(){
-        var c0 = centers.get(n);
-        nodes.forEach(function(m){
-          if(m===n) return;
-          var c1 = centers.get(m);
-          if(!c0 || !c1) return;
-          var d = distance(c0, c1);
-          var influence = Math.max(0, 1 - (d/180)); // radius ~180px
-          if(influence<=0) return;
-          var tx = lerp(0, (c0.x - c1.x)*0.04, influence); // move slightly towards
-          var ty = lerp(0, (c0.y - c1.y)*0.04, influence);
-          m.style.transition = 'transform 180ms ease, filter 180ms ease, stroke 180ms ease';
-          m.style.transform = 'translate('+ (tx) +'px,'+ (ty) +'px)';
-        });
-        // de-emphasize all edges, then highlight adjacent ones
-        svg.querySelectorAll('g.edge').forEach(function(e){
-          e.style.transition = 'opacity 150ms ease, stroke 150ms ease';
-          e.style.opacity = '0.35';
-        });
-        var title = (n.querySelector('title')||{}).textContent||'';
-        if(title){
-          svg.querySelectorAll('g.edge').forEach(function(e){
-            var et = (e.querySelector('title')||{}).textContent||'';
-            if(et.indexOf(title)!==-1){ e.style.opacity = '1'; }
-          });
+    // per-node animation state
+    var state = new Map();
+    nodes.forEach(function(n){ state.set(n, { tx:0, ty:0, s:1, txT:0, tyT:0, sT:1 }); });
+
+    // pointer in svg coords
+    function toSvgPoint(evt){
+      var pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+      try{
+        var ctm = svg.getScreenCTM();
+        if(ctm && typeof ctm.inverse==='function') return pt.matrixTransform(ctm.inverse());
+      }catch(e){}
+      return { x: evt.clientX, y: evt.clientY };
+    }
+
+    var cursor = null;
+    svg.addEventListener('pointermove', function(evt){ cursor = toSvgPoint(evt); });
+    svg.addEventListener('pointerleave', function(){ cursor = null; });
+
+    function frame(){
+      // set targets
+      nodes.forEach(function(n){
+        var st = state.get(n); var c = centers.get(n);
+        if(!st || !c) return;
+        if(cursor){
+          var dx = cursor.x - c.x, dy = cursor.y - c.y; var d = Math.sqrt(dx*dx+dy*dy) || 1;
+          var g = Math.exp(-(d*d)/(2*SIGMA*SIGMA));
+          var tmag = MAX_T * g; var s = 1 + (MAX_S - 1) * g;
+          st.txT = (dx / d) * tmag;
+          st.tyT = (dy / d) * tmag;
+          st.sT  = s;
+        } else {
+          st.txT = 0; st.tyT = 0; st.sT = 1;
         }
       });
-      n.addEventListener('mouseleave', function(){
-        nodes.forEach(function(m){ m.style.transform=''; m.style.filter=''; });
-        svg.querySelectorAll('g.edge').forEach(function(e){ e.style.opacity=''; });
+
+      // ease
+      nodes.forEach(function(n){
+        var st = state.get(n); if(!st) return;
+        st.tx += (st.txT - st.tx) * ALPHA;
+        st.ty += (st.tyT - st.ty) * ALPHA;
+        st.s  += (st.sT  - st.s ) * ALPHA;
+        n.style.transform = 'translate('+st.tx.toFixed(2)+'px,'+st.ty.toFixed(2)+'px) scale('+st.s.toFixed(4)+')';
       });
-    });
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   }
 
   function bindInlineSvgs(){
     var svgs = document.querySelectorAll('svg[id^="graph_"], svg[id^="inherit_graph_"], svg[id^="coll_graph_"], svg[id^="dir_"], svg[id^="class_"], svg[id^="namespace_"]');
-    svgs.forEach(function(svg){ applyGravity(svg); });
+    svgs.forEach(function(svg){ applyLens(svg); });
   }
 
   function bindEmbeddedSvgs(){
@@ -70,7 +90,7 @@
       function tryBind(){
         try{
           var d = fr.contentDocument || fr.contentWindow && fr.contentWindow.document;
-          if(d){ var svg = d.querySelector('svg'); if(svg){ applyGravity(svg); } }
+          if(d){ var svg = d.querySelector('svg'); if(svg){ applyLens(svg); } }
         }catch(e){}
       }
       if(fr.complete) tryBind();
@@ -81,7 +101,7 @@
     var objects = Array.from(document.querySelectorAll('object[type="image/svg+xml"]'));
     objects.forEach(function(obj){
       function tryBindObj(){
-        try{ var d = obj.contentDocument; if(d){ var svg = d.querySelector('svg'); if(svg){ applyGravity(svg); } } }catch(e){}
+        try{ var d = obj.contentDocument; if(d){ var svg = d.querySelector('svg'); if(svg){ applyLens(svg); } } }catch(e){}
       }
       tryBindObj();
       obj.addEventListener('load', tryBindObj, { once:false });

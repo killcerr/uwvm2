@@ -185,35 +185,23 @@ span.mlabel { background: var(--uwvm2-accent-2); color: #fff; border-radius: 4px
 /* Footer */
 .navpath { border-top: 1px solid var(--uwvm2-border); }
 
-/* ============================
-   Graphviz SVG hover animation
-   ============================ */
-svg[id^="graph_"], svg[id^="inherit_graph_"], svg[id^="coll_graph_"], svg[id^="dir_"], svg[id^="class_"], svg[id^="namespace_"] {
-    /* smoother hover animations */
-}
+/* Disable all SVG hover animations/effects for Graphviz outputs */
+svg[id^="graph_"], svg[id^="inherit_graph_"], svg[id^="coll_graph_"], svg[id^="dir_"], svg[id^="class_"], svg[id^="namespace_"] { }
+svg g.node polygon, svg g.node ellipse, svg g.node rect { transition: none !important; transform-origin: center center; }
+svg g.node:hover polygon, svg g.node:hover ellipse, svg g.node:hover rect { transform: none !important; filter: none !important; stroke: inherit !important; }
+svg g.edge path, svg g.edge polygon { transition: none !important; }
+svg g.edge:hover path, svg g.edge:hover polygon { stroke: inherit !important; opacity: 1 !important; }
+/* Force Graphviz SVG text/edge label colors to visible in both themes */
+/* Theme-aware graph colors */
+/* default (light) */
+svg g.node rect, svg g.node polygon, svg g.node ellipse { fill: #ffffff !important; stroke: #222 !important; }
+svg g.edge path, svg g.edge polygon, svg g.graph polygon, svg g.graph path { stroke: #222 !important; }
+svg g.node text, svg g.edge text, svg g.cluster text, svg g.graph text, svg text { fill: #000000 !important; }
 
-svg g.node polygon,
-svg g.node ellipse,
-svg g.node rect {
-    transition: transform 180ms ease, fill 180ms ease, stroke 180ms ease, filter 180ms ease;
-    transform-origin: center center;
-}
-svg g.node:hover polygon,
-svg g.node:hover ellipse,
-svg g.node:hover rect {
-    transform: scale(1.03);
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,.15));
-    stroke: var(--uwvm2-link);
-}
-svg g.edge path,
-svg g.edge polygon {
-    transition: stroke 180ms ease, opacity 180ms ease;
-}
-svg g.edge:hover path,
-svg g.edge:hover polygon {
-    stroke: var(--uwvm2-link-hover);
-    opacity: .9;
-}
+/* dark mode override */
+.dark-mode svg g.node rect, .dark-mode svg g.node polygon, .dark-mode svg g.node ellipse { fill: transparent !important; stroke: #000 !important; }
+.dark-mode svg g.edge path, .dark-mode svg g.edge polygon, .dark-mode svg g.graph polygon, .dark-mode svg g.graph path { stroke: #000 !important; }
+.dark-mode svg g.node text, .dark-mode svg g.edge text, .dark-mode svg g.cluster text, .dark-mode svg g.graph text, .dark-mode svg text { fill: #ffffff !important; }
 svg a:hover text, svg g.node:hover text {
     fill: var(--uwvm2-link-hover);
 }
