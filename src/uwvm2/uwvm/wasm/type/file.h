@@ -100,6 +100,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
                 [[unlikely]] default:
                 {
+                    static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
                     break;
                 }
             }
@@ -121,6 +122,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
                 [[unlikely]] default:
                 {
+                    static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
                     break;
                 }
             }
@@ -141,6 +143,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
                 [[unlikely]] default:
                 {
+                    static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
                     break;
                 }
             }
@@ -162,6 +165,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
                 [[unlikely]] default:
                 {
+                    static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
                     break;
                 }
             }
@@ -180,6 +184,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
                 [[unlikely]] default:
                 {
+                    static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
                     break;
                 }
             }
@@ -196,6 +201,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
                 [[unlikely]] default:
                 {
+                    static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
                     break;
                 }
             }
@@ -211,6 +217,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
                 }
                 [[unlikely]] default:
                 {
+                    static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
                     break;
                 }
             }
@@ -220,6 +227,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         inline constexpr auto& get_curr_binfmt_version_wasm_storage() noexcept
         {
             static_assert(binfmt_ver == 1u, "Unsupported binfmt version");
+            static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
             if constexpr(binfmt_ver == 1u) { return this->wasm_module_storage.wasm_binfmt_ver1_storage; }
         }
 
@@ -227,6 +235,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         inline constexpr auto const& get_curr_binfmt_version_wasm_storage() const noexcept
         {
             static_assert(binfmt_ver == 1u, "Unsupported binfmt version");
+            static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
             if constexpr(binfmt_ver == 1u) { return this->wasm_module_storage.wasm_binfmt_ver1_storage; }
         }
     };
