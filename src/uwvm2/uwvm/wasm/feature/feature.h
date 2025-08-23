@@ -60,14 +60,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::feature
     /// @brief wasm binfmt ver1 features ///
     ////////////////////////////////////////
     using wasm_binfmt_ver1_features_t =
-        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_features_tuple<1>(all_features));
+        decltype(::uwvm2::parser::wasm::concepts::operation::get_specified_binfmt_feature_tuple_from_all_features_tuple<1u>(all_features));
     static_assert(::fast_io::is_tuple<wasm_binfmt_ver1_features_t>);  // check is tuple
     static_assert(::std::is_empty_v<wasm_binfmt_ver1_features_t>);    // check is empty
     inline constexpr wasm_binfmt_ver1_features_t wasm_binfmt1_features{};
     /// @brief binfmt ver1 module storage
     using wasm_binfmt_ver1_module_storage_t = decltype(::uwvm2::parser::wasm::concepts::operation::get_module_storage_type_from_tuple(wasm_binfmt1_features));
     /// @brief binfmt ver1 module wasm parser (func pointer)
-    inline constexpr auto binfmt_ver1_handler{::uwvm2::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1>(wasm_binfmt1_features)};
+    inline constexpr auto binfmt_ver1_handler{::uwvm2::parser::wasm::concepts::operation::get_binfmt_handler_func_p_from_tuple<1u>(wasm_binfmt1_features)};
     static_assert(::std::is_pointer_v<decltype(binfmt_ver1_handler)>);  // check is func pointer
     /// @brief binfmt ver1 module parameter storage_t (feature_parameter_t)
     using wasm_binfmt_ver1_feature_parameter_storage_t =
