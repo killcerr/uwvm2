@@ -28,6 +28,9 @@
 # include <cstdint>
 # include <climits>
 # include <type_traits>
+# include <limits>
+# include <utility>
+# include <algorithm>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -38,6 +41,7 @@
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/madvise/impl.h>
 # include <uwvm2/utils/utf/impl.h>
+# include <uwvm2/utils/hash/impl.h>
 # include <uwvm2/parser/wasm/base/impl.h>
 # include <uwvm2/parser/wasm/concepts/impl.h>
 # include <uwvm2/parser/wasm/standard/impl.h>

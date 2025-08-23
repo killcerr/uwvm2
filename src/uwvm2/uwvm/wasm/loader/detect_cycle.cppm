@@ -27,6 +27,9 @@ module;
 #include <cstdint>
 #include <climits>
 #include <type_traits>
+#include <limits>
+#include <utility>
+#include <algorithm>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
@@ -39,6 +42,7 @@ import uwvm2.utils.ansies;
 import uwvm2.utils.debug;
 import uwvm2.utils.madvise;
 import uwvm2.utils.utf;
+import uwvm2.utils.hash;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard;
