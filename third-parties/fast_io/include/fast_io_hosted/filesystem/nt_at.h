@@ -436,7 +436,7 @@ struct nt_create_nothrow_callback
 template <bool zw>
 inline void nt_symlinkat_impl([[maybe_unused]] char16_t const *oldpath_c_str, [[maybe_unused]] ::std::size_t oldpath_size,
 							  [[maybe_unused]] void *newdirhd, [[maybe_unused]] char16_t const *newpath_c_str, 
-							  [[maybe_unused]] ::std::size_t newpath_size, [[maybe_unused]] bool kernel)
+                              [[maybe_unused]] ::std::size_t newpath_size, [[maybe_unused]] bool kernel)
 {
 #if !defined(_WIN32_WINNT) || _WIN32_WINNT > 0x0600
 
