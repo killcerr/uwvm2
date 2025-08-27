@@ -47,7 +47,13 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::memory::platform_page
 {
-    UWVM_GNU_PURE inline ::std::size_t get_platform_page_size() noexcept
+    struct get_platform_page_size_result_t
+    {
+        ::std::size_t page_size;
+        bool success;
+    };
+
+    UWVM_GNU_PURE inline get_platform_page_size_result_t get_platform_page_size() noexcept
     {
 #if defined(_WIN32) || defined(__CYGWIN__)                                                          // Windows
 # if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)  // WIN32
@@ -57,21 +63,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::platform_page
         if(!::fast_io::win32::GetSystemInfo(::std::addressof(si))) [[unlikely]]
         {
             // Systems running in protected mode (with paging support) crash immediately upon a failed call.
-#  ifdef UWVM
-            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"Cannot get platform page size.\n",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
-#  endif
-
-            ::fast_io::fast_terminate();
+            return {0uz, false};
         }
 
-        return static_cast<::std::size_t>(si.dwPageSize);
+        return {static_cast<::std::size_t>(si.dwPageSize), true};
 
 # else  // NT
 
@@ -82,53 +77,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::platform_page
                                                                                 ::std::addressof(si),
                                                                                 sizeof(si),
                                                                                 nullptr)};
-
         if(status) [[unlikely]]
         {
             // Systems running in protected mode (with paging support) crash immediately upon a failed call.
-#  ifdef UWVM
-            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"Cannot get platform page size.\n",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
-#  endif
-
-            ::fast_io::fast_terminate();
+            return {0uz, false};
         }
 
-        return static_cast<::std::size_t>(si.PageSize);
+        return {static_cast<::std::size_t>(si.PageSize), true};
 
 # endif
 #elif !defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) && (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) &&    \
     __has_include(<sys/mman.h>)  // POSIX
 
-        long const preferred_virtual_page_size{::fast_io::noexcept_call(::sysconf, _SC_PAGESIZE)};
+        int const preferred_virtual_page_size{::fast_io::noexcept_call(::getpagesize)};
 
-        if(preferred_virtual_page_size == static_cast<long>(-1)) [[unlikely]]
-        {
-# ifdef UWVM
-            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                                u8"uwvm: ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                                u8"[error] ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"Cannot get platform page size.\n",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
-# endif
+        // getpagesize() never fails
+        // Do not use sysconf(_SC_PAGESIZE) because it may set errno (though it will almost certainly succeed in most cases), violating gnu::pure semantics.
 
-            ::fast_io::fast_terminate();
-        }
-
-        return static_cast<::std::size_t>(preferred_virtual_page_size);
+        return {static_cast<::std::size_t>(preferred_virtual_page_size), true};
 
 #else  // None (e.g. i586-msdosdjgpp)
 
-        return 0uz;
+        return {0uz, true};
 
 #endif
     }
