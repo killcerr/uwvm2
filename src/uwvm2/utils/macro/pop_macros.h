@@ -52,6 +52,7 @@
 #pragma pop_macro("UWVM_GNU_ALWAYS_INLINE_ARTIFICIAL")
 #pragma pop_macro("UWVM_GNU_ARTIFICIAL")
 #pragma pop_macro("UWVM_ALWAYS_INLINE")
+#pragma pop_macro("UWVM_GNU_PURE")
 #pragma pop_macro("UWVM_GNU_CONST")
 #pragma pop_macro("UWVM_WINFASTCALL_RENAME")
 #pragma pop_macro("UWVM_WINFASTCALL")

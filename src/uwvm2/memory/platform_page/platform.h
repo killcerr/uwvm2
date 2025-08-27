@@ -47,7 +47,7 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::memory::platform_page
 {
-    UWVM_GNU_COLD inline ::std::size_t get_platform_page_size() noexcept
+    UWVM_GNU_PURE inline ::std::size_t get_platform_page_size() noexcept
     {
 #if defined(_WIN32) || defined(__CYGWIN__)                                                          // Windows
 # if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)  // WIN32

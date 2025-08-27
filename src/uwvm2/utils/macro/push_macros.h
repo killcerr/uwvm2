@@ -214,6 +214,17 @@
 # define UWVM_GNU_CONST
 #endif
 
+/// @brief        [[gnu::pure]] is an attribute that can be applied to functions that have no observable effects on the state of the program other than to
+///               return a value may lend themselves to optimizations such as common subexpression elimination.
+/// @details      on gcc, clang: [[__gnu__::__pure__]]
+#pragma push_macro("UWVM_GNU_PURE")
+#undef UWVM_GNU_PURE
+#if __has_cpp_attribute(__gnu__::__pure__)
+# define UWVM_GNU_PURE [[__gnu__::__pure__]]
+#else
+# define UWVM_GNU_PURE
+#endif
+
 /// @brief        forceinline
 /// @details      After C++17, the `inline` keyword no longer indicates forced inlining;
 ///               instead, it serves to prevent ODR violations. Forced inlining should be achieved using the forceinline attribute.
