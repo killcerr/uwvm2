@@ -92,8 +92,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::platform_page
         int const preferred_virtual_page_size{::fast_io::noexcept_call(::getpagesize)};
 
         // getpagesize() never fails
-        // Do not use sysconf(_SC_PAGESIZE) because it may set errno (though it will almost certainly succeed in most cases), violating gnu::pure semantics.
+        // Guarantees a positive integer return value under POSIX semantics
+        [[assume(preferred_virtual_page_size > 0)]];
 
+        // Do not use sysconf(_SC_PAGESIZE) because it may set errno (though it will almost certainly succeed in most cases), violating gnu::pure semantics.
         return {static_cast<::std::size_t>(preferred_virtual_page_size), true};
 
 #else  // None (e.g. i586-msdosdjgpp)
