@@ -231,6 +231,9 @@ target("uwvm")
 		-- utils
 		add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
 
+		-- memory
+		add_files("src/uwvm2/memory/**.cppm", {public = is_debug_mode})
+
 		-- wasm parser
 		add_files("src/uwvm2/parser/**.cppm", {public = is_debug_mode})
 
@@ -293,6 +296,9 @@ for _, file in ipairs(os.files("test/**.cc")) do
 			
 			-- utils
 			add_files("src/uwvm2/utils/**.cppm", {public = is_debug_mode})
+
+			-- memory
+			add_files("src/uwvm2/memory/**.cppm", {public = is_debug_mode})
 
 			-- wasm parser
 			add_files("src/uwvm2/parser/**.cppm", {public = is_debug_mode})
