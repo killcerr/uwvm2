@@ -10,5 +10,7 @@ export namespace fast_io
         using ::fast_io::win32::nt::nt_set_information_virtual_memory;
         using ::fast_io::win32::nt::memory_range_entry;
         using ::fast_io::win32::nt::virtual_memory_information_class;
+        using ::fast_io::win32::nt::nt_query_system_information;
+        using ::fast_io::win32::nt::system_information_class;
     } // namespace win32::nt
 }

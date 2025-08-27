@@ -23,5 +23,7 @@ export namespace fast_io
         using ::fast_io::win32::SetConsoleTextAttribute;
         using ::fast_io::win32::console_screen_buffer_info;
         using ::fast_io::win32::GetConsoleScreenBufferInfo;
+        using ::fast_io::win32::GetSystemInfo;
+        using ::fast_io::win32::system_info;
     } // namespace win32
 }
