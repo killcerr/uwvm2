@@ -60,6 +60,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::wasm_page
     inline constexpr auto default_wasm32_page_size{static_cast<wasm32_page_size_t>(65536u)};
     inline constexpr auto default_wasm64_page_size{static_cast<wasm64_page_size_t>(65536u)};
 
+    template <::std::unsigned_integral T>
+    inline constexpr T floor_log2(T value) noexcept
+    {
+        constexpr auto dgt{::std::numeric_limits<T>::digits - 1u};
+        return value == 0u ? ::std::numeric_limits<T>::max() : static_cast<T>(dgt - ::std::countl_zero(value));
+    }
+
+    inline constexpr auto default_wasm32_page_size_log2{floor_log2(default_wasm32_page_size)};
+    inline constexpr auto default_wasm64_page_size_log2{floor_log2(default_wasm64_page_size)};
 
 }  // namespace uwvm2::memory::wasm_page
 

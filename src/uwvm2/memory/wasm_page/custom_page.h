@@ -26,6 +26,8 @@
 # include <cstddef>
 # include <cstdint>
 # include <limits>
+# include <concepts>
+# include <bit>
 // import
 # include <fast_io.h>
 # include <uwvm2/parser/wasm/base/impl.h>
@@ -57,6 +59,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::wasm_page
         if(page_size_log2 >= max_page_size_log2) [[unlikely]] { ::fast_io::fast_terminate(); }
 
         return static_cast<::uwvm2::memory::wasm_page::wasm64_page_size_t>(static_cast<::uwvm2::memory::wasm_page::wasm64_page_size_t>(1u) << page_size_log2);
+    }
+
+    inline constexpr unsigned get_wasm32_page_size_log2(::uwvm2::memory::wasm_page::wasm32_page_size_t page_size) noexcept
+    {
+        return ::uwvm2::memory::wasm_page::floor_log2(page_size);
+    }
+
+    inline constexpr unsigned get_wasm64_page_size_log2(::uwvm2::memory::wasm_page::wasm64_page_size_t page_size) noexcept
+    {
+        return ::uwvm2::memory::wasm_page::floor_log2(page_size);
     }
 
 }  // namespace uwvm2::memory::wasm_page
