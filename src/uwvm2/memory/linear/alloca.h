@@ -111,7 +111,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             this->growing_flag_p = atomic_flag_allcator_t::allocate(1uz);
             ::new(this->growing_flag_p)::std::atomic_flag{ATOMIC_FLAG_INIT};
 
-            set_custom_page_size(custom_page_size);
+            // The same method as set_custom_page_size, but without adding a lock.
+
+            // Check if it is a power of 2
+            if(static_cast<unsigned>(::std::popcount(custom_page_size)) != 1u) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+            // Since there is only one pop, directly counting the number of zeros suffices to calculate log2
+            this->custom_page_size_log2 = ::std::countr_zero(custom_page_size);
         }
 
         inline constexpr void set_custom_page_size(::std::size_t custom_page_size) noexcept
