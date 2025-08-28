@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,6 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-06-30
  * @copyright   APL-2.0 License
  */
 
@@ -19,31 +20,29 @@
  *                                      *
  ****************************************/
 
-module;
-
-// std
-#include <cstddef>
-#include <cstdint>
-#include <limits>
-#include <memory>
-// platform
-#if !(defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                       \
-                                                  (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) && __has_include(<sys/mman.h>))
-# include <unistd.h>
-#endif
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-
-import fast_io;
-
-export module uwvm2.memory.platform_page:platform;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+// std
+# include <cstdint>
+# include <cstddef>
+# include <cstring>
+# include <climits>
+# include <concepts>
+# include <memory>
+# include <utility>
+# include <type_traits>
+// import
+# include <fast_io.h>
 #endif
+
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
+# define UWVM_MODULE_EXPORT
 #endif
 
-#include "platform.h"
-
+UWVM_MODULE_EXPORT namespace uwvm2::utils::mutex
+{
+    using mutex_t = ::fast_io::native_mutex;
+    using mutex_guard_t = ::fast_io::operations::decay::stream_ref_decay_lock_guard<mutex_t>;
+    using unlock_mutex_guard_t = ::fast_io::operations::decay::unlock_stream_ref_decay_lock_guard<mutex_t>;
+}

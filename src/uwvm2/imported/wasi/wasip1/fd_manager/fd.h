@@ -34,6 +34,7 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/mutex/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 #endif
@@ -46,7 +47,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 {
     struct wasi_fd_t
     {
-        using mutex_t = ::fast_io::native_mutex;
+        using mutex_t = ::uwvm2::utils::mutex::mutex_t;
         using mutex_alloc_t = ::fast_io::native_typed_global_allocator<mutex_t>;
 
         // ====== for wasi ======

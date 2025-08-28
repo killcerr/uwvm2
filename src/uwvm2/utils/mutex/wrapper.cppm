@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,6 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-06-30
  * @copyright   APL-2.0 License
  */
 
@@ -22,21 +23,18 @@
 module;
 
 // std
-#include <cstddef>
 #include <cstdint>
-#include <limits>
+#include <cstddef>
+#include <cstring>
+#include <climits>
+#include <concepts>
 #include <memory>
-// platform
-#if !(defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                       \
-                                                  (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) && __has_include(<sys/mman.h>))
-# include <unistd.h>
-#endif
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
+#include <utility>
+#include <type_traits>
+
+export module uwvm2.utils.mutex:wrapper;
 
 import fast_io;
-
-export module uwvm2.memory.platform_page:platform;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -45,5 +43,4 @@ export module uwvm2.memory.platform_page:platform;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "platform.h"
-
+#include "wrapper.h"

@@ -19,31 +19,8 @@
  *                                      *
  ****************************************/
 
-module;
-
-// std
-# include <cstddef>
-# include <cstdint>
-# include <stdfloat>
-# include <limits>
-# include <type_traits>
-# include <memory>
-# include <new>
-// macro
-# include <uwvm2/utils/macro/push_macros.h>
-
-export module uwvm2.imported.wasi.wasip1.abi:fd;
-
-import fast_io;
-import uwvm2.utils.mutex;
-import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.imported.wasi.wasip1.abi;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+# include "wrapper.h"
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "fd.h"
