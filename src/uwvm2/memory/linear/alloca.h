@@ -92,6 +92,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
         unsigned custom_page_size_log2{};
         ::std::atomic_flag* growing_flag_p{};
 
+        // constexpr data
+
+        /// @brief If mmap is not possible, it indicates that realloc is required. This means the content may grow, potentially changing the base address,
+        ///        necessitating lock control.
+        inline static constexpr bool can_mmap{false};
+
+        /// @brief If multithreading is not supported, it cannot be used in a multithreaded environment. The reason for supporting multithreading here is to
+        ///        accommodate certain embedded platforms that do not support mmap but do support multithreading.
+        inline static constexpr bool support_multi_thread{true};
+
         // function
 
         /// @brief      Default constructor.
