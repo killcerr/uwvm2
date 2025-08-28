@@ -56,6 +56,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
         {
             if(this->growing_flag_p != nullptr) [[likely]]
             {
+                // acquire: establish exclusive lock ownership; prevent later accesses from moving before lock
+                // relaxed: waiting needs no ordering; wake-up is ordered via clear(release)
                 while(this->growing_flag_p->test_and_set(::std::memory_order_acquire)) { this->growing_flag_p->wait(true, ::std::memory_order_relaxed); }
             }
         }
@@ -69,12 +71,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
         {
             if(this->growing_flag_p != nullptr) [[likely]]
             {
+                // release: publish critical-section updates before unlocking
                 this->growing_flag_p->clear(::std::memory_order_release);
                 // Memory access for all threads has been blocked, so it is necessary to notify all.
                 this->growing_flag_p->notify_all();
             }
         }
     };
+
+    /// @brief   Safe Memory Growth under Concurrency for Linear Memory (Non-mmap Fallback)
+    /// @details When linear memory growth requires relocating the underlying buffer (e.g., realloc + memcpy on platforms without mmap), concurrent
+    ///          loads/stores—including atomic RMW operations—may race with the relocation process. A pathological case arises when:
+    ///
+    ///          - Thread A acquires a cache line with an atomic operation.
+    ///          - Thread B contends on the same cache line with another atomic.
+    ///          - Thread C performs memory.grow, which relocates the buffer and stalls while copying the very cache line.
+    ///          - After A releases the line, B and C race; if C proceeds first and copies “old” data into the new buffer, then B writes to the old buffer,
+    ///            yielding divergence between the new buffer and reality.
+    ///
+    ///          Therefore, the grow_flag must be set during the grow phase to prevent new threads from attempting to read or write memory. Reference counting
+    ///          is performed for instructions currently being read or written. When the reference count reaches zero, the grow process begins.
 
     /// @brief      The basic allocator memory class.
     /// @defailt    The allocator memory supports the following scenarios: First, platforms that do not support mmap. Second, when the size of custom_page is
@@ -83,7 +99,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
     struct basic_allocator_memory_t
     {
         using allocator_t = Alloc;
-        using atomic_flag_allcator_t = ::fast_io::native_typed_global_allocator<::std::atomic_flag>;
+        using atomic_flag_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_flag>;
+        using atomic_size_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_size_t>;
 
         // data
         ::std::byte* memory_begin{};
@@ -91,7 +108,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
 
         unsigned custom_page_size_log2{};
         ::std::atomic_flag* growing_flag_p{};
-
+        ::std::atomic_size_t* active_ops_p{};
         // constexpr data
 
         /// @brief If mmap is not possible, it indicates that realloc is required. This means the content may grow, potentially changing the base address,
@@ -111,6 +128,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             this->growing_flag_p = atomic_flag_allcator_t::allocate(1uz);
             ::new(this->growing_flag_p)::std::atomic_flag{ATOMIC_FLAG_INIT};
 
+            this->active_ops_p = atomic_size_allcator_t::allocate(1uz);
+            ::new(this->active_ops_p)::std::atomic_size_t{0uz};
+
             constexpr ::std::size_t default_wasm_page_size{65536uz};
             constexpr unsigned default_wasm_page_size_log2{static_cast<unsigned>(::std::countr_zero(default_wasm_page_size))};
             this->custom_page_size_log2 = default_wasm_page_size_log2;
@@ -121,18 +141,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             this->growing_flag_p = atomic_flag_allcator_t::allocate(1uz);
             ::new(this->growing_flag_p)::std::atomic_flag{ATOMIC_FLAG_INIT};
 
+            this->active_ops_p = atomic_size_allcator_t::allocate(1uz);
+            ::new(this->active_ops_p)::std::atomic_size_t{0uz};
+
             // The same method as set_custom_page_size, but without adding a lock.
-
-            // Check if it is a power of 2
-            if(static_cast<unsigned>(::std::popcount(custom_page_size)) != 1u) [[unlikely]] { ::fast_io::fast_terminate(); }
-
-            // Since there is only one pop, directly counting the number of zeros suffices to calculate log2
-            this->custom_page_size_log2 = ::std::countr_zero(custom_page_size);
-        }
-
-        inline constexpr void set_custom_page_size(::std::size_t custom_page_size) noexcept
-        {
-            growing_flag_guard_t growing_flag_guard{this->growing_flag_p};
 
             // Check if it is a power of 2
             if(static_cast<unsigned>(::std::popcount(custom_page_size)) != 1u) [[unlikely]] { ::fast_io::fast_terminate(); }
@@ -143,11 +155,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
 
         /// @brief      Initialize the memory.
         /// @note       Maximum value checks are not provided; maximum value checks should be performed outside of memory management.
+        /// @note       This function is designed to be lock-free and cannot be executed during WASM execution (multi-threaded). It can only be done before the
+        ///             WASM execution.
+        /// @note       You can use it after clear().
         inline constexpr void init_by_page_count(::std::size_t init_page_count) noexcept
         {
             if(init_page_count > ::std::numeric_limits<::std::size_t>::max() >> this->custom_page_size_log2) [[unlikely]] { ::fast_io::fast_terminate(); }
-
-            growing_flag_guard_t growing_flag_guard{this->growing_flag_p};
 
             if(this->memory_begin == nullptr) [[likely]]
             {
@@ -174,6 +187,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             if(page_grow_size == 0uz) [[unlikely]] { return; }
 
             growing_flag_guard_t growing_flag_guard{this->growing_flag_p};
+
+            // Stop-the-world: wait for all in-flight operations to finish
+
+            if(this->active_ops_p == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+            // acquire: observe decrements published with release; ensures quiescence is visible
+            for(auto v{this->active_ops_p->load(::std::memory_order_acquire)}; v != 0uz; v = this->active_ops_p->load(::std::memory_order_acquire))
+            {
+                // acquire: pair with operation's release decrement before proceeding after wake
+                this->active_ops_p->wait(v, ::std::memory_order_acquire);
+            }
 
             if(this->memory_begin == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
 
@@ -226,12 +250,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             this->memory_length = other.memory_length;
             this->custom_page_size_log2 = other.custom_page_size_log2;
             this->growing_flag_p = other.growing_flag_p;
+            this->active_ops_p = other.active_ops_p;
 
             // clear destory other
             other.memory_begin = nullptr;
             other.memory_length = 0uz;
             other.custom_page_size_log2 = 0u;
             other.growing_flag_p = nullptr;
+            other.active_ops_p = nullptr;
         }
 
         /// @note      This function is designed to be lock-free and cannot be executed during WASM execution (multi-threaded). It can only be done before the
@@ -246,12 +272,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             this->memory_length = other.memory_length;
             this->custom_page_size_log2 = other.custom_page_size_log2;
             this->growing_flag_p = other.growing_flag_p;
+            this->active_ops_p = other.active_ops_p;
 
             // clear destory other
             other.memory_begin = nullptr;
             other.memory_length = 0uz;
             other.custom_page_size_log2 = 0u;
             other.growing_flag_p = nullptr;
+            other.active_ops_p = nullptr;
 
             return *this;
         }
@@ -268,7 +296,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             this->memory_begin = nullptr;
         }
 
-        /// @brief      Clear the memory and destroy the growing flag.
+        /// @brief      Clear the memory and destroy all flag.
         /// @note       After calling this, you must reinitialize it according to the initialization process.
         /// @note       This function is designed to be lock-free and cannot be executed during WASM execution (multi-threaded). It can only be done after the
         ///             WASM execution.
@@ -277,26 +305,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
             Alloc::deallocate_n(this->memory_begin, this->memory_length);  // dealloc includes built-in nullptr checking
 
             if(this->growing_flag_p != nullptr) [[likely]] { ::std::destroy_at(this->growing_flag_p); }
-
             atomic_flag_allcator_t::deallocate_n(this->growing_flag_p, 1uz);  // dealloc includes built-in nullptr checking
+
+            if(this->active_ops_p != nullptr) [[likely]] { ::std::destroy_at(this->active_ops_p); }
+            atomic_size_allcator_t::deallocate_n(this->active_ops_p, 1uz);  // dealloc includes built-in nullptr checking
 
             this->memory_length = 0uz;
             this->memory_begin = nullptr;
             this->custom_page_size_log2 = 0u;
             this->growing_flag_p = nullptr;
+            this->active_ops_p = nullptr;
         }
 
         /// @note       This function is designed to be lock-free and cannot be executed during WASM execution (multi-threaded). It can only be done after the
         ///             WASM execution.
-        inline ~basic_allocator_memory_t() noexcept
+        inline constexpr ~basic_allocator_memory_t() noexcept
         {
             Alloc::deallocate_n(this->memory_begin, this->memory_length);  // dealloc includes built-in nullptr checking
 
             if(this->growing_flag_p != nullptr) [[likely]] { ::std::destroy_at(this->growing_flag_p); }
-
             atomic_flag_allcator_t::deallocate_n(this->growing_flag_p, 1uz);  // dealloc includes built-in nullptr checking
 
-            // multiple call to destructor is undefined behavior, so never set to nullptr
+            if(this->active_ops_p != nullptr) [[likely]] { ::std::destroy_at(this->active_ops_p); }
+            atomic_size_allcator_t::deallocate_n(this->active_ops_p, 1uz);  // dealloc includes built-in nullptr checking
+
+            // multiple call to destructor is undefined behavior, so never set to default value
         }
     };
 
