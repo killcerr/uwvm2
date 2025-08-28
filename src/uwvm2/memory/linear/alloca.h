@@ -186,12 +186,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
         {
             if(page_grow_size == 0uz) [[unlikely]] { return; }
 
+            // Prevent new memory operation instructions from being read for speculation
             growing_flag_guard_t growing_flag_guard{this->growing_flag_p};
 
             // Stop-the-world: wait for all in-flight operations to finish
 
             if(this->active_ops_p == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
 
+            // Wait for all existing memory read instructions to complete.
             // acquire: observe decrements published with release; ensures quiescence is visible
             for(auto v{this->active_ops_p->load(::std::memory_order_acquire)}; v != 0uz; v = this->active_ops_p->load(::std::memory_order_acquire))
             {
