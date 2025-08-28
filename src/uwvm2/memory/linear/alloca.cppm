@@ -28,6 +28,8 @@ module;
 #include <memory>
 #include <new>
 #include <atomic>
+#include <bit>
+#include <utility>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
