@@ -27,6 +27,7 @@ module;
 #include <cstddef>
 #include <concepts>
 #include <new>
+#include <memory>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 

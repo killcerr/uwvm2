@@ -28,6 +28,7 @@
 # include <cstddef>
 # include <concepts>
 # include <new>
+# include <memory>
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // import
@@ -67,7 +68,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
             if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[y_length + 1uz]; }
             else
             {
-                d = Alloc::allocate(y_length + 1uz);
+                auto const alloc_length{y_length + 1uz};
+
+                auto const alloc_ptr{Alloc::allocate(alloc_length)};
+
+#if __cpp_lib_start_lifetime_as >= 202207L
+                // No UBs, type_allocator provides built-in type alignment.
+                d = ::std::start_lifetime_as_array<::std::size_t>(alloc_ptr, alloc_length);
+#else
+                // Historical leniency for trivial types
+                // Under older conventions, many compiler implementations adopted a “lenient mode” for trivial types:
+                // Simply reinterpret_cast<T*>(raw) and write to it, and lifetimes would be automatically managed for you.
+                d = alloc_ptr;
+#endif
             }
         }
 
