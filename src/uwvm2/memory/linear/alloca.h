@@ -96,7 +96,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
     /// @defailt    The allocator memory supports the following scenarios: First, platforms that do not support mmap. Second, when the size of custom_page is
     ///             smaller than platform_page.
     template <typename Alloc>
-    struct basic_allocator_memory_t
+    struct basic_allocator_memory_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         using allocator_t = Alloc;
         using atomic_flag_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_flag>;

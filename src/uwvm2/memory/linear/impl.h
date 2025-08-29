@@ -23,4 +23,6 @@
 
 #ifndef UWVM_MODULE
 # include "alloca.h"
+# include "mmap.h"
+# include "native.h"
 #endif
