@@ -126,10 +126,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
         inline constexpr basic_allocator_memory_t() noexcept
         {
             this->growing_flag_p = atomic_flag_allcator_t::allocate(1uz);
-            ::new(this->growing_flag_p)::std::atomic_flag{ATOMIC_FLAG_INIT};
+            ::new(this->growing_flag_p)::std::atomic_flag{};
 
             this->active_ops_p = atomic_size_allcator_t::allocate(1uz);
-            ::new(this->active_ops_p)::std::atomic_size_t{0uz};
+            ::new(this->active_ops_p)::std::atomic_size_t{};
 
             constexpr ::std::size_t default_wasm_page_size{65536uz};
             constexpr unsigned default_wasm_page_size_log2{static_cast<unsigned>(::std::countr_zero(default_wasm_page_size))};
@@ -139,10 +139,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
         inline constexpr basic_allocator_memory_t(::std::size_t custom_page_size) noexcept
         {
             this->growing_flag_p = atomic_flag_allcator_t::allocate(1uz);
-            ::new(this->growing_flag_p)::std::atomic_flag{ATOMIC_FLAG_INIT};
+            ::new(this->growing_flag_p)::std::atomic_flag{};
 
             this->active_ops_p = atomic_size_allcator_t::allocate(1uz);
-            ::new(this->active_ops_p)::std::atomic_size_t{0uz};
+            ::new(this->active_ops_p)::std::atomic_size_t{};
 
             // The same method as set_custom_page_size, but without adding a lock.
 

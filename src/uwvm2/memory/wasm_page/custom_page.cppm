@@ -26,14 +26,14 @@ module;
 #include <cstdint>
 #include <limits>
 
+export module uwvm2.memory.wasm_page:custom_page;
+
 import fast_io;
 import uwvm2.parser.wasm.base;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.binfmt;
 import uwvm2.parser.wasm.standard;
 import :default_page;
-
-export module uwvm2.memory.wasm_page:custom_page;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

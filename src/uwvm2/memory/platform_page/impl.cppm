@@ -23,7 +23,7 @@
 module;
 
 export module uwvm2.memory.platform_page;
-export import :native;
+export import :platform;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

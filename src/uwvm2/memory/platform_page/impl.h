@@ -22,5 +22,5 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "native.h"
+# include "platform.h"
 #endif

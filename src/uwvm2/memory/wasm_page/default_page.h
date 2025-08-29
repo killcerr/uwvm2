@@ -26,6 +26,8 @@
 # include <cstddef>
 # include <cstdint>
 # include <limits>
+# include <concepts>
+# include <bit>
 // import
 # include <fast_io.h>
 # include <uwvm2/parser/wasm/base/impl.h>

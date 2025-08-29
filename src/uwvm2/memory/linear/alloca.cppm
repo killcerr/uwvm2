@@ -33,12 +33,12 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
+export module uwvm2.memory.linear:alloca;
+
 import fast_io;
 import uwvm2.utils.debug;
 import uwvm2.utils.mutex;
 import uwvm2.memory.wasm_page;
-
-export module uwvm2.memory.linear:alloca;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
