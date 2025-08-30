@@ -24,6 +24,7 @@
 
 #ifndef UWVM_MODULE
 // std
+# include <version>
 # include <cstdint>
 # include <cstddef>
 # include <concepts>
@@ -66,12 +67,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         else
         {
             if(y_length > ::std::numeric_limits<::std::size_t>::max() - 1uz) [[unlikely]] { ::fast_io::fast_terminate(); }
+           
+            auto const alloc_length{y_length + 1uz};
 
-            if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[y_length + 1uz]; }
+            if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[alloc_length]; }
             else
             {
-                auto const alloc_length{y_length + 1uz};
-
                 auto const alloc_ptr{Alloc::allocate(alloc_length)};
 
 #if __cpp_lib_start_lifetime_as >= 202207L
