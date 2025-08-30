@@ -191,6 +191,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                     {
                         // In full protection mode, the maximum memory allocation permitted is half of the full protection size.
                         // ::std::numeric_limits<::std::uint_least32_t>::max() == max_full_protection_wasm32_length / 2u
+                        static_assert(::std::numeric_limits<::std::uint_least32_t>::max() == max_full_protection_wasm32_length / 2u);
+                        
                         max_init_page_count = ::std::numeric_limits<::std::uint_least32_t>::max() >> this->custom_page_size_log2;
                         break;
                     }
