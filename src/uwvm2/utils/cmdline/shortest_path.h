@@ -65,6 +65,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         if constexpr(Stack_Len) { d = storage.data(); }
         else
         {
+            if(y_length > ::std::numeric_limits<::std::size_t>::max() - 1uz) [[unlikely]] { ::fast_io::fast_terminate(); }
+
             if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[y_length + 1uz]; }
             else
             {
