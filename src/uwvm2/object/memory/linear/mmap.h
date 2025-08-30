@@ -101,7 +101,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             this->memory_length_p = atomic_size_allcator_t::allocate(1uz);
             ::new(this->memory_length_p)::std::atomic_size_t{};
 
-            constexpr ::std::size_t default_wasm_page_size{65536uz};
+            constexpr ::std::size_t default_wasm_page_size{static_cast<::std::size_t>(::uwvm2::object::memory::wasm_page::default_wasm32_page_size)};
             constexpr unsigned default_wasm_page_size_log2{static_cast<unsigned>(::std::countr_zero(default_wasm_page_size))};
             this->custom_page_size_log2 = default_wasm_page_size_log2;
 
@@ -192,7 +192,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                         // In full protection mode, the maximum memory allocation permitted is half of the full protection size.
                         // ::std::numeric_limits<::std::uint_least32_t>::max() == max_full_protection_wasm32_length / 2u
                         static_assert(::std::numeric_limits<::std::uint_least32_t>::max() == max_full_protection_wasm32_length / 2u);
-                        
+
                         max_init_page_count = ::std::numeric_limits<::std::uint_least32_t>::max() >> this->custom_page_size_log2;
                         break;
                     }

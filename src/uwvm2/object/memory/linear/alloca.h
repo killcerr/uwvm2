@@ -107,7 +107,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         ::std::size_t memory_length{};
 
         unsigned custom_page_size_log2{};
-        
+
         ::std::atomic_flag* growing_flag_p{};
         ::std::atomic_size_t* active_ops_p{};
         // constexpr data
@@ -132,7 +132,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             this->active_ops_p = atomic_size_allcator_t::allocate(1uz);
             ::new(this->active_ops_p)::std::atomic_size_t{};
 
-            constexpr ::std::size_t default_wasm_page_size{65536uz};
+            constexpr ::std::size_t default_wasm_page_size{static_cast<::std::size_t>(::uwvm2::object::memory::wasm_page::default_wasm32_page_size)};
             constexpr unsigned default_wasm_page_size_log2{static_cast<unsigned>(::std::countr_zero(default_wasm_page_size))};
             this->custom_page_size_log2 = default_wasm_page_size_log2;
         }
