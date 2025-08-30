@@ -40,13 +40,13 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::memory::wasm_page
+UWVM_MODULE_EXPORT namespace uwvm2::object::memory::wasm_page
 {
     // page_size must be 2^n
     union wasm32_wasm64_page_size_storage_u
     {
-        ::uwvm2::memory::wasm_page::wasm32_page_size_t wasm32_page_size;
-        ::uwvm2::memory::wasm_page::wasm64_page_size_t wasm64_page_size;
+        ::uwvm2::object::memory::wasm_page::wasm32_page_size_t wasm32_page_size;
+        ::uwvm2::object::memory::wasm_page::wasm64_page_size_t wasm64_page_size;
     };
 
     struct runtime_wasm_page
@@ -57,22 +57,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::wasm_page
 
     inline constexpr runtime_wasm_page get_default_wasm32_runtime_wasm_page() noexcept
     {
-        return {wasm32_wasm64_page_size_storage_u{.wasm32_page_size = ::uwvm2::memory::wasm_page::default_wasm32_page_size}, false};
+        return {wasm32_wasm64_page_size_storage_u{.wasm32_page_size = ::uwvm2::object::memory::wasm_page::default_wasm32_page_size}, false};
     }
 
     inline constexpr runtime_wasm_page get_default_wasm64_runtime_wasm_page() noexcept
     {
-        return {wasm32_wasm64_page_size_storage_u{.wasm64_page_size = ::uwvm2::memory::wasm_page::default_wasm64_page_size}, true};
+        return {wasm32_wasm64_page_size_storage_u{.wasm64_page_size = ::uwvm2::object::memory::wasm_page::default_wasm64_page_size}, true};
     }
 
     inline constexpr runtime_wasm_page get_custom_wasm32_runtime_wasm_page(unsigned page_size_log2) noexcept
     {
-        return {wasm32_wasm64_page_size_storage_u{.wasm32_page_size = ::uwvm2::memory::wasm_page::set_custom_wasm32_page_size(page_size_log2)}, false};
+        return {wasm32_wasm64_page_size_storage_u{.wasm32_page_size = ::uwvm2::object::memory::wasm_page::set_custom_wasm32_page_size(page_size_log2)}, false};
     }
 
     inline constexpr runtime_wasm_page get_custom_wasm64_runtime_wasm_page(unsigned page_size_log2) noexcept
     {
-        return {wasm32_wasm64_page_size_storage_u{.wasm64_page_size = ::uwvm2::memory::wasm_page::set_custom_wasm64_page_size(page_size_log2)}, true};
+        return {wasm32_wasm64_page_size_storage_u{.wasm64_page_size = ::uwvm2::object::memory::wasm_page::set_custom_wasm64_page_size(page_size_log2)}, true};
     }
-}  // namespace uwvm2::memory::wasm_page
+}  // namespace uwvm2::object::memory::wasm_page
 

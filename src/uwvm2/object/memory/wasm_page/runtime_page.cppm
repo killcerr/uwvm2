@@ -25,20 +25,16 @@ module;
 #include <cstddef>
 #include <cstdint>
 #include <limits>
-#include <memory>
-#include <new>
-#include <atomic>
-#include <bit>
-#include <utility>
 
-export module uwvm2.memory.linear:native;
+export module uwvm2.object.memory.wasm_page:runtime_page;
 
 import fast_io;
-import uwvm2.utils.debug;
-import uwvm2.utils.mutex;
-import uwvm2.memory.wasm_page;
-import :alloca;
-import :mmap;
+import uwvm2.parser.wasm.base;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.binfmt;
+import uwvm2.parser.wasm.standard;
+import :default_page;
+import :custom_page;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -47,5 +43,5 @@ import :mmap;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "native.h"
+#include "runtime_page.h"
 

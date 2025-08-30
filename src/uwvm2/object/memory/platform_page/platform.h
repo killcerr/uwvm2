@@ -42,7 +42,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::memory::platform_page
+UWVM_MODULE_EXPORT namespace uwvm2::object::memory::platform_page
 {
     struct get_platform_page_size_result_t
     {
@@ -102,7 +102,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::platform_page
 #endif
     }
 
-}  // namespace uwvm2::memory::wasm_page
+}  // namespace uwvm2::object::memory::wasm_page
 
 #ifndef UWVM_MODULE
 // macro

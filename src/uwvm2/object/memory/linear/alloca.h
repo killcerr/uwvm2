@@ -36,14 +36,14 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/debug/impl.h>
-# include <uwvm2/memory/wasm_page/impl.h>
+# include <uwvm2/object/memory/wasm_page/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
+UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 {
     /// @brief      The guard for the growing flag.
     /// @note       This guard is only used in `grow`. During memory operations, it directly employs `this->growing_flag->wait(true,
@@ -107,6 +107,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
         ::std::size_t memory_length{};
 
         unsigned custom_page_size_log2{};
+        
         ::std::atomic_flag* growing_flag_p{};
         ::std::atomic_size_t* active_ops_p{};
         // constexpr data
@@ -337,19 +338,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::linear
 
     using allocator_memory_t = basic_allocator_memory_t<::fast_io::native_global_allocator>;
 
-}  // namespace uwvm2::memory::wasm_page
+}  // namespace uwvm2::object::memory::wasm_page
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <typename Alloc>
-    struct is_trivially_copyable_or_relocatable<::uwvm2::memory::linear::basic_allocator_memory_t<Alloc>>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc>>
     {
         inline static constexpr bool value = true;
     };
 
     template <typename Alloc>
-    struct is_zero_default_constructible<::uwvm2::memory::linear::basic_allocator_memory_t<Alloc>>
+    struct is_zero_default_constructible<::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc>>
     {
         inline static constexpr bool value = true;
     };

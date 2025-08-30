@@ -25,20 +25,16 @@ module;
 #include <cstddef>
 #include <cstdint>
 #include <limits>
-#include <memory>
-#include <new>
-#include <atomic>
+#include <concepts>
 #include <bit>
-#include <utility>
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.memory.linear:mmap;
+export module uwvm2.object.memory.wasm_page:default_page;
 
 import fast_io;
-import uwvm2.utils.debug;
-import uwvm2.utils.mutex;
-import uwvm2.memory.wasm_page;
+import uwvm2.parser.wasm.base;
+import uwvm2.parser.wasm.concepts;
+import uwvm2.parser.wasm.binfmt;
+import uwvm2.parser.wasm.standard;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -47,5 +43,5 @@ import uwvm2.memory.wasm_page;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "mmap.h"
+#include "default_page.h"
 

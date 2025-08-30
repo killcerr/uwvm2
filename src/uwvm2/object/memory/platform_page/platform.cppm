@@ -36,7 +36,7 @@ module;
 
 import fast_io;
 
-export module uwvm2.memory.platform_page:platform;
+export module uwvm2.object.memory.platform_page:platform;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

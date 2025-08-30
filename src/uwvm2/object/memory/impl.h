@@ -1,4 +1,3 @@
-
 /*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
@@ -20,18 +19,10 @@
  *                                      *
  ****************************************/
 
-module;
-
-export module uwvm2.memory.linear;
-export import :alloca;
-export import :mmap;
-export import :native;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+# include <uwvm2/object/memory/wasm_page/impl.h>
+# include <uwvm2/object/memory/platform_page/impl.h>
+# include <uwvm2/object/memory/linear/impl.h>
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "impl.h"

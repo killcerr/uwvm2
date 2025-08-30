@@ -40,7 +40,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::memory::wasm_page
+UWVM_MODULE_EXPORT namespace uwvm2::object::memory::wasm_page
 {
     using wasm32_page_size_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32;
     using wasm64_page_size_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64;
@@ -72,5 +72,5 @@ UWVM_MODULE_EXPORT namespace uwvm2::memory::wasm_page
     inline constexpr auto default_wasm32_page_size_log2{floor_log2(default_wasm32_page_size)};
     inline constexpr auto default_wasm64_page_size_log2{floor_log2(default_wasm64_page_size)};
 
-}  // namespace uwvm2::memory::wasm_page
+}  // namespace uwvm2::object::memory::wasm_page
 

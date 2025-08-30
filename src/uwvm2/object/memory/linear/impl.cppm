@@ -1,3 +1,4 @@
+
 /*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
@@ -21,20 +22,10 @@
 
 module;
 
-// std
-#include <cstddef>
-#include <cstdint>
-#include <limits>
-#include <concepts>
-#include <bit>
-
-export module uwvm2.memory.wasm_page:default_page;
-
-import fast_io;
-import uwvm2.parser.wasm.base;
-import uwvm2.parser.wasm.concepts;
-import uwvm2.parser.wasm.binfmt;
-import uwvm2.parser.wasm.standard;
+export module uwvm2.object.memory.linear;
+export import :alloca;
+export import :mmap;
+export import :native;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -43,5 +34,4 @@ import uwvm2.parser.wasm.standard;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "default_page.h"
-
+#include "impl.h"
