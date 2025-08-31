@@ -22,11 +22,8 @@
 
 module;
 
-export module uwvm2.object.memory;
-export import uwvm2.object.memory.wasm_page;
-export import uwvm2.object.memory.platform_page;
-export import uwvm2.object.memory.linear;
-export import uwvm2.object.memory.multiple;
+export module uwvm2.object.memory.multiple;
+export import :multiple;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

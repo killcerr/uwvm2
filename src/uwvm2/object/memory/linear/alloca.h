@@ -92,7 +92,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
     /// @note       This guard implements the enter/exit protocol for memory operations to ensure thread safety
     ///             during memory growth operations. It prevents race conditions between memory operations and
     ///             the memory relocation process.
-    /// @details   The protocol ensures:
+    /// @details    The protocol ensures:
     ///             1. Memory operations wait for any ongoing grow operation to complete
     ///             2. Active operations are properly counted to prevent grow from starting while operations are in progress
     ///             3. Double-check mechanism prevents race conditions where grow starts immediately after entry
@@ -119,7 +119,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         }
 
         /// @brief      Enter the memory operation safely.
-        /// @details   Implements the enter protocol to prevent race conditions:
+        /// @details    Implements the enter protocol to prevent race conditions:
         ///             1. Wait for grow operation to complete (acquire semantics)
         ///             2. Increment active operations counter (acq_rel semantics)
         ///             3. Double-check that grow hasn't started (acquire semantics)
@@ -147,7 +147,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         }
 
         /// @brief      Exit the memory operation safely.
-        /// @details   Implements the exit protocol:
+        /// @details    Implements the exit protocol:
         ///             1. Decrement active operations counter (release semantics)
         ///             2. Notify waiting grow operations
         inline constexpr void exit_operation() noexcept
@@ -160,8 +160,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
     };
 
     /// @brief   Safe Memory Growth under Concurrency for Linear Memory (Non-mmap Fallback)
-    /// @details When linear memory growth requires relocating the underlying buffer (e.g., realloc + memcpy on platforms without mmap), concurrent
-    ///          loads/stores—including atomic RMW operations—may race with the relocation process. A pathological case arises when:
+    /// @details When linear memory growth requires relocating the underlying buffer (e.g., realloc or dealloc + alloc + memcpy on platforms without mmap),
+    ///          concurrent loads/stores—including atomic RMW operations—may race with the relocation process. A pathological case arises when:
     ///
     ///          - Thread A acquires a cache line with an atomic operation.
     ///          - Thread B contends on the same cache line with another atomic.

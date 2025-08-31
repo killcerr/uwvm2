@@ -25,4 +25,5 @@
 # include <uwvm2/object/memory/wasm_page/impl.h>
 # include <uwvm2/object/memory/platform_page/impl.h>
 # include <uwvm2/object/memory/linear/impl.h>
+# include <uwvm2/object/memory/multiple/impl.h>
 #endif
