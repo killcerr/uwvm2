@@ -23,6 +23,7 @@
 module;
 
 export module uwvm2.parser.wasm.standard.wasm3.type;
+export import :value_type;
 export import :section_type;
 
 #ifndef UWVM_MODULE

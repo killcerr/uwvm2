@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-02
+ * @date        2025-03-31
  * @copyright   APL-2.0 License
  */
 
@@ -20,9 +20,27 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+// std
+#include <cstdint>
+#include <cstddef>
+#include <climits>
+#include <concepts>
+#include <bit>
+// macro
+#include <uwvm2/parser/wasm/feature/feature_push_macro.h>
+
+export module uwvm2.parser.wasm.standard.wasm3.type:value_type;
+
+import fast_io;
+import uwvm2.utils.container;
 
 #ifndef UWVM_MODULE
-# include "value_type.h"
-# include "section_type.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "value_type.h"

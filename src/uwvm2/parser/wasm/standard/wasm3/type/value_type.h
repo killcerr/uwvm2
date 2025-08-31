@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-02
+ * @date        2025-03-31
  * @copyright   APL-2.0 License
  */
 
@@ -23,6 +23,29 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "value_type.h"
-# include "section_type.h"
+// std
+# include <cstdint>
+# include <cstddef>
+# include <climits>
+# include <concepts>
+# include <bit>
+// macro
+# include <uwvm2/parser/wasm/feature/feature_push_macro.h>
+// import
+# include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
+#endif
+
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm3::type
+{
+    using wasm_i31 = ::std::int_least32_t;
+}
+
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/parser/wasm/feature/feature_pop_macro.h>
 #endif
