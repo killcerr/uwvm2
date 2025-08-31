@@ -276,14 +276,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_details
 
                 break;
             }
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
             case ::uwvm2::uwvm::wasm::type::module_type_t::preloaded_dl:
             {
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 if(module_storage.module_storage_ptr.wd == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
-#endif
+# endif
                 /// @todo
                 break;
             }
+#endif
             case ::uwvm2::uwvm::wasm::type::module_type_t::local_import:
             {
                 /// @todo

@@ -42,7 +42,23 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm3::type
 {
-    using wasm_i31 = ::std::int_least32_t;
+/// @brief      The abstract type i31 denotes unboxed scalars, that is, integers injected into references. Their observable value range is limited to 31 bits
+/// @see        WebAssembly Release 3.0 (Draft 2024-09-21) § 2.2.3
+/// @note       The i31 type specification in Wasm does not mandate whether tags must reside in the high or low byte. Therefore, bit fields are used here for
+///             implementation, with access optimizations applied for certain big-endian systems.
+#if defined(__BIG_ENDIAN__)  // GCC, LLVM Big Endian
+    struct wasm_i31
+    {
+        bool tag : 1;
+        ::std::int_least32_t value : 31;
+    };
+#else  // Little Endian, PDP11 Endian, MSVC Platform
+    struct wasm_i31
+    {
+        ::std::int_least32_t value : 31;
+        bool tag : 1;
+    };
+#endif
 }
 
 #ifndef UWVM_MODULE
