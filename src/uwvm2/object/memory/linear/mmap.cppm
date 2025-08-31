@@ -43,6 +43,7 @@ export module uwvm2.object.memory.linear:mmap;
 
 import fast_io;
 import uwvm2.utils.debug;
+import uwvm2.utils.mutex;
 import uwvm2.object.memory.wasm_page;
 import uwvm2.object.memory.platform_page;
 

@@ -52,7 +52,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
         // posix_clock_gettime may throw
         // Please use string literals initially to prevent dangling.
 
-        UWVM_GNU_COLD inline explicit timer(::uwvm2::utils::container::u8string_view strvw) noexcept : s{strvw}
+        UWVM_GNU_COLD inline explicit constexpr timer(::uwvm2::utils::container::u8string_view strvw) noexcept : s{strvw}
         {
 #ifdef UWVM_CPP_EXCEPTIONS
             try
@@ -100,12 +100,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::debug
 #endif
         }
 
-        inline timer(timer const&) = delete;
-        inline timer& operator= (timer const&) = delete;
-        inline timer(timer&&) = delete;
-        inline timer& operator= (timer&&) = delete;
+        inline constexpr timer(timer const&) = delete;
+        inline constexpr timer& operator= (timer const&) = delete;
+        inline constexpr timer(timer&&) = delete;
+        inline constexpr timer& operator= (timer&&) = delete;
 
-        UWVM_GNU_COLD inline ~timer()
+        UWVM_GNU_COLD inline constexpr ~timer()
         {
 #ifdef UWVM_CPP_EXCEPTIONS
             if(!t0_success) [[unlikely]]

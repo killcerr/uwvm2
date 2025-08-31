@@ -46,19 +46,23 @@
 UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 {
     /// @brief      The guard for the growing flag.
-    /// @note       This guard is only used in `grow`. During memory operations, it directly employs `this->growing_flag->wait(true,
-    ///             std::memory_order_relaxed);`.
+    /// @note       This guard is only used in `grow` operations to acquire exclusive access to memory.
+    /// @details    Memory ordering ensures proper synchronization:
+    ///             1. test_and_set(acquire): Establishes lock ownership and prevents later accesses from moving before lock
+    ///             2. wait(acquire): Ensures that when woken up, the thread sees all memory updates from the grow operation
+    ///             3. clear(release): Publishes all critical section updates before unlocking
+    ///             4. notify_all(): Wakes up waiting threads after memory updates are published
     struct growing_flag_guard_t
     {
         ::std::atomic_flag* growing_flag_p{};
 
-        UWVM_ALWAYS_INLINE inline constexpr growing_flag_guard_t(::std::atomic_flag* other_growing_flag_p) noexcept : growing_flag_p{other_growing_flag_p}
+        inline constexpr growing_flag_guard_t(::std::atomic_flag* other_growing_flag_p) noexcept : growing_flag_p{other_growing_flag_p}
         {
             if(this->growing_flag_p != nullptr) [[likely]]
             {
                 // acquire: establish exclusive lock ownership; prevent later accesses from moving before lock
-                // relaxed: waiting needs no ordering; wake-up is ordered via clear(release)
-                while(this->growing_flag_p->test_and_set(::std::memory_order_acquire)) { this->growing_flag_p->wait(true, ::std::memory_order_relaxed); }
+                // acquire: waiting must use acquire to see memory updates from grow operation
+                while(this->growing_flag_p->test_and_set(::std::memory_order_acquire)) { this->growing_flag_p->wait(true, ::std::memory_order_acquire); }
             }
         }
 
@@ -67,15 +71,91 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         inline constexpr growing_flag_guard_t(growing_flag_guard_t&& other) noexcept = delete;
         inline constexpr growing_flag_guard_t& operator= (growing_flag_guard_t&& other) noexcept = delete;
 
-        UWVM_ALWAYS_INLINE inline constexpr ~growing_flag_guard_t() noexcept
+        inline constexpr ~growing_flag_guard_t()
         {
             if(this->growing_flag_p != nullptr) [[likely]]
             {
                 // release: publish critical-section updates before unlocking
+                // This ensures that all memory modifications made during grow are visible to threads
+                // that will be woken up by the subsequent notify_all()
                 this->growing_flag_p->clear(::std::memory_order_release);
-                // Memory access for all threads has been blocked, so it is necessary to notify all.
+
+                // Notify all waiting threads that the lock has been released
+                // The release semantics of clear() ensure that waiting threads will see
+                // all memory updates made during the critical section
                 this->growing_flag_p->notify_all();
             }
+        }
+    };
+
+    /// @brief      The guard for memory operations (read/write instructions).
+    /// @note       This guard implements the enter/exit protocol for memory operations to ensure thread safety
+    ///             during memory growth operations. It prevents race conditions between memory operations and
+    ///             the memory relocation process.
+    /// @details   The protocol ensures:
+    ///             1. Memory operations wait for any ongoing grow operation to complete
+    ///             2. Active operations are properly counted to prevent grow from starting while operations are in progress
+    ///             3. Double-check mechanism prevents race conditions where grow starts immediately after entry
+    ///             4. Proper memory ordering (acquire/release) ensures visibility of memory updates
+    struct memory_operation_guard_t
+    {
+        ::std::atomic_flag* growing_flag_p{};
+        ::std::atomic_size_t* active_ops_p{};
+
+        inline constexpr memory_operation_guard_t(::std::atomic_flag* other_growing_flag_p, ::std::atomic_size_t* other_active_ops_p) noexcept :
+            growing_flag_p{other_growing_flag_p}, active_ops_p{other_active_ops_p}
+        {
+            if(this->growing_flag_p != nullptr && this->active_ops_p != nullptr) [[likely]] { enter_operation(); }
+        }
+
+        inline constexpr memory_operation_guard_t(memory_operation_guard_t const& other) noexcept = delete;
+        inline constexpr memory_operation_guard_t& operator= (memory_operation_guard_t const& other) noexcept = delete;
+        inline constexpr memory_operation_guard_t(memory_operation_guard_t&& other) noexcept = delete;
+        inline constexpr memory_operation_guard_t& operator= (memory_operation_guard_t&& other) noexcept = delete;
+
+        inline constexpr ~memory_operation_guard_t()
+        {
+            if(this->growing_flag_p != nullptr && this->active_ops_p != nullptr) [[likely]] { exit_operation(); }
+        }
+
+        /// @brief      Enter the memory operation safely.
+        /// @details   Implements the enter protocol to prevent race conditions:
+        ///             1. Wait for grow operation to complete (acquire semantics)
+        ///             2. Increment active operations counter (acq_rel semantics)
+        ///             3. Double-check that grow hasn't started (acquire semantics)
+        ///             4. If grow started, undo increment and retry
+        inline constexpr void enter_operation() noexcept
+        {
+            for(;;)
+            {
+                // 1) Wait for grow operation to complete, must use acquire to see memory updates
+                while(this->growing_flag_p->test(::std::memory_order_acquire)) { this->growing_flag_p->wait(true, ::std::memory_order_acquire); }
+
+                // 2) Declare entry into active region, use acq_rel for proper ordering
+                auto const prev{this->active_ops_p->fetch_add(1uz, ::std::memory_order_acq_rel)};
+
+                // 3) Double-check that grow hasn't started after we "entered"
+                if(!this->growing_flag_p->test(::std::memory_order_acquire))
+                {
+                    break;  // Successfully entered, grow is not active
+                }
+
+                // 4) Grow started after we entered: undo increment and retry
+                this->active_ops_p->fetch_sub(1uz, ::std::memory_order_release);
+                this->active_ops_p->notify_all();  // Wake up waiting grow operations
+            }
+        }
+
+        /// @brief      Exit the memory operation safely.
+        /// @details   Implements the exit protocol:
+        ///             1. Decrement active operations counter (release semantics)
+        ///             2. Notify waiting grow operations
+        inline constexpr void exit_operation() noexcept
+        {
+            // Decrement counter with release semantics to publish our updates
+            this->active_ops_p->fetch_sub(1uz, ::std::memory_order_release);
+            // Notify waiting grow operations that they can proceed
+            this->active_ops_p->notify_all();
         }
     };
 
@@ -91,6 +171,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
     ///
     ///          Therefore, the grow_flag must be set during the grow phase to prevent new threads from attempting to read or write memory. Reference counting
     ///          is performed for instructions currently being read or written. When the reference count reaches zero, the grow process begins.
+    ///
+    /// @note    Usage example for memory operations:
+    ///          ```cpp
+    ///          void memory_read_operation() {
+    ///              memory_operation_guard_t guard{this->growing_flag_p, this->active_ops_p};
+    ///              // Safe to access memory here - guard ensures thread safety
+    ///              // Memory access code...
+    ///          }  // Guard automatically exits when function ends
+    ///          ```
+
+    /// @brief      Summary of thread safety mechanisms for alloca path
+    /// @details    This module provides two complementary protection mechanisms:
+    ///             1. growing_flag_guard_t: Used by grow() operations to acquire exclusive access
+    ///             2. memory_operation_guard_t: Used by memory operations (read/write) to safely enter/exit
+    ///
+    ///             The combination ensures:
+    ///             - No memory operation can start while grow is in progress
+    ///             - No grow can start while memory operations are active
+    ///             - Proper memory ordering for visibility of updates
+    ///             - Automatic cleanup via RAII pattern
 
     /// @brief      The basic allocator memory class.
     /// @defailt    The allocator memory supports the following scenarios: First, platforms that do not support mmap. Second, when the size of custom_page is
@@ -108,6 +208,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
         unsigned custom_page_size_log2{};
 
+        // Querying lock status itself can cause race conditions, so a double-atom model is used here.
         ::std::atomic_flag* growing_flag_p{};
         ::std::atomic_size_t* active_ops_p{};
         // constexpr data
@@ -166,9 +267,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             if(this->memory_begin == nullptr) [[likely]]
             {
                 // UB will never appear; it has been preemptively checked.
-                auto const custom_page_size{1uz << this->custom_page_size_log2};
-
-                this->memory_length = init_page_count * custom_page_size;
+                this->memory_length = init_page_count << this->custom_page_size_log2;
 
                 // Ensure alignment. Typically, the maximum allowed alignment size for WASM memory operation instructions is 16 (v128). Here, align to the size
                 // of a cache line, which is usually 64.
@@ -183,6 +282,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         }
 
         /// @brief      Grow the memory.
+        /// @param      max_limit_memory_length     This maximum value is derived from the maximum memory limit.
         inline constexpr void grow(::std::size_t page_grow_size, ::std::size_t max_limit_memory_length = ::std::numeric_limits<::std::size_t>::max()) noexcept
         {
             if(page_grow_size == 0uz) [[unlikely]] { return; }
@@ -204,23 +304,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
             if(this->memory_begin == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-            auto const custom_page_size{1uz << this->custom_page_size_log2};
+            auto const this_custom_page_size_log2{this->custom_page_size_log2};
 
-            if(page_grow_size > ::std::numeric_limits<::std::size_t>::max() / custom_page_size) [[unlikely]]
+            if(page_grow_size > ::std::numeric_limits<::std::size_t>::max() >> this_custom_page_size_log2) [[unlikely]]
             {
                 // This situation cannot occur; it is due to user input error.
                 ::fast_io::fast_terminate();
             }
 
-            auto const memory_grow_size{page_grow_size * custom_page_size};
+            auto const memory_grow_size{page_grow_size << this_custom_page_size_log2};
+            auto const curr_memory_length{this->memory_length};
 
-            if(max_limit_memory_length < this->memory_length) [[unlikely]]
+            if(max_limit_memory_length < curr_memory_length) [[unlikely]]
             {
                 // This situation cannot occur; it is due to user input error.
                 ::fast_io::fast_terminate();
             }
 
-            auto const left_memory_size{max_limit_memory_length - this->memory_length};
+            auto const left_memory_size{max_limit_memory_length - curr_memory_length};
 
             if(memory_grow_size > left_memory_size) [[unlikely]]
             {
@@ -228,17 +329,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 ::fast_io::fast_terminate();
             }
 
-            this->memory_length += memory_grow_size;
+            // After realloc, write new_memory_length
+            auto const new_memory_length{curr_memory_length + memory_grow_size};
 
-            this->memory_begin = reinterpret_cast<::std::byte*>(allocator_t::reallocate_zero(this->memory_begin, this->memory_length));
+            constexpr ::std::size_t alignment{64uz};
+            auto const temp_memory_begin{allocator_t::reallocate_aligned_zero(this->memory_begin, alignment, new_memory_length)};
+            if(reinterpret_cast<::std::size_t>(temp_memory_begin) % alignment != 0uz) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+            this->memory_begin = ::std::assume_aligned<alignment>(reinterpret_cast<::std::byte*>(temp_memory_begin));
+            this->memory_length = new_memory_length;
+
+            // growing_flag_guard destruct here
         }
 
         inline constexpr ::std::size_t get_page_size() const noexcept
         {
-            growing_flag_guard_t growing_flag_guard{this->growing_flag_p};
+            memory_operation_guard_t memory_op_guard{this->growing_flag_p, this->active_ops_p};
             // UB will never appear; it has been preemptively checked.
-            auto const custom_page_size{1uz << this->custom_page_size_log2};
-            return this->memory_length / custom_page_size;
+
+            // memory_op_guard destruct here
+            return this->memory_length >> this->custom_page_size_log2;
         }
 
         inline constexpr basic_allocator_memory_t(basic_allocator_memory_t const& other) noexcept = delete;
@@ -322,7 +432,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
         /// @note       This function is designed to be lock-free and cannot be executed during WASM execution (multi-threaded). It can only be done after the
         ///             WASM execution.
-        inline constexpr ~basic_allocator_memory_t() noexcept
+        inline constexpr ~basic_allocator_memory_t()
         {
             Alloc::deallocate_n(this->memory_begin, this->memory_length);  // dealloc includes built-in nullptr checking
 
@@ -338,7 +448,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
     using allocator_memory_t = basic_allocator_memory_t<::fast_io::native_global_allocator>;
 
-}  // namespace uwvm2::object::memory::wasm_page
+}  // namespace uwvm2::object::memory::linear
 
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
