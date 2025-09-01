@@ -57,6 +57,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::table
         elem_type kind;
     };
 
+    using wasm_table_t = ::uwvm2::utils::container::vector<wasm_table_storage_t>;
+
 }  // namespace uwvm2::object::table
 
 #ifndef UWVM_MODULE

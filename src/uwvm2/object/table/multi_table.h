@@ -42,7 +42,7 @@
 UWVM_MODULE_EXPORT namespace uwvm2::object::table
 {
 
-    using multi_table_t = ::uwvm2::utils::container::vector<::uwvm2::object::table::wasm_table_storage_t>;
+    using multi_table_t = ::uwvm2::utils::container::vector<::uwvm2::object::table::wasm_table_t>;
 
 }  // namespace uwvm2::object::table
 
