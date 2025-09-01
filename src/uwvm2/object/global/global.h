@@ -51,7 +51,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::global
         wasm_f32,
         wasm_f64,
         wasm_v128,
+#if 0
+        /// @todo wasm3.0
         wasm_ref
+#endif
     };
 
     union wasm_global_storage_u
@@ -61,13 +64,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::global
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f32 f32;
         ::uwvm2::parser::wasm::standard::wasm1::type::wasm_f64 f64;
         ::uwvm2::parser::wasm::standard::wasm1p1::type::wasm_v128 v128;
+#if 0
+        /// @todo wasm3.0
         ::uwvm2::object::global::wasm_global_ref_t ref;
+#endif
     };
 
     struct wasm_global_storage_t
     {
         wasm_global_storage_u storage;
-        ::uwvm2::object::global::global_type kind;
+        global_type kind;
         bool is_mutable;
     };
 

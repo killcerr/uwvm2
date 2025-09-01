@@ -31,42 +31,33 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::object::global
+UWVM_MODULE_EXPORT namespace uwvm2::object::table
 {
-#if 0
-    /// @todo wasm3.0
-
-    enum class wasm_ref_kind : unsigned
+    enum class elem_type : unsigned
     {
-        wasm_null,
-        wasm_func,
-        wasm_extern,
-        wasm_struct,
-        wasm_array,
-        wasm_exn,
-        wasm_i31
+        func_ref,
     };
 
-    union wasm_global_ref_storage_u
+    union wasm_table_storage_u
     {
-        void* ptr;
-        ::uwvm2::parser::wasm::standard::wasm3::type::wasm_i31 wasm_i31;
+        ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 func_ref_func_idx;
     };
 
-    struct wasm_global_ref_t
+    struct wasm_table_storage_t
     {
-        wasm_global_ref_storage_u storage;
-        ::uwvm2::object::global::wasm_ref_kind kind;
+        wasm_table_storage_u storage;
+        elem_type kind;
     };
-    
-#endif
-}  // namespace uwvm2::object::global
+
+}  // namespace uwvm2::object::table
 
 #ifndef UWVM_MODULE
 // macro
