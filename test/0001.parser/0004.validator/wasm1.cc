@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -80,7 +80,7 @@ namespace wasm1_test
 
 int main(int argc, char** argv)
 {
-    if(argc < 2)
+    if(argc < 2) [[unlikely]]
     {
         if(argc == 0) { return 1; }
         ::fast_io::io::perr("Usage: ", ::fast_io::mnp::os_c_str(*argv), " <wasm>\n");
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
     auto const binfmt_ver{::uwvm2::parser::wasm::binfmt::detect_wasm_binfmt_version(reinterpret_cast<::std::byte const*>(wasm_file.cbegin()),
                                                                                     reinterpret_cast<::std::byte const*>(wasm_file.cend()))};
 
-    if(binfmt_ver != 1)
+    if(binfmt_ver != 1) [[unlikely]]
     {
         ::fast_io::io::perr("WASM 1.0 only supports Binary Format Version 1\n");
         return 1;

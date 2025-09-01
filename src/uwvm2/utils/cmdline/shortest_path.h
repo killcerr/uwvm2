@@ -67,7 +67,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::cmdline
         else
         {
             if(y_length > ::std::numeric_limits<::std::size_t>::max() - 1uz) [[unlikely]] { ::fast_io::fast_terminate(); }
-           
+
             auto const alloc_length{y_length + 1uz};
 
             if UWVM_IF_CONSTEVAL { d = ::new ::std::size_t[alloc_length]; }

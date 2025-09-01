@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -64,7 +64,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::global
         wasm_global_ref_storage_u storage;
         ::uwvm2::object::global::wasm_ref_kind kind;
     };
-    
+
 #endif
 }  // namespace uwvm2::object::global
 

@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -49,7 +49,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::wasm_page
 
         if(page_size_log2 >= max_page_size_log2) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-        return static_cast<::uwvm2::object::memory::wasm_page::wasm32_page_size_t>(static_cast<::uwvm2::object::memory::wasm_page::wasm32_page_size_t>(1u) << page_size_log2);
+        return static_cast<::uwvm2::object::memory::wasm_page::wasm32_page_size_t>(static_cast<::uwvm2::object::memory::wasm_page::wasm32_page_size_t>(1u)
+                                                                                   << page_size_log2);
     }
 
     inline constexpr ::uwvm2::object::memory::wasm_page::wasm64_page_size_t set_custom_wasm64_page_size(unsigned page_size_log2) noexcept
@@ -58,7 +59,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::wasm_page
 
         if(page_size_log2 >= max_page_size_log2) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-        return static_cast<::uwvm2::object::memory::wasm_page::wasm64_page_size_t>(static_cast<::uwvm2::object::memory::wasm_page::wasm64_page_size_t>(1u) << page_size_log2);
+        return static_cast<::uwvm2::object::memory::wasm_page::wasm64_page_size_t>(static_cast<::uwvm2::object::memory::wasm_page::wasm64_page_size_t>(1u)
+                                                                                   << page_size_log2);
     }
 
     inline constexpr unsigned get_wasm32_page_size_log2(::uwvm2::object::memory::wasm_page::wasm32_page_size_t page_size) noexcept
