@@ -287,9 +287,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
 
                 using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
-                auto const func_begin{wd.wasm_dl_storage.capi_function_vec.function_begin};
-                auto const func_size{wd.wasm_dl_storage.capi_function_vec.function_size};
-
                 constexpr auto get_final_value_type_from_tuple{
                     []<::uwvm2::parser::wasm::concepts::wasm_feature... Fs>(::uwvm2::utils::container::tuple<Fs...>) consteval noexcept
                     { return ::uwvm2::parser::wasm::standard::wasm1::features::final_value_type_t<Fs...>{}; }};
@@ -297,7 +294,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                 using curr_value_type = ::std::remove_cvref_t<decltype(get_final_value_type_from_tuple(::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features))>;
                 static_assert(sizeof(curr_value_type) == 1uz, "curr_value_type is not 1 byte");
 
-                // module information
+                // module information + func size
+
+                auto const func_begin{wd.wasm_dl_storage.capi_function_vec.function_begin};
+                auto const func_size{wd.wasm_dl_storage.capi_function_vec.function_size};
+
+                if(func_begin == nullptr && func_size != 0uz) [[unlikely]]
+                {
+                    // If the function is not defined, it should be nullptr and 0uz, which is permissible. However, if it is nullptr plus a non-zero uz, a
+                    // memory safety issue will arise.
+                    ::fast_io::fast_terminate();
+                }
 
                 if constexpr(::std::same_as<char_type, char>)
                 {
@@ -367,7 +374,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
 
                     if constexpr(::std::same_as<char_type, char>)
                     {
-                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), " - func[", func_counter++, "] <", func_name, "> sig=(");
+                        ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream),
+                                                                         " - func[",
+                                                                         func_counter++,
+                                                                         "] <",
+                                                                         ::fast_io::mnp::code_cvt(func_name),
+                                                                         "> sig=(");
                     }
                     if constexpr(::std::same_as<char_type, wchar_t>)
                     {
@@ -375,7 +387,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          L" - func[",
                                                                          func_counter++,
                                                                          L"] <",
-                                                                         func_name,
+                                                                         ::fast_io::mnp::code_cvt(func_name),
                                                                          L"> sig=(");
                     }
                     if constexpr(::std::same_as<char_type, char8_t>)
@@ -393,7 +405,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          u" - func[",
                                                                          func_counter++,
                                                                          u"] <",
-                                                                         func_name,
+                                                                         ::fast_io::mnp::code_cvt(func_name),
                                                                          u"> sig=(");
                     }
                     if constexpr(::std::same_as<char_type, char32_t>)
@@ -402,8 +414,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          U" - func[",
                                                                          func_counter++,
                                                                          U"] <",
-                                                                         func_name,
+                                                                         ::fast_io::mnp::code_cvt(func_name),
                                                                          U"> sig=(");
+                    }
+
+                    if(func_curr->para_type_vec_begin == nullptr && func_curr->para_type_vec_size != 0uz) [[unlikely]]
+                    {
+                        // If the parameter type vector is not defined, it should be nullptr and 0uz, which is permissible. However, if it is nullptr plus a
+                        // non-zero uz, a memory safety issue will arise.
+                        ::fast_io::fast_terminate();
                     }
 
                     auto const para_type_vec_end{func_curr->para_type_vec_begin + func_curr->para_type_vec_size};
@@ -459,6 +478,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
 
                     if(func_curr->res_type_vec_size == 0uz)
                     {
+                        // output "nil"
+
+                        // When `res_type_vec_size` is 0, `begin_ptr` may be `nullptr` or any valid pointer.
+
                         if constexpr(::std::same_as<char_type, char>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "nil\n");
@@ -482,6 +505,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                     }
                     else if(func_curr->res_type_vec_size == 1uz)
                     {
+                        if(func_curr->res_type_vec_begin == nullptr) [[unlikely]]
+                        {
+                            // If the result type vector is not defined, it should be nullptr and 0uz, which is permissible. However, if it is nullptr plus a
+                            // non-zero uz, a memory safety issue will arise.
+                            ::fast_io::fast_terminate();
+                        }
+
+                        // output "i32"
+
                         curr_value_type curr_value_type_storage;  // no initialize
                         ::std::memcpy(::std::addressof(curr_value_type_storage), func_curr->res_type_vec_begin, sizeof(curr_value_type_storage));
 
@@ -489,6 +521,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                     }
                     else
                     {
+                        // output "(i32, i32)"
+
                         if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "("); }
                         if constexpr(::std::same_as<char_type, wchar_t>)
                         {
@@ -505,6 +539,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                         if constexpr(::std::same_as<char_type, char32_t>)
                         {
                             ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"(");
+                        }
+
+                        if(func_curr->res_type_vec_begin == nullptr) [[unlikely]]
+                        {
+                            // If the result type vector is not defined, it should be nullptr and 0uz, which is permissible. However, if it is nullptr plus a
+                            // non-zero uz, a memory safety issue will arise.
+                            ::fast_io::fast_terminate();
                         }
 
                         auto const res_type_vec_end{func_curr->res_type_vec_begin + func_curr->res_type_vec_size};
@@ -565,6 +606,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                 auto const handler_begin{wd.wasm_dl_storage.capi_custom_handler_vec.custom_handler_begin};
                 auto const handler_size{wd.wasm_dl_storage.capi_custom_handler_vec.custom_handler_size};
 
+                if(handler_begin == nullptr && handler_size != 0uz) [[unlikely]]
+                {
+                    // If the custom handler vector is not defined, it should be nullptr and 0uz, which is permissible. However, if it is nullptr plus a
+                    // non-zero uz, a memory safety issue will arise.
+                    ::fast_io::fast_terminate();
+                }
+
                 if constexpr(::std::same_as<char_type, char>)
                 {
                     ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "Custom Handler[", handler_size, "]:\n");
@@ -610,7 +658,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          handler_counter++,
                                                                          L"] <",
                                                                          ::fast_io::mnp::code_cvt(custom_name),
-                                                                         u8">\n");
+                                                                         L">\n");
                     }
                     if constexpr(::std::same_as<char_type, char8_t>)
                     {
