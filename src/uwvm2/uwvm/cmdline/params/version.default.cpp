@@ -228,7 +228,9 @@ namespace uwvm2::uwvm::cmdline::params::details
 #endif
                                 // Compiler
                                 u8"\nCompiler: "
-#if defined(__clang__)
+#if defined(__INTEL_LLVM_COMPILER)
+                                u8"Intel LLVM Compiler "
+#elif defined(__clang__)
                                 u8"LLVM clang "
 # if defined(__clang_version__)
                                 __clang_version__
@@ -784,7 +786,9 @@ namespace uwvm2::uwvm::cmdline::params::details
 #endif
                 // C Library
                                 u8"\nC Library: "
-#if defined(__wasi__)
+#if defined(__EMSCRIPTEN__)
+                                u8"Emscripten"
+#elif defined(__wasi__)
                                 u8"WASI"
 #elif defined(__MINGW32__) && !defined(_UCRT) && !defined(__BIONIC__)
                                 u8"MSVCRT"
@@ -815,8 +819,6 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"LLVM LIBC "
 #elif defined(__MLIBC_O_CLOEXEC)
                                 u8"MLIBC"
-#elif defined(__wasi__)
-                                u8"WASI"
 #elif defined(__NEED___isoc_va_list) || defined(__musl__)
                                 u8"MUSL"
 #elif defined(__serenity__)
