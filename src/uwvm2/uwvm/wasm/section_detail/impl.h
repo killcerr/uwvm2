@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -19,17 +19,8 @@
  *                                      *
  ****************************************/
 
-module;
-
-export module uwvm2.uwvm.wasm.section_details;
-
-export import :section_details;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+# include "section_detail.h"
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "impl.h"

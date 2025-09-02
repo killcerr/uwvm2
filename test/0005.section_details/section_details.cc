@@ -38,19 +38,19 @@ void test_build()
     ::uwvm2::uwvm::wasm::type::all_module_t s{};
 
     ::fast_io::black_hole dev_null{};
-    ::fast_io::io::print(dev_null, ::uwvm2::uwvm::wasm::section_details::section_details(s));
+    ::fast_io::io::print(dev_null, ::uwvm2::uwvm::wasm::section_detail::section_details(s));
 
     ::fast_io::wblack_hole wdev_null{};
-    ::fast_io::io::print(wdev_null, ::uwvm2::uwvm::wasm::section_details::section_details(s));
+    ::fast_io::io::print(wdev_null, ::uwvm2::uwvm::wasm::section_detail::section_details(s));
 
     ::fast_io::u8black_hole u8dev_null{};
-    ::fast_io::io::print(u8dev_null, ::uwvm2::uwvm::wasm::section_details::section_details(s));
+    ::fast_io::io::print(u8dev_null, ::uwvm2::uwvm::wasm::section_detail::section_details(s));
 
     ::fast_io::u16black_hole u16dev_null{};
-    ::fast_io::io::print(u16dev_null, ::uwvm2::uwvm::wasm::section_details::section_details(s));
+    ::fast_io::io::print(u16dev_null, ::uwvm2::uwvm::wasm::section_detail::section_details(s));
 
     ::fast_io::u32black_hole u32dev_null{};
-    ::fast_io::io::print(u32dev_null, ::uwvm2::uwvm::wasm::section_details::section_details(s));
+    ::fast_io::io::print(u32dev_null, ::uwvm2::uwvm::wasm::section_detail::section_details(s));
 }
 
 int main() {}

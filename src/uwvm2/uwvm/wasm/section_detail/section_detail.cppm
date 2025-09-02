@@ -32,7 +32,7 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.uwvm.wasm.section_details:section_details;
+export module uwvm2.uwvm.wasm.section_detail:section_detail;
 
 import fast_io;
 import uwvm2.utils.container;
@@ -53,4 +53,4 @@ import uwvm2.uwvm.wasm.storage;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "section_details.h"
+#include "section_detail.h"

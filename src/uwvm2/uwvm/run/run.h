@@ -94,7 +94,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                 }
 
-                ::uwvm2::uwvm::wasm::section_details::print_section_details();
+                ::uwvm2::uwvm::wasm::section_detail::print_section_details();
 
                 // Return directly
                 return static_cast<int>(::uwvm2::uwvm::run::retval::ok);

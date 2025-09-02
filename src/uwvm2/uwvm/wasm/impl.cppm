@@ -26,7 +26,7 @@ export module uwvm2.uwvm.wasm;
 export import uwvm2.uwvm.wasm.base;
 export import uwvm2.uwvm.wasm.feature;
 export import uwvm2.uwvm.wasm.type;
-export import uwvm2.uwvm.wasm.section_details;
+export import uwvm2.uwvm.wasm.section_detail;
 export import uwvm2.uwvm.wasm.storage;
 export import uwvm2.uwvm.wasm.custom;
 export import uwvm2.uwvm.wasm.loader;
