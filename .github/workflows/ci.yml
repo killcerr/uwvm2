@@ -54,7 +54,6 @@ jobs:
 
   # ---------------------------------------------------------------------------
   x86_64-linux-gnu-uwvm-cxxmodule:
-    if: ${{ !always() }}
     name: x86_64-linux-gnu (ubuntu-24.04) uwvm (cxx-module build)
     runs-on: ubuntu-24.04 # noble
     strategy:
