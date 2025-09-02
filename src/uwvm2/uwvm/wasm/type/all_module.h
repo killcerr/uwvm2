@@ -56,8 +56,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         exec_wasm,       // wasm_file
         preloaded_wasm,  // wasm_file
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#if defined(UWVM_SUPPORT_PRELOAD_DL)
+
         preloaded_dl,  // wasm_dl
 #endif
 
@@ -71,8 +71,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         ::uwvm2::uwvm::wasm::type::wasm_file_t const* wf;
         /// @todo local_import
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#if defined(UWVM_SUPPORT_PRELOAD_DL)
         ::uwvm2::uwvm::wasm::type::wasm_dl_t const* wd;
 #endif
     };
@@ -107,8 +106,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
     };
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#if defined(UWVM_SUPPORT_PRELOAD_DL)
     struct wasm_dl_export_t
     {
         using wasm_dl_export_storage_t = ::uwvm2::uwvm::wasm::type::capi_function_t;
@@ -120,8 +118,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
     {
         using wasm_file_export_storage_t = wasm_file_export_t;
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#if defined(UWVM_SUPPORT_PRELOAD_DL)
         using wasm_dl_export_storage_t = wasm_dl_export_t;
 #endif
 
@@ -130,8 +127,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
             wasm_file_export_storage_t wasm_file_export_storage_ptr;
             static_assert(::std::is_trivially_copyable_v<wasm_file_export_storage_t> && ::std::is_trivially_destructible_v<wasm_file_export_storage_t>);
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#if defined(UWVM_SUPPORT_PRELOAD_DL)
             wasm_dl_export_storage_t wasm_dl_export_storage_ptr;
             static_assert(::std::is_trivially_copyable_v<wasm_dl_export_storage_t> && ::std::is_trivially_destructible_v<wasm_dl_export_storage_t>);
 #endif

@@ -25,6 +25,8 @@
 // std
 # include <cstdint>
 # include <cstddef>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
@@ -43,8 +45,7 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 {
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#if defined(UWVM_SUPPORT_PRELOAD_DL)
 
     extern "C"
     {
@@ -151,3 +152,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 
 #endif
 }  // namespace uwvm2::uwvm::wasm::storage
+
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif

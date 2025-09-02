@@ -24,6 +24,8 @@ module;
 // std
 #include <cstdint>
 #include <cstddef>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.uwvm.wasm.type:dl;
 

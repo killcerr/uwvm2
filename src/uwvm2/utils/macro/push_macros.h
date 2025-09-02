@@ -545,3 +545,10 @@
 #  define UWVM_CPP_EXCEPTIONS
 # endif
 #endif
+
+#pragma push_macro("UWVM_SUPPORT_PRELOAD_DL")
+#undef UWVM_SUPPORT_PRELOAD_DL
+#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
+    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+# define UWVM_SUPPORT_PRELOAD_DL
+#endif

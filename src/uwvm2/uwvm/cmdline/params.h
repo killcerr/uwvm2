@@ -25,6 +25,8 @@
 #ifndef UWVM_MODULE
 // std
 # include <memory>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/uwvm/cmdline/params/impl.h>
@@ -54,8 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_set_main_module_name),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_preload_library),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_depend_recursion_limit),
-#if (defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__CYGWIN__) && !defined(__WINE__)) ||                                                                \
-    ((!defined(_WIN32) || defined(__WINE__)) && (__has_include(<dlfcn.h>) && (defined(__CYGWIN__) || (!defined(__NEWLIB__) && !defined(__wasi__)))))
+#if defined(UWVM_SUPPORT_PRELOAD_DL)
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_register_dl),
 #endif
 
@@ -86,3 +87,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
     inline constexpr ::std::size_t hash_table_byte_sz{sizeof(hash_table)};
     // inline constexpr auto sizeof_hash_table{sizeof(hash_table)};
 }
+
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif
