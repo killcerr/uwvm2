@@ -2,7 +2,7 @@
 Includes various widgets
 
 ## widgets
-* `ansies` An implementation of UTF-8 ANSI Escape Sequences that provides macros or outputable manipulation structures.
+* `ansies` An implementation of UTF-8 ANSI Escape Sequences that provides macros or outputable manipulation structures. (No dependencies)
 * `cmdline` Command line infrastructure to generate hash tables at compile time, including generate function, lookup function
 * `debug` Debugging Tools
 * `install_path` Get the path where the program binary is located, supports many systems
