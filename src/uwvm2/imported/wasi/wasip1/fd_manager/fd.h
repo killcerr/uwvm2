@@ -45,6 +45,8 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 {
+    /// @brief    WASI file descriptor
+    /// @details  Using a singleton ensures that when encountering multithreaded scaling during usage, the file descriptors currently in use remain unaffected.
     struct wasi_fd_t
     {
         using mutex_t = ::uwvm2::utils::mutex::mutex_t;
@@ -76,10 +78,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         inline constexpr ~wasi_fd_t() = default;
     };
 
-    struct wasi_fd_unique_ptr_t
+    struct wasi_fd_unique_ptr_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         using wasi_fd_t_fast_io_type_allocator = ::fast_io::native_typed_global_allocator<wasi_fd_t>;
 
+        //
         wasi_fd_t* fd_p;
 
         inline constexpr wasi_fd_unique_ptr_t() noexcept
@@ -108,10 +111,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
             }
 
             this->fd_p = other.fd_p;
-            other.fd_p = nullptr
+            other.fd_p = nullptr;
+
+            return *this;
         }
 
-        inline constexpr clear_destroy() noexcept
+        inline constexpr void clear_destroy() noexcept
         {
             if(this->fd_p) [[likely]]
             {
@@ -132,6 +137,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
                 // Multiple calls to the destructor are ub, no need to set it to nullptr here
             }
         }
+    };
+}
+
+/// @brief Define container optimization operations for use with fast_io
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_unique_ptr_t>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_unique_ptr_t>
+    {
+        inline static constexpr bool value = true;
     };
 }
 
