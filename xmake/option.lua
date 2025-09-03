@@ -33,14 +33,14 @@ option("sysroot", function()
     end)
 end)
 
-option("target", function()
+option("llvm-target", function()
     set_description
     (
-        "Set the `--target` option for gcc and clang.",
+        "Set the `--llvm-target` option for clang.",
         "The option is automatically added if using our toolchain option.",
-        [[    none: Don't set the "--target" option, use the default target of the toolchain.]],
-        [[    detect: Detect and set the target for clang, use the default target for gcc.]],
-        [[    triplet: Set the "--target" option as "--target=triplet".]]
+        [[    none: Don't set the "--llvm-target" option, use the default target of the toolchain.]],
+        [[    detect: Detect and set the target for clang.]],
+        [[    triplet: Set the "--llvm-target" option as "--llvm-target=triplet".]]
     )
     set_default("detect")
 end)

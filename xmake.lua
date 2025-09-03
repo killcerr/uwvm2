@@ -92,6 +92,16 @@ function def_build()
 		wasm_wasi_target()
     end
 
+	local use_llvm_toolchain = get_config("use-llvm")
+    if use_llvm_toolchain then	
+        local llvm_target = get_config("llvm-target")
+		if llvm_target ~= "detect" and llvm_target then
+			local llvm_target_cvt = "--target=" .. llvm_target
+			add_cxflags(llvm_target_cvt, {force = true})
+			add_ldflags(llvm_target_cvt, {force = true})
+		end
+    end
+
 	before_build(
 		function (target)
 			try 
