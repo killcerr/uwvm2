@@ -23,6 +23,7 @@ module;
 
 export module uwvm2.imported.wasi.wasip1.abi;
 export import :wasm32;
+export import :wasm64;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

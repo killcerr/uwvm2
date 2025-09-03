@@ -23,4 +23,5 @@
 
 #ifndef UWVM_MODULE
 # include "wasm32.h"
+# include "wasm64.h"
 #endif

@@ -41,6 +41,9 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
 {
+    /// @note This only provides the base ABI; structs are not included. When using the struct, perform memcpy on each member individually according to the
+    ///       alignment.
+
     // static assert
 
     static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i8) == 1uz, "non-wasi data layout");
