@@ -82,7 +82,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
     {
         using wasi_fd_t_fast_io_type_allocator = ::fast_io::native_typed_global_allocator<wasi_fd_t>;
 
-        //
         wasi_fd_t* fd_p;
 
         inline constexpr wasi_fd_unique_ptr_t() noexcept

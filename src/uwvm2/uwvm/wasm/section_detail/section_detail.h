@@ -379,7 +379,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          func_counter++,
                                                                          "] <",
                                                                          ::fast_io::mnp::code_cvt(func_name),
-                                                                         "> sig=(");
+                                                                         "> sig: (");
                     }
                     if constexpr(::std::same_as<char_type, wchar_t>)
                     {
@@ -388,7 +388,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          func_counter++,
                                                                          L"] <",
                                                                          ::fast_io::mnp::code_cvt(func_name),
-                                                                         L"> sig=(");
+                                                                         L"> sig: (");
                     }
                     if constexpr(::std::same_as<char_type, char8_t>)
                     {
@@ -397,7 +397,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          func_counter++,
                                                                          u8"] <",
                                                                          func_name,
-                                                                         u8"> sig=(");
+                                                                         u8"> sig: (");
                     }
                     if constexpr(::std::same_as<char_type, char16_t>)
                     {
@@ -406,7 +406,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          func_counter++,
                                                                          u"] <",
                                                                          ::fast_io::mnp::code_cvt(func_name),
-                                                                         u"> sig=(");
+                                                                         u"> sig: (");
                     }
                     if constexpr(::std::same_as<char_type, char32_t>)
                     {
@@ -415,7 +415,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::section_detail
                                                                          func_counter++,
                                                                          U"] <",
                                                                          ::fast_io::mnp::code_cvt(func_name),
-                                                                         U"> sig=(");
+                                                                         U"> sig: (");
                     }
 
                     if(func_curr->para_type_vec_begin == nullptr && func_curr->para_type_vec_size != 0uz) [[unlikely]]
