@@ -35,7 +35,7 @@
 # include <fast_io.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/debug/impl.h>
-# include <src/uwvm2/imported/wasi/wasip1/impl.h>
+# include <uwvm2/imported/wasi/wasip1/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT

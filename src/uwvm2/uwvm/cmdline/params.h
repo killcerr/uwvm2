@@ -60,6 +60,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasm_register_dl),
 #endif
 
+            // wasi
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasip1_set_fd_limit),
+
             // log
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_output),
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_disable_warning),

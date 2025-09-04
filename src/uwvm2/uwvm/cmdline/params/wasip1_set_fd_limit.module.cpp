@@ -19,15 +19,16 @@
  *                                      *
  ****************************************/
 
-module;
+// import
+import fast_io;
+import uwvm2.utils.container;
+import uwvm2.utils.ansies;
+import uwvm2.utils.cmdline;
+import uwvm2.uwvm.io;
+import uwvm2.uwvm.utils.ansies;
+import uwvm2.uwvm.utils.depend;
+import uwvm2.uwvm.cmdline;
+import uwvm2.uwvm.cmdline.params;
+import uwvm2.uwvm.imported.wasi.wasip1.storage;
 
-export module uwvm2.imported.wasi.wasip1.func;
-
-#ifndef UWVM_MODULE
-# define UWVM_MODULE
-#endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "impl.h"
+#include "wasip1_set_fd_limit.default.cpp"

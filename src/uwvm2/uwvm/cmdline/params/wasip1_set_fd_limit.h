@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-04-16
+ * @date        2025-03-27
  * @copyright   APL-2.0 License
  */
 
@@ -37,16 +37,15 @@
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
-
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline bool log_output_is_exist{};
-        inline constexpr ::uwvm2::utils::container::u8string_view log_output_alias{u8"-log"};
-        extern "C++" ::uwvm2::utils::cmdline::parameter_return_type log_output_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                        ::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                        ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
+        inline bool wasip1_set_fd_limit_is_exist{};
+        inline constexpr ::uwvm2::utils::container::u8string_view wasip1_set_fd_limit_alias{u8"-Ifdlim"};
+        extern "C++" ::uwvm2::utils::cmdline::parameter_return_type wasip1_set_fd_limit_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                                 ::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                                 ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
 
     }  // namespace details
 
@@ -54,21 +53,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wbraced-scalar-init"
 #endif
-    inline constexpr ::uwvm2::utils::cmdline::parameter log_output{
-        .name{u8"--log-output"},
-        .describe{u8"Setting the log output of the uwvm, (DEFAULT: err)."},
-        .usage{
-#if !defined(__AVR__) && !((defined(_WIN32) && !defined(__WINE__)) && defined(_WIN32_WINDOWS)) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&               \
-    !(defined(__NEWLIB__) && !defined(__CYGWIN__)) && !defined(_PICOLIBC__) && !defined(__wasm__)
-            u8"[out|err|file <file:str>]"
-#else
-            u8"[out|err]"
-#endif
-        },
-        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::log_output_alias), 1uz}},
-        .handle{::std::addressof(details::log_output_callback)},
-        .is_exist{::std::addressof(details::log_output_is_exist)},
-        .cate{::uwvm2::utils::cmdline::categorization::log}};
+    inline constexpr ::uwvm2::utils::cmdline::parameter wasip1_set_fd_limit{
+        .name{u8"--wasip1-set-fd-limit"},
+        .describe{u8"Set the WASI Preview 1 file descriptor limit."},
+        .usage{u8"<limit:size_t>"},
+        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasip1_set_fd_limit_alias), 1uz}},
+        .handle{::std::addressof(details::wasip1_set_fd_limit_callback)},
+        .is_exist{::std::addressof(details::wasip1_set_fd_limit_is_exist)},
+        .cate{::uwvm2::utils::cmdline::categorization::wasi}};
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif

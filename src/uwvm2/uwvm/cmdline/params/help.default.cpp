@@ -175,6 +175,18 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"--help wasm",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" to display the wasm arguments." u8"\n\n",
+                                // wasi
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                u8"  ",
+                                ::fast_io::mnp::left(u8"<wasi>", ::uwvm2::uwvm::cmdline::parameter_max_principal_name_size),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                u8"  -----  ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Use \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                u8"--help wasi",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\" to display the wasi arguments." u8"\n\n",
                                 // log
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
                                 u8"  ",
@@ -246,6 +258,19 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8":\n");
             help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::wasm);
+            // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
+            ::fast_io::io::perrln(u8log_output_ul);
+        }
+        else if(currp1_str == u8"wasi")
+        {
+            ::fast_io::io::perr(u8log_output_ul,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"Arguments:\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_CYAN),
+                                u8"  <wasi>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8":\n");
+            help_output_singal_cate(u8log_output_ul, ::uwvm2::utils::cmdline::categorization::wasi);
             // help_output_singal_cate comes with UWVM_COLOR_U8_RST_ALL
             ::fast_io::io::perrln(u8log_output_ul);
         }

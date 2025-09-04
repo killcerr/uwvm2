@@ -38,6 +38,9 @@ export import :wasm_preload_library;
 export import :wasm_register_dl;
 export import :wasm_depend_recursion_limit;
 
+// wasi
+export import :wasip1_set_fd_limit;
+
 // log
 export import :log_output;
 export import :log_disable_warning;

@@ -97,7 +97,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         inline constexpr wasi_fd_unique_ptr_t(wasi_fd_unique_ptr_t&& other) noexcept
         {
             this->fd_p = other.fd_p;
-            other.fd_p = nullptr
+            other.fd_p = nullptr;
         }
 
         inline constexpr wasi_fd_unique_ptr_t& operator= (wasi_fd_unique_ptr_t&& other) noexcept

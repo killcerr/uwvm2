@@ -61,7 +61,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         preloaded_dl,  // wasm_dl
 #endif
 
-        local_import  /// @todo
+        local_import  /// @todo wasip1, wasip2
     };
 
     // all module

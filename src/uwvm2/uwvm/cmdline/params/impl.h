@@ -40,6 +40,9 @@
 # include "wasm_register_dl.h"
 # include "wasm_depend_recursion_limit.h"
 
+// wasi
+# include "wasip1_set_fd_limit.h"
+
 // log
 # include "log_output.h"
 # include "log_disable_warning.h"
