@@ -56,8 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 #endif
     inline constexpr ::uwvm2::utils::cmdline::parameter wasm_set_main_module_name{
         .name{u8"--wasm-set-main-module-name"},
-        .describe{
-            u8"Set the module name of the WASM main module, use the file containing the path by default. (Note that this option does not affect WASI's argv0, if you need to set WASI's argv0, use `--wasi-set-argv0`)"},
+        .describe{u8"Set the module name of the WASM main module, use the file containing the path by default."},
         .usage{u8"<name:str>"},
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasm_set_main_module_name_alias), 1uz}},
         .handle{::std::addressof(details::wasm_set_main_module_name_callback)},
