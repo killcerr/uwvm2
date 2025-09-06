@@ -35,7 +35,7 @@
 # include <fast_io.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/object/memory/wasm_page/impl.h>
-# include "alloca.h"
+# include "allocator.h"
 # include "mmap.h"
 #endif
 

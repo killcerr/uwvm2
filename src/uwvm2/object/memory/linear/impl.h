@@ -22,7 +22,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "alloca.h"
+# include "allocator.h"
 # include "mmap.h"
 # include "native.h"
 #endif
