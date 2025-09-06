@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,7 +7,6 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-06-30
  * @copyright   APL-2.0 License
  */
 
@@ -20,29 +19,30 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
 
-#ifndef UWVM_MODULE
 // std
-# include <cstdint>
 # include <cstddef>
+# include <cstdint>
 # include <cstring>
 # include <climits>
+# include <limits>
 # include <concepts>
-# include <memory>
-# include <utility>
-# include <type_traits>
-// import
-# include <fast_io.h>
-#endif
+# include <bit>
 
+export module uwvm2.imported.wasi.wasip1.memory:allocator;
+
+import fast_io;
+import uwvm2.object.memory;
+import uwvm2.imported.wasi.wasip1.abi;
+import uwvm2.imported.wasi.wasip1.fd_manager;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::utils::mutex
-{
-    using mutex_t = ::fast_io::native_mutex;
-    using mutex_guard_t = ::fast_io::operations::decay::stream_ref_decay_lock_guard<mutex_t&>;
-    using unlock_mutex_guard_t = ::fast_io::operations::decay::unlock_stream_ref_decay_lock_guard<mutex_t&>;
-}
+#include "allocator.h"
+

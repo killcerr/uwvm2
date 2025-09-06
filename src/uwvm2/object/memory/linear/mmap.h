@@ -200,16 +200,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                     case mmap_memory_status_t::wasm32:
                     {
                         // In full protection mode, the maximum memory allocation permitted is half of the full protection size.
-                        // ::std::numeric_limits<::std::uint_least32_t>::max() == max_full_protection_wasm32_length / 2u
-                        static_assert(::std::numeric_limits<::std::uint_least32_t>::max() == max_full_protection_wasm32_length / 2u);
+                        // max_full_protection_wasm32_length_half == (u64)u32max + 1ui64
+                        constexpr auto max_full_protection_wasm32_length_half{max_full_protection_wasm32_length / 2u};
 
-                        max_init_page_count = ::std::numeric_limits<::std::uint_least32_t>::max() >> this->custom_page_size_log2;
+                        max_init_page_count = static_cast<::std::size_t>(max_full_protection_wasm32_length_half >> this->custom_page_size_log2);
                         break;
                     }
                     case mmap_memory_status_t::wasm64:
                     {
                         // partial protection. No need to provide double protection, as static checks are in place.
-                        max_init_page_count = max_partial_protection_wasm64_length >> this->custom_page_size_log2;
+                        max_init_page_count = static_cast<::std::size_t>(max_partial_protection_wasm64_length >> this->custom_page_size_log2);
                         break;
                     }
                     [[unlikely]] default:
@@ -226,7 +226,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 // 32bit platform
                 // On 32-bit platforms, both wasm64 and wasm32 use 32-bit versions.
                 // partial protection. No need to provide double protection, as static checks are in place.
-                max_init_page_count = max_partial_protection_wasm32_length >> this->custom_page_size_log2;
+                max_init_page_count = static_cast<::std::size_t>(max_partial_protection_wasm32_length >> this->custom_page_size_log2);
             }
             else
             {

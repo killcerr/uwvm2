@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,7 +7,6 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-06-30
  * @copyright   APL-2.0 License
  */
 
@@ -20,29 +19,17 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+export module uwvm2.imported.wasi.wasip1.memory;
+export import :allocator;
+export import :mmap;
 
 #ifndef UWVM_MODULE
-// std
-# include <cstdint>
-# include <cstddef>
-# include <cstring>
-# include <climits>
-# include <concepts>
-# include <memory>
-# include <utility>
-# include <type_traits>
-// import
-# include <fast_io.h>
+# define UWVM_MODULE
 #endif
-
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::utils::mutex
-{
-    using mutex_t = ::fast_io::native_mutex;
-    using mutex_guard_t = ::fast_io::operations::decay::stream_ref_decay_lock_guard<mutex_t&>;
-    using unlock_mutex_guard_t = ::fast_io::operations::decay::unlock_stream_ref_decay_lock_guard<mutex_t&>;
-}
+#include "impl.h"

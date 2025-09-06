@@ -36,6 +36,7 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/debug/impl.h>
+# include <uwvm2/utils/mutex/impl.h>
 # include <uwvm2/object/memory/wasm_page/impl.h>
 #endif
 
@@ -132,7 +133,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 while(this->growing_flag_p->test(::std::memory_order_acquire)) { this->growing_flag_p->wait(true, ::std::memory_order_acquire); }
 
                 // 2) Declare entry into active region, use acq_rel for proper ordering
-                auto const prev{this->active_ops_p->fetch_add(1uz, ::std::memory_order_acq_rel)};
+                this->active_ops_p->fetch_add(1uz, ::std::memory_order_acq_rel);
 
                 // 3) Double-check that grow hasn't started after we "entered"
                 if(!this->growing_flag_p->test(::std::memory_order_acquire))
@@ -198,9 +199,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
     template <typename Alloc>
     struct basic_allocator_memory_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
+        // The default allocator is unaligned.
         using allocator_t = Alloc;
+        // A type allocator must be an aligned allocator.
         using atomic_flag_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_flag>;
         using atomic_size_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_size_t>;
+
+        /// @brief Ensure alignment. Typically, the maximum allowed alignment size for WASM memory operation instructions is 16 (v128). Here, align to the size
+        ///        of a cache line, which is usually 64.
+        /// @note  All WASM memory must be aligned when allocated and released.
+        inline static constexpr ::std::size_t alignment{64uz};
 
         // data
         ::std::byte* memory_begin{};
@@ -271,11 +279,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
                 // Ensure alignment. Typically, the maximum allowed alignment size for WASM memory operation instructions is 16 (v128). Here, align to the size
                 // of a cache line, which is usually 64.
-                constexpr ::std::size_t alignment{64uz};
-
                 auto const temp_memory_begin{allocator_t::allocate_aligned_zero(alignment, this->memory_length)};
-
-                if(reinterpret_cast<::std::size_t>(temp_memory_begin) % alignment != 0uz) [[unlikely]] { ::fast_io::fast_terminate(); }
 
                 this->memory_begin = ::std::assume_aligned<alignment>(reinterpret_cast<::std::byte*>(temp_memory_begin));
             }
@@ -332,11 +336,42 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             // After realloc, write new_memory_length
             auto const new_memory_length{curr_memory_length + memory_grow_size};
 
-            constexpr ::std::size_t alignment{64uz};
-            auto const temp_memory_begin{allocator_t::reallocate_aligned_zero(this->memory_begin, alignment, new_memory_length)};
-            if(reinterpret_cast<::std::size_t>(temp_memory_begin) % alignment != 0uz) [[unlikely]] { ::fast_io::fast_terminate(); }
+            // In this model, regardless of whether `memory_begin` changes, no thread safety issues will arise.
+            // Therefore, realloc_zero is used by default here.
+            ::std::byte* temp_memory_begin;  // no init required
 
-            this->memory_begin = ::std::assume_aligned<alignment>(reinterpret_cast<::std::byte*>(temp_memory_begin));
+            // All WASM memory must be aligned when allocated and released.
+            if constexpr(allocator_t::has_reallocate_aligned_zero)
+            {
+                // Very few platforms directly support
+
+                temp_memory_begin = reinterpret_cast<::std::byte*>(allocator_t::reallocate_aligned_zero(this->memory_begin, alignment, new_memory_length));
+            }
+            else if constexpr(allocator_t::has_reallocate_aligned)
+            {
+                // Very few platforms directly support
+
+                temp_memory_begin = reinterpret_cast<::std::byte*>(allocator_t::reallocate_aligned(this->memory_begin, alignment, new_memory_length));
+
+                // Manually clear the contents from the old boundary to the new boundary.
+                ::fast_io::freestanding::bytes_clear_n(temp_memory_begin + curr_memory_length, memory_grow_size);
+            }
+            else
+            {
+                // General Implementation
+
+                // Using `aligned zero` directly instead of `aligned` allocation followed by memory clearing leverages the platform's default page
+                // initialization mechanism, which sets all pages to zero.
+                temp_memory_begin = reinterpret_cast<::std::byte*>(allocator_t::allocate_aligned_zero(alignment, new_memory_length));
+
+                // Copy all old content to the new memory.
+                ::fast_io::freestanding::my_memcpy(temp_memory_begin, this->memory_begin, curr_memory_length);
+
+                // Deallocate the old memory.
+                allocator_t::deallocate_aligned_n(this->memory_begin, alignment, curr_memory_length);
+            }
+
+            this->memory_begin = ::std::assume_aligned<alignment>(temp_memory_begin);
             this->memory_length = new_memory_length;
 
             // growing_flag_guard destruct here
@@ -403,7 +438,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         ///             WASM execution.
         inline constexpr void clear() noexcept
         {
-            Alloc::deallocate_n(this->memory_begin, this->memory_length);  // dealloc includes built-in nullptr checking
+            Alloc::deallocate_aligned_n(this->memory_begin, alignment, this->memory_length);  // dealloc includes built-in nullptr checking
 
             this->memory_length = 0uz;
             this->memory_begin = nullptr;
@@ -415,7 +450,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         ///             WASM execution.
         inline constexpr void clear_destroy() noexcept
         {
-            Alloc::deallocate_n(this->memory_begin, this->memory_length);  // dealloc includes built-in nullptr checking
+            Alloc::deallocate_aligned_n(this->memory_begin, alignment, this->memory_length);  // dealloc includes built-in nullptr checking
 
             if(this->growing_flag_p != nullptr) [[likely]] { ::std::destroy_at(this->growing_flag_p); }
             atomic_flag_allcator_t::deallocate_n(this->growing_flag_p, 1uz);  // dealloc includes built-in nullptr checking
@@ -434,7 +469,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         ///             WASM execution.
         inline constexpr ~basic_allocator_memory_t()
         {
-            Alloc::deallocate_n(this->memory_begin, this->memory_length);  // dealloc includes built-in nullptr checking
+            Alloc::deallocate_aligned_n(this->memory_begin, alignment, this->memory_length);  // dealloc includes built-in nullptr checking
 
             if(this->growing_flag_p != nullptr) [[likely]] { ::std::destroy_at(this->growing_flag_p); }
             atomic_flag_allcator_t::deallocate_n(this->growing_flag_p, 1uz);  // dealloc includes built-in nullptr checking
