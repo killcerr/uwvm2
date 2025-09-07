@@ -35,7 +35,7 @@
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 // platform
-# ifdef UWVM_SUPPORT_MMAP
+# if defined(UWVM_SUPPORT_MMAP) && !(defined(_WIN32) || defined(__CYGWIN__))  // posix mmap
 #  include <sys/mman.h>
 # endif
 // import
@@ -50,8 +50,7 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) || (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                        \
-                                                 (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) && __has_include(<sys/mman.h>))
+#if defined(UWVM_SUPPORT_MMAP)
 # if CHAR_BIT != 8
 #  error "mmap unsupported platform"
 # endif
@@ -59,8 +58,7 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 {
-#if (defined(_WIN32) || defined(__CYGWIN__)) || (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                        \
-                                                 (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) && __has_include(<sys/mman.h>))
+#if defined(UWVM_SUPPORT_MMAP)
 
     enum class mmap_memory_status_t : unsigned
     {
@@ -443,14 +441,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             // The minimum allocation unit for mmap is a page. Even if you request a size smaller than a page, the kernel will ultimately manage and
             // map the memory in page-sized units.
 
-# if defined(_WIN32) || defined(__CYGWIN__)
-#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
+# if defined(_WIN32) || defined(__CYGWIN__)                                                          // windows
+#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)  // win32
             {
                 auto const vamemory{reinterpret_cast<::std::byte*>(
                     ::fast_io::win32::VirtualAlloc(this->memory_begin, grow_final_memory_length, 0x00001000u /*MEM_COMMIT*/, 0x04u /*PAGE_READWRITE*/))};
                 if(vamemory != this->memory_begin) [[unlikely]] { ::fast_io::fast_terminate(); }
             }
-#  else
+#  else  // nt
             {
                 ::std::byte* vamemory{this->memory_begin};
 
@@ -469,7 +467,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             }
 #  endif
 # elif !defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) && (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) &&   \
-     __has_include(<sys/mman.h>)
+     __has_include(<sys/mman.h>)  // posix
             {
 
                 // sys_mprotect may throw ::fast_io::error
@@ -577,12 +575,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             // This can only be used after the WASM execution has completed, so use relaxed instead of acquired.
             auto const all_memory_length{this->memory_length_p->load(::std::memory_order_relaxed)};
 
-# if defined(_WIN32) || defined(__CYGWIN__)
-#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
+# if defined(_WIN32) || defined(__CYGWIN__)                                                          // windows
+#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)  // win32
             {
                 if(!::fast_io::win32::VirtualFree(this->memory_begin, 0u, 0x00008000u /*MEM_RELEASE*/)) [[unlikely]] { ::fast_io::fast_terminate(); }
             }
-#  else
+#  else  // nt
             {
                 ::std::byte* vfmemory{this->memory_begin};
                 ::std::size_t free_type{0uz};
@@ -598,7 +596,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             }
 #  endif
 # elif !defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) && (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) &&   \
-     __has_include(<sys/mman.h>)
+     __has_include(<sys/mman.h>)  // posix
             {
                 // The length argument must be a multiple of the page size as returned by sysconf(_SC_PAGE_SIZE).
                 // Since custom_page may appear, it must be aligned to the top here.
@@ -632,12 +630,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 // This can only be used after the WASM execution has completed, so use relaxed instead of acquired.
                 auto const all_memory_length{this->memory_length_p->load(::std::memory_order_relaxed)};
 
-# if defined(_WIN32) || defined(__CYGWIN__)
-#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
+# if defined(_WIN32) || defined(__CYGWIN__)                                                          // windows
+#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)  // win32
                 {
                     if(!::fast_io::win32::VirtualFree(this->memory_begin, 0u, 0x00008000u /*MEM_RELEASE*/)) [[unlikely]] { ::fast_io::fast_terminate(); }
                 }
-#  else
+#  else  // nt
                 {
                     ::std::byte* vfmemory{this->memory_begin};
                     ::std::size_t free_type{0uz};
@@ -653,7 +651,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 }
 #  endif
 # elif !defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) && (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) &&   \
-     __has_include(<sys/mman.h>)
+     __has_include(<sys/mman.h>)  // posix
                 {
                     // The length argument must be a multiple of the page size as returned by sysconf(_SC_PAGE_SIZE).
                     // Since custom_page may appear, it must be aligned to the top here.
@@ -695,12 +693,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 // This can only be used after the WASM execution has completed, so use relaxed instead of acquired.
                 auto const all_memory_length{this->memory_length_p->load(::std::memory_order_relaxed)};
 
-# if defined(_WIN32) || defined(__CYGWIN__)
-#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
+# if defined(_WIN32) || defined(__CYGWIN__)                                                          // windows
+#  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)  // win32
                 {
                     if(!::fast_io::win32::VirtualFree(this->memory_begin, 0u, 0x00008000u /*MEM_RELEASE*/)) [[unlikely]] { ::fast_io::fast_terminate(); }
                 }
-#  else
+#  else  // nt
                 {
                     ::std::byte* vfmemory{this->memory_begin};
                     ::std::size_t free_type{0uz};
@@ -716,7 +714,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 }
 #  endif
 # elif !defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) && (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) &&   \
-     __has_include(<sys/mman.h>)
+     __has_include(<sys/mman.h>)  // posix
                 {
                     // The length argument must be a multiple of the page size as returned by sysconf(_SC_PAGE_SIZE).
                     // Since custom_page may appear, it must be aligned to the top here.
@@ -752,8 +750,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 /// @brief Define container optimization operations for use with fast_io
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
-#if (defined(_WIN32) || defined(__CYGWIN__)) || (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                        \
-                                                 (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) && __has_include(<sys/mman.h>))
+#if defined(UWVM_SUPPORT_MMAP)
     template <>
     struct is_trivially_copyable_or_relocatable<::uwvm2::object::memory::linear::mmap_memory_t>
     {

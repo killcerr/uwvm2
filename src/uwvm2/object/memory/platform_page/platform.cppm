@@ -29,7 +29,7 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 // platform
-#ifdef UWVM_SUPPORT_MMAP
+#if defined(UWVM_SUPPORT_MMAP) && !(defined(_WIN32) || defined(__CYGWIN__))  // posix mmap
 # include <unistd.h>
 #endif
 

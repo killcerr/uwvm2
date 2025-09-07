@@ -31,6 +31,8 @@
 # include <atomic>
 # include <bit>
 # include <utility>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/debug/impl.h>
@@ -46,8 +48,7 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 {
-#if (defined(_WIN32) || defined(__CYGWIN__)) || (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                        \
-                                                 (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) && __has_include(<sys/mman.h>))
+#if defined(UWVM_SUPPORT_MMAP)
     using native_memory_t = mmap_memory_t;
 #else  // None
     using native_memory_t = allocator_memory_t;
@@ -55,3 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
 }  // namespace uwvm2::object::memory::wasm_page
 
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif

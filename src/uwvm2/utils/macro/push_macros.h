@@ -553,9 +553,11 @@
 # define UWVM_SUPPORT_PRELOAD_DL
 #endif
 
+/// @brief        Determine whether the operating system supports mmap
+/// @note         support: win9x, winnt, posix
 #pragma push_macro("UWVM_SUPPORT_MMAP")
 #undef UWVM_SUPPORT_MMAP
-#if !(defined(_WIN32) || defined(__CYGWIN__)) && (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                       \
+#if (defined(_WIN32) || defined(__CYGWIN__)) || (!defined(__NEWLIB__) && !(defined(__MSDOS__) || defined(__DJGPP__)) &&                                       \
                                                   (!defined(__wasm__) || (defined(__wasi__) && defined(_WASI_EMULATED_MMAN))) && __has_include(<sys/mman.h>))
 # define UWVM_SUPPORT_MMAP
 #endif

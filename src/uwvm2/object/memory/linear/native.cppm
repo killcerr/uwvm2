@@ -30,6 +30,8 @@ module;
 #include <atomic>
 #include <bit>
 #include <utility>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.object.memory.linear:native;
 
