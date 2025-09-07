@@ -151,7 +151,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
                 // 4) Grow started after we entered: undo increment and retry
                 this->active_ops_p->fetch_sub(1uz, ::std::memory_order_release);
-                this->active_ops_p->notify_all();  // Wake up waiting grow operations
+
+                // Only one grow can await active_ops: the grow path holds growing_flag exclusively.
+                // Other grow attempts block on growing_flag->wait until the flag is cleared.
+                // Thus the waiter set for active_ops==0 contains at most one grow thread.
+                // Wake a single grow waiter to re-check the counter; at most one grow can await active_ops
+                this->active_ops_p->notify_one();  // Wake up a waiting grow operation
             }
         }
 
@@ -163,8 +168,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         {
             // Decrement counter with release semantics to publish our updates
             this->active_ops_p->fetch_sub(1uz, ::std::memory_order_release);
-            // Notify waiting grow operations that they can proceed
-            this->active_ops_p->notify_all();
+            
+            // Only one grow can await active_ops: the grow path holds growing_flag exclusively.
+            // Other grow attempts block on growing_flag->wait until the flag is cleared.
+            // Thus the waiter set for active_ops==0 contains at most one grow thread.
+            // Wake a single grow waiter to re-check the counter; at most one grow can await active_ops
+            this->active_ops_p->notify_one();
         }
     };
 

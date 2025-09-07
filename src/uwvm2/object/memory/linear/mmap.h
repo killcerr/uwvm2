@@ -627,7 +627,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             return *this;
         }
 
-        inline constexpr ::std::size_t get_max_space() const noexcept
+        inline constexpr ::std::size_t get_acquire_reserved_space() const noexcept
         {
             // UB will never appear; it has been preemptively checked.
             auto const custom_page_size{1uz << this->custom_page_size_log2};
@@ -681,6 +681,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             // This section does not check for overflow because it was already checked during initialization.
             auto const max_space{max_protection_space + custom_page_size + max_type_size};
 
+            // The content retrieved here is not aligned with the platform page. To obtain the reserved space, simply align the platform page upward.
             return max_space;
         }
 
@@ -719,10 +720,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 auto const [page_size, success]{::uwvm2::object::memory::platform_page::get_platform_page_size()};
                 if(!success) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-                auto const max_space_ceil{(get_max_space() + page_size - 1uz) & ~(page_size - 1uz)};
+                auto const acquire_reserved_space_ceil{(get_acquire_reserved_space() + page_size - 1uz) & ~(page_size - 1uz)};
 
                 // fast_io::details::sys_munmap_nothrow is noexcept, manually throws exceptions.
-                if(::fast_io::details::sys_munmap_nothrow(this->memory_begin, max_space_ceil)) [[unlikely]] { ::fast_io::fast_terminate(); }
+                if(::fast_io::details::sys_munmap_nothrow(this->memory_begin, acquire_reserved_space_ceil)) [[unlikely]] { ::fast_io::fast_terminate(); }
             }
 # endif
 
@@ -779,10 +780,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 auto const [page_size, success]{::uwvm2::object::memory::platform_page::get_platform_page_size()};
                 if(!success) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-                auto const max_space_ceil{(get_max_space() + page_size - 1uz) & ~(page_size - 1uz)};
+                auto const acquire_reserved_space_ceil{(get_acquire_reserved_space() + page_size - 1uz) & ~(page_size - 1uz)};
 
                 // fast_io::details::sys_munmap_nothrow is noexcept, manually throws exceptions.
-                if(::fast_io::details::sys_munmap_nothrow(this->memory_begin, max_space_ceil)) [[unlikely]] { ::fast_io::fast_terminate(); }
+                if(::fast_io::details::sys_munmap_nothrow(this->memory_begin, acquire_reserved_space_ceil)) [[unlikely]] { ::fast_io::fast_terminate(); }
             }
 # endif
 
@@ -839,10 +840,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 if(page_size == 0uz) [[unlikely]] { ::fast_io::fast_terminate(); }
 
                 // Overflow "all_memory_length + (page_size - 1uz)" will never occur here because such a situation cannot be allocated.
-                auto const max_space_ceil{(get_max_space() + (page_size - 1uz)) & ~(page_size - 1uz)};
+                auto const acquire_reserved_space_ceil{(get_acquire_reserved_space() + (page_size - 1uz)) & ~(page_size - 1uz)};
 
                 // fast_io::details::sys_munmap_nothrow is noexcept, manually throws exceptions.
-                if(::fast_io::details::sys_munmap_nothrow(this->memory_begin, max_space_ceil)) [[unlikely]] { ::fast_io::fast_terminate(); }
+                if(::fast_io::details::sys_munmap_nothrow(this->memory_begin, acquire_reserved_space_ceil)) [[unlikely]] { ::fast_io::fast_terminate(); }
             }
 # endif
 
