@@ -40,9 +40,10 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory 
+UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 {
-    /// @todo
+    // In WASI, all mmap operations are handled by a single function rather than split across multiple functions. This approach ensures that the binary size
+    // does not inflate, and WASI does not impose excessive performance demands on memory access.
 
 }  // namespace uwvm2::imported::wasi::wasip1::memory
 

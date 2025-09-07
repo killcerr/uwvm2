@@ -33,6 +33,7 @@
 # include <bit>
 // import
 # include <fast_io.h>
+# include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/object/memory/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
@@ -49,13 +50,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 # error "CHAR_BIT must be 8"
 #endif
 
-    template <typename WasmType>
-    struct get_basic_wasm_type_from_memory_ret_t
-    {
-        ::uwvm2::imported::wasi::wasip1::abi::errno_t error_code;
-        WasmType value;
-    };
-
     /// @brief      Read a Wasm value from linear memory (allocator backend) with concurrency safety and bounds double-checking.
     /// @details    - Concurrency safety: use the double-atom guard (growing_flag_p + active_ops_p) to synchronize with grow operations.
     ///             - Bounds double-checks:
@@ -64,10 +58,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
     ///               (2) Compare with the actual memory length to prevent out-of-bounds access.
     ///             - Endianness: decode as little-endian; byteswap on big-endian hosts, PDP-11 Segment Sequence and Non-8-Bit Charbit Platform-Specific
     ///                   Handling.
+    /// @note       WebAssembly 1.0 (MVP) specifies that a module can have at most one memory. WASI Preview 1 is an API designed under this constraint, so it
+    ///             defaults to considering only a single memory. All system calls accept offsets relative to this unique memory. Therefore, only memory[0] can
+    ///             be passed subsequently.
     template <typename WasmType, typename Alloc>
-    inline constexpr get_basic_wasm_type_from_memory_ret_t<WasmType> get_basic_wasm_type_from_memory(
-        ::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
-        ::std::size_t offset) noexcept
+    inline constexpr WasmType get_basic_wasm_type_from_memory(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                              ::std::size_t offset) noexcept
     {
         // Number of 8-bit WASM bytes needed to represent WasmType
         constexpr ::std::size_t wasm_bytes{sizeof(WasmType)};
@@ -78,15 +74,38 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
         // Conduct a full inspection of the memory.
         auto const memory_begin{memory.memory_begin};
 
-        if(memory_begin == nullptr) [[unlikely]] { return {::uwvm2::imported::wasi::wasip1::abi::errno_t::efault, {}}; }
+        if(memory_begin == nullptr) [[unlikely]]
+        {
+            // This is a bug in uwvm rather than a bug in the program running in WASM.
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+            ::fast_io::fast_terminate();
+        }
 
         auto const memory_length{memory.memory_length};
 
         // The remaining size does not support reading a single type.
-        if(wasm_bytes > memory_length) [[unlikely]] { return {::uwvm2::imported::wasi::wasip1::abi::errno_t::efault, {}}; }
+        if(wasm_bytes > memory_length) [[unlikely]]
+        {
+            ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                .memory_idx = 0uz,
+                .memory_offset = {.offset = offset, .offset_65_bit = false},
+                .memory_static_offset = 0u,
+                .memory_length = static_cast<::std::uint_least64_t>(memory_length)
+            });
+        }
 
         // Can read N bytes at the last legal position
-        if(offset > (memory_length - wasm_bytes)) [[unlikely]] { return {::uwvm2::imported::wasi::wasip1::abi::errno_t::efault, {}}; }
+        if(offset > (memory_length - wasm_bytes)) [[unlikely]]
+        {
+            ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                .memory_idx = 0uz,
+                .memory_offset = {.offset = offset, .offset_65_bit = false},
+                .memory_static_offset = 0u,
+                .memory_length = static_cast<::std::uint_least64_t>(memory_length)
+            });
+        }
 
         if constexpr(::std::integral<WasmType>)
         {
@@ -96,17 +115,63 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             // never overflow
             ::std::memcpy(::std::addressof(u), memory_begin + offset, sizeof(u));
 
+            // Supports big-endian, little-endian, and PDP-11 endian
             u = ::fast_io::little_endian(u);
 
-            return {::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess, static_cast<WasmType>(u)};
+            return static_cast<WasmType>(u);
         }
         else
         {
             static_assert(::std::integral<WasmType>, "wasi only supports the use of integer types.");
         }
 
-        return {::uwvm2::imported::wasi::wasip1::abi::errno_t::efault, {}};
+        return {};
     }
 
+    template <typename WasmType, typename Alloc>
+    inline constexpr WasmType get_basic_wasm_type_from_memory_wasm32(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u32
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length)
+                });
+            }
+        }
+
+        return get_basic_wasm_type_from_memory<WasmType, Alloc>(memory, static_cast<::std::size_t>(offset));
+    }
+
+    template <typename WasmType, typename Alloc>
+    inline constexpr WasmType get_basic_wasm_type_from_memory_wasm64(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u64
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length)
+                });
+            }
+        }
+
+        return get_basic_wasm_type_from_memory<WasmType, Alloc>(memory, static_cast<::std::size_t>(offset));
+    }
 }  // namespace uwvm2::imported::wasi::wasip1::memory
 

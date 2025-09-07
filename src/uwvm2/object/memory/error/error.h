@@ -69,6 +69,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::error
         ::std::size_t memory_idx{};
         basic_memory_65bit_offset_t memory_offset{};
         ::std::uint_least64_t memory_static_offset{};
+        ::std::uint_least64_t memory_length{};
     };
 
     inline constexpr void output_memory_error(memory_error_t const& memerr) noexcept
@@ -91,6 +92,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::error
                               u8" + (d)",
                               ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
                               ::fast_io::mnp::addrvw(get_dynamic_offset(memerr.memory_offset, memerr.memory_static_offset)),
+                              u8" > ",
+                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                              ::fast_io::mnp::addrvw(memerr.memory_length),
                               ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
         ::fast_io::io::perrln(::fast_io::u8err(),
@@ -99,8 +103,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::error
                               u8"] access overflow: (s)",
                               ::fast_io::mnp::addrvw(memerr.memory_static_offset),
                               u8" + (d)",
-                              ::fast_io::mnp::addrvw(get_dynamic_offset(memerr.memory_offset, memerr.memory_static_offset)));
+                              ::fast_io::mnp::addrvw(get_dynamic_offset(memerr.memory_offset, memerr.memory_static_offset)),
+                              u8" > ",
+                              ::fast_io::mnp::addrvw(memerr.memory_length));
 #endif
+    }
+
+    [[noreturn]] inline void output_memory_error_and_terminate(memory_error_t const& memerr) noexcept
+    {
+        output_memory_error(memerr);
+        ::fast_io::fast_terminate();
     }
 
 }  // namespace uwvm2::object::memory::error
