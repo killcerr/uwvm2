@@ -92,7 +92,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
                 .memory_idx = 0uz,
                 .memory_offset = {.offset = offset, .offset_65_bit = false},
                 .memory_static_offset = 0u,
-                .memory_length = static_cast<::std::uint_least64_t>(memory_length)
+                .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                .memory_type_size = wasm_bytes
             });
         }
 
@@ -103,7 +104,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
                 .memory_idx = 0uz,
                 .memory_offset = {.offset = offset, .offset_65_bit = false},
                 .memory_static_offset = 0u,
-                .memory_length = static_cast<::std::uint_least64_t>(memory_length)
+                .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                .memory_type_size = wasm_bytes
             });
         }
 
@@ -143,7 +145,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
                     .memory_idx = 0uz,
                     .memory_offset = {.offset = offset, .offset_65_bit = false},
                     .memory_static_offset = 0u,
-                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length)
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = sizeof(WasmType)
                 });
             }
         }
@@ -166,7 +169,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
                     .memory_idx = 0uz,
                     .memory_offset = {.offset = offset, .offset_65_bit = false},
                     .memory_static_offset = 0u,
-                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length)
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = sizeof(WasmType)
                 });
             }
         }

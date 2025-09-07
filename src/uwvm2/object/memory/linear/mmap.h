@@ -52,7 +52,7 @@
 
 #if defined(UWVM_SUPPORT_MMAP)
 # if CHAR_BIT != 8
-#  error "mmap unsupported platform"
+#  error "mmap unsupported platform (The POSIX standard requires CHAR_BIT == 8)"
 # endif
 #endif
 
@@ -288,8 +288,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
                 if(custom_page_size > ::std::numeric_limits<::std::size_t>::max() - max_protection_space) [[unlikely]] { ::fast_io::fast_terminate(); }
 
-                // | max_protection_space | custom_page_size |
-                auto const max_space{max_protection_space + custom_page_size};
+                // Provides a 64-byte type protection mechanism (no foreseeable future type will exceed this size) to prevent custom page sizes (arbitrary
+                // sizes) from being smaller than the type size.
+                constexpr ::std::size_t max_type_size{64uz};
+
+                // | max_protection_space | custom_page_size | max_type_size | ... align to platform page size ... |
+                auto const max_space{max_protection_space + custom_page_size + max_type_size};
+
+                // If the page alignment size of max_space cannot be reserved, the vm will trap.
 
 # if defined(_WIN32) || defined(__CYGWIN__)                                                          // Windows
 #  if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)  // WIN32
@@ -429,6 +435,57 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             // This atomic operation prevents the dynamic check from retrieving an erroneous value when reading the length.
             // Here, with the lock's support, memory access is already guaranteed to be relaxed. However, during dynamic checks, an acquire is still required.
             auto const current_length{this->memory_length_p->load(::std::memory_order_relaxed)};
+
+            // Select the smaller value between the manually set maximum and the maximum already mmapped by the platform.
+            // Beyond the boundaries of the VMA (adjacent virtual address space), protection is not automatically enforced; these regions are simply “unmapped.”
+            // These unmapped areas remain as potentially available address space. Subsequent mmap operations may automatically allocate memory within these
+            // spaces. Failing to impose such restrictions during memory expansion risks corrupting memory allocated to other parts of the program.
+            ::std::size_t max_page_memory_length;  // No initlization is required
+
+            if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint_least64_t))
+            {
+                // 64bit platform
+                switch(this->status)
+                {
+                    case mmap_memory_status_t::wasm32:
+                    {
+                        // In full protection mode, the maximum memory allocation permitted is half of the full protection size.
+                        // max_full_protection_wasm32_length_half == (u64)u32max + 1ui64
+                        constexpr auto max_full_protection_wasm32_length_half{max_full_protection_wasm32_length / 2u};
+
+                        max_page_memory_length = static_cast<::std::size_t>(max_full_protection_wasm32_length_half);
+                        break;
+                    }
+                    case mmap_memory_status_t::wasm64:
+                    {
+                        // partial protection. No need to provide double protection, as static checks are in place.
+                        max_page_memory_length = static_cast<::std::size_t>(max_partial_protection_wasm64_length);
+                        break;
+                    }
+                    [[unlikely]] default:
+                    {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+# endif
+                        ::std::unreachable();
+                    }
+                }
+            }
+            else if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint_least32_t))
+            {
+                // 32bit platform
+                // On 32-bit platforms, both wasm64 and wasm32 use 32-bit versions.
+                // partial protection. No need to provide double protection, as static checks are in place.
+                max_page_memory_length = static_cast<::std::size_t>(max_partial_protection_wasm32_length);
+            }
+            else
+            {
+                static_assert(sizeof(::std::size_t) >= sizeof(::std::uint_least32_t), "mmap unsupported platform");
+            }
+
+            max_limit_memory_length = ::std::min(max_limit_memory_length, max_page_memory_length);
+
+            // start checking
             if(max_limit_memory_length < current_length) [[unlikely]] { ::fast_io::fast_terminate(); }
 
             auto const left_memory_size{max_limit_memory_length - current_length};

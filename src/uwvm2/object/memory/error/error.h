@@ -70,42 +70,54 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::error
         basic_memory_65bit_offset_t memory_offset{};
         ::std::uint_least64_t memory_static_offset{};
         ::std::uint_least64_t memory_length{};
+        ::std::size_t memory_type_size{};
     };
 
     inline constexpr void output_memory_error(memory_error_t const& memerr) noexcept
     {
 #ifdef UWVM
-        ::fast_io::io::perrln(::uwvm2::uwvm::io::u8log_output,
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                              u8"uwvm: ",
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                              u8"[error] ",
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                              u8"memory[",
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                              memerr.memory_idx,
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                              u8"] access overflow: (s)",
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                              ::fast_io::mnp::addrvw(memerr.memory_static_offset),
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                              u8" + (d)",
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
-                              ::fast_io::mnp::addrvw(get_dynamic_offset(memerr.memory_offset, memerr.memory_static_offset)),
-                              u8" > ",
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                              ::fast_io::mnp::addrvw(memerr.memory_length),
-                              ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                            u8"uwvm: ",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                            u8"[error] ",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                            u8"memory[",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                            memerr.memory_idx,
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                            u8"] access overflow: (s)",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                            ::fast_io::mnp::addrvw(memerr.memory_static_offset),
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                            u8" + (d)",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_RED),
+                            ::fast_io::mnp::addrvw(get_dynamic_offset(memerr.memory_offset, memerr.memory_static_offset)),
+                            u8" > ",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                            ::fast_io::mnp::addrvw(memerr.memory_length),
+                            u8" (Read ",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                            memerr.memory_type_size,
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                            u8" bytes)\n",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-        ::fast_io::io::perrln(::fast_io::u8err(),
-                              u8"uwvm: [error] memory[",
-                              memerr.memory_idx,
-                              u8"] access overflow: (s)",
-                              ::fast_io::mnp::addrvw(memerr.memory_static_offset),
-                              u8" + (d)",
-                              ::fast_io::mnp::addrvw(get_dynamic_offset(memerr.memory_offset, memerr.memory_static_offset)),
-                              u8" > ",
-                              ::fast_io::mnp::addrvw(memerr.memory_length));
+        ::fast_io::io::perr(::fast_io::u8err(),
+                            u8"uwvm: [error] memory[",
+                            memerr.memory_idx,
+                            u8"] access overflow: (s)",
+                            ::fast_io::mnp::addrvw(memerr.memory_static_offset),
+                            u8" + (d)",
+                            ::fast_io::mnp::addrvw(get_dynamic_offset(memerr.memory_offset, memerr.memory_static_offset)),
+                            u8" > ",
+                            ::fast_io::mnp::addrvw(memerr.memory_length),
+                            u8" (Read ",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                            memerr.memory_type_size,
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                            u8" bytes)\n",
+                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #endif
     }
 
