@@ -106,7 +106,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         inline constexpr memory_operation_guard_t(::std::atomic_flag* other_growing_flag_p, ::std::atomic_size_t* other_active_ops_p) noexcept :
             growing_flag_p{other_growing_flag_p}, active_ops_p{other_active_ops_p}
         {
-            if(this->growing_flag_p != nullptr && this->active_ops_p != nullptr) [[likely]] { enter_operation(); }
+            // Since this is a path frequently accessed during WASM execution, we should strive to avoid branches related to the virtual machine's own bug
+            // checks (which are verified during debugging).
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            if(this->growing_flag_p == nullptr || this->active_ops_p == nullptr) [[unlikely]]
+            {
+                // This is a bug in uwvm rather than a bug in the program running in WASM.
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
+#endif
+
+            enter_operation();
         }
 
         inline constexpr memory_operation_guard_t(memory_operation_guard_t const& other) noexcept = delete;
@@ -114,10 +125,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         inline constexpr memory_operation_guard_t(memory_operation_guard_t&& other) noexcept = delete;
         inline constexpr memory_operation_guard_t& operator= (memory_operation_guard_t&& other) noexcept = delete;
 
-        inline constexpr ~memory_operation_guard_t()
-        {
-            if(this->growing_flag_p != nullptr && this->active_ops_p != nullptr) [[likely]] { exit_operation(); }
-        }
+        inline constexpr ~memory_operation_guard_t() { exit_operation(); }
 
         /// @brief      Enter the memory operation safely.
         /// @details    Implements the enter protocol to prevent race conditions:

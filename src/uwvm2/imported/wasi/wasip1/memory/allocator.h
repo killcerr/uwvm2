@@ -74,14 +74,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
         // Conduct a full inspection of the memory.
         auto const memory_begin{memory.memory_begin};
 
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
         if(memory_begin == nullptr) [[unlikely]]
         {
-            // This is a bug in uwvm rather than a bug in the program running in WASM.
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            // Since this is a path frequently accessed during WASM execution, we should strive to avoid branches related to the virtual machine's own bug
+            // checks (which are verified during debugging).
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#endif
-            ::fast_io::fast_terminate();
         }
+#endif
 
         auto const memory_length{memory.memory_length};
 
