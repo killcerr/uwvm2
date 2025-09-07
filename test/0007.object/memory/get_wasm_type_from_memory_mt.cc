@@ -85,7 +85,7 @@ int main()
                 for(int round = 0; round < 100000; ++round)
                 {
                     auto const v = get_basic_wasm_type_from_memory<std::uint32_t>(mem, static_offset + dynamic_offset);
-                    if(v.value != expected)
+                    if(v != expected)
                     {
                         mismatch_count.fetch_add(1u, std::memory_order_relaxed);
                         break;
