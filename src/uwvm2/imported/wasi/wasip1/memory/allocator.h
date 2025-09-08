@@ -61,15 +61,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
     /// @note       WebAssembly 1.0 (MVP) specifies that a module can have at most one memory. WASI Preview 1 is an API designed under this constraint, so it
     ///             defaults to considering only a single memory. All system calls accept offsets relative to this unique memory. Therefore, only memory[0] can
     ///             be passed subsequently.
-    template <typename WasmType, typename Alloc>
-    inline constexpr WasmType get_basic_wasm_type_from_memory(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
-                                                              ::std::size_t offset) noexcept
-    {
-        // Number of 8-bit WASM bytes needed to represent WasmType
-        constexpr ::std::size_t wasm_bytes{sizeof(WasmType)};
+    /// @note       Although optional distributors are provided, remember to use multiple distributors.
 
-        // Mutual exclusion between concurrent read/write operations and memory growth: Entering the memory operation region
-        ::uwvm2::object::memory::linear::memory_operation_guard_t memory_op_guard{memory.growing_flag_p, memory.active_ops_p};
+    template <typename Alloc>
+    inline constexpr void check_memory_bounds(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                              ::std::size_t offset,
+                                              ::std::size_t wasm_bytes) noexcept
+    {
+        // Locking is required before accessing memory_op_guard.
 
         // Conduct a full inspection of the memory.
         auto const memory_begin{memory.memory_begin};
@@ -96,6 +95,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
                 .memory_type_size = wasm_bytes
             });
         }
+    }
+
+    template <typename WasmType, typename Alloc>
+    inline constexpr WasmType get_basic_wasm_type_from_memory(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                              ::std::size_t offset) noexcept
+    {
+        // Mutual exclusion between concurrent read/write operations and memory growth: Entering the memory operation region
+        ::uwvm2::object::memory::linear::memory_operation_guard_t memory_op_guard{memory.growing_flag_p, memory.active_ops_p};
+
+        constexpr auto wasm_bytes{sizeof(WasmType)};
+
+        check_memory_bounds(memory, offset, wasm_bytes);
 
         if constexpr(::std::integral<WasmType>)
         {
@@ -103,7 +114,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             unsigned_wasm_type u;  // no init required
 
             // never overflow
-            ::std::memcpy(::std::addressof(u), memory_begin + offset, sizeof(u));
+            ::std::memcpy(::std::addressof(u), memory.memory_begin + offset, sizeof(u));
 
             // Supports big-endian, little-endian, and PDP-11 endian
             u = ::fast_io::little_endian(u);
@@ -171,37 +182,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
                                                           ::std::size_t offset,
                                                           WasmType value) noexcept
     {
-        // Number of 8-bit WASM bytes needed to represent WasmType
-        constexpr ::std::size_t wasm_bytes{sizeof(WasmType)};
-
         // Mutual exclusion between concurrent read/write operations and memory growth: Entering the memory operation region
         ::uwvm2::object::memory::linear::memory_operation_guard_t memory_op_guard{memory.growing_flag_p, memory.active_ops_p};
 
-        // Conduct a full inspection of the memory.
-        auto const memory_begin{memory.memory_begin};
+        constexpr auto wasm_bytes{sizeof(WasmType)};
 
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-        if(memory_begin == nullptr) [[unlikely]]
-        {
-            // Since this is a path frequently accessed during WASM execution, we should strive to avoid branches related to the virtual machine's own bug
-            // checks (which are verified during debugging).
-            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-        }
-#endif
-
-        auto const memory_length{memory.memory_length};
-
-        // The remaining size does not support reading a single type. Can read N bytes at the last legal position
-        if(wasm_bytes > memory_length || offset > memory_length - wasm_bytes) [[unlikely]]
-        {
-            ::uwvm2::object::memory::error::output_memory_error_and_terminate({
-                .memory_idx = 0uz,
-                .memory_offset = {.offset = offset, .offset_65_bit = false},
-                .memory_static_offset = 0u,
-                .memory_length = static_cast<::std::uint_least64_t>(memory_length),
-                .memory_type_size = wasm_bytes
-            });
-        }
+        check_memory_bounds(memory, offset, wasm_bytes);
 
         if constexpr(::std::integral<WasmType>)
         {
@@ -211,7 +197,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             u = ::fast_io::little_endian(u);
 
             // never overflow
-            ::std::memcpy(memory_begin + offset, ::std::addressof(u), sizeof(u));
+            ::std::memcpy(memory.memory_begin + offset, ::std::addressof(u), sizeof(u));
         }
         else
         {
@@ -268,5 +254,146 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 
         store_basic_wasm_type_to_memory<WasmType, Alloc>(memory, static_cast<::std::size_t>(offset), value);
     }
+
+    template <typename Alloc>
+    inline constexpr void read_all_from_memory(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                               ::std::size_t offset,
+                                               ::std::byte* begin,
+                                               ::std::byte* end) noexcept
+    {
+        if(begin > end) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        // Mutual exclusion between concurrent read/write operations and memory growth: Entering the memory operation region
+        ::uwvm2::object::memory::linear::memory_operation_guard_t memory_op_guard{memory.growing_flag_p, memory.active_ops_p};
+
+        auto const wasm_bytes{static_cast<::std::size_t>(end - begin)};
+
+        check_memory_bounds(memory, offset, wasm_bytes);
+
+        ::std::memcpy(begin, memory.memory_begin + offset, wasm_bytes);
+    }
+
+    template <typename Alloc>
+    inline constexpr void read_all_from_memory_wasm32(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                      ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                      ::std::byte* begin,
+                                                      ::std::byte* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u32
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        read_all_from_memory<Alloc>(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
+    template <typename Alloc>
+    inline constexpr void read_all_from_memory_wasm64(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                      ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                      ::std::byte* begin,
+                                                      ::std::byte* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u64
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        read_all_from_memory<Alloc>(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
+    template <typename Alloc>
+    inline constexpr void write_all_to_memory(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                              ::std::size_t offset,
+                                              ::std::byte const* begin,
+                                              ::std::byte const* end) noexcept
+    {
+        if(begin > end) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        // Mutual exclusion between concurrent read/write operations and memory growth: Entering the memory operation region
+        ::uwvm2::object::memory::linear::memory_operation_guard_t memory_op_guard{memory.growing_flag_p, memory.active_ops_p};
+
+        auto const wasm_bytes{static_cast<::std::size_t>(end - begin)};
+
+        check_memory_bounds(memory, offset, wasm_bytes);
+
+        ::std::memcpy(memory.memory_begin + offset, begin, wasm_bytes);
+    }
+
+    template <typename Alloc>
+    inline constexpr void write_all_to_memory_wasm32(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                     ::std::byte const* begin,
+                                                     ::std::byte const* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u32
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        write_all_to_memory<Alloc>(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
+    template <typename Alloc>
+    inline constexpr void write_all_to_memory_wasm64(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                     ::std::byte const* begin,
+                                                     ::std::byte const* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u64
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        write_all_to_memory<Alloc>(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
 }  // namespace uwvm2::imported::wasi::wasip1::memory
 
