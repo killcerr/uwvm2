@@ -34,8 +34,8 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
-# include <uwvm2/object/memory/impl.h>
 # include <uwvm2/utils/debug/impl.h>
+# include <uwvm2/object/memory/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
 #endif
