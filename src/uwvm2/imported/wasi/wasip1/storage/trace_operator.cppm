@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -21,10 +21,18 @@
 
 module;
 
-export module uwvm2.imported.wasi.wasip1;
-export import uwvm2.imported.wasi.wasip1.abi;
-export import uwvm2.imported.wasi.wasip1.fd_manager;
-export import uwvm2.imported.wasi.wasip1.storage;
+// std
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <climits>
+#include <limits>
+#include <concepts>
+#include <bit>
+
+export module uwvm2.imported.wasi.wasip1.storage:trace_operator;
+
+import fast_io;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -33,4 +41,5 @@ export import uwvm2.imported.wasi.wasip1.storage;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "trace_operator.h"
+

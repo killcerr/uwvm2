@@ -24,4 +24,5 @@
 #ifndef UWVM_MODULE
 # include "abi/impl.h"
 # include "fd_manager/impl.h"
+# include "storage/impl.h"
 #endif
