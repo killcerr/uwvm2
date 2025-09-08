@@ -48,10 +48,18 @@
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 {
     template <typename memory_type>
-    concept is_wasip1_valid_memory_type = requires(memory_type& mem, ::std::size_t offset) {
+    concept wasip1_memory = requires(memory_type& mem, ::std::size_t offset) {
         { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(mem, offset) };
         { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64>(mem, offset) };
     };
+
+    template <wasip1_memory memory_type>
+    struct wasip1_environment
+    {
+        // wasip1 only support only one memory (memory[0])
+        memory_type& wasip1_memory;
+    };
+
 }  // namespace uwvm2::imported::wasi::wasip1::environment
 
 #ifndef UWVM_MODULE
