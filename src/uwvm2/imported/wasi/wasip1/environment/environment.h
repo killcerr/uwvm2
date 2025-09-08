@@ -47,7 +47,6 @@
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 {
 }  // namespace uwvm2::imported::wasi::wasip1::environment
-#endif
 
 #ifndef UWVM_MODULE
 // macro
