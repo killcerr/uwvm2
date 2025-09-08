@@ -38,6 +38,7 @@
 # include <uwvm2/object/memory/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
+# include <uwvm2/imported/wasi/wasip1/memory/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -46,6 +47,10 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 {
+    template <typename memory_type>
+    concept is_wasip1_valid_memory_type = requires(memory_type& mem) {
+        { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(mem, 0uz) };
+    };
 }  // namespace uwvm2::imported::wasi::wasip1::environment
 
 #ifndef UWVM_MODULE

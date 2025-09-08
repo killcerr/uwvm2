@@ -24,6 +24,7 @@ module;
 export module uwvm2.imported.wasi.wasip1;
 export import uwvm2.imported.wasi.wasip1.abi;
 export import uwvm2.imported.wasi.wasip1.fd_manager;
+export import uwvm2.imported.wasi.wasip1.environment;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

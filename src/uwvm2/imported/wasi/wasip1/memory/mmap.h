@@ -133,7 +133,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             return {};
         }
         else
-        {       
+        {
             bool const is_full_page_protection{memory.is_full_page_protection()};
 
             if(is_full_page_protection)
