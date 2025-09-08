@@ -372,6 +372,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 {
                     ::std::byte* vamemory2{this->memory_begin};
                     ::std::size_t memory_length_tmp{memory_length};
+                    constexpr bool zw{false};
                     auto const status{::fast_io::win32::nt::nt_allocate_virtual_memory<zw>(reinterpret_cast<void*>(-1),
                                                                                            reinterpret_cast<void**>(::std::addressof(vamemory2)),
                                                                                            0,
