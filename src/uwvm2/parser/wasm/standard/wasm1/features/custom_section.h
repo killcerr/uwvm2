@@ -227,11 +227,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         }
 #endif
 
-        if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), "Customs:\n"); }
-        else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), L"Customs:\n"); }
-        else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), u8"Customs:\n"); }
-        else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), u"Customs:\n"); }
-        else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<true>(::std::forward<Stm>(stream), U"Customs:\n"); }
+        if constexpr(::std::same_as<char_type, char>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), "Customs:\n"); }
+        else if constexpr(::std::same_as<char_type, wchar_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), L"Customs:\n"); }
+        else if constexpr(::std::same_as<char_type, char8_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u8"Customs:\n"); }
+        else if constexpr(::std::same_as<char_type, char16_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), u"Customs:\n"); }
+        else if constexpr(::std::same_as<char_type, char32_t>) { ::fast_io::operations::print_freestanding<false>(::std::forward<Stm>(stream), U"Customs:\n"); }
 
         for(auto const& curr_custom: custom_section_details_wrapper.custom_section_storage_ptr->customs)
         {
