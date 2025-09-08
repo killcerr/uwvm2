@@ -50,6 +50,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 {
     template <typename memory_type>
     concept wasip1_memory = requires(memory_type& mem, ::std::size_t offset, ::std::byte* begin, ::std::byte* end) {
+        { ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(mem, offset, 0uz) };
+
         { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(mem, offset) };
         { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64>(mem, offset) };
         {
@@ -64,12 +66,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
                 offset,
                 ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64{})
         };
+        { ::uwvm2::imported::wasi::wasip1::memory::read_all_from_memory(mem, offset, begin, end) };
+        { ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory(mem, offset, begin, end) };
+
         {
-            ::uwvm2::imported::wasi::wasip1::memory::read_all_from_memory(mem, offset, begin, end)
+            ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_unchecked<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(mem,
+                                                                                                                                                       offset)
         };
         {
-            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory(mem, offset, begin, end)
+            ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_unchecked<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64>(mem,
+                                                                                                                                                       offset)
         };
+        {
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_unchecked<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(
+                mem,
+                offset,
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32{})
+        };
+        {
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_unchecked<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64>(
+                mem,
+                offset,
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64{})
+        };
+        { ::uwvm2::imported::wasi::wasip1::memory::read_all_from_memory_unchecked(mem, offset, begin, end) };
+        { ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_unchecked(mem, offset, begin, end) };
     };
 
     static_assert(wasip1_memory<::uwvm2::object::memory::linear::allocator_memory_t>);
