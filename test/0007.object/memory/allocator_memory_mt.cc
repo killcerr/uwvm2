@@ -29,7 +29,7 @@
 
 #ifndef UWVM_MODULE
 // import
-# include <uwvm2/imported/wasi/wasip1/memory/allocator.h>
+# include <uwvm2/imported/wasi/wasip1/memory/impl.h>
 #else
 # error "Module testing is not currently supported"
 #endif
@@ -97,6 +97,12 @@ int main()
     for(auto& t: threads) { t.join(); }
     grow_thread.join();
 
-    return mismatch_count.load(std::memory_order_relaxed) == 0u ? 0 : 1;
+    auto const mismatch_count_value = mismatch_count.load(std::memory_order_relaxed);
+
+    if (mismatch_count_value != 0u)
+    {
+        ::fast_io::io::perr(::fast_io::u8err(), u8"allocator memory test errror\n");
+        ::fast_io::fast_terminate();
+    }
 }
 
