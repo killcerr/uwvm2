@@ -35,6 +35,7 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/debug/impl.h>
+# include <uwvm2/utils/container/impl.h>
 # include <uwvm2/object/memory/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
@@ -48,16 +49,42 @@
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 {
     template <typename memory_type>
-    concept wasip1_memory = requires(memory_type& mem, ::std::size_t offset) {
+    concept wasip1_memory = requires(memory_type& mem, ::std::size_t offset, ::std::byte* begin, ::std::byte* end) {
         { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(mem, offset) };
         { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64>(mem, offset) };
+        {
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(
+                mem,
+                offset,
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32{})
+        };
+        {
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64>(
+                mem,
+                offset,
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64{})
+        };
+        {
+            ::uwvm2::imported::wasi::wasip1::memory::read_all_from_memory(mem, offset, begin, end)
+        };
+        {
+            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory(mem, offset, begin, end)
+        };
     };
+
+    static_assert(wasip1_memory<::uwvm2::object::memory::linear::allocator_memory_t>);
+#if defined(UWVM_SUPPORT_MMAP)
+    static_assert(wasip1_memory<::uwvm2::object::memory::linear::mmap_memory_t>);
+#endif
 
     template <wasip1_memory memory_type>
     struct wasip1_environment
     {
         // wasip1 only support only one memory (memory[0])
         memory_type& wasip1_memory;
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8cstring_view> argv;
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8cstring_view> envs;
+        bool trace_wasip1_call;
     };
 
 }  // namespace uwvm2::imported::wasi::wasip1::environment
