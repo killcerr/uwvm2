@@ -48,8 +48,9 @@
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 {
     template <typename memory_type>
-    concept is_wasip1_valid_memory_type = requires(memory_type& mem) {
-        { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(mem, 0uz) };
+    concept is_wasip1_valid_memory_type = requires(memory_type& mem, ::std::size_t offset) {
+        { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(mem, offset) };
+        { ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64>(mem, offset) };
     };
 }  // namespace uwvm2::imported::wasi::wasip1::environment
 
