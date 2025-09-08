@@ -25,6 +25,7 @@ module;
 #include <cstddef>
 #include <cstdint>
 #include <climits>
+#include <cstring>
 #include <limits>
 #include <concepts>
 #include <bit>

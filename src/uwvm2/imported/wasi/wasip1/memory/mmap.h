@@ -27,6 +27,7 @@
 # include <cstddef>
 # include <cstdint>
 # include <climits>
+# include <cstring>
 # include <limits>
 # include <concepts>
 # include <bit>
@@ -486,6 +487,307 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 
         write_all_to_memory(memory, static_cast<::std::size_t>(offset), begin, end);
     }
+
+    template <typename WasmType>
+    inline constexpr WasmType get_basic_wasm_type_from_memory_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                        ::std::size_t offset) noexcept
+    {
+        if constexpr(::std::integral<WasmType>)
+        {
+            using unsigned_wasm_type = ::std::make_unsigned_t<WasmType>;
+            unsigned_wasm_type u;  // no init required
+
+            // never overflow
+            ::std::memcpy(::std::addressof(u), memory.memory_begin + offset, sizeof(u));
+
+            // Supports big-endian, little-endian. mmap platform without PDP-11 sequence.
+            u = ::fast_io::little_endian(u);
+
+            return static_cast<WasmType>(u);
+        }
+        else
+        {
+            static_assert(::std::integral<WasmType>, "wasi only supports the use of integer types.");
+        }
+
+        return {};
+    }
+
+    template <typename WasmType>
+    inline constexpr WasmType get_basic_wasm_type_from_memory_wasm32_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                               ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = sizeof(WasmType)
+                });
+            }
+        }
+
+        return get_basic_wasm_type_from_memory_unchecked<WasmType>(memory, static_cast<::std::size_t>(offset));
+    }
+
+    template <typename WasmType>
+    inline constexpr WasmType get_basic_wasm_type_from_memory_wasm64_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                               ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_wasm64_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = sizeof(WasmType)
+                });
+            }
+        }
+
+        return get_basic_wasm_type_from_memory_unchecked<WasmType>(memory, static_cast<::std::size_t>(offset));
+    }
+
+    template <typename WasmType>
+    inline constexpr void store_basic_wasm_type_to_memory_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                    ::std::size_t offset,
+                                                                    WasmType value) noexcept
+    {
+        if constexpr(::std::integral<WasmType>)
+        {
+            using unsigned_wasm_type = ::std::make_unsigned_t<WasmType>;
+            unsigned_wasm_type u{static_cast<unsigned_wasm_type>(value)};
+
+            u = ::fast_io::little_endian(u);
+
+            // never overflow
+            ::std::memcpy(memory.memory_begin + offset, ::std::addressof(u), sizeof(u));
+        }
+        else
+        {
+            static_assert(::std::integral<WasmType>, "wasi only supports the use of integer types.");
+        }
+    }
+
+    template <typename WasmType>
+    inline constexpr void store_basic_wasm_type_to_memory_wasm32_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                           ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                                           WasmType value) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = sizeof(WasmType)
+                });
+            }
+        }
+
+        store_basic_wasm_type_to_memory_unchecked<WasmType>(memory, static_cast<::std::size_t>(offset), value);
+    }
+
+    template <typename WasmType>
+    inline constexpr void store_basic_wasm_type_to_memory_wasm64_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                           ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                                           WasmType value) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_wasm64_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = sizeof(WasmType)
+                });
+            }
+        }
+
+        store_basic_wasm_type_to_memory_unchecked<WasmType>(memory, static_cast<::std::size_t>(offset), value);
+    }
+
+    inline constexpr void read_all_from_memory_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                         ::std::size_t offset,
+                                                         ::std::byte* begin,
+                                                         ::std::byte* end) noexcept
+    {
+        if(begin > end) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        auto const wasm_bytes{static_cast<::std::size_t>(end - begin)};
+
+        ::std::memcpy(begin, memory.memory_begin + offset, wasm_bytes);
+    }
+
+    inline constexpr void read_all_from_memory_wasm32_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                                ::std::byte* begin,
+                                                                ::std::byte* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        read_all_from_memory_unchecked(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
+    inline constexpr void read_all_from_memory_wasm64_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                                ::std::byte* begin,
+                                                                ::std::byte* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_wasm64_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        read_all_from_memory_unchecked(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
+    inline constexpr void write_all_to_memory_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                        ::std::size_t offset,
+                                                        ::std::byte const* begin,
+                                                        ::std::byte const* end) noexcept
+    {
+        if(begin > end) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        auto const wasm_bytes{static_cast<::std::size_t>(end - begin)};
+
+        ::std::memcpy(memory.memory_begin + offset, begin, wasm_bytes);
+    }
+
+    inline constexpr void write_all_to_memory_wasm32_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                               ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                               ::std::byte const* begin,
+                                                               ::std::byte const* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        write_all_to_memory_unchecked(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
+    inline constexpr void write_all_to_memory_wasm64_unchecked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                               ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                               ::std::byte const* begin,
+                                                               ::std::byte const* end) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_wasm64_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = static_cast<::std::size_t>(end - begin)
+                });
+            }
+        }
+
+        write_all_to_memory_unchecked(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
 }  // namespace uwvm2::imported::wasi::wasip1::memory
 #endif
 
