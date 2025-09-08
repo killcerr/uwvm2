@@ -88,20 +88,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             // exceeds the limit. Therefore, using `memory_length` directly is sufficient for this determination.
 
             // The remaining size does not support reading a single type.
-            if(wasm_bytes > memory_length) [[unlikely]]
-            {
-                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
-                    .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
-                    .memory_static_offset = 0u,
-                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
-                    .memory_type_size = wasm_bytes
-                });
-            }
-
             // Here, since the custom page size is smaller than the platform page size, page protection cannot be used to determine whether a cross-page read is
             // required. Therefore, an inter-page check must be performed.
-            if(offset > memory_length - wasm_bytes) [[unlikely]]
+            if(wasm_bytes > memory_length || offset > memory_length - wasm_bytes) [[unlikely]]
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
@@ -302,6 +291,227 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
         return get_basic_wasm_type_from_memory<WasmType>(memory, static_cast<::std::size_t>(offset));
     }
 
+    template <typename WasmType>
+    inline constexpr void store_basic_wasm_type_to_memory(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                          ::std::size_t offset,
+                                                          WasmType value) noexcept
+    {
+        // Number of 8-bit WASM bytes needed to represent WasmType
+        constexpr ::std::size_t wasm_bytes{sizeof(WasmType)};
+
+        // Base address must exist once initialized
+        // In an mmap environment, the memory beginning remains constant.
+        auto const memory_begin{memory.memory_begin};
+
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        // Since this is a path frequently accessed during WASM execution, we should strive to avoid branches related to the virtual machine's own bug
+        // checks (which are verified during debugging).
+        if(memory_begin == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+        bool const need_dynamic_determination_memory_size{memory.require_dynamic_determination_memory_size()};
+
+        if(need_dynamic_determination_memory_size)
+        {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+            auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+
+            // There is no need to distinguish whether it is fully protected here, as the system will automatically check during expansion whether the expansion
+            // exceeds the limit. Therefore, using `memory_length` directly is sufficient for this determination.
+
+            // The remaining size does not support reading a single type.
+            // Here, since the custom page size is smaller than the platform page size, page protection cannot be used to determine whether a cross-page read is
+            // required. Therefore, an inter-page check must be performed.
+            if(wasm_bytes > memory_length || offset > memory_length - wasm_bytes) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = wasm_bytes
+                });
+            }
+
+            if constexpr(::std::integral<WasmType>)
+            {
+                using unsigned_wasm_type = ::std::make_unsigned_t<WasmType>;
+                unsigned_wasm_type u{static_cast<unsigned_wasm_type>(value)};
+
+                u = ::fast_io::little_endian(u);
+
+                // never overflow
+                ::std::memcpy(memory_begin + offset, ::std::addressof(u), sizeof(u));
+            }
+            else
+            {
+                static_assert(::std::integral<WasmType>, "wasi only supports the use of integer types.");
+            }
+        }
+        else
+        {
+            bool const is_full_page_protection{memory.is_full_page_protection()};
+
+            if(is_full_page_protection)
+            {
+                // Any operation within the bounds of the memory length data type is safe.
+
+                // | max_protection_space (SIZE_MAX) | custom_page_size | max_type_size | ... align to platform page size ... |
+
+                if constexpr(::std::integral<WasmType>)
+                {
+                    using unsigned_wasm_type = ::std::make_unsigned_t<WasmType>;
+                    unsigned_wasm_type u{static_cast<unsigned_wasm_type>(value)};
+
+                    u = ::fast_io::little_endian(u);
+
+                    // never overflow
+                    ::std::memcpy(memory_begin + offset, ::std::addressof(u), sizeof(u));
+                }
+                else
+                {
+                    static_assert(::std::integral<WasmType>, "wasi only supports the use of integer types.");
+                }
+            }
+            else
+            {
+                // No dynamic checks are required, but static checks are necessary.
+
+                switch(memory.status)
+                {
+                    case ::uwvm2::object::memory::linear::mmap_memory_status_t::wasm32:
+                    {
+                        // Since there is a page at the boundary and a protection page of the maximum possible type, no type size reduction check is required
+                        // here.
+                        // | max_protection_space | custom_page_size | max_type_size | ... align to platform page size ... |
+                        if(offset > ::uwvm2::object::memory::linear::max_partial_protection_wasm32_length) [[unlikely]]
+                        {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                            if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                            auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                            ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                                .memory_idx = 0uz,
+                                .memory_offset = {.offset = offset, .offset_65_bit = false},
+                                .memory_static_offset = 0u,
+                                .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                                .memory_type_size = wasm_bytes
+                            });
+                        }
+
+                        break;
+                    }
+                    case ::uwvm2::object::memory::linear::mmap_memory_status_t::wasm64:
+                    {
+                        // Since there is a page at the boundary and a protection page of the maximum possible type, no type size reduction check is required
+                        // here.
+                        // | max_protection_space | custom_page_size | max_type_size | ... align to platform page size ... |
+                        if(offset > ::uwvm2::object::memory::linear::max_partial_protection_wasm64_length) [[unlikely]]
+                        {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                            if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                            auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                            ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                                .memory_idx = 0uz,
+                                .memory_offset = {.offset = offset, .offset_65_bit = false},
+                                .memory_static_offset = 0u,
+                                .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                                .memory_type_size = wasm_bytes
+                            });
+                        }
+
+                        break;
+                    }
+                    [[unlikely]] default:
+                    {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+# endif
+                        ::std::unreachable();
+                    }
+                }
+
+                if constexpr(::std::integral<WasmType>)
+                {
+                    using unsigned_wasm_type = ::std::make_unsigned_t<WasmType>;
+                    unsigned_wasm_type u{static_cast<unsigned_wasm_type>(value)};
+
+                    u = ::fast_io::little_endian(u);
+
+                    // never overflow
+                    ::std::memcpy(memory_begin + offset, ::std::addressof(u), sizeof(u));
+                }
+                else
+                {
+                    static_assert(::std::integral<WasmType>, "wasi only supports the use of integer types.");
+                }
+            }
+        }
+    }
+
+    template <typename WasmType>
+    inline constexpr void store_basic_wasm_type_to_memory_wasm32(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                 ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                                 WasmType value) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = sizeof(WasmType)
+                });
+            }
+        }
+
+        store_basic_wasm_type_to_memory<WasmType>(memory, static_cast<::std::size_t>(offset), value);
+    }
+
+    template <typename WasmType>
+    inline constexpr void store_basic_wasm_type_to_memory_wasm64(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
+                                                                 ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                                 WasmType value) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_wasm64_max)
+        {
+            if(offset > size_t_max) [[unlikely]]
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                if(memory.memory_length_p == nullptr) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+# endif
+
+                auto const memory_length{memory.memory_length_p->load(::std::memory_order_acquire)};
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory_length),
+                    .memory_type_size = sizeof(WasmType)
+                });
+            }
+        }
+
+        store_basic_wasm_type_to_memory<WasmType>(memory, static_cast<::std::size_t>(offset), value);
+    }
 }  // namespace uwvm2::imported::wasi::wasip1::memory
 #endif
 
