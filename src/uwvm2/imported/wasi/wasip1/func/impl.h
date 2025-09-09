@@ -25,5 +25,7 @@
 #ifndef UWVM_MODULE
 # include "args_get_wasm64.h"
 # include "args_get.h"
+# include "args_sizes_get_wasm64.h"
+# include "args_sizes_get.h"
 
 #endif

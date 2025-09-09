@@ -61,13 +61,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     ///            In multithreaded environments, synchronization must be handled by the application (typically not called in multithreaded scenarios).
     ///            If buffer conflicts occur → results are undefined, constituting a caller bug.
 
-    ::uwvm2::imported::wasi::wasip1::abi::errno_t args_sizes_get(
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t args_sizes_get_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t argc,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t argv_buf_size) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argc,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv_buf_size) noexcept
     {
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
-        constexpr auto wasi_size_t_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max()};
+        constexpr auto wasi_size_t_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max()};
 
         auto& memory{env.wasip1_memory};
         auto const trace_wasip1_call{env.trace_wasip1_call};
@@ -83,27 +83,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"args_sizes_get ",
+                                u8"args_sizes_get_wasm64 ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(wasi-trace)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: args_sizes_get (wasi-trace)\n");
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: args_sizes_get_wasm64 (wasi-trace)\n");
 #endif
         }
 
         auto const argv_vec_size{env.argv.size()};
 
-        if constexpr(size_t_max > wasi_size_t_max)
+        if constexpr(size_t_max > wasi_size_t_wasm64_max)
         {
             // This differs from args_get in that args_size_get only checks the size portion.
-            if(argv_vec_size > wasi_size_t_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(argv_vec_size > wasi_size_t_wasm64_max) [[unlikely]] { ::fast_io::fast_terminate(); }
         }
 
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
             memory,
             argc,
-            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(argv_vec_size));
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(argv_vec_size));
 
         // get all size
         ::std::size_t curr_argv_size_bytes{};
@@ -115,17 +115,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             curr_argv_size_bytes += curr_argv_size + 1uz;  // end zero-byte
         }
 
-        if constexpr(size_t_max > wasi_size_t_max)
+        if constexpr(size_t_max > wasi_size_t_wasm64_max)
         {
-            if(curr_argv_size_bytes > wasi_size_t_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(curr_argv_size_bytes > wasi_size_t_wasm64_max) [[unlikely]] { ::fast_io::fast_terminate(); }
         }
 
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
             memory,
             argv_buf_size,
-            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(curr_argv_size_bytes));
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(curr_argv_size_bytes));
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func
 
