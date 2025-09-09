@@ -57,10 +57,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     ///            In multithreaded environments, synchronization must be handled by the application (typically not called in multithreaded scenarios).
     ///            If buffer conflicts occur → results are undefined, constituting a caller bug.
 
-    ::uwvm2::imported::wasi::wasip1::abi::errno_t args_get(
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t args_get_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t argv,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t argv_buf) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv_buf) noexcept
     {
         auto& memory{env.wasip1_memory};
         auto const trace_wasip1_call{env.trace_wasip1_call};
@@ -76,23 +76,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"args_get ",
+                                u8"args_get_wasm64 ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(wasi-trace)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: args_get (wasi-trace)\n");
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: args_get_wasm64 (wasi-trace)\n");
 #endif
         }
 
         auto const argv_vec_size{env.argv.size()};
-        if(argv_vec_size > ::std::numeric_limits<::std::size_t>::max() / sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t)) [[unlikely]]
+        if(argv_vec_size > ::std::numeric_limits<::std::size_t>::max() / sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t)) [[unlikely]]
         {
             ::fast_io::fast_terminate();
         }
 
-        auto const argv_vec_size_bytes{argv_vec_size * sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t)};
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm32(memory, argv, argv_vec_size_bytes);
+        auto const argv_vec_size_bytes{argv_vec_size * sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t)};
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, argv, argv_vec_size_bytes);
 
         // Check only once to avoid excessive locking overhead.
         ::std::size_t curr_argv_size_bytes{};
@@ -103,32 +103,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             // nerver overflow
             curr_argv_size_bytes += curr_argv_size + 1uz;  // end zero-byte
         }
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm32(memory, argv_buf, curr_argv_size_bytes);
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, argv_buf, curr_argv_size_bytes);
 
         auto argv_curr_size{argv};
         auto argv_buff_curr_size{argv_buf};
         for(auto const curr_argv: env.argv)
         {
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(
-                memory,
-                argv_curr_size,
-                argv_buff_curr_size);
-            argv_curr_size += sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t);
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked<
+                ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(memory, argv_curr_size, argv_buff_curr_size);
+            argv_curr_size += sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t);
 
-            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm32_unchecked(memory,
+            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm64_unchecked(memory,
                                                                                           argv_buff_curr_size,
                                                                                           reinterpret_cast<::std::byte const*>(curr_argv.cbegin()),
                                                                                           reinterpret_cast<::std::byte const*>(curr_argv.cend()));
             argv_buff_curr_size += curr_argv.size();
 
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked<char8_t>(memory, argv_buff_curr_size, u8'\0');
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked<char8_t>(memory, argv_buff_curr_size, u8'\0');
             argv_buff_curr_size += sizeof(char8_t);
             static_assert(sizeof(char8_t) == 1uz);
         }
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
     }
-}  // namespace uwvm2::object::memory::wasm_page
+}  // namespace uwvm2::imported::wasi::wasip1::func
 
 #ifndef UWVM_MODULE
 // macro
