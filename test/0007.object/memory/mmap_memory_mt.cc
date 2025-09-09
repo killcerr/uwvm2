@@ -52,7 +52,7 @@ int main()
     mmap_memory_t mem{};
     mem.init_by_page_count(2u);
 
-    if(mem.memory_begin == nullptr) { return 2; }
+    if(mem.memory_begin == nullptr) { ::fast_io::fast_terminate(); }
 
     // Basic layout
     constexpr std::size_t static_offset{256u};
@@ -116,7 +116,7 @@ int main()
 
     auto const mismatch_count_value = mismatch_count.load(std::memory_order_relaxed);
 
-    if (mismatch_count_value != 0u)
+    if(mismatch_count_value != 0u)
     {
         ::fast_io::io::perr(::fast_io::u8err(), u8"mmap memory test errror\n");
         ::fast_io::fast_terminate();

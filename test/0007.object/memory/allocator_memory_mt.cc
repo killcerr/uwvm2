@@ -43,8 +43,8 @@ int main()
     // 2 wasm pages
     mem.init_by_page_count(2u);
 
-    if(mem.memory_begin == nullptr) { return 2; }
-    if(mem.memory_length < (1u << 16)) { return 3; }
+    if(mem.memory_begin == nullptr) { ::fast_io::fast_terminate(); }
+    if(mem.memory_length < (1u << 16)) { ::fast_io::fast_terminate(); }
 
     constexpr std::size_t static_offset{128u};
     constexpr std::size_t stride{16u};
@@ -55,7 +55,7 @@ int main()
     {
         std::size_t dynamic_offset{static_cast<std::size_t>(i) * stride};
         std::size_t off{static_offset + dynamic_offset};
-        if(off + sizeof(std::uint32_t) > mem.memory_length) { return 4; }
+        if(off + sizeof(std::uint32_t) > mem.memory_length) { ::fast_io::fast_terminate(); }
         auto* p = reinterpret_cast<std::uint32_t*>(reinterpret_cast<std::byte*>(mem.memory_begin) + off);
         *p = 0xA5A50000u + i;
     }
@@ -99,7 +99,7 @@ int main()
 
     auto const mismatch_count_value = mismatch_count.load(std::memory_order_relaxed);
 
-    if (mismatch_count_value != 0u)
+    if(mismatch_count_value != 0u)
     {
         ::fast_io::io::perr(::fast_io::u8err(), u8"allocator memory test errror\n");
         ::fast_io::fast_terminate();

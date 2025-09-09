@@ -129,7 +129,7 @@ int main()
         auto B = gb.add_node(u8string_view{u8"B", 1});
         gb.add_edge(A, B);
         auto res = detect_cycles(gb.adj);
-        if(!res.empty()) { return 1; }
+        if(!res.empty()) { ::fast_io::fast_terminate(); }
     }
 
     // Case 2: 2-cycle A<->B (should only report once)
@@ -147,7 +147,7 @@ int main()
             cyc.emplace_back(u8string_view{u8"B", 1});
             expect.push_back(std::move(cyc));
         }
-        if(!equal_cycles(res, expect)) { return 2; }
+        if(!equal_cycles(res, expect)) { ::fast_io::fast_terminate(); }
     }
 
     // Case 3: 3-cycle A->B->C->A
@@ -168,7 +168,7 @@ int main()
             cyc.emplace_back(u8string_view{u8"C", 1});
             expect.push_back(std::move(cyc));
         }
-        if(!equal_cycles(res, expect)) { return 3; }
+        if(!equal_cycles(res, expect)) { ::fast_io::fast_terminate(); }
     }
 
     // Case 4: multiple independent cycles
@@ -198,7 +198,7 @@ int main()
             c2.emplace_back(u8string_view{u8"E", 1});
             expect.push_back(std::move(c2));
         }
-        if(!equal_cycles(res, expect)) { return 4; }
+        if(!equal_cycles(res, expect)) { ::fast_io::fast_terminate(); }
     }
 
     // Case 5: self-loop
@@ -207,11 +207,9 @@ int main()
         auto A = gb.add_node(u8string_view{u8"A", 1});
         gb.add_edge(A, A);
         auto res = detect_cycles(gb.adj);
-        if(res.size() != 1) { return 5; }
+        if(res.size() != 1) { ::fast_io::fast_terminate(); }
         auto cyc = res.front();
-        if(!(cyc.size() == 2 && cyc[0] == u8"A" && cyc[1] == u8"A")) { return 6; }
+        if(!(cyc.size() == 2 && cyc[0] == u8"A" && cyc[1] == u8"A")) { ::fast_io::fast_terminate(); }
     }
-
-    return 0;
 }
 

@@ -106,10 +106,9 @@ int main()
             auto gb = build_disjoint_cycles(k, L);
             auto res = detect_cycles(gb.adj);
             // Basic sanity: expect exactly k cycles
-            if(res.size() != k) { return 10; }
+            if(res.size() != k) { ::fast_io::fast_terminate(); }
         }
     }
 
-    return 0;
 }
 

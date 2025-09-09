@@ -93,13 +93,12 @@ int main()
             // Sanity: if cycle exists, each reported cycle must have size >=2 and start==end
             for(auto const& cyc: res)
             {
-                if(cyc.size() < 2) { return 1; }
-                if(cyc.front() != cyc.back()) { return 2; }
+                if(cyc.size() < 2) { ::fast_io::fast_terminate(); }
+                if(cyc.front() != cyc.back()) { ::fast_io::fast_terminate(); }
             }
         }
     }
 
-    return 0;
 }
 
 

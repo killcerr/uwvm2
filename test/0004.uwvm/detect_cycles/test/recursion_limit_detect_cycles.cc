@@ -80,7 +80,7 @@ int main()
         {
             // Expected at least one cycle when unlimited
             ::uwvm2::uwvm::utils::depend::recursion_depth_limit = saved_limit;
-            return 1;
+            ::fast_io::fast_terminate();
         }
     }
 
@@ -103,13 +103,12 @@ int main()
         {
             // Expect early termination -> empty result under strict limit
             ::uwvm2::uwvm::utils::depend::recursion_depth_limit = saved_limit;
-            return 2;
+            ::fast_io::fast_terminate();
         }
     }
 
     // Restore limit
     ::uwvm2::uwvm::utils::depend::recursion_depth_limit = saved_limit;
-    return 0;
 }
 
 

@@ -435,11 +435,10 @@ int main()
     if(all_tests_passed)
     {
         ::fast_io::io::perr("\nAll memory safety tests PASSED!\n");
-        return 0;
     }
     else
     {
         ::fast_io::io::perr("\nSome memory safety tests FAILED!\n");
-        return 1;
+        ::fast_io::fast_terminate();
     }
 }

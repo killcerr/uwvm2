@@ -98,7 +98,6 @@ int main()
         ::fast_io::fast_terminate();
     }
 
-    return 0;
 }
 
 // macro
