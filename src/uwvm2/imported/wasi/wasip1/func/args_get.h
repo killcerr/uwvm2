@@ -51,6 +51,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
     /// @brief     WasiPreview1.args_get
     /// @details   errno_t args_get(char** argv, char* argv_buf);
+    /// @note      The WASI specification does not require implementation-side isolation of argv/argvbuf memory order; the caller must ensure they do not
+    ///            overlap.
+    ///            Memory write visibility is guaranteed by function call synchronization boundaries, requiring no additional memory barriers.
+    ///            In multithreaded environments, synchronization must be handled by the application (typically not called in multithreaded scenarios).
+    ///            If buffer conflicts occur → results are undefined, constituting a caller bug.
+
     ::uwvm2::imported::wasi::wasip1::abi::errno_t args_get(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t argv,
@@ -87,7 +93,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         auto const argv_vec_size_bytes{argv_vec_size * sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t)};
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv_buf, argv_vec_size_bytes);
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv, argv_vec_size_bytes);
 
         // Check only once to avoid excessive locking overhead.
         ::std::size_t curr_argv_size_bytes{};
@@ -96,9 +102,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             auto const curr_argv_size{curr_argv.size()};
             if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_argv_size_bytes < curr_argv_size) [[unlikely]] { ::fast_io::fast_terminate(); }
             // nerver overflow
-            curr_argv_size_bytes += curr_argv.size() + 1uz;  // end zero-byte
+            curr_argv_size_bytes += curr_argv_size + 1uz;  // end zero-byte
         }
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv_buf, argv_vec_size_bytes);
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv_buf, curr_argv_size_bytes);
 
         auto argv_curr_size{argv};
         auto argv_buff_curr_size{argv_buf};
@@ -110,12 +116,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 argv_buff_curr_size);
             argv_curr_size += sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t);
 
-            // Since it's a cstring_view, the end must be null-terminated. Therefore, copying one extra character avoids excessive atomic lock overhead.
             ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_unchecked(memory,
                                                                                    argv_buff_curr_size,
                                                                                    reinterpret_cast<::std::byte const*>(curr_argv.cbegin()),
-                                                                                   reinterpret_cast<::std::byte const*>(curr_argv.cend() + 1uz));
-            argv_buff_curr_size += curr_argv.size() + 1uz;
+                                                                                   reinterpret_cast<::std::byte const*>(curr_argv.cend()));
+            argv_buff_curr_size += curr_argv.size();
+
+            constexpr char8_t u8_zero{u8'\0'};
+            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_unchecked(
+                memory,
+                argv_buff_curr_size,
+                reinterpret_cast<::std::byte const*>(::std::addressof(u8_zero)),
+                reinterpret_cast<::std::byte const*>(::std::addressof(u8_zero) + sizeof(char8_t)));
+            argv_buff_curr_size += sizeof(char8_t);
         }
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;

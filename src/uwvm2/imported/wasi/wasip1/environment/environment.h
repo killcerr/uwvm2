@@ -103,8 +103,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
     {
         // wasip1 only support only one memory (memory[0])
         memory_type& wasip1_memory;
-        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8cstring_view> argv;
-        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8cstring_view> envs;
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> argv;
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> envs;
         bool trace_wasip1_call;
     };
 
