@@ -29,7 +29,7 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.object.global.global;
+export module uwvm2.object.global:global;
 
 import fast_io;
 import uwvm2.utils.container;

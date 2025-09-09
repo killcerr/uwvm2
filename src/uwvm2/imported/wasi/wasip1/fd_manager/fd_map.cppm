@@ -31,7 +31,7 @@ module;
 // macro
 # include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.imported.wasi.wasip1.abi:fd_map;
+export module uwvm2.imported.wasi.wasip1.fd_manager:fd_map;
 
 import fast_io;
 import uwvm2.utils.container;
