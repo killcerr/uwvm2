@@ -25,5 +25,7 @@ export namespace fast_io
         using ::fast_io::win32::GetConsoleScreenBufferInfo;
         using ::fast_io::win32::GetSystemInfo;
         using ::fast_io::win32::system_info;
+        using ::fast_io::win32::VirtualAlloc;
+        using ::fast_io::win32::VirtualFree;
     } // namespace win32
 }

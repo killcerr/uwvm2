@@ -31,6 +31,8 @@
 # include <limits>
 # include <concepts>
 # include <bit>
+# include <type_traits>
+# include <memory>
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/debug/impl.h>

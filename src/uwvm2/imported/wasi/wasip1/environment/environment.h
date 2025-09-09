@@ -36,6 +36,7 @@
 # include <fast_io.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/container/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
 # include <uwvm2/object/memory/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>

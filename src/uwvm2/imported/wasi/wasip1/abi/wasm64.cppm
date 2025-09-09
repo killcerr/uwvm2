@@ -38,6 +38,9 @@ import uwvm2.parser.wasm.standard.wasm1.type;
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
 
 #include "wasm64.h"
 

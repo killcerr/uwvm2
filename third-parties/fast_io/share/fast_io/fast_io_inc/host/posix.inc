@@ -10,5 +10,13 @@ export namespace fast_io
     {
         using ::fast_io::posix::libc_ioctl;
     }
+
+    namespace details
+    {
+        using ::fast_io::details::sys_mmap;
+        using ::fast_io::details::sys_mprotect;
+        using ::fast_io::details::sys_munmap;
+        using ::fast_io::details::sys_munmap_nothrow;
+    }
 #endif
 }

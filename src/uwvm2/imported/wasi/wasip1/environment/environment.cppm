@@ -35,6 +35,7 @@ export module uwvm2.imported.wasi.wasip1.environment:environment;
 import fast_io;
 import uwvm2.utils.debug;
 import uwvm2.utils.container;
+import uwvm2.parser.wasm.standard.wasm1.type;
 import uwvm2.object.memory;
 import uwvm2.imported.wasi.wasip1.abi;
 import uwvm2.imported.wasi.wasip1.fd_manager;
