@@ -93,7 +93,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         auto const argv_vec_size_bytes{argv_vec_size * sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t)};
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv, argv_vec_size_bytes);
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm32(memory, argv, argv_vec_size_bytes);
 
         // Check only once to avoid excessive locking overhead.
         ::std::size_t curr_argv_size_bytes{};
@@ -104,7 +104,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             // nerver overflow
             curr_argv_size_bytes += curr_argv_size + 1uz;  // end zero-byte
         }
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv_buf, curr_argv_size_bytes);
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm32(memory, argv_buf, curr_argv_size_bytes);
 
         auto argv_curr_size{argv};
         auto argv_buff_curr_size{argv_buf};
