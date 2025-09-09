@@ -63,8 +63,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t args_sizes_get_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argc,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv_buf_size) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argc_ptrsz,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv_buf_size_ptrsz) noexcept
     {
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
         constexpr auto wasi_size_t_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max()};
@@ -102,7 +102,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
             memory,
-            argc,
+            argc_ptrsz,
             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(argv_vec_size));
 
         // get all size
@@ -122,7 +122,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
             memory,
-            argv_buf_size,
+            argv_buf_size_ptrsz,
             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(curr_argv_size_bytes));
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;

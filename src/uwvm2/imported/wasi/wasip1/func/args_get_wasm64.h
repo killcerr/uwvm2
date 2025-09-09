@@ -62,8 +62,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t args_get_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv_buf) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv_ptrsz,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t argv_buf_ptrsz) noexcept
     {
         auto& memory{env.wasip1_memory};
         auto const trace_wasip1_call{env.trace_wasip1_call};
@@ -95,7 +95,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         auto const argv_vec_size_bytes{argv_vec_size * sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t)};
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, argv, argv_vec_size_bytes);
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, argv_ptrsz, argv_vec_size_bytes);
 
         // Check only once to avoid excessive locking overhead.
         ::std::size_t curr_argv_size_bytes{};
@@ -106,10 +106,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             // nerver overflow
             curr_argv_size_bytes += curr_argv_size + 1uz;  // end zero-byte
         }
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, argv_buf, curr_argv_size_bytes);
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, argv_buf_ptrsz, curr_argv_size_bytes);
 
-        auto argv_curr_size{argv};
-        auto argv_buff_curr_size{argv_buf};
+        auto argv_curr_size{argv_ptrsz};
+        auto argv_buff_curr_size{argv_buf_ptrsz};
         for(auto const curr_argv: env.argv)
         {
             ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked<
