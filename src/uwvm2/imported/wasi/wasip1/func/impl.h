@@ -27,5 +27,7 @@
 # include "args_get.h"
 # include "args_sizes_get_wasm64.h"
 # include "args_sizes_get.h"
+# include "clock_res_get_wasm64.h"
+# include "clock_res_get.h"
 
 #endif

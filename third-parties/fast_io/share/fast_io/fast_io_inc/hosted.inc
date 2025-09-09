@@ -124,6 +124,7 @@ using ::fast_io::system_call;
 
 using ::fast_io::posix_clock_id;
 using ::fast_io::posix_clock_gettime;
+using ::fast_io::posix_clock_getres;
 
 using ::fast_io::native_mutex;
 
