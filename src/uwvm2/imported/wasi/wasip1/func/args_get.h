@@ -110,25 +110,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto argv_buff_curr_size{argv_buf};
         for(auto const curr_argv: env.argv)
         {
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_unchecked<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(
                 memory,
                 argv_curr_size,
                 argv_buff_curr_size);
             argv_curr_size += sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t);
 
-            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_unchecked(memory,
-                                                                                   argv_buff_curr_size,
-                                                                                   reinterpret_cast<::std::byte const*>(curr_argv.cbegin()),
-                                                                                   reinterpret_cast<::std::byte const*>(curr_argv.cend()));
+            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm32_unchecked(memory,
+                                                                                          argv_buff_curr_size,
+                                                                                          reinterpret_cast<::std::byte const*>(curr_argv.cbegin()),
+                                                                                          reinterpret_cast<::std::byte const*>(curr_argv.cend()));
             argv_buff_curr_size += curr_argv.size();
 
-            constexpr char8_t u8_zero{u8'\0'};
-            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_unchecked(
-                memory,
-                argv_buff_curr_size,
-                reinterpret_cast<::std::byte const*>(::std::addressof(u8_zero)),
-                reinterpret_cast<::std::byte const*>(::std::addressof(u8_zero) + sizeof(char8_t)));
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked<char8_t>(memory, argv_buff_curr_size, u8'\0');
             argv_buff_curr_size += sizeof(char8_t);
+            static_assert(sizeof(char8_t) == 1uz);
         }
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
