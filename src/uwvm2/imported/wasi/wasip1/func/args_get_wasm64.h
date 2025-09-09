@@ -53,7 +53,7 @@
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
     /// @brief     WasiPreview1.args_get
-    /// @details   errno_t args_get(char** argv, char* argv_buf);
+    /// @details   __wasi_errno_t args_get(char** argv, char* argv_buf);
     /// @note      The WASI specification does not require implementation-side isolation of argv/argvbuf memory order; the caller must ensure they do not
     ///            overlap.
     ///            Memory write visibility is guaranteed by function call synchronization boundaries, requiring no additional memory barriers.
