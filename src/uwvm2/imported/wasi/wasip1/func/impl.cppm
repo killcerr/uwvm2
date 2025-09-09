@@ -23,6 +23,8 @@ module;
 
 export module uwvm2.imported.wasi.wasip1.func;
 
+export import :args_get;
+
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
 #endif
