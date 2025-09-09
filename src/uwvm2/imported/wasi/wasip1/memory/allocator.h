@@ -89,12 +89,62 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
         {
             ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                 .memory_idx = 0uz,
-                .memory_offset = {.offset = offset, .offset_65_bit = false},
+                .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                 .memory_static_offset = 0u,
                 .memory_length = static_cast<::std::uint_least64_t>(memory_length),
                 .memory_type_size = wasm_bytes
             });
         }
+    }
+
+    template <typename Alloc>
+    inline constexpr void check_memory_bounds_wasm32(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                     ::std::size_t wasm_bytes) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u32
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = wasm_bytes
+                });
+            }
+        }
+
+        check_memory_bounds<Alloc>(memory, static_cast<::std::size_t>(offset), wasm_bytes);
+    }
+
+    template <typename Alloc>
+    inline constexpr void check_memory_bounds_wasm64(::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc> const& memory,
+                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                     ::std::size_t wasm_bytes) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u64
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = wasm_bytes
+                });
+            }
+        }
+
+        check_memory_bounds<Alloc>(memory, static_cast<::std::size_t>(offset), wasm_bytes);
     }
 
     template <typename WasmType, typename Alloc>
@@ -142,7 +192,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -166,7 +216,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -219,7 +269,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -244,7 +294,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -288,7 +338,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
@@ -314,7 +364,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
@@ -358,7 +408,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
@@ -384,7 +434,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
@@ -436,7 +486,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -460,7 +510,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -509,7 +559,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -534,7 +584,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = sizeof(WasmType)
@@ -576,7 +626,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
@@ -602,7 +652,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
@@ -644,7 +694,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
@@ -670,7 +720,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             {
                 ::uwvm2::object::memory::error::output_memory_error_and_terminate({
                     .memory_idx = 0uz,
-                    .memory_offset = {.offset = offset, .offset_65_bit = false},
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
                     .memory_static_offset = 0u,
                     .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
                     .memory_type_size = static_cast<::std::size_t>(end - begin)
