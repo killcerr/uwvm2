@@ -64,7 +64,7 @@ namespace uwvm2::uwvm::cmdline::params::details
             if(p->cate != cate) { continue; }
             ::fast_io::io::perr(::std::forward<Stm>(stm),
                                 u8"  ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
                                 ::fast_io::mnp::left(p->name, ::uwvm2::uwvm::cmdline::parameter_max_principal_name_size));
             ::fast_io::io::perrln(::std::forward<Stm>(stm),
                                   ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
@@ -88,7 +88,7 @@ namespace uwvm2::uwvm::cmdline::params::details
         {
             ::fast_io::io::perr(::std::forward<Stm>(stm),
                                 u8"  ",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
                                 ::fast_io::mnp::left(p->name, ::uwvm2::uwvm::cmdline::parameter_max_principal_name_size));
             ::fast_io::io::perrln(::std::forward<Stm>(stm),
                                   ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
