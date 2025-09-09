@@ -24,13 +24,23 @@ module;
 // std
 #include <cstddef>
 #include <cstdint>
+#include <climits>
+#include <cstring>
 #include <limits>
+#include <concepts>
+#include <bit>
+#include <memory>
+// macro
+#include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.imported.wasi.wasip1.func:args_get;
 
 import fast_io;
 import uwvm2.imported.wasi.wasip1.abi;
 import uwvm2.imported.wasi.wasip1.fd_manager;
+import uwvm2.imported.wasi.wasip1.memory;
+import uwvm2.imported.wasi.wasip1.environment;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

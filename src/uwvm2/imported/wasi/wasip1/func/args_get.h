@@ -26,13 +26,21 @@
 // std
 # include <cstddef>
 # include <cstdint>
+# include <climits>
+# include <cstring>
 # include <limits>
 # include <concepts>
 # include <bit>
+# include <memory>
+// macro
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
+# include <uwvm2/imported/wasi/wasip1/memory/impl.h>
+# include <uwvm2/imported/wasi/wasip1/environment/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -41,7 +49,81 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
-    
+    /// @brief     WasiPreview1.args_get
+    /// @details   errno_t args_get(char** argv, char* argv_buf);
+    ::uwvm2::imported::wasi::wasip1::abi::errno_t args_get(
+        ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t argv,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t argv_buf) noexcept
+    {
+        auto& memory{env.wasip1_memory};
+        auto const trace_wasip1_call{env.trace_wasip1_call};
 
+        if(trace_wasip1_call) [[unlikely]]
+        {
+#ifdef UWVM
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                u8"[info]  ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"wasip1: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                u8"args_get ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                u8"(wasi-trace)\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+#else
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: args_get (wasi-trace)\n");
+#endif
+        }
+
+        auto const argv_vec_size{env.argv.size()};
+        if(argv_vec_size > ::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max() /
+                               sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t)) [[unlikely]]
+        {
+            ::fast_io::fast_terminate();
+        }
+
+        auto const argv_vec_size_bytes{argv_vec_size * sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t)};
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv_buf, argv_vec_size_bytes);
+
+        // Check only once to avoid excessive locking overhead.
+        ::std::size_t curr_argv_size_bytes{};
+        for(auto const curr_argv: env.argv)
+        {
+            auto const curr_argv_size{curr_argv.size()};
+            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_argv_size_bytes < curr_argv_size) [[unlikely]] { ::fast_io::fast_terminate(); }
+            // nerver overflow
+            curr_argv_size_bytes += curr_argv.size() + 1uz;  // end zero-byte
+        }
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds(memory, argv_buf, argv_vec_size_bytes);
+
+        auto argv_curr_size{argv};
+        auto argv_buff_curr_size{argv_buf};
+        for(auto const curr_argv: env.argv)
+        {
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_unchecked<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(
+                memory,
+                argv_curr_size,
+                argv_buff_curr_size);
+            argv_curr_size += sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t);
+
+            // Since it's a cstring_view, the end must be null-terminated. Therefore, copying one extra character avoids excessive atomic lock overhead.
+            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_unchecked(memory,
+                                                                                   argv_buff_curr_size,
+                                                                                   reinterpret_cast<::std::byte const*>(curr_argv.cbegin()),
+                                                                                   reinterpret_cast<::std::byte const*>(curr_argv.cend() + 1uz));
+            argv_buff_curr_size += curr_argv.size() + 1uz;
+        }
+
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+    }
 }  // namespace uwvm2::object::memory::wasm_page
 
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
+#endif
