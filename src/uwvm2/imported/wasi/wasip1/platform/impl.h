@@ -19,19 +19,8 @@
  *                                      *
  ****************************************/
 
-module;
-
-export module uwvm2.imported.wasi.wasip1;
-export import uwvm2.imported.wasi.wasip1.abi;
-export import uwvm2.imported.wasi.wasip1.fd_manager;
-export import uwvm2.imported.wasi.wasip1.environment;
-export import uwvm2.imported.wasi.wasip1.platform;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+# include "get_process_env.h"
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "impl.h"

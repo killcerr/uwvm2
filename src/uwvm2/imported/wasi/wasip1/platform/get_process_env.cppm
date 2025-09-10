@@ -20,12 +20,24 @@
  ****************************************/
 
 module;
+// std
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <new>
+#include <atomic>
+#include <bit>
+#include <utility>
+// macro
+#include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.imported.wasi.wasip1;
-export import uwvm2.imported.wasi.wasip1.abi;
-export import uwvm2.imported.wasi.wasip1.fd_manager;
-export import uwvm2.imported.wasi.wasip1.environment;
-export import uwvm2.imported.wasi.wasip1.platform;
+export module uwvm2.imported.wasi.wasip1.platform:get_process_env;
+
+import fast_io;
+import uwvm2.uwvm_predefine.io;
+import uwvm2.uwvm_predefine.utils.ansies;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -34,4 +46,5 @@ export import uwvm2.imported.wasi.wasip1.platform;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "get_process_env.h"
+

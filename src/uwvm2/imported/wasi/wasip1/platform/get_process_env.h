@@ -19,19 +19,39 @@
  *                                      *
  ****************************************/
 
-module;
-
-export module uwvm2.imported.wasi.wasip1;
-export import uwvm2.imported.wasi.wasip1.abi;
-export import uwvm2.imported.wasi.wasip1.fd_manager;
-export import uwvm2.imported.wasi.wasip1.environment;
-export import uwvm2.imported.wasi.wasip1.platform;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
-#endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
+// std
+# include <cstddef>
+# include <cstdint>
+# include <limits>
+# include <memory>
+# include <new>
+# include <atomic>
+# include <bit>
+# include <utility>
+// macro
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm2/utils/macro/push_macros.h>
+// import
+# include <fast_io.h>
+# include <uwvm2/uwvm_predefine/io/impl.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
 #endif
 
-#include "impl.h"
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
+{
+    /// @todo
+
+}  // namespace uwvm2::imported::wasi::wasip1::platform
+
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
+#endif
