@@ -92,6 +92,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         if(environ_vec_size > ::std::numeric_limits<::std::size_t>::max() / sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t) - 1uz)
             [[unlikely]]
         {
+            // This is an error specific to env itself, which triggers a direct trap.
             ::fast_io::fast_terminate();
         }
 
@@ -104,7 +105,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         for(auto const curr_environ: env.envs)
         {
             auto const curr_environ_size{curr_environ.size()};
-            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_environ_size_bytes < curr_environ_size) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_environ_size_bytes < curr_environ_size) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
             // never overflow
             curr_environ_size_bytes += curr_environ_size + 1uz;  // end zero-byte
         }
@@ -144,5 +149,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # include <uwvm2/utils/macro/pop_macros.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
 #endif
-
 

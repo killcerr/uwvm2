@@ -95,7 +95,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         if constexpr(size_t_max > wasi_size_t_max)
         {
             // This differs from args_get in that args_size_get only checks the size portion.
-            if(argv_vec_size > wasi_size_t_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(argv_vec_size > wasi_size_t_max) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
         }
 
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
@@ -108,14 +112,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         for(auto const curr_argv: env.argv)
         {
             auto const curr_argv_size{curr_argv.size()};
-            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_argv_size_bytes < curr_argv_size) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_argv_size_bytes < curr_argv_size) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
             // nerver overflow
             curr_argv_size_bytes += curr_argv_size + 1uz;  // end zero-byte
         }
 
         if constexpr(size_t_max > wasi_size_t_max)
         {
-            if(curr_argv_size_bytes > wasi_size_t_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(curr_argv_size_bytes > wasi_size_t_max) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
         }
 
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(

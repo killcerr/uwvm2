@@ -91,6 +91,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         if(argv_vec_size > ::std::numeric_limits<::std::size_t>::max() / sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t) - 1uz)
             [[unlikely]]
         {
+            // This is an error specific to env itself, which triggers a direct trap.
             ::fast_io::fast_terminate();
         }
 
@@ -103,7 +104,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         for(auto const curr_argv: env.argv)
         {
             auto const curr_argv_size{curr_argv.size()};
-            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_argv_size_bytes < curr_argv_size) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_argv_size_bytes < curr_argv_size) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
             // nerver overflow
             curr_argv_size_bytes += curr_argv_size + 1uz;  // end zero-byte
         }

@@ -90,7 +90,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         if constexpr(size_t_max > wasi_size_t_wasm64_max)
         {
-            if(environ_vec_size > wasi_size_t_wasm64_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(environ_vec_size > wasi_size_t_wasm64_max) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
         }
 
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
@@ -103,14 +107,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         for(auto const curr_env: env.envs)
         {
             auto const curr_env_size{curr_env.size()};
-            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_env_size_bytes < curr_env_size) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(::std::numeric_limits<::std::size_t>::max() - 1uz - curr_env_size_bytes < curr_env_size) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
             // never overflow
             curr_env_size_bytes += curr_env_size + 1uz;  // end zero-byte
         }
 
         if constexpr(size_t_max > wasi_size_t_wasm64_max)
         {
-            if(curr_env_size_bytes > wasi_size_t_wasm64_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(curr_env_size_bytes > wasi_size_t_wasm64_max) [[unlikely]]
+            {
+                // This is an error specific to env itself, which triggers a direct trap.
+                ::fast_io::fast_terminate();
+            }
         }
 
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
@@ -127,5 +139,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # include <uwvm2/utils/macro/pop_macros.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
 #endif
-
 
