@@ -28,6 +28,7 @@
 # include <cstdint>
 # include <cstring>
 # include <climits>
+# include <version>
 # include <limits>
 # include <concepts>
 # include <bit>
@@ -45,12 +46,14 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
+#if __cpp_lib_atomic_wait >= 201907L
+
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 {
 
-#if CHAR_BIT != 8
-# error "CHAR_BIT must be 8"
-#endif
+# if CHAR_BIT != 8
+#  error "CHAR_BIT must be 8"
+# endif
 
     /// @brief      Read a Wasm value from linear memory (allocator backend) with concurrency safety and bounds double-checking.
     /// @details    - Concurrency safety: use the double-atom guard (growing_flag_p + active_ops_p) to synchronize with grow operations.
@@ -75,14 +78,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
         // Conduct a full inspection of the memory.
         auto const memory_begin{memory.memory_begin};
 
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
         if(memory_begin == nullptr) [[unlikely]]
         {
             // Since this is a path frequently accessed during WASM execution, we should strive to avoid branches related to the virtual machine's own bug
             // checks (which are verified during debugging).
             ::uwvm2::utils::debug::trap_and_inform_bug_pos();
         }
-#endif
+# endif
 
         auto const memory_length{memory.memory_length};
 
@@ -735,3 +738,4 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 
 }  // namespace uwvm2::imported::wasi::wasip1::memory
 
+#endif

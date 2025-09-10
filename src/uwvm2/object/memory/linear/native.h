@@ -25,6 +25,7 @@
 // std
 # include <cstddef>
 # include <cstdint>
+# include <version>
 # include <limits>
 # include <memory>
 # include <new>
@@ -51,7 +52,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 #if defined(UWVM_SUPPORT_MMAP)
     using native_memory_t = mmap_memory_t;
 #else  // None
+# if __cpp_lib_atomic_wait >= 201907L
     using native_memory_t = allocator_memory_t;
+# else
+#  error "The platform does not support atomic wait"
+# endif
 #endif
 
 }  // namespace uwvm2::object::memory::wasm_page

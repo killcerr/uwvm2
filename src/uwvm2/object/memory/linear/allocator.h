@@ -25,6 +25,7 @@
 // std
 # include <cstddef>
 # include <cstdint>
+# include <version>
 # include <limits>
 # include <memory>
 # include <new>
@@ -43,6 +44,8 @@
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
+
+#if __cpp_lib_atomic_wait >= 201907L
 
 UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 {
@@ -109,13 +112,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             // Since this is a path frequently accessed during WASM execution, we should strive to avoid branches related to the virtual machine's own bug
             // checks (which are verified during debugging).
 
-#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
             if(this->growing_flag_p == nullptr || this->active_ops_p == nullptr) [[unlikely]]
             {
                 // This is a bug in uwvm rather than a bug in the program running in WASM.
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
             }
-#endif
+# endif
 
             enter_operation();
         }
@@ -517,6 +520,8 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
         inline static constexpr bool value = true;
     };
 }
+
+#endif
 
 #ifndef UWVM_MODULE
 // macro

@@ -22,6 +22,7 @@
 // std
 #include <cstddef>
 #include <cstdint>
+#include <version>
 #include <atomic>
 #include <thread>
 #include <vector>
@@ -36,6 +37,7 @@
 
 int main()
 {
+#if __cpp_lib_atomic_wait >= 201907L
     using namespace ::uwvm2::imported::wasi::wasip1::memory;
     using ::uwvm2::object::memory::linear::allocator_memory_t;
 
@@ -104,5 +106,6 @@ int main()
         ::fast_io::io::perr(::fast_io::u8err(), u8"allocator memory test errror\n");
         ::fast_io::fast_terminate();
     }
+#endif
 }
 

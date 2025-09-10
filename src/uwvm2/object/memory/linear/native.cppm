@@ -24,6 +24,7 @@ module;
 // std
 #include <cstddef>
 #include <cstdint>
+#include <version>
 #include <limits>
 #include <memory>
 #include <new>
