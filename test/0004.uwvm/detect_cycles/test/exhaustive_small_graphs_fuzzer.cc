@@ -19,6 +19,7 @@
  *                                      *
  ****************************************/
 
+#include <bit>
 #include <uwvm2/utils/container/impl.h>
 #include <uwvm2/uwvm/wasm/loader/detect_cycle.h>
 #include <uwvm2/uwvm/wasm/loader/load_and_check_modules.h>
@@ -86,7 +87,7 @@ int main()
 
         for(std::uint64_t m = 0; m < limit_masks; ++m)
         {
-            if(__builtin_popcountll(m) > 10) { continue; }
+            if(::std::popcount(m) > 10) { continue; }
             auto gb = build_graph_from_mask(n, m);
             auto res = detect_cycles(gb.adj);
 

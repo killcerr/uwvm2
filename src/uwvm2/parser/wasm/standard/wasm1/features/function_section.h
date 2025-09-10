@@ -1205,7 +1205,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     };
 
     template <::std::size_t table_size, ::std::size_t max_leb_size, ::std::uint8_t mask_zero>
-        requires (::std::popcount(table_size) == 1u && ::std::popcount(max_leb_size) == 1u)  // Check to see if it is an nth power of 2
+        requires (::std::has_single_bit(table_size) && ::std::has_single_bit(max_leb_size))  // Check to see if it is an nth power of 2
     inline constexpr ::uwvm2::utils::container::array<simd128_shuffle_table_t, table_size> generate_simd128_shuffle_table() noexcept
     {
         // Since all shuffles have a channel width of 128, only the 128 version can be done

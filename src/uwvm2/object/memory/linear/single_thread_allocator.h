@@ -83,7 +83,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         inline constexpr basic_single_thread_allocator_memory_t(::std::size_t custom_page_size) noexcept
         {
             // Check if it is a power of 2
-            if(static_cast<unsigned>(::std::popcount(custom_page_size)) != 1u) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(!::std::has_single_bit(custom_page_size)) [[unlikely]] { ::fast_io::fast_terminate(); }
 
             // Since there is only one pop, directly counting the number of zeros suffices to calculate log2
             this->custom_page_size_log2 = ::std::countr_zero(custom_page_size);
