@@ -1,6 +1,4 @@
-﻿
-
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -58,7 +56,7 @@
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
 
-    /// @brief     WasiPreview1.clock_res_get
+    /// @brief     WasiPreview1.clock_res_get_wasm64
     /// @details   __wasi_errno_t wasi_clock_res_get(__wasi_clockid_t clock_id, __wasi_timestamp_t* resolution);
 
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t clock_res_get_wasm64(
@@ -129,16 +127,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         catch(::fast_io::error)
         {
             // This may be an unsupported system call or an ID not recognized by the system call. In this case, it is uniformly treated as an unsupported ID.
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
         }
 #endif
 
         using timestamp_integral_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>;
 
-        // fast_io internally scales tv_nsec to a base of "10^19 nanoseconds per second".
+        // fast_io internally scales tv_nsec to a base of "10^19 subseconds per second".
         constexpr timestamp_integral_t mul_factor{static_cast<timestamp_integral_t>(::fast_io::uint_least64_subseconds_per_second / 1'000'000'000u)};
 
         // reduced to nanoseconds
+        // Since fast_io directly obtains the clock value via clock_getres, this operation will not overflow and will not produce negative values.
         auto const ts_integral{static_cast<timestamp_integral_t>(ts.seconds * 1'000'000'000u + ts.subseconds / mul_factor)};
 
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(memory, resolution_ptrsz, ts_integral);

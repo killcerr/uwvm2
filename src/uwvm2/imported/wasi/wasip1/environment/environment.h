@@ -104,7 +104,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
     {
         // wasip1 only support only one memory (memory[0])
         memory_type& wasip1_memory;
+        // allow user custom argv, generate argv from system api is not supported
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> argv;
+        // allow user custom envs, use current vm envs by default
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> envs;
         bool trace_wasip1_call;
     };

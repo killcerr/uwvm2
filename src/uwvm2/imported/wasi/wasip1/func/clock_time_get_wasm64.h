@@ -55,13 +55,14 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
-    /// @brief     WasiPreview1.clock_res_get
-    /// @details   __wasi_errno_t wasi_clock_res_get(__wasi_clockid_t clock_id, __wasi_timestamp_t* resolution);
+    /// @brief     WasiPreview1.clock_time_get_wasm64
+    /// @details   __wasi_errno_t clock_time_get(__wasi_clockid_t clock_id, __wasi_timestamp_t precision, __wasi_timestamp_t *time);
 
-    ::uwvm2::imported::wasi::wasip1::abi::errno_t clock_res_get(
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t clock_time_get_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::clockid_t clock_id,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t resolution_ptrsz) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::clockid_wasm64_t clock_id,
+        [[maybe_unused]] ::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t precision,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t time_ptrsz) noexcept
     {
         auto& memory{env.wasip1_memory};
         auto const trace_wasip1_call{env.trace_wasip1_call};
@@ -77,72 +78,83 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"clock_res_get ",
+                                u8"clock_time_get_wasm64 ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(wasi-trace)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: clock_res_get (wasi-trace)\n");
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: clock_time_get_wasm64 (wasi-trace)\n");
 #endif
         }
 
         ::fast_io::posix_clock_id id;  // no initialize
         switch(clock_id)
         {
-            case ::uwvm2::imported::wasi::wasip1::abi::clockid_t::clock_realtime:
+            case ::uwvm2::imported::wasi::wasip1::abi::clockid_wasm64_t::clock_realtime:
             {
                 id = ::fast_io::posix_clock_id::realtime;
                 break;
             }
-            case ::uwvm2::imported::wasi::wasip1::abi::clockid_t::clock_monotonic:
+            case ::uwvm2::imported::wasi::wasip1::abi::clockid_wasm64_t::clock_monotonic:
             {
                 id = ::fast_io::posix_clock_id::monotonic;
                 break;
             }
-            case ::uwvm2::imported::wasi::wasip1::abi::clockid_t::clock_process_cputime_id:
+            case ::uwvm2::imported::wasi::wasip1::abi::clockid_wasm64_t::clock_process_cputime_id:
             {
                 id = ::fast_io::posix_clock_id::process_cputime_id;
                 break;
             }
-            case ::uwvm2::imported::wasi::wasip1::abi::clockid_t::clock_thread_cputime_id:
+            case ::uwvm2::imported::wasi::wasip1::abi::clockid_wasm64_t::clock_thread_cputime_id:
             {
                 id = ::fast_io::posix_clock_id::thread_cputime_id;
                 break;
             }
             [[unlikely]] default:
             {
-                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
             }
         }
 
-        ::fast_io::unix_timestamp ts;  // no initialize
+        ::fast_io::unix_timestamp ts;
 #ifdef UWVM_CPP_EXCEPTIONS
         try
 #endif
         {
-            ts = ::fast_io::posix_clock_getres(id);
+            ts = ::fast_io::posix_clock_gettime(id);
         }
 #ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error)
         {
             // This may be an unsupported system call or an ID not recognized by the system call. In this case, it is uniformly treated as an unsupported ID.
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
         }
 #endif
 
-        using timestamp_integral_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>;
+        using timestamp_integral_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>;
 
         // fast_io internally scales tv_nsec to a base of "10^19 subseconds per second".
         constexpr timestamp_integral_t mul_factor{static_cast<timestamp_integral_t>(::fast_io::uint_least64_subseconds_per_second / 1'000'000'000u)};
 
         // reduced to nanoseconds
-        // Since fast_io directly obtains the clock value via clock_getres, this operation will not overflow and will not produce negative values.
-        auto const ts_integral{static_cast<timestamp_integral_t>(ts.seconds * 1'000'000'000u + ts.subseconds / mul_factor)};
+        // Since fast_io directly obtains the clock value via clock_gettime, this operation will not overflow and will not produce negative values.
+        auto ts_integral{static_cast<timestamp_integral_t>(ts.seconds * 1'000'000'000u + ts.subseconds / mul_factor)};
 
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, resolution_ptrsz, ts_integral);
+        // WASI provides this solely as an "accuracy hint"; the returned time value should not be modified.
+#if 0
+        // ceil to precision
+        if(auto const precision_integral{static_cast<timestamp_integral_t>(precision)}; precision_integral != 0u)
+        {
+            auto const rem{ts_integral % precision_integral};
+            if(rem != 0u) { ts_integral += precision_integral - rem; }
+        }
+#endif
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(memory, time_ptrsz, ts_integral);
+
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
     }
+
 }  // namespace uwvm2::imported::wasi::wasip1::func
 
 #ifndef UWVM_MODULE

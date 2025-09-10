@@ -1,5 +1,4 @@
-﻿
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -52,7 +51,7 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
-    /// @brief     WasiPreview1.args_get
+    /// @brief     WasiPreview1.args_get_wasm64
     /// @details   __wasi_errno_t args_get(char** argv, char* argv_buf);
     /// @note      The WASI specification does not require implementation-side isolation of argv/argvbuf memory order; the caller must ensure they do not
     ///            overlap.
