@@ -32,12 +32,25 @@ module;
 // macro
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
+// platform
+#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+# include <crt_externs.h>
+# include <unistd.h>
+#endif
+#if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(BSD) || defined(_SYSTYPE_BSD) ||           \
+    defined(__OpenBSD__)
+# include <sys/types.h>
+# include <sys/param.h>
+# include <sys/sysctl.h>
+# include <unistd.h>
+#endif
 
 export module uwvm2.imported.wasi.wasip1.platform:get_process_env;
 
 import fast_io;
 import uwvm2.uwvm_predefine.io;
 import uwvm2.uwvm_predefine.utils.ansies;
+import uwvm2.utils.container;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
