@@ -27,5 +27,9 @@ export namespace fast_io
         using ::fast_io::win32::system_info;
         using ::fast_io::win32::VirtualAlloc;
         using ::fast_io::win32::VirtualFree;
+        using ::fast_io::win32::GetEnvironmentStringsW;
+        using ::fast_io::win32::GetEnvironmentStringsA;
+        using ::fast_io::win32::FreeEnvironmentStringsW;
+        using ::fast_io::win32::FreeEnvironmentStringsA;
     } // namespace win32
 }

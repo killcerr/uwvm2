@@ -56,11 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::platform_page
 
         ::fast_io::win32::system_info si;  // No initlization is required
 
-        if(!::fast_io::win32::GetSystemInfo(::std::addressof(si))) [[unlikely]]
-        {
-            // Systems running in protected mode (with paging support) crash immediately upon a failed call.
-            return {0uz, false};
-        }
+        ::fast_io::win32::GetSystemInfo(::std::addressof(si));
 
         return {static_cast<::std::size_t>(si.dwPageSize), true};
 
