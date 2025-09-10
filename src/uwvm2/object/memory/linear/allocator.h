@@ -219,6 +219,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
     template <typename Alloc>
     struct basic_allocator_memory_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
+        inline static constexpr ::uwvm2::utils::container::u8string_view name{u8"mult-thread allocator"};
+
         // The default allocator is unaligned.
         using allocator_t = Alloc;
         // A type allocator must be an aligned allocator.

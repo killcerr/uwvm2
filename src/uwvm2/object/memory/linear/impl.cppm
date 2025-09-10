@@ -24,6 +24,7 @@ module;
 
 export module uwvm2.object.memory.linear;
 export import :allocator;
+export import :single_thread_allocator;
 export import :mmap;
 export import :native;
 

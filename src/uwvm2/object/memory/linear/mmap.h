@@ -73,6 +73,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
     struct mmap_memory_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
+        inline static constexpr ::uwvm2::utils::container::u8string_view name{u8"mmap"};
+
         using allocator_t = ::fast_io::native_global_allocator;
         using atomic_size_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_size_t>;
         using mutex_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::uwvm2::utils::mutex::mutex_t>;

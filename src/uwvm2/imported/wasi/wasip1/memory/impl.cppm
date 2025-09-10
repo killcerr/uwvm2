@@ -23,6 +23,7 @@ module;
 
 export module uwvm2.imported.wasi.wasip1.memory;
 export import :allocator;
+export import :single_thread_allocator;
 export import :mmap;
 
 #ifndef UWVM_MODULE

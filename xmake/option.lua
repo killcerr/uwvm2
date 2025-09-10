@@ -331,3 +331,12 @@ option("fno-exceptions", function()
     )
     set_default(false)
 end)
+
+option("use-multithread-allocator", function()
+    set_description
+    (
+        "Enable on platforms that do not support mmap but support multithreading.",
+        "default = false"
+    )
+    set_default(false)
+end)

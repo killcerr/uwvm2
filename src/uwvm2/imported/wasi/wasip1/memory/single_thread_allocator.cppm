@@ -24,25 +24,22 @@ module;
 // std
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <climits>
 #include <version>
 #include <limits>
-#include <memory>
-#include <new>
-#include <atomic>
+#include <concepts>
 #include <bit>
-#include <utility>
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
+#include <type_traits>
+#include <memory>
 
-export module uwvm2.object.memory.linear:native;
+export module uwvm2.imported.wasi.wasip1.memory:single_thread_allocator;
 
 import fast_io;
 import uwvm2.utils.debug;
-import uwvm2.utils.mutex;
-import uwvm2.object.memory.wasm_page;
-import :allocator;
-import :single_thread_allocator;
-import :mmap;
+import uwvm2.object.memory;
+import uwvm2.imported.wasi.wasip1.abi;
+import uwvm2.imported.wasi.wasip1.fd_manager;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -51,5 +48,5 @@ import :mmap;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "native.h"
+#include "single_thread_allocator.h"
 
