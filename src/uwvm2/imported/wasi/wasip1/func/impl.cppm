@@ -33,6 +33,8 @@ export import :clock_time_get_wasm64;
 export import :clock_time_get;
 export import :environ_get_wasm64;
 export import :environ_get;
+export import :environ_sizes_get_wasm64;
+export import :environ_sizes_get;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

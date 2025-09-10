@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -51,17 +51,17 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
-    /// @brief     WasiPreview1.environ_sizes_get
+    /// @brief     WasiPreview1.environ_sizes_get_wasm64
     /// @details   __wasi_errno_t environ_sizes_get(__wasi_size_t* environ_count, __wasi_size_t* environ_buf_size);
     /// @note      This function only writes sizes; callers must provide valid memory offsets.
 
-    ::uwvm2::imported::wasi::wasip1::abi::errno_t environ_sizes_get(
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t environ_sizes_get_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t environ_count_ptrsz,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t environ_buf_size_ptrsz) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t environ_count_ptrsz,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t environ_buf_size_ptrsz) noexcept
     {
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
-        constexpr auto wasi_size_t_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max()};
+        constexpr auto wasi_size_t_wasm64_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max()};
 
         auto& memory{env.wasip1_memory};
         auto const trace_wasip1_call{env.trace_wasip1_call};
@@ -77,26 +77,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"environ_sizes_get ",
+                                u8"environ_sizes_get_wasm64 ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(wasi-trace)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: environ_sizes_get (wasi-trace)\n");
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: environ_sizes_get_wasm64 (wasi-trace)\n");
 #endif
         }
 
         auto const environ_vec_size{env.envs.size()};
 
-        if constexpr(size_t_max > wasi_size_t_max)
+        if constexpr(size_t_max > wasi_size_t_wasm64_max)
         {
-            if(environ_vec_size > wasi_size_t_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(environ_vec_size > wasi_size_t_wasm64_max) [[unlikely]] { ::fast_io::fast_terminate(); }
         }
 
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
             memory,
             environ_count_ptrsz,
-            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(environ_vec_size));
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(environ_vec_size));
 
         // get all size
         ::std::size_t curr_env_size_bytes{};
@@ -108,17 +108,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             curr_env_size_bytes += curr_env_size + 1uz;  // end zero-byte
         }
 
-        if constexpr(size_t_max > wasi_size_t_max)
+        if constexpr(size_t_max > wasi_size_t_wasm64_max)
         {
-            if(curr_env_size_bytes > wasi_size_t_max) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(curr_env_size_bytes > wasi_size_t_wasm64_max) [[unlikely]] { ::fast_io::fast_terminate(); }
         }
 
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
             memory,
             environ_buf_size_ptrsz,
-            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(curr_env_size_bytes));
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(curr_env_size_bytes));
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func
 
