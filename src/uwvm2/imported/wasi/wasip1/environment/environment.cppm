@@ -22,14 +22,14 @@
 module;
 
 // std
-# include <cstddef>
-# include <cstdint>
-# include <cstring>
-# include <climits>
-# include <version>
-# include <limits>
-# include <concepts>
-# include <bit>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <climits>
+#include <version>
+#include <limits>
+#include <concepts>
+#include <bit>
 
 export module uwvm2.imported.wasi.wasip1.environment:environment;
 

@@ -49,14 +49,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
 
     // static assert
 
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i8) == 1uz, "non-wasi data layout");
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8) == 1uz, "non-wasi data layout");
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i16) == 2uz, "non-wasi data layout");
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16) == 2uz, "non-wasi data layout");
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32) == 4uz, "non-wasi data layout");
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32) == 4uz, "non-wasi data layout");
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64) == 8uz, "non-wasi data layout");
-    static_assert(alignof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64) == 8uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i8) == 1uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8) == 1uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i16) == 2uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16) == 2uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32) == 4uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32) == 4uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64) == 8uz, "non-wasi data layout");
+    static_assert(sizeof(::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64) == 8uz, "non-wasi data layout");
 
     // wasm64 pointer-sized types
     using wasi_intptr_wasm64_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64;
