@@ -137,7 +137,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
     }
-}  // namespace uwvm2::object::memory::wasm_page
+}  // namespace uwvm2::imported::wasi::wasip1::func
 
 #ifndef UWVM_MODULE
 // macro

@@ -21,18 +21,29 @@
 
 module;
 
-export module uwvm2.imported.wasi.wasip1.func;
+// std
+#include <cstddef>
+#include <cstdint>
+#include <climits>
+#include <cstring>
+#include <limits>
+#include <concepts>
+#include <bit>
+#include <memory>
+// macro
+#include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
-export import :args_get_wasm64;
-export import :args_get;
-export import :args_sizes_get_wasm64;
-export import :args_sizes_get;
-export import :clock_res_get_wasm64;
-export import :clock_res_get;
-export import :clock_time_get_wasm64;
-export import :clock_time_get;
-export import :environ_get_wasm64;
-export import :environ_get;
+export module uwvm2.imported.wasi.wasip1.func:environ_get_wasm64;
+
+import fast_io;
+import uwvm2.uwvm_predefine.utils.ansies;
+import uwvm2.uwvm_predefine.io;
+import uwvm2.object.memory.linear;
+import uwvm2.imported.wasi.wasip1.abi;
+import uwvm2.imported.wasi.wasip1.fd_manager;
+import uwvm2.imported.wasi.wasip1.memory;
+import uwvm2.imported.wasi.wasip1.environment;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -41,4 +52,6 @@ export import :environ_get;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "impl.h"
+#include "environ_get_wasm64.h"
+
+

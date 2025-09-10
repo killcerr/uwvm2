@@ -31,5 +31,7 @@
 # include "clock_res_get.h"
 # include "clock_time_get_wasm64.h"
 # include "clock_time_get.h"
+# include "environ_get_wasm64.h"
+# include "environ_get.h"
 
 #endif
