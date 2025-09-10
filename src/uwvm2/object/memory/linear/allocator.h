@@ -168,7 +168,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         {
             // Decrement counter with release semantics to publish our updates
             this->active_ops_p->fetch_sub(1uz, ::std::memory_order_release);
-            
+
             // Only one grow can await active_ops: the grow path holds growing_flag exclusively.
             // Other grow attempts block on growing_flag->wait until the flag is cleared.
             // Thus the waiter set for active_ops==0 contains at most one grow thread.

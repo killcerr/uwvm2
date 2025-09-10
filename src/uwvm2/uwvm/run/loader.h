@@ -130,7 +130,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         }
 
         if(::uwvm2::uwvm::wasm::storage::local_preload_wasip2)
-        {  
+        {
             // verbose
             if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
             {
@@ -153,7 +153,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         }
 
         if(::uwvm2::uwvm::wasm::storage::local_preload_wasix)
-        {  
+        {
             // verbose
             if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
             {

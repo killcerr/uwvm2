@@ -278,7 +278,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"DEC Alpha"
 #elif defined(__arm64ec__) || defined(_M_ARM64EC)
                                 u8"ARM64EC"
-                                // ARM64EC is a Windows hybrid binary ABI that supports little-endian only.
+        // ARM64EC is a Windows hybrid binary ABI that supports little-endian only.
 #elif defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)
                                 u8"AArch64"
 # if defined(__AARCH64EB__) || defined(__AARCH_BIG_ENDIAN)
