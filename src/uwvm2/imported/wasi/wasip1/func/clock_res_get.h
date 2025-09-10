@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "uwvm2/imported/wasi/wasip1/abi/wasm32.h"
 #ifndef UWVM_MODULE
 // std
 # include <cstddef>
