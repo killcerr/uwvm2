@@ -61,7 +61,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 {
     inline ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string> get_process_env() noexcept
     {
-        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string> result;
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string> result{};
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 # if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
@@ -69,9 +69,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         struct fast_io_get_environment_string_a_guard_t
         {
-            char* environ{};
+            char* tmp_environ{};
 
-            inline constexpr fast_io_get_environment_string_a_guard_t(char* env_environ) noexcept : environ{env_environ} {}
+            inline constexpr fast_io_get_environment_string_a_guard_t(char* tmp_environ_o) noexcept : tmp_environ{tmp_environ_o} {}
 
             inline constexpr fast_io_get_environment_string_a_guard_t(fast_io_get_environment_string_a_guard_t const& other) noexcept = delete;
             inline constexpr fast_io_get_environment_string_a_guard_t& operator= (fast_io_get_environment_string_a_guard_t const& other) noexcept = delete;
@@ -80,60 +80,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
             inline constexpr ~fast_io_get_environment_string_a_guard_t()
             {
-                if(environ) { ::fast_io::win32::FreeEnvironmentStringsA(environ); }
+                if(tmp_environ) [[likely]] { ::fast_io::win32::FreeEnvironmentStringsA(tmp_environ); }
                 // multi-call to destructor is ub
             }
         };
 
-        while(*environ_curr)
+        auto env_str{::fast_io::win32::GetEnvironmentStringsA()};
+        fast_io_get_environment_string_a_guard_t env_str_guard{env_str};
+
+        using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+        for(auto env_str_curr{reinterpret_cast<char8_t_const_may_alias_ptr>(env_str)};;)
         {
-            auto const env_buf_offset_le32{
-                ::fast_io::little_endian(static_cast<::std::uint_least32_t>(env_buf_begin - reinterpret_cast<char8_t_may_alias_ptr>(memory_begin)))};
-            ::fast_io::freestanding::my_memcpy(env_para_i32p, __builtin_addressof(env_buf_offset_le32), sizeof(env_buf_offset_le32));
+            auto const pos{env_str_curr + ::fast_io::cstr_len(env_str_curr)};
 
-            auto const env_str{*envion};
-            auto const env_str_len{::fast_io::cstr_len(env_str)};
+            result.emplace_back(env_str_curr, pos);
 
-            if(reinterpret_cast<::std::byte*>(env_buf_begin) + env_str_len >= memory_end) [[unlikely]]
-            {
-                return static_cast<::std::int_least32_t>(::uwvm::vm::wasi::errno_t::eaddrnotavail);
-            }
+            env_str_curr = pos + 1u;
 
-            ::fast_io::freestanding::my_memcpy(env_buf_begin, env_str, env_str_len);
-
-            env_buf_begin += env_str_len;
-            *env_buf_begin++ = u8'\0';
-
-            ++env_para_i32p;
-            ++envion;
+            if(*env_str_curr == u8'\0') { break; }
         }
+
+        return result;
 # else
-        // Windows NT: query wide-char environment block and convert to UTF-8
-        using ::uwvm2::utils::container::u8string;
-        using ::uwvm2::utils::container::vector;
-        auto peb{::fast_io::win32::nt::nt_get_current_peb()};
-        auto const envW{peb->ProcessParameters->Environment};
-        auto const envWSize{peb->ProcessParameters->EnvironmentSize};
-        if(envW == nullptr || envWSize == 0u) { return result; }
-        // Environment is double NUL-terminated list of UTF-16 key=value
-        char16_t const* first{reinterpret_cast<char16_t const*>(envW)};
-        char16_t const* last{reinterpret_cast<char16_t const*>(envW) + (envWSize / sizeof(char16_t))};
-        // Scan until double zero
-        while(first < last)
+        auto const c_peb{::fast_io::win32::nt::nt_get_current_peb()};
+        auto const c_peb_environment{c_peb->ProcessParameters->Environment};
+        auto const c_peb_environment_size{c_peb->ProcessParameters->EnvironmentSize};
+        auto const c_peb_environment_end{c_peb_environment + c_peb_environment_size};
+
+        ::fast_io::tlc::u8string env_str{
+            ::fast_io::tlc::u8concat_fast_io_tlc(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(c_peb_environment, c_peb_environment_end)))};
+
+        auto const env_str_end{env_str.cend()};
+
+        for(auto env_str_curr{env_str.cbegin()};;)
         {
-            char16_t const* p{first};
-            while(p < last && *p != u'\0') { ++p; }
-            if(p == first)
-            {
-                // empty string indicates end
-                break;
-            }
-            // convert this UTF-16 pair to UTF-8 string
-            auto tmp_u8 = ::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(first, p)));
-            result.push_back(::uwvm2::utils::container::u8string{tmp_u8.c_str(), tmp_u8.size()});
-            if(p == last) { break; }
-            first = p + 1;
+            auto const pos{::std::find(env_str_curr, env_str_end, u8'\0')};
+
+            result.emplace_back(env_str_curr, pos);
+
+            env_str_curr = pos + 1u;
+
+            if(*env_str_curr == u8'\0') { break; }
         }
+
         return result;
 # endif
 #elif defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
