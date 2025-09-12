@@ -24,6 +24,7 @@ module;
 export module uwvm2.utils.container;
 export import :allocator;
 export import :wrapper;
+export import :string_concat;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

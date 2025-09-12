@@ -97,7 +97,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
             result.emplace_back(env_str_curr, pos);
 
-            env_str_curr = pos + sizeof(char8_t);
+            env_str_curr = pos + 1u;
 
             if(*env_str_curr == u8'\0') { break; }
         }
@@ -106,24 +106,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
 # else
         auto const c_peb{::fast_io::win32::nt::nt_get_current_peb()};
+        // c_peb->ProcessParameters cannot be null.
         auto const c_peb_environment{c_peb->ProcessParameters->Environment};
         auto const c_peb_environment_size{c_peb->ProcessParameters->EnvironmentSize};
-        auto const c_peb_environment_end{c_peb_environment + c_peb_environment_size};
+        auto const c_peb_environment_end{c_peb_environment + c_peb_environment_size / sizeof(char16_t)};
 
-        ::fast_io::tlc::u8string env_str{
-            ::fast_io::tlc::u8concat_fast_io_tlc(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(c_peb_environment, c_peb_environment_end)))};
+        // Converting everything at once is faster than converting one by one.
+        auto const env_str{
+            ::uwvm2::utils::container::u8concat_uwvm_tlc(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(c_peb_environment, c_peb_environment_end)))};
 
         auto const env_str_end{env_str.cend()};
 
-        for(auto env_str_curr{env_str.cbegin()};;)
+        for(auto env_str_curr{env_str.cbegin()}; env_str_curr < env_str_end;)
         {
-            auto const pos{::std::find(env_str_curr, env_str_end, u8'\0')};
+            auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
+            if(len == 0u) { break; }
+            auto const next{env_str_curr + len};
 
-            result.emplace_back(env_str_curr, pos);
+            result.emplace_back(env_str_curr, next);
 
-            env_str_curr = pos + sizeof(char8_t);
-
-            if(*env_str_curr == u8'\0') { break; }
+            if(next == env_str_end) { break; }
+            env_str_curr = next + 1u;
         }
 
         return result;
@@ -137,7 +140,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
         {
-            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
+            result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
         }
 
         return result;
@@ -151,7 +154,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
         {
-            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
+            result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
         }
 
         return result;
@@ -175,15 +178,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         auto const env_str_end{envs.cend()};
 
-        for(auto env_str_curr{envs.cbegin()};;)
+        for(auto env_str_curr{envs.cbegin()}; env_str_curr < env_str_end;)
         {
-            auto const pos{::std::find(env_str_curr, env_str_end, u8'\0')};
+            auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
+            if(len == 0u) { break; }
 
-            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, pos))));
+            auto const next{env_str_curr + len};
+            result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, next))));
 
-            env_str_curr = pos + sizeof(char8_t);
-
-            if(*env_str_curr == u8'\0') { break; }
+            if(next == env_str_end) { break; }
+            env_str_curr = next + 1u;
         }
 
         return result;
@@ -212,21 +216,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         bool filled_via_sysctl{};
 
+# if defined(KERN_PROC_ENV) || defined(__NetBSD__)
         // FreeBSD/NetBSD/DragonFly: KERN_PROC... interface
         // FreeBSD warning: sysctl may truncate without ENOMEM; mitigate by two-call sizing and growth loop
         int mib[4];  // no initialize
 
-# if defined(__NetBSD__)
+#  if defined(__NetBSD__)
         mib[0] = CTL_KERN;
         mib[1] = KERN_PROC_ARGS;
-        mib[2] = -1;
+        mib[2] = ::fast_io::noexcept_call(::getpid);
         mib[3] = KERN_PROC_ENV;
-# else
+#  else
         mib[0] = CTL_KERN;
         mib[1] = KERN_PROC;
         mib[2] = KERN_PROC_ENV;
-        mib[3] = -1;
-# endif
+        mib[3] = ::fast_io::noexcept_call(::getpid);
+#  endif
 
         ::std::size_t size{};
         // Probe size; if the kernel returns 0 or small, still attempt read with exponential buffer growth
@@ -240,20 +245,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
             {
                 auto const env_str_end{buf + size};
 
-                for(auto env_str_curr{buf};;)
+                for(auto env_str_curr{buf}; env_str_curr < env_str_end;)
                 {
-                    auto const pos{::std::find(env_str_curr, env_str_end, '\0')};
+                    auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
+                    if(len == 0u) { break; }
 
-                    result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, pos))));
+                    auto const next{env_str_curr + len};
+                    result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, next))));
 
-                    env_str_curr = pos + sizeof(char);
-
-                    if(*env_str_curr == '\0') { break; }
+                    if(next == env_str_end) { break; }
+                    env_str_curr = next + 1u;
                 }
 
                 filled_via_sysctl = true;
             }
         }
+# endif
 
         if(!filled_via_sysctl) [[unlikely]]
         {
@@ -265,7 +272,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
             for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
             {
-                result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
+                result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
             }
         }
 
@@ -280,7 +287,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
         {
-            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
+            result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
         }
 
         return result;
