@@ -117,7 +117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         auto const env_str_end{env_str.cend()};
 
-        for(auto env_str_curr{env_str.cbegin()}; env_str_curr < env_str_end;)
+        for(auto env_str_curr{env_str.cbegin()};;)
         {
             auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
             if(len == 0uz) [[unlikely]] { break; }
@@ -125,7 +125,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
             result.emplace_back(env_str_curr, next);
 
-            if(next == env_str_end) { break; }
+            if(next >= env_str_end) { break; }
             env_str_curr = next + 1u;
         }
 
@@ -178,7 +178,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         auto const env_str_end{envs.cend()};
 
-        for(auto env_str_curr{envs.cbegin()}; env_str_curr < env_str_end;)
+        for(auto env_str_curr{envs.cbegin()};;)
         {
             auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
             if(len == 0uz) [[unlikely]] { break; }
@@ -186,7 +186,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
             auto const next{env_str_curr + len};
             result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, next))));
 
-            if(next == env_str_end) { break; }
+            if(next >= env_str_end) { break; }
             env_str_curr = next + 1u;
         }
 
@@ -245,7 +245,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
             {
                 auto const env_str_end{buf + size};
 
-                for(auto env_str_curr{buf}; env_str_curr < env_str_end;)
+                for(auto env_str_curr{buf};;)
                 {
                     auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
                     if(len == 0uz) [[unlikely]] { break; }
@@ -253,7 +253,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
                     auto const next{env_str_curr + len};
                     result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, next))));
 
-                    if(next == env_str_end) { break; }
+                    if(next >= env_str_end) { break; }
                     env_str_curr = next + 1u;
                 }
 
