@@ -23,4 +23,5 @@
 
 #ifndef UWVM_MODULE
 # include "wrapper.h"
+# include "mere_release.h"
 #endif

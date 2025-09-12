@@ -305,6 +305,36 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
         right_sock_shutdown = 0x0000000010000000,
     };
 
+    inline constexpr rights_wasm64_t operator& (rights_wasm64_t x, rights_wasm64_t y) noexcept
+    {
+        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
+        return static_cast<rights_wasm64_t>(static_cast<utype>(x) & static_cast<utype>(y));
+    }
+
+    inline constexpr rights_wasm64_t operator| (rights_wasm64_t x, rights_wasm64_t y) noexcept
+    {
+        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
+        return static_cast<rights_wasm64_t>(static_cast<utype>(x) | static_cast<utype>(y));
+    }
+
+    inline constexpr rights_wasm64_t operator^ (rights_wasm64_t x, rights_wasm64_t y) noexcept
+    {
+        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
+        return static_cast<rights_wasm64_t>(static_cast<utype>(x) ^ static_cast<utype>(y));
+    }
+
+    inline constexpr rights_wasm64_t operator~(rights_wasm64_t x) noexcept
+    {
+        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
+        return static_cast<rights_wasm64_t>(~static_cast<utype>(x));
+    }
+
+    inline constexpr rights_wasm64_t& operator&= (rights_wasm64_t& x, rights_wasm64_t y) noexcept { return x = x & y; }
+
+    inline constexpr rights_wasm64_t& operator|= (rights_wasm64_t& x, rights_wasm64_t y) noexcept { return x = x | y; }
+
+    inline constexpr rights_wasm64_t& operator^= (rights_wasm64_t& x, rights_wasm64_t y) noexcept { return x = x ^ y; }
+
     enum class roflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
     {
         sock_recv_data_truncated = 0x0001,
