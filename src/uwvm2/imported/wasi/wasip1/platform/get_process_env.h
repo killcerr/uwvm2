@@ -88,6 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 # if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
         // Windows 9x
 
+        // Use raii to manage environment strings
         struct fast_io_get_environment_string_a_guard_t
         {
             char* tmp_environ{};
@@ -180,7 +181,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 #else
 
         auto const environ_begin{posix::environ};
-
         if(environ_begin == nullptr) [[unlikely]] { return result; }
 
         for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
