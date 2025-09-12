@@ -88,6 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         auto env_str{::fast_io::win32::GetEnvironmentStringsA()};
         fast_io_get_environment_string_a_guard_t env_str_guard{env_str};
 
+        // Do not perform APC escaping from ANSI to UTF-8 under Windows 9x.
         using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
         for(auto env_str_curr{reinterpret_cast<char8_t_const_may_alias_ptr>(env_str)};;)
@@ -96,12 +97,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
             result.emplace_back(env_str_curr, pos);
 
-            env_str_curr = pos + 1u;
+            env_str_curr = pos + sizeof(char8_t);
 
             if(*env_str_curr == u8'\0') { break; }
         }
 
         return result;
+
 # else
         auto const c_peb{::fast_io::win32::nt::nt_get_current_peb()};
         auto const c_peb_environment{c_peb->ProcessParameters->Environment};
@@ -119,160 +121,168 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
             result.emplace_back(env_str_curr, pos);
 
-            env_str_curr = pos + 1u;
+            env_str_curr = pos + sizeof(char8_t);
 
             if(*env_str_curr == u8'\0') { break; }
         }
 
         return result;
+
 # endif
-#elif defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
-        // macOS: use _NSGetEnviron to obtain process environ pointer
-        using ::uwvm2::utils::container::u8string;
-        using ::uwvm2::utils::container::vector;
-        char*** envpp = ::fast_io::noexcept_call(::_NSGetEnviron);
-        if(envpp == nullptr) { return result; }
-        char** envp = *envpp;
-        if(envp == nullptr) { return result; }
-        for(char** p = envp; *p != nullptr; ++p)
+#elif defined(__MSDOS__) || defined(__DJGPP__)
+        extern char** _environ;
+        auto const environ_begin{_environ};
+
+        if(environ_begin == nullptr) [[unlikely]] { return result; }
+
+        for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
         {
-            auto s = *p;
-            auto len = ::fast_io::cstr_len(s);
-            ::uwvm2::utils::container::u8string str;
-            str.resize(len);
-            ::fast_io::freestanding::my_memcpy(str.data(), s, len);
-            result.push_back(::std::move(str));
+            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
         }
+
+        return result;
+
+#elif defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+        auto const envpp{::fast_io::noexcept_call(::_NSGetEnviron)};
+        if(envpp == nullptr) [[unlikely]] { return result; }
+
+        auto const environ_begin{*envpp};
+        if(environ_begin == nullptr) [[unlikely]] { return result; }
+
+        for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
+        {
+            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
+        }
+
         return result;
 
 #elif defined(__linux__) || defined(__sun)
-        // Linux/Solaris: use POSIX environ (robust and sufficient)
-        extern "C" char** environ;
-        if(environ == nullptr) { return result; }
-        for(char** p = environ; *p != nullptr; ++p)
+
+        ::fast_io::native_file_loader envs;  // no initialize
+
+# ifdef UWVM_CPP_EXCEPTIONS
+        try
+# endif
         {
-            auto s = *p;
-            auto len = ::fast_io::cstr_len(s);
-            ::uwvm2::utils::container::u8string u8;
-            u8.resize(len);
-            ::fast_io::freestanding::my_memcpy(u8.data(), s, len);
-            result.push_back(::std::move(u8));
+            envs = ::fast_io::native_file_loader{u8"/proc/self/environ"};
         }
+# ifdef UWVM_CPP_EXCEPTIONS
+        catch(::fast_io::error)
+        {
+            return result;
+        }
+# endif
+
+        auto const env_str_end{envs.cend()};
+
+        for(auto env_str_curr{envs.cbegin()};;)
+        {
+            auto const pos{::std::find(env_str_curr, env_str_end, u8'\0')};
+
+            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, pos))));
+
+            env_str_curr = pos + sizeof(char8_t);
+
+            if(*env_str_curr == u8'\0') { break; }
+        }
+
         return result;
 
 #elif defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(BSD) || defined(_SYSTYPE_BSD) ||         \
     defined(__OpenBSD__)
         // BSD family: robustly collect environment via sysctl where applicable; fallback to environ
-        using ::uwvm2::utils::container::u8string;
-        using ::uwvm2::utils::container::vector;
-        bool filled_via_sysctl = false;
-
-# if defined(__OpenBSD__)
-        // OpenBSD requires a two-step sysctl to get size safely
-        int mib[4]{CTL_KERN, KERN_PROC_ARGS, getpid(), KERN_PROC_ENV};
-        ::std::size_t size{};
-        if(::fast_io::noexcept_call(::sysctl, mib, 4, nullptr, &size, nullptr, 0) == 0 && size != 0u)
+        struct buf_guard_t
         {
-            ::uwvm2::utils::container::u8string buf;
-            buf.resize(size);
-            if(::fast_io::noexcept_call(::sysctl, mib, 4, buf.data(), &size, nullptr, 0) == 0)
+            using allocator = ::fast_io::native_thread_local_allocator;
+
+            char* buf{};
+
+            inline constexpr buf_guard_t(char* buf_o) noexcept : buf{buf_o} {}
+
+            inline constexpr buf_guard_t(buf_guard_t const& other) noexcept = delete;
+            inline constexpr buf_guard_t& operator= (buf_guard_t const& other) noexcept = delete;
+            inline constexpr buf_guard_t(buf_guard_t&& other) noexcept = delete;
+            inline constexpr buf_guard_t& operator= (buf_guard_t&& other) noexcept = delete;
+
+            inline constexpr ~buf_guard_t()
             {
-                // Trim to actual size
-                if(size < buf.size()) { buf.resize(size); }
-                auto* beg = buf.data();
-                auto* end = buf.data() + buf.size();
-                while(beg < end)
-                {
-                    char8_t* pos = beg;
-                    while(pos < end && *pos != u8'\0') { ++pos; }
-                    if(pos == beg && pos == end) { break; }
-                    result.push_back(u8string{beg, static_cast<::std::size_t>(pos - beg)});
-                    if(pos == end) { break; }
-                    beg = pos + 1;
-                }
-                filled_via_sysctl = true;
+                if(buf) [[likely]] { allocator::deallocate(buf); }
             }
-        }
-# else
+        };
+
+        bool filled_via_sysctl{};
+
         // FreeBSD/NetBSD/DragonFly: KERN_PROC... interface
         // FreeBSD warning: sysctl may truncate without ENOMEM; mitigate by two-call sizing and growth loop
-        int mib[4];
-#  if defined(__NetBSD__)
+        int mib[4];  // no initialize
+
+# if defined(__NetBSD__)
         mib[0] = CTL_KERN;
         mib[1] = KERN_PROC_ARGS;
-        mib[2] = getpid();
+        mib[2] = -1;
         mib[3] = KERN_PROC_ENV;
-#  else
+# else
         mib[0] = CTL_KERN;
         mib[1] = KERN_PROC;
         mib[2] = KERN_PROC_ENV;
-        mib[3] = getpid();
-#  endif
-        ::std::size_t size{0};
-        // Probe size; if the kernel returns 0 or small, still attempt read with exponential buffer growth
-        (void)::fast_io::noexcept_call(::sysctl, mib, 4, nullptr, &size, nullptr, 0);
-        if(size == 0u) { size = 4096u; }
-        for(int attempt = 0; attempt < 6; ++attempt)
-        {
-            ::uwvm2::utils::container::u8string buf;
-            buf.resize(size);
-            ::std::size_t cursize = size;
-            int rc = ::fast_io::noexcept_call(::sysctl, mib, 4, buf.data(), &cursize, nullptr, 0);
-            if(rc == 0)
-            {
-                if(cursize < buf.size()) { buf.resize(cursize); }
-                auto* beg = buf.data();
-                auto* end = buf.data() + buf.size();
-                while(beg < end)
-                {
-                    char8_t* pos = beg;
-                    while(pos < end && *pos != u8'\0') { ++pos; }
-                    if(pos == beg && pos == end) { break; }
-                    result.push_back(u8string{beg, static_cast<::std::size_t>(pos - beg)});
-                    if(pos == end) { break; }
-                    beg = pos + 1;
-                }
-                filled_via_sysctl = true;
-                break;
-            }
-            // If failed, grow buffer and retry to mitigate silent truncation
-            size *= 2u;
-        }
+        mib[3] = -1;
 # endif
-        if(!filled_via_sysctl)
+
+        ::std::size_t size{};
+        // Probe size; if the kernel returns 0 or small, still attempt read with exponential buffer growth
+
+        if(::fast_io::noexcept_call(::sysctl, mib, 4, nullptr, ::std::addressof(size), nullptr, 0) == 0 && size != 0u) [[likely]]
+        {
+            auto const buf{reinterpret_cast<char*>(allocator::allocate(size))};
+            buf_guard_t buf_guard{buf};
+
+            if(::fast_io::noexcept_call(::sysctl, mib, 4, buf, ::std::addressof(size), nullptr, 0) == 0)
+            {
+                auto const env_str_end{buf + size};
+
+                for(auto env_str_curr{buf};;)
+                {
+                    auto const pos{::std::find(env_str_curr, env_str_end, '\0')};
+
+                    result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, pos))));
+
+                    env_str_curr = pos + sizeof(char);
+
+                    if(*env_str_curr == '\0') { break; }
+                }
+
+                filled_via_sysctl = true;
+            }
+        }
+
+        if(!filled_via_sysctl) [[unlikely]]
         {
             // Fallback: use process environ when sysctl is unavailable or permission denied
-            extern "C" char** environ;
-            if(environ)
+            extern char** environ;
+            auto const environ_begin{environ};
+
+            if(environ_begin == nullptr) [[unlikely]] { return result; }
+
+            for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
             {
-                for(char** p = environ; *p != nullptr; ++p)
-                {
-                    auto s = *p;
-                    auto len = ::fast_io::cstr_len(s);
-                    ::uwvm2::utils::container::u8string u8;
-                    u8.resize(len);
-                    ::fast_io::freestanding::my_memcpy(u8.data(), s, len);
-                    result.push_back(::std::move(u8));
-                }
+                result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
             }
         }
+
         return result;
 
 #else
         // Unknown platform: fallback to POSIX environ if available
-        extern "C" char** environ;
-        if(environ)
+        extern char** environ;
+        auto const environ_begin{environ};
+
+        if(environ_begin == nullptr) [[unlikely]] { return result; }
+
+        for(auto environ_curr{environ_begin}; *environ_curr != nullptr; ++environ_curr)
         {
-            for(char** p = environ; *p != nullptr; ++p)
-            {
-                auto s = *p;
-                auto len = ::fast_io::cstr_len(s);
-                ::uwvm2::utils::container::u8string u8;
-                u8.resize(len);
-                ::fast_io::freestanding::my_memcpy(u8.data(), s, len);
-                result.push_back(::std::move(u8));
-            }
+            result.push_back(::fast_io::u8concat_fast_io(::fast_io::mnp::code_cvt_os_c_str(*environ_curr)));
         }
+
         return result;
 #endif
     }
