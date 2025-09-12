@@ -113,14 +113,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         // Converting everything at once is faster than converting one by one.
         auto const env_str{
-            ::uwvm2::utils::container::u8concat_uwvm_tlc(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(c_peb_environment, c_peb_environment_end)))};
+            ::uwvm2::utils::container::tlc::u8concat_uwvm_tlc(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(c_peb_environment, c_peb_environment_end)))};
 
         auto const env_str_end{env_str.cend()};
 
         for(auto env_str_curr{env_str.cbegin()}; env_str_curr < env_str_end;)
         {
             auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
-            if(len == 0u) { break; }
+            if(len == 0uz) [[unlikely]] { break; }
             auto const next{env_str_curr + len};
 
             result.emplace_back(env_str_curr, next);
@@ -181,7 +181,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         for(auto env_str_curr{envs.cbegin()}; env_str_curr < env_str_end;)
         {
             auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
-            if(len == 0u) { break; }
+            if(len == 0uz) [[unlikely]] { break; }
 
             auto const next{env_str_curr + len};
             result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, next))));
@@ -248,7 +248,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
                 for(auto env_str_curr{buf}; env_str_curr < env_str_end;)
                 {
                     auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
-                    if(len == 0u) { break; }
+                    if(len == 0uz) [[unlikely]] { break; }
 
                     auto const next{env_str_curr + len};
                     result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, next))));
