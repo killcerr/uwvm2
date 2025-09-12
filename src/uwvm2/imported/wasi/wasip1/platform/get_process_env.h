@@ -53,7 +53,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         // Darwin does not provide an `environ` function; here we use `_NSGetEnviron` to obtain it.
         extern char*** _NSGetEnviron() noexcept __asm__("__NSGetEnviron");
 #elif defined(__MSDOS__) || defined(__DJGPP__)
-        // djgpp only provides char**_environ; for consistency, a symbolic link is used here.
+        // djgpp only provides `char** _environ`. For consistency, a symbolic link is used here.
         extern char** environ __asm__("__environ");
 #elif !(defined(_WIN32) || defined(__CYGWIN__))
         // Reference to the global `environ` variable
@@ -116,7 +116,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         {
             auto const len{::fast_io::cstr_len(env_str_curr)};
             // When encountering a double null character (env terminator), execution will terminate here.
-            if(len == 0uz) { break; }
+            if(len == 0uz) [[unlikely]] { break; }
 
             auto const next{env_str_curr + len};
             result.emplace_back(env_str_curr, next);
@@ -124,7 +124,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
             env_str_curr = next + 1u;
 
             // The ending consists of two null characters.
-            if(*env_str_curr == u8'\0') [[unlikely]] { break; }
+            if(*env_str_curr == u8'\0') { break; }
         }
 
         return result;
@@ -146,13 +146,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         {
             auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
             // Length 0 is not included in envs.
-            if(len == 0uz) { break; }
+            if(len == 0uz) [[unlikely]] { break; }
 
             auto const next{env_str_curr + len};
             result.emplace_back(env_str_curr, next);
 
             // Prevent reaching the end (Under normal circumstances, it will not hit)
-            if(next == env_str_end) [[unlikely]] { break; }
+            // no necessary to check `next == env_str_end`
             env_str_curr = next + 1u;
 
             // The ending consists of two null characters.
