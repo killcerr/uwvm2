@@ -50,15 +50,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
     namespace posix
     {
 #if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+        // Darwin does not provide an `environ` function; here we use `_NSGetEnviron` to obtain it.
         extern char*** _NSGetEnviron() noexcept __asm__("__NSGetEnviron");
 #elif defined(__MSDOS__) || defined(__DJGPP__)
+        // djgpp only provides char**_environ; for consistency, a symbolic link is used here.
         extern char** environ __asm__("__environ");
-#elif defined(__linux__) || defined(__sun)
-        extern char** environ __asm__("_environ");
-#elif defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(BSD) || defined(_SYSTYPE_BSD) ||         \
-    defined(__OpenBSD__)
-        extern char** environ __asm__("_environ");
 #elif !(defined(_WIN32) || defined(__CYGWIN__))
+        // Reference to the global `environ` variable
         extern "C" char** environ;
 #endif
     }  // namespace posix
@@ -125,6 +123,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
             env_str_curr = next + 1u;
 
+            // The ending consists of two null characters.
             if(*env_str_curr == u8'\0') [[unlikely]] { break; }
         }
 
@@ -152,7 +151,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
             auto const next{env_str_curr + len};
             result.emplace_back(env_str_curr, next);
 
-            // Prevent reaching the end
+            // Prevent reaching the end (Under normal circumstances, it will not hit)
             if(next == env_str_end) [[unlikely]] { break; }
             env_str_curr = next + 1u;
 
