@@ -59,6 +59,25 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 {
+    struct buf_guard_t
+    {
+        using allocator = ::fast_io::native_thread_local_allocator;
+
+        char* buf{};
+
+        inline constexpr buf_guard_t(char* buf_o) noexcept : buf{buf_o} {}
+
+        inline constexpr buf_guard_t(buf_guard_t const& other) noexcept = delete;
+        inline constexpr buf_guard_t& operator= (buf_guard_t const& other) noexcept = delete;
+        inline constexpr buf_guard_t(buf_guard_t&& other) noexcept = delete;
+        inline constexpr buf_guard_t& operator= (buf_guard_t&& other) noexcept = delete;
+
+        inline constexpr ~buf_guard_t()
+        {
+            if(buf) [[likely]] { allocator::deallocate(buf); }
+        }
+    };
+
     inline ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string> get_process_env() noexcept
     {
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string> result{};
@@ -161,13 +180,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
 #elif defined(__linux__) || defined(__sun)
 
-        ::fast_io::native_file_loader envs;  // no initialize
-
+        ::fast_io::u8native_file envs;  // no initialize
+        ::std::size_t envs_file_size;   // no initialize
 # ifdef UWVM_CPP_EXCEPTIONS
         try
 # endif
         {
-            envs = ::fast_io::native_file_loader{u8"/proc/self/environ"};
+            envs = ::fast_io::u8native_file{u8"/proc/self/environ", ::fast_io::open_mode::in};
+            envs_file_size = file_size(envs);
         }
 # ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error)
@@ -176,17 +196,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         }
 # endif
 
-        auto const env_str_end{envs.cend()};
+        auto const buf{reinterpret_cast<char8_t*>(allocator::allocate(envs_file_size * sizeof(char8_t)))};
+        buf_guard_t buf_guard{buf};
 
-        for(auto env_str_curr{envs.cbegin()};;)
+        auto const env_buf_end{::fast_io::operations::read_some(envs, buf, buf + envs_file_size)};
+
+        for(auto env_str_curr{buf};;)
         {
-            auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_str_end - env_str_curr))};
+            auto const len{::fast_io::cstr_nlen(env_str_curr, static_cast<::std::size_t>(env_buf_end - env_str_curr))};
             if(len == 0uz) [[unlikely]] { break; }
 
             auto const next{env_str_curr + len};
             result.push_back(::uwvm2::utils::container::u8concat_uwvm(::fast_io::mnp::code_cvt(::fast_io::mnp::strvw(env_str_curr, next))));
 
-            if(next >= env_str_end) { break; }
+            if(next >= env_buf_end) { break; }
             env_str_curr = next + 1u;
         }
 
@@ -195,24 +218,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 #elif defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(BSD) || defined(_SYSTYPE_BSD) ||         \
     defined(__OpenBSD__)
         // BSD family: robustly collect environment via sysctl where applicable; fallback to environ
-        struct buf_guard_t
-        {
-            using allocator = ::fast_io::native_thread_local_allocator;
-
-            char* buf{};
-
-            inline constexpr buf_guard_t(char* buf_o) noexcept : buf{buf_o} {}
-
-            inline constexpr buf_guard_t(buf_guard_t const& other) noexcept = delete;
-            inline constexpr buf_guard_t& operator= (buf_guard_t const& other) noexcept = delete;
-            inline constexpr buf_guard_t(buf_guard_t&& other) noexcept = delete;
-            inline constexpr buf_guard_t& operator= (buf_guard_t&& other) noexcept = delete;
-
-            inline constexpr ~buf_guard_t()
-            {
-                if(buf) [[likely]] { allocator::deallocate(buf); }
-            }
-        };
 
         bool filled_via_sysctl{};
 
