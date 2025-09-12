@@ -58,7 +58,6 @@ extern "C" char** environ;
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 {
-#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
     namespace posix
     {
 # if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
