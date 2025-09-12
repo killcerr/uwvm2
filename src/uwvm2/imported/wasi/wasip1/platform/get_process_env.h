@@ -57,6 +57,17 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
+#if defined(__MSDOS__) || defined(__DJGPP__)
+extern "C" char** _environ;
+#elif defined(__linux__) || defined(__sun)
+extern "C" char** environ;
+#elif defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(BSD) || defined(_SYSTYPE_BSD) ||         \
+    defined(__OpenBSD__)
+extern "C" char** environ;
+#elif !((defined(_WIN32) || defined(__CYGWIN__)) || defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+extern "C" char** environ;
+#endif
+
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 {
     struct buf_guard_t
@@ -158,7 +169,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
 # endif
 #elif defined(__MSDOS__) || defined(__DJGPP__)
-        extern char** _environ;
+
         auto const environ_begin{_environ};
 
         if(environ_begin == nullptr) [[unlikely]] { return result; }
@@ -171,6 +182,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         return result;
 
 #elif defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+
         auto const envpp{::fast_io::noexcept_call(::_NSGetEnviron)};
         if(envpp == nullptr) [[unlikely]] { return result; }
 
@@ -190,7 +202,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         // the process.
         // extern char **environ; Points to the envp passed down from the user stack.
 
-        extern char** environ;
         auto const environ_begin{environ};
 
         if(environ_begin == nullptr) [[unlikely]] { return result; }
