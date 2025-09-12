@@ -61,11 +61,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 {
     struct buf_guard_t
     {
-        using allocator = ::fast_io::native_thread_local_allocator;
+        using allocator_t = ::fast_io::native_thread_local_allocator;
 
-        char* buf{};
+        void* buf{};
 
-        inline constexpr buf_guard_t(char* buf_o) noexcept : buf{buf_o} {}
+        inline constexpr buf_guard_t(void* buf_o) noexcept : buf{buf_o} {}
 
         inline constexpr buf_guard_t(buf_guard_t const& other) noexcept = delete;
         inline constexpr buf_guard_t& operator= (buf_guard_t const& other) noexcept = delete;
@@ -74,7 +74,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         inline constexpr ~buf_guard_t()
         {
-            if(buf) [[likely]] { allocator::deallocate(buf); }
+            if(buf) [[likely]] { allocator_t::deallocate(buf); }
         }
     };
 
@@ -196,7 +196,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
         }
 # endif
 
-        auto const buf{reinterpret_cast<char8_t*>(allocator::allocate(envs_file_size * sizeof(char8_t)))};
+        auto const buf{reinterpret_cast<char8_t*>(buf_guard_t::allocator_t::allocate(envs_file_size * sizeof(char8_t)))};
         buf_guard_t buf_guard{buf};
 
         auto const env_buf_end{::fast_io::operations::read_some(envs, buf, buf + envs_file_size)};
@@ -243,7 +243,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::platform
 
         if(::fast_io::noexcept_call(::sysctl, mib, 4, nullptr, ::std::addressof(size), nullptr, 0) == 0 && size != 0u) [[likely]]
         {
-            auto const buf{reinterpret_cast<char*>(allocator::allocate(size))};
+            auto const buf{reinterpret_cast<char*>(buf_guard_t::allocator_t::allocate(size))};
             buf_guard_t buf_guard{buf};
 
             if(::fast_io::noexcept_call(::sysctl, mib, 4, buf, ::std::addressof(size), nullptr, 0) == 0)
