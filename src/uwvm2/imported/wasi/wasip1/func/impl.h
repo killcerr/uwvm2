@@ -36,5 +36,7 @@
 # include "environ_get.h"
 # include "environ_sizes_get_wasm64.h"
 # include "environ_sizes_get.h"
+# include "fd_advise_wasm64.h"
+# include "fd_advise.h"
 
 #endif

@@ -1,0 +1,376 @@
+﻿/*************************************************************
+ * Ultimate WebAssembly Virtual Machine (Version 2)          *
+ * Copyright (c) 2025-present UlteSoft. All rights reserved. *
+ * Licensed under the APL-2.0 License (see LICENSE file).    *
+ *************************************************************/
+
+/**
+ * @author      MacroModel
+ * @version     2.0.0
+ * @copyright   APL-2.0 License
+ */
+
+/****************************************
+ *  _   _ __        ____     __ __  __  *
+ * | | | |\ \      / /\ \   / /|  \/  | *
+ * | | | | \ \ /\ / /  \ \ / / | |\/| | *
+ * | |_| |  \ V  V /    \ V /  | |  | | *
+ *  \___/    \_/\_/      \_/   |_|  |_| *
+ *                                      *
+ ****************************************/
+
+#pragma once
+
+#ifndef UWVM_MODULE
+// std
+# include <cstddef>
+# include <cstdint>
+# include <climits>
+# include <cstring>
+# include <limits>
+# include <concepts>
+# include <bit>
+# include <memory>
+# include <type_traits>
+// macro
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+# include <uwvm2/utils/macro/push_macros.h>
+// import
+# include <fast_io.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
+# include <uwvm2/uwvm_predefine/io/impl.h>
+# include <uwvm2/utils/mutex/impl.h>
+# include <uwvm2/utils/debug/impl.h>
+# include <uwvm2/object/memory/linear/impl.h>
+# include <uwvm2/imported/wasi/wasip1/abi/impl.h>
+# include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
+# include <uwvm2/imported/wasi/wasip1/memory/impl.h>
+# include <uwvm2/imported/wasi/wasip1/environment/impl.h>
+# include "posix.h"
+#endif
+
+#ifndef UWVM_CPP_EXCEPTIONS
+# warning "Without enabling C++ exceptions, using this WASI function may cause termination."
+#endif
+
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
+{
+    /// @brief     WasiPreview1.fd_advise_wasm64
+    /// @details   __wasi_errno_t fd_advise( __wasi_fd_t fd, __wasi_filesize_t offset, __wasi_filesize_t len, __wasi_advice_t advice);
+    /// @note      This function only writes sizes; callers must provide valid memory offsets.
+
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_advise_wasm64(
+        ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
+        [[maybe_unused]] ::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t offset,
+        [[maybe_unused]] ::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t len,
+        [[maybe_unused]] ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t advice) noexcept
+    {
+        auto const trace_wasip1_call{env.trace_wasip1_call};
+
+        if(trace_wasip1_call) [[unlikely]]
+        {
+#ifdef UWVM
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                u8"[info]  ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"wasip1: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                u8"fd_advise_wasm64 ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                u8"(wasi-trace)\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+#else
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: fd_advise_wasm64 (wasi-trace)\n");
+#endif
+        }
+
+        // The negative value fd is invalid, and this check prevents subsequent undefined behavior.
+        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
+
+        auto& wasm_fd_storage{env.fd_storage};
+
+        // The pointer to `wasm_fd` is fixed and remains unchanged even when the vector within `fd_manager` is resized.
+        ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t* curr_wasi_fd_t_p;  // no initialize
+
+        // Subsequent operations involving the file descriptor require locking. curr_fd_release_guard release when return.
+        ::uwvm2::utils::mutex::mutex_merely_release_guard_t curr_fd_release_guard{};
+
+        {
+            // Prevent operations to obtain the size or perform resizing at this time.
+            // Only a lock is required when acquiring the unique pointer for the file descriptor. The lock can be released once the acquisition is complete.
+            // Since the file descriptor's location is fixed and accessed via the unique pointer,
+
+            ::uwvm2::utils::mutex::mutex_guard_t fds_lock{wasm_fd_storage.fds_mutex};
+
+            // Negative states have been excluded, so the conversion result will only be positive numbers.
+            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
+            auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
+
+            // On platforms where `size_t` is smaller than the `fd` type, this check must be added.
+            constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+            if constexpr(::std::numeric_limits<unsigned_fd_t>::max() > size_t_max)
+            {
+                if(unsigned_fd > size_t_max) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
+            }
+
+            auto const fd_opens_pos{static_cast<::std::size_t>(unsigned_fd)};
+
+            // The minimum value in rename_map is greater than opensize.
+            if(wasm_fd_storage.opens.size() <= fd_opens_pos)
+            {
+                // Possibly within the tree being renumbered
+                if(auto const renumber_map_iter{wasm_fd_storage.renumber_map.find(fd)}; renumber_map_iter != wasm_fd_storage.renumber_map.end())
+                {
+                    curr_wasi_fd_t_p = renumber_map_iter->second.fd_p;
+                }
+                else [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                }
+            }
+            else
+            {
+                // The addition here is safe.
+                curr_wasi_fd_t_p = wasm_fd_storage.opens.index_unchecked(fd_opens_pos).fd_p;
+            }
+
+            // curr_wasi_fd_t_p never nullptr
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            if(curr_wasi_fd_t_p == nullptr) [[unlikely]]
+            {
+                // Security issues inherent to virtual machines
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
+#endif
+
+            // Other threads will definitely lock fds_mutex when performing close operations (since they need to access the fd vector). If the current thread is
+            // performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
+            // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
+            // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
+            // encounter issues. Thus, locking must occur before releasing fds_mutex.
+            curr_fd_release_guard.device_p = ::std::addressof(curr_wasi_fd_t_p->fd_mutex);
+            curr_fd_release_guard.lock();
+
+            // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
+        }
+
+        // curr_fd_uniptr is not null.
+        [[maybe_unused]] auto& curr_fd{*curr_wasi_fd_t_p};
+
+#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+
+        switch(advice)
+        {
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_normal:
+            {
+                [[fallthrough]];
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_sequential:
+            {
+                [[fallthrough]];
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_random:
+            {
+                [[fallthrough]];
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_dontneed:
+            {
+                [[fallthrough]];
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_noreuse:
+            {
+                // None of these are supported on Darwin.
+                // In WASI or POSIX semantics, `fd_advise` is merely an advisory hint. It does not and cannot alter the correctness of program logic, so it
+                // does not return an error on unsupported platforms.
+
+                // Even if returning directly, permission must be checked.
+                if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
+                   ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                }
+
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_willneed:
+            {
+                if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
+                   ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                }
+
+                auto const curr_fd_native_handle{curr_fd.file_fd.native_handle()};
+
+                using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t>;
+
+                // The kernel uses only the `ra_offset` and `ra_count` fields from the passed `struct radvisory` for prefetching, without relying on or altering
+                // the current position of the file descriptor.
+                // Set up pre-fetching suggestions. The return value is not checked here, as this is merely a recommendation.
+                radvisory radvisory_advice;  // no initialize
+
+                // Saturation treatment
+                if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+                {
+                    if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                    {
+                        radvisory_advice.ra_offset = ::std::numeric_limits<off_t>::max();
+                    }
+                    else
+                    {
+                        radvisory_advice.ra_offset = static_cast<off_t>(offset);
+                    }
+                }
+                else
+                {
+                    radvisory_advice.ra_offset = static_cast<off_t>(offset);
+                }
+
+                if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<int>::max())
+                {
+                    if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<int>::max()) [[unlikely]]
+                    {
+                        radvisory_advice.ra_count = ::std::numeric_limits<int>::max();
+                    }
+                    else
+                    {
+                        radvisory_advice.ra_count = static_cast<int>(len);
+                    }
+                }
+                else
+                {
+                    radvisory_advice.ra_count = static_cast<int>(len);
+                }
+
+                ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_RDADVISE, ::std::addressof(radvisory_advice));
+
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+            }
+            [[unlikely]] default:
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+            }
+        }
+
+#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(__MSDOS__) && !(defined(_WIN32) || defined(__CYGWIN__)) &&                                     \
+    __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+
+        int curr_platform_advice;  // no initialize
+
+        switch(advice)
+        {
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_normal:
+            {
+                curr_platform_advice = POSIX_FADV_NORMAL;
+                break;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_sequential:
+            {
+                curr_platform_advice = POSIX_FADV_SEQUENTIAL;
+                break;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_random:
+            {
+                curr_platform_advice = POSIX_FADV_RANDOM;
+                break;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_willneed:
+            {
+                curr_platform_advice = POSIX_FADV_WILLNEED;
+                break;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_dontneed:
+            {
+                curr_platform_advice = POSIX_FADV_DONTNEED;
+                break;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_noreuse:
+            {
+                curr_platform_advice = POSIX_FADV_NOREUSE;
+                break;
+            }
+            [[unlikely]] default:
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+            }
+        }
+
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+        }
+
+        // If the file descriptor only requires a single operation that does not need locking, the operating system provides its own built-in lock mechanism.
+        auto const curr_fd_native_handle{curr_fd.file_fd.native_handle()};
+
+        using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t>;
+
+        // Saturation treatment
+        off_t offset_saturation;  // no initialize
+        off_t len_saturation;     // no initialize
+
+        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+        {
+            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            {
+                offset_saturation = ::std::numeric_limits<off_t>::max();
+            }
+            else
+            {
+                offset_saturation = static_cast<off_t>(offset);
+            }
+
+            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            {
+                len_saturation = ::std::numeric_limits<off_t>::max();
+            }
+            else
+            {
+                len_saturation = static_cast<off_t>(len);
+            }
+        }
+        else
+        {
+            offset_saturation = static_cast<off_t>(offset);
+            len_saturation = static_cast<off_t>(len);
+        }
+
+        // Provide advisory hint; ignore return values and always report success per WASI semantics.
+# if defined(__linux__) && defined(__NR_fadvise64)
+        ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+# else
+        ::uwvm2::imported::wasi::wasip1::func::posix::fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+# endif
+
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+
+#else
+        // In WASI or POSIX semantics, `fd_advise` is merely an advisory hint. It does not and cannot alter the correctness of program logic, so it does not
+        // return an error on unsupported platforms.
+
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+        }
+
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+#endif
+    }
+}  // namespace uwvm2::imported::wasi::wasip1::func
+
+#ifndef UWVM_MODULE
+// macro
+# include <uwvm2/utils/macro/pop_macros.h>
+# include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
+#endif
+
