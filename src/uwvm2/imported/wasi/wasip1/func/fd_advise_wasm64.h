@@ -35,6 +35,10 @@
 // macro
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 # include <uwvm2/utils/macro/push_macros.h>
+// platform
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+#  include <fcntl.h>
+# endif
 // import
 # include <fast_io.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
@@ -212,7 +216,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // The kernel uses only the `ra_offset` and `ra_count` fields from the passed `struct radvisory` for prefetching, without relying on or altering
                 // the current position of the file descriptor.
                 // Set up pre-fetching suggestions. The return value is not checked here, as this is merely a recommendation.
-                radvisory radvisory_advice;  // no initialize
+                struct radvisory radvisory_advice;  // no initialize
 
                 // Saturation treatment
                 if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
@@ -339,7 +343,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # if defined(__linux__) && defined(__NR_fadvise64)
         ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 # else
-        ::uwvm2::imported::wasi::wasip1::func::posix::fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+        ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 # endif
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;

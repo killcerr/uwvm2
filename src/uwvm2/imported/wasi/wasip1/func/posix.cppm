@@ -37,6 +37,7 @@ module;
 // platform
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 # include <fcntl.h>
+# include <sys/stat.h>
 #endif
 
 export module uwvm2.imported.wasi.wasip1.func:posix;
