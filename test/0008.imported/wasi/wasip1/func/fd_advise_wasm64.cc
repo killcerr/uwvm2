@@ -40,8 +40,7 @@ int main()
     wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = {}, .envs = {}, .fd_storage = {}, .trace_wasip1_call = false};
 
     // Prepare fd table: ensure indices [0..4] exist with valid entries
-    env.fd_storage.opens.clear_destroy();
-    for(std::size_t i{}; i < 5uz; ++i) { env.fd_storage.opens.emplace_back(); }
+    env.fd_storage.opens.resize(5uz);
 
     // Case 1: success with valid rights (default constructed rights_base == all)
     {

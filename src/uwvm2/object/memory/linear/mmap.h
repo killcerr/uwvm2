@@ -874,12 +874,6 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
         inline static constexpr bool value = true;
     };
 
-    template <>
-    struct is_zero_default_constructible<::uwvm2::object::memory::linear::mmap_memory_t>
-    {
-        inline static constexpr bool value = true;
-    };
-
 #endif
 }
 

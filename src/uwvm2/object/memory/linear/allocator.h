@@ -515,12 +515,6 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
     {
         inline static constexpr bool value = true;
     };
-
-    template <typename Alloc>
-    struct is_zero_default_constructible<::uwvm2::object::memory::linear::basic_allocator_memory_t<Alloc>>
-    {
-        inline static constexpr bool value = true;
-    };
 }
 
 #endif

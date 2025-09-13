@@ -147,12 +147,6 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
     {
         inline static constexpr bool value = true;
     };
-
-    template <>
-    struct is_zero_default_constructible<::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_unique_ptr_t>
-    {
-        inline static constexpr bool value = true;
-    };
 }
 
 #ifndef UWVM_MODULE
