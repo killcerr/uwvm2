@@ -81,7 +81,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
             {
                 ::std::uint64_t res;
                 // Parameters can't be filled with ::std::addressof(i), to ensure determinism of exceptions.
-                if(_addcarry_u64(false, i, add, ::std::addressof(res))) [[unlikely]]
+                if(::fast_io::intrinsics::msvc::x86::_addcarry_u64(false, i, add, ::std::addressof(res))) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::counter_overflows;
@@ -93,7 +93,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
             {
                 ::std::uint32_t res;
                 // Parameters can't be filled with ::std::addressof(i), to ensure determinism of exceptions.
-                if(_addcarry_u32(false, i, add, ::std::addressof(res))) [[unlikely]]
+                if(::fast_io::intrinsics::msvc::x86::_addcarry_u32(false, i, add, ::std::addressof(res))) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::counter_overflows;
@@ -105,7 +105,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
             {
                 ::std::uint16_t res;
                 // Parameters can't be filled with ::std::addressof(i), to ensure determinism of exceptions.
-                if(_addcarry_u16(false, i, add, ::std::addressof(res))) [[unlikely]]
+                if(::fast_io::intrinsics::msvc::x86::_addcarry_u16(false, i, add, ::std::addressof(res))) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::counter_overflows;
@@ -117,7 +117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
             {
                 ::std::uint8_t res;
                 // Parameters can't be filled with ::std::addressof(i), to ensure determinism of exceptions.
-                if(_addcarry_u8(false, i, add, ::std::addressof(res))) [[unlikely]]
+                if(::fast_io::intrinsics::msvc::x86::_addcarry_u8(false, i, add, ::std::addressof(res))) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::counter_overflows;
@@ -144,7 +144,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
             {
                 ::std::uint32_t res;
                 // Parameters can't be filled with ::std::addressof(i), to ensure determinism of exceptions.
-                if(_addcarry_u32(false, i, add, ::std::addressof(res))) [[unlikely]]
+                if(::fast_io::intrinsics::msvc::x86::_addcarry_u32(false, i, add, ::std::addressof(res))) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::counter_overflows;
@@ -156,7 +156,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
             {
                 ::std::uint16_t res;
                 // Parameters can't be filled with ::std::addressof(i), to ensure determinism of exceptions.
-                if(_addcarry_u16(false, i, add, ::std::addressof(res))) [[unlikely]]
+                if(::fast_io::intrinsics::msvc::x86::_addcarry_u16(false, i, add, ::std::addressof(res))) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::counter_overflows;
@@ -168,7 +168,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::utils
             {
                 ::std::uint8_t res;
                 // Parameters can't be filled with ::std::addressof(i), to ensure determinism of exceptions.
-                if(_addcarry_u8(false, i, add, ::std::addressof(res))) [[unlikely]]
+                if(::fast_io::intrinsics::msvc::x86::_addcarry_u8(false, i, add, ::std::addressof(res))) [[unlikely]]
                 {
                     err.err_curr = section_curr;
                     err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::counter_overflows;

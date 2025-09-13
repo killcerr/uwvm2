@@ -23,6 +23,7 @@
 #pragma once
 
 #ifndef UWVM_MODULE
+# include "base.h"
 # include "posix.h"
 # include "args_get_wasm64.h"
 # include "args_get.h"
