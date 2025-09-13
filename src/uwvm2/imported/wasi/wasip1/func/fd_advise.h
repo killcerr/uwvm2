@@ -167,17 +167,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 #if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
 
+        // Even if returning directly, permission must be checked.
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+        }
+
+        auto const curr_fd_native_handle{curr_fd.file_fd.native_handle()};
+
         switch(advice)
         {
             case ::uwvm2::imported::wasi::wasip1::abi::advice_t::advice_normal:
-            {
-                [[fallthrough]];
-            }
-            case ::uwvm2::imported::wasi::wasip1::abi::advice_t::advice_sequential:
-            {
-                [[fallthrough]];
-            }
-            case ::uwvm2::imported::wasi::wasip1::abi::advice_t::advice_random:
             {
                 [[fallthrough]];
             }
@@ -191,25 +192,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // In WASI or POSIX semantics, `fd_advise` is merely an advisory hint. It does not and cannot alter the correctness of program logic, so it
                 // does not return an error on unsupported platforms.
 
-                // Even if returning directly, permission must be checked.
-                if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
-                   ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
-                {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
-                }
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_t::advice_sequential:
+            {
+                ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_RDAHEAD, 1);
+
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+            }
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_t::advice_random:
+            {
+                ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_RDAHEAD, 0);
 
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
             }
             case ::uwvm2::imported::wasi::wasip1::abi::advice_t::advice_willneed:
             {
-                if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
-                   ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
-                {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
-                }
-
-                auto const curr_fd_native_handle{curr_fd.file_fd.native_handle()};
-
                 using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_t>;
 
                 // The kernel uses only the `ra_offset` and `ra_count` fields from the passed `struct radvisory` for prefetching, without relying on or altering
