@@ -35,7 +35,7 @@ module;
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
 // platform
-#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 # include <fcntl.h>
 #endif
 

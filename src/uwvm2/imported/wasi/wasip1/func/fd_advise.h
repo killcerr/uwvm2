@@ -163,16 +163,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         // curr_fd_uniptr is not null.
-        [[maybe_unused]] auto& curr_fd{*curr_wasi_fd_t_p};
+        auto& curr_fd{*curr_wasi_fd_t_p};
 
-#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
-
-        // Even if returning directly, permission must be checked.
         if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
            ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }
+
+#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
 
         auto const curr_fd_native_handle{curr_fd.file_fd.native_handle()};
 
@@ -258,7 +257,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
         }
 
-#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(__MSDOS__) && !(defined(_WIN32) || defined(__CYGWIN__)) &&                                     \
+#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(_WIN32) || defined(__CYGWIN__)) &&                                     \
     __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 
         int curr_platform_advice;  // no initialize
@@ -299,12 +298,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
             }
-        }
-
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
-        {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }
 
         // If the file descriptor only requires a single operation that does not need locking, the operating system provides its own built-in lock mechanism.
@@ -354,12 +347,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #else
         // In WASI or POSIX semantics, `fd_advise` is merely an advisory hint. It does not and cannot alter the correctness of program logic, so it does not
         // return an error on unsupported platforms.
-
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
-        {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
-        }
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
 #endif

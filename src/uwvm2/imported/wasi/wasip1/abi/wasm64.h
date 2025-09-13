@@ -33,6 +33,7 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+# include "wasm32.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -64,355 +65,67 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
     using wasi_size_wasm64_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64;
     using wasi_void_ptr_wasm64_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64;
 
-    using wasi_posix_fd_wasm64_t = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i32;
+    using wasi_posix_fd_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t;
 
-    enum class advice_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
-    {
-        advice_normal,
-        advice_sequential,
-        advice_random,
-        advice_willneed,
-        advice_dontneed,
-        advice_noreuse,
+    using advice_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::advice_t;
 
-    };
+    using clockid_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::clockid_t;
 
-    enum class clockid_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
-    {
-        clock_realtime,
-        clock_monotonic,
-        clock_process_cputime_id,
-        clock_thread_cputime_id,
+    using device_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::device_t;
 
-    };
+    using dirnamlen_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::dirnamlen_t;
 
-    enum class device_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
+    using dircookie_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::dircookie_t;
 
-    };
+    using errno_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::errno_t;
 
-    enum class dirnamlen_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
-    {
+    using eventrwflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::eventrwflags_t;
 
-    };
+    using eventtype_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::eventtype_t;
 
-    enum class dircookie_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
-        dircookie_start
-    };
+    using exitcode_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::exitcode_t;
 
-    enum class errno_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        esuccess,
-        e2big,
-        eacces,
-        eaddrinuse,
-        eaddrnotavail,
-        eafnosupport,
-        eagain,
-        ealready,
-        ebadf,
-        ebadmsg,
-        ebusy,
-        ecanceled,
-        echild,
-        econnaborted,
-        econnrefused,
-        econnreset,
-        edeadlk,
-        edestaddrreq,
-        edom,
-        edquot,
-        eexist,
-        efault,
-        efbig,
-        ehostunreach,
-        eidrm,
-        eilseq,
-        einprogress,
-        eintr,
-        einval,
-        eio,
-        eisconn,
-        eisdir,
-        eloop,
-        emfile,
-        emlink,
-        emsgsize,
-        emultihop,
-        enametoolong,
-        enetdown,
-        enetreset,
-        enetunreach,
-        enfile,
-        enobufs,
-        enodev,
-        enoent,
-        enoexec,
-        enolck,
-        enolink,
-        enomem,
-        enomsg,
-        enoprotoopt,
-        enospc,
-        enosys,
-        enotconn,
-        enotdir,
-        enotempty,
-        enotrecoverable,
-        enotsock,
-        enotsup,
-        enotty,
-        enxio,
-        eoverflow,
-        eownerdead,
-        eperm,
-        epipe,
-        eproto,
-        eprotonosupport,
-        eprototype,
-        erange,
-        erofs,
-        espipe,
-        esrch,
-        estale,
-        etimedout,
-        etxtbsy,
-        exdev,
-        enotcapable,
-    };
+    using fd_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::fd_t;
 
-    enum class eventrwflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        event_fd_readwrite_hangup = 0x0001
-    };
+    using fdflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::fdflags_t;
 
-    enum class eventtype_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
-    {
-        eventtype_clock,
-        eventtype_fd_read,
-        eventtype_fd_write,
-    };
+    using filedelta_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::filedelta_t;
 
-    enum class exitcode_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
-    {
+    using filesize_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::filesize_t;
 
-    };
+    using filetype_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::filetype_t;
 
-    enum class fd_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
-    {
+    using fstflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::fstflags_t;
 
-    };
+    using inode_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::inode_t;
 
-    enum class fdflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        fdflag_append = 0x0001,
-        fdflag_dsync = 0x0002,
-        fdflag_nonblock = 0x0004,
-        fdflag_rsync = 0x0008,
-        fdflag_sync = 0x0010,
-    };
+    using linkcount_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::linkcount_t;
 
-    enum class filedelta_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_i64
-    {
+    using lookupflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::lookupflags_t;
 
-    };
+    using oflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::oflags_t;
 
-    enum class filesize_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
+    using riflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::riflags_t;
 
-    };
+    using rights_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::rights_t;
 
-    enum class filetype_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
-    {
-        filetype_unknown,
-        filetype_block_device,
-        filetype_character_device,
-        filetype_directory,
-        filetype_regular_file,
-        filetype_socket_dgram,
-        filetype_socket_stream,
-        filetype_symbolic_link,
-    };
+    using roflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::roflags_t;
 
-    enum class fstflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        filestat_set_atim = 0x0001,
-        filestat_set_atim_now = 0x0002,
-        filestat_set_mtim = 0x0004,
-        filestat_set_mtim_now = 0x0008,
-    };
+    using sdflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::sdflags_t;
 
-    enum class inode_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
+    using siflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::siflags_t;
 
-    };
+    using signal_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::signal_t;
 
-    enum class linkcount_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
+    using subclockflags_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::subclockflags_t;
 
-    };
+    using timestamp_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::timestamp_t;
 
-    enum class lookupflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32
-    {
-        lookup_symlink_follow = 0x00000001
-    };
+    using userdata_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::userdata_t;
 
-    enum class oflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        o_creat = 0x0001,
-        o_directory = 0x0002,
-        o_excl = 0x0004,
-        o_trunc = 0x0008,
-    };
+    using whence_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::whence_t;
 
-    enum class riflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        sock_recv_peek = 0x0001,
-        sock_recv_waitall = 0x0002,
-    };
-
-    enum class rights_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
-        right_fd_datasync = 0x0000000000000001,
-        right_fd_read = 0x0000000000000002,
-        right_fd_seek = 0x0000000000000004,
-        right_fd_fdstat_set_flags = 0x0000000000000008,
-        right_fd_sync = 0x0000000000000010,
-        right_fd_tell = 0x0000000000000020,
-        right_fd_write = 0x0000000000000040,
-        right_fd_advise = 0x0000000000000080,
-        right_fd_allocate = 0x0000000000000100,
-        right_path_create_directory = 0x0000000000000200,
-        right_path_create_file = 0x0000000000000400,
-        right_path_link_source = 0x0000000000000800,
-        right_path_link_target = 0x0000000000001000,
-        right_path_open = 0x0000000000002000,
-        right_fd_readdir = 0x0000000000004000,
-        right_path_readlink = 0x0000000000008000,
-        right_path_rename_source = 0x0000000000010000,
-        right_path_rename_target = 0x0000000000020000,
-        right_path_filestat_get = 0x0000000000040000,
-        right_path_filestat_set_size = 0x0000000000080000,
-        right_path_filestat_set_times = 0x0000000000100000,
-        right_fd_filestat_get = 0x0000000000200000,
-        right_fd_filestat_set_size = 0x0000000000400000,
-        right_fd_filestat_set_times = 0x0000000000800000,
-        right_path_symlink = 0x0000000001000000,
-        right_path_remove_directory = 0x0000000002000000,
-        right_path_unlink_file = 0x0000000004000000,
-        right_poll_fd_readwrite = 0x0000000008000000,
-        right_sock_shutdown = 0x0000000010000000,
-    };
-
-    inline constexpr rights_wasm64_t operator& (rights_wasm64_t x, rights_wasm64_t y) noexcept
-    {
-        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
-        return static_cast<rights_wasm64_t>(static_cast<utype>(x) & static_cast<utype>(y));
-    }
-
-    inline constexpr rights_wasm64_t operator| (rights_wasm64_t x, rights_wasm64_t y) noexcept
-    {
-        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
-        return static_cast<rights_wasm64_t>(static_cast<utype>(x) | static_cast<utype>(y));
-    }
-
-    inline constexpr rights_wasm64_t operator^ (rights_wasm64_t x, rights_wasm64_t y) noexcept
-    {
-        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
-        return static_cast<rights_wasm64_t>(static_cast<utype>(x) ^ static_cast<utype>(y));
-    }
-
-    inline constexpr rights_wasm64_t operator~(rights_wasm64_t x) noexcept
-    {
-        using utype = typename ::std::underlying_type<rights_wasm64_t>::type;
-        return static_cast<rights_wasm64_t>(~static_cast<utype>(x));
-    }
-
-    inline constexpr rights_wasm64_t& operator&= (rights_wasm64_t& x, rights_wasm64_t y) noexcept { return x = x & y; }
-
-    inline constexpr rights_wasm64_t& operator|= (rights_wasm64_t& x, rights_wasm64_t y) noexcept { return x = x | y; }
-
-    inline constexpr rights_wasm64_t& operator^= (rights_wasm64_t& x, rights_wasm64_t y) noexcept { return x = x ^ y; }
-
-    enum class roflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        sock_recv_data_truncated = 0x0001,
-    };
-
-    enum class sdflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
-    {
-        shut_rd = 0x01,
-        shut_wr = 0x02,
-    };
-
-    enum class siflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-
-    };
-
-    enum class signal_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
-    {
-        sighup = 1,
-        sigint,
-        sigquit,
-        sigill,
-        sigtrap,
-        sigabrt,
-        sigbus,
-        sigfpe,
-        sigkill,
-        sigusr1,
-        sigsegv,
-        sigusr2,
-        sigpipe,
-        sigalrm,
-        sigterm,
-        sigchld,
-        sigcont,
-        sigstop,
-        sigtstp,
-        sigttin,
-        sigttou,
-        sigurg,
-        sigxcpu,
-        sigxfsz,
-        sigvtalrm,
-        sigprof,
-        sigwinch,
-        sigpoll,
-        sigpwr,
-        sigsys,
-
-    };
-
-    enum class subclockflags_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
-    {
-        subscription_clock_abstime = 0x0001
-    };
-
-    enum class timestamp_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
-
-    };
-
-    enum class userdata_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
-    {
-
-    };
-
-    enum class whence_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
-    {
-        whence_set,
-        whence_cur,
-        whence_end,
-
-    };
-
-    enum class preopentype_wasm64_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8
-    {
-        preopentype_dir
-    };
+    using preopentype_wasm64_t = ::uwvm2::imported::wasi::wasip1::abi::preopentype_t;
 }
 
 #ifndef UWVM_MODULE

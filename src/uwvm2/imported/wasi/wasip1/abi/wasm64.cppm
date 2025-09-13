@@ -34,6 +34,7 @@ export module uwvm2.imported.wasi.wasip1.abi:wasm64;
 
 import fast_io;
 import uwvm2.parser.wasm.standard.wasm1.type;
+import :wasm32;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

@@ -36,7 +36,7 @@
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 # include <uwvm2/utils/macro/push_macros.h>
 // platform
-# if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 #  include <fcntl.h>
 # endif
 // import
@@ -61,13 +61,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
     namespace posix
     {
-# if !defined(__MSDOS__) && !defined(__DARWIN_C_LEVEL)
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
         extern int fadvise(int fd, off_t offset, off_t len, int advice) noexcept __asm__("posix_fadvise");
         extern int fallocate(int fd, int mode, off_t offset, off_t len) noexcept __asm__("fallocate");
 # endif
 
         extern int fcntl(int fd, int cmd, ... /* arg */) noexcept
-# if !defined(__MSDOS__) && !defined(__DARWIN_C_LEVEL)
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("fcntl")
 # else
             __asm__("_fcntl")
