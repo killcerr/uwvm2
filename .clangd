@@ -2,3 +2,17 @@
   UnusedIncludes: None
 Hover:
   ShowAKA: Yes
+
+CompileFlags:
+  Add: [-fno-ms-compatibility]
+
+InlayHints:
+  Enabled: No
+
+Diagnostics:
+  UnusedIncludes: Strict
+
+Completion:
+  AllScopes: true
+  Duplicated: true
+  IncludeInsertion: false
