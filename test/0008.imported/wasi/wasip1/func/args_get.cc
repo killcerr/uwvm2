@@ -45,7 +45,7 @@ int main()
 
     vector<u8string_view> envs;  // empty
 
-    wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = args, .envs = envs, .trace_wasip1_call = false};
+    wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = args, .envs = envs, .fd_storage = {}, .trace_wasip1_call = false};
 
     // layout: argv: [ptr0, ptr1], argv_buf: [a0, '\0', a1, '\0']
     constexpr wasi_void_ptr_t argv_ptr{256u};

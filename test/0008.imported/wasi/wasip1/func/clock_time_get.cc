@@ -36,7 +36,7 @@ int main()
     native_memory_t memory{};
     memory.init_by_page_count(1uz);
 
-    wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = {}, .envs = {}, .trace_wasip1_call = false};
+    wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = {}, .envs = {}, .fd_storage = {}, .trace_wasip1_call = false};
 
     constexpr wasi_void_ptr_t time_ptr{4096u};
 
@@ -45,7 +45,8 @@ int main()
         auto const ret{::uwvm2::imported::wasi::wasip1::func::clock_time_get(env, clockid_t::clock_monotonic, timestamp_t{}, time_ptr)};
         if(ret != errno_t::esuccess) { ::fast_io::fast_terminate(); }
 
-        auto const time1{::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
+        auto const time1{
+            ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
 
         // Sanity: time should be > 0
         if(time1 == 0u)
@@ -58,7 +59,8 @@ int main()
         auto const ret2{::uwvm2::imported::wasi::wasip1::func::clock_time_get(env, clockid_t::clock_monotonic, timestamp_t{}, time_ptr)};
         if(ret2 != errno_t::esuccess) { ::fast_io::fast_terminate(); }
 
-        auto const time2{::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
+        auto const time2{
+            ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
 
         if(time2 < time1)
         {
@@ -72,12 +74,15 @@ int main()
         auto const ret1{::uwvm2::imported::wasi::wasip1::func::clock_time_get(env, clockid_t::clock_monotonic, static_cast<timestamp_t>(1'000'000u), time_ptr)};
         if(ret1 != errno_t::esuccess) { ::fast_io::fast_terminate(); }
 
-        auto const time1{::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
+        auto const time1{
+            ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
 
-        auto const ret2{::uwvm2::imported::wasi::wasip1::func::clock_time_get(env, clockid_t::clock_monotonic, static_cast<timestamp_t>(1'000'000'000u), time_ptr)};
+        auto const ret2{
+            ::uwvm2::imported::wasi::wasip1::func::clock_time_get(env, clockid_t::clock_monotonic, static_cast<timestamp_t>(1'000'000'000u), time_ptr)};
         if(ret2 != errno_t::esuccess) { ::fast_io::fast_terminate(); }
 
-        auto const time2{::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
+        auto const time2{
+            ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<timestamp_t>>(memory, time_ptr)};
 
         // Times should be monotonic regardless of precision hint
         if(time2 < time1)

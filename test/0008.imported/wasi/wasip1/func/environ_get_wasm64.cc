@@ -44,7 +44,7 @@ int main()
     envs.push_back(u8string_view{e0.data(), e0.size()});
     envs.push_back(u8string_view{e1.data(), e1.size()});
 
-    wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = args, .envs = envs, .trace_wasip1_call = false};
+    wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = args, .envs = envs, .fd_storage = {}, .trace_wasip1_call = false};
 
     constexpr wasi_void_ptr_wasm64_t environ_ptr{8192u};
     constexpr wasi_void_ptr_wasm64_t environ_buf_ptr{16384u};
@@ -64,8 +64,9 @@ int main()
     {
         for(std::size_t i{}; i < expect.size(); ++i)
         {
-            auto const ch = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<unsigned char>(memory,
-                                                                                                                             static_cast<wasi_void_ptr_wasm64_t>(off + i));
+            auto const ch =
+                ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<unsigned char>(memory,
+                                                                                                               static_cast<wasi_void_ptr_wasm64_t>(off + i));
             if(ch != static_cast<unsigned char>(expect[i])) { return false; }
         }
         auto const zero = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<unsigned char>(
@@ -78,5 +79,4 @@ int main()
     if(!check_cstr(p1, e1)) { ::fast_io::fast_terminate(); }
     if(pnull != static_cast<wasi_void_ptr_wasm64_t>(0u)) { ::fast_io::fast_terminate(); }
 }
-
 
