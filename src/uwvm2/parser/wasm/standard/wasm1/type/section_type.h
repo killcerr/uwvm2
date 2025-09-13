@@ -379,7 +379,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
             static_assert(::std::is_trivially_copyable_v<memory_type> && ::std::is_trivially_destructible_v<memory_type>);
             global_type global;
             static_assert(::std::is_trivially_copyable_v<global_type> && ::std::is_trivially_destructible_v<global_type>);
-        } storage;
+        } storage{};
 
         external_types type{};
     };
@@ -526,25 +526,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
 UWVM_MODULE_EXPORT namespace fast_io::freestanding
 {
     template <>
-    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::limits_type>
-    {
-        inline static constexpr bool value = true;
-    };
-
-    template <>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::function_type>
-    {
-        inline static constexpr bool value = true;
-    };
-
-    template <>
-    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::table_type>
-    {
-        inline static constexpr bool value = true;
-    };
-
-    template <>
-    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::memory_type>
     {
         inline static constexpr bool value = true;
     };

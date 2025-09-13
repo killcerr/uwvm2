@@ -201,7 +201,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...> global;
             static_assert(::std::is_trivially_copyable_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>> &&
                           ::std::is_trivially_destructible_v<::uwvm2::parser::wasm::standard::wasm1::features::final_global_type<Fs...>>);
-        } storage;
+        } storage{};
 
         ::uwvm2::parser::wasm::standard::wasm1::type::external_types type{};
     };
@@ -1668,7 +1668,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             inline constexpr ~storage_u() {}
 
             // The release of table_idx is managed by struct wasm1_element_t, there is no issue of raii resources being unreleased.
-        } storage;
+        } storage{};
 
         static_assert(sizeof(storage_u) == sizeof_storage_u, "sizeof(storage_t) not equal to sizeof_storage_u");
 
@@ -1973,7 +1973,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             inline constexpr ~storage_u() {}
 
             // The release of memory_idx is managed by struct wasm1_data_t, there is no issue of raii resources being unreleased.
-        } storage;
+        } storage{};
 
         static_assert(sizeof(storage_u) == sizeof_storage_u, "sizeof(storage_t) not equal to sizeof_storage_u");
 

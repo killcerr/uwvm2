@@ -111,7 +111,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::type
     /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.4.6
     struct initializer_exp
     {
-        global_storage_t global_storage;
+        global_storage_t global_storage{};
 
         ::uwvm2::parser::wasm::standard::wasm1::type::op_basic_type type_opcode{};
     };
@@ -168,6 +168,12 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
 
     template <>
     struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::import_type>
+    {
+        inline static constexpr bool value = true;
+    };
+
+    template <>
+    struct is_zero_default_constructible<::uwvm2::parser::wasm::standard::wasm1::type::initializer_exp>
     {
         inline static constexpr bool value = true;
     };

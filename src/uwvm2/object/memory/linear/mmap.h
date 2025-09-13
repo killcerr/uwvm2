@@ -873,7 +873,6 @@ UWVM_MODULE_EXPORT namespace fast_io::freestanding
     {
         inline static constexpr bool value = true;
     };
-
 #endif
 }
 

@@ -1107,8 +1107,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     struct final_local_global_type UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
-        final_global_type<Fs...> global;    // Types used to store global
-        final_wasm_const_expr<Fs...> expr;  // Expressions used to initialize global
+        final_global_type<Fs...> global{};    // Types used to store global
+        final_wasm_const_expr<Fs...> expr{};  // Expressions used to initialize global
 
         // check
         static_assert(::fast_io::freestanding::is_zero_default_constructible_v<final_global_type<Fs...>>);
