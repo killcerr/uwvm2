@@ -34,10 +34,6 @@ module;
 // macro
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
-// platform
-#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
-# include <fcntl.h>
-#endif
 
 export module uwvm2.imported.wasi.wasip1.func:fd_advise;
 
@@ -51,6 +47,7 @@ import uwvm2.imported.wasi.wasip1.abi;
 import uwvm2.imported.wasi.wasip1.fd_manager;
 import uwvm2.imported.wasi.wasip1.memory;
 import uwvm2.imported.wasi.wasip1.environment;
+import :posix;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

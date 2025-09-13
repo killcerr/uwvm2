@@ -1,5 +1,4 @@
-﻿
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -36,10 +35,6 @@
 // macro
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 # include <uwvm2/utils/macro/push_macros.h>
-// platform
-# if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
-#  include <fcntl.h>
-# endif
 // import
 # include <fast_io.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
@@ -51,6 +46,7 @@
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
 # include <uwvm2/imported/wasi/wasip1/memory/impl.h>
 # include <uwvm2/imported/wasi/wasip1/environment/impl.h>
+# include "posix.h"
 #endif
 
 #ifndef UWVM_CPP_EXCEPTIONS
@@ -66,24 +62,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     /// @brief     WasiPreview1.fd_advise
     /// @details   __wasi_errno_t fd_advise( __wasi_fd_t fd, __wasi_filesize_t offset, __wasi_filesize_t len, __wasi_advice_t advice);
     /// @note      This function only writes sizes; callers must provide valid memory offsets.
-
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
-    namespace posix
-    {
-# if !defined(__MSDOS__) && !defined(__DARWIN_C_LEVEL)
-        extern int fadvise(int fd, off_t offset, off_t len, int advice) noexcept __asm__("posix_fadvise");
-        extern int fallocate(int fd, int mode, off_t offset, off_t len) noexcept __asm__("fallocate");
-# endif
-
-        extern int fcntl(int fd, int cmd, ... /* arg */) noexcept
-# if !defined(__MSDOS__) && !defined(__DARWIN_C_LEVEL)
-            __asm__("fcntl")
-# else
-            __asm__("_fcntl")
-# endif
-                ;
-    }  // namespace posix
-#endif
 
     ::uwvm2::imported::wasi::wasip1::abi::errno_t fd_advise(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
@@ -272,7 +250,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     radvisory_advice.ra_count = static_cast<int>(len);
                 }
 
-                posix::fcntl(curr_fd_native_handle, F_RDADVISE, ::std::addressof(radvisory_advice));
+                ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_RDADVISE, ::std::addressof(radvisory_advice));
 
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
             }
@@ -370,7 +348,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # if defined(__linux__) && defined(__NR_fadvise64)
         ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 # else
-        posix::fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+        ::uwvm2::imported::wasi::wasip1::func::posix::fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 # endif
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
