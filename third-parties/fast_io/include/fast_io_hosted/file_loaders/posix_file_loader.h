@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "fast_io_hosted/platforms/nt.h"
 namespace fast_io
 {
 
@@ -85,7 +86,7 @@ inline auto posix_load_file_options_impl(::fast_io::posix_mmap_options const &op
 
 } // namespace details
 
-class posix_file_loader
+class posix_file_loader FAST_IO_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
 {
 public:
 	using value_type = char;
@@ -396,4 +397,13 @@ inline constexpr basic_io_scatter_t<char> print_alias_define(io_alias_t, posix_f
 	return {load.data(), load.size()};
 }
 
+namespace freestanding
+{
+template <>
+struct is_trivially_copyable_or_relocatable<posix_file_loader>
+{
+	inline static constexpr bool value = true;
+};
+
+} // namespace freestanding
 } // namespace fast_io

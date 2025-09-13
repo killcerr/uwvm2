@@ -48,7 +48,7 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 {
-    struct wasm_file_t
+    struct wasm_file_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
     {
         // support binfmt ver1 currently
         static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
@@ -240,6 +240,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         }
     };
 }  // namespace uwvm2::uwvm::wasm::storage
+
+UWVM_MODULE_EXPORT namespace fast_io::freestanding
+{
+    template <>
+    struct is_trivially_copyable_or_relocatable<::uwvm2::uwvm::wasm::type::wasm_file_t>
+    {
+        inline static constexpr bool value = true;
+    };
+}
 
 #ifndef UWVM_MODULE
 // macro
