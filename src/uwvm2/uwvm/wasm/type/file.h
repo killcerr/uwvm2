@@ -48,7 +48,7 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 {
-    struct wasm_file_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
+    struct wasm_file_t
     {
         // support binfmt ver1 currently
         static_assert(::uwvm2::uwvm::wasm::feature::max_binfmt_version == 1u, "missing implementation of other binfmt version");
