@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "fast_io_hosted/platforms/nt.h"
 namespace fast_io
 {
 
