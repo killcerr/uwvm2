@@ -178,43 +178,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }
 
+        using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_t>;
+
+        // Trivial success when len == 0
+        if(static_cast<underlying_filesize_t>(len) == 0u) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess; }
+
 #if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
         // Darwin
 
         auto const& curr_fd_posix_file{curr_fd.file_fd};
         auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
 
-        using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_t>;
-
-        off_t fallocate_offset;  // no initialize
-        off_t fallocate_len;     // no initialize
-
-        // Saturation treatment
+        // Do NOT saturate: if the requested size exceeds API limits, report error per WASI semantics.
         if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
         {
             if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
             {
-                fallocate_offset = ::std::numeric_limits<off_t>::max();
-            }
-            else
-            {
-                fallocate_offset = static_cast<off_t>(offset);
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
             }
 
             if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
             {
-                fallocate_len = ::std::numeric_limits<off_t>::max();
-            }
-            else
-            {
-                fallocate_len = static_cast<off_t>(len);
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
             }
         }
-        else
-        {
-            fallocate_offset = static_cast<off_t>(offset);
-            fallocate_len = static_cast<off_t>(len);
-        }
+
+        off_t fallocate_offset{static_cast<off_t>(offset)};
+        off_t fallocate_len{static_cast<off_t>(len)};
 
         // macOS: use F_PREALLOCATE / fstore_t
         fstore_t fstore{.fst_flags = F_ALLOCATECONTIG,
@@ -236,18 +226,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             fstore.fst_flags = F_ALLOCATEALL;
             if(::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_PREALLOCATE, ::std::addressof(fstore)) == -1) [[unlikely]]
             {
-                // fallback: ftruncate to ensure file is large enough (may not preallocate underlying blocks)
-
-                if(::uwvm2::imported::wasi::wasip1::func::posix::ftruncate(curr_fd_native_handle, newsize) == -1) [[unlikely]]
+                // If preallocation fails, report error directly per WASI semantics
+                switch(errno)
                 {
-                    switch(errno)
-                    {
-                        case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                        case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
-                        case EACCES: [[fallthrough]];
-                        case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
-                        default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                    }
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                    case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                    case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                    case EACCES: [[fallthrough]];
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+                    case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
+                    case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                    case ENOTSUP: [[fallthrough]];
+                    case EOPNOTSUPP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 }
             }
         }
@@ -265,14 +259,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         if(st.st_size < newsize) [[unlikely]]
         {
+            // Only allowed to extend logical file size when preallocation succeeded
             if(::uwvm2::imported::wasi::wasip1::func::posix::ftruncate(curr_fd_native_handle, newsize) == -1) [[unlikely]]
             {
                 switch(errno)
                 {
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                    case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                     case EACCES: [[fallthrough]];
                     case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+                    case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
+                    case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 }
             }
@@ -292,8 +293,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const curr_nt_io_observer{static_cast<::fast_io::nt_io_observer>(curr_posix_file)};
         auto const curr_fd_native_handle{curr_nt_io_observer.native_handle()};
 
-        using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_t>;
-
         underlying_filesize_t allocation_size;  // no initialize
 
         if(::uwvm2::imported::wasi::wasip1::func::add_overflow(static_cast<underlying_filesize_t>(offset),
@@ -305,6 +304,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // Attempt to set allocation size using SetFileInformationByHandle (FileAllocationInfo)
         // FILE_ALLOCATION_INFO contains AllocationSize (LARGE_INTEGER)
+        // Do NOT saturate: if the requested size exceeds API limits, report error per WASI semantics.
+        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::int_least64_t>::max())
+        {
+            if(allocation_size > ::std::numeric_limits<::std::int_least64_t>::max()) [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+            }
+        }
+
         ::fast_io::win32::nt::file_allocation_information faInfo{.AllocationSize = static_cast<::std::int_least64_t>(allocation_size)};
         ::fast_io::win32::nt::io_status_block IoStatusBlock;  // no initialize
 
@@ -331,19 +339,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Ensure that the logical block is reserved on the physical disk, but it does not necessarily modify the logical size of the file. Therefore, it is
         // necessary to ensure that the logical size of the file covers the entire area.
 
-        ::std::size_t cur_file_size;  // no initialize
-
 #  ifdef UWVM_CPP_EXCEPTIONS
         try
 #  endif
         {
-            cur_file_size = file_size(curr_nt_io_observer);
-            if(cur_file_size < allocation_size) [[unlikely]] { truncate(curr_nt_io_observer, static_cast<::std::uintmax_t>(allocation_size)); }
+            ::std::size_t const old_file_size{file_size(curr_nt_io_observer)};
+            if(old_file_size < allocation_size) [[unlikely]] { truncate(curr_nt_io_observer, static_cast<::std::uintmax_t>(allocation_size)); }
         }
 #  ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error)
         {
-            // This may be an unsupported system call or an ID not recognized by the system call. In this case, it is uniformly treated as an unsupported ID.
+            // This may be an unsupported system call or an ID not recognized by the system call. In this case, it is uniformly treated as an unsupported
+            // ID.
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
         }
 #  endif
@@ -362,57 +369,230 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // posix_fallocate signature: int posix_fallocate(int fd, off_t offset, off_t len);
         // But on some platforms off_t might be smaller; do saturation.
-        using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_t>;
 
-        off_t fallocate_offset;  // no initialize
-        off_t fallocate_len;     // no initialize
+# if defined(__linux__) && defined(__NR_fallocate)
+        if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint64_t))
+        {
+            // 64bits platform
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
 
-        // Saturation treatment
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
+            }
+
+            ::std::uint64_t fallocate_offset{static_cast<::std::uint64_t>(offset)};
+            ::std::uint64_t fallocate_len{static_cast<::std::uint64_t>(len)};
+            int result_syscall{::fast_io::system_call<__NR_fallocate, int>(curr_fd_native_handle, 0, fallocate_offset, fallocate_len)};
+
+            if(::fast_io::linux_system_call_fails(result_syscall)) [[unlikely]]
+            {
+                int const err{static_cast<int>(-result_syscall)};
+                switch(err)
+                {
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                    case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                    case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                    case EACCES: [[fallthrough]];
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+                    case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
+                    case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                    case ENOTSUP: [[fallthrough]];
+                    case EOPNOTSUPP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                }
+            }
+        }
+        else if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint32_t))
+        {
+            // 32bits platform
+#  if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH)) && defined(_ABIN32)
+            // MIPSN32
+            
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint32_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint32_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
+
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint32_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
+            }
+
+            ::std::uint32_t fallocate_offset{static_cast<::std::uint32_t>(offset)};
+
+            ::std::uint32_t fallocate_len{static_cast<::std::uint32_t>(len)};
+
+            int result_syscall{::fast_io::system_call<__NR_fallocate, int>(curr_fd_native_handle, 0, fallocate_offset, fallocate_len)};
+
+            if(::fast_io::linux_system_call_fails(result_syscall)) [[unlikely]]
+            {
+                int const err{static_cast<int>(-result_syscall)};
+                switch(err)
+                {
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                    case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                    case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                    case EACCES: [[fallthrough]];
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+                    case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
+                    case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                    case ENOTSUP: [[fallthrough]];
+                    case EOPNOTSUPP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                }
+            }
+
+#  else
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
+
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
+            }
+
+            ::std::uint64_t fallocate_offset{static_cast<::std::uint64_t>(offset)};
+            ::std::uint32_t fallocate_offset_low{static_cast<::std::uint32_t>(offset)};
+            ::std::uint32_t fallocate_offset_high{static_cast<::std::uint32_t>(offset >> 32u)};
+
+            ::std::uint64_t fallocate_len{static_cast<::std::uint64_t>(len)};
+            ::std::uint32_t fallocate_len_low{static_cast<::std::uint32_t>(len)};
+            ::std::uint32_t fallocate_len_high{static_cast<::std::uint32_t>(len >> 32u)};
+
+            int result_syscall{::fast_io::system_call<__NR_fallocate, int>(curr_fd_native_handle,
+                                                                           0,
+                                                                           fallocate_offset_high,
+                                                                           fallocate_offset_low,
+                                                                           fallocate_len_high,
+                                                                           fallocate_len_low)};
+
+            if(::fast_io::linux_system_call_fails(result_syscall)) [[unlikely]]
+            {
+                int const err{static_cast<int>(-result_syscall)};
+                switch(err)
+                {
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                    case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                    case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                    case EACCES: [[fallthrough]];
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+                    case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
+                    case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                    case ENOTSUP: [[fallthrough]];
+                    case EOPNOTSUPP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                }
+            }
+
+#  endif
+        }
+        else
+        {
+            // unknown linux platform
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
+
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                }
+            }
+
+            off_t fallocate_offset{static_cast<off_t>(offset)};
+            off_t fallocate_len{static_cast<off_t>(len)};
+
+            int result_pf{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
+            if(result_pf != 0) [[unlikely]]
+            {
+                switch(result_pf)
+                {
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                    case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                    case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                    case EACCES: [[fallthrough]];
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+                    case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
+                    case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                    case ENOTSUP: [[fallthrough]];
+                    case EOPNOTSUPP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                }
+            }
+        }
+
+# else
         if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
         {
             if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
             {
-                fallocate_offset = ::std::numeric_limits<off_t>::max();
-            }
-            else
-            {
-                fallocate_offset = static_cast<off_t>(offset);
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
             }
 
             if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
             {
-                fallocate_len = ::std::numeric_limits<off_t>::max();
-            }
-            else
-            {
-                fallocate_len = static_cast<off_t>(len);
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
             }
         }
-        else
-        {
-            fallocate_offset = static_cast<off_t>(offset);
-            fallocate_len = static_cast<off_t>(len);
-        }
 
-# if defined(__linux__) && defined(__NR_fallocate)
-        int result{::fast_io::system_call<__NR_fallocate, int>(curr_fd_native_handle, 0, fallocate_offset, fallocate_len)};
-# else
-        int result{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
-# endif
+        off_t fallocate_offset{static_cast<off_t>(offset)};
+        off_t fallocate_len{static_cast<off_t>(len)};
 
-        if(result == -1) [[unlikely]]
+        int result_pf{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
+        if(result_pf != 0) [[unlikely]]
         {
-            switch(errno)
+            switch(result_pf)
             {
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
                 case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                 case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                 case EACCES: [[fallthrough]];
                 case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+                case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
+                case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                case ENOTSUP: [[fallthrough]];
+                case EOPNOTSUPP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
             }
         }
 
+# endif
+
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+
 #else
         // Unsupported platform
         // If the underlying platform cannot guarantee this semantics at all (e.g., it completely lacks fallocate/posix_fallocate, etc.), then this

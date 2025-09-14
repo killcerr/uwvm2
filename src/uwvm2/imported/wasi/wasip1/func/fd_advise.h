@@ -293,7 +293,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 // Provide advisory hint; ignore return values and always report success per WASI semantics.
 # if defined(__linux__)
-        if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint_least64_t))
+        if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint64_t))
         {
             // 64bits platform
 #  if defined(__NR_fadvise64)
@@ -339,7 +339,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 #  endif
         }
-        else if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint_least32_t))
+        else if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint32_t))
         {
             // 32bits platform
 #  if defined(__NR_fadvise64_64)
@@ -438,8 +438,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 #  endif
         }
+        else
+        {
+            // unknown linux platform
+            
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+                }
 
-        static_assert(sizeof(::std::size_t) >= sizeof(::std::uint_least32_t), "linux never support 8bits/16bits platform");
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+                }
+            }
+
+            off_t offset_saturation{static_cast<off_t>(offset)};
+            off_t len_saturation{static_cast<off_t>(len)};
+
+            ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+        }
 
 # else
         // bsd series
