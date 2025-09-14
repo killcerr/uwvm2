@@ -9,7 +9,7 @@ add_defines("UWVM_VERSION_Y=0")
 add_defines("UWVM_VERSION_Z=0")
 add_defines("UWVM_VERSION_S=0")
 
-set_allowedplats("windows", "mingw", "linux", "djgpp", "unix", "bsd", "freebsd", "dragonflybsd", "netbsd", "openbsd", "macosx", "iphoneos", "watchos", "wasm-wasi", "wasm-wasip1", "wasm-wasip2", "wasm-wasi-threads", "wasm-wasip1-threads", "wasm-wasip2-threads", "serenity", "sun", "cross")
+set_allowedplats("windows", "mingw", "linux", "djgpp", "unix", "bsd", "freebsd", "dragonflybsd", "netbsd", "openbsd", "macosx", "iphoneos", "watchos", "wasm-wasi", "wasm-wasip1", "wasm-wasip2", "wasm-wasi-threads", "wasm-wasip1-threads", "wasm-wasip2-threads", "serenity", "sun", "cross", "none")
 
 includes("xmake/impl.lua")
 includes("xmake/platform/impl.lua")
@@ -95,6 +95,8 @@ function def_build()
         bsd_target()
 	elseif is_plat("wasm-wasi", "wasm-wasip1", "wasm-wasip2", "wasm-wasi-threads", "wasm-wasip1-threads", "wasm-wasip2-threads") then 
 		wasm_wasi_target()
+	elseif is_plat("none") then
+		none_target()
     end
 
 	local use_llvm_toolchain = get_config("use-llvm")
