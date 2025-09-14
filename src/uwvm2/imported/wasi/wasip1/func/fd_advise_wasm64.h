@@ -53,10 +53,6 @@
 # include "posix.h"
 #endif
 
-#ifndef UWVM_CPP_EXCEPTIONS
-# warning "Without enabling C++ exceptions, using this WASI function may cause termination."
-#endif
-
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
