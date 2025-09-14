@@ -359,12 +359,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             ::std::uint64_t offset_saturation{static_cast<::std::uint64_t>(offset)};
-            ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset)};
-            ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset >> 32u)};
+            ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset_saturation)};
+            ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset_saturation >> 32u)};
 
             ::std::uint64_t len_saturation{static_cast<::std::uint64_t>(len)};
-            ::std::uint32_t len_saturation_low{static_cast<::std::uint32_t>(len)};
-            ::std::uint32_t len_saturation_high{static_cast<::std::uint32_t>(len >> 32u)};
+            ::std::uint32_t len_saturation_low{static_cast<::std::uint32_t>(len_saturation)};
+            ::std::uint32_t len_saturation_high{static_cast<::std::uint32_t>(len_saturation >> 32u)};
 
             if constexpr(::std::endian::native == ::std::endian::big)
             {
@@ -427,8 +427,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             ::std::uint64_t offset_saturation{static_cast<::std::uint64_t>(offset)};
-            ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset)};
-            ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset >> 32u)};
+            ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset_saturation)};
+            ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset_saturation >> 32u)};
 
             ::std::uint32_t len_saturation{static_cast<::std::uint32_t>(len)};
 

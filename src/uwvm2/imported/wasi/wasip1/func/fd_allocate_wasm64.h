@@ -73,6 +73,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     /// @brief     WasiPreview1.fd_allocate_wasm64
     /// @details   __wasi_errno_t fd_allocate(__wasi_fd_t fd, __wasi_filesize_t offset, __wasi_filesize_t len);
     /// @note      Preallocate storage for [offset, offset+len); may extend file size.
+    /// @note      On Darwin and Windows platforms, `fd_allocate` is not fully atomic. If allocation succeeds but subsequent file size adjustments fail, the
+    ///            allocated space cannot be automatically rolled back. This is a platform limitation, not a code defect.
 
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_allocate_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
@@ -478,12 +480,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             ::std::uint64_t fallocate_offset{static_cast<::std::uint64_t>(offset)};
-            ::std::uint32_t fallocate_offset_low{static_cast<::std::uint32_t>(offset)};
-            ::std::uint32_t fallocate_offset_high{static_cast<::std::uint32_t>(offset >> 32u)};
+            ::std::uint32_t fallocate_offset_low{static_cast<::std::uint32_t>(fallocate_offset)};
+            ::std::uint32_t fallocate_offset_high{static_cast<::std::uint32_t>(fallocate_offset >> 32u)};
 
             ::std::uint64_t fallocate_len{static_cast<::std::uint64_t>(len)};
-            ::std::uint32_t fallocate_len_low{static_cast<::std::uint32_t>(len)};
-            ::std::uint32_t fallocate_len_high{static_cast<::std::uint32_t>(len >> 32u)};
+            ::std::uint32_t fallocate_len_low{static_cast<::std::uint32_t>(fallocate_len)};
+            ::std::uint32_t fallocate_len_high{static_cast<::std::uint32_t>(fallocate_len >> 32u)};
 
             int result_syscall;  // no initlize
 
