@@ -447,13 +447,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
                 }
 
                 if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
                 }
             }
 

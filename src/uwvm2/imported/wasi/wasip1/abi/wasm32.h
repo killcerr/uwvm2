@@ -174,7 +174,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
         etimedout,
         etxtbsy,
         exdev,
-        enotcapable,
+        enotcapable
     };
 
     enum class eventrwflags_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u16
