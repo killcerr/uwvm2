@@ -165,8 +165,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // curr_fd_uniptr is not null.
         auto& curr_fd{*curr_wasi_fd_t_p};
 
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_advise) [[unlikely]]
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_advise) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_advise) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
@@ -212,40 +212,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // The kernel uses only the `ra_offset` and `ra_count` fields from the passed `struct radvisory` for prefetching, without relying on or altering
                 // the current position of the file descriptor.
                 // Set up pre-fetching suggestions. The return value is not checked here, as this is merely a recommendation.
-                struct radvisory radvisory_advice;  // no initialize
 
-                // Saturation treatment
                 if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
                 {
                     if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
                     {
-                        radvisory_advice.ra_offset = ::std::numeric_limits<off_t>::max();
+                        // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
                     }
-                    else
-                    {
-                        radvisory_advice.ra_offset = static_cast<off_t>(offset);
-                    }
-                }
-                else
-                {
-                    radvisory_advice.ra_offset = static_cast<off_t>(offset);
                 }
 
                 if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<int>::max())
                 {
                     if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<int>::max()) [[unlikely]]
                     {
-                        radvisory_advice.ra_count = ::std::numeric_limits<int>::max();
-                    }
-                    else
-                    {
-                        radvisory_advice.ra_count = static_cast<int>(len);
+                        // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
                     }
                 }
-                else
-                {
-                    radvisory_advice.ra_count = static_cast<int>(len);
-                }
+
+                struct radvisory radvisory_advice{.ra_offset = static_cast<off_t>(offset), .ra_count = static_cast<int>(len)};
 
                 ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_RDADVISE, ::std::addressof(radvisory_advice));
 
@@ -257,7 +243,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
         }
 
-#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(_WIN32) || defined(__CYGWIN__)) &&                                     \
+#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(_WIN32) || defined(__CYGWIN__)) &&             \
     __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 
         int curr_platform_advice;  // no initialize
@@ -305,40 +291,163 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t>;
 
-        // Saturation treatment
-        off_t offset_saturation;  // no initialize
-        off_t len_saturation;     // no initialize
+        // Provide advisory hint; ignore return values and always report success per WASI semantics.
+# if defined(__linux__)
+        if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint_least64_t))
+        {
+            // 64bits platform
+#  if defined(__NR_fadvise64)
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+            }
+
+            ::std::uint64_t offset_saturation{static_cast<::std::uint64_t>(offset)};
+            ::std::uint64_t len_saturation{static_cast<::std::uint64_t>(len)};
+
+            ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+#  else
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+            }
+
+            off_t offset_saturation{static_cast<off_t>(offset)};
+            off_t len_saturation{static_cast<off_t>(len)};
+
+            ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+
+#  endif
+        }
+        else if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint_least32_t))
+        {
+            // 32bits platform
+#  if defined(__NR_fadvise64_64)
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+            }
+
+            ::std::uint64_t offset_saturation{static_cast<::std::uint64_t>(offset)};
+            ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset)};
+            ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset >> 32u)};
+            ::std::uint64_t len_saturation{static_cast<::std::uint64_t>(len)};
+            ::std::uint32_t len_saturation_low{static_cast<::std::uint32_t>(len)};
+            ::std::uint32_t len_saturation_high{static_cast<::std::uint32_t>(len >> 32u)};
+
+            ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
+                                                           offset_saturation_high,
+                                                           offset_saturation_low,
+                                                           len_saturation_high,
+                                                           len_saturation_low,
+                                                           curr_platform_advice);
+
+#  elif defined(__NR_fadvise64)
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+            }
+
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint32_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint32_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+            }
+
+            ::std::uint64_t offset_saturation{static_cast<::std::uint64_t>(offset)};
+            ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset)};
+            ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset >> 32u)};
+            ::std::uint32_t len_saturation{static_cast<::std::uint32_t>(len)};
+
+            ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle,
+                                                        offset_saturation_high,
+                                                        offset_saturation_low,
+                                                        len_saturation,
+                                                        curr_platform_advice);
+#  else
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            {
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                {
+                    // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+                }
+            }
+
+            off_t offset_saturation{static_cast<off_t>(offset)};
+            off_t len_saturation{static_cast<off_t>(len)};
+
+            ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
+
+#  endif
+        }
+
+        static_assert(sizeof(::std::size_t) >= sizeof(::std::uint_least32_t), "linux never support 8bits/16bits platform");
+
+# else
+        // bsd series
 
         if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
         {
             if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
             {
-                offset_saturation = ::std::numeric_limits<off_t>::max();
-            }
-            else
-            {
-                offset_saturation = static_cast<off_t>(offset);
+                // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
             }
 
             if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
             {
-                len_saturation = ::std::numeric_limits<off_t>::max();
+                // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
             }
-            else
-            {
-                len_saturation = static_cast<off_t>(len);
-            }
-        }
-        else
-        {
-            offset_saturation = static_cast<off_t>(offset);
-            len_saturation = static_cast<off_t>(len);
         }
 
-        // Provide advisory hint; ignore return values and always report success per WASI semantics.
-# if defined(__linux__) && defined(__NR_fadvise64)
-        ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
-# else
+        off_t offset_saturation{static_cast<off_t>(offset)};
+        off_t len_saturation{static_cast<off_t>(len)};
+
         ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 # endif
 
