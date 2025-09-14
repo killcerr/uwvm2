@@ -361,16 +361,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::std::uint64_t offset_saturation{static_cast<::std::uint64_t>(offset)};
             ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset)};
             ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset >> 32u)};
+
             ::std::uint64_t len_saturation{static_cast<::std::uint64_t>(len)};
             ::std::uint32_t len_saturation_low{static_cast<::std::uint32_t>(len)};
             ::std::uint32_t len_saturation_high{static_cast<::std::uint32_t>(len >> 32u)};
 
+#   if (defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)) || defined(__XTENSA__)
+            /* 6 args: fd, advice, offset (high, low), len (high, low) */
+            ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
+                                                           curr_platform_advice,
+                                                           offset_saturation_high,
+                                                           offset_saturation_low,
+                                                           len_saturation_high,
+                                                           len_saturation_low);
+#   else
+            /* 6 args: fd, offset (high, low), len (high, low), advice */
             ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
                                                            offset_saturation_high,
                                                            offset_saturation_low,
                                                            len_saturation_high,
                                                            len_saturation_low,
                                                            curr_platform_advice);
+#   endif
 
 #  elif defined(__NR_fadvise64)
             if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
@@ -394,8 +406,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::std::uint64_t offset_saturation{static_cast<::std::uint64_t>(offset)};
             ::std::uint32_t offset_saturation_low{static_cast<::std::uint32_t>(offset)};
             ::std::uint32_t offset_saturation_high{static_cast<::std::uint32_t>(offset >> 32u)};
+
             ::std::uint32_t len_saturation{static_cast<::std::uint32_t>(len)};
 
+            /* 5 args: fd, offset (high, low), len, advice */
             ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle,
                                                         offset_saturation_high,
                                                         offset_saturation_low,
