@@ -30,10 +30,13 @@
 #if defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
 # include <linux/version.h>
 #endif
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
 # include <TargetConditionals.h>
 # include <Availability.h>
 #endif
+# if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH))
+#  include <sgidefs.h>
+# endif
 // std
 #ifndef UWVM_MODULE
 # include <fast_io.h>
@@ -312,9 +315,9 @@ namespace uwvm2::uwvm::cmdline::params::details
 #elif defined(__XTENSA__)
                                 u8"Xtensa"
 # if defined(__XTENSA_EL__)
-                                u8" EL"
+                                u8"EL"
 # elif defined(__XTENSA_EB__)
-                                u8" EB"
+                                u8"EB"
 # endif
 #elif defined(__IA64__) || defined(_M_IA64) || defined(__ia64__) || defined(__itanium__)
                                 u8"Intel Itanium 64"
@@ -332,6 +335,15 @@ namespace uwvm2::uwvm::cmdline::params::details
 # if defined(__MIPSEL__) || defined(__MIPSEL) || defined(_MIPSEL)
                                 u8"EL"
 # endif
+# if defined(_MIPS_SIM)
+#  if _MIPS_SIM == _ABIO32
+                                u8"O32"
+#  elif _MIPS_SIM == _ABIN32
+                                u8"N32"
+#  elif _MIPS_SIM == _ABI64
+                                u8"N64"
+#  endif
+# endif
 # if defined(_MIPS_ARCH_MIPS64R2)
                                 u8" (R2)"
 # endif
@@ -339,6 +351,15 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"MIPS"
 # if defined(__MIPSEL__) || defined(__MIPSEL) || defined(_MIPSEL)
                                 u8"EL"
+# endif
+# if defined(_MIPS_SIM)
+#  if _MIPS_SIM == _ABIO32
+                                u8"O32"
+#  elif _MIPS_SIM == _ABIN32
+                                u8"N32"
+#  elif _MIPS_SIM == _ABI64
+                                u8"N64"
+#  endif
 # endif
 # if defined(_MIPS_ARCH_MIPS32R2)
                                 u8" (R2)"

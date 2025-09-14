@@ -42,6 +42,9 @@
 #  include <fcntl.h>
 #  include <sys/stat.h>
 # endif
+# if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH))
+#  include <sgidefs.h>
+# endif
 // import
 # include <fast_io.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
@@ -415,26 +418,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint32_t))
         {
             // 32bits platform
-#  if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH)) && defined(_ABIN32)
+#  if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH)) && (defined(_MIPS_SIM) && defined(_ABIN32) && _MIPS_SIM == _ABIN32)
             // MIPSN32
-            
-            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint32_t>::max())
+
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
             {
-                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint32_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
                 {
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                 }
 
-                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint32_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
                 {
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                 }
             }
 
-            ::std::uint32_t fallocate_offset{static_cast<::std::uint32_t>(offset)};
+            ::std::uint64_t fallocate_offset{static_cast<::std::uint64_t>(offset)};
 
-            ::std::uint32_t fallocate_len{static_cast<::std::uint32_t>(len)};
+            ::std::uint64_t fallocate_len{static_cast<::std::uint64_t>(len)};
 
+            // N32 ABI: Register width is 64 bits, but pointers/longs remain 32 bits.
             int result_syscall{::fast_io::system_call<__NR_fallocate, int>(curr_fd_native_handle, 0, fallocate_offset, fallocate_len)};
 
             if(::fast_io::linux_system_call_fails(result_syscall)) [[unlikely]]
@@ -459,6 +463,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
 #  else
+            // default 32bits platform
             if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
             {
                 if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::std::uint64_t>::max()) [[unlikely]]
@@ -552,6 +557,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
 # else
+        // bsd series
+
         if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
         {
             if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]

@@ -40,6 +40,9 @@ module;
 # include <fcntl.h>
 # include <sys/stat.h>
 #endif
+#if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH))
+# include <sgidefs.h>
+#endif
 
 export module uwvm2.imported.wasi.wasip1.func:fd_allocate;
 
