@@ -38,6 +38,7 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // platform
 # if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+#  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
 # endif
@@ -178,8 +179,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
 #if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+        // Darwin
 
-        auto const curr_fd_native_handle{curr_fd.file_fd.native_handle()};
+        auto const& curr_fd_posix_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
 
         using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_t>;
 
@@ -226,6 +229,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
         }
 
+        // Priority Request for Continuous Allocation
         if(::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_PREALLOCATE, ::std::addressof(fstore)) == -1) [[unlikely]]
         {
             // try non-contiguous allocation
@@ -236,7 +240,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
                 if(::uwvm2::imported::wasi::wasip1::func::posix::ftruncate(curr_fd_native_handle, newsize) == -1) [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                    switch(errno)
+                    {
+                        case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                        case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                        case EACCES: [[fallthrough]];
+                        case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                        default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                    }
                 }
             }
         }
@@ -245,68 +256,109 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         struct stat st;
         if(::uwvm2::imported::wasi::wasip1::func::posix::fstat(curr_fd_native_handle, ::std::addressof(st)) == -1) [[unlikely]]
         {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+            switch(errno)
+            {
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+            }
         }
 
         if(st.st_size < newsize) [[unlikely]]
         {
             if(::uwvm2::imported::wasi::wasip1::func::posix::ftruncate(curr_fd_native_handle, newsize) == -1) [[unlikely]]
             {
-                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                switch(errno)
+                {
+                    case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                    case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                    case EACCES: [[fallthrough]];
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                }
             }
         }
 
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+
 #elif defined(_WIN32) || defined(__CYGWIN__)
+        // Windows
+# if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
+        // Windows 9x
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+# elif !defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x600
+        // NT Version >= 6.0 (Vista)
         // Windows path. We accept a C runtime descriptor. Convert to HANDLE.
-        auto const& curr_posix_file {curr_fd.file_fd};
-        auto const curr_win32_io_observer{static_cast<::fast_io::win32_io_observer>(curr_posix_file)};
-        auto const curr_fd_native_handle{curr_win32_io_observer.native_handle()};
+        auto const& curr_posix_file{curr_fd.file_fd};
+        auto const curr_nt_io_observer{static_cast<::fast_io::nt_io_observer>(curr_posix_file)};
+        auto const curr_fd_native_handle{curr_nt_io_observer.native_handle()};
+
+        using underlying_filesize_t = ::std::underlying_type_t<::uwvm2::imported::wasi::wasip1::abi::filesize_t>;
+
+        underlying_filesize_t allocation_size;  // no initialize
+
+        if(::uwvm2::imported::wasi::wasip1::func::add_overflow(static_cast<underlying_filesize_t>(offset),
+                                                               static_cast<underlying_filesize_t>(len),
+                                                               allocation_size)) [[unlikely]]
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+        }
 
         // Attempt to set allocation size using SetFileInformationByHandle (FileAllocationInfo)
         // FILE_ALLOCATION_INFO contains AllocationSize (LARGE_INTEGER)
-        typedef struct _FILE_ALLOCATION_INFO_WIN
-        {
-            LARGE_INTEGER AllocationSize;
-        } FILE_ALLOCATION_INFO_WIN;
+        ::fast_io::win32::nt::file_allocation_information faInfo{.AllocationSize = static_cast<::std::int_least64_t>(allocation_size)};
+        ::fast_io::win32::nt::io_status_block IoStatusBlock;  // no initialize
 
-        FILE_ALLOCATION_INFO_WIN faInfo;
-        faInfo.AllocationSize.QuadPart = (LONGLONG)(offset + len);
-
-        if(SetFileInformationByHandle(h, FileAllocationInfo, &faInfo, sizeof(faInfo)))
+        constexpr bool zw{false};
+        if(auto const status{::fast_io::win32::nt::nt_set_information_file<zw>(curr_fd_native_handle,
+                                                                               ::std::addressof(IoStatusBlock),
+                                                                               ::std::addressof(faInfo),
+                                                                               sizeof(::fast_io::win32::nt::file_allocation_information),
+                                                                               ::fast_io::win32::nt::file_information_class::FileAllocationInformation)};
+           status) [[unlikely]]
         {
-            // Optionally ensure file logical size covers region
-            LARGE_INTEGER cur;
-            if(!GetFileSizeEx(h, &cur)) { return EIO; }
-            if(cur.QuadPart < (LONGLONG)(offset + len))
+            switch(status)
             {
-                // Move file pointer and set end of file
-                LARGE_INTEGER move;
-                move.QuadPart = offset + len;
-                if(!SetFilePointerEx(h, move, NULL, FILE_BEGIN)) { return EIO; }
-                if(!SetEndOfFile(h)) { return EIO; }
+                case 0xC000007Fu /*STATUS_DISK_FULL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                case 0xC0000904u /*STATUS_FILE_TOO_LARGE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                case 0xC000000Du /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+                case 0xC0000022u /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                case 0xC0000185u /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
             }
-            return 0;
         }
 
-        // Fallbacks for older Windows (or if operation not permitted)
-        // Try SetEndOfFile via MoveFilePointer
-        {
-            LARGE_INTEGER cur;
-            if(!GetFileSizeEx(h, &cur)) { return EIO; }
-            if(cur.QuadPart < (LONGLONG)(offset + len))
-            {
-                LARGE_INTEGER move;
-                move.QuadPart = offset + len;
-                if(!SetFilePointerEx(h, move, NULL, FILE_BEGIN)) { return EIO; }
-                if(!SetEndOfFile(h)) { return EIO; }
-            }
-            return 0;
-        }
+        // Ensure that the logical block is reserved on the physical disk, but it does not necessarily modify the logical size of the file. Therefore, it is
+        // necessary to ensure that the logical size of the file covers the entire area.
 
+        ::std::size_t cur_file_size;  // no initialize
+
+#  ifdef UWVM_CPP_EXCEPTIONS
+        try
+#  endif
+        {
+            cur_file_size = file_size(curr_nt_io_observer);
+            if(cur_file_size < allocation_size) [[unlikely]] { truncate(curr_nt_io_observer, static_cast<::std::uintmax_t>(allocation_size)); }
+        }
+#  ifdef UWVM_CPP_EXCEPTIONS
+        catch(::fast_io::error)
+        {
+            // This may be an unsupported system call or an ID not recognized by the system call. In this case, it is uniformly treated as an unsupported ID.
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+        }
+#  endif
+
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+
+# else
+        // NT Version < 6.0
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+# endif
 #elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(_WIN32) || defined(__CYGWIN__)) &&             \
     __has_include(<dirent.h>) && !defined(_PICOLIBC__)
         // Prefer posix_fallocate (portable) -- it returns 0 on success or an errno value on failure.
-        auto const curr_fd_native_handle{curr_fd.file_fd.native_handle()};
+        auto const& curr_fd_posix_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
 
         // posix_fallocate signature: int posix_fallocate(int fd, off_t offset, off_t len);
         // But on some platforms off_t might be smaller; do saturation.
@@ -344,14 +396,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 # if defined(__linux__) && defined(__NR_fallocate)
         int result{::fast_io::system_call<__NR_fallocate, int>(curr_fd_native_handle, 0, fallocate_offset, fallocate_len)};
-        if(result == -1) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; };
 # else
         int result{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
-        if(result == -1) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; };
 # endif
-#endif
+
+        if(result == -1) [[unlikely]]
+        {
+            switch(errno)
+            {
+                case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
+                case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
+                case EACCES: [[fallthrough]];
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+            }
+        }
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+#else
+        // Unsupported platform
+        // If the underlying platform cannot guarantee this semantics at all (e.g., it completely lacks fallocate/posix_fallocate, etc.), then this
+        // functionality cannot be implemented on that platform.
+        // The specification states: Errors must be returned; success must not be simulated.
+
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+#endif
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func
 
