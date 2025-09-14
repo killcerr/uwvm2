@@ -366,23 +366,46 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::std::uint32_t len_saturation_low{static_cast<::std::uint32_t>(len)};
             ::std::uint32_t len_saturation_high{static_cast<::std::uint32_t>(len >> 32u)};
 
+            if constexpr(::std::endian::native == ::std::endian::big)
+            {
 #   if (defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)) || defined(__XTENSA__)
-            /* 6 args: fd, advice, offset (high, low), len (high, low) */
-            ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
-                                                           curr_platform_advice,
-                                                           offset_saturation_high,
-                                                           offset_saturation_low,
-                                                           len_saturation_high,
-                                                           len_saturation_low);
+                /* 6 args: fd, advice, offset (high, low), len (high, low) */
+                ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
+                                                               curr_platform_advice,
+                                                               offset_saturation_high,
+                                                               offset_saturation_low,
+                                                               len_saturation_high,
+                                                               len_saturation_low);
 #   else
-            /* 6 args: fd, offset (high, low), len (high, low), advice */
-            ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
-                                                           offset_saturation_high,
-                                                           offset_saturation_low,
-                                                           len_saturation_high,
-                                                           len_saturation_low,
-                                                           curr_platform_advice);
+                /* 6 args: fd, offset (high, low), len (high, low), advice */
+                ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
+                                                               offset_saturation_high,
+                                                               offset_saturation_low,
+                                                               len_saturation_high,
+                                                               len_saturation_low,
+                                                               curr_platform_advice);
 #   endif
+            }
+            else
+            {
+#   if (defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)) || defined(__XTENSA__)
+                /* 6 args: fd, advice, offset (low, high), len (low, high) */
+                ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
+                                                               curr_platform_advice,
+                                                               offset_saturation_low,
+                                                               offset_saturation_high,
+                                                               len_saturation_low,
+                                                               len_saturation_high);
+#   else
+                /* 6 args: fd, offset (low, high), len (low, high), advice */
+                ::fast_io::system_call<__NR_fadvise64_64, int>(curr_fd_native_handle,
+                                                               offset_saturation_low,
+                                                               offset_saturation_high,
+                                                               len_saturation_low,
+                                                               len_saturation_high,
+                                                               curr_platform_advice);
+#   endif
+            }
 
 #  elif defined(__NR_fadvise64)
             if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::std::uint64_t>::max())
@@ -409,12 +432,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             ::std::uint32_t len_saturation{static_cast<::std::uint32_t>(len)};
 
-            /* 5 args: fd, offset (high, low), len, advice */
-            ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle,
-                                                        offset_saturation_high,
-                                                        offset_saturation_low,
-                                                        len_saturation,
-                                                        curr_platform_advice);
+            if constexpr(::std::endian::native == ::std::endian::big)
+            {
+                /* 5 args: fd, offset (high, low), len, advice */
+                ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle,
+                                                            offset_saturation_high,
+                                                            offset_saturation_low,
+                                                            len_saturation,
+                                                            curr_platform_advice);
+            }
+            else
+            {
+                /* 5 args: fd, offset (low, high), len, advice */
+                ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle,
+                                                            offset_saturation_low,
+                                                            offset_saturation_high,
+                                                            len_saturation,
+                                                            curr_platform_advice);
+            }
 #  else
             if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
             {
@@ -441,7 +476,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             // unknown linux platform
-            
+
             if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
             {
                 if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]

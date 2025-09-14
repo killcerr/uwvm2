@@ -39,6 +39,8 @@ export import :environ_sizes_get_wasm64;
 export import :environ_sizes_get;
 export import :fd_advise_wasm64;
 export import :fd_advise;
+export import :fd_allocate_wasm64;
+export import :fd_allocate;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

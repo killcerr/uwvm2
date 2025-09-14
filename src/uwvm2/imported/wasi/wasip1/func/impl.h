@@ -39,5 +39,7 @@
 # include "environ_sizes_get.h"
 # include "fd_advise_wasm64.h"
 # include "fd_advise.h"
+# include "fd_allocate_wasm64.h"
+# include "fd_allocate.h"
 
 #endif
