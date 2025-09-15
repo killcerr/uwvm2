@@ -129,6 +129,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // You can simply delete it here. The lock will wait to be destroyed upon unlocking, and all files can be automatically closed via RAII.
                 try
                 {
+                    // automatically close when erase
                     wasm_fd_storage.renumber_map.erase(renumber_map_iter);
                 }
                 catch(::fast_io::error)
