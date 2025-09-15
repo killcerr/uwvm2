@@ -264,6 +264,11 @@ using ::fast_io::operations::decay::output_stream_unlocked_ref_decay;
 
 } // namespace decay
 
+namespace defines
+{
+using ::fast_io::operations::defines::print_freestanding_okay;
+} // namespace defines
+
 using ::fast_io::operations::print_freestanding;
 
 } // namespace operations
@@ -373,4 +378,14 @@ using ::fast_io::operator^=;
 
 using ::fast_io::operator++;
 
+namespace details
+{
+using ::fast_io::details::dummy_buffer_output_stream;
+} // namespace details
+
+using ::fast_io::basic_general_concat;
+using ::fast_io::io_print_forward;
+using ::fast_io::io_print_alias;
+
+using ::fast_io::uint_least64_subseconds_per_second;
 } // namespace fast_io
