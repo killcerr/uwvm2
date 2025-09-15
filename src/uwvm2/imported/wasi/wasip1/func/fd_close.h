@@ -156,10 +156,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             // If deleted by renumber_map, it returns ebadf directly when not found, yielding the same result.
             if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
 
+#ifdef UWVM_CPP_EXCEPTIONS
             try
+#endif
             {
                 curr_fd.close();
             }
+#ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
             {
                 // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws an
@@ -169,6 +172,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe
                 // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
             }
+#endif
 
             // Add the location to be closed to the close list.
             auto const close_pos{::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos))};
