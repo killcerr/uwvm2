@@ -31,6 +31,7 @@
 # include <concepts>
 # include <bit>
 # include <memory>
+# include <new>
 # include <type_traits>
 // macro
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
@@ -132,7 +133,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 catch(::fast_io::error)
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 }
             }
             else [[unlikely]]
@@ -143,14 +144,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             // The addition here is safe.
-            auto& curr_fd{*wasm_fd_storage.opens.index_unchecked(fd_opens_pos).fd_p};
+            auto const curr_fd_p{wasm_fd_storage.opens.index_unchecked(fd_opens_pos).fd_p};
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            if(curr_fd_p == nullptr) [[unlikely]]
+            {
+                // Security issues inherent to virtual machines
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
+#endif
+
+            auto& curr_fd{*curr_fd_p};
+
+            // Detect double-close: if this fd has already been closed and recorded, report EBADF per WASI.
+            // If deleted by renumber_map, it returns ebadf directly when not found, yielding the same result.
+            if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+
             try
             {
                 curr_fd.close();
             }
             catch(::fast_io::error)
             {
-                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
             }
 
             // Add the location to be closed to the close list.

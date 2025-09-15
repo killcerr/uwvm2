@@ -807,6 +807,12 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"HP-UX"
 #elif defined(__HAIKU__)
                                 u8"Haiku"
+#elif defined(__AROS__)
+                                u8"AROS"
+#elif defined(__OS2__)
+                                u8"OS/2"
+#elif defined(__MVS__) || defined(__HOS_MVS__)
+                                u8"z/OS"
 #elif defined(__unix) || defined(_XOPEN_SOURCE) || defined(_POSIX_SOURCE)
                                 u8"Unix Environment"
 #else
