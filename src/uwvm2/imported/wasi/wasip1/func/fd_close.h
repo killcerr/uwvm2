@@ -127,20 +127,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             if(auto const renumber_map_iter{wasm_fd_storage.renumber_map.find(fd)}; renumber_map_iter != wasm_fd_storage.renumber_map.end())
             {
                 // You can simply delete it here. The lock will wait to be destroyed upon unlocking, and all files can be automatically closed via RAII.
-                try
-                {
-                    // automatically close when erase
-                    wasm_fd_storage.renumber_map.erase(renumber_map_iter);
-                }
-                catch(::fast_io::error)
-                {
-                    // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws
-                    // an exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly
-                    // likely already unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is
-                    // thrown here and `eio` is returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights,
-                    // the VM will mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither
-                    // exception-safe (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
-                }
+
+                // automatically close when erase
+                // There's no need to catch it, because the destructor doesn't throw an exception.
+                wasm_fd_storage.renumber_map.erase(renumber_map_iter);
             }
             else [[unlikely]]
             {
