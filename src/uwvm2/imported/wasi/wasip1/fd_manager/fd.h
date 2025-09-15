@@ -81,6 +81,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         {
             ::uwvm2::utils::mutex::mutex_guard_t curr_fd_mutex_guard{this->fd_mutex};
 
+            // Modify `right` in advance to prevent subsequent exceptions from causing the modification to fail.
+            this->rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
+            this->rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
+
+            // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws an
+            // exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly likely already
+            // unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is thrown here and `eio` is
+            // returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights, the VM will mistakenly believe
+            // the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe (no fallback possible)
+            // nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
+
 #if defined(_WIN32) && defined(_WIN32_WINDOWS)
             if(this->is_dir) { this->dir_fd.close(); }
             else
@@ -90,9 +101,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 #else
             this->file_fd.close();
 #endif
-
-            this->rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
-            this->rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
 
             // The close position requires the wasi function to set it itself.
         }

@@ -133,7 +133,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 catch(::fast_io::error)
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                    // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws
+                    // an exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly
+                    // likely already unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is
+                    // thrown here and `eio` is returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights,
+                    // the VM will mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither
+                    // exception-safe (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
                 }
             }
             else [[unlikely]]
@@ -166,7 +171,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
             catch(::fast_io::error)
             {
-                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws an
+                // exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly likely
+                // already unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is thrown here and
+                // `eio` is returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights, the VM will
+                // mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe
+                // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
             }
 
             // Add the location to be closed to the close list.
