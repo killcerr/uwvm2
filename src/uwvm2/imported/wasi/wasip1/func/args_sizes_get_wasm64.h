@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "fast_io_core_impl/integers/impl.h"
+#include "fast_io_core_impl/integers/sto/sto_contiguous.h"
 #ifndef UWVM_MODULE
 // std
 # include <cstddef>
@@ -81,12 +83,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"args_sizes_get_wasm64 ",
+                                u8"args_sizes_get_wasm64",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"(",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                ::fast_io::mnp::addrvw(argc_ptrsz),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8", ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                ::fast_io::mnp::addrvw(argv_buf_size_ptrsz),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8") ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(wasi-trace)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: args_sizes_get_wasm64 (wasi-trace)\n");
+            ::fast_io::io::perr(::fast_io::u8err(),
+                                u8"uwvm: [info]  wasip1: args_sizes_get_wasm64(",
+                                ::fast_io::mnp::addrvw(argc_ptrsz),
+                                u8", ",
+                                ::fast_io::mnp::addrvw(argv_buf_size_ptrsz),
+                                u8") (wasi-trace)\n");
 #endif
         }
 
