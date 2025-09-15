@@ -44,6 +44,7 @@ int main()
     // Case 1: esuccess when len == 0 and rights ok
     {
         env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::posix_file{u8"test_fd_allocate.log", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(3uz).fd_p->rights_base = static_cast<rights_t>(-1);
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_allocate_wasm64(env,
                                                                                    static_cast<wasi_posix_fd_wasm64_t>(3),
                                                                                    static_cast<filesize_wasm64_t>(0),

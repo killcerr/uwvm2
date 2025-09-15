@@ -46,6 +46,7 @@ int main()
     {
         // ensure target fd has a valid native handle
         env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::posix_file{u8"test.log", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(3uz).fd_p->rights_base = static_cast<rights_t>(-1);
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_advise(env,
                                                                           static_cast<wasi_posix_fd_t>(3),
                                                                           static_cast<filesize_t>(0),
@@ -63,7 +64,7 @@ int main()
         env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_base = static_cast<rights_t>(0);
         // ensure the target fd has a valid native handle to avoid platform traps on fadvise
         env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd = ::fast_io::posix_file{u8"test.log", ::fast_io::open_mode::out};
-
+        
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_advise(env,
                                                                           static_cast<wasi_posix_fd_t>(4),
                                                                           static_cast<filesize_t>(0),

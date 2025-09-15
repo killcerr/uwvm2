@@ -41,5 +41,7 @@
 # include "fd_advise.h"
 # include "fd_allocate_wasm64.h"
 # include "fd_allocate.h"
+# include "fd_close_wasm64.h"
+# include "fd_close.h"
 
 #endif

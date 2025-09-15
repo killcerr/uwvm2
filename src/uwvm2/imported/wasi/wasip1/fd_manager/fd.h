@@ -58,8 +58,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         ::fast_io::win32_9xa_dir_file dir_fd{};
         bool is_dir{};
 #endif
-        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_base{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
-        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{static_cast<::uwvm2::imported::wasi::wasip1::abi::rights_t>(-1)};
+        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_base{};
+        ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{};
 
         // ====== for vm ======
         mutex_t fd_mutex{};  // [singleton]
@@ -76,6 +76,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         inline constexpr wasi_fd_t& operator= (wasi_fd_t&& other) noexcept = delete;
 
         inline ~wasi_fd_t() = default;
+
+        inline constexpr void close()
+        {
+            ::uwvm2::utils::mutex::mutex_guard_t curr_fd_mutex_guard{this->fd_mutex};
+
+#if defined(_WIN32) && defined(_WIN32_WINDOWS)
+            if(this->is_dir) { this->dir_fd.close(); }
+            else
+            {
+                this->file_fd.close();
+            }
+#else
+            this->file_fd.close();
+#endif
+
+            this->rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
+            this->rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
+
+            // The close position requires the wasi function to set it itself.
+        }
     };
 
     struct wasi_fd_unique_ptr_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
