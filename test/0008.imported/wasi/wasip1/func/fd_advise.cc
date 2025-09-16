@@ -23,6 +23,8 @@
 #include <cstdint>
 
 #include <uwvm2/imported/wasi/wasip1/func/fd_advise.h>
+// for close-then-advise test
+#include <uwvm2/imported/wasi/wasip1/func/fd_close.h>
 
 int main()
 {
@@ -104,5 +106,34 @@ int main()
             ::fast_io::fast_terminate();
         }
     }
+
+    // Case 5: ebadf after fd has been closed
+    {
+        // prepare fd 2 with a valid handle and sufficient rights
+        auto& fd2 = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
+        fd2.file_fd = ::fast_io::posix_file{u8"test_fd_close_then_advise.tmp", ::fast_io::open_mode::out};
+        fd2.rights_base = static_cast<rights_t>(-1);
+
+        // close should succeed
+        auto const closed = ::uwvm2::imported::wasi::wasip1::func::fd_close(env, static_cast<wasi_posix_fd_t>(2));
+        if(closed != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_advise: close before advise expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+
+        // advise after close should be EBADF
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_advise(env,
+                                                                          static_cast<wasi_posix_fd_t>(2),
+                                                                          static_cast<filesize_t>(0),
+                                                                          static_cast<filesize_t>(0),
+                                                                          advice_t::advice_normal);
+        if(ret != errno_t::ebadf)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_advise: expected ebadf after fd_close");
+            ::fast_io::fast_terminate();
+        }
+    }
+
 }
 
