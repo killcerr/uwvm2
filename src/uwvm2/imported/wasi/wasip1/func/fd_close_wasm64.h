@@ -120,7 +120,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // not nullprt -> File descriptors in the open list require additional handling.
         // nullptr -> File descriptors in the renumber map, simply erase it.
-        ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t* curr_fd_p{};
+        ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t* curr_fd_p;  // no initialize
         // If curr_fd_p is not nullptr, this thread-safety guarantee is required.
         ::uwvm2::utils::mutex::mutex_merely_release_guard_t curr_fd_release_guard{};
 
@@ -146,6 +146,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     // automatically close when erase
                     // There's no need to catch it, because the destructor doesn't throw an exception.
                     wasm_fd_storage.renumber_map.erase(renumber_map_iter);
+
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
                 }
                 else [[unlikely]]
                 {
@@ -184,42 +186,47 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
         }
 
-        if(curr_fd_p)
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(curr_fd_p == nullptr) [[unlikely]]
         {
-            auto& curr_fd{*curr_fd_p};
+            // Security issues inherent to virtual machines
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
 
-            // Modify `right` in advance to prevent subsequent exceptions from causing the modification to fail.
-            curr_fd.rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
-            curr_fd.rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
+        auto& curr_fd{*curr_fd_p};
 
-            // The "close" operation always succeeds. Even if an exception is thrown, it will be reset to the initial value.
+        // Modify `right` in advance to prevent subsequent exceptions from causing the modification to fail.
+        curr_fd.rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
+        curr_fd.rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
+
+        // The "close" operation always succeeds. Even if an exception is thrown, it will be reset to the initial value.
 
 #ifdef UWVM_CPP_EXCEPTIONS
-            try
+        try
 #endif
-            {
+        {
 #if defined(_WIN32) && defined(_WIN32_WINDOWS)
-                if(curr_fd.is_dir) { curr_fd.dir_fd.close(); }
-                else
-                {
-                    curr_fd.file_fd.close();
-                }
-#else
-                curr_fd.file_fd.close();
-#endif
-            }
-#ifdef UWVM_CPP_EXCEPTIONS
-            catch(::fast_io::error)
+            if(curr_fd.is_dir) { curr_fd.dir_fd.close(); }
+            else
             {
-                // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws an
-                // exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly likely
-                // already unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is thrown here and
-                // `eio` is returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights, the VM will
-                // mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe
-                // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
+                curr_fd.file_fd.close();
             }
+#else
+            curr_fd.file_fd.close();
 #endif
         }
+#ifdef UWVM_CPP_EXCEPTIONS
+        catch(::fast_io::error)
+        {
+            // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws an
+            // exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly likely
+            // already unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is thrown here and
+            // `eio` is returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights, the VM will
+            // mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe
+            // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
+        }
+#endif
 
         // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
 
