@@ -178,9 +178,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 if(curr_fd_p->close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
 
                 // Allocate new storage space for closepos while simultaneously acquiring the position for subsequent writes to the internal fd.
+                // new_close_pos must be written separately from -cebgin, otherwise it will cause undefined evaluation order issues. If expansion occurs, it
+                // will result in UB.
+                auto const new_close_pos{::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos))};
+
                 // Add the position where it closes itself to facilitate subsequent renumbering.
-                curr_fd_p->close_pos =
-                    static_cast<::std::size_t>(::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos)) - wasm_fd_storage.closes.cbegin());
+                curr_fd_p->close_pos = static_cast<::std::size_t>(new_close_pos - wasm_fd_storage.closes.cbegin());
             }
 
             // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
@@ -197,8 +200,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto& curr_fd{*curr_fd_p};
 
         // Modify `right` in advance to prevent subsequent exceptions from causing the modification to fail.
-        curr_fd.rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
-        curr_fd.rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
+        curr_fd.rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
+        curr_fd.rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
 
         // The "close" operation always succeeds. Even if an exception is thrown, it will be reset to the initial value.
 
