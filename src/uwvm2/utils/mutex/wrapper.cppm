@@ -31,6 +31,7 @@ module;
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <atomic>
 
 export module uwvm2.utils.mutex:wrapper;
 

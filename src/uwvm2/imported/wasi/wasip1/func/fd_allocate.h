@@ -141,7 +141,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             // Only a lock is required when acquiring the unique pointer for the file descriptor. The lock can be released once the acquisition is complete.
             // Since the file descriptor's location is fixed and accessed via the unique pointer,
 
-            ::uwvm2::utils::mutex::mutex_guard_t fds_lock{wasm_fd_storage.fds_mutex};
+            // Simply acquiring data using a shared_lock
+            ::uwvm2::utils::mutex::rw_shared_guard_t fds_lock{wasm_fd_storage.fds_rwlock};
 
             // Negative states have been excluded, so the conversion result will only be positive numbers.
             using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
@@ -184,11 +185,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 #endif
 
-            // Other threads will definitely lock fds_mutex when performing close operations (since they need to access the fd vector). If the current thread is
+            // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread is
             // performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
             // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
             // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
-            // encounter issues. Thus, locking must occur before releasing fds_mutex.
+            // encounter issues. Thus, locking must occur before releasing fds_rwlock.
             curr_fd_release_guard.device_p = ::std::addressof(curr_wasi_fd_t_p->fd_mutex);
             curr_fd_release_guard.lock();
 

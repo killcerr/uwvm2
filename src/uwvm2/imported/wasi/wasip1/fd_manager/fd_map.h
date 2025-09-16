@@ -56,7 +56,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
             renumber_map{};
         // Used to record the coordinates of closure for subsequent builds
         ::uwvm2::utils::container::vector<::std::size_t> closes{};
-        ::uwvm2::utils::mutex::mutex_t fds_mutex{};  // [singleton]
+        ::uwvm2::utils::mutex::rwlock_t fds_rwlock{};  // [singleton]
         ::std::size_t fd_limit{};
     };
 }

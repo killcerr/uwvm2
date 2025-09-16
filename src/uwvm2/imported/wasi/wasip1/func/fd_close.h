@@ -127,7 +127,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         ::std::size_t curr_fd_close_pos{SIZE_MAX};
 
         {
-            ::uwvm2::utils::mutex::mutex_guard_t fds_lock{wasm_fd_storage.fds_mutex};
+            // Manipulating fd_manager requires a unique_lock.
+            ::uwvm2::utils::mutex::rw_unique_guard_t fds_lock{wasm_fd_storage.fds_rwlock};
 
             // The minimum value in rename_map is greater than opensize.
             if(wasm_fd_storage.opens.size() <= fd_opens_pos)
