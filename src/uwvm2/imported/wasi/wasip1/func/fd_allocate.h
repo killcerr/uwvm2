@@ -198,6 +198,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // curr_fd_uniptr is not null.
         auto& curr_fd{*curr_wasi_fd_t_p};
 
+        // If obtained from the renumber map, it will always be the correct value. If obtained from the open vec, it requires checking whether it is closed.
+        // Therefore, a unified check is implemented.
+        if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+
         if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_allocate) !=
            ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_allocate) [[unlikely]]
         {

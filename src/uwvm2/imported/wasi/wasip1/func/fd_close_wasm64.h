@@ -61,8 +61,8 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
-    /// @brief     WasiPreview1.fd_close_wasm64
-    /// @details   __wasi_errno_wasm64_t fd_close(__wasi_fd_t fd);
+    /// @brief     WasiPreview1.fd_close
+    /// @details   __wasi_errno_t fd_close(__wasi_fd_t fd);
     /// @note      Close a file descriptor.
 
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_close_wasm64(
@@ -105,8 +105,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Only a lock is required when acquiring the unique pointer for the file descriptor. The lock can be released once the acquisition is complete.
         // Since the file descriptor's location is fixed and accessed via the unique pointer,
 
-        ::uwvm2::utils::mutex::mutex_guard_t fds_lock{wasm_fd_storage.fds_mutex};
-
         // Negative states have been excluded, so the conversion result will only be positive numbers.
         using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
         auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
@@ -120,47 +118,87 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         auto const fd_opens_pos{static_cast<::std::size_t>(unsigned_fd)};
 
-        // The minimum value in rename_map is greater than opensize.
-        if(wasm_fd_storage.opens.size() <= fd_opens_pos)
-        {
-            // Possibly within the tree being renumbered
-            if(auto const renumber_map_iter{wasm_fd_storage.renumber_map.find(fd)}; renumber_map_iter != wasm_fd_storage.renumber_map.end())
-            {
-                // You can simply delete it here. The lock will wait to be destroyed upon unlocking, and all files can be automatically closed via RAII.
+        // not nullprt -> File descriptors in the open list require additional handling.
+        // nullptr -> File descriptors in the renumber map, simply erase it.
+        ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t* curr_fd_p{};
+        // If curr_fd_p is not nullptr, this thread-safety guarantee is required.
+        ::uwvm2::utils::mutex::mutex_merely_release_guard_t curr_fd_release_guard{};
+        // Used to obtain and write the close position. Initialize to default values to prevent subsequent modification errors.
+        ::std::size_t curr_fd_close_pos{SIZE_MAX};
 
-                // automatically close when erase
-                // There's no need to catch it, because the destructor doesn't throw an exception.
-                wasm_fd_storage.renumber_map.erase(renumber_map_iter);
-            }
-            else [[unlikely]]
-            {
-                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
-            }
-        }
-        else
         {
-            // The addition here is safe.
-            auto const curr_fd_p{wasm_fd_storage.opens.index_unchecked(fd_opens_pos).fd_p};
+            ::uwvm2::utils::mutex::mutex_guard_t fds_lock{wasm_fd_storage.fds_mutex};
+
+            // The minimum value in rename_map is greater than opensize.
+            if(wasm_fd_storage.opens.size() <= fd_opens_pos)
+            {
+                // Possibly within the tree being renumbered
+                if(auto const renumber_map_iter{wasm_fd_storage.renumber_map.find(fd)}; renumber_map_iter != wasm_fd_storage.renumber_map.end())
+                {
+                    // You can simply delete it here. The lock will wait to be destroyed upon unlocking, and all files can be automatically closed via RAII.
+
+                    // In the renumber map, all close positions are initial values and hold no practical significance; they need not be checked.
+
+                    // automatically close when erase
+                    // There's no need to catch it, because the destructor doesn't throw an exception.
+                    wasm_fd_storage.renumber_map.erase(renumber_map_iter);
+                }
+                else [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                }
+            }
+            else
+            {
+                // The addition here is safe.
+                curr_fd_p = wasm_fd_storage.opens.index_unchecked(fd_opens_pos).fd_p;
+                // Allocate new storage space for closepos while simultaneously acquiring the position for subsequent writes to the internal fd.
+                curr_fd_close_pos =
+                    static_cast<::std::size_t>(::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos)) - wasm_fd_storage.closes.cbegin());
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-            if(curr_fd_p == nullptr) [[unlikely]]
-            {
-                // Security issues inherent to virtual machines
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+                if(curr_fd_p == nullptr) [[unlikely]]
+                {
+                    // Security issues inherent to virtual machines
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+                }
 #endif
 
+                // Ensure lock granularity reduction
+                curr_fd_release_guard.device_p = ::std::addressof(curr_fd_p->fd_mutex);
+                curr_fd_release_guard.lock();
+            }
+
+            // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
+        }
+
+        if(curr_fd_p)
+        {
             auto& curr_fd{*curr_fd_p};
 
             // Detect double-close: if this fd has already been closed and recorded, report EBADF per WASI.
             // If deleted by renumber_map, it returns ebadf directly when not found, yielding the same result.
             if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
+            // Modify `right` in advance to prevent subsequent exceptions from causing the modification to fail.
+            curr_fd.rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
+            curr_fd.rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t{};
+
+            // The "close" operation always succeeds. Even if an exception is thrown, it will be reset to the initial value.
+
 #ifdef UWVM_CPP_EXCEPTIONS
             try
 #endif
             {
-                curr_fd.close();
+#if defined(_WIN32) && defined(_WIN32_WINDOWS)
+                if(curr_fd.is_dir) { curr_fd.dir_fd.close(); }
+                else
+                {
+                    curr_fd.file_fd.close();
+                }
+#else
+                curr_fd.file_fd.close();
+#endif
             }
 #ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error)
@@ -174,11 +212,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 #endif
 
-            // Add the location to be closed to the close list.
-            auto const close_pos{::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos))};
-
             // Add the position where it closes itself to facilitate subsequent renumbering.
-            curr_fd.close_pos = static_cast<::std::size_t>(close_pos - wasm_fd_storage.closes.cbegin());
+            curr_fd.close_pos = curr_fd_close_pos;
         }
 
         // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.

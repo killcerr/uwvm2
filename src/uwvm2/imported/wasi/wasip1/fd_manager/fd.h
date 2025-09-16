@@ -78,29 +78,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         inline constexpr wasi_fd_t& operator= (wasi_fd_t&& other) noexcept = delete;
 
         inline ~wasi_fd_t() = default;
-
-        inline constexpr void close()
-        {
-            ::uwvm2::utils::mutex::mutex_guard_t curr_fd_mutex_guard{this->fd_mutex};
-
-            // Modify `right` in advance to prevent subsequent exceptions from causing the modification to fail.
-            this->rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
-            this->rights_inherit = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
-
-            // The "close" operation always succeeds. Even if an exception is thrown, it will be reset to the initial value.
-
-#if defined(_WIN32) && defined(_WIN32_WINDOWS)
-            if(this->is_dir) { this->dir_fd.close(); }
-            else
-            {
-                this->file_fd.close();
-            }
-#else
-            this->file_fd.close();
-#endif
-
-            // The close position requires the wasi function to set it itself.
-        }
     };
 
     struct wasi_fd_unique_ptr_t UWVM_TRIVIALLY_RELOCATABLE_IF_ELIGIBLE
