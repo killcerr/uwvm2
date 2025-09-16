@@ -559,7 +559,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // In WASI or POSIX semantics, `fd_advise` is merely an advisory hint. It does not and cannot alter the correctness of program logic, so it does not
         // return an error on unsupported platforms.
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+        switch(advice)
+        {
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_normal: [[fallthrough]];
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_sequential: [[fallthrough]];
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_random: [[fallthrough]];
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_willneed: [[fallthrough]];
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_dontneed: [[fallthrough]];
+            case ::uwvm2::imported::wasi::wasip1::abi::advice_wasm64_t::advice_noreuse:
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+            }
+            [[unlikely]] default:
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+            }
+        }
 #endif
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func
