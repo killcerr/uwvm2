@@ -123,8 +123,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         ::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_t* curr_fd_p{};
         // If curr_fd_p is not nullptr, this thread-safety guarantee is required.
         ::uwvm2::utils::mutex::mutex_merely_release_guard_t curr_fd_release_guard{};
-        // Used to obtain and write the close position. Initialize to default values to prevent subsequent modification errors.
-        ::std::size_t curr_fd_close_pos{SIZE_MAX};
 
         {
             // Manipulating fd_manager requires a unique_lock.
@@ -158,9 +156,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 // The addition here is safe.
                 curr_fd_p = wasm_fd_storage.opens.index_unchecked(fd_opens_pos).fd_p;
-                // Allocate new storage space for closepos while simultaneously acquiring the position for subsequent writes to the internal fd.
-                curr_fd_close_pos =
-                    static_cast<::std::size_t>(::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos)) - wasm_fd_storage.closes.cbegin());
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 if(curr_fd_p == nullptr) [[unlikely]]
@@ -173,6 +168,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // Ensure lock granularity reduction
                 curr_fd_release_guard.device_p = ::std::addressof(curr_fd_p->fd_mutex);
                 curr_fd_release_guard.lock();
+
+                // During the duration of the dual lock, two operations can be performed simultaneously.
+
+                // Detect double-close: if this fd has already been closed and recorded, report EBADF per WASI.
+                // If deleted by renumber_map, it returns ebadf directly when not found, yielding the same result.
+                if(curr_fd_p->close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+
+                // Allocate new storage space for closepos while simultaneously acquiring the position for subsequent writes to the internal fd.
+                // Add the position where it closes itself to facilitate subsequent renumbering.
+                curr_fd_p->close_pos =
+                    static_cast<::std::size_t>(::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos)) - wasm_fd_storage.closes.cbegin());
             }
 
             // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
@@ -181,10 +187,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         if(curr_fd_p)
         {
             auto& curr_fd{*curr_fd_p};
-
-            // Detect double-close: if this fd has already been closed and recorded, report EBADF per WASI.
-            // If deleted by renumber_map, it returns ebadf directly when not found, yielding the same result.
-            if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
 
             // Modify `right` in advance to prevent subsequent exceptions from causing the modification to fail.
             curr_fd.rights_base = ::uwvm2::imported::wasi::wasip1::abi::rights_t{};
@@ -217,9 +219,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
             }
 #endif
-
-            // Add the position where it closes itself to facilitate subsequent renumbering.
-            curr_fd.close_pos = curr_fd_close_pos;
         }
 
         // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
