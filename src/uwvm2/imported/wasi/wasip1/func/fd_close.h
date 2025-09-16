@@ -138,6 +138,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     // You can simply delete it here. The lock will wait to be destroyed upon unlocking, and all files can be automatically closed via RAII.
 
                     // In the renumber map, all close positions are initial values and hold no practical significance; they need not be checked.
+                    // If this mutex is currently blocked and waiting for another thread, destroying it will result in undefined behavior.
+                    // Therefore, locking and unlocking are required to ensure no reads occur. Since the lock handover process for other functions is
+                    // well-established, no locking actions occur in other threads during the unlock and erase phases of this lock-unlock-erase sequence. Using
+                    // an anonymous struct ensures direct simultaneous execution of lock and unlock operations, while RAII guarantees exception safety.
+                    ::uwvm2::utils::mutex::mutex_guard_t{renumber_map_iter->second.fd_p->fd_mutex};
 
                     // automatically close when erase
                     // There's no need to catch it, because the destructor doesn't throw an exception.
@@ -153,7 +158,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // The addition here is safe.
                 curr_fd_p = wasm_fd_storage.opens.index_unchecked(fd_opens_pos).fd_p;
                 // Allocate new storage space for closepos while simultaneously acquiring the position for subsequent writes to the internal fd.
-                curr_fd_close_pos = static_cast<::std::size_t>(::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos)) - wasm_fd_storage.closes.cbegin());
+                curr_fd_close_pos =
+                    static_cast<::std::size_t>(::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos)) - wasm_fd_storage.closes.cbegin());
 
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 if(curr_fd_p == nullptr) [[unlikely]]

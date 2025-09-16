@@ -138,6 +138,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     // You can simply delete it here. The lock will wait to be destroyed upon unlocking, and all files can be automatically closed via RAII.
 
                     // In the renumber map, all close positions are initial values and hold no practical significance; they need not be checked.
+                    // If this mutex is currently blocked and waiting for another thread, destroying it will result in undefined behavior.
+                    // Therefore, locking and unlocking are required to ensure no reads occur. Since the lock handover process for other functions is
+                    // well-established, no locking actions occur in other threads during the unlock and erase phases of this lock-unlock-erase sequence. Using
+                    // an anonymous struct ensures direct simultaneous execution of lock and unlock operations, while RAII guarantees exception safety.
+                    ::uwvm2::utils::mutex::mutex_guard_t{renumber_map_iter->second.fd_p->fd_mutex};
 
                     // automatically close when erase
                     // There's no need to catch it, because the destructor doesn't throw an exception.
