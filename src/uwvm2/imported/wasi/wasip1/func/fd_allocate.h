@@ -185,8 +185,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 #endif
 
-            // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread is
-            // performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
+            // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread
+            // is performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
             // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
             // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
             // encounter issues. Thus, locking must occur before releasing fds_rwlock.
@@ -264,8 +264,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
@@ -301,8 +301,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
@@ -363,7 +363,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 case 0xC0000904u /*STATUS_FILE_TOO_LARGE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                 case 0xC000000Du /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                 case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                case 0xC0000022u /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                case 0xC0000022u /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eaccess;
                 case 0xC0000185u /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
             }
@@ -433,8 +433,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
@@ -482,8 +482,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
@@ -551,8 +551,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
@@ -595,8 +595,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
@@ -638,8 +638,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                 case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                case EACCES: [[fallthrough]];
-                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
                 case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                 case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
                 case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
