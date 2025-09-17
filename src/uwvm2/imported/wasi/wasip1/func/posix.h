@@ -39,6 +39,7 @@
 # if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 #  include <fcntl.h>
 #  include <sys/stat.h>
+#  include <sys/socket.h>
 # endif
 
 // import
@@ -102,6 +103,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("fsync")
 # else
             __asm__("_fsync")
+# endif
+                ;
+        extern int getsockopt(int, int, int, void* __restrict, ::socklen_t* __restrict) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("getsockopt")
+# else
+            __asm__("_getsockopt")
 # endif
                 ;
     }  // namespace posix

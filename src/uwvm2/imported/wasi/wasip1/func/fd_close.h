@@ -209,8 +209,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         try
 #endif
         {
-#if defined(_WIN32) && defined(_WIN32_WINDOWS)
-            if(curr_fd.is_dir) { curr_fd.dir_fd.close(); }
+#if defined(_WIN32) && !defined(__CYGWIN__)
+            if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket) { curr_fd.socket_fd.close(); }
+# if defined(_WIN32_WINDOWS)
+            else if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir) { curr_fd.dir_fd.close(); }
+# endif
             else
             {
                 curr_fd.file_fd.close();
@@ -229,6 +232,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             // mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe
             // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
         }
+#endif
+
+        // For Win32, restore the file_type to its original state.
+#if defined(_WIN32) && !defined(__CYGWIN__)
+        curr_fd.file_type = ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t{};
 #endif
 
         // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.

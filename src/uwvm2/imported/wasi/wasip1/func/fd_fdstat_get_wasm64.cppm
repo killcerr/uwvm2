@@ -36,12 +36,14 @@ module;
 #include <uwvm2/utils/macro/push_macros.h>
 // platform
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+# include <unistd.h>
+# include <errno.h>
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <sys/socket.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:posix;
+export module uwvm2.imported.wasi.wasip1.func:fd_fdstat_get_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -53,6 +55,8 @@ import uwvm2.imported.wasi.wasip1.abi;
 import uwvm2.imported.wasi.wasip1.fd_manager;
 import uwvm2.imported.wasi.wasip1.memory;
 import uwvm2.imported.wasi.wasip1.environment;
+import :base;
+import :posix;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -61,5 +65,5 @@ import uwvm2.imported.wasi.wasip1.environment;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "posix.h"
+#include "fd_fdstat_get_wasm64.h"
 

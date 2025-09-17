@@ -164,7 +164,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #endif
 
             // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread
-            // is performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
+            // is performing fdatasync, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
             // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
             // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
             // encounter issues. Thus, locking must occur before releasing fds_rwlock.
@@ -188,14 +188,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_win32_io_observer{static_cast<::fast_io::win32_io_observer>(curr_fd_posix_file)};
+
+# if !defined(__CYGWIN__)
+        if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+        }
+#  if defined(_WIN32_WINDOWS)
+        else if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
+        }
+#  endif
+# endif
+        auto const& curr_fd_native_file{curr_fd.file_fd};
 
 # ifdef UWVM_CPP_EXCEPTIONS
         try
 # endif
         {
-            data_sync(curr_fd_win32_io_observer, ::fast_io::data_sync_flags::file_data_sync_only);
+            // Supports both Win32 and NT
+            data_sync(curr_fd_native_file, ::fast_io::data_sync_flags::file_data_sync_only);
         }
 # ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error e)
@@ -221,6 +234,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 case ::fast_io::nt_domain_value:
                 {
+                    static_assert(sizeof(::fast_io::error::value_type) >= sizeof(::std::uint_least32_t));
                     switch(e.code)
                     {
                         // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
@@ -246,12 +260,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 
-#elif (defined(__MSDOS__) || defined(__DJGPP__)) || defined(__hpux) || defined(__OpenBSD__)
+#elif (defined(__MSDOS__) || defined(__DJGPP__)) || defined(__hpux)
 
         // The Platform only supports fsync: MSDOS-DJGPP, hpux, OpenBSD
 
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
         auto const result_fsync{::uwvm2::imported::wasi::wasip1::func::posix::fsync(curr_fd_native_handle)};
         if(result_fsync == -1) [[unlikely]]
@@ -290,8 +304,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // linux, bsd series, darwin
         // use fdatasync
 
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
 # if defined(__linux__) && (defined(__NR_fdatasync) && defined(__NR_fsync))
         auto const result_fdatasync{::fast_io::system_call<__NR_fdatasync, int>(curr_fd_native_handle)};

@@ -45,6 +45,19 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 {
+#if defined(_WIN32)
+    // on WinNt: Files and paths are both managed under handle management, while sockets are managed by ws3.
+    // on Win9x: Files are managed by handles, paths are managed as strings, and sockets are managed by ws3.
+    enum class win32_wasi_fd_typesize_t : unsigned
+    {
+        file,
+        socket,
+# if defined(_WIN32_WINDOWS)
+        dir,
+# endif
+    };
+#endif
+
     /// @brief    WASI file descriptor
     /// @details  Using a singleton ensures that when encountering multithreaded scaling during usage, the file descriptors currently in use remain unaffected.
     struct wasi_fd_t
@@ -53,11 +66,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         using mutex_alloc_t = ::fast_io::native_typed_global_allocator<mutex_t>;
 
         // ====== for wasi ======
-        ::fast_io::posix_file file_fd{};
-#if defined(_WIN32) && defined(_WIN32_WINDOWS)
+        // Wasi does not differentiate between text and binary modes, so on Win32 systems, files can be opened using CreateFile even if the Win32 layer does not
+        // provide CRLF escaping.
+        ::fast_io::native_file file_fd{};
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+        /// @note The global win32_wsa_service must be created in advance.
+# if !defined(UWVM_ALREADY_PROVIDED_WIN32_WSA_SERVICE)
+        inline static ::fast_io::win32_wsa_service wasi_fd_win32_wsa_service{};  // [global]
+# endif
+        // Win32 sockets are independent of files, so socket functionality must be provided separately.
+        ::fast_io::win32_socket_file socket_fd{};
+# if defined(_WIN32_WINDOWS)
+        // The file system of Windows 9x is independent and requires string storage.
         ::fast_io::win32_9xa_dir_file dir_fd{};
-        bool is_dir{};
+# endif
+        win32_wasi_fd_typesize_t file_type{};
 #endif
+
         ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_base{};
         ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{};
 

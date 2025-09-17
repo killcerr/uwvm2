@@ -44,7 +44,7 @@ int main()
     // Case 1: enotcapable when rights do not include right_fd_datasync
     {
         env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_base = static_cast<rights_t>(0);
-        env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd = ::fast_io::posix_file{u8"test_fd_datasync64.tmp", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd = ::fast_io::native_file{u8"test_fd_datasync64.tmp", ::fast_io::open_mode::out};
 
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_datasync_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(4));
         if(ret != errno_wasm64_t::enotcapable)
@@ -57,7 +57,7 @@ int main()
     // Case 2: esuccess when rights ok and fd valid
     {
         env.fd_storage.opens.index_unchecked(3uz).fd_p->rights_base = static_cast<rights_t>(-1);
-        env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::posix_file{u8"test_fd_datasync64_ok.tmp", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::native_file{u8"test_fd_datasync64_ok.tmp", ::fast_io::open_mode::out};
 
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_datasync_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(3));
         if(ret != errno_wasm64_t::esuccess)
@@ -80,7 +80,7 @@ int main()
     // Case 4: ebadf after fd has been closed
     {
         auto& fd2 = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
-        fd2.file_fd = ::fast_io::posix_file{u8"test_fd_close_then_datasync64.tmp", ::fast_io::open_mode::out};
+        fd2.file_fd = ::fast_io::native_file{u8"test_fd_close_then_datasync64.tmp", ::fast_io::open_mode::out};
         fd2.rights_base = static_cast<rights_t>(-1);
 
         auto const closed = ::uwvm2::imported::wasi::wasip1::func::fd_close_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(2));

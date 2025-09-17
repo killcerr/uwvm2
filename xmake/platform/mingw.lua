@@ -47,6 +47,9 @@ function mingw_target()
         add_ldflags("-static", {force = true})
     end
 
+    -- support all platforms
+    add_syslinks("ws2_32")
+
     local opt_name = get_config("winmin")
     if opt_name == "default" then	
         -- same as WIN10

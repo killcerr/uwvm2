@@ -218,8 +218,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
         // Darwin
 
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
         // Do NOT saturate: if the requested size exceeds API limits, report error per WASI semantics.
         if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
@@ -322,13 +322,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Windows
 # if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
         // Windows 9x
+        // Windows 9x does not support any type.
         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
 # elif !defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x600
         // NT Version >= 6.0 (Vista)
+
+#  if !defined(__CYGWIN__)
+        if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+        }
+#  endif
+
         // Windows path. We accept a C runtime descriptor. Convert to HANDLE.
         auto const& curr_posix_file{curr_fd.file_fd};
+        // Ensure that the handle obtained is for nt. If native is win32 or nt, there will be no overhead.
         auto const curr_nt_io_observer{static_cast<::fast_io::nt_io_observer>(curr_posix_file)};
-        auto const curr_fd_native_handle{curr_nt_io_observer.native_handle()};
+        auto const curr_fd_nt_handle{curr_nt_io_observer.native_handle()};
 
         underlying_filesize_t allocation_size;  // no initialize
 
@@ -354,7 +364,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         ::fast_io::win32::nt::io_status_block IoStatusBlock;  // no initialize
 
         constexpr bool zw{false};
-        if(auto const status{::fast_io::win32::nt::nt_set_information_file<zw>(curr_fd_native_handle,
+        if(auto const status{::fast_io::win32::nt::nt_set_information_file<zw>(curr_fd_nt_handle,
                                                                                ::std::addressof(IoStatusBlock),
                                                                                ::std::addressof(faInfo),
                                                                                sizeof(::fast_io::win32::nt::file_allocation_information),
@@ -401,8 +411,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(_WIN32) || defined(__CYGWIN__)) &&             \
     __has_include(<dirent.h>) && !defined(_PICOLIBC__)
         // Prefer posix_fallocate (portable) -- it returns 0 on success or an errno value on failure.
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
         // posix_fallocate signature: int posix_fallocate(int fd, ::off_t offset, ::off_t len);
         // But on some platforms ::off_t might be smaller; do saturation.

@@ -60,9 +60,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
     /// @note       Although optional distributors are provided, remember to use multiple distributors.
 
     template <typename Alloc>
-    inline constexpr void check_memory_bounds(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
-                                              ::std::size_t offset,
-                                              ::std::size_t wasm_bytes) noexcept
+    inline constexpr void check_memory_bounds_unlocked(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                       ::std::size_t offset,
+                                                       ::std::size_t wasm_bytes) noexcept
     {
         // Conduct a full inspection of the memory.
         auto const memory_begin{memory.memory_begin};
@@ -92,9 +92,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
     }
 
     template <typename Alloc>
-    inline constexpr void check_memory_bounds_wasm32(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
-                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
-                                                     ::std::size_t wasm_bytes) noexcept
+    inline constexpr void check_memory_bounds_wasm32_unlocked(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                              ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                              ::std::size_t wasm_bytes) noexcept
     {
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
         constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
@@ -113,13 +113,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             }
         }
 
-        check_memory_bounds<Alloc>(memory, static_cast<::std::size_t>(offset), wasm_bytes);
+        check_memory_bounds_unlocked<Alloc>(memory, static_cast<::std::size_t>(offset), wasm_bytes);
     }
 
     template <typename Alloc>
-    inline constexpr void check_memory_bounds_wasm64(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
-                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
-                                                     ::std::size_t wasm_bytes) noexcept
+    inline constexpr void check_memory_bounds_wasm64_unlocked(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                              ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                              ::std::size_t wasm_bytes) noexcept
     {
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
         constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
@@ -138,7 +138,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
             }
         }
 
-        check_memory_bounds<Alloc>(memory, static_cast<::std::size_t>(offset), wasm_bytes);
+        check_memory_bounds_unlocked<Alloc>(memory, static_cast<::std::size_t>(offset), wasm_bytes);
+    }
+
+    template <typename Alloc>
+    inline constexpr void check_memory_bounds(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                              ::std::size_t offset,
+                                              ::std::size_t wasm_bytes) noexcept
+    {
+        return check_memory_bounds_unlocked(memory, offset, wasm_bytes);
+    }
+
+    template <typename Alloc>
+    inline constexpr void check_memory_bounds_wasm32(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                     ::std::size_t wasm_bytes) noexcept
+    {
+        return check_memory_bounds_wasm32_unlocked(memory, offset, wasm_bytes);
+    }
+
+    template <typename Alloc>
+    inline constexpr void check_memory_bounds_wasm64(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                     ::std::size_t wasm_bytes) noexcept
+    {
+        return check_memory_bounds_wasm64_unlocked(memory, offset, wasm_bytes);
     }
 
     template <typename WasmType, typename Alloc>
@@ -147,7 +171,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
     {
         constexpr auto wasm_bytes{sizeof(WasmType)};
 
-        check_memory_bounds(memory, offset, wasm_bytes);
+        check_memory_bounds_unlocked(memory, offset, wasm_bytes);
 
         if constexpr(::std::integral<WasmType>)
         {
@@ -227,7 +251,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
     {
         constexpr auto wasm_bytes{sizeof(WasmType)};
 
-        check_memory_bounds(memory, offset, wasm_bytes);
+        check_memory_bounds_unlocked(memory, offset, wasm_bytes);
 
         if constexpr(::std::integral<WasmType>)
         {
@@ -305,7 +329,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 
         auto const wasm_bytes{static_cast<::std::size_t>(end - begin)};
 
-        check_memory_bounds(memory, offset, wasm_bytes);
+        check_memory_bounds_unlocked(memory, offset, wasm_bytes);
 
         ::std::memcpy(begin, memory.memory_begin + offset, wasm_bytes);
     }
@@ -372,7 +396,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
 
         auto const wasm_bytes{static_cast<::std::size_t>(end - begin)};
 
-        check_memory_bounds(memory, offset, wasm_bytes);
+        check_memory_bounds_unlocked(memory, offset, wasm_bytes);
 
         ::std::memcpy(memory.memory_begin + offset, begin, wasm_bytes);
     }
@@ -427,6 +451,66 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
         }
 
         write_all_to_memory<Alloc>(memory, static_cast<::std::size_t>(offset), begin, end);
+    }
+
+    template <typename Alloc>
+    inline constexpr void clear_memory(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                       ::std::size_t offset,
+                                       ::std::size_t size) noexcept
+    {
+        check_memory_bounds_unlocked(memory, offset, size);
+
+        ::std::memset(memory.memory_begin + offset, 0, size);
+    }
+
+    template <typename Alloc>
+    inline constexpr void clear_memory_wasm32(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                              ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                              ::std::size_t size) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u32
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = size
+                });
+            }
+        }
+
+        clear_memory<Alloc>(memory, static_cast<::std::size_t>(offset), size);
+    }
+
+    template <typename Alloc>
+    inline constexpr void clear_memory_wasm64(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                              ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                              ::std::size_t size) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u64
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = size
+                });
+            }
+        }
+
+        clear_memory<Alloc>(memory, static_cast<::std::size_t>(offset), size);
     }
 
     template <typename WasmType, typename Alloc>
@@ -709,5 +793,62 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
         write_all_to_memory_unchecked<Alloc>(memory, static_cast<::std::size_t>(offset), begin, end);
     }
 
+    template <typename Alloc>
+    inline constexpr void clear_memory_unchecked(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                 ::std::size_t offset,
+                                                 ::std::size_t size) noexcept
+    {
+        ::std::memset(memory.memory_begin + offset, 0, size);
+    }
+
+    template <typename Alloc>
+    inline constexpr void clear_memory_wasm32_unchecked(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t offset,
+                                                        ::std::size_t size) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u32
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = size
+                });
+            }
+        }
+
+        clear_memory_unchecked<Alloc>(memory, static_cast<::std::size_t>(offset), size);
+    }
+
+    template <typename Alloc>
+    inline constexpr void clear_memory_wasm64_unchecked(::uwvm2::object::memory::linear::basic_single_thread_allocator_memory_t<Alloc> const& memory,
+                                                        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t offset,
+                                                        ::std::size_t size) noexcept
+    {
+        constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
+        constexpr auto wasi_void_ptr_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>::max()};
+        if constexpr(size_t_max < wasi_void_ptr_max)
+        {
+            // The size_t of current platforms is smaller than u64
+            if(offset > size_t_max) [[unlikely]]
+            {
+                ::uwvm2::object::memory::error::output_memory_error_and_terminate({
+                    .memory_idx = 0uz,
+                    .memory_offset = {.offset = static_cast<::std::uint_least64_t>(offset), .offset_65_bit = false},
+                    .memory_static_offset = 0u,
+                    .memory_length = static_cast<::std::uint_least64_t>(memory.memory_length),
+                    .memory_type_size = size
+                });
+            }
+        }
+
+        clear_memory_unchecked<Alloc>(memory, static_cast<::std::size_t>(offset), size);
+    }
 }  // namespace uwvm2::imported::wasi::wasip1::memory
 

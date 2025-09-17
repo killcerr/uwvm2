@@ -63,6 +63,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     /// @brief     WasiPreview1.fd_advise
     /// @details   __wasi_errno_t fd_advise( __wasi_fd_t fd, __wasi_filesize_t offset, __wasi_filesize_t len, __wasi_advice_t advice);
     /// @note      This function only writes sizes; callers must provide valid memory offsets.
+    /// @note      On Darwin platforms, `fd_advise` is non-atomic due to platform limitations. In extreme cases, it may only reserve space in the operating
+    ///            system without modifying file attributes, rendering the operation invisible. Within the scope of WASM, however, it is atomic.
 
     ::uwvm2::imported::wasi::wasip1::abi::errno_t fd_advise(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
@@ -180,8 +182,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 #endif
 
-            // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread is
-            // performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
+            // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread
+            // is performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
             // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
             // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
             // encounter issues. Thus, locking must occur before releasing fds_rwlock.
@@ -560,6 +562,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #else
         // In WASI or POSIX semantics, `fd_advise` is merely an advisory hint. It does not and cannot alter the correctness of program logic, so it does not
         // return an error on unsupported platforms.
+
+        // Whether it's a directory, file, or socket, it returns esuccess.
 
         switch(advice)
         {
