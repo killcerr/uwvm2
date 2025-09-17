@@ -72,7 +72,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
         /// @note The global win32_wsa_service must be created in advance.
-
+# if !defined(UWVM_ALREADY_PROVIDED_WIN32_WSA_SERVICE)
+        inline static ::fast_io::win32_wsa_service wasi_fd_win32_wsa_service{};  // [global]
+# endif
         // Win32 sockets are independent of files, so socket functionality must be provided separately.
         ::fast_io::win32_socket_file socket_fd{};
 # if defined(_WIN32_WINDOWS)
