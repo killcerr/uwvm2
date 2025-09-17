@@ -38,6 +38,7 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // platform
 # if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+#  include <unistd.h>
 #  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
