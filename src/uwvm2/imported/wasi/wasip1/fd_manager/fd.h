@@ -45,6 +45,19 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 {
+#if defined(_WIN32)
+    // on WinNt: Files and paths are both managed under handle management, while sockets are managed by ws3.
+    // on Win9x: Files are managed by handles, paths are managed as strings, and sockets are managed by ws3.
+    enum class win32_wasi_fd_typesize_t : unsigned
+    {
+        file,
+        socket,
+# if defined(_WIN32_WINDOWS)
+        dir,
+# endif
+    };
+#endif
+
     /// @brief    WASI file descriptor
     /// @details  Using a singleton ensures that when encountering multithreaded scaling during usage, the file descriptors currently in use remain unaffected.
     struct wasi_fd_t
@@ -54,10 +67,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         // ====== for wasi ======
         ::fast_io::posix_file file_fd{};
-#if defined(_WIN32) && defined(_WIN32_WINDOWS)
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+        // The global win32_wsa_service must be created in advance.
+        ::fast_io::win32_socket_file socket_fd{};
+# if defined(_WIN32_WINDOWS)
         ::fast_io::win32_9xa_dir_file dir_fd{};
-        bool is_dir{};
+# endif
+        win32_wasi_fd_typesize_t file_type{};
 #endif
+
         ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_base{};
         ::uwvm2::imported::wasi::wasip1::abi::rights_t rights_inherit{};
 

@@ -322,9 +322,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Windows
 # if !defined(__CYGWIN__) && !defined(__WINE__) && !defined(__BIONIC__) && defined(_WIN32_WINDOWS)
         // Windows 9x
+        // Windows 9x does not support any type.
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
 # elif !defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x600
         // NT Version >= 6.0 (Vista)
+
+#  if !defined(__CYGWIN__)
+        if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+        }
+#  endif
+
         // Windows path. We accept a C runtime descriptor. Convert to HANDLE.
         auto const& curr_posix_file{curr_fd.file_fd};
         auto const curr_nt_io_observer{static_cast<::fast_io::nt_io_observer>(curr_posix_file)};

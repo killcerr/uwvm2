@@ -219,21 +219,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const& curr_fd_posix_file{curr_fd.file_fd};
         auto const native_fd{curr_fd_posix_file.native_handle()};
 
-        ::fast_io::posix_file_status curr_fd_status;  // no initialize
-
-#ifdef UWVM_CPP_EXCEPTIONS
-        try
-#endif
-        {
-            curr_fd_status = status(curr_fd_posix_file);
-        }
-#ifdef UWVM_CPP_EXCEPTIONS
-        catch(::fast_io::error)
-        {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-        }
-#endif
-
         // Query native fd flags via fcntl(F_GETFL) for WASI fdflags mapping
         ::uwvm2::imported::wasi::wasip1::abi::filetype_t fs_filetype;                                 // 0, no initialize
         ::uwvm2::imported::wasi::wasip1::abi::fdflags_t fs_flags{};                                   // 2
@@ -270,6 +255,143 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         if(oflags & O_SYNC) { fs_flags |= ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync; }
 # endif
 #endif
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+        switch(curr_fd.file_type)
+        {
+            case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket:
+            {
+                fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_stream;
+
+                char so_type{};
+                int optlen{static_cast<int>(sizeof(so_type))};
+                if(::fast_io::win32::getsockopt(curr_fd.socket_fd.native_handle(),
+                                                0xFFFF /*SOL_SOCKET*/,
+                                                0x1008 /*SO_TYPE*/,
+                                                ::std::addressof(so_type),
+                                                ::std::addressof(optlen)) == 0 &&
+                   optlen == sizeof(so_type))
+                {
+                    if(so_type == 2 /*SOCK_DGRAM*/) { fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_dgram; }
+                }
+
+                break;
+            }
+# if defined(_WIN32_WINDOWS)
+            case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir:
+            {
+                fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_directory;
+                break;
+            }
+# endif
+            case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::file:
+            {
+                ::fast_io::posix_file_status curr_fd_status;  // no initialize
+
+# ifdef UWVM_CPP_EXCEPTIONS
+                try
+# endif
+                {
+                    curr_fd_status = status(curr_fd_posix_file);
+                }
+# ifdef UWVM_CPP_EXCEPTIONS
+                catch(::fast_io::error)
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                }
+# endif
+
+                switch(curr_fd_status.type)
+                {
+                    case ::fast_io::file_type::none:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        break;
+                    }
+                    case ::fast_io::file_type::not_found:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        break;
+                    }
+                    case ::fast_io::file_type::regular:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_regular_file;
+                        break;
+                    }
+                    case ::fast_io::file_type::directory:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_directory;
+                        break;
+                    }
+                    case ::fast_io::file_type::symlink:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_symbolic_link;
+                        break;
+                    }
+                    case ::fast_io::file_type::block:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_block_device;
+                        break;
+                    }
+                    case ::fast_io::file_type::character:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_character_device;
+                        break;
+                    }
+                    case ::fast_io::file_type::fifo:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        break;
+                    }
+                    case ::fast_io::file_type::socket:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_stream;
+                        break;
+                    }
+                    case ::fast_io::file_type::unknown:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        break;
+                    }
+                    case ::fast_io::file_type::remote:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        break;
+                    }
+                    [[unlikely]] default:
+                    {
+                        fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        break;
+                    }
+                }
+
+                break;
+            }
+            [[unlikely]] default:
+            {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                // Security issues inherent to virtual machines
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+# endif
+                fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                break;
+            }
+        }
+#else
+        ::fast_io::posix_file_status curr_fd_status;  // no initialize
+
+# ifdef UWVM_CPP_EXCEPTIONS
+        try
+# endif
+        {
+            curr_fd_status = status(curr_fd_posix_file);
+        }
+# ifdef UWVM_CPP_EXCEPTIONS
+        catch(::fast_io::error)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+        }
+# endif
 
         switch(curr_fd_status.type)
         {
@@ -317,7 +439,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_stream;
 
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
                 int so_type{};
                 auto optlen{static_cast<::socklen_t>(sizeof(so_type))};
                 if(::uwvm2::imported::wasi::wasip1::func::posix::getsockopt(native_fd,
@@ -329,7 +451,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(so_type == SOCK_DGRAM) { fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_dgram; }
                 }
-#endif
+# endif
                 break;
             }
             case ::fast_io::file_type::unknown:
@@ -348,6 +470,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 break;
             }
         }
+#endif
 
         using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
         auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};

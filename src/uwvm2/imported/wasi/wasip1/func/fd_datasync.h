@@ -188,6 +188,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
 #if defined(_WIN32) || defined(__CYGWIN__)
+
+# if !defined(__CYGWIN__)
+        if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+        }
+#  if defined(_WIN32_WINDOWS)
+        else if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+        }
+#  endif
+# endif
+
         auto const& curr_fd_posix_file{curr_fd.file_fd};
         auto const curr_fd_win32_io_observer{static_cast<::fast_io::win32_io_observer>(curr_fd_posix_file)};
 
