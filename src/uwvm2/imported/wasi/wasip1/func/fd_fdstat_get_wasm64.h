@@ -217,8 +217,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, stat_ptrsz, size_of_wasi_fdstat_wasm64_t);
 
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const native_fd{curr_fd_posix_file.native_handle()};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
+        auto const native_fd{curr_fd_native_file.native_handle()};
 
         // Query native fd flags via fcntl(F_GETFL) for WASI fdflags mapping
         ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t fs_filetype;                                 // 0, no initialize
@@ -293,7 +293,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 try
 # endif
                 {
-                    curr_fd_status = status(curr_fd_posix_file);
+                    curr_fd_status = status(curr_fd_native_file);
                 }
 # ifdef UWVM_CPP_EXCEPTIONS
                 catch(::fast_io::error)
@@ -385,7 +385,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         try
 # endif
         {
-            curr_fd_status = status(curr_fd_posix_file);
+            curr_fd_status = status(curr_fd_native_file);
         }
 # ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error)

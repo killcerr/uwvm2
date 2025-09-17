@@ -202,14 +202,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #  endif
 # endif
 
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_win32_io_observer{static_cast<::fast_io::win32_io_observer>(curr_fd_posix_file)};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
 
 # ifdef UWVM_CPP_EXCEPTIONS
         try
 # endif
         {
-            data_sync(curr_fd_win32_io_observer, ::fast_io::data_sync_flags::file_data_sync_only);
+            // Supports both Win32 and NT
+            data_sync(curr_fd_native_file, ::fast_io::data_sync_flags::file_data_sync_only);
         }
 # ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error e)
@@ -265,8 +265,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // The Platform only supports fsync: MSDOS-DJGPP, hpux, OpenBSD
 
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
         auto const result_fsync{::uwvm2::imported::wasi::wasip1::func::posix::fsync(curr_fd_native_handle)};
         if(result_fsync == -1) [[unlikely]]
@@ -305,8 +305,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // linux, bsd series, darwin
         // use fdatasync
 
-        auto const& curr_fd_posix_file{curr_fd.file_fd};
-        auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
+        auto const& curr_fd_native_file{curr_fd.file_fd};
+        auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
 # if defined(__linux__) && (defined(__NR_fdatasync) && defined(__NR_fsync))
         auto const result_fdatasync{::fast_io::system_call<__NR_fdatasync, int>(curr_fd_native_handle)};

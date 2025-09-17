@@ -66,12 +66,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
         using mutex_alloc_t = ::fast_io::native_typed_global_allocator<mutex_t>;
 
         // ====== for wasi ======
-        ::fast_io::posix_file file_fd{};
+        // Wasi does not differentiate between text and binary modes, so on Win32 systems, files can be opened using CreateFile even if the Win32 layer does not
+        // provide CRLF escaping.
+        ::fast_io::native_file file_fd{};
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-        // The global win32_wsa_service must be created in advance.
+        /// @note The global win32_wsa_service must be created in advance.
+
+        // Win32 sockets are independent of files, so socket functionality must be provided separately.
         ::fast_io::win32_socket_file socket_fd{};
 # if defined(_WIN32_WINDOWS)
+        // The file system of Windows 9x is independent and requires string storage.
         ::fast_io::win32_9xa_dir_file dir_fd{};
 # endif
         win32_wasi_fd_typesize_t file_type{};
