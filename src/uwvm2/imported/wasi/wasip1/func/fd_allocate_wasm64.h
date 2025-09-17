@@ -221,21 +221,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
 
         // Do NOT saturate: if the requested size exceeds API limits, report error per WASI semantics.
-        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
         {
-            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
 
-            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
         }
 
-        off_t fallocate_offset{static_cast<off_t>(offset)};
-        off_t fallocate_len{static_cast<off_t>(len)};
+        ::off_t fallocate_offset{static_cast<::off_t>(offset)};
+        ::off_t fallocate_len{static_cast<::off_t>(len)};
 
         // macOS: use F_PREALLOCATE / fstore_t
         fstore_t fstore{.fst_flags = F_ALLOCATECONTIG,
@@ -244,7 +244,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                         .fst_length = fallocate_len,
                         .fst_bytesalloc = 0u};
 
-        off_t newsize;  // no initialize
+        ::off_t newsize;  // no initialize
         if(::uwvm2::imported::wasi::wasip1::func::add_overflow(fallocate_offset, fallocate_len, newsize)) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
@@ -399,8 +399,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const& curr_fd_posix_file{curr_fd.file_fd};
         auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
 
-        // posix_fallocate signature: int posix_fallocate(int fd, off_t offset, off_t len);
-        // But on some platforms off_t might be smaller; do saturation.
+        // posix_fallocate signature: int posix_fallocate(int fd, ::off_t offset, ::off_t len);
+        // But on some platforms ::off_t might be smaller; do saturation.
 
 # if defined(__linux__) && defined(__NR_fallocate)
         if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint64_t))
@@ -572,21 +572,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             // unknown linux platform
-            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
             {
-                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 }
 
-                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 }
             }
 
-            off_t fallocate_offset{static_cast<off_t>(offset)};
-            off_t fallocate_len{static_cast<off_t>(len)};
+            ::off_t fallocate_offset{static_cast<::off_t>(offset)};
+            ::off_t fallocate_len{static_cast<::off_t>(len)};
 
             int result_pf{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
             if(result_pf != 0) [[unlikely]]
@@ -616,21 +616,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # else
         // bsd series
 
-        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
         {
-            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
 
-            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
         }
 
-        off_t fallocate_offset{static_cast<off_t>(offset)};
-        off_t fallocate_len{static_cast<off_t>(len)};
+        ::off_t fallocate_offset{static_cast<::off_t>(offset)};
+        ::off_t fallocate_len{static_cast<::off_t>(len)};
 
         int result_pf{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
         if(result_pf != 0) [[unlikely]]

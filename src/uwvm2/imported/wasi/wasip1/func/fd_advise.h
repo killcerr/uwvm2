@@ -245,9 +245,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // the current position of the file descriptor.
                 // Set up pre-fetching suggestions. The return value is not checked here, as this is merely a recommendation.
 
-                if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+                if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
                 {
-                    if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                    if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                     {
                         // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
@@ -263,7 +263,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     }
                 }
 
-                struct radvisory radvisory_advice{.ra_offset = static_cast<off_t>(offset), .ra_count = static_cast<int>(len)};
+                struct radvisory radvisory_advice{.ra_offset = static_cast<::off_t>(offset), .ra_count = static_cast<int>(len)};
 
                 ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(curr_fd_native_handle, F_RDADVISE, ::std::addressof(radvisory_advice));
 
@@ -349,23 +349,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             ::fast_io::system_call<__NR_fadvise64, int>(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 #  else
-            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
             {
-                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
                 }
 
-                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
                 }
             }
 
-            off_t offset_saturation{static_cast<off_t>(offset)};
-            off_t len_saturation{static_cast<off_t>(len)};
+            ::off_t offset_saturation{static_cast<::off_t>(offset)};
+            ::off_t len_saturation{static_cast<::off_t>(len)};
 
             ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 
@@ -483,23 +483,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                                             curr_platform_advice);
             }
 #  else
-            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
             {
-                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
                 }
 
-                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
                 }
             }
 
-            off_t offset_saturation{static_cast<off_t>(offset)};
-            off_t len_saturation{static_cast<off_t>(len)};
+            ::off_t offset_saturation{static_cast<::off_t>(offset)};
+            ::off_t len_saturation{static_cast<::off_t>(len)};
 
             ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 
@@ -509,23 +509,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             // unknown linux platform
 
-            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
             {
-                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
                 }
 
-                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
                 }
             }
 
-            off_t offset_saturation{static_cast<off_t>(offset)};
-            off_t len_saturation{static_cast<off_t>(len)};
+            ::off_t offset_saturation{static_cast<::off_t>(offset)};
+            ::off_t len_saturation{static_cast<::off_t>(len)};
 
             ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
         }
@@ -533,23 +533,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # else
         // bsd series
 
-        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
         {
-            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
             }
 
-            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 // Ensure no incorrect positions are suggested while preserving the wasi semantics (this is a suggestion).
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
             }
         }
 
-        off_t offset_saturation{static_cast<off_t>(offset)};
-        off_t len_saturation{static_cast<off_t>(len)};
+        ::off_t offset_saturation{static_cast<::off_t>(offset)};
+        ::off_t len_saturation{static_cast<::off_t>(len)};
 
         ::uwvm2::imported::wasi::wasip1::func::posix::posix_fadvise(curr_fd_native_handle, offset_saturation, len_saturation, curr_platform_advice);
 # endif

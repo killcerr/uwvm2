@@ -64,9 +64,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     namespace posix
     {
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
-        extern int posix_fadvise(int fd, off_t offset, off_t len, int advice) noexcept __asm__("posix_fadvise");
-        extern int fallocate(int fd, int mode, off_t offset, off_t len) noexcept __asm__("fallocate");
-        extern int posix_fallocate(int fd, off_t offset, off_t size) noexcept __asm__("posix_fallocate");
+        extern int posix_fadvise(int fd, ::off_t offset, ::off_t len, int advice) noexcept __asm__("posix_fadvise");
+        extern int fallocate(int fd, int mode, ::off_t offset, ::off_t len) noexcept __asm__("fallocate");
+        extern int posix_fallocate(int fd, ::off_t offset, ::off_t size) noexcept __asm__("posix_fallocate");
 # endif
 
         extern int fcntl(int fd, int cmd, ... /* arg */) noexcept
@@ -76,7 +76,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fcntl")
 # endif
                 ;
-        extern int ftruncate(int fd, off_t size) noexcept
+        extern int ftruncate(int fd, ::off_t size) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("ftruncate")
 # else
