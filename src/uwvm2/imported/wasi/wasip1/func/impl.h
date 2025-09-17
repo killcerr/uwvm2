@@ -45,5 +45,7 @@
 # include "fd_close.h"
 # include "fd_datasync_wasm64.h"
 # include "fd_datasync.h"
+# include "fd_fdstat_get_wasm64.h"
+# include "fd_fdstat_get.h"
 
 #endif
