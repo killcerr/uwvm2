@@ -38,6 +38,7 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // platform
 # if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+#  include <unistd.h>
 #  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
@@ -185,8 +186,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 #endif
 
-            // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread is
-            // performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
+            // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread
+            // is performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
             // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
             // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
             // encounter issues. Thus, locking must occur before releasing fds_rwlock.
@@ -221,21 +222,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
 
         // Do NOT saturate: if the requested size exceeds API limits, report error per WASI semantics.
-        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
         {
-            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
 
-            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
         }
 
-        off_t fallocate_offset{static_cast<off_t>(offset)};
-        off_t fallocate_len{static_cast<off_t>(len)};
+        ::off_t fallocate_offset{static_cast<::off_t>(offset)};
+        ::off_t fallocate_len{static_cast<::off_t>(len)};
 
         // macOS: use F_PREALLOCATE / fstore_t
         fstore_t fstore{.fst_flags = F_ALLOCATECONTIG,
@@ -244,7 +245,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                         .fst_length = fallocate_len,
                         .fst_bytesalloc = 0u};
 
-        off_t newsize;  // no initialize
+        ::off_t newsize;  // no initialize
         if(::uwvm2::imported::wasi::wasip1::func::add_overflow(fallocate_offset, fallocate_len, newsize)) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
@@ -260,12 +261,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // If preallocation fails, report error directly per WASI semantics
                 switch(errno)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
@@ -283,11 +285,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         struct stat st;
         if(::uwvm2::imported::wasi::wasip1::func::posix::fstat(curr_fd_native_handle, ::std::addressof(st)) == -1) [[unlikely]]
         {
-            switch(errno)
-            {
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
-            }
+            // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
         }
 
         if(st.st_size < newsize) [[unlikely]]
@@ -297,16 +296,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 switch(errno)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
                     case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
+# if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                    case EOPNOTSUPP: [[fallthrough]];
+# endif
+                    case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 }
             }
@@ -363,7 +367,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 case 0xC0000904u /*STATUS_FILE_TOO_LARGE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 case 0xC000000Du /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
                 case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
-                case 0xC0000022u /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                case 0xC0000022u /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
                 case 0xC0000185u /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
@@ -400,8 +404,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const& curr_fd_posix_file{curr_fd.file_fd};
         auto const curr_fd_native_handle{curr_fd_posix_file.native_handle()};
 
-        // posix_fallocate signature: int posix_fallocate(int fd, off_t offset, off_t len);
-        // But on some platforms off_t might be smaller; do saturation.
+        // posix_fallocate signature: int posix_fallocate(int fd, ::off_t offset, ::off_t len);
+        // But on some platforms ::off_t might be smaller; do saturation.
 
 # if defined(__linux__) && defined(__NR_fallocate)
         if constexpr(sizeof(::std::size_t) >= sizeof(::std::uint64_t))
@@ -429,12 +433,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 int const err{static_cast<int>(-result_syscall)};
                 switch(err)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
@@ -478,12 +483,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 int const err{static_cast<int>(-result_syscall)};
                 switch(err)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
@@ -547,12 +553,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 int const err{static_cast<int>(-result_syscall)};
                 switch(err)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
@@ -570,33 +577,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             // unknown linux platform
-            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+            if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
             {
-                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 }
 
-                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+                if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
                 {
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 }
             }
 
-            off_t fallocate_offset{static_cast<off_t>(offset)};
-            off_t fallocate_len{static_cast<off_t>(len)};
+            ::off_t fallocate_offset{static_cast<::off_t>(offset)};
+            ::off_t fallocate_len{static_cast<::off_t>(len)};
 
             int result_pf{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
             if(result_pf != 0) [[unlikely]]
             {
                 switch(result_pf)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
-                    case EACCES: [[fallthrough]];
-                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                    case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                    case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
                     case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                     case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
                     case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
@@ -613,33 +621,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # else
         // bsd series
 
-        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<off_t>::max())
+        if constexpr(::std::numeric_limits<underlying_filesize_t>::max() > ::std::numeric_limits<::off_t>::max())
         {
-            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(offset) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
 
-            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<off_t>::max()) [[unlikely]]
+            if(static_cast<underlying_filesize_t>(len) > ::std::numeric_limits<::off_t>::max()) [[unlikely]]
             {
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
             }
         }
 
-        off_t fallocate_offset{static_cast<off_t>(offset)};
-        off_t fallocate_len{static_cast<off_t>(len)};
+        ::off_t fallocate_offset{static_cast<::off_t>(offset)};
+        ::off_t fallocate_len{static_cast<::off_t>(len)};
 
         int result_pf{::uwvm2::imported::wasi::wasip1::func::posix::posix_fallocate(curr_fd_native_handle, fallocate_offset, fallocate_len)};
         if(result_pf != 0) [[unlikely]]
         {
             switch(result_pf)
             {
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                 case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
-                case EACCES: [[fallthrough]];
-                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
+                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
                 case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                 case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
                 case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;

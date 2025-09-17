@@ -71,9 +71,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     /// @brief     WasiPreview1.fd_datasync
     /// @details   __wasi_errno_t fd_datasync(__wasi_fd_t fd);
 
-    ::uwvm2::imported::wasi::wasip1::abi::errno_t fd_datasync(
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_datasync_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t fd) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd) noexcept
     {
         auto const trace_wasip1_call{env.trace_wasip1_call};
 
@@ -88,7 +88,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"fd_datasync",
+                                u8"fd_datasync_wasm64",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
@@ -99,12 +99,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 u8"(wasi-trace)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
-            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: fd_datasync(", fd, u8") (wasi-trace)\n");
+            ::fast_io::io::perr(::fast_io::u8err(), u8"uwvm: [info]  wasip1: fd_datasync_wasm64(", fd, u8") (wasi-trace)\n");
 #endif
         }
 
         // The negative value fd is invalid, and this check prevents subsequent undefined behavior.
-        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
         auto& wasm_fd_storage{env.fd_storage};
 
@@ -123,14 +123,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::uwvm2::utils::mutex::rw_shared_guard_t fds_lock{wasm_fd_storage.fds_rwlock};
 
             // Negative states have been excluded, so the conversion result will only be positive numbers.
-            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
+            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
             auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
 
             // On platforms where `size_t` is smaller than the `fd` type, this check must be added.
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
             if constexpr(::std::numeric_limits<unsigned_fd_t>::max() > size_t_max)
             {
-                if(unsigned_fd > size_t_max) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+                if(unsigned_fd > size_t_max) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
             }
 
             auto const fd_opens_pos{static_cast<::std::size_t>(unsigned_fd)};
@@ -145,7 +145,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 else [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
                 }
             }
             else
@@ -179,12 +179,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // If obtained from the renumber map, it will always be the correct value. If obtained from the open vec, it requires checking whether it is closed.
         // Therefore, a unified check is implemented.
-        if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+        if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_datasync) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_datasync) [[unlikely]]
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_datasync) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_datasync) [[unlikely]]
         {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
 
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -207,16 +207,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     switch(e.code)
                     {
                         // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                        case 6uz /*ERROR_INVALID_HANDLE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                        case 5uz /*ERROR_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                        case 1uz /*ERROR_INVALID_FUNCTION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
-                        case 50uz /*ERROR_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                        case 19uz /*ERROR_WRITE_PROTECT*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                        case 87uz /*ERROR_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                        case 1117uz /*ERROR_IO_DEVICE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                        case 31uz /*ERROR_GEN_FAILURE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                        case 1784uz /*ERROR_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efault;
-                        default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                        case 6uz /*ERROR_INVALID_HANDLE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                        case 5uz /*ERROR_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                        case 1uz /*ERROR_INVALID_FUNCTION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
+                        case 50uz /*ERROR_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+                        case 19uz /*ERROR_WRITE_PROTECT*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
+                        case 87uz /*ERROR_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        case 1117uz /*ERROR_IO_DEVICE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                        case 31uz /*ERROR_GEN_FAILURE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                        case 1784uz /*ERROR_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efault;
+                        default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     }
                 }
                 case ::fast_io::nt_domain_value:
@@ -224,27 +224,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     switch(e.code)
                     {
                         // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                        case 0xC0000008uz /*STATUS_INVALID_HANDLE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                        case 0xC0000022uz /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                        case 0xC0000002uz /*STATUS_NOT_IMPLEMENTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
-                        case 0xC00000BBuz /*STATUS_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                        case 0xC00000A2uz /*STATUS_MEDIA_WRITE_PROTECTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                        case 0xC000000Duz /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                        case 0xC0000185uz /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                        case 0xC0000001uz /*STATUS_UNSUCCESSFUL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                        case 0xC00000E8uz /*STATUS_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efault;
-                        default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                        case 0xC0000008uz /*STATUS_INVALID_HANDLE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                        case 0xC0000022uz /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                        case 0xC0000002uz /*STATUS_NOT_IMPLEMENTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
+                        case 0xC00000BBuz /*STATUS_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+                        case 0xC00000A2uz /*STATUS_MEDIA_WRITE_PROTECTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
+                        case 0xC000000Duz /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        case 0xC0000185uz /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                        case 0xC0000001uz /*STATUS_UNSUCCESSFUL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                        case 0xC00000E8uz /*STATUS_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efault;
+                        default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     }
                 }
                 [[unlikely]] default:
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 }
             }
         }
 # endif
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 
 #elif (defined(__MSDOS__) || defined(__DJGPP__)) || defined(__hpux) || defined(__OpenBSD__)
 
@@ -259,30 +259,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             switch(errno)
             {
                 // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
-                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
-                case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
-                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
+                case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
+                case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
+                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
+                case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
+                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
 # if defined(EWOULDBLOCK) && (!defined(EAGAIN) || (EAGAIN != EWOULDBLOCK))
                 case EWOULDBLOCK: [[fallthrough]];
 # endif
-                case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
-                case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eagain;
+                case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
 # if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
                 case EOPNOTSUPP: [[fallthrough]];
 # endif
-                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 
 #elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(_WIN32) || defined(__CYGWIN__)) &&             \
     __has_include(<dirent.h>) && !defined(_PICOLIBC__)
@@ -310,51 +310,51 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                         {
                             // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used
                             // instead.
-                            case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                            case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                            case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
-                            case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                            case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                            case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
-                            case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                            case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                            case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
-                            case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
+                            case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                            case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
+                            case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
+                            case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                            case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                            case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
+                            case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
+                            case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
+                            case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
+                            case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
 #  if defined(EWOULDBLOCK) && (!defined(EAGAIN) || (EAGAIN != EWOULDBLOCK))
                             case EWOULDBLOCK: [[fallthrough]];
 #  endif
-                            case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
-                            case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                            case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eagain;
+                            case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
 #  if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
                             case EOPNOTSUPP: [[fallthrough]];
 #  endif
-                            case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                            default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                            case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+                            default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                         }
                     }
 
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
                 }
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
-                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
-                case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
-                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
+                case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
+                case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
+                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
+                case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
+                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
 #  if defined(EWOULDBLOCK) && (!defined(EAGAIN) || (EAGAIN != EWOULDBLOCK))
                 case EWOULDBLOCK: [[fallthrough]];
 #  endif
-                case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
-                case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eagain;
+                case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
 #  if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
                 case EOPNOTSUPP: [[fallthrough]];
 #  endif
-                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
 # else
@@ -374,59 +374,59 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                         {
                             // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used
                             // instead.
-                            case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                            case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                            case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
-                            case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                            case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                            case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
-                            case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                            case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                            case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
-                            case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
+                            case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                            case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
+                            case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
+                            case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                            case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                            case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
+                            case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
+                            case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
+                            case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
+                            case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
 #  if defined(EWOULDBLOCK) && (!defined(EAGAIN) || (EAGAIN != EWOULDBLOCK))
                             case EWOULDBLOCK: [[fallthrough]];
 #  endif
-                            case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
-                            case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                            case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eagain;
+                            case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
 #  if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
                             case EOPNOTSUPP: [[fallthrough]];
 #  endif
-                            case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                            default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                            case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+                            default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                         }
                     }
 
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
                 }
                 // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efbig;
-                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
-                case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::edquot;
-                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
+                case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
+                case EISDIR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
+                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
+                case EDQUOT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::edquot;
+                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
 #  if defined(EWOULDBLOCK) && (!defined(EAGAIN) || (EAGAIN != EWOULDBLOCK))
                 case EWOULDBLOCK: [[fallthrough]];
 #  endif
-                case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
-                case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                case EAGAIN: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eagain;
+                case ESPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
 #  if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
                 case EOPNOTSUPP: [[fallthrough]];
 #  endif
-                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
 # endif
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 #else
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
 #endif
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func

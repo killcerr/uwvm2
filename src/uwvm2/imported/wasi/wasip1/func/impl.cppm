@@ -43,6 +43,8 @@ export import :fd_allocate_wasm64;
 export import :fd_allocate;
 export import :fd_close_wasm64;
 export import :fd_close;
+export import :fd_datasync_wasm64;
+export import :fd_datasync;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
