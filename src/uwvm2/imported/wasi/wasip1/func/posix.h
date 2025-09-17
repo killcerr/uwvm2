@@ -90,6 +90,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fstat")
 # endif
                 ;
+        extern int fdatasync(int fd) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("fdatasync")
+# else
+            __asm__("_fdatasync")
+# endif
+                ;
+        extern int fsync(int fd) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("fsync")
+# else
+            __asm__("_fsync")
+# endif
+                ;
     }  // namespace posix
 #endif
 
