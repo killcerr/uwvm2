@@ -164,7 +164,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #endif
 
             // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread
-            // is performing fadvise, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
+            // is performing fdatasync, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
             // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
             // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
             // encounter issues. Thus, locking must occur before releasing fds_rwlock.
@@ -246,7 +246,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 
-#elif (defined(__MSDOS__) || defined(__DJGPP__)) || defined(__hpux) || defined(__OpenBSD__)
+#elif (defined(__MSDOS__) || defined(__DJGPP__)) || defined(__hpux)
 
         // The Platform only supports fsync: MSDOS-DJGPP, hpux, OpenBSD
 
