@@ -43,5 +43,7 @@
 # include "fd_allocate.h"
 # include "fd_close_wasm64.h"
 # include "fd_close.h"
+# include "fd_datasync_wasm64.h"
+# include "fd_datasync.h"
 
 #endif
