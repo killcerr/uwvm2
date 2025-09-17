@@ -61,7 +61,7 @@ int main()
     env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_base = static_cast<rights_wasm64_t>(-1);
     env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_inherit = static_cast<rights_wasm64_t>(-1);
     env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd =
-        ::fast_io::posix_file{u8"test_fd_fdstat_get_wasm64_regular.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+        ::fast_io::native_file{u8"test_fd_fdstat_get_wasm64_regular.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
     {
         int const fd_native = env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd.native_handle();
         int const curr = fcntl(fd_native, F_GETFL);
@@ -111,7 +111,7 @@ int main()
         env.fd_storage.opens.index_unchecked(1uz).fd_p->rights_base = static_cast<rights_wasm64_t>(-1);
         env.fd_storage.opens.index_unchecked(1uz).fd_p->rights_inherit = static_cast<rights_wasm64_t>(-1);
         env.fd_storage.opens.index_unchecked(1uz).fd_p->file_fd =
-            ::fast_io::posix_file{u8"test_fd_fdstat_get_wasm64_fd1.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+            ::fast_io::native_file{u8"test_fd_fdstat_get_wasm64_fd1.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
 
         constexpr wasi_void_ptr_wasm64_t stat_ptr{4096u};
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_get_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(1), stat_ptr);
@@ -138,7 +138,7 @@ int main()
         auto& fde = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
         fde.rights_base = static_cast<rights_wasm64_t>(-1);
         fde.rights_inherit = static_cast<rights_wasm64_t>(-1);
-        fde.file_fd = ::fast_io::posix_file{u8"test_fd_fdstat_get_wasm64_close.tmp",
+        fde.file_fd = ::fast_io::native_file{u8"test_fd_fdstat_get_wasm64_close.tmp",
                                             ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
 
         auto const closed = ::uwvm2::imported::wasi::wasip1::func::fd_close_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(2));

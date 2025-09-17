@@ -45,7 +45,7 @@ int main()
     {
         env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_base = static_cast<rights_t>(0);
         // ensure the target fd has a valid native handle to avoid platform traps
-        env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd = ::fast_io::posix_file{u8"test_fd_datasync.tmp", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd = ::fast_io::native_file{u8"test_fd_datasync.tmp", ::fast_io::open_mode::out};
 
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_datasync(env, static_cast<wasi_posix_fd_t>(4));
         if(ret != errno_t::enotcapable)
@@ -58,7 +58,7 @@ int main()
     // Case 2: esuccess when rights ok and fd valid
     {
         env.fd_storage.opens.index_unchecked(3uz).fd_p->rights_base = static_cast<rights_t>(-1);
-        env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::posix_file{u8"test_fd_datasync_ok.tmp", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::native_file{u8"test_fd_datasync_ok.tmp", ::fast_io::open_mode::out};
 
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_datasync(env, static_cast<wasi_posix_fd_t>(3));
         if(ret != errno_t::esuccess)
@@ -81,7 +81,7 @@ int main()
     // Case 4: ebadf after fd has been closed
     {
         auto& fd2 = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
-        fd2.file_fd = ::fast_io::posix_file{u8"test_fd_close_then_datasync.tmp", ::fast_io::open_mode::out};
+        fd2.file_fd = ::fast_io::native_file{u8"test_fd_close_then_datasync.tmp", ::fast_io::open_mode::out};
         fd2.rights_base = static_cast<rights_t>(-1);
 
         auto const closed = ::uwvm2::imported::wasi::wasip1::func::fd_close(env, static_cast<wasi_posix_fd_t>(2));

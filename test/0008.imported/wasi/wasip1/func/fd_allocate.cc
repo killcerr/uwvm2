@@ -44,7 +44,7 @@ int main()
     // Case 1: esuccess when len == 0 and rights ok
     {
         // ensure target fd has a valid native handle (not required for len==0 path, but keeps behavior uniform)
-        env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::posix_file{u8"test_fd_allocate.log", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(3uz).fd_p->file_fd = ::fast_io::native_file{u8"test_fd_allocate.log", ::fast_io::open_mode::out};
         env.fd_storage.opens.index_unchecked(3uz).fd_p->rights_base = static_cast<rights_t>(-1);
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_allocate(env,
                                                                             static_cast<wasi_posix_fd_t>(3),
@@ -61,7 +61,7 @@ int main()
     {
         env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_base = static_cast<rights_t>(0);
         // ensure the target fd has a valid native handle
-        env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd = ::fast_io::posix_file{u8"test_fd_allocate.log", ::fast_io::open_mode::out};
+        env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd = ::fast_io::native_file{u8"test_fd_allocate.log", ::fast_io::open_mode::out};
 
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_allocate(env,
                                                                             static_cast<wasi_posix_fd_t>(4),
