@@ -260,7 +260,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 // If preallocation fails, report error directly per WASI semantics
                 switch(errno)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
@@ -283,11 +284,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         struct stat st;
         if(::uwvm2::imported::wasi::wasip1::func::posix::fstat(curr_fd_native_handle, ::std::addressof(st)) == -1) [[unlikely]]
         {
-            switch(errno)
-            {
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
-            }
+            // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
         }
 
         if(st.st_size < newsize) [[unlikely]]
@@ -297,7 +295,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 switch(errno)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
@@ -363,7 +362,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 case 0xC0000904u /*STATUS_FILE_TOO_LARGE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 case 0xC000000Du /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
                 case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
-                case 0xC0000022u /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eaccess;
+                case 0xC0000022u /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
                 case 0xC0000185u /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
@@ -429,7 +428,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 int const err{static_cast<int>(-result_syscall)};
                 switch(err)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
@@ -478,7 +478,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 int const err{static_cast<int>(-result_syscall)};
                 switch(err)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
@@ -547,7 +548,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 int const err{static_cast<int>(-result_syscall)};
                 switch(err)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
@@ -591,7 +593,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 switch(result_pf)
                 {
-                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                    case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                     case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
@@ -634,7 +637,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             switch(result_pf)
             {
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 case ENOSPC: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                 case EFBIG: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efbig;
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
