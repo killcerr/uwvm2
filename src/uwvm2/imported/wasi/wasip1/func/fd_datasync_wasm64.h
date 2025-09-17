@@ -123,7 +123,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::uwvm2::utils::mutex::rw_shared_guard_t fds_lock{wasm_fd_storage.fds_rwlock};
 
             // Negative states have been excluded, so the conversion result will only be positive numbers.
-            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
+            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
             auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
 
             // On platforms where `size_t` is smaller than the `fd` type, this check must be added.
