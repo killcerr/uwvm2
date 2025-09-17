@@ -195,7 +195,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #endif
 
             // Other threads will definitely lock fds_rwlock when performing close operations (since they need to access the fd vector). If the current thread
-            // is performing fdatasync, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
+            // is performing fdstat_get, no other thread can be executing any close operations simultaneously, eliminating any destruction issues. Therefore,
             // acquiring the lock at this point is safe. However, the problem arises when, immediately after acquiring the lock and before releasing the manager
             // lock and beginning fd operations, another thread executes a deletion that removes this fd. Subsequent operations by the current thread would then
             // encounter issues. Thus, locking must occur before releasing fds_rwlock.
@@ -218,7 +218,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, stat_ptrsz, size_of_wasi_fdstat_wasm64_t);
 
         auto const& curr_fd_native_file{curr_fd.file_fd};
-        auto const native_fd{curr_fd_native_file.native_handle()};
+        [[maybe_unused]] auto const native_fd{curr_fd_native_file.native_handle()};
 
         // Query native fd flags via fcntl(F_GETFL) for WASI fdflags mapping
         ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t fs_filetype;                                 // 0, no initialize
