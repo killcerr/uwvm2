@@ -221,6 +221,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 case ::fast_io::nt_domain_value:
                 {
+                    static_assert(sizeof(::fast_io::error::value_type) >= sizeof(::std::uint_least32_t));
                     switch(e.code)
                     {
                         // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
