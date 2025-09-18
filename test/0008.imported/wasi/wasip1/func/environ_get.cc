@@ -22,6 +22,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <fast_io.h>
+
 #include <uwvm2/imported/wasi/wasip1/func/environ_get.h>
 
 int main()

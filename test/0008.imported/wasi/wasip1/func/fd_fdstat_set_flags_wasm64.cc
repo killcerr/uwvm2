@@ -22,6 +22,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <fast_io.h>
+
 #include <uwvm2/imported/wasi/wasip1/func/fd_fdstat_set_flags_wasm64.h>
 #include <uwvm2/imported/wasi/wasip1/func/fd_fdstat_get_wasm64.h>
 #include <uwvm2/imported/wasi/wasip1/func/fd_close_wasm64.h>
