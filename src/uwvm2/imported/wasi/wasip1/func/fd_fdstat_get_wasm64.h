@@ -42,7 +42,9 @@
 #  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
-#  include <sys/socket.h>
+#  if !(defined(__MSDOS__) || defined(__DJGPP__))
+#   include <sys/socket.h>
+#  endif
 # endif
 // import
 # include <fast_io.h>
@@ -440,7 +442,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_socket_stream;
 
-# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) &&                                                                                      \
+     __has_include(<dirent.h>) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
                 int so_type{};
                 auto optlen{static_cast<::socklen_t>(sizeof(so_type))};
                 if(::uwvm2::imported::wasi::wasip1::func::posix::getsockopt(native_fd,
