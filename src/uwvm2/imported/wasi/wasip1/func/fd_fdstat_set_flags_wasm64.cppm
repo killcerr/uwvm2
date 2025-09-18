@@ -44,7 +44,7 @@ module;
 # include <sys/socket.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:fd_fdstat_set_flags;
+export module uwvm2.imported.wasi.wasip1.func:fd_fdstat_set_flags_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -66,5 +66,5 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "fd_fdstat_set_flags.h"
+#include "fd_fdstat_set_flags_wasm64.h"
 
