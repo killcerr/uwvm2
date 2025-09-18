@@ -40,8 +40,9 @@ module;
 # include <errno.h>
 # include <fcntl.h>
 # include <sys/stat.h>
-# include <sys/socket.h>
-# include <sys/socket.h>
+# if !(defined(__MSDOS__) || defined(__DJGPP__))
+#  include <sys/socket.h>
+# endif
 #endif
 
 export module uwvm2.imported.wasi.wasip1.func:fd_fdstat_set_flags_wasm64;

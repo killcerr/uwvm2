@@ -42,7 +42,9 @@
 #  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
-#  include <sys/socket.h>
+#  if !(defined(__MSDOS__) || defined(__DJGPP__))
+#   include <sys/socket.h>
+#  endif
 # endif
 // import
 # include <fast_io.h>
