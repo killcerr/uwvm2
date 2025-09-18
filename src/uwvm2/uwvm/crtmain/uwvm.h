@@ -95,6 +95,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
     {
         // Automatically get the correct timezone data
         ::uwvm2::uwvm::global::tz_set_s tz_set_ele{};
+        
+        // fast_io network servive
+        ::fast_io::net_service service{};
 
         // The size_t of some platforms is smaller than int, in these platforms you need to do a size check before conversion
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
@@ -179,6 +182,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
         ::uwvm2::uwvm::cmdline::nt_code_cvt_argv_storage const u8_cmdline{::uwvm2::uwvm::cmdline::nt_code_cvt_argv()};
         auto const argc_uz{u8_cmdline.argc};
         auto const argv_u8{u8_cmdline.argv.data()};
+
+        // fast_io network servive
+        ::fast_io::net_service service{};
 
         // u8main
         return uwvm_uz_u8main(argc_uz, argv_u8);
