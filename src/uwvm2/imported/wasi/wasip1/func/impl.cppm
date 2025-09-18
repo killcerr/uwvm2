@@ -47,6 +47,8 @@ export import :fd_datasync_wasm64;
 export import :fd_datasync;
 export import :fd_fdstat_get_wasm64;
 export import :fd_fdstat_get;
+export import :fd_fdstat_set_flags_wasm64;
+export import :fd_fdstat_set_flags;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

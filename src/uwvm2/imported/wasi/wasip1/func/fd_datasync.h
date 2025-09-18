@@ -253,6 +253,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 [[unlikely]] default:
                 {
+#  if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    // Security issues inherent to virtual machines
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#  endif
                     return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 }
             }

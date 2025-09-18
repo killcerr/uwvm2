@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-06-15
+ * @date        2025-06-16
  * @copyright   APL-2.0 License
  */
 

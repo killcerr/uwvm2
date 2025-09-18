@@ -45,7 +45,7 @@ module;
 # endif
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:fd_fdstat_get_wasm64;
+export module uwvm2.imported.wasi.wasip1.func:fd_fdstat_set_flags_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -67,5 +67,5 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "fd_fdstat_get_wasm64.h"
+#include "fd_fdstat_set_flags_wasm64.h"
 

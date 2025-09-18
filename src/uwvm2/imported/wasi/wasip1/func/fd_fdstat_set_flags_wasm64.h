@@ -74,10 +74,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
     /// @brief     WasiPreview1.fd_fdstat_set_flags
     /// @details   __wasi_errno_t fd_fdstat_get(__wasi_fd_t fd, __wasi_fdflags_t flags);
-    ::uwvm2::imported::wasi::wasip1::abi::errno_t fd_fdstat_set_flags(
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_fdstat_set_flags_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t fd,
-        ::uwvm2::imported::wasi::wasip1::abi::fdflags_t flags) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
+        ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t flags) noexcept
     {
         auto const trace_wasip1_call{env.trace_wasip1_call};
 
@@ -92,7 +92,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"fd_fdstat_set_flags",
+                                u8"fd_fdstat_set_flags_wasm64",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
@@ -108,7 +108,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
             ::fast_io::io::perr(::fast_io::u8err(),
-                                u8"uwvm: [info]  wasip1: fd_fdstat_set_flags(",
+                                u8"uwvm: [info]  wasip1: fd_fdstat_set_flags_wasm64(",
                                 fd,
                                 u8", ",
                                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(flags)>>>(flags),
@@ -117,7 +117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         // The negative value fd is invalid, and this check prevents subsequent undefined behavior.
-        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
         auto& wasm_fd_storage{env.fd_storage};
 
@@ -136,14 +136,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::uwvm2::utils::mutex::rw_shared_guard_t fds_lock{wasm_fd_storage.fds_rwlock};
 
             // Negative states have been excluded, so the conversion result will only be positive numbers.
-            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
+            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
             auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
 
             // On platforms where `size_t` is smaller than the `fd` type, this check must be added.
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
             if constexpr(::std::numeric_limits<unsigned_fd_t>::max() > size_t_max)
             {
-                if(unsigned_fd > size_t_max) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+                if(unsigned_fd > size_t_max) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
             }
 
             auto const fd_opens_pos{static_cast<::std::size_t>(unsigned_fd)};
@@ -158,7 +158,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 else [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
                 }
             }
             else
@@ -195,12 +195,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // If obtained from the renumber map, it will always be the correct value. If obtained from the open vec, it requires checking whether it is closed.
         // Therefore, a unified check is implemented.
-        if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+        if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_fdstat_set_flags) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_fdstat_set_flags) [[unlikely]]
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_fdstat_set_flags) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_fdstat_set_flags) [[unlikely]]
         {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
 
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
@@ -214,9 +214,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             switch(err)
             {
                 // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
 
@@ -228,9 +228,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             switch(errno)
             {
                 // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
 
@@ -239,7 +239,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // Toggle per-WASI bits only.
 # ifdef O_APPEND
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append)
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_append) ==
+           ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_append)
         {
             new_oflags |= O_APPEND;
         }
@@ -250,7 +251,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
 
 # ifdef O_DSYNC
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_dsync) ==
+           ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_dsync)
         {
             new_oflags |= O_DSYNC;
         }
@@ -261,7 +263,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
 
 # ifdef O_NONBLOCK
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock)
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_nonblock) ==
+           ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_nonblock)
         {
             new_oflags |= O_NONBLOCK;
         }
@@ -272,7 +275,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
 
 # ifdef O_RSYNC
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_rsync) ==
+           ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_rsync)
         {
             new_oflags |= O_RSYNC;
         }
@@ -283,7 +287,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
 
 # ifdef O_SYNC
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync)
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync)
         {
             new_oflags |= O_SYNC;
         }
@@ -302,12 +306,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             switch(err)
             {
                 // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
-                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
+                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
 # else
@@ -318,19 +322,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             switch(errno)
             {
                 // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
-                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
-                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
-                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm;
+                case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
 # endif
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 #else
         // Systems that do not support modifying file attributes mid-process
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
 #endif
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func

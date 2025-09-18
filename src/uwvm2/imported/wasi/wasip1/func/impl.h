@@ -47,5 +47,7 @@
 # include "fd_datasync.h"
 # include "fd_fdstat_get_wasm64.h"
 # include "fd_fdstat_get.h"
+# include "fd_fdstat_set_flags_wasm64.h"
+# include "fd_fdstat_set_flags.h"
 
 #endif

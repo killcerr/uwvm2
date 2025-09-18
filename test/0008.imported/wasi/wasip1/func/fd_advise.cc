@@ -22,6 +22,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <fast_io.h>
+
 #include <uwvm2/imported/wasi/wasip1/func/fd_advise.h>
 // for close-then-advise test
 #include <uwvm2/imported/wasi/wasip1/func/fd_close.h>

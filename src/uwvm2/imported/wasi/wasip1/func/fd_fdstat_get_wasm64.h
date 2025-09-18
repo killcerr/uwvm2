@@ -42,7 +42,9 @@
 #  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
-#  include <sys/socket.h>
+#  if !(defined(__MSDOS__) || defined(__DJGPP__))
+#   include <sys/socket.h>
+#  endif
 # endif
 // import
 # include <fast_io.h>
@@ -227,6 +229,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t fs_rights_inheriting{curr_fd.rights_inherit};  // 16
 
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+# if defined(__linux__) && defined(__NR_fcntl)
+        int const oflags{::fast_io::system_call<__NR_fcntl, int>(native_fd, F_GETFL)};
+
+        if(::fast_io::linux_system_call_fails(oflags)) [[unlikely]]
+        {
+            int const err{static_cast<int>(-oflags)};
+            switch(err)
+            {
+                // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+            }
+        }
+# else
         int const oflags{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL)};
 
         if(oflags == -1) [[unlikely]]
@@ -239,6 +256,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
+# endif
 
 # ifdef O_APPEND
         if(oflags & O_APPEND) { fs_flags |= ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_append; }
@@ -440,7 +458,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_socket_stream;
 
-# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) &&                                                                                      \
+     __has_include(<dirent.h>) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
                 int so_type{};
                 auto optlen{static_cast<::socklen_t>(sizeof(so_type))};
                 if(::uwvm2::imported::wasi::wasip1::func::posix::getsockopt(native_fd,
