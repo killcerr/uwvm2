@@ -180,6 +180,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm
         auto const argc_uz{u8_cmdline.argc};
         auto const argv_u8{u8_cmdline.argv.data()};
 
+        // fast_io network servive
+        ::fast_io::win32_wsa_service service{};
+
         // u8main
         return uwvm_uz_u8main(argc_uz, argv_u8);
     }
