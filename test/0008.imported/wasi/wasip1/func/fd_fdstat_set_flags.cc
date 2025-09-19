@@ -158,6 +158,184 @@ int main()
 # endif
     }
 
+    // Case 3b: clear NONBLOCK by passing 0
+    {
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
+        if(ret != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: clear nonblock expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+
+        int const flags4 = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL);
+        if(flags4 == -1)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: F_GETFL after clear nonblock failed");
+            ::fast_io::fast_terminate();
+        }
+# ifdef O_NONBLOCK
+        if((flags4 & O_NONBLOCK) != 0)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: O_NONBLOCK should be cleared");
+            ::fast_io::fast_terminate();
+        }
+# endif
+    }
+
+    // Case 6: DSYNC set/clear with platform variance
+    {
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env,
+                                                                                    static_cast<wasi_posix_fd_t>(4),
+                                                                                    fdflags_t::fdflag_dsync);
+# ifdef O_DSYNC
+        if(ret != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set dsync expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+        int const f = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL);
+        if(f == -1)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: F_GETFL after dsync failed");
+            ::fast_io::fast_terminate();
+        }
+        if((f & O_DSYNC) == 0)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: O_DSYNC not set");
+            ::fast_io::fast_terminate();
+        }
+# else
+        if(ret != errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set dsync expected enotsup on this platform");
+            ::fast_io::fast_terminate();
+        }
+# endif
+
+        // Clear all managed bits and ensure DSYNC cleared when available
+        auto const clr = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
+        if(clr != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: clear dsync expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+# ifdef O_DSYNC
+        int const f2 = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL);
+        if(f2 == -1)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: F_GETFL after clear dsync failed");
+            ::fast_io::fast_terminate();
+        }
+        if((f2 & O_DSYNC) != 0)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: O_DSYNC should be cleared");
+            ::fast_io::fast_terminate();
+        }
+# endif
+    }
+
+    // Case 7: SYNC set/clear with platform variance
+    {
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env,
+                                                                                    static_cast<wasi_posix_fd_t>(4),
+                                                                                    fdflags_t::fdflag_sync);
+# ifdef O_SYNC
+        if(ret != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set sync expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+        int const f = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL);
+        if(f == -1)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: F_GETFL after sync failed");
+            ::fast_io::fast_terminate();
+        }
+        if((f & O_SYNC) == 0)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: O_SYNC not set");
+            ::fast_io::fast_terminate();
+        }
+# else
+        if(ret != errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set sync expected enotsup on this platform");
+            ::fast_io::fast_terminate();
+        }
+# endif
+
+        auto const clr = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
+        if(clr != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: clear sync expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+# ifdef O_SYNC
+        int const f2 = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL);
+        if(f2 == -1)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: F_GETFL after clear sync failed");
+            ::fast_io::fast_terminate();
+        }
+        if((f2 & O_SYNC) != 0)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: O_SYNC should be cleared");
+            ::fast_io::fast_terminate();
+        }
+# endif
+    }
+
+    // Case 8: RSYNC set/clear with platform variance
+    {
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env,
+                                                                                    static_cast<wasi_posix_fd_t>(4),
+                                                                                    fdflags_t::fdflag_rsync);
+# ifdef O_RSYNC
+        if(ret != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set rsync expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+        int const f = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL);
+        if(f == -1)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: F_GETFL after rsync failed");
+            ::fast_io::fast_terminate();
+        }
+        if((f & O_RSYNC) == 0)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: O_RSYNC not set");
+            ::fast_io::fast_terminate();
+        }
+# else
+        if(ret != errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set rsync expected enotsup on this platform");
+            ::fast_io::fast_terminate();
+        }
+# endif
+
+        auto const clr = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
+        if(clr != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: clear rsync expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+# ifdef O_RSYNC
+        int const f2 = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL);
+        if(f2 == -1)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: F_GETFL after clear rsync failed");
+            ::fast_io::fast_terminate();
+        }
+        if((f2 & O_RSYNC) != 0)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: O_RSYNC should be cleared");
+            ::fast_io::fast_terminate();
+        }
+# endif
+    }
+
     // Case 4: enotcapable when rights missing
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(3uz).fd_p;
