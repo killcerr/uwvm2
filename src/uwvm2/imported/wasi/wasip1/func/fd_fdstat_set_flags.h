@@ -203,7 +203,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }
 
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) &&                                                                                       \
+    __has_include(<dirent.h>) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
 
         // Preserve unrelated OS flags: read current flags first, then toggle only WASI-managed bits.
 # if defined(__linux__) && defined(__NR_fcntl)
@@ -222,6 +223,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         int new_oflags{curr_flags_sc};
 # else
+        // Although djgpp provides these flags, it only supports F_DUPFD, so it is prohibited here.
+        
         int const curr_flags{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL)};
         if(curr_flags == -1) [[unlikely]]
         {
