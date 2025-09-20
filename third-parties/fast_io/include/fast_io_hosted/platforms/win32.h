@@ -1698,6 +1698,43 @@ inline posix_file_status win32_status_impl(void *__restrict handle)
 							 0};
 }
 
+inline posix_file_status win32_9xa_dir_file_status_impl(win32_9xa_dir_handle const& handle)
+{
+	::fast_io::win32::win32_find_dataa wfda{};
+	tlc_win32_9xa_dir_handle_path_str temp_find_path{concat_tlc_win32_9xa_dir_handle_path_str(handle.path, u8"\\*")};
+	auto find_struct{::fast_io::win32::FindFirstFileA(reinterpret_cast<char const *>(temp_find_path.c_str()), __builtin_addressof(wfda))};
+	if (find_struct == reinterpret_cast<void *>(static_cast<::std::ptrdiff_t>(-1))) [[unlikely]]
+	{
+		throw_win32_error(0x5);
+	}
+	else
+	{
+		// The first piece of information obtained by findfirstfile is current path ('.')
+		::fast_io::posix_file_status tmp_file{};
+		
+		::std::underlying_type_t<perms> pm{0444};
+		if ((wfda.dwFileAttributes & 0x1) == 0x0)
+		{
+			pm |= 0222;
+		}
+
+		tmp_file.perm = static_cast<perms>(pm);
+		tmp_file.type = ::fast_io::file_type::directory;
+		tmp_file.nlink  = 1u;
+		tmp_file.size = static_cast<::std::uintmax_t>((static_cast<::std::uint_least64_t>(wfda.nFileSizeHigh) << 32u) | wfda.nFileSizeLow);
+		tmp_file.blksize = 512u;
+		tmp_file.blocks = (tmp_file.size + 511u) / 512u;
+		tmp_file.atim = to_unix_timestamp(wfda.ftLastAccessTime);
+		tmp_file.mtim = to_unix_timestamp(wfda.ftLastWriteTime);
+		tmp_file.ctim = tmp_file.mtim;
+		tmp_file.btim = to_unix_timestamp(wfda.ftCreationTime);
+
+		::fast_io::win32::FindClose(find_struct);
+
+		return tmp_file;
+	}
+}
+
 /*
 Thanks Fseuio for providing source code.
 */
@@ -1761,6 +1798,11 @@ template <win32_family family, ::std::integral ch_type>
 inline posix_file_status status(basic_win32_family_io_observer<family, ch_type> wiob)
 {
 	return win32::details::win32_status_impl(wiob.handle);
+}
+
+inline posix_file_status status(win32_9xa_dir_io_observer w9xiob)
+{
+	return win32::details::win32_9xa_dir_file_status_impl(w9xiob.handle);
 }
 
 template <win32_family family, ::std::integral ch_type>
