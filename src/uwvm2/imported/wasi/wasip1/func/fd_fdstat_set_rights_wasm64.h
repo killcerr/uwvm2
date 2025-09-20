@@ -66,7 +66,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     /// @details   __wasi_errno_t fd_fdstat_get(__wasi_fd_t fd, __wasi_rights_t fs_rights_base, __wasi_rights_t fs_rights_inheriting);
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_fdstat_set_rights_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t fd,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
         ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t fs_rights_base,
         ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t fs_rights_inheriting) noexcept
     {
@@ -133,7 +133,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::uwvm2::utils::mutex::rw_shared_guard_t fds_lock{wasm_fd_storage.fds_rwlock};
 
             // Negative states have been excluded, so the conversion result will only be positive numbers.
-            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
+            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
             auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
 
             // On platforms where `size_t` is smaller than the `fd` type, this check must be added.
