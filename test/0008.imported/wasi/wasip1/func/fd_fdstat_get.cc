@@ -79,33 +79,6 @@ int main()
         }
     }
 
-    // Case 2: stdin/stdout/stderr rights_inheriting mask for fd=1
-    {
-        env.fd_storage.opens.index_unchecked(1uz).fd_p->rights_base = static_cast<rights_t>(-1);
-        env.fd_storage.opens.index_unchecked(1uz).fd_p->rights_inherit = static_cast<rights_t>(-1);
-        env.fd_storage.opens.index_unchecked(1uz).fd_p->file_fd =
-            ::fast_io::native_file{u8"test_fd_fdstat_get_win32_fd1.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
-
-        constexpr wasi_void_ptr_t stat_ptr{4096u};
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_get(env, static_cast<wasi_posix_fd_t>(1), stat_ptr);
-        if(ret != errno_t::esuccess)
-        {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_get_win32: expected esuccess for fd=1");
-            ::fast_io::fast_terminate();
-        }
-
-        auto const rights_inh = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<rights_t>>(
-            memory,
-            static_cast<wasi_void_ptr_t>(stat_ptr + 16u));
-        auto const mask =
-            static_cast<std::underlying_type_t<rights_t>>(rights_t::right_fd_seek) | static_cast<std::underlying_type_t<rights_t>>(rights_t::right_fd_tell);
-        if((rights_inh & mask) != 0)
-        {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_get_win32: rights_inheriting should have seek/tell cleared for fd<3");
-            ::fast_io::fast_terminate();
-        }
-    }
-
     // Case 3: ebadf after fd_close
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
@@ -211,32 +184,7 @@ int main()
         }
     }
 
-    // Case 2: stdin/stdout/stderr rights_inheriting mask for fd=1
-    {
-        env.fd_storage.opens.index_unchecked(1uz).fd_p->rights_base = static_cast<rights_t>(-1);
-        env.fd_storage.opens.index_unchecked(1uz).fd_p->rights_inherit = static_cast<rights_t>(-1);
-        env.fd_storage.opens.index_unchecked(1uz).fd_p->file_fd =
-            ::fast_io::native_file{u8"test_fd_fdstat_get_fd1.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
-
-        constexpr wasi_void_ptr_t stat_ptr{4096u};
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_get(env, static_cast<wasi_posix_fd_t>(1), stat_ptr);
-        if(ret != errno_t::esuccess)
-        {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_get: expected esuccess for fd=1");
-            ::fast_io::fast_terminate();
-        }
-
-        auto const rights_inh = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<std::underlying_type_t<rights_t>>(
-            memory,
-            static_cast<wasi_void_ptr_t>(stat_ptr + 16u));
-        auto const mask =
-            static_cast<std::underlying_type_t<rights_t>>(rights_t::right_fd_seek) | static_cast<std::underlying_type_t<rights_t>>(rights_t::right_fd_tell);
-        if((rights_inh & mask) != 0)
-        {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_get: rights_inheriting should have seek/tell cleared for fd<3");
-            ::fast_io::fast_terminate();
-        }
-    }
+    
 
     // Case 3: ebadf after fd_close
     {

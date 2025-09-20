@@ -491,16 +491,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 #endif
 
-        using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
-        auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
-
-        // in out err
-        if(unsigned_fd < 3u)
-        {
-            fs_rights_inheriting &=
-                ~(::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_seek | ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_tell);
-        }
-
         if constexpr(is_default_wasi_fdstat_data_layout())
         {
             // If the memory is identical, it is copied directly, which is the most efficient approach.
