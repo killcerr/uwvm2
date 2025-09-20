@@ -203,7 +203,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }
 
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) &&                                                                                       \
+    __has_include(<dirent.h>) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
 
         // Preserve unrelated OS flags: read current flags first, then toggle only WASI-managed bits.
 # if defined(__linux__) && defined(__NR_fcntl)
@@ -222,6 +223,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         int new_oflags{curr_flags_sc};
 # else
+        // Although djgpp provides these flags, it only supports F_DUPFD, so it is prohibited here.
+        
         int const curr_flags{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL)};
         if(curr_flags == -1) [[unlikely]]
         {
@@ -247,6 +250,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             new_oflags &= ~O_APPEND;
         }
+# else
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
 # endif
 
 # ifdef O_DSYNC
@@ -257,6 +265,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             new_oflags &= ~O_DSYNC;
+        }
+# else
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
         }
 # endif
 
@@ -269,6 +282,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             new_oflags &= ~O_NONBLOCK;
         }
+# else
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
 # endif
 
 # ifdef O_RSYNC
@@ -280,6 +298,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             new_oflags &= ~O_RSYNC;
         }
+# else
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
 # endif
 
 # ifdef O_SYNC
@@ -290,6 +313,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             new_oflags &= ~O_SYNC;
+        }
+# else
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
         }
 # endif
 
@@ -330,6 +358,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
 #else
         // Systems that do not support modifying file attributes mid-process
+
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
+
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
+
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
+
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
+
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
+
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
 #endif
     }
