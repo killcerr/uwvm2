@@ -298,6 +298,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # if defined(_WIN32_WINDOWS)
             case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir:
             {
+                // There is no need to use status, as status can only retrieve the creation time.
                 fs_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_directory;
                 break;
             }
