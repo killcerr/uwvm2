@@ -223,7 +223,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         [[maybe_unused]] auto const native_fd{curr_fd_native_file.native_handle()};
 
         // Query native fd flags via fcntl(F_GETFL) for WASI fdflags mapping
-        ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t fs_filetype;                                 // 0, no initialize
+        // All require initialization to prevent subsequent unconfigured settings from causing undefined behavior.
+        ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t fs_filetype{};                               // 0
         ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t fs_flags{};                                   // 2
         ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t fs_rights_base{curr_fd.rights_base};           // 8
         ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t fs_rights_inheriting{curr_fd.rights_inherit};  // 16
