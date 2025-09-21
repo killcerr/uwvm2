@@ -969,6 +969,8 @@ struct find_struct_guard
 {
 	void *file_struct{};
 
+	inline explicit constexpr find_struct_guard(void *fs) noexcept: file_struct{fs} {}
+
 	find_struct_guard(find_struct_guard const &) = delete;
 	find_struct_guard &operator=(find_struct_guard const &) = delete;
 
