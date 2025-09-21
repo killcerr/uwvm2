@@ -1699,40 +1699,76 @@ inline posix_file_status win32_status_impl(void *__restrict handle)
 }
 
 inline posix_file_status win32_9xa_dir_file_status_impl(win32_9xa_dir_handle const& handle)
-{
-	::fast_io::win32::win32_find_dataa wfda{};
-	tlc_win32_9xa_dir_handle_path_str temp_find_path{concat_tlc_win32_9xa_dir_handle_path_str(handle.path, u8"\\*")};
-	auto find_struct{::fast_io::win32::FindFirstFileA(reinterpret_cast<char const *>(temp_find_path.c_str()), __builtin_addressof(wfda))};
-	if (find_struct == reinterpret_cast<void *>(static_cast<::std::ptrdiff_t>(-1))) [[unlikely]]
+{		
+	::fast_io::posix_file_status tmp_file{};
+
 	{
-		throw_win32_error(0x5);
-	}
-	else
-	{
-		// The first piece of information obtained by findfirstfile is current path ('.')
-		::fast_io::posix_file_status tmp_file{};
-		
-		::std::underlying_type_t<perms> pm{0444};
-		if ((wfda.dwFileAttributes & 0x1) == 0x0)
+		// find data
+		::fast_io::win32::win32_find_dataa wfda{};
+		tlc_win32_9xa_dir_handle_path_str temp_find_path{concat_tlc_win32_9xa_dir_handle_path_str(handle.path, u8"\\*")};
+		auto find_struct{::fast_io::win32::FindFirstFileA(reinterpret_cast<char const *>(temp_find_path.c_str()), __builtin_addressof(wfda))};
+		if (find_struct == reinterpret_cast<void *>(static_cast<::std::ptrdiff_t>(-1))) [[unlikely]]
 		{
-			pm |= 0222;
+			throw_win32_error(0x5);
+		}
+		else
+		{
+			// The first piece of information obtained by findfirstfile is current path ('.')
+			
+			::std::underlying_type_t<perms> pm{0444};
+			if ((wfda.dwFileAttributes & 0x1) == 0x0)
+			{
+				pm |= 0222;
+			}
+
+			tmp_file.perm = static_cast<perms>(pm);
+			tmp_file.type = ::fast_io::file_type::directory;
+			tmp_file.nlink  = 1u;
+			tmp_file.size = static_cast<::std::uintmax_t>((static_cast<::std::uint_least64_t>(wfda.nFileSizeHigh) << 32u) | wfda.nFileSizeLow);
+			tmp_file.blksize = 512u;
+			tmp_file.blocks = (tmp_file.size + 511u) / 512u;
+			tmp_file.atim = to_unix_timestamp(wfda.ftLastAccessTime);
+			tmp_file.mtim = to_unix_timestamp(wfda.ftLastWriteTime);
+			tmp_file.ctim = tmp_file.mtim;
+			tmp_file.btim = to_unix_timestamp(wfda.ftCreationTime);
+
+			::fast_io::win32::FindClose(find_struct);
+		}
+	}
+
+	{
+        // dev
+		char8_t tmp_path[260u];
+
+		using char_const_may_alias_ptr
+#if __has_cpp_attribute(__gnu__::__may_alias__)
+			[[__gnu__::__may_alias__]]
+#endif
+			= char const *;
+		
+		using char_may_alias_ptr
+#if __has_cpp_attribute(__gnu__::__may_alias__)
+						[[__gnu__::__may_alias__]]
+#endif
+			= char *;
+
+		if (!::fast_io::win32::GetFullPathNameA(reinterpret_cast<char_const_may_alias_ptr>(handle.path.c_str()), 260u * sizeof(char8_t), 
+		                                        reinterpret_cast<char_may_alias_ptr>(tmp_path), nullptr)) [[unlikely]]
+            return tmp_file;
+
+		tmp_path[3u] = u8'\0';
+
+		::std::uint_least32_t serial{};
+
+		if (!::fast_io::win32::GetVolumeInformationA(reinterpret_cast<char_const_may_alias_ptr>(tmp_path), nullptr, 0u, __builtin_addressof(serial), nullptr, nullptr, nullptr, 0u)) 
+		{
+			return tmp_file;
 		}
 
-		tmp_file.perm = static_cast<perms>(pm);
-		tmp_file.type = ::fast_io::file_type::directory;
-		tmp_file.nlink  = 1u;
-		tmp_file.size = static_cast<::std::uintmax_t>((static_cast<::std::uint_least64_t>(wfda.nFileSizeHigh) << 32u) | wfda.nFileSizeLow);
-		tmp_file.blksize = 512u;
-		tmp_file.blocks = (tmp_file.size + 511u) / 512u;
-		tmp_file.atim = to_unix_timestamp(wfda.ftLastAccessTime);
-		tmp_file.mtim = to_unix_timestamp(wfda.ftLastWriteTime);
-		tmp_file.ctim = tmp_file.mtim;
-		tmp_file.btim = to_unix_timestamp(wfda.ftCreationTime);
-
-		::fast_io::win32::FindClose(find_struct);
-
-		return tmp_file;
+		tmp_file.dev = static_cast<::std::uintmax_t>(serial);
 	}
+
+	return tmp_file;
 }
 
 /*
