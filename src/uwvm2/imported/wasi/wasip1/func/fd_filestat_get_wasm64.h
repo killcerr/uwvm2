@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -71,36 +71,37 @@
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
 
-    struct alignas(8uz) wasi_filestat_t
+    struct alignas(8uz) wasi_filestat_wasm64_t
     {
-        ::uwvm2::imported::wasi::wasip1::abi::device_t st_dev;
-        ::uwvm2::imported::wasi::wasip1::abi::inode_t st_ino;
-        ::uwvm2::imported::wasi::wasip1::abi::filetype_t st_filetype;
-        ::uwvm2::imported::wasi::wasip1::abi::linkcount_t st_nlink;
-        ::uwvm2::imported::wasi::wasip1::abi::filesize_t st_size;
-        ::uwvm2::imported::wasi::wasip1::abi::timestamp_t st_atim;
-        ::uwvm2::imported::wasi::wasip1::abi::timestamp_t st_mtim;
-        ::uwvm2::imported::wasi::wasip1::abi::timestamp_t st_ctim;
+        ::uwvm2::imported::wasi::wasip1::abi::device_wasm64_t st_dev;
+        ::uwvm2::imported::wasi::wasip1::abi::inode_wasm64_t st_ino;
+        ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t st_filetype;
+        ::uwvm2::imported::wasi::wasip1::abi::linkcount_wasm64_t st_nlink;
+        ::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t st_size;
+        ::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t st_atim;
+        ::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t st_mtim;
+        ::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t st_ctim;
     };
 
-    inline constexpr ::std::size_t size_of_wasi_filestat_t{64uz};
+    inline constexpr ::std::size_t size_of_wasi_filestat_wasm64_t{64uz};
 
-    inline consteval bool is_default_wasi_filestat_data_layout() noexcept
+    inline consteval bool is_default_wasi_filestat_wasm64_data_layout() noexcept
     {
         // In standard layout mode, data can be transferred in a single memcpy operation (static length), improving read efficiency.
-        return __builtin_offsetof(wasi_filestat_t, st_dev) == 0uz && __builtin_offsetof(wasi_filestat_t, st_ino) == 8uz &&
-               __builtin_offsetof(wasi_filestat_t, st_filetype) == 16uz && __builtin_offsetof(wasi_filestat_t, st_nlink) == 24uz &&
-               __builtin_offsetof(wasi_filestat_t, st_size) == 32uz && __builtin_offsetof(wasi_filestat_t, st_atim) == 40uz &&
-               __builtin_offsetof(wasi_filestat_t, st_mtim) == 48uz && __builtin_offsetof(wasi_filestat_t, st_ctim) == 56uz &&
-               sizeof(wasi_filestat_t) == size_of_wasi_filestat_t && alignof(wasi_filestat_t) == 8uz && ::std::endian::native == ::std::endian::little;
+        return __builtin_offsetof(wasi_filestat_wasm64_t, st_dev) == 0uz && __builtin_offsetof(wasi_filestat_wasm64_t, st_ino) == 8uz &&
+               __builtin_offsetof(wasi_filestat_wasm64_t, st_filetype) == 16uz && __builtin_offsetof(wasi_filestat_wasm64_t, st_nlink) == 24uz &&
+               __builtin_offsetof(wasi_filestat_wasm64_t, st_size) == 32uz && __builtin_offsetof(wasi_filestat_wasm64_t, st_atim) == 40uz &&
+               __builtin_offsetof(wasi_filestat_wasm64_t, st_mtim) == 48uz && __builtin_offsetof(wasi_filestat_wasm64_t, st_ctim) == 56uz &&
+               sizeof(wasi_filestat_wasm64_t) == size_of_wasi_filestat_wasm64_t && alignof(wasi_filestat_wasm64_t) == 8uz &&
+               ::std::endian::native == ::std::endian::little;
     }
 
-    /// @brief     WasiPreview1.fd_filestat_get
-    /// @details   __wasi_errno_t fd_filestat_get(__wasi_fd_t fd, __wasi_filestat_t *stat);
-    ::uwvm2::imported::wasi::wasip1::abi::errno_t fd_filestat_get(
+    /// @brief     WasiPreview1(fd) for wasm64. fd_filestat_get_wasm64
+    /// @details   __wasi_errno_t fd_filestat_get_wasm64(__wasi_fd_t fd, __wasi_filestat_t *stat);
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_filestat_get_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t fd,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t stat_ptrsz) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t stat_ptrsz) noexcept
     {
         auto& memory{env.wasip1_memory};
         auto const trace_wasip1_call{env.trace_wasip1_call};
@@ -116,7 +117,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"fd_filestat_get",
+                                u8"fd_filestat_get_wasm64",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
@@ -132,7 +133,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
             ::fast_io::io::perr(::fast_io::u8err(),
-                                u8"uwvm: [info]  wasip1: fd_filestat_get(",
+                                u8"uwvm: [info]  wasip1: fd_filestat_get_wasm64(",
                                 fd,
                                 u8", ",
                                 ::fast_io::mnp::addrvw(stat_ptrsz),
@@ -141,7 +142,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         // The negative value fd is invalid, and this check prevents subsequent undefined behavior.
-        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
         auto& wasm_fd_storage{env.fd_storage};
 
@@ -160,14 +161,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             ::uwvm2::utils::mutex::rw_shared_guard_t fds_lock{wasm_fd_storage.fds_rwlock};
 
             // Negative states have been excluded, so the conversion result will only be positive numbers.
-            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>;
+            using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
             auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
 
             // On platforms where `size_t` is smaller than the `fd` type, this check must be added.
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
             if constexpr(::std::numeric_limits<unsigned_fd_t>::max() > size_t_max)
             {
-                if(unsigned_fd > size_t_max) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+                if(unsigned_fd > size_t_max) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
             }
 
             auto const fd_opens_pos{static_cast<::std::size_t>(unsigned_fd)};
@@ -182,7 +183,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
                 else [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
                 }
             }
             else
@@ -216,27 +217,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // If obtained from the renumber map, it will always be the correct value. If obtained from the open vec, it requires checking whether it is closed.
         // Therefore, a unified check is implemented.
-        if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
+        if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
-        // Rights check: fd_filestat_get requires right_fd_filestat_get.
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_filestat_get) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_filestat_get) [[unlikely]]
+        // Rights check
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_filestat_get) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_filestat_get) [[unlikely]]
         {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
 
-        // check memory bounds
-        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm32(memory, stat_ptrsz, size_of_wasi_filestat_t);
+        // Check memory bounds for output
+        ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory, stat_ptrsz, size_of_wasi_filestat_wasm64_t);
 
         // All require initialization to prevent subsequent unconfigured settings from causing undefined behavior.
-        ::uwvm2::imported::wasi::wasip1::abi::device_t st_dev{};         // 0
-        ::uwvm2::imported::wasi::wasip1::abi::inode_t st_ino{};          // 8
-        ::uwvm2::imported::wasi::wasip1::abi::filetype_t st_filetype{};  // 16
-        ::uwvm2::imported::wasi::wasip1::abi::linkcount_t st_nlink{};    // 24
-        ::uwvm2::imported::wasi::wasip1::abi::filesize_t st_size{};      // 32
-        ::uwvm2::imported::wasi::wasip1::abi::timestamp_t st_atim{};     // 40
-        ::uwvm2::imported::wasi::wasip1::abi::timestamp_t st_mtim{};     // 48
-        ::uwvm2::imported::wasi::wasip1::abi::timestamp_t st_ctim{};     // 56
+        ::uwvm2::imported::wasi::wasip1::abi::device_wasm64_t st_dev{};         // 0
+        ::uwvm2::imported::wasi::wasip1::abi::inode_wasm64_t st_ino{};          // 8
+        ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t st_filetype{};  // 16
+        ::uwvm2::imported::wasi::wasip1::abi::linkcount_wasm64_t st_nlink{};    // 24
+        ::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t st_size{};      // 32
+        ::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t st_atim{};     // 40
+        ::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t st_mtim{};     // 48
+        ::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t st_ctim{};     // 56
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
         switch(curr_fd.file_type)
@@ -246,7 +247,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 auto const& curr_fd_native_file{curr_fd.socket_fd};
                 auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_stream;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_socket_stream;
 
                 char so_type{};
                 int optlen{static_cast<int>(sizeof(so_type))};
@@ -257,10 +258,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                                 ::std::addressof(optlen)) == 0 &&
                    optlen == sizeof(so_type))
                 {
-                    if(so_type == 2 /*SOCK_DGRAM*/) { st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_dgram; }
+                    if(so_type == 2 /*SOCK_DGRAM*/) { st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_socket_dgram; }
                 }
 
-                st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_t>(1u);
+                st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_wasm64_t>(1u);
 
                 break;
             }
@@ -270,7 +271,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 auto const& curr_fd_native_file{curr_fd.dir_fd};
 
                 ::fast_io::posix_file_status curr_fd_status;  // no initialize
-
 #  ifdef UWVM_CPP_EXCEPTIONS
                 try
 #  endif
@@ -280,27 +280,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #  ifdef UWVM_CPP_EXCEPTIONS
                 catch(::fast_io::error)
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 }
 #  endif
 
-                st_dev = static_cast<::uwvm2::imported::wasi::wasip1::abi::device_t>(curr_fd_status.dev);
-                st_ino = static_cast<::uwvm2::imported::wasi::wasip1::abi::inode_t>(curr_fd_status.ino);
+                st_dev = static_cast<::uwvm2::imported::wasi::wasip1::abi::device_wasm64_t>(curr_fd_status.dev);
+                st_ino = static_cast<::uwvm2::imported::wasi::wasip1::abi::inode_wasm64_t>(curr_fd_status.ino);
 
                 // curr_fd_status.type always directory
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_directory;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_directory;
 
-                st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_t>(curr_fd_status.nlink);
-                st_size = static_cast<::uwvm2::imported::wasi::wasip1::abi::filesize_t>(curr_fd_status.size);
+                st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_wasm64_t>(curr_fd_status.nlink);
+                st_size = static_cast<::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t>(curr_fd_status.size);
 
                 constexpr ::std::uint_least64_t mul_factor{::fast_io::uint_least64_subseconds_per_second / 1'000'000'000u};
 
                 // Since fast_io directly obtains the clock value via clock_getres, this operation will not overflow and will not produce negative values.
-                st_atim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+                st_atim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
                     static_cast<::std::uint_least64_t>(curr_fd_status.atim.seconds * 1'000'000'000u + curr_fd_status.atim.subseconds / mul_factor));
-                st_mtim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+                st_mtim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
                     static_cast<::std::uint_least64_t>(curr_fd_status.mtim.seconds * 1'000'000'000u + curr_fd_status.mtim.subseconds / mul_factor));
-                st_ctim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+                st_ctim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
                     static_cast<::std::uint_least64_t>(curr_fd_status.ctim.seconds * 1'000'000'000u + curr_fd_status.ctim.subseconds / mul_factor));
 
                 break;
@@ -321,88 +321,88 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # ifdef UWVM_CPP_EXCEPTIONS
                 catch(::fast_io::error)
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 }
 # endif
 
-                st_dev = static_cast<::uwvm2::imported::wasi::wasip1::abi::device_t>(curr_fd_status.dev);
-                st_ino = static_cast<::uwvm2::imported::wasi::wasip1::abi::inode_t>(curr_fd_status.ino);
+                st_dev = static_cast<::uwvm2::imported::wasi::wasip1::abi::device_wasm64_t>(curr_fd_status.dev);
+                st_ino = static_cast<::uwvm2::imported::wasi::wasip1::abi::inode_wasm64_t>(curr_fd_status.ino);
 
                 switch(curr_fd_status.type)
                 {
                     case ::fast_io::file_type::none:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                         break;
                     }
                     case ::fast_io::file_type::not_found:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                         break;
                     }
                     case ::fast_io::file_type::regular:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_regular_file;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_regular_file;
                         break;
                     }
                     case ::fast_io::file_type::directory:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_directory;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_directory;
                         break;
                     }
                     case ::fast_io::file_type::symlink:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_symbolic_link;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_symbolic_link;
                         break;
                     }
                     case ::fast_io::file_type::block:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_block_device;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_block_device;
                         break;
                     }
                     case ::fast_io::file_type::character:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_character_device;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_character_device;
                         break;
                     }
                     case ::fast_io::file_type::fifo:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                         break;
                     }
                     case ::fast_io::file_type::socket:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_stream;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_socket_stream;
                         break;
                     }
                     case ::fast_io::file_type::unknown:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                         break;
                     }
                     case ::fast_io::file_type::remote:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                         break;
                     }
                     [[unlikely]] default:
                     {
-                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                        st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                         break;
                     }
                 }
 
-                st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_t>(curr_fd_status.nlink);
-                st_size = static_cast<::uwvm2::imported::wasi::wasip1::abi::filesize_t>(curr_fd_status.size);
+                st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_wasm64_t>(curr_fd_status.nlink);
+                st_size = static_cast<::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t>(curr_fd_status.size);
 
                 constexpr ::std::uint_least64_t mul_factor{::fast_io::uint_least64_subseconds_per_second / 1'000'000'000u};
 
                 // Since fast_io directly obtains the clock value via clock_getres, this operation will not overflow and will not produce negative values.
-                st_atim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+                st_atim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
                     static_cast<::std::uint_least64_t>(curr_fd_status.atim.seconds * 1'000'000'000u + curr_fd_status.atim.subseconds / mul_factor));
-                st_mtim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+                st_mtim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
                     static_cast<::std::uint_least64_t>(curr_fd_status.mtim.seconds * 1'000'000'000u + curr_fd_status.mtim.subseconds / mul_factor));
-                st_ctim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+                st_ctim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
                     static_cast<::std::uint_least64_t>(curr_fd_status.ctim.seconds * 1'000'000'000u + curr_fd_status.ctim.subseconds / mul_factor));
 
                 break;
@@ -433,61 +433,61 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error)
         {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
         }
 # endif
 
-        st_dev = static_cast<::uwvm2::imported::wasi::wasip1::abi::device_t>(curr_fd_status.dev);
-        st_ino = static_cast<::uwvm2::imported::wasi::wasip1::abi::inode_t>(curr_fd_status.ino);
+        st_dev = static_cast<::uwvm2::imported::wasi::wasip1::abi::device_wasm64_t>(curr_fd_status.dev);
+        st_ino = static_cast<::uwvm2::imported::wasi::wasip1::abi::inode_wasm64_t>(curr_fd_status.ino);
 
         switch(curr_fd_status.type)
         {
             case ::fast_io::file_type::none:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                 break;
             }
             case ::fast_io::file_type::not_found:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                 break;
             }
             case ::fast_io::file_type::regular:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_regular_file;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_regular_file;
                 break;
             }
             case ::fast_io::file_type::directory:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_directory;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_directory;
                 break;
             }
             case ::fast_io::file_type::symlink:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_symbolic_link;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_symbolic_link;
                 break;
             }
             case ::fast_io::file_type::block:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_block_device;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_block_device;
                 break;
             }
             case ::fast_io::file_type::character:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_character_device;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_character_device;
                 break;
             }
             case ::fast_io::file_type::fifo:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                 break;
             }
             case ::fast_io::file_type::socket:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_stream;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_socket_stream;
 
-# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) &&                                                                                      \
-     __has_include(<dirent.h>) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
+# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__) && \
+     !(defined(__MSDOS__) || defined(__DJGPP__))
                 int so_type{};
                 auto optlen{static_cast<::socklen_t>(sizeof(so_type))};
                 if(::uwvm2::imported::wasi::wasip1::func::posix::getsockopt(curr_fd_native_file.native_handle(),
@@ -497,7 +497,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                                                             ::std::addressof(optlen)) == 0 &&
                    optlen == sizeof(so_type))
                 {
-                    if(so_type == SOCK_DGRAM) { st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_socket_dgram; }
+                    if(so_type == SOCK_DGRAM) { st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_socket_dgram; }
                 }
 # endif
 
@@ -505,41 +505,42 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
             case ::fast_io::file_type::unknown:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                 break;
             }
             case ::fast_io::file_type::remote:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                 break;
             }
             [[unlikely]] default:
             {
-                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_t::filetype_unknown;
+                st_filetype = ::uwvm2::imported::wasi::wasip1::abi::filetype_wasm64_t::filetype_unknown;
                 break;
             }
         }
 
-        st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_t>(curr_fd_status.nlink);
-        st_size = static_cast<::uwvm2::imported::wasi::wasip1::abi::filesize_t>(curr_fd_status.size);
+        st_nlink = static_cast<::uwvm2::imported::wasi::wasip1::abi::linkcount_wasm64_t>(curr_fd_status.nlink);
+        st_size = static_cast<::uwvm2::imported::wasi::wasip1::abi::filesize_wasm64_t>(curr_fd_status.size);
 
         constexpr ::std::uint_least64_t mul_factor{::fast_io::uint_least64_subseconds_per_second / 1'000'000'000u};
 
         // Since fast_io directly obtains the clock value via clock_getres, this operation will not overflow and will not produce negative values.
-        st_atim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+        st_atim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
             static_cast<::std::uint_least64_t>(curr_fd_status.atim.seconds * 1'000'000'000u + curr_fd_status.atim.subseconds / mul_factor));
-        st_mtim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+        st_mtim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
             static_cast<::std::uint_least64_t>(curr_fd_status.mtim.seconds * 1'000'000'000u + curr_fd_status.mtim.subseconds / mul_factor));
-        st_ctim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_t>(
+        st_ctim = static_cast<::uwvm2::imported::wasi::wasip1::abi::timestamp_wasm64_t>(
             static_cast<::std::uint_least64_t>(curr_fd_status.ctim.seconds * 1'000'000'000u + curr_fd_status.ctim.subseconds / mul_factor));
 #endif
 
         // write
-        if constexpr(is_default_wasi_filestat_data_layout())
+        if constexpr(is_default_wasi_filestat_wasm64_data_layout())
         {
-            wasi_filestat_t const tmp_wasi_filestat{st_dev, st_ino, st_filetype, st_nlink, st_size, st_atim, st_mtim, st_ctim};
+            // If the memory is identical, it is copied directly, which is the most efficient approach.
+            wasi_filestat_wasm64_t const tmp_wasi_filestat{st_dev, st_ino, st_filetype, st_nlink, st_size, st_atim, st_mtim, st_ctim};
 
-            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz,
                 reinterpret_cast<::std::byte const*>(::std::addressof(tmp_wasi_filestat)),
@@ -547,42 +548,42 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
         else
         {
-            // Fallback for non-default host layout: store members individually at WASI-defined offsets.
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            // Ensure the structure meets the requirements for wasi memory.
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_dev)>>>(st_dev));
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz + 8u,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_ino)>>>(st_ino));
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz + 16u,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_filetype)>>>(st_filetype));
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz + 24u,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_nlink)>>>(st_nlink));
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz + 32u,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_size)>>>(st_size));
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz + 40u,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_atim)>>>(st_atim));
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz + 48u,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_mtim)>>>(st_mtim));
-            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unchecked(
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unchecked(
                 memory,
                 stat_ptrsz + 56u,
                 static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(st_ctim)>>>(st_ctim));
         }
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func
 

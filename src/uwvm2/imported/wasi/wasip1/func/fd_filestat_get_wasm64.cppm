@@ -18,7 +18,7 @@
  *  \___/    \_/\_/      \_/   |_|  |_| *
  *                                      *
  ****************************************/
-
+ 
 module;
 
 // std
@@ -45,7 +45,7 @@ module;
 # endif
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:fd_filestat_get;
+export module uwvm2.imported.wasi.wasip1.func:fd_filestat_get_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -67,5 +67,6 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "fd_filestat_get.h"
+#include "fd_filestat_get_wasm64.h"
+
 
