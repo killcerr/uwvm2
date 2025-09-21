@@ -548,7 +548,7 @@ struct win32_io_redirection_std : win32_io_redirection
 {
 	inline constexpr win32_io_redirection_std() noexcept = default;
 	template <typename T>
-		requires requires (T &&t) {
+		requires requires(T &&t) {
 			{ redirect(::std::forward<T>(t)) } -> ::std::same_as<win32_io_redirection>;
 		}
 	inline constexpr win32_io_redirection_std(T &&t) noexcept
@@ -713,11 +713,8 @@ inline ::fast_io::intfpos_t seek_impl(void *handle, ::fast_io::intfpos_t offset,
 
 	::std::int_least32_t distance_to_move_high{};
 	constexpr ::std::uint_least32_t invalid{UINT_LEAST32_MAX};
-	auto const low{::fast_io::win32::SetFilePointer(
-		handle,
-		static_cast<::std::int_least32_t>(offset),
-		__builtin_addressof(distance_to_move_high),
-		static_cast<::std::uint_least32_t>(s))};
+	auto const low{::fast_io::win32::SetFilePointer(handle, static_cast<::std::int_least32_t>(offset),
+													__builtin_addressof(distance_to_move_high), static_cast<::std::uint_least32_t>(s))};
 
 	if (low == invalid) [[unlikely]]
 	{
@@ -969,7 +966,8 @@ struct find_struct_guard
 {
 	void *file_struct{};
 
-	inline explicit constexpr find_struct_guard(void *fs) noexcept: file_struct{fs} {}
+	inline explicit constexpr find_struct_guard(void *fs) noexcept : file_struct{fs}
+	{}
 
 	find_struct_guard(find_struct_guard const &) = delete;
 	find_struct_guard &operator=(find_struct_guard const &) = delete;
@@ -1033,7 +1031,7 @@ inline void close_win32_9xa_dir_handle(win32_9xa_dir_handle &h) noexcept(!throw_
 	}
 }
 
-inline win32_9xa_dir_handle win32_9xa_dir_dup_impl(win32_9xa_dir_handle const &h) 
+inline win32_9xa_dir_handle win32_9xa_dir_dup_impl(win32_9xa_dir_handle const &h)
 {
 	check_win32_9xa_dir_is_valid(h);
 	return {h.path};
@@ -1708,80 +1706,82 @@ inline posix_file_status win32_status_impl(void *__restrict handle)
 							 0};
 }
 
-inline posix_file_status win32_9xa_dir_file_status_impl(win32_9xa_dir_handle const& handle)
-{		
+inline posix_file_status win32_9xa_dir_file_status_impl(win32_9xa_dir_handle const &handle)
+{
 	::fast_io::posix_file_status tmp_file{};
 
-		// find data
-		::fast_io::win32::win32_find_dataa wfda{};
-		tlc_win32_9xa_dir_handle_path_str temp_find_path{concat_tlc_win32_9xa_dir_handle_path_str(handle.path, u8"\\*")};
-		auto find_struct{::fast_io::win32::FindFirstFileA(reinterpret_cast<char const *>(temp_find_path.c_str()), __builtin_addressof(wfda))};
-		if (find_struct == reinterpret_cast<void *>(static_cast<::std::ptrdiff_t>(-1))) [[unlikely]]
-		{
-			throw_win32_error(0x5);
-		}
-		else
-		{
-			find_struct_guard guard{find_struct};
-			// The first piece of information obtained by findfirstfile is current path ('.')
-			
-			::std::underlying_type_t<perms> pm{0444};
-			if ((wfda.dwFileAttributes & 0x1) == 0x0)
-			{
-				pm |= 0222;
-			}
+	// find data
+	::fast_io::win32::win32_find_dataa wfda{};
+	tlc_win32_9xa_dir_handle_path_str temp_find_path{concat_tlc_win32_9xa_dir_handle_path_str(handle.path, u8"\\*")};
+	auto find_struct{::fast_io::win32::FindFirstFileA(reinterpret_cast<char const *>(temp_find_path.c_str()), __builtin_addressof(wfda))};
+	if (find_struct == reinterpret_cast<void *>(static_cast<::std::ptrdiff_t>(-1))) [[unlikely]]
+	{
+		throw_win32_error(0x5);
+	}
+	else
+	{
+		find_struct_guard guard{find_struct};
+		// The first piece of information obtained by findfirstfile is current path ('.')
 
-			tmp_file.perm = static_cast<perms>(pm);
-			tmp_file.type = ::fast_io::file_type::directory;
-			tmp_file.nlink  = 1u;
-			tmp_file.size = static_cast<::std::uintmax_t>((static_cast<::std::uint_least64_t>(wfda.nFileSizeHigh) << 32u) | wfda.nFileSizeLow);
-			tmp_file.blksize = 512u;
-			tmp_file.blocks = (tmp_file.size + 511u) / 512u;
-			tmp_file.atim = to_unix_timestamp(wfda.ftLastAccessTime);
-			tmp_file.mtim = to_unix_timestamp(wfda.ftLastWriteTime);
-			tmp_file.ctim = tmp_file.mtim;
-			tmp_file.btim = to_unix_timestamp(wfda.ftCreationTime);
-
-			// find_struct destructor will close the handle
+		::std::underlying_type_t<perms> pm{0444};
+		if ((wfda.dwFileAttributes & 0x1) == 0x0)
+		{
+			pm |= 0222;
 		}
 
-        // dev
-		using char_const_may_alias_ptr
+		tmp_file.perm = static_cast<perms>(pm);
+		tmp_file.type = ::fast_io::file_type::directory;
+		tmp_file.nlink = 1u;
+		tmp_file.size = static_cast<::std::uintmax_t>((static_cast<::std::uint_least64_t>(wfda.nFileSizeHigh) << 32u) | wfda.nFileSizeLow);
+		tmp_file.blksize = 512u;
+		tmp_file.blocks = (tmp_file.size + 511u) / 512u;
+		tmp_file.atim = to_unix_timestamp(wfda.ftLastAccessTime);
+		tmp_file.mtim = to_unix_timestamp(wfda.ftLastWriteTime);
+		tmp_file.ctim = tmp_file.mtim;
+		tmp_file.btim = to_unix_timestamp(wfda.ftCreationTime);
+
+		// find_struct destructor will close the handle
+	}
+
+	// dev
+	using char_const_may_alias_ptr
 #if __has_cpp_attribute(__gnu__::__may_alias__)
-			[[__gnu__::__may_alias__]]
+		[[__gnu__::__may_alias__]]
 #endif
-			= char const *;
-		
-		using char_may_alias_ptr
+		= char const *;
+
+	using char_may_alias_ptr
 #if __has_cpp_attribute(__gnu__::__may_alias__)
-						[[__gnu__::__may_alias__]]
+		[[__gnu__::__may_alias__]]
 #endif
-			= char *;
+		= char *;
 
-		// Use A APIs and a char buffer; avoid multiplying by sizeof(char8_t)
-		constexpr ::std::size_t tmp_path_char_size{260u};
-		char tmp_path_char[tmp_path_char_size];
+	// Use A APIs and a char buffer; avoid multiplying by sizeof(char8_t)
+	constexpr ::std::size_t tmp_path_char_size{260u};
+	char tmp_path_char[tmp_path_char_size];
 
-		auto const full_len{::fast_io::win32::GetFullPathNameA(reinterpret_cast<char_const_may_alias_ptr>(handle.path.c_str()), tmp_path_char_size, tmp_path_char, nullptr)};
-		if (!full_len || full_len >= tmp_path_char_size) [[unlikely]]
-            return tmp_file;
+	auto const full_len{::fast_io::win32::GetFullPathNameA(reinterpret_cast<char_const_may_alias_ptr>(handle.path.c_str()), tmp_path_char_size, tmp_path_char, nullptr)};
+	if (!full_len || full_len >= tmp_path_char_size) [[unlikely]]
+	{
+		return tmp_file;
+	}
 
-		// Build root like "C:\\" safely
-		if (full_len < 3u) [[unlikely]]
-		{
-			return tmp_file;
-		}
-		
-		tmp_path_char[3u] = static_cast<char>(u8'\0');
+	// Build root like "C:\\" safely
+	if (full_len < 3u) [[unlikely]]
+	{
+		return tmp_file;
+	}
 
-		::std::uint_least32_t serial{};
+	tmp_path_char[3u] = static_cast<char>(u8'\0');
 
-		if (!::fast_io::win32::GetVolumeInformationA(tmp_path_char, nullptr, 0u, __builtin_addressof(serial), nullptr, nullptr, nullptr, 0u)) 
-		{
-			return tmp_file;
-		}
+	::std::uint_least32_t serial{};
 
-		tmp_file.dev = static_cast<::std::uintmax_t>(serial);
+	if (!::fast_io::win32::GetVolumeInformationA(tmp_path_char, nullptr, 0u, __builtin_addressof(serial), nullptr, nullptr, nullptr, 0u))
+	{
+		return tmp_file;
+	}
+
+	tmp_file.dev = static_cast<::std::uintmax_t>(serial);
 
 	return tmp_file;
 }
