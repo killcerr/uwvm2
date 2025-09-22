@@ -115,6 +115,28 @@ int main()
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: expected esuccess for setting explicit atim/mtim");
             ::fast_io::fast_terminate();
         }
+
+        // Verify via fd_filestat_get_wasm64 with 100ns precision alignment
+        constexpr ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t stat_ptr{4096u};
+        auto const gr = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_get_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(4), stat_ptr);
+        if(gr != errno_wasm64_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: fd_filestat_get_wasm64 expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+
+        using u_timestamp = ::std::underlying_type_t<timestamp_wasm64_t>;
+        auto const got_at = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<u_timestamp>(
+            memory, static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 40u));
+        auto const got_mt = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<u_timestamp>(
+            memory, static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 48u));
+
+        auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 100u) * 100u); };
+        if(q100(got_at) != q100(static_cast<u_timestamp>(at)) || q100(got_mt) != q100(static_cast<u_timestamp>(mt)))
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: atim/mtim mismatch (100ns precision)");
+            ::fast_io::fast_terminate();
+        }
     }
 
     // Case 4: rights missing → enotcapable
