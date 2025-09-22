@@ -414,7 +414,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 # endif
 
-                break;
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
             }
         }
 
