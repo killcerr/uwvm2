@@ -49,5 +49,9 @@
 # include "fd_fdstat_get.h"
 # include "fd_fdstat_set_flags_wasm64.h"
 # include "fd_fdstat_set_flags.h"
+# include "fd_filestat_get_wasm64.h"
+# include "fd_filestat_get.h"
+# include "fd_filestat_set_size_wasm64.h"
+# include "fd_filestat_set_size.h"
 
 #endif

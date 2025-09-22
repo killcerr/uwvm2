@@ -40,7 +40,7 @@ module;
 # include <errno.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:fd_filestat_set_size;
+export module uwvm2.imported.wasi.wasip1.func:fd_filestat_set_size_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -62,5 +62,6 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "fd_filestat_set_size.h"
+#include "fd_filestat_set_size_wasm64.h"
+
 
