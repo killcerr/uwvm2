@@ -1732,9 +1732,9 @@ inline posix_file_status win32_9xa_dir_file_status_impl(win32_9xa_dir_handle con
 		tmp_file.perm = static_cast<perms>(pm);
 		tmp_file.type = ::fast_io::file_type::directory;
 		tmp_file.nlink = 1u;
-		tmp_file.size = static_cast<::std::uintmax_t>((static_cast<::std::uint_least64_t>(wfda.nFileSizeHigh) << 32u) | wfda.nFileSizeLow);
-		tmp_file.blksize = 512u;
-		tmp_file.blocks = (tmp_file.size + 511u) / 512u;
+		tmp_file.size = static_cast<::std::uintmax_t>((static_cast<::std::uint_least64_t>(wfda.nFileSizeHigh) << 32u) | wfda.nFileSizeLow);  // always zero
+		tmp_file.blksize = 512u;  // default
+		tmp_file.blocks = (tmp_file.size + 511u) / 512u;  // default
 		tmp_file.atim = to_unix_timestamp(wfda.ftLastAccessTime);
 		tmp_file.mtim = to_unix_timestamp(wfda.ftLastWriteTime);
 		tmp_file.ctim = tmp_file.mtim;
@@ -1774,8 +1774,8 @@ inline posix_file_status win32_9xa_dir_file_status_impl(win32_9xa_dir_handle con
 		::std::uint_least32_t bytes_per_sector{};
 		if (::fast_io::win32::GetDiskFreeSpaceA(tmp_path_char, __builtin_addressof(sector_per_cluster), __builtin_addressof(bytes_per_sector), nullptr, nullptr)) [[likely]]
 		{
-			tmp_file.blocks = static_cast<::std::uintmax_t>(sector_per_cluster);
-			tmp_file.blksize = static_cast<::std::uintmax_t>(bytes_per_sector) * tmp_file.blocks;
+			tmp_file.blksize = static_cast<::std::uintmax_t>(bytes_per_sector) * static_cast<::std::uintmax_t>(sector_per_cluster);
+			tmp_file.blocks = (tmp_file.blksize + 511u) / 512u;
 		}
 	}
 
