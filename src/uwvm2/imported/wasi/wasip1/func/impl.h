@@ -53,5 +53,7 @@
 # include "fd_filestat_get.h"
 # include "fd_filestat_set_size_wasm64.h"
 # include "fd_filestat_set_size.h"
+# include "fd_filestat_set_times_wasm64.h"
+# include "fd_filestat_set_times.h"
 
 #endif

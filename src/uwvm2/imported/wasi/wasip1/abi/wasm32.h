@@ -268,6 +268,36 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
         filestat_set_mtim_now = 0x0008,
     };
 
+    inline constexpr fstflags_t operator& (fstflags_t x, fstflags_t y) noexcept
+    {
+        using utype = typename ::std::underlying_type<fstflags_t>::type;
+        return static_cast<fstflags_t>(static_cast<utype>(x) & static_cast<utype>(y));
+    }
+
+    inline constexpr fstflags_t operator| (fstflags_t x, fstflags_t y) noexcept
+    {
+        using utype = typename ::std::underlying_type<fstflags_t>::type;
+        return static_cast<fstflags_t>(static_cast<utype>(x) | static_cast<utype>(y));
+    }
+
+    inline constexpr fstflags_t operator^ (fstflags_t x, fstflags_t y) noexcept
+    {
+        using utype = typename ::std::underlying_type<fstflags_t>::type;
+        return static_cast<fstflags_t>(static_cast<utype>(x) ^ static_cast<utype>(y));
+    }
+
+    inline constexpr fstflags_t operator~(fstflags_t x) noexcept
+    {
+        using utype = typename ::std::underlying_type<fstflags_t>::type;
+        return static_cast<fstflags_t>(~static_cast<utype>(x));
+    }
+
+    inline constexpr fstflags_t& operator&= (fstflags_t& x, fstflags_t y) noexcept { return x = x & y; }
+
+    inline constexpr fstflags_t& operator|= (fstflags_t& x, fstflags_t y) noexcept { return x = x | y; }
+
+    inline constexpr fstflags_t& operator^= (fstflags_t& x, fstflags_t y) noexcept { return x = x ^ y; }
+
     enum class inode_t : ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u64
     {
 

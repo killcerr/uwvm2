@@ -37,6 +37,7 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // platform
 # if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
+#  include <time.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
 #  if !(defined(__MSDOS__) || defined(__DJGPP__))
@@ -66,6 +67,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
     namespace posix
     {
+        // https://github.com/torvalds/linux/blob/07e27ad16399afcd693be20211b0dfae63e0615f/include/uapi/linux/time_types.h#L7
+        // https://github.com/qemu/qemu/blob/ab8008b231e758e03c87c1c483c03afdd9c02e19/linux-user/syscall_defs.h#L251
+        // https://github.com/bminor/glibc/blob/b7e0ec907ba94b6fcc6142bbaddea995bcc3cef3/include/struct___timespec64.h#L15
+        struct linux_kernel_timespec64
+        {
+            ::std::int_least64_t tv_sec;
+            ::std::int_least64_t tv_nsec;
+        };
+
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
         extern int posix_fadvise(int fd, ::off_t offset, ::off_t len, int advice) noexcept __asm__("posix_fadvise");
         extern int fallocate(int fd, int mode, ::off_t offset, ::off_t len) noexcept __asm__("fallocate");
@@ -107,7 +117,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fsync")
 # endif
                 ;
-                
+        extern int futimens(int fd, const struct timespec times[2]) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("futimens")
+# else
+            __asm__("_futimens")
+# endif
+                ;
+
 # if !(defined(__MSDOS__) || defined(__DJGPP__))
         extern int getsockopt(int, int, int, void* __restrict, ::socklen_t* __restrict) noexcept
 #  if !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
