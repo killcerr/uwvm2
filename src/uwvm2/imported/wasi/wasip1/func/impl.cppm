@@ -49,6 +49,10 @@ export import :fd_fdstat_get_wasm64;
 export import :fd_fdstat_get;
 export import :fd_fdstat_set_flags_wasm64;
 export import :fd_fdstat_set_flags;
+export import :fd_filestat_get_wasm64;
+export import :fd_filestat_get;
+export import :fd_filestat_set_size_wasm64;
+export import :fd_filestat_set_size;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
