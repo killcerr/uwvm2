@@ -288,8 +288,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 # if !defined(_WIN32_WINDOWS)
         // Windows NT
-        ::fast_io::win32::nt::file_basic_information fbi{.LastAccessTime = lpLastAccessTime, .LastWriteTime = lpLastWriteTime};  // Everything else is zero.
-        ::fast_io::win32::nt::io_status_block isb;                                                                               // no initialize
+        ::fast_io::win32::nt::file_basic_information fbi{.CreationTime = {},
+                                                         .LastAccessTime = lpLastAccessTime,
+                                                         .LastWriteTime = lpLastWriteTime,
+                                                         .ChangeTime = {},
+                                                         .FileAttributes = {}};
+        ::fast_io::win32::nt::io_status_block isb;                               // no initialize
         constexpr bool zw{false};
         auto const status{::fast_io::win32::nt::nt_set_information_file<zw>(curr_fd_native_handle,
                                                                             ::std::addressof(isb),
