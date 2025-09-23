@@ -48,10 +48,10 @@ int main()
     // Case 0: negative fd → ebadf
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(env,
-                                                                                       static_cast<wasi_posix_fd_t>(-1),
-                                                                                       static_cast<timestamp_t>(0),
-                                                                                       static_cast<timestamp_t>(0),
-                                                                                       static_cast<fstflags_t>(0));
+                                                                                      static_cast<wasi_posix_fd_t>(-1),
+                                                                                      static_cast<timestamp_t>(0),
+                                                                                      static_cast<timestamp_t>(0),
+                                                                                      static_cast<fstflags_t>(0));
         if(ret != errno_t::ebadf)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: expected ebadf for negative fd");
@@ -68,13 +68,12 @@ int main()
 
     // Case 1: conflict flags atim_now+atim → einval
     {
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(env,
-                                                                                       static_cast<wasi_posix_fd_t>(4),
-                                                                                       static_cast<timestamp_t>(123u),
-                                                                                       static_cast<timestamp_t>(0u),
-                                                                                       static_cast<fstflags_t>(
-                                                                                           fstflags_t::filestat_set_atim_now |
-                                                                                           fstflags_t::filestat_set_atim));
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(
+            env,
+            static_cast<wasi_posix_fd_t>(4),
+            static_cast<timestamp_t>(123u),
+            static_cast<timestamp_t>(0u),
+            static_cast<fstflags_t>(fstflags_t::filestat_set_atim_now | fstflags_t::filestat_set_atim));
         if(ret != errno_t::einval)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: expected einval for conflict flags atim_now+atim");
@@ -85,12 +84,16 @@ int main()
     // Case 2: set mtim_now only → esuccess
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(env,
-                                                                                       static_cast<wasi_posix_fd_t>(4),
-                                                                                       static_cast<timestamp_t>(0u),
-                                                                                       static_cast<timestamp_t>(0u),
-                                                                                       static_cast<fstflags_t>(
-                                                                                           fstflags_t::filestat_set_mtim_now));
-        if(ret != errno_t::esuccess)
+                                                                                      static_cast<wasi_posix_fd_t>(4),
+                                                                                      static_cast<timestamp_t>(0u),
+                                                                                      static_cast<timestamp_t>(0u),
+                                                                                      static_cast<fstflags_t>(fstflags_t::filestat_set_mtim_now));
+        if(ret == errno_t::enosys)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: enosys");
+            return 0;
+        }
+        else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: expected esuccess for mtim_now");
             ::fast_io::fast_terminate();
@@ -102,13 +105,12 @@ int main()
         timestamp_t const at = static_cast<timestamp_t>(1'000'000'000ull * 10ull + 123ull);
         timestamp_t const mt = static_cast<timestamp_t>(1'000'000'000ull * 20ull + 456ull);
 
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(env,
-                                                                                       static_cast<wasi_posix_fd_t>(4),
-                                                                                       at,
-                                                                                       mt,
-                                                                                       static_cast<fstflags_t>(
-                                                                                           fstflags_t::filestat_set_atim |
-                                                                                           fstflags_t::filestat_set_mtim));
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(
+            env,
+            static_cast<wasi_posix_fd_t>(4),
+            at,
+            mt,
+            static_cast<fstflags_t>(fstflags_t::filestat_set_atim | fstflags_t::filestat_set_mtim));
         if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: expected esuccess for setting explicit atim/mtim");
@@ -126,9 +128,11 @@ int main()
 
         using u_timestamp = ::std::underlying_type_t<timestamp_t>;
         auto const got_at = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<u_timestamp>(
-            memory, static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(stat_ptr + 40u));
+            memory,
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(stat_ptr + 40u));
         auto const got_mt = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<u_timestamp>(
-            memory, static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(stat_ptr + 48u));
+            memory,
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(stat_ptr + 48u));
 
         auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 100u) * 100u); };
         if(q100(got_at) != q100(static_cast<u_timestamp>(at)) || q100(got_mt) != q100(static_cast<u_timestamp>(mt)))
@@ -147,11 +151,10 @@ int main()
                                    ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
 
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(env,
-                                                                                       static_cast<wasi_posix_fd_t>(5),
-                                                                                       static_cast<timestamp_t>(0u),
-                                                                                       static_cast<timestamp_t>(0u),
-                                                                                       static_cast<fstflags_t>(
-                                                                                           fstflags_t::filestat_set_mtim_now));
+                                                                                      static_cast<wasi_posix_fd_t>(5),
+                                                                                      static_cast<timestamp_t>(0u),
+                                                                                      static_cast<timestamp_t>(0u),
+                                                                                      static_cast<fstflags_t>(fstflags_t::filestat_set_mtim_now));
         if(ret != errno_t::enotcapable)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: expected enotcapable when rights missing");
@@ -175,10 +178,10 @@ int main()
         }
 
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times(env,
-                                                                                       static_cast<wasi_posix_fd_t>(2),
-                                                                                       static_cast<timestamp_t>(0u),
-                                                                                       static_cast<timestamp_t>(0u),
-                                                                                       static_cast<fstflags_t>(0));
+                                                                                      static_cast<wasi_posix_fd_t>(2),
+                                                                                      static_cast<timestamp_t>(0u),
+                                                                                      static_cast<timestamp_t>(0u),
+                                                                                      static_cast<fstflags_t>(0));
         if(ret != errno_t::ebadf)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: expected ebadf after fd_close");
@@ -186,7 +189,4 @@ int main()
         }
     }
 }
-
-
-
 

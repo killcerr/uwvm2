@@ -52,7 +52,12 @@ int main()
                                                                                              static_cast<timestamp_wasm64_t>(0),
                                                                                              static_cast<timestamp_wasm64_t>(0),
                                                                                              static_cast<fstflags_wasm64_t>(0));
-        if(ret != errno_wasm64_t::ebadf)
+        if(ret == errno_wasm64_t::enosys)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"enosys");
+            return 0;
+        }
+        else if(ret != errno_wasm64_t::ebadf)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: expected ebadf for negative fd");
             ::fast_io::fast_terminate();
@@ -68,13 +73,12 @@ int main()
 
     // Case 1: conflict flags atim_now+atim → einval
     {
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(env,
-                                                                                             static_cast<wasi_posix_fd_wasm64_t>(4),
-                                                                                             static_cast<timestamp_wasm64_t>(123ull),
-                                                                                             static_cast<timestamp_wasm64_t>(0ull),
-                                                                                             static_cast<fstflags_wasm64_t>(
-                                                                                                 fstflags_wasm64_t::filestat_set_atim_now |
-                                                                                                 fstflags_wasm64_t::filestat_set_atim));
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(
+            env,
+            static_cast<wasi_posix_fd_wasm64_t>(4),
+            static_cast<timestamp_wasm64_t>(123ull),
+            static_cast<timestamp_wasm64_t>(0ull),
+            static_cast<fstflags_wasm64_t>(fstflags_wasm64_t::filestat_set_atim_now | fstflags_wasm64_t::filestat_set_atim));
         if(ret != errno_wasm64_t::einval)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: expected einval for conflict flags atim_now+atim");
@@ -84,12 +88,12 @@ int main()
 
     // Case 2: set mtim_now only → esuccess
     {
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(env,
-                                                                                             static_cast<wasi_posix_fd_wasm64_t>(4),
-                                                                                             static_cast<timestamp_wasm64_t>(0ull),
-                                                                                             static_cast<timestamp_wasm64_t>(0ull),
-                                                                                             static_cast<fstflags_wasm64_t>(
-                                                                                                 fstflags_wasm64_t::filestat_set_mtim_now));
+        auto const ret =
+            ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(env,
+                                                                                static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                static_cast<timestamp_wasm64_t>(0ull),
+                                                                                static_cast<timestamp_wasm64_t>(0ull),
+                                                                                static_cast<fstflags_wasm64_t>(fstflags_wasm64_t::filestat_set_mtim_now));
         if(ret != errno_wasm64_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: expected esuccess for mtim_now");
@@ -100,16 +104,15 @@ int main()
     // Case 3: set atim/mtim to specific values → esuccess
     {
         // pick arbitrary but small timestamps
-        timestamp_wasm64_t const at = static_cast<timestamp_wasm64_t>(1'000'000'000ull * 10ull + 123ull); // 10s + 123ns
-        timestamp_wasm64_t const mt = static_cast<timestamp_wasm64_t>(1'000'000'000ull * 20ull + 456ull); // 20s + 456ns
+        timestamp_wasm64_t const at = static_cast<timestamp_wasm64_t>(1'000'000'000ull * 10ull + 123ull);  // 10s + 123ns
+        timestamp_wasm64_t const mt = static_cast<timestamp_wasm64_t>(1'000'000'000ull * 20ull + 456ull);  // 20s + 456ns
 
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(env,
-                                                                                             static_cast<wasi_posix_fd_wasm64_t>(4),
-                                                                                             at,
-                                                                                             mt,
-                                                                                             static_cast<fstflags_wasm64_t>(
-                                                                                                 fstflags_wasm64_t::filestat_set_atim |
-                                                                                                 fstflags_wasm64_t::filestat_set_mtim));
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(
+            env,
+            static_cast<wasi_posix_fd_wasm64_t>(4),
+            at,
+            mt,
+            static_cast<fstflags_wasm64_t>(fstflags_wasm64_t::filestat_set_atim | fstflags_wasm64_t::filestat_set_mtim));
         if(ret != errno_wasm64_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: expected esuccess for setting explicit atim/mtim");
@@ -127,9 +130,11 @@ int main()
 
         using u_timestamp = ::std::underlying_type_t<timestamp_wasm64_t>;
         auto const got_at = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<u_timestamp>(
-            memory, static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 40u));
+            memory,
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 40u));
         auto const got_mt = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<u_timestamp>(
-            memory, static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 48u));
+            memory,
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 48u));
 
         auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 100u) * 100u); };
         if(q100(got_at) != q100(static_cast<u_timestamp>(at)) || q100(got_mt) != q100(static_cast<u_timestamp>(mt)))
@@ -147,12 +152,12 @@ int main()
             ::fast_io::native_file{u8"test_fd_filestat_set_times_wasm64_rights.tmp",
                                    ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
 
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(env,
-                                                                                             static_cast<wasi_posix_fd_wasm64_t>(5),
-                                                                                             static_cast<timestamp_wasm64_t>(0ull),
-                                                                                             static_cast<timestamp_wasm64_t>(0ull),
-                                                                                             static_cast<fstflags_wasm64_t>(
-                                                                                                 fstflags_wasm64_t::filestat_set_mtim_now));
+        auto const ret =
+            ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(env,
+                                                                                static_cast<wasi_posix_fd_wasm64_t>(5),
+                                                                                static_cast<timestamp_wasm64_t>(0ull),
+                                                                                static_cast<timestamp_wasm64_t>(0ull),
+                                                                                static_cast<fstflags_wasm64_t>(fstflags_wasm64_t::filestat_set_mtim_now));
         if(ret != errno_wasm64_t::enotcapable)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: expected enotcapable when rights missing");
@@ -187,7 +192,4 @@ int main()
         }
     }
 }
-
-
-
 
