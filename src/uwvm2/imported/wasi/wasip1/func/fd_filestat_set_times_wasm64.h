@@ -238,7 +238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
 
 # if (!defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x0602) && !defined(_WIN32_WINDOWS)
-            // Windows 7 or later
+            // Windows 8 or later
             currtime = static_cast<::std::uint_least64_t>(::fast_io::win32::nt::RtlGetSystemTimePrecise());
 # else
             ::fast_io::win32::filetime ftm;  // no initialize
@@ -261,7 +261,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             if(!currtime) [[unlikely]]
             {
 # if (!defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x0602) && !defined(_WIN32_WINDOWS)
-                // Windows 7 or later
+                // Windows 8 or later
                 currtime = static_cast<::std::uint_least64_t>(::fast_io::win32::nt::RtlGetSystemTimePrecise());
 # else
                 ::fast_io::win32::filetime ftm;  // no initialize
@@ -314,8 +314,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Windows 9x
         ::fast_io::win32::filetime const LastAccessTime_filetime{::std::bit_cast<::fast_io::win32::filetime>(lpLastAccessTime)};
         ::fast_io::win32::filetime const LastWriteTime_filetime{::std::bit_cast<::fast_io::win32::filetime>(lpLastWriteTime)};
-        if(!::fast_io::win32::SetFileTime(curr_fd_native_handle, nullptr, ::std::addressof(LastAccessTime_filetime), ::std::addressof(LastWriteTime_filetime)))
-            [[unlikely]]
+        bool const set_atime{((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim_now) ==
+                              ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim_now) ||
+                             ((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim) ==
+                              ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim)};
+        bool const set_mtime{((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim_now) ==
+                              ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim_now) ||
+                             ((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim) ==
+                              ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim)};
+        ::fast_io::win32::filetime const* const pAccess{set_atime ? ::std::addressof(LastAccessTime_filetime) : nullptr};
+        ::fast_io::win32::filetime const* const pWrite{set_mtime ? ::std::addressof(LastWriteTime_filetime) : nullptr};
+        if(!::fast_io::win32::SetFileTime(curr_fd_native_handle, nullptr, pAccess, pWrite)) [[unlikely]]
         {
             switch(::fast_io::win32::GetLastError())
             {
@@ -339,7 +348,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const& curr_fd_native_file{curr_fd.file_fd};
         auto const curr_fd_native_handle{curr_fd_native_file.native_handle()};
 
-        // Since MS-DOS can obtain the file descriptor name and then call utimes, this can be implemented here.
+        // Since MS-DOS can obtain the file descriptor name and then call utime, this can be implemented here.
         auto const fd_native_handle_pathname_cstr{::fast_io::noexcept_call(::__get_fd_name, curr_fd_native_handle)};
 
         if(fd_native_handle_pathname_cstr == nullptr) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio; }
@@ -371,7 +380,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
             }
 
-            // Since timeval has a precision of 1 microsecond, ns must be converted to us.
+            // utime uses time_t seconds; assign seconds (ns truncated).
             timestamp_spec.actime = static_cast<::std::time_t>(now_unix_timestamp.seconds);
         }
         else if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim) ==
@@ -387,7 +396,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
             }
 
-            // Since timeval has a precision of 1 microsecond, ns must be converted to us.
+            // utime uses time_t seconds; convert ns to seconds.
             timestamp_spec.actime = static_cast<::std::time_t>(atim_seconds);
         }
         else
@@ -411,7 +420,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // No need to check, because it will never overflow.
-            // Since timeval has a precision of 1 microsecond, ns must be converted to us.
+            // utime uses time_t seconds; assign preserved seconds.
             timestamp_spec.actime = static_cast<::std::time_t>(omit_atim_unix_timestamp.seconds);
         }
 
@@ -434,7 +443,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
             }
 
-            // Since timeval has a precision of 1 microsecond, ns must be converted to us.
+            // utime uses time_t seconds; assign seconds (ns truncated).
             timestamp_spec.modtime = static_cast<::std::time_t>(now_unix_timestamp.seconds);
         }
         else if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim) ==
@@ -450,7 +459,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
             }
 
-            // Since timeval has a precision of 1 microsecond, ns must be converted to us.
+            // utime uses time_t seconds; convert ns to seconds.
             timestamp_spec.modtime = static_cast<::std::time_t>(mtim_seconds);
         }
         else
@@ -474,7 +483,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // No need to check, because it will never overflow.
-            // Since timeval has a precision of 1 microsecond, ns must be converted to us.
+            // utime uses time_t seconds; assign preserved seconds.
             timestamp_spec.modtime = static_cast<::std::time_t>(omit_mtim_unix_timestamp.seconds);
         }
 
