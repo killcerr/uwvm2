@@ -42,7 +42,7 @@ module;
 # include <sys/time.h>
 #endif
 #if defined(__MSDOS__) || defined(__DJGPP__)
-# include <sys/time.h>
+# include <utime.h>
 #endif
 
 export module uwvm2.imported.wasi.wasip1.func:fd_filestat_set_times_wasm64;

@@ -43,6 +43,8 @@
 #  include <sys/time.h>
 #  if !(defined(__MSDOS__) || defined(__DJGPP__))
 #   include <sys/socket.h>
+#  else
+#   include <utime.h>
 #  endif
 # endif
 
@@ -90,6 +92,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fcntl")
 # endif
                 ;
+                
         extern int ftruncate(int fd, ::off_t size) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("ftruncate")
@@ -97,6 +100,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_ftruncate")
 # endif
                 ;
+
         extern int fstat(int fd, struct stat* st) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("fstat")
@@ -104,6 +108,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fstat")
 # endif
                 ;
+
         extern int fdatasync(int fd) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("fdatasync")
@@ -111,6 +116,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fdatasync")
 # endif
                 ;
+
         extern int fsync(int fd) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("fsync")
@@ -118,6 +124,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fsync")
 # endif
                 ;
+
+        // POSIX 2008
         extern int futimens(int fd, const struct timespec times[2]) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("futimens")
@@ -125,6 +133,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_futimens")
 # endif
                 ;
+
+        // POSIX 2001
         extern int utimes(char const* path, const struct timeval times[2]) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("utimes")
@@ -133,6 +143,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
                 ;
 
+        // POSIX 1988 (LEGACY), only support msdos-djgpp here
+# if defined(__MSDOS__) || defined(__DJGPP__)
+        extern int utime(char const* path, const struct utimbuf* time) noexcept
+#  if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("utime")
+#  else
+            __asm__("_utime")
+#  endif
+                ;
+# endif
+
+        // POSIX 2001, but msdos-djgpp not supported
 # if !(defined(__MSDOS__) || defined(__DJGPP__))
         extern int getsockopt(int, int, int, void* __restrict, ::socklen_t* __restrict) noexcept
 #  if !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))

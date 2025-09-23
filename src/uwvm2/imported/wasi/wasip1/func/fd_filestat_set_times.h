@@ -45,7 +45,7 @@
 #  include <sys/time.h>
 # endif
 # if defined(__MSDOS__) || defined(__DJGPP__)
-#  include <sys/time.h>
+#  include <utime.h>
 # endif
 // import
 # include <fast_io.h>
@@ -360,7 +360,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         ::fast_io::unix_timestamp omit_mtim_unix_timestamp{};
         ::fast_io::unix_timestamp now_unix_timestamp{};
 
-        struct timeval timestamp_spec[2];
+        // Note that, as under DOS a file only has a single timestamp, the actime field of struct utimbuf is ignored by this function, and only modtime field is
+        // used. On filesystems which support long filenames, both fields are used and both access and modification times are set.
+        struct utimbuf timestamp_spec;
 
         if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_t::filestat_set_atim_now) ==
            ::uwvm2::imported::wasi::wasip1::abi::fstflags_t::filestat_set_atim_now)
@@ -382,13 +384,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[0] = {static_cast<::std::time_t>(now_unix_timestamp.seconds), static_cast<long>(now_unix_timestamp.subseconds / 1000u)};
+            timestamp_spec.actime = static_cast<::std::time_t>(now_unix_timestamp.seconds);
         }
         else if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_t::filestat_set_atim) ==
                 ::uwvm2::imported::wasi::wasip1::abi::fstflags_t::filestat_set_atim)
         {
             auto const atim_seconds{static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(atim)>>>(atim) / 1'000'000'000u};
-            auto const atim_subseconds{static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(atim)>>>(atim) % 1'000'000'000u};
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
@@ -396,7 +397,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[0] = {static_cast<::std::time_t>(atim_seconds), static_cast<long>(atim_subseconds / 1000u)};
+            timestamp_spec.actime = static_cast<::std::time_t>(atim_seconds);
         }
         else
         {
@@ -420,8 +421,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             // No need to check, because it will never overflow.
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[0] = {static_cast<::std::time_t>(omit_atim_unix_timestamp.seconds),
-                                 static_cast<long>(omit_atim_unix_timestamp.subseconds / 1000u)};
+            timestamp_spec.actime = static_cast<::std::time_t>(omit_atim_unix_timestamp.seconds);
         }
 
         if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_t::filestat_set_mtim_now) ==
@@ -444,13 +444,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[1] = {static_cast<::std::time_t>(now_unix_timestamp.seconds), static_cast<long>(now_unix_timestamp.subseconds / 1000u)};
+            timestamp_spec.modtime = static_cast<::std::time_t>(now_unix_timestamp.seconds);
         }
         else if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_t::filestat_set_mtim) ==
                 ::uwvm2::imported::wasi::wasip1::abi::fstflags_t::filestat_set_mtim)
         {
             auto const mtim_seconds{static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(mtim)>>>(mtim) / 1'000'000'000u};
-            auto const mtim_subseconds{static_cast<::std::underlying_type_t<::std::remove_cvref_t<decltype(mtim)>>>(mtim) % 1'000'000'000u};
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
@@ -458,7 +457,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[1] = {static_cast<::std::time_t>(mtim_seconds), static_cast<long>(mtim_subseconds / 1000u)};
+            timestamp_spec.modtime = static_cast<::std::time_t>(mtim_seconds);
         }
         else
         {
@@ -482,11 +481,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             // No need to check, because it will never overflow.
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[1] = {static_cast<::std::time_t>(omit_mtim_unix_timestamp.seconds),
-                                 static_cast<long>(omit_mtim_unix_timestamp.subseconds / 1000u)};
+            timestamp_spec.modtime = static_cast<::std::time_t>(omit_mtim_unix_timestamp.seconds);
         }
 
-        if(::uwvm2::imported::wasi::wasip1::func::posix::utimes(fd_native_handle_pathname_cstr, timestamp_spec) == -1) [[unlikely]]
+        // Note that, as under DOS a file only has a single timestamp, the actime field of struct utimbuf is ignored by this function, and only modtime field is
+        // used. On filesystems which support long filenames, both fields are used and both access and modification times are set.
+        if(::uwvm2::imported::wasi::wasip1::func::posix::utime(fd_native_handle_pathname_cstr, ::std::addressof(timestamp_spec)) == -1) [[unlikely]]
         {
             switch(errno)
             {
