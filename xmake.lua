@@ -53,8 +53,8 @@ function def_build()
 		add_defines("UWVM_TIMER")
 	end
 
-    local enable_multithread_allocator = get_config("use-multithread-allocator")
-	if enable_multithread_allocator then
+    local enable_multithread_allocator_mem = get_config("use-multithread-allocator-memory")
+	if enable_multithread_allocator_mem then
 		add_defines("UWVM_USE_MULTITHREAD_ALLOCATOR")
 	end
 
