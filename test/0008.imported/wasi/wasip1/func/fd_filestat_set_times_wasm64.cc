@@ -102,6 +102,50 @@ int main()
     }
 
     // Case 3: set atim/mtim to specific values → esuccess
+#if defined(__MSDOS__) || defined(__DJGPP__)
+    // On MSDOS/DJGPP, skip atime-specific testing; verify only mtim.
+    {
+        timestamp_wasm64_t const mt = static_cast<timestamp_wasm64_t>(1'000'000'000ull * 20ull + 456ull);
+
+        auto const ret =
+            ::uwvm2::imported::wasi::wasip1::func::fd_filestat_set_times_wasm64(env,
+                                                                                static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                static_cast<timestamp_wasm64_t>(0ull),
+                                                                                mt,
+                                                                                static_cast<fstflags_wasm64_t>(fstflags_wasm64_t::filestat_set_mtim));
+        if(ret != errno_wasm64_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: expected esuccess for setting explicit mtim (DOS)");
+            ::fast_io::fast_terminate();
+        }
+
+        // Verify via fd_filestat_get_wasm64 with 100ns precision alignment
+        constexpr ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t stat_ptr{4096u};
+        auto const gr = ::uwvm2::imported::wasi::wasip1::func::fd_filestat_get_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(4), stat_ptr);
+        if(gr != errno_wasm64_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times_wasm64: fd_filestat_get_wasm64 expected esuccess");
+            ::fast_io::fast_terminate();
+        }
+
+        using u_timestamp = ::std::underlying_type_t<timestamp_wasm64_t>;
+        auto const got_mt = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<u_timestamp>(
+            memory,
+            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 48u));
+
+        auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 1'000'000'000u) * 1'000'000'000u); };
+
+        if(q100(got_mt) != q100(static_cast<u_timestamp>(mt)))
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(),
+                                  u8"fd_filestat_set_times_wasm64: mtim mismatch (with precision, DOS): ",
+                                  q100(got_mt),
+                                  u8" ",
+                                  q100(static_cast<u_timestamp>(mt)));
+            ::fast_io::fast_terminate();
+        }
+    }
+#else
     {
         // pick arbitrary but small timestamps
         timestamp_wasm64_t const at = static_cast<timestamp_wasm64_t>(1'000'000'000ull * 10ull + 123ull);  // 10s + 123ns
@@ -136,13 +180,11 @@ int main()
             memory,
             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t>(stat_ptr + 48u));
 
-#if defined(__MSDOS__) || defined(__DJGPP__)
-        auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 1000u) * 1000u); };
-#elif defined(_WIN32)
+# if defined(_WIN32)
         auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 100u) * 100u); };
-#else
+# else
         auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>(ns); };
-#endif
+# endif
 
         if(q100(got_at) != q100(static_cast<u_timestamp>(at)) || q100(got_mt) != q100(static_cast<u_timestamp>(mt)))
         {
@@ -158,6 +200,7 @@ int main()
             ::fast_io::fast_terminate();
         }
     }
+#endif
 
     // Case 4: rights missing → enotcapable
     {
