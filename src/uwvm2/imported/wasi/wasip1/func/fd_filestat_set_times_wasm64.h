@@ -342,10 +342,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Since MS-DOS can obtain the file descriptor name and then call utimes, this can be implemented here.
         auto const fd_native_handle_pathname_cstr{::fast_io::noexcept_call(::__get_fd_name, curr_fd_native_handle)};
 
-        if (fd_native_handle_pathname_cstr == nullptr) [[unlikely]]
-        {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
-        }
+        if(fd_native_handle_pathname_cstr == nullptr) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio; }
 
         ::fast_io::unix_timestamp omit_atim_unix_timestamp{};
         ::fast_io::unix_timestamp omit_mtim_unix_timestamp{};
@@ -356,7 +353,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim_now) ==
            ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim_now)
         {
-            if(now_unix_timestamp.second == 0u && now_unix_timestamp.subsecond == 0u)
+            if(now_unix_timestamp.seconds == 0u && now_unix_timestamp.subseconds == 0u)
             {
 # ifdef UWVM_CPP_EXCEPTIONS
                 try
@@ -373,7 +370,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[0] = {static_cast<::std::time_t>(now_unix_timestamp.second), static_cast<suseconds_t>(now_unix_timestamp.subsecond / 1000u)};
+            timestamp_spec[0] = {static_cast<::std::time_t>(now_unix_timestamp.seconds), static_cast<long>(now_unix_timestamp.subseconds / 1000u)};
         }
         else if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim) ==
                 ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_atim)
@@ -383,15 +380,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
-                if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval; }
+                if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                }
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[0] = {static_cast<::std::time_t>(atim_seconds), static_cast<suseconds_t>(atim_subseconds / 1000u)};
+            timestamp_spec[0] = {static_cast<::std::time_t>(atim_seconds), static_cast<long>(atim_subseconds / 1000u)};
         }
         else
         {
-            if(omit_atim_unix_timestamp.second == 0u && omit_atim_unix_timestamp.subsecond == 0u)
+            if(omit_atim_unix_timestamp.seconds == 0u && omit_atim_unix_timestamp.subseconds == 0u)
             {
 # ifdef UWVM_CPP_EXCEPTIONS
                 try
@@ -411,14 +411,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             // No need to check, because it will never overflow.
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[0] = {static_cast<::std::time_t>(omit_atim_unix_timestamp.second),
-                                 static_cast<suseconds_t>(omit_atim_unix_timestamp.subsecond / 1000u)};
+            timestamp_spec[0] = {static_cast<::std::time_t>(omit_atim_unix_timestamp.seconds), static_cast<long>(omit_atim_unix_timestamp.subseconds / 1000u)};
         }
 
         if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim_now) ==
            ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim_now)
         {
-            if(now_unix_timestamp.second == 0u && now_unix_timestamp.subsecond == 0u)
+            if(now_unix_timestamp.seconds == 0u && now_unix_timestamp.subseconds == 0u)
             {
 # ifdef UWVM_CPP_EXCEPTIONS
                 try
@@ -435,7 +434,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[1] = {static_cast<::std::time_t>(now_unix_timestamp.second), static_cast<suseconds_t>(now_unix_timestamp.subsecond / 1000u)};
+            timestamp_spec[1] = {static_cast<::std::time_t>(now_unix_timestamp.seconds), static_cast<long>(now_unix_timestamp.subseconds / 1000u)};
         }
         else if((fstflags & ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim) ==
                 ::uwvm2::imported::wasi::wasip1::abi::fstflags_wasm64_t::filestat_set_mtim)
@@ -445,15 +444,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
-                if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval; }
+                if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
+                {
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                }
             }
 
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[1] = {static_cast<::std::time_t>(mtim_seconds), static_cast<suseconds_t>(mtim_subseconds / 1000u)};
+            timestamp_spec[1] = {static_cast<::std::time_t>(mtim_seconds), static_cast<long>(mtim_subseconds / 1000u)};
         }
         else
         {
-            if(omit_mtim_unix_timestamp.second == 0u && omit_mtim_unix_timestamp.subsecond == 0u)
+            if(omit_mtim_unix_timestamp.seconds == 0u && omit_mtim_unix_timestamp.subseconds == 0u)
             {
 # ifdef UWVM_CPP_EXCEPTIONS
                 try
@@ -473,8 +475,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             // No need to check, because it will never overflow.
             // Since timeval has a precision of 1 microsecond, ns must be converted to us.
-            timestamp_spec[1] = {static_cast<::std::time_t>(omit_mtim_unix_timestamp.second),
-                                 static_cast<suseconds_t>(omit_mtim_unix_timestamp.subsecond / 1000u)};
+            timestamp_spec[1] = {static_cast<::std::time_t>(omit_mtim_unix_timestamp.seconds), static_cast<long>(omit_mtim_unix_timestamp.subseconds / 1000u)};
         }
 
         if(::uwvm2::imported::wasi::wasip1::func::posix::utimes(fd_native_handle_pathname_cstr, timestamp_spec) == -1) [[unlikely]]
