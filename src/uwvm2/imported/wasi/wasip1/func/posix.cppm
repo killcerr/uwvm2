@@ -39,8 +39,11 @@ module;
 # include <time.h>
 # include <fcntl.h>
 # include <sys/stat.h>
+# include <sys/time.h>
 # if !(defined(__MSDOS__) || defined(__DJGPP__))
 #  include <sys/socket.h>
+# else
+#  include <utime.h>
 # endif
 #endif
 
