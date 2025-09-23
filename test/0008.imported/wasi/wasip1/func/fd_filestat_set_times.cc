@@ -134,10 +134,25 @@ int main()
             memory,
             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(stat_ptr + 48u));
 
+#if defined(__MSDOS__) || defined(__DJGPP__)
+        auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 1000u) * 1000u); };
+#elif defined(_WIN32)
         auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>((ns / 100u) * 100u); };
+#else
+        auto const q100 = [](u_timestamp ns) constexpr -> u_timestamp { return static_cast<u_timestamp>(ns); };
+#endif
+
         if(q100(got_at) != q100(static_cast<u_timestamp>(at)) || q100(got_mt) != q100(static_cast<u_timestamp>(mt)))
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_filestat_set_times: atim/mtim mismatch (100ns precision)");
+            ::fast_io::io::perrln(::fast_io::u8err(),
+                                  u8"fd_filestat_set_times: atim/mtim mismatch (with precision): ",
+                                  q100(got_at),
+                                  u8" ",
+                                  q100(static_cast<u_timestamp>(at)),
+                                  u8" ",
+                                  q100(got_mt),
+                                  u8" ",
+                                  q100(static_cast<u_timestamp>(mt)));
             ::fast_io::fast_terminate();
         }
     }
