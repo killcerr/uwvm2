@@ -40,6 +40,7 @@
 #  include <time.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
+#  include <sys/time.h>
 #  if !(defined(__MSDOS__) || defined(__DJGPP__))
 #   include <sys/socket.h>
 #  endif
@@ -122,6 +123,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("futimens")
 # else
             __asm__("_futimens")
+# endif
+                ;
+        extern int utimes(char const* path, const struct timeval times[2]) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("utimes")
+# else
+            __asm__("_utimes")
 # endif
                 ;
 

@@ -39,6 +39,10 @@ module;
 # include <unistd.h>
 # include <errno.h>
 # include <sys/stat.h>
+# include <sys/time.h>
+#endif
+#if defined(__MSDOS__) || defined(__DJGPP__)
+# include <sys/time.h>
 #endif
 
 export module uwvm2.imported.wasi.wasip1.func:fd_filestat_set_times_wasm64;
@@ -64,6 +68,4 @@ import :posix;
 #endif
 
 #include "fd_filestat_set_times_wasm64.h"
-
-
 
