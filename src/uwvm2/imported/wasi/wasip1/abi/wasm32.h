@@ -468,6 +468,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
     {
         preopentype_dir
     };
+
+    struct alignas(4uz) wasi_iovec_t
+    {
+        wasi_void_ptr_t buf;
+        wasi_size_t buf_len;
+    };
+
+    inline constexpr ::std::size_t size_of_wasi_iovec_t{8uz};
+
+    inline consteval bool is_default_wasi_iovec_data_layout() noexcept
+    {
+        // In standard layout mode, data can be transferred in a single memcpy operation (static length), improving read efficiency.
+        return __builtin_offsetof(wasi_iovec_t, buf) == 0uz && __builtin_offsetof(wasi_iovec_t, buf_len) == 4uz &&
+               sizeof(wasi_iovec_t) == size_of_wasi_iovec_t && alignof(wasi_iovec_t) == 4uz && ::std::endian::native == ::std::endian::little;
+    }
 }
 
 #ifndef UWVM_MODULE
