@@ -239,10 +239,71 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         if constexpr(::uwvm2::imported::wasi::wasip1::abi::is_default_wasi_iovec_data_layout())
         {
-            if constexpr(sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_t) == sizeof(::fast_io::basic_io_scatter_t<char>))
+            if constexpr(::uwvm2::imported::wasi::wasip1::abi::can_reinterpret_wasi_iovec_t_as_fast_io_io_scatter_t())
             {
-                using fast_io_basic_io_scatter_t_char_may_alias UWVM_GNU_MAY_ALIAS = ::fast_io::basic_io_scatter_t<char>*;
-                
+                auto const memory_locker_guard{::uwvm2::imported::wasi::wasip1::memory::lock_memory(memory)};
+                // After locking, we can directly manipulate memory.
+
+                // get scatter base
+                using fast_io_io_scatter_t_may_alias UWVM_GNU_MAY_ALIAS = ::fast_io::io_scatter_t*;
+                auto const scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(memory.memory_base + iovs)};
+
+                // check size_t and get scatter length
+                if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max() > ::std::numeric_limits<::std::size_t>::max())
+                {
+                    if(iovs_len > ::std::numeric_limits<::std::size_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; }
+                }
+                auto const scatter_length{static_cast<::std::size_t>(iovs_len)};
+
+                // get fpos
+                using underlying_offset_t = ::std::underlying_type_t<::std::remove_cvref_t<decltype(offset)>>;
+                if constexpr(::std::numeric_limits<underlying_offset_t>::max() > ::std::numeric_limits<::fast_io::intfpos_t>::max())
+                {
+                    if(static_cast<underlying_offset_t>(offset) > ::std::numeric_limits<::fast_io::intfpos_t>::max()) [[unlikely]]
+                    {
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                    }
+                }
+                auto const scatter_p_off{static_cast<::fast_io::intfpos_t>(static_cast<underlying_offset_t>(offset))};
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+                // win32
+                switch(curr_fd.file_type)
+                {
+                    case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket:
+                    {
+                        auto const [position, position_in_scatter]{
+                            ::fast_io::operations::scatter_pread_some_bytes(curr_fd.socket_fd, scatter_base, scatter_length, scatter_p_off)};
+
+                        break;
+                    }
+# if defined(_WIN32_WINDOWS)
+                    case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir:
+                    {
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+                    }
+# endif
+                    case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::file:
+                    {
+                        auto const [position, position_in_scatter]{
+                            ::fast_io::operations::scatter_pread_some_bytes(curr_fd.file_fd, scatter_base, scatter_length, scatter_p_off)};
+
+                        break;
+                    }
+                    [[unlikely]] default:
+                    {
+# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                        // Security issues inherent to virtual machines
+                        ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+# endif
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                    }
+                }
+#else
+                // posix
+                auto const [position,
+                            position_in_scatter]{::fast_io::operations::scatter_pread_some_bytes(curr_fd.file_fd, scatter_base, scatter_length, scatter_p_off)};
+#endif
             }
             else
             {

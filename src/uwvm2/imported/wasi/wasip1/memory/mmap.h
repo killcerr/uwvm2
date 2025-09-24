@@ -62,6 +62,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::memory
     /// @note       In WASI, all mmap operations are handled by a single function rather than split across multiple functions. This approach ensures that the
     ///             binary size does not inflate, and WASI does not impose excessive performance demands on memory access.
 
+    inline constexpr auto lock_memory(::uwvm2::object::memory::linear::mmap_memory_t const&) noexcept
+    {
+        return ::uwvm2::object::memory::linear::dummy_memory_operation_guard_t{};
+    }
+
     inline constexpr void check_memory_bounds_unlocked(::uwvm2::object::memory::linear::mmap_memory_t const& memory,
                                                        ::std::size_t offset,
                                                        ::std::size_t wasm_bytes) noexcept
