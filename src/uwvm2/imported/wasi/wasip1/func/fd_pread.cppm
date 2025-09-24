@@ -34,6 +34,10 @@ module;
 // macro
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
+// platform
+#include <alloca.h>
+#include <errno.h>
+#include <unistd.h>
 
 export module uwvm2.imported.wasi.wasip1.func:fd_pread;
 

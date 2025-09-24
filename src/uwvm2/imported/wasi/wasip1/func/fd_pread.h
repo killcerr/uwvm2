@@ -38,15 +38,9 @@
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 # include <uwvm2/utils/macro/push_macros.h>
 // platform
-# if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && !defined(__MSDOS__) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
-#  include <unistd.h>
-#  include <errno.h>
-#  include <sys/stat.h>
-#  include <sys/time.h>
-# endif
-# if defined(__MSDOS__) || defined(__DJGPP__)
-#  include <utime.h>
-# endif
+# include <alloca.h>
+# include <errno.h>
+# include <unistd.h>
 // import
 # include <fast_io.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
