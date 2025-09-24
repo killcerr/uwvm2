@@ -224,25 +224,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }
 
-        // check overflow
+        // check overflow (wasi_iovec_t)
         constexpr ::std::size_t max_iovs_len{::std::numeric_limits<::std::size_t>::max() / ::uwvm2::imported::wasi::wasip1::abi::size_of_wasi_iovec_t};
         if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max() > max_iovs_len)
         {
             if(iovs_len > max_iovs_len) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; }
         }
 
+        // check size_t and get scatter length, the alignment portion also needs to be processed. (fast_io::io_scatter_t)
+        if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max() >
+                     ::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz))
+        {
+            if(iovs_len > ::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz)) [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+            }
+        }
+
+        auto const scatter_length{static_cast<::std::size_t>(iovs_len)};
+
         // may alias
         using fast_io_io_scatter_t_may_alias UWVM_GNU_MAY_ALIAS = ::fast_io::io_scatter_t*;
-
-        // for nread
-        ::fast_io::intfpos_t total_bytes_read{};
-
-        // check size_t and get scatter length
-        if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max() > ::std::numeric_limits<::std::size_t>::max())
-        {
-            if(iovs_len > ::std::numeric_limits<::std::size_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; }
-        }
-        auto const scatter_length{static_cast<::std::size_t>(iovs_len)};
 
         // get fpos
         using underlying_offset_t = ::std::underlying_type_t<::std::remove_cvref_t<decltype(offset)>>;
@@ -253,6 +255,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
             }
         }
+
         auto const scatter_p_off{static_cast<::fast_io::intfpos_t>(static_cast<underlying_offset_t>(offset))};
 
         // check memory bounds
@@ -260,13 +263,71 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                                                             iovs,
                                                                             iovs_len * ::uwvm2::imported::wasi::wasip1::abi::size_of_wasi_iovec_t);
 
-        if constexpr(::uwvm2::imported::wasi::wasip1::abi::can_reinterpret_wasi_iovec_t_as_fast_io_io_scatter_t())
+        auto scatter_alloca_guaranteed_size{scatter_length * sizeof(::fast_io::io_scatter_t)};
+        auto scatter_alloca_size{scatter_alloca_guaranteed_size + (alignof(::fast_io::io_scatter_t) - 1uz)};
+#if UWVM_HAS_BUILTIN(__builtin_alloca)
+        auto tmp_scatter_base_unaligned{__builtin_alloca(scatter_alloca_size)};
+        auto const scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(
+            ::std::align(alignof(::fast_io::io_scatter_t), scatter_alloca_guaranteed_size, tmp_scatter_base_unaligned, scatter_alloca_size))};
+#elif defined(_WIN32) && !defined(__WINE__) && !defined(__BIONIC__) && !defined(__CYGWIN__)
+        auto tmp_scatter_base_unaligned{_alloca(scatter_alloca_size)};
+        auto const scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(
+            ::std::align(alignof(::fast_io::io_scatter_t), scatter_alloca_guaranteed_size, tmp_scatter_base_unaligned, scatter_alloca_size))};
+#else
+        auto tmp_scatter_base_unaligned{alloca(scatter_alloca_size)};
+        auto const scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(
+            ::std::align(alignof(::fast_io::io_scatter_t), scatter_alloca_guaranteed_size, tmp_scatter_base_unaligned, scatter_alloca_size))};
+#endif
+
+        // for nread
+        ::fast_io::intfpos_t total_bytes_read{};
+
         {
-            // After locking, we can directly manipulate memory.
-            auto const memory_locker_guard{::uwvm2::imported::wasi::wasip1::memory::lock_memory(memory)};
+            // Full locking is required during writing.
+            [[maybe_unused]] auto const memory_locker_guard{::uwvm2::imported::wasi::wasip1::memory::lock_memory(memory)};
 
             // get scatter base
-            auto const scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(memory.memory_base + iovs)};
+            using wasi_iovec_t_may_alias UWVM_GNU_MAY_ALIAS = ::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_t*;
+            auto iovs_curr{iovs};
+
+            for(::std::size_t i{}; i != scatter_length; ++i)
+            {
+                ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t wasm_base;  // no initialize
+                ::uwvm2::imported::wasi::wasip1::abi::wasi_size_t wasm_len;       // no initialize
+
+                if constexpr(::uwvm2::imported::wasi::wasip1::abi::is_default_wasi_iovec_data_layout())
+                {
+                    ::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_t tmp_iovec;  // no initialize
+
+                    // iovs_len has been checked.
+                    ::uwvm2::imported::wasi::wasip1::memory::read_all_from_memory_wasm32_unchecked_unlocked(
+                        memory,
+                        iovs_curr,
+                        reinterpret_cast<::std::byte*>(::std::addressof(tmp_iovec)),
+                        reinterpret_cast<::std::byte*>(::std::addressof(tmp_iovec)) + sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_t));
+                    iovs_curr += 8uz;
+
+                    wasm_base = tmp_iovec.buf;
+                    wasm_len = tmp_iovec.buf_len;
+                }
+                else
+                {
+                    wasm_base = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked_unlocked<
+                        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(memory, iovs_curr);
+                    iovs_curr += 4uz;
+
+                    wasm_len = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked_unlocked<
+                        ::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(memory, iovs_curr);
+                    iovs_curr += 4uz;
+                }
+
+                // It is necessary to verify whether the memory referenced within the WASM is sufficient.
+                ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm32_unlocked(memory, wasm_base, wasm_len);
+
+                auto& curr_tmp_scatter_base{scatter_base[i]};
+                curr_tmp_scatter_base.base = memory.memory_begin + wasm_base;
+                curr_tmp_scatter_base.len = wasm_len;
+            }
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
             // win32
@@ -302,137 +363,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             auto const scatter_status{::fast_io::operations::scatter_pread_some_bytes(curr_fd.file_fd, scatter_base, scatter_length, scatter_p_off)};
             total_bytes_read = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
 #endif
-            // memory_locker_guard destructor will be called here
-        }
-        else if constexpr(::uwvm2::imported::wasi::wasip1::abi::is_default_wasi_iovec_data_layout())
-        {
-#if UWVM_HAS_BUILTIN(__builtin_alloca)
-            auto const tmp_scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(__builtin_alloca(scatter_length * sizeof(::fast_io::io_scatter_t)))};
-#elif defined(_WIN32) && !defined(__WINE__) && !defined(__BIONIC__) && !defined(__CYGWIN__)
-            auto const tmp_scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(_alloca(scatter_length * sizeof(::fast_io::io_scatter_t)))};
-#else
-            auto const tmp_scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(alloca(scatter_length * sizeof(::fast_io::io_scatter_t)))};
-#endif
 
-            // After locking, we can directly manipulate memory.
-            auto const memory_locker_guard{::uwvm2::imported::wasi::wasip1::memory::lock_memory(memory)};
-
-            // get scatter base
-            using wasi_iovec_t_may_alias UWVM_GNU_MAY_ALIAS = ::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_t*;
-            auto const iovec_base{reinterpret_cast<wasi_iovec_t_may_alias>(memory.memory_base + iovs)};
-
-            for(::std::size_t i{}; i != scatter_length; ++i)
-            {
-                auto& curr_tmp_scatter_base{tmp_scatter_base[i]};
-                auto& curr_iovec_base{iovec_base[i]};
-
-                curr_tmp_scatter_base.base = curr_iovec_base.buf;
-                curr_tmp_scatter_base.len = curr_iovec_base.buf_len;
-            }
-
-#if defined(_WIN32) && !defined(__CYGWIN__)
-            // win32
-            switch(curr_fd.file_type)
-            {
-                case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket:
-                {
-                    auto const scatter_status{
-                        ::fast_io::operations::scatter_pread_some_bytes(curr_fd.socket_fd, tmp_scatter_base, scatter_length, scatter_p_off)};
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, tmp_scatter_base, scatter_status);
-                }
-# if defined(_WIN32_WINDOWS)
-                case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir:
-                {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                }
-# endif
-                case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::file:
-                {
-                    auto const scatter_status{
-                        ::fast_io::operations::scatter_pread_some_bytes(curr_fd.file_fd, tmp_scatter_base, scatter_length, scatter_p_off)};
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, tmp_scatter_base, scatter_status);
-                }
-                [[unlikely]] default:
-                {
-# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                    // Security issues inherent to virtual machines
-                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-# endif
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                }
-            }
-#else
-            // posix
-            auto const scatter_status{::fast_io::operations::scatter_pread_some_bytes(curr_fd.file_fd, tmp_scatter_base, scatter_length, scatter_p_off)};
-            total_bytes_read = ::fast_io::fposoffadd_scatters(0, tmp_scatter_base, scatter_status);
-#endif
-        }
-        else
-        {
-#if UWVM_HAS_BUILTIN(__builtin_alloca)
-            auto const tmp_scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(__builtin_alloca(scatter_length * sizeof(::fast_io::io_scatter_t)))};
-#elif defined(_WIN32) && !defined(__WINE__) && !defined(__BIONIC__) && !defined(__CYGWIN__)
-            auto const tmp_scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(_alloca(scatter_length * sizeof(::fast_io::io_scatter_t)))};
-#else
-            auto const tmp_scatter_base{reinterpret_cast<fast_io_io_scatter_t_may_alias>(alloca(scatter_length * sizeof(::fast_io::io_scatter_t)))};
-#endif
-
-            // After locking, we can directly manipulate memory.
-            auto const memory_locker_guard{::uwvm2::imported::wasi::wasip1::memory::lock_memory(memory)};
-
-            // get scatter base
-            using wasi_iovec_t_may_alias UWVM_GNU_MAY_ALIAS = ::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_t*;
-            auto iovs_curr{iovs};
-
-            for(::std::size_t i{}; i != scatter_length; ++i)
-            {
-                auto& curr_tmp_scatter_base{tmp_scatter_base[i]};
-
-                curr_tmp_scatter_base.base = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked<
-                    ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(memory, iovs_curr);
-                iovs_curr += 4uz;
-
-                curr_tmp_scatter_base.len = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked<
-                    ::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(memory, iovs_curr);
-                iovs_curr += 4uz;
-            }
-
-#if defined(_WIN32) && !defined(__CYGWIN__)
-            // win32
-            switch(curr_fd.file_type)
-            {
-                case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket:
-                {
-                    auto const scatter_status{
-                        ::fast_io::operations::scatter_pread_some_bytes(curr_fd.socket_fd, tmp_scatter_base, scatter_length, scatter_p_off)};
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, tmp_scatter_base, scatter_status);
-                }
-# if defined(_WIN32_WINDOWS)
-                case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir:
-                {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                }
-# endif
-                case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::file:
-                {
-                    auto const scatter_status{
-                        ::fast_io::operations::scatter_pread_some_bytes(curr_fd.file_fd, tmp_scatter_base, scatter_length, scatter_p_off)};
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, tmp_scatter_base, scatter_status);
-                }
-                [[unlikely]] default:
-                {
-# if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                    // Security issues inherent to virtual machines
-                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-# endif
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                }
-            }
-#else
-            // posix
-            auto const scatter_status{::fast_io::operations::scatter_pread_some_bytes(curr_fd.file_fd, tmp_scatter_base, scatter_length, scatter_p_off)};
-            total_bytes_read = ::fast_io::fposoffadd_scatters(0, tmp_scatter_base, scatter_status);
-#endif
+            // memory_locker_guard deallocated here
         }
 
         if(total_bytes_read < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio; }
