@@ -388,16 +388,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 auto& curr_tmp_scatter_base{tmp_scatter_base[i]};
 
-                curr_tmp_scatter_base.base = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked<wasi_void_ptr_t>
+                curr_tmp_scatter_base.base = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked<
                     ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t>(memory, iovs_curr);
-
-                    iovs_curr += 4uz;
-
-                curr_tmp_scatter_base.len = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked<wasi_size_t>
-                    ::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(memory, iovs_curr);
-
                 iovs_curr += 4uz;
 
+                curr_tmp_scatter_base.len = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32_unchecked<
+                    ::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(memory, iovs_curr);
+                iovs_curr += 4uz;
             }
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
