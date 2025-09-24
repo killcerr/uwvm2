@@ -48,14 +48,17 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 {
+    // Provide a dummy structure to facilitate a unified API.
     struct dummy_memory_operation_guard_t
     {
         inline constexpr dummy_memory_operation_guard_t() noexcept = default;
 
         inline constexpr dummy_memory_operation_guard_t(dummy_memory_operation_guard_t const& other) noexcept = delete;
         inline constexpr dummy_memory_operation_guard_t& operator= (dummy_memory_operation_guard_t const& other) noexcept = delete;
-        inline constexpr dummy_memory_operation_guard_t(dummy_memory_operation_guard_t&& other) noexcept = delete;
-        inline constexpr dummy_memory_operation_guard_t& operator= (dummy_memory_operation_guard_t&& other) noexcept = delete;
+
+        // Provide mobile semantic convenience functions for return
+        inline constexpr dummy_memory_operation_guard_t(dummy_memory_operation_guard_t&& other) noexcept = default;
+        inline constexpr dummy_memory_operation_guard_t& operator= (dummy_memory_operation_guard_t&& other) noexcept = default;
         
         inline constexpr ~dummy_memory_operation_guard_t() noexcept = default;
 

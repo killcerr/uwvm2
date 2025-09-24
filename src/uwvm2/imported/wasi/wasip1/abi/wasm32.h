@@ -483,14 +483,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
         return __builtin_offsetof(wasi_iovec_t, buf) == 0uz && __builtin_offsetof(wasi_iovec_t, buf_len) == 4uz &&
                sizeof(wasi_iovec_t) == size_of_wasi_iovec_t && alignof(wasi_iovec_t) == 4uz && ::std::endian::native == ::std::endian::little;
     }
-
-    inline consteval bool can_reinterpret_wasi_iovec_t_as_fast_io_io_scatter_t() noexcept
-    {
-        return sizeof(wasi_iovec_t) == sizeof(::fast_io::io_scatter_t) && alignof(wasi_iovec_t) == alignof(::fast_io::io_scatter_t) &&
-               __builtin_offsetof(wasi_iovec_t, buf) == __builtin_offsetof(::fast_io::io_scatter_t, base) &&
-               __builtin_offsetof(wasi_iovec_t, buf_len) == __builtin_offsetof(::fast_io::io_scatter_t, len) &&
-               sizeof(wasi_iovec_t{}.buf) == sizeof(::fast_io::io_scatter_t{}.base) && sizeof(wasi_iovec_t{}.buf_len) == sizeof(::fast_io::io_scatter_t{}.len);
-    }
 }
 
 #ifndef UWVM_MODULE

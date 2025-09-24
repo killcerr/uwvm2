@@ -126,8 +126,33 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
         inline constexpr memory_operation_guard_t(memory_operation_guard_t const& other) noexcept = delete;
         inline constexpr memory_operation_guard_t& operator= (memory_operation_guard_t const& other) noexcept = delete;
-        inline constexpr memory_operation_guard_t(memory_operation_guard_t&& other) noexcept = delete;
-        inline constexpr memory_operation_guard_t& operator= (memory_operation_guard_t&& other) noexcept = delete;
+
+        inline constexpr memory_operation_guard_t(memory_operation_guard_t&& other) noexcept
+        {
+            // Directly take over the lock from the other process.
+            this->growing_flag_p = other.growing_flag_p;
+            this->active_ops_p = other.active_ops_p;
+
+            other.growing_flag_p = nullptr;
+            other.active_ops_p = nullptr;
+        }
+
+        inline constexpr memory_operation_guard_t& operator= (memory_operation_guard_t&& other) noexcept
+        {
+            if(::std::addressof(other) == this) [[unlikely]] { return *this; }
+
+            // Wait for the end of its own lock, then acquire the lock on other.
+            // This function includes built-in null pointer checks.
+            exit_operation();
+
+            this->growing_flag_p = other.growing_flag_p;
+            this->active_ops_p = other.active_ops_p;
+
+            other.growing_flag_p = nullptr;
+            other.active_ops_p = nullptr;
+
+            return *this;
+        }
 
         inline constexpr ~memory_operation_guard_t() { exit_operation(); }
 
@@ -139,6 +164,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         ///             4. If grow started, undo increment and retry
         inline constexpr void enter_operation() noexcept
         {
+            // Due to the inclusion of mobile semantics, null pointer checks must be performed.
+            if(this->growing_flag_p == nullptr || this->active_ops_p == nullptr) [[unlikely]] { return; }
+
             for(;;)
             {
                 // 1) Wait for grow operation to complete, must use acquire to see memory updates
@@ -170,6 +198,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         ///             2. Notify waiting grow operations
         inline constexpr void exit_operation() noexcept
         {
+            // Due to the inclusion of mobile semantics, null pointer checks must be performed.
+            if(this->growing_flag_p == nullptr || this->active_ops_p == nullptr) [[unlikely]] { return; }
+
             // Decrement counter with release semantics to publish our updates
             this->active_ops_p->fetch_sub(1uz, ::std::memory_order_release);
 
