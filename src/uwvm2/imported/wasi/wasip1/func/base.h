@@ -162,6 +162,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         return result < a;
 #endif
     }
+
+    struct fast_io_io_scatter_t_allocator_guard
+    {
+        using allocator = ::fast_io::native_typed_global_allocator<::fast_io::io_scatter_t>;
+        ::fast_io::io_scatter_t* ptr{};
+
+        inline constexpr fast_io_io_scatter_t_allocator_guard() noexcept = default;
+        inline constexpr fast_io_io_scatter_t_allocator_guard(::fast_io::io_scatter_t* o_ptr) noexcept : ptr{o_ptr} {}
+
+        fast_io_io_scatter_t_allocator_guard(fast_io_io_scatter_t_allocator_guard const&) = delete;
+        fast_io_io_scatter_t_allocator_guard& operator= (fast_io_io_scatter_t_allocator_guard const&) = delete;
+
+        fast_io_io_scatter_t_allocator_guard(fast_io_io_scatter_t_allocator_guard&& other) = delete;
+        fast_io_io_scatter_t_allocator_guard& operator= (fast_io_io_scatter_t_allocator_guard&& other) = delete;
+
+        inline constexpr ~fast_io_io_scatter_t_allocator_guard() 
+        { 
+            // The deallocator performs internal null pointer checks.
+            allocator::deallocate(ptr); 
+        }
+    };
 }  // namespace uwvm2::imported::wasi::wasip1::func
 
 #ifndef UWVM_MODULE
