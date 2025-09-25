@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <cstring>
 
+#include <fast_io.h>
+
 #if __has_include(<fcntl.h>)
 # include <fcntl.h>
 #endif
@@ -35,8 +37,6 @@
 #if __has_include(<third-parties/bizwen/include/bizwen/deque.hpp>)
 # include <third-parties/bizwen/include/bizwen/deque.hpp>
 #endif
-
-#include <fast_io.h>
 
 #include <uwvm2/imported/wasi/wasip1/func/fd_pread_wasm64.h>
 
