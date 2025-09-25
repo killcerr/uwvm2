@@ -236,10 +236,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         // check size_t and get scatter length, the alignment portion also needs to be processed. (fast_io::io_scatter_t)
-        if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max() >
-                     ::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz))
+        constexpr auto max_iovs_len2{(::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz)) /
+                                     sizeof(::fast_io::io_scatter_t)};
+        if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max() > max_iovs_len2)
         {
-            if(iovs_len > ::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz)) [[unlikely]]
+            if(iovs_len > max_iovs_len2) [[unlikely]]
             {
                 // Exceeding the platform's maximum limit but not exceeding the wasi limit uses overflow.
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
@@ -312,6 +313,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             // When the bytes count is greater than 1024, it exists on the heap.
+            // The allocator crashes upon failure.
             scatter_base = ::uwvm2::imported::wasi::wasip1::func::fast_io_io_scatter_t_allocator_guard::allocator::allocate(scatter_length);
 
             // Start the raii guard to deallocate the memory.
@@ -441,7 +443,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 1uz /*ERROR_INVALID_FUNCTION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
                                     case 50uz /*ERROR_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
                                     case 19uz /*ERROR_WRITE_PROTECT*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
-                                    case 87uz /*ERROR_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                                    case 87uz /*ERROR_INVALID_PARAMETER*/:
+                                    {
+                                        // Avoid interference from FILE_TYPE_REMOTE
+                                        if((::fast_io::win32::GetFileType(curr_fd.file_fd.native_handle()) & 0xFFFF7FFFu) == 3 /*FILE_TYPE_PIPE*/)
+                                        {
+                                            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
+                                        }
+                                        else
+                                        {
+                                            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                                        }
+                                    }
                                     case 1117uz /*ERROR_IO_DEVICE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                                     case 31uz /*ERROR_GEN_FAILURE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                                     case 1784uz /*ERROR_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efault;
@@ -489,7 +502,35 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC0000002uz /*STATUS_NOT_IMPLEMENTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
                                     case 0xC00000BBuz /*STATUS_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
                                     case 0xC00000A2uz /*STATUS_MEDIA_WRITE_PROTECTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::erofs;
-                                    case 0xC000000Duz /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                                    case 0xC000000Duz /*STATUS_INVALID_PARAMETER*/:
+                                    {
+                                        ::fast_io::win32::nt::io_status_block isb;       // no initialize
+                                        ::fast_io::win32::nt::file_fs_device_type ffdt;  // no initialize
+
+                                        constexpr bool zw{false};
+                                        auto const status{::fast_io::win32::nt::nt_query_volume_information_file<zw>(
+                                            curr_fd.file_fd.native_handle(),
+                                            ::std::addressof(isb),
+                                            ::std::addressof(ffdt),
+                                            static_cast<::std::uint_least32_t>(sizeof(ffdt)),
+                                            ::fast_io::win32::nt::fs_information_class::FileFsDeviceInformation)};
+
+                                        switch(status)
+                                        {
+                                            [[likely]] case 0x00000000u:
+                                                break;
+                                            case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
+                                            default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                                        }
+
+                                        if(ffdt.DeviceType == 0x00000011u /*FILE_DEVICE_NAMED_PIPE*/)
+                                        {
+                                            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
+                                        }
+
+                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                                    }
+
                                     case 0xC0000185uz /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                                     case 0xC0000001uz /*STATUS_UNSUCCESSFUL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                                     case 0xC00000E8uz /*STATUS_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::efault;

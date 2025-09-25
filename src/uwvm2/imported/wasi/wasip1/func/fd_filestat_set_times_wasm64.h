@@ -280,6 +280,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 # if !defined(_WIN32_WINDOWS)
         // Windows NT
+        // file_basic_information passing 0 indicates no modification to the attribute
         ::fast_io::win32::nt::file_basic_information fbi{.CreationTime = {},
                                                          .LastAccessTime = lpLastAccessTime,
                                                          .LastWriteTime = lpLastWriteTime,
