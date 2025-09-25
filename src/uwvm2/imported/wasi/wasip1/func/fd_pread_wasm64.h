@@ -494,6 +494,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     [[likely]] case 0xC0000011uz /* STATUS_END_OF_FILE */:
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
+                                        // It seems not to trigger in NT contexts, as it appears to reference POSIX design.
                                         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
                                             memory,
                                             nread,
@@ -623,6 +624,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     [[likely]] case 0xC0000011uz /* STATUS_END_OF_FILE */:
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
+                                        // It seems not to trigger in NT contexts, as it appears to reference POSIX design.
                                         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
                                             memory,
                                             nread,
