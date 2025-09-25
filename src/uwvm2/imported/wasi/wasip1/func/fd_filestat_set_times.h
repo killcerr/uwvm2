@@ -402,7 +402,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
-                if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; }
+                if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow; }
             }
 
             // utime uses time_t seconds; convert ns to seconds.
@@ -462,7 +462,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
-                if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; }
+                if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow; }
             }
 
             // utime uses time_t seconds; convert ns to seconds.
@@ -538,7 +538,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow;
                     }
                 }
 
@@ -564,7 +564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow;
                     }
                 }
 
@@ -686,7 +686,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow;
                     }
                 }
 
@@ -712,7 +712,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow;
                     }
                 }
 
@@ -779,7 +779,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow;
                     }
                 }
 
@@ -805,7 +805,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow;
                     }
                 }
 
@@ -852,7 +852,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
-                if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; }
+                if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow; }
             }
 
             timestamp_spec[0] = {static_cast<::std::time_t>(atim_seconds), static_cast<long>(atim_subseconds)};
@@ -875,7 +875,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             if constexpr(::std::numeric_limits<::std::uint_least64_t>::max() > ::std::numeric_limits<::std::time_t>::max())
             {
-                if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval; }
+                if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow; }
             }
 
             timestamp_spec[1] = {static_cast<::std::time_t>(mtim_seconds), static_cast<long>(mtim_subseconds)};

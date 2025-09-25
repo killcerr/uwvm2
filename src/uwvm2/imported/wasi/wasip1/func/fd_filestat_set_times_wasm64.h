@@ -392,7 +392,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                 }
             }
 
@@ -455,7 +455,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                 }
             }
 
@@ -532,7 +532,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                     }
                 }
 
@@ -558,7 +558,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                     }
                 }
 
@@ -680,7 +680,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                     }
                 }
 
@@ -706,7 +706,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                     }
                 }
 
@@ -773,7 +773,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                     }
                 }
 
@@ -799,7 +799,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                     }
                 }
 
@@ -848,7 +848,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 if(atim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                 }
             }
 
@@ -874,7 +874,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 if(mtim_seconds > ::std::numeric_limits<::std::time_t>::max()) [[unlikely]]
                 {
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
                 }
             }
 
