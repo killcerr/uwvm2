@@ -454,7 +454,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     [[likely]] case 38uz /*ERROR_HANDLE_EOF*/:
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+                                        // Since it is still within the locked memory section, the locked version cannot be used.
+                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unlocked(
                                             memory,
                                             nread,
                                             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(0uz));
@@ -502,7 +503,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
                                         // It seems not to trigger in NT contexts, as it appears to reference POSIX design.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+                                        // Since it is still within the locked memory section, the locked version cannot be used.
+                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unlocked(
                                             memory,
                                             nread,
                                             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(0uz));
