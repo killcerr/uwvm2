@@ -262,6 +262,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
         }
 
+        // After checking all items, determine whether the result equals zero.
+        if(scatter_length == 0uz)
+        {
+            // If the length of iovs is 0, the system call returns successfully with nread=0.
+            ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
+                memory,
+                nread,
+                static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(0uz));
+
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+        }
+
         auto const scatter_p_off{static_cast<::fast_io::intfpos_t>(static_cast<underlying_offset_t>(offset))};
 
         // check memory bounds
