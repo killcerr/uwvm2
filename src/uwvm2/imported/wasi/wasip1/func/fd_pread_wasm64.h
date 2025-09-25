@@ -709,7 +709,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // Since the total size was previously checked to be less than or equal to wasi_size_wasm64_t max, it must also be less than here.
         constexpr auto max_val{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max()};
-        [[assume(total_bytes_read <= max_val)]];
+        if constexpr(max_val < ::std::numeric_limits<::fast_io::intfpos_t>::max()) { [[assume(total_bytes_read <= max_val)]]; }
 
         // Requires locking and simultaneous checking
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
