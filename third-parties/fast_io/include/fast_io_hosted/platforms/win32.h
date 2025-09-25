@@ -780,9 +780,10 @@ inline ::std::byte *read_some_bytes_impl(void *__restrict handle, ::std::byte *f
 	return ::fast_io::win32::details::read_or_pread_some_bytes_common_impl(handle, first, last, nullptr);
 }
 
-inline ::std::byte *pread_some_bytes_impl(void *__restrict handle, ::std::byte *first, ::std::byte *last,
+inline ::std::byte *win32_ntw_pread_some_bytes_impl(void *__restrict handle, ::std::byte *first, ::std::byte *last,
 										  ::fast_io::intfpos_t off)
 {
+	// The use of overlapped behavior is not supported in Windows 95.
 	::fast_io::win32::overlapped overlap{};
 	::fast_io::win32::details::win32_calculate_offset_impl(handle, overlap, off);
 	return ::fast_io::win32::details::read_or_pread_some_bytes_common_impl(handle, first, last,
@@ -809,9 +810,10 @@ inline ::std::byte const *write_some_bytes_impl(void *__restrict handle, ::std::
 	return ::fast_io::win32::details::write_or_pwrite_some_bytes_common_impl(handle, first, last, nullptr);
 }
 
-inline ::std::byte const *pwrite_some_bytes_impl(void *__restrict handle, ::std::byte const *first,
+inline ::std::byte const *win32_ntw_pwrite_some_bytes_impl(void *__restrict handle, ::std::byte const *first,
 												 ::std::byte const *last, ::fast_io::intfpos_t off)
 {
+	// The use of overlapped behavior is not supported in Windows 95.
 	::fast_io::win32::overlapped overlap{};
 	::fast_io::win32::details::win32_calculate_offset_impl(handle, overlap, off);
 	return ::fast_io::win32::details::write_or_pwrite_some_bytes_common_impl(handle, first, last,
@@ -845,11 +847,14 @@ inline ::fast_io::intfpos_t io_stream_seek_bytes_define(basic_win32_family_io_ob
 I am not confident that i understand semantics correctly. Disabled first and test it later
 */
 
+// Windows 9x does not support atomic p-series functions. When using operation::p-series functions, 
+// they will be emulated through seek and non-p-series functions.
+#if !defined(_WIN32_WINDOWS)
 template <win32_family family, ::std::integral ch_type>
 inline ::std::byte *pread_some_bytes_underflow_define(basic_win32_family_io_observer<family, ch_type> niob,
 													  ::std::byte *first, ::std::byte *last, ::fast_io::intfpos_t off)
 {
-	return ::fast_io::win32::details::pread_some_bytes_impl(niob.handle, first, last, off);
+	return ::fast_io::win32::details::win32_ntw_pread_some_bytes_impl(niob.handle, first, last, off);
 }
 
 template <win32_family family, ::std::integral ch_type>
@@ -857,8 +862,9 @@ inline ::std::byte const *pwrite_some_bytes_overflow_define(basic_win32_family_i
 															::std::byte const *first, ::std::byte const *last,
 															::fast_io::intfpos_t off)
 {
-	return ::fast_io::win32::details::pwrite_some_bytes_impl(niob.handle, first, last, off);
+	return ::fast_io::win32::details::win32_ntw_pwrite_some_bytes_impl(niob.handle, first, last, off);
 }
+#endif
 
 template <win32_family family, ::std::integral ch_type>
 inline constexpr basic_win32_family_io_observer<family, ch_type>
