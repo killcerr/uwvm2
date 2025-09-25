@@ -775,7 +775,7 @@ inline ::std::byte *read_or_pread_some_bytes_common_impl(void *__restrict handle
 	return first + number_of_bytes;
 }
 
-inline ::std::byte *read_some_bytes_impl(void *__restrict handle, ::std::byte *first, ::std::byte *last)
+inline ::std::byte *win32_read_some_bytes_impl(void *__restrict handle, ::std::byte *first, ::std::byte *last)
 {
 	return ::fast_io::win32::details::read_or_pread_some_bytes_common_impl(handle, first, last, nullptr);
 }
@@ -804,7 +804,7 @@ inline ::std::byte const *write_or_pwrite_some_bytes_common_impl(void *__restric
 	return first + number_of_bytes;
 }
 
-inline ::std::byte const *write_some_bytes_impl(void *__restrict handle, ::std::byte const *first,
+inline ::std::byte const *win32_write_some_bytes_impl(void *__restrict handle, ::std::byte const *first,
 												::std::byte const *last)
 {
 	return ::fast_io::win32::details::write_or_pwrite_some_bytes_common_impl(handle, first, last, nullptr);
@@ -826,14 +826,14 @@ template <win32_family family, ::std::integral ch_type>
 inline ::std::byte *read_some_bytes_underflow_define(basic_win32_family_io_observer<family, ch_type> wiob,
 													 ::std::byte *first, ::std::byte *last)
 {
-	return ::fast_io::win32::details::read_some_bytes_impl(wiob.handle, first, last);
+	return ::fast_io::win32::details::win32_read_some_bytes_impl(wiob.handle, first, last);
 }
 
 template <win32_family family, ::std::integral ch_type>
 inline ::std::byte const *write_some_bytes_overflow_define(basic_win32_family_io_observer<family, ch_type> wiob,
 														   ::std::byte const *first, ::std::byte const *last)
 {
-	return ::fast_io::win32::details::write_some_bytes_impl(wiob.handle, first, last);
+	return ::fast_io::win32::details::win32_write_some_bytes_impl(wiob.handle, first, last);
 }
 
 template <win32_family family, ::std::integral ch_type>
@@ -849,6 +849,7 @@ I am not confident that i understand semantics correctly. Disabled first and tes
 
 // Windows 9x does not support atomic p-series functions. When using operation::p-series functions, 
 // they will be emulated through seek and non-p-series functions.
+// For Win9x, use the operation::p series functions, which automatically combine seek operations with non-p series functions.
 #if !defined(_WIN32_WINDOWS)
 template <win32_family family, ::std::integral ch_type>
 inline ::std::byte *pread_some_bytes_underflow_define(basic_win32_family_io_observer<family, ch_type> niob,
