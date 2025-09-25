@@ -381,7 +381,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             int const err{static_cast<int>(-set_res)};
             switch(err)
             {
-                // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                // If "ebadf" appears here, it is caused by a WASI implementation issue. This differs from WASI's 'ebadf'; here, "eio" is used instead.
                 case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
                 case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
@@ -390,6 +390,51 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
+
+        // Verify that the flags were actually set by reading them back
+        int const verify_flags{::fast_io::system_call<__NR_fcntl, int>(native_fd, F_GETFL)};
+        if(::fast_io::linux_system_call_fails(verify_flags)) [[unlikely]]
+        {
+            int const err{static_cast<int>(-verify_flags)};
+            switch(err)
+            {
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+            }
+        }
+
+        // Check if the WASI-managed flags match what we expected
+        int wasi_managed_flags{};
+        int actual_wasi_flags{};
+
+#  ifdef O_APPEND
+        wasi_managed_flags |= (new_oflags & O_APPEND);
+        actual_wasi_flags |= (verify_flags & O_APPEND);
+#  endif
+
+#  ifdef O_NONBLOCK
+        wasi_managed_flags |= (new_oflags & O_NONBLOCK);
+        actual_wasi_flags |= (verify_flags & O_NONBLOCK);
+#  endif
+
+#  ifdef O_DSYNC
+        wasi_managed_flags |= (new_oflags & O_DSYNC);
+        actual_wasi_flags |= (verify_flags & O_DSYNC);
+#  endif
+
+#  ifdef O_RSYNC
+        wasi_managed_flags |= (new_oflags & O_RSYNC);
+        actual_wasi_flags |= (verify_flags & O_RSYNC);
+#  endif
+
+#  ifdef O_SYNC
+        wasi_managed_flags |= (new_oflags & O_SYNC);
+        actual_wasi_flags |= (verify_flags & O_SYNC);
+#  endif
+
+        if(wasi_managed_flags != actual_wasi_flags) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup; }
+        
 # else
         int const set_res{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_SETFL, new_oflags)};
 
@@ -397,7 +442,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             switch(errno)
             {
-                // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                // If "ebadf" appears here, it is caused by a WASI implementation issue. This differs from WASI's 'ebadf'; here, "eio" is used instead.
                 case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
                 case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
@@ -406,6 +451,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
             }
         }
+
+        // Verify that the flags were actually set by reading them back
+        int const verify_flags{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL)};
+        if(verify_flags == -1) [[unlikely]]
+        {
+            switch(errno)
+            {
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+            }
+        }
+
+        // Check if the WASI-managed flags match what we expected
+        int wasi_managed_flags{};
+        int actual_wasi_flags{};
+
+#  ifdef O_APPEND
+        wasi_managed_flags |= (new_oflags & O_APPEND);
+        actual_wasi_flags |= (verify_flags & O_APPEND);
+#  endif
+
+#  ifdef O_NONBLOCK
+        wasi_managed_flags |= (new_oflags & O_NONBLOCK);
+        actual_wasi_flags |= (verify_flags & O_NONBLOCK);
+#  endif
+
+#  ifdef O_DSYNC
+        wasi_managed_flags |= (new_oflags & O_DSYNC);
+        actual_wasi_flags |= (verify_flags & O_DSYNC);
+#  endif
+
+#  ifdef O_RSYNC
+        wasi_managed_flags |= (new_oflags & O_RSYNC);
+        actual_wasi_flags |= (verify_flags & O_RSYNC);
+#  endif
+
+#  ifdef O_SYNC
+        wasi_managed_flags |= (new_oflags & O_SYNC);
+        actual_wasi_flags |= (verify_flags & O_SYNC);
+#  endif
+
+        if(wasi_managed_flags != actual_wasi_flags) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup; }
+
 # endif
         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 #else
@@ -440,7 +529,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
         }
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
+        // When the system does not support modifying file attributes at all, passing flags set to 0 indicates success.
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
 #endif
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func
