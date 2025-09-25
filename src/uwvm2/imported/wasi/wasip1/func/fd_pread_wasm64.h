@@ -687,8 +687,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case EIO: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                     case ENOMEM: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enomem;
                     case EOVERFLOW: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
+#  if defined(ETIMEDOUT)
                     case ETIMEDOUT: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::etimedout;
+#  endif
+#  if defined(ECONNRESET)
                     case ECONNRESET: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::econnreset;
+#  endif
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 }
             }
