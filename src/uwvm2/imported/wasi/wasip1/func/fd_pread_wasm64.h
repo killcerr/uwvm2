@@ -501,6 +501,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
 
                     total_bytes_read = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
+
+                    break;
                 }
 # if defined(_WIN32_WINDOWS)
                 case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir:
@@ -614,6 +616,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
 
                     total_bytes_read = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
+
+                    break;
                 }
                 [[unlikely]] default:
                 {
