@@ -491,7 +491,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC000007Fuz /* STATUS_DISK_FULL */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                                     case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */:
                                         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
-                                    [[likely]] case 0x80000011uz /* STATUS_END_OF_FILE */:
+                                    [[likely]] case 0xC0000011uz /* STATUS_END_OF_FILE */:
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
                                         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
@@ -620,7 +620,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC000007Fuz /* STATUS_DISK_FULL */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                                     case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */:
                                         return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
-                                    [[likely]] case 0x80000011uz /* STATUS_END_OF_FILE */:
+                                    [[likely]] case 0xC0000011uz /* STATUS_END_OF_FILE */:
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
                                         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
