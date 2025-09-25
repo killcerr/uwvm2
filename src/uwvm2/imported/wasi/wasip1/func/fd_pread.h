@@ -236,10 +236,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 
         // check size_t and get scatter length, the alignment portion also needs to be processed. (fast_io::io_scatter_t)
-        if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max() >
-                     ::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz))
+        constexpr auto max_iovs_len2{(::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz)) /
+                                     sizeof(::fast_io::io_scatter_t)};
+        if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max() > max_iovs_len2)
         {
-            if(iovs_len > ::std::numeric_limits<::std::size_t>::max() - (alignof(::fast_io::io_scatter_t) - 1uz)) [[unlikely]]
+            if(iovs_len > max_iovs_len2) [[unlikely]]
             {
                 // Exceeding the platform's maximum limit but not exceeding the wasi limit uses overflow.
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eoverflow;
@@ -312,6 +313,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         else
         {
             // When the bytes count is greater than 1024, it exists on the heap.
+            // The allocator crashes upon failure.
             scatter_base = ::uwvm2::imported::wasi::wasip1::func::fast_io_io_scatter_t_allocator_guard::allocator::allocate(scatter_length);
 
             // Start the raii guard to deallocate the memory.
@@ -406,128 +408,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             {
                 case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket:
                 {
-                    ::fast_io::io_scatter_status_t scatter_status;  // no initialize
-
-# ifdef UWVM_CPP_EXCEPTIONS
-                    try
-# endif
-                    {
-                        // In certain kernel versions, calling `readv` on file descriptor types that explicitly do not support `preadv` may return `EINVAL`.
-                        // However, Linux directly supports common cases like sockets, which degrade to `readv`. Therefore, unified support is provided here.
-                        scatter_status = ::fast_io::operations::scatter_read_some_bytes(curr_fd.socket_fd, scatter_base, scatter_length);
-                    }
-# ifdef UWVM_CPP_EXCEPTIONS
-                    catch(::fast_io::error e)
-                    {
-                        switch(e.domain)
-                        {
-                            case ::fast_io::win32_domain_value:
-                            {
-                                switch(e.code)
-                                {
-                                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is
-                                    // used instead.
-                                    case 6uz /*ERROR_INVALID_HANDLE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 5uz /*ERROR_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                                    case 1uz /*ERROR_INVALID_FUNCTION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
-                                    case 50uz /*ERROR_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                                    case 19uz /*ERROR_WRITE_PROTECT*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                                    case 87uz /*ERROR_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                                    case 1117uz /*ERROR_IO_DEVICE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 31uz /*ERROR_GEN_FAILURE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 1784uz /*ERROR_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efault;
-                                    case 2uz /*ERROR_FILE_NOT_FOUND*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
-                                    case 3uz /*ERROR_PATH_NOT_FOUND*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
-                                    case 4uz /*ERROR_TOO_MANY_OPEN_FILES*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::emfile;
-                                    case 24uz /*ERROR_BAD_LENGTH*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                                    case 25uz /*ERROR_SEEK*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
-                                    case 21uz /*ERROR_NOT_READY*/:
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    [[likely]] case 38uz /*ERROR_HANDLE_EOF*/:
-                                    {
-                                        // Under POSIX semantics, EOF always returns correctly with nread set to 0.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
-                                            memory,
-                                            nread,
-                                            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(0uz));
-
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
-                                    }
-                                    case 112uz /*ERROR_DISK_FULL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                                    case 12uz /*ERROR_INVALID_ACCESS*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                                    case 32uz /*ERROR_SHARING_VIOLATION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebusy;
-                                    case 33uz /*ERROR_LOCK_VIOLATION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
-                                    case 109uz /*ERROR_BROKEN_PIPE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::epipe;
-                                    case 232uz /*ERROR_NO_DATA*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::epipe;
-                                    case 8uz /*ERROR_NOT_ENOUGH_MEMORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enomem;
-                                    case 14uz /*ERROR_OUTOFMEMORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enomem;
-                                    case 267uz /*ERROR_DIRECTORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                }
-
-                                break;
-                            }
-                            case ::fast_io::nt_domain_value:
-                            {
-                                static_assert(sizeof(::fast_io::error::value_type) >= sizeof(::std::uint_least32_t));
-                                switch(e.code)
-                                {
-                                    // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is
-                                    // used instead.
-                                    case 0xC0000008uz /*STATUS_INVALID_HANDLE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 0xC0000022uz /*STATUS_ACCESS_DENIED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
-                                    case 0xC0000002uz /*STATUS_NOT_IMPLEMENTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
-                                    case 0xC00000BBuz /*STATUS_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-                                    case 0xC00000A2uz /*STATUS_MEDIA_WRITE_PROTECTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                                    case 0xC000000Duz /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
-                                    case 0xC0000185uz /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 0xC0000001uz /*STATUS_UNSUCCESSFUL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 0xC00000E8uz /*STATUS_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efault;
-                                    case 0xC0000034uz /* STATUS_OBJECT_NAME_NOT_FOUND */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
-                                    case 0xC000003Auz /* STATUS_OBJECT_PATH_NOT_FOUND */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
-                                    case 0xC0000043uz /* STATUS_SHARING_VIOLATION */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebusy;
-                                    case 0xC0000054uz /* STATUS_FILE_LOCK_CONFLICT */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
-                                    case 0xC000007Fuz /* STATUS_DISK_FULL */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                                    case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */:
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
-                                    [[likely]] case 0xC0000011uz /* STATUS_END_OF_FILE */:
-                                    {
-                                        // Under POSIX semantics, EOF always returns correctly with nread set to 0.
-                                        // It seems not to trigger in NT contexts, as it appears to reference POSIX design.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
-                                            memory,
-                                            nread,
-                                            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(0uz));
-
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
-                                    }
-                                    case 0xC0000013uz /* STATUS_NO_MEDIA_IN_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
-                                    case 0xC000000Euz /* STATUS_NO_SUCH_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
-                                    case 0xC0000101uz /* STATUS_DIRECTORY_NOT_EMPTY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotempty;
-                                    case 0xC0000281uz /* STATUS_DIRECTORY_IS_A_REPARSE_POINT */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 0xC00000BAuz /* STATUS_FILE_IS_A_DIRECTORY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
-                                    case 0xC000009Auz /* STATUS_INSUFFICIENT_RESOURCES */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enomem;
-                                    case 0xC0000017uz /* STATUS_NO_MEMORY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enomem;
-                                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                }
-
-                                break;
-                            }
-                            [[unlikely]] default:
-                            {
-#  if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-                                // Security issues inherent to virtual machines
-                                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-#  endif
-                                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                            }
-                        }
-                    }
-# endif
-
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
-
-                    break;
+                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
                 }
 # if defined(_WIN32_WINDOWS)
                 case ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir:
@@ -561,7 +442,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 1uz /*ERROR_INVALID_FUNCTION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                                     case 50uz /*ERROR_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                                     case 19uz /*ERROR_WRITE_PROTECT*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                                    case 87uz /*ERROR_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                                    case 87uz /*ERROR_INVALID_PARAMETER*/:
+                                    {
+                                        // Avoid interference from FILE_TYPE_REMOTE
+                                        if((::fast_io::win32::GetFileType(curr_fd.file_fd.native_handle()) & 0xFFFF7FFFu) == 3 /*FILE_TYPE_PIPE*/)
+                                        {
+                                            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                                        }
+                                        else
+                                        {
+                                            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                                        }
+                                    }
                                     case 1117uz /*ERROR_IO_DEVICE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                     case 31uz /*ERROR_GEN_FAILURE*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                     case 1784uz /*ERROR_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efault;
@@ -575,7 +467,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     [[likely]] case 38uz /*ERROR_HANDLE_EOF*/:
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+                                        // Since it is still within the locked memory section, the locked version cannot be used.
+                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unlocked(
                                             memory,
                                             nread,
                                             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(0uz));
@@ -608,7 +501,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC0000002uz /*STATUS_NOT_IMPLEMENTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                                     case 0xC00000BBuz /*STATUS_NOT_SUPPORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                                     case 0xC00000A2uz /*STATUS_MEDIA_WRITE_PROTECTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
-                                    case 0xC000000Duz /*STATUS_INVALID_PARAMETER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                                    case 0xC000000Duz /*STATUS_INVALID_PARAMETER*/:
+                                    {
+                                        ::fast_io::win32::nt::io_status_block isb;       // no initialize
+                                        ::fast_io::win32::nt::file_fs_device_type ffdt;  // no initialize
+
+                                        constexpr bool zw{false};
+                                        auto const status{::fast_io::win32::nt::nt_query_volume_information_file<zw>(
+                                            curr_fd.file_fd.native_handle(),
+                                            ::std::addressof(isb),
+                                            ::std::addressof(ffdt),
+                                            static_cast<::std::uint_least32_t>(sizeof(ffdt)),
+                                            ::fast_io::win32::nt::fs_information_class::FileFsDeviceInformation)};
+
+                                        switch(status)
+                                        {
+                                            [[likely]] case 0x00000000u:
+                                                break;
+                                            case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                                            default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                                        }
+
+                                        if(ffdt.DeviceType == 0x00000011u /*FILE_DEVICE_NAMED_PIPE*/)
+                                        {
+                                            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
+                                        }
+
+                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                                    }
                                     case 0xC0000185uz /*STATUS_IO_DEVICE_ERROR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                     case 0xC0000001uz /*STATUS_UNSUCCESSFUL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                     case 0xC00000E8uz /*STATUS_INVALID_USER_BUFFER*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::efault;
@@ -623,7 +543,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     {
                                         // Under POSIX semantics, EOF always returns correctly with nread set to 0.
                                         // It seems not to trigger in NT contexts, as it appears to reference POSIX design.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
+                                        // Since it is still within the locked memory section, the locked version cannot be used.
+                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32_unlocked(
                                             memory,
                                             nread,
                                             static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>(0uz));

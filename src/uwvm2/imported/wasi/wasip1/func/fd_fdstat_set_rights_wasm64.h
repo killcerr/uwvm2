@@ -63,7 +63,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
 
     /// @brief     WasiPreview1.fd_fdstat_set_rights
-    /// @details   __wasi_errno_t fd_fdstat_get(__wasi_fd_t fd, __wasi_rights_t fs_rights_base, __wasi_rights_t fs_rights_inheriting);
+    /// @details   __wasi_errno_t fd_fdstat_set_rights(__wasi_fd_t fd, __wasi_rights_t fs_rights_base, __wasi_rights_t fs_rights_inheriting);
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_fdstat_set_rights_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
@@ -203,8 +203,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
 
-        // The new inheriting does not necessarily have to be a subset of the old inheriting—it can be “reset” as long as inheriting -> base.
-        // If the base is not modifie, then inheriting can be modified arbitrarily as long as it remains a subset of the base.
+        // The new inheriting does not necessarily have to be a subset of the old inheriting—it can be "reset" as long as it's a subset of the old inheriting.
+        // According to WASI specification, rights_inherit and rights_base are independent permission sets.
 
         curr_fd.rights_base = fs_rights_base;
         curr_fd.rights_inherit = fs_rights_inheriting;

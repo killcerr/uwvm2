@@ -73,7 +73,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
 
     /// @brief     WasiPreview1.fd_fdstat_set_flags
-    /// @details   __wasi_errno_t fd_fdstat_get(__wasi_fd_t fd, __wasi_fdflags_t flags);
+    /// @details   __wasi_errno_t fd_fdstat_set_flags(__wasi_fd_t fd, __wasi_fdflags_t flags);
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_fdstat_set_flags_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
@@ -203,8 +203,52 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
 
-#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) &&                                                                                       \
-    __has_include(<dirent.h>) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
+#if defined(_WIN32) && !defined(__CYGWIN__)
+
+        if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket)
+        {
+            // For ws2, support for setting nonblock is available.
+            if((flags &
+                (::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_append | ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_dsync |
+                 ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_rsync | ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync)) !=
+               ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t{}) [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+            }
+
+            ::std::uint_least32_t mode{static_cast<::std::uint_least32_t>((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_nonblock) ==
+                                                                          ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_nonblock)};
+
+            if(::fast_io::win32::ioctlsocket(curr_fd.socket_fd.native_handle(), 0x8004'667El /*FIONBIO*/, ::std::addressof(mode)) == -1) [[unlikely]]
+            {
+                switch(::fast_io::win32::WSAGetLastError())
+                {
+                    case 10022 /*WSAEINVAL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                    case 10004 /*WSAEINTR*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eintr;
+                    case 10038 /*WSAENOTSOCK*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf;
+                    case 10013 /*WSAEACCES*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
+                    default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                }
+            }
+
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+        }
+        else
+        {
+            // All closed, then permitted: no-op success
+            if((flags &
+                (::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_append | ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_dsync |
+                 ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_rsync | ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync |
+                 ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_nonblock)) != ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t{})
+                [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotsup;
+            }
+
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
+        }
+
+#elif (!defined(__NEWLIB__) || defined(__CYGWIN__)) && __has_include(<dirent.h>) && !defined(_PICOLIBC__) && !(defined(__MSDOS__) || defined(__DJGPP__))
 
         // Preserve unrelated OS flags: read current flags first, then toggle only WASI-managed bits.
 # if defined(__linux__) && defined(__NR_fcntl)
