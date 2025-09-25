@@ -395,6 +395,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     try
 # endif
                     {
+                        // In certain kernel versions, calling `readv` on file descriptor types that explicitly do not support `preadv` may return `EINVAL`.
+                        // However, Linux directly supports common cases like sockets, which degrade to `readv`. Therefore, unified support is provided here.
                         scatter_status = ::fast_io::operations::scatter_pread_some_bytes(curr_fd.socket_fd, scatter_base, scatter_length, scatter_p_off);
                     }
 # ifdef UWVM_CPP_EXCEPTIONS
@@ -422,8 +424,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 4uz /*ERROR_TOO_MANY_OPEN_FILES*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::emfile;
                                     case 24uz /*ERROR_BAD_LENGTH*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                                     case 25uz /*ERROR_SEEK*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
-                                    case 21uz /*ERROR_NOT_READY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 38uz /*ERROR_HANDLE_EOF*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eof;
+                                    case 21uz /*ERROR_NOT_READY*/:
+                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                                    [[likely]] case 38uz /*ERROR_HANDLE_EOF*/:
+                                        break;  // In POSIX/WASI semantics, EOF is not an error.
                                     case 112uz /*ERROR_DISK_FULL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                                     case 12uz /*ERROR_INVALID_ACCESS*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                                     case 32uz /*ERROR_SHARING_VIOLATION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebusy;
@@ -435,6 +439,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 267uz /*ERROR_DIRECTORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                 }
+
+                                // Provide a path for jumping to a valid end-of-file.
+                                break;
                             }
                             case ::fast_io::nt_domain_value:
                             {
@@ -457,8 +464,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC0000043uz /* STATUS_SHARING_VIOLATION */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebusy;
                                     case 0xC0000054uz /* STATUS_FILE_LOCK_CONFLICT */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
                                     case 0xC000007Fuz /* STATUS_DISK_FULL */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                                    case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
-                                    case 0x80000011uz /* STATUS_END_OF_FILE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eof;
+                                    case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */:
+                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+                                    [[likely]] case 0x80000011uz /* STATUS_END_OF_FILE */:
+                                        break;  // In POSIX/WASI semantics, EOF is not an error.
                                     case 0xC0000013uz /* STATUS_NO_MEDIA_IN_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
                                     case 0xC000000Euz /* STATUS_NO_SUCH_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
                                     case 0xC0000101uz /* STATUS_DIRECTORY_NOT_EMPTY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotempty;
@@ -468,6 +477,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC0000017uz /* STATUS_NO_MEMORY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enomem;
                                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                 }
+
+                                // Provide a path for jumping to a valid end-of-file.
+                                break;
                             }
                             [[unlikely]] default:
                             {
@@ -524,8 +536,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 4uz /*ERROR_TOO_MANY_OPEN_FILES*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::emfile;
                                     case 24uz /*ERROR_BAD_LENGTH*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                                     case 25uz /*ERROR_SEEK*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::espipe;
-                                    case 21uz /*ERROR_NOT_READY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
-                                    case 38uz /*ERROR_HANDLE_EOF*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eof;
+                                    case 21uz /*ERROR_NOT_READY*/:
+                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                                    [[likely]] case 38uz /*ERROR_HANDLE_EOF*/:
+                                        break;  // In POSIX/WASI semantics, EOF is not an error.
                                     case 112uz /*ERROR_DISK_FULL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
                                     case 12uz /*ERROR_INVALID_ACCESS*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                                     case 32uz /*ERROR_SHARING_VIOLATION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebusy;
@@ -537,6 +551,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 267uz /*ERROR_DIRECTORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
                                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                 }
+
+                                // Provide a path for jumping to a valid end-of-file.
+                                break;
                             }
                             case ::fast_io::nt_domain_value:
                             {
@@ -559,8 +576,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC0000043uz /* STATUS_SHARING_VIOLATION */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebusy;
                                     case 0xC0000054uz /* STATUS_FILE_LOCK_CONFLICT */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eagain;
                                     case 0xC000007Fuz /* STATUS_DISK_FULL */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enospc;
-                                    case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
-                                    case 0x80000011uz /* STATUS_END_OF_FILE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eof;
+                                    case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */:
+                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+                                    [[likely]] case 0x80000011uz /* STATUS_END_OF_FILE */:
+                                        break;  // In POSIX/WASI semantics, EOF is not an error.
                                     case 0xC0000013uz /* STATUS_NO_MEDIA_IN_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
                                     case 0xC000000Euz /* STATUS_NO_SUCH_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enoent;
                                     case 0xC0000101uz /* STATUS_DIRECTORY_NOT_EMPTY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotempty;
@@ -570,6 +589,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC0000017uz /* STATUS_NO_MEMORY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enomem;
                                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                                 }
+
+                                // Provide a path for jumping to a valid end-of-file.
+                                break;
                             }
                             [[unlikely]] default:
                             {
@@ -657,6 +679,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Verified: fposoffadd_scatters cannot produce negative values; it undergoes saturation handling during overflow.
         [[assume(total_bytes_read >= 0)]];
 
+        // Since the total size was previously checked to be less than or equal to wasi_size_t max, it must also be less than here.
+        [[assume(total_bytes_read <= ::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max())]];
+
+        // Requires locking and simultaneous checking
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(
             memory,
             nread,
