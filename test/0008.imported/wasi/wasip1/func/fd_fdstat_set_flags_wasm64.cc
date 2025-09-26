@@ -139,7 +139,7 @@ int main()
 # endif
     }
 
-case2:
+[[maybe_unused]] case2:
     // Case 2: clear APPEND (pass 0), verify APPEND cleared
     {
         auto const ret =
@@ -195,7 +195,7 @@ case2:
 # endif
     }
 
-case3b:
+[[maybe_unused]] case3b:
     // Case 3b: clear NONBLOCK by passing 0
     {
         auto const ret =
@@ -277,7 +277,7 @@ case3b:
 # endif
     }
 
-case7:
+[[maybe_unused]] case7:
     // Case 7: SYNC set/clear with platform variance
     {
         auto const ret =
@@ -334,7 +334,7 @@ case7:
 # endif
     }
 
-case8:
+[[maybe_unused]] case8:
     // Case 8: RSYNC set/clear with platform variance
     {
         auto const ret =

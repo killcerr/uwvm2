@@ -136,7 +136,7 @@ int main()
         }
 # endif
     }
-case1b:
+[[maybe_unused]] case1b:
     // Case 1b: set only NONBLOCK, verify NONBLOCK is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_nonblock);
@@ -205,7 +205,7 @@ case1b:
         }
     }
 
-case1c:
+[[maybe_unused]] case1c:
     // Case 1c: set only DSYNC, verify DSYNC is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_dsync);
@@ -274,7 +274,7 @@ case1c:
         }
     }
 
-case1d:
+[[maybe_unused]] case1d:
     // Case 1d: set only RSYNC, verify RSYNC is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_rsync);
@@ -343,7 +343,7 @@ case1d:
         }
     }
 
-case1e:
+[[maybe_unused]] case1e:
     // Case 1e: set only SYNC, verify SYNC is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_sync);
@@ -412,7 +412,7 @@ case1e:
         }
     }
 
-case2:
+[[maybe_unused]] case2:
     // Case 2: clear APPEND (pass 0), verify APPEND cleared
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
@@ -466,7 +466,7 @@ case2:
 # endif
     }
 
-case3b:
+[[maybe_unused]] case3b:
     // Case 3b: clear NONBLOCK by passing 0
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
@@ -546,7 +546,7 @@ case3b:
 # endif
     }
 
-case7:
+[[maybe_unused]] case7:
     // Case 7: SYNC set/clear with platform variance
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_sync);
@@ -601,7 +601,7 @@ case7:
 # endif
     }
 
-case8:
+[[maybe_unused]] case8:
     // Case 8: RSYNC set/clear with platform variance
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_rsync);
@@ -656,7 +656,7 @@ case8:
 # endif
     }
 
-after_case8:
+[[maybe_unused]] after_case8:
     // Case 4: enotcapable when rights missing
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(3uz).fd_p;
