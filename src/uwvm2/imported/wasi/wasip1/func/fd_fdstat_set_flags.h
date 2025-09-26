@@ -249,10 +249,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // Preserve unrelated OS flags: read current flags first, then toggle only WASI-managed bits.
 # if defined(__linux__) && defined(__NR_fcntl)
-        int const curr_flags_sc{::fast_io::system_call<__NR_fcntl, int>(native_fd, F_GETFL)};
-        if(::fast_io::linux_system_call_fails(curr_flags_sc)) [[unlikely]]
+        int const curr_flags{::fast_io::system_call<__NR_fcntl, int>(native_fd, F_GETFL)};
+        if(::fast_io::linux_system_call_fails(curr_flags)) [[unlikely]]
         {
-            int const err{static_cast<int>(-curr_flags_sc)};
+            int const err{static_cast<int>(-curr_flags)};
             switch(err)
             {
                 // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
@@ -262,7 +262,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
         }
 
-        int new_oflags{curr_flags_sc};
+        int new_oflags{curr_flags};
 # else
         // Although djgpp provides these flags, it only supports F_DUPFD, so it is prohibited here.
 
@@ -282,7 +282,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # endif
 
         // Toggle per-WASI bits only.
-# ifdef O_APPEND
+# if defined(O_APPEND) && O_APPEND != 0
         if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_append)
         {
             new_oflags |= O_APPEND;
@@ -298,23 +298,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 # endif
 
-# ifdef O_DSYNC
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
-        {
-            new_oflags |= O_DSYNC;
-        }
-        else
-        {
-            new_oflags &= ~O_DSYNC;
-        }
-# else
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
-        {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-        }
-# endif
-
-# ifdef O_NONBLOCK
+# if defined(O_NONBLOCK) && O_NONBLOCK != 0
         if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_nonblock)
         {
             new_oflags |= O_NONBLOCK;
@@ -330,7 +314,55 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 # endif
 
-# ifdef O_RSYNC
+# if (defined(O_DSYNC) && O_DSYNC != 0) && (defined(O_SYNC) && O_SYNC != 0) && (defined(O_RSYNC) && O_RSYNC != 0) && ((O_SYNC | O_DSYNC) == O_SYNC) &&         \
+     (O_RSYNC == O_SYNC)
+        // On Android, O_SYNC is a superset of O_DSYNC, and O_RSYNC == O_SYNC. Requesting SYNC or RSYNC implies O_SYNC.
+        if(((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) ||
+           ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync))
+        {
+            new_oflags |= O_SYNC;
+        }
+        else if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            new_oflags |= O_DSYNC;
+        }
+        else
+        {
+            new_oflags &= ~O_SYNC;
+        }
+# elif (defined(O_DSYNC) && O_DSYNC != 0) && (defined(O_SYNC) && O_SYNC != 0) && ((O_SYNC | O_DSYNC) == O_SYNC)
+        if(((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) &&
+           ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync))
+        {
+            new_oflags |= O_SYNC;
+        }
+        else if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            new_oflags |= O_DSYNC;
+        }
+        else
+        {
+            new_oflags &= ~O_SYNC;
+        }
+# else
+        // default
+#  if defined(O_DSYNC) && O_DSYNC != 0
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            new_oflags |= O_DSYNC;
+        }
+        else
+        {
+            new_oflags &= ~O_DSYNC;
+        }
+#  else
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
+#  endif
+
+#  if defined(O_RSYNC) && O_RSYNC != 0
         if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
         {
             new_oflags |= O_RSYNC;
@@ -339,14 +371,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             new_oflags &= ~O_RSYNC;
         }
-# else
+#  else
         if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
         }
-# endif
+#  endif
 
-# ifdef O_SYNC
+#  if defined(O_SYNC) && O_SYNC != 0
         if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync)
         {
             new_oflags |= O_SYNC;
@@ -355,11 +387,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             new_oflags &= ~O_SYNC;
         }
-# else
+#  else
         if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync)
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
         }
+#  endif
 # endif
 
 # if defined(__linux__) && defined(__NR_fcntl)
@@ -370,7 +403,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             int const err{static_cast<int>(-set_res)};
             switch(err)
             {
-                // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                // If "ebadf" appears here, it is caused by a WASI implementation issue. This differs from WASI's 'ebadf'; here, "eio" is used instead.
                 case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                 case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
@@ -379,6 +412,66 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
             }
         }
+
+        // Verify that the flags were actually set by reading them back
+        int const verify_flags{::fast_io::system_call<__NR_fcntl, int>(native_fd, F_GETFL)};
+        if(::fast_io::linux_system_call_fails(verify_flags)) [[unlikely]]
+        {
+            int const err{static_cast<int>(-verify_flags)};
+            switch(err)
+            {
+                case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+                case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
+                default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+            }
+        }
+
+        // Check if the WASI-managed flags match what we expected
+        int wasi_managed_flags{};
+        int actual_wasi_flags{};
+
+#  if defined(O_APPEND) && O_APPEND != 0
+        wasi_managed_flags |= (new_oflags & O_APPEND);
+        actual_wasi_flags |= (verify_flags & O_APPEND);
+#  endif
+
+#  if defined(O_NONBLOCK) && O_NONBLOCK != 0
+        wasi_managed_flags |= (new_oflags & O_NONBLOCK);
+        actual_wasi_flags |= (verify_flags & O_NONBLOCK);
+#  endif
+
+#  if defined(O_DSYNC) && O_DSYNC != 0
+        wasi_managed_flags |= (new_oflags & O_DSYNC);
+        actual_wasi_flags |= (verify_flags & O_DSYNC);
+#  endif
+
+#  if defined(O_RSYNC) && O_RSYNC != 0
+        wasi_managed_flags |= (new_oflags & O_RSYNC);
+        actual_wasi_flags |= (verify_flags & O_RSYNC);
+#  endif
+
+#  if defined(O_SYNC) && O_SYNC != 0
+        wasi_managed_flags |= (new_oflags & O_SYNC);
+        actual_wasi_flags |= (verify_flags & O_SYNC);
+#  endif
+
+        if(wasi_managed_flags != actual_wasi_flags) [[unlikely]]
+        {
+            // Attempt to restore
+            int const set_res{::fast_io::system_call<__NR_fcntl, int>(native_fd, F_SETFL, curr_flags)};
+            if(::fast_io::linux_system_call_fails(set_res)) [[unlikely]]
+            {
+                // eio: An I/O exception occurred that we cannot control or recover from (e.g., rollback failure, sporadic F_GETFL failure, etc.).
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+            }
+            else
+            {
+                // enotsup: The requested semantics are unsupported, and we guarantee behavior that “appears atomic” to the caller (either no change or a
+                // rollback).
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+            }
+        }
+
 # else
         int const set_res{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_SETFL, new_oflags)};
 
@@ -386,7 +479,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         {
             switch(errno)
             {
-                // If “ebadf” appears here, it is caused by a WASI implementation issue. This differs from WASI's ‘ebadf’; here, “eio” is used instead.
+                // If "ebadf" appears here, it is caused by a WASI implementation issue. This differs from WASI's 'ebadf'; here, "eio" is used instead.
                 case EBADF: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                 case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
@@ -395,6 +488,57 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
             }
         }
+
+        // Verify that the flags were actually set by reading them back
+        int const verify_flags{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_GETFL)};
+        if(verify_flags == -1) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio; }
+
+        // Check if the WASI-managed flags match what we expected
+        int wasi_managed_flags{};
+        int actual_wasi_flags{};
+
+#  if defined(O_APPEND) && O_APPEND != 0
+        wasi_managed_flags |= (new_oflags & O_APPEND);
+        actual_wasi_flags |= (verify_flags & O_APPEND);
+#  endif
+
+#  if defined(O_NONBLOCK) && O_NONBLOCK != 0
+        wasi_managed_flags |= (new_oflags & O_NONBLOCK);
+        actual_wasi_flags |= (verify_flags & O_NONBLOCK);
+#  endif
+
+#  if defined(O_DSYNC) && O_DSYNC != 0
+        wasi_managed_flags |= (new_oflags & O_DSYNC);
+        actual_wasi_flags |= (verify_flags & O_DSYNC);
+#  endif
+
+#  if defined(O_RSYNC) && O_RSYNC != 0
+        wasi_managed_flags |= (new_oflags & O_RSYNC);
+        actual_wasi_flags |= (verify_flags & O_RSYNC);
+#  endif
+
+#  if defined(O_SYNC) && O_SYNC != 0
+        wasi_managed_flags |= (new_oflags & O_SYNC);
+        actual_wasi_flags |= (verify_flags & O_SYNC);
+#  endif
+
+        if(wasi_managed_flags != actual_wasi_flags) [[unlikely]]
+        {
+            // Attempt to restore
+            int const set_res{::uwvm2::imported::wasi::wasip1::func::posix::fcntl(native_fd, F_SETFL, curr_flags)};
+            if(set_res == -1) [[unlikely]]
+            {
+                // eio: An I/O exception occurred that we cannot control or recover from (e.g., rollback failure, sporadic F_GETFL failure, etc.).
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
+            }
+            else
+            {
+                // enotsup: The requested semantics are unsupported, and we guarantee behavior that “appears atomic” to the caller (either no change or a
+                // rollback).
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+            }
+        }
+
 # endif
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
 #else
@@ -425,7 +569,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
         }
 
-        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
+        // When the system does not support modifying file attributes at all, passing flags set to 0 indicates success.
+        return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
 #endif
     }
 }  // namespace uwvm2::imported::wasi::wasip1::func

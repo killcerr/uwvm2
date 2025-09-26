@@ -489,6 +489,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
                                 break;
                             }
+#  if !defined(_WIN32_WINDOWS)
                             case ::fast_io::nt_domain_value:
                             {
                                 static_assert(sizeof(::fast_io::error::value_type) >= sizeof(::std::uint_least32_t));
@@ -563,6 +564,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
                                 break;
                             }
+#  endif
                             [[unlikely]] default:
                             {
 #  if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
