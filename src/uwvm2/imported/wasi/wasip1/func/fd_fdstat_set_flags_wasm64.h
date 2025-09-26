@@ -341,10 +341,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             new_oflags &= ~(O_SYNC | O_DSYNC);
         }
 # elif (defined(O_DSYNC) && O_DSYNC != 0) && (defined(O_SYNC) && O_SYNC != 0) && ((O_SYNC | O_DSYNC) == O_SYNC)
-        if(((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync) ==
-            ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync) &&
-           ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_dsync) ==
-            ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_dsync))
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync)
         {
             new_oflags |= O_SYNC;
         }
