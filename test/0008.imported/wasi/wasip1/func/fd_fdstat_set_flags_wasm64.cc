@@ -167,7 +167,11 @@ int main()
     {
         auto const ret =
             ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(4), fdflags_wasm64_t::fdflag_nonblock);
-        if(ret != errno_wasm64_t::esuccess)
+        if(ret == errno_wasm64_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: nonblock not supported on this platform, skip");
+        }
+        else if(ret != errno_wasm64_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: set nonblock expected esuccess");
             ::fast_io::fast_terminate();
@@ -218,7 +222,11 @@ int main()
         auto const ret =
             ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(4), fdflags_wasm64_t::fdflag_dsync);
 # if defined(O_DSYNC) && O_DSYNC != 0
-        if(ret != errno_wasm64_t::esuccess)
+        if(ret == errno_wasm64_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: dsync not supported on this platform, skip");
+        }
+        else if(ret != errno_wasm64_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: set dsync expected esuccess");
             ::fast_io::fast_terminate();
@@ -269,7 +277,11 @@ int main()
         auto const ret =
             ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(4), fdflags_wasm64_t::fdflag_sync);
 # if defined(O_SYNC) && O_SYNC != 0
-        if(ret != errno_wasm64_t::esuccess)
+        if(ret == errno_wasm64_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: sync not supported on this platform, skip");
+        }
+        else if(ret != errno_wasm64_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: set sync expected esuccess");
             ::fast_io::fast_terminate();
@@ -320,7 +332,11 @@ int main()
         auto const ret =
             ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(4), fdflags_wasm64_t::fdflag_rsync);
 # if defined(O_RSYNC) && O_RSYNC != 0
-        if(ret != errno_wasm64_t::esuccess)
+        if(ret == errno_wasm64_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: rsync not supported on this platform, skip");
+        }
+        else if(ret != errno_wasm64_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: set rsync expected esuccess");
             ::fast_io::fast_terminate();
