@@ -316,12 +316,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
 # if (defined(O_DSYNC) && O_DSYNC != 0) && (defined(O_SYNC) && O_SYNC != 0) && (defined(O_RSYNC) && O_RSYNC != 0) && ((O_SYNC | O_DSYNC) == O_SYNC) &&         \
      (O_RSYNC == O_SYNC)
-        // On Android, O_SYNC is a superset of O_DSYNC, O_RSYNC == O_SYNC
-        auto const has_sync_flags{
-            ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) ||
-            ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)};
-        if(has_sync_flags &&
-           ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync))
+        // On Android, O_SYNC is a superset of O_DSYNC, and O_RSYNC == O_SYNC. Requesting SYNC or RSYNC implies O_SYNC.
+        if(((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) ||
+           ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync))
         {
             new_oflags |= O_SYNC;
         }
