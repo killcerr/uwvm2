@@ -86,6 +86,7 @@ int main()
             if(ret == errno_wasm64_t::enotsup)
             {
                 ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: append not supported on this platform, skip");
+                goto case2;
             }
             else
             {
@@ -138,6 +139,7 @@ int main()
 # endif
     }
 
+case2:
     // Case 2: clear APPEND (pass 0), verify APPEND cleared
     {
         auto const ret =
@@ -170,6 +172,7 @@ int main()
         if(ret == errno_wasm64_t::enotsup)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: nonblock not supported on this platform, skip");
+            goto case3b;
         }
         else if(ret != errno_wasm64_t::esuccess)
         {
@@ -192,6 +195,7 @@ int main()
 # endif
     }
 
+case3b:
     // Case 3b: clear NONBLOCK by passing 0
     {
         auto const ret =
@@ -225,6 +229,7 @@ int main()
         if(ret == errno_wasm64_t::enotsup)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: dsync not supported on this platform, skip");
+            goto case7;
         }
         else if(ret != errno_wasm64_t::esuccess)
         {
@@ -272,6 +277,7 @@ int main()
 # endif
     }
 
+case7:
     // Case 7: SYNC set/clear with platform variance
     {
         auto const ret =
@@ -280,6 +286,7 @@ int main()
         if(ret == errno_wasm64_t::enotsup)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: sync not supported on this platform, skip");
+            goto case8;
         }
         else if(ret != errno_wasm64_t::esuccess)
         {
@@ -327,6 +334,7 @@ int main()
 # endif
     }
 
+case8:
     // Case 8: RSYNC set/clear with platform variance
     {
         auto const ret =
@@ -335,6 +343,7 @@ int main()
         if(ret == errno_wasm64_t::enotsup)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64: rsync not supported on this platform, skip");
+            goto after_case8;
         }
         else if(ret != errno_wasm64_t::esuccess)
         {

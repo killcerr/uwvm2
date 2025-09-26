@@ -81,7 +81,11 @@ int main()
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_append);
         if(ret != errno_t::esuccess)
         {
-            if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: append not supported on this platform, skip"); }
+            if(ret == errno_t::enotsup)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: append not supported on this platform, skip");
+                goto case1b;
+            }
             else
             {
                 ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set append expected esuccess");
@@ -132,11 +136,15 @@ int main()
         }
 # endif
     }
-
+case1b:
     // Case 1b: set only NONBLOCK, verify NONBLOCK is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_nonblock);
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: nonblock not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: nonblock not supported on this platform, skip");
+            goto case1c;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set nonblock expected esuccess");
@@ -197,10 +205,15 @@ int main()
         }
     }
 
+case1c:
     // Case 1c: set only DSYNC, verify DSYNC is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_dsync);
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: dsync not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: dsync not supported on this platform, skip");
+            goto case1d;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set dsync expected esuccess");
@@ -261,10 +274,15 @@ int main()
         }
     }
 
+case1d:
     // Case 1d: set only RSYNC, verify RSYNC is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_rsync);
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: rsync not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: rsync not supported on this platform, skip");
+            goto case1e;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set rsync expected esuccess");
@@ -325,10 +343,15 @@ int main()
         }
     }
 
+case1e:
     // Case 1e: set only SYNC, verify SYNC is set and others cleared; ENOTSUP -> skip
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_sync);
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: sync not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: sync not supported on this platform, skip");
+            goto case2;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set sync expected esuccess");
@@ -389,6 +412,7 @@ int main()
         }
     }
 
+case2:
     // Case 2: clear APPEND (pass 0), verify APPEND cleared
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
@@ -416,7 +440,11 @@ int main()
     // Case 3: set NONBLOCK through WASI and verify
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_nonblock);
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: nonblock not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: nonblock not supported on this platform, skip");
+            goto case3b;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set nonblock expected esuccess");
@@ -438,6 +466,7 @@ int main()
 # endif
     }
 
+case3b:
     // Case 3b: clear NONBLOCK by passing 0
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), static_cast<fdflags_t>(0));
@@ -466,7 +495,11 @@ int main()
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_dsync);
 # if defined(O_DSYNC) && O_DSYNC != 0
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: dsync not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: dsync not supported on this platform, skip");
+            goto case7;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set dsync expected esuccess");
@@ -513,11 +546,16 @@ int main()
 # endif
     }
 
+case7:
     // Case 7: SYNC set/clear with platform variance
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_sync);
 # if defined(O_SYNC) && O_SYNC != 0
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: sync not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: sync not supported on this platform, skip");
+            goto case8;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set sync expected esuccess");
@@ -563,11 +601,16 @@ int main()
 # endif
     }
 
+case8:
     // Case 8: RSYNC set/clear with platform variance
     {
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags(env, static_cast<wasi_posix_fd_t>(4), fdflags_t::fdflag_rsync);
 # if defined(O_RSYNC) && O_RSYNC != 0
-        if(ret == errno_t::enotsup) { ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: rsync not supported on this platform, skip"); }
+        if(ret == errno_t::enotsup)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: rsync not supported on this platform, skip");
+            goto after_case8;
+        }
         else if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags: set rsync expected esuccess");
@@ -613,6 +656,7 @@ int main()
 # endif
     }
 
+after_case8:
     // Case 4: enotcapable when rights missing
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(3uz).fd_p;
