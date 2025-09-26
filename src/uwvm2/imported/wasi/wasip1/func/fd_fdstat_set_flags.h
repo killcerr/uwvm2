@@ -314,25 +314,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 # endif
 
-        // O_RSYNC is typically equivalent to O_SYNC and does not impose any additional flags.
-# if defined(O_RSYNC) && O_RSYNC != 0
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
+# if (defined(O_DSYNC) && O_DSYNC != 0) && (defined(O_SYNC) && O_SYNC != 0) && (defined(O_RSYNC) && O_RSYNC != 0) && ((O_SYNC | O_DSYNC) == O_SYNC) &&         \
+     (O_RSYNC == O_SYNC)
+        // On Android, O_SYNC is a superset of O_DSYNC, O_RSYNC == O_SYNC
+        auto const has_sync_flags{
+            ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) ||
+            ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)};
+        if(has_sync_flags &&
+           ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync))
         {
-            new_oflags |= O_RSYNC;
+            new_oflags |= O_SYNC;
+        }
+        else if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            new_oflags |= O_DSYNC;
         }
         else
         {
-            new_oflags &= ~O_RSYNC;
+            new_oflags &= ~O_SYNC;
         }
-# else
-        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
-        {
-            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
-        }
-# endif
-
-# if (defined(O_DSYNC) && O_DSYNC != 0) && (defined(O_SYNC) && O_SYNC != 0) && ((O_SYNC | O_DSYNC) == O_SYNC)
-        // On Android, O_SYNC is a superset of O_DSYNC.
+# elif (defined(O_DSYNC) && O_DSYNC != 0) && (defined(O_SYNC) && O_SYNC != 0) && ((O_SYNC | O_DSYNC) == O_SYNC)
         if(((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_sync) &&
            ((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync))
         {
@@ -359,6 +360,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
 #  else
         if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_dsync)
+        {
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
+        }
+#  endif
+
+#  if defined(O_RSYNC) && O_RSYNC != 0
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
+        {
+            new_oflags |= O_RSYNC;
+        }
+        else
+        {
+            new_oflags &= ~O_RSYNC;
+        }
+#  else
+        if((flags & ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync) == ::uwvm2::imported::wasi::wasip1::abi::fdflags_t::fdflag_rsync)
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
         }
