@@ -391,6 +391,7 @@ case8:
 # endif
     }
 
+[[maybe_unused]] after_case8:
     // Case 4: enotcapable when rights missing
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(3uz).fd_p;
