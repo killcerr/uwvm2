@@ -678,6 +678,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
 #include "error_code_outputs/eco_illegal_custom_section_order.h"
                 return;
             }
+            case ::uwvm2::parser::wasm::base::wasm_parse_error_code::missing_code_body_end:
+            {
+#include "error_code_outputs/eco_missing_code_body_end.h"
+                return;
+            }
         }
     }
 }
