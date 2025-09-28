@@ -208,6 +208,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket)
         {
             // For ws2, support for setting nonblock is available.
+            // Since the flags on ws2 are fixed and confirmed, there is no need to perform verification again after configuration.
             if((flags &
                 (::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_append | ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_dsync |
                  ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_rsync | ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t::fdflag_sync)) !=

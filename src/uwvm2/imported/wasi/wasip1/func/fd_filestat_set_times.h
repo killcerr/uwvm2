@@ -505,6 +505,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                 case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                 case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+# if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                case EOPNOTSUPP: [[fallthrough]];
+# endif
+                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                 case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                 case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
@@ -588,6 +593,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                     case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                     case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+#   if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                    case EOPNOTSUPP: [[fallthrough]];
+#   endif
+                    case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                     case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                     case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
@@ -603,6 +613,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                     case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                     case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+#   if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                    case EOPNOTSUPP: [[fallthrough]];
+#   endif
+                    case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                     case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                     case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
@@ -662,6 +677,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                     case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                     case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+#   if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                    case EOPNOTSUPP: [[fallthrough]];
+#   endif
+                    case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                     case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                     case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
@@ -736,6 +756,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                     case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                     case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+#    if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                    case EOPNOTSUPP: [[fallthrough]];
+#    endif
+                    case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                     case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                     case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
@@ -751,6 +776,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                     case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                     case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+#    if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                    case EOPNOTSUPP: [[fallthrough]];
+#    endif
+                    case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                     case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                     case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
@@ -826,6 +856,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                     case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                     case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                    case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+#  if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                    case EOPNOTSUPP: [[fallthrough]];
+#  endif
+                    case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                     case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                     case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
@@ -895,6 +930,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 case EINVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::einval;
                 case EACCES: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eacces;
                 case EPERM: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eperm;
+                case EROFS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::erofs;
+#  if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
+                case EOPNOTSUPP: [[fallthrough]];
+#  endif
+                case ENOTSUP: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotsup;
                 case EINTR: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eintr;
                 case ENOSYS: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enosys;
                 default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;

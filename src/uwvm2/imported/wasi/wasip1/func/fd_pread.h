@@ -217,9 +217,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Therefore, a unified check is implemented.
         if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
 
-        // Rights check: pread uses read permission
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) [[unlikely]]
+        // Rights check: pread uses read permission and seek permission
+        if(((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) !=
+            ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) ||
+           ((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_seek) !=
+            ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_seek)) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }
