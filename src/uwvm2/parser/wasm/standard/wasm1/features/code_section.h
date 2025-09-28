@@ -411,9 +411,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             // minimum check end (0x0B)
             // At least one byte, with the last byte being 0x0B.
-            if(static_cast<::std::size_t>(section_curr - code_end) == 0uz) [[unlikely]]
+            if(section_curr == code_end) [[unlikely]]
             {
-                // Equivalent to "< 1uz"
+                // Equivalent to "static_cast<::std::size_t>(section_curr - code_end) < 1uz"
                 err.err_curr = section_curr;
                 err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::missing_code_body_end;
                 ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
