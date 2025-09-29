@@ -405,9 +405,38 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 
             code.body.expr_begin = reinterpret_cast<wasm_byte_const_may_alias_ptr>(section_curr);
 
-            // [ ...] (code_end)
-            // [safe] unsafe (could be the section_end)
-            //        ^^ section_curr
+            // [ ...] [(expr_begin) ...] (code_end)
+            // [safe] [     safe       ] unsafe (could be the section_end)
+            //         ^^ section_curr
+
+            // minimum check end (0x0B)
+            // At least one byte, with the last byte being 0x0B.
+            if(section_curr == code_end) [[unlikely]]
+            {
+                // Equivalent to "static_cast<::std::size_t>(section_curr - code_end) < 1uz"
+                err.err_curr = section_curr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::missing_code_body_end;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // [ ...] [(expr_begin) ...] [0x0B] (code_end)
+            // [safe] [   scope safe   ] [safe] unsafe (could be the section_end)
+            //         ^^ section_curr
+
+            auto const code_end_ptr{reinterpret_cast<::std::byte const*>(code_end) - 1u};
+
+            // [ ...] [(expr_begin) ...] [0x0B] (code_end)
+            // [safe] [   scope safe   ] [safe] unsafe (could be the section_end)
+            //                            ^^ code_end_ptr
+
+            if(*code_end_ptr != static_cast<::std::byte>(::uwvm2::parser::wasm::standard::wasm1::opcode::op_basic::end)) [[unlikely]]
+            {
+                err.err_curr = code_end_ptr;
+                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::missing_code_body_end;
+                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+            }
+
+            // Parsing of the expression will be completed later.
 
             section_curr = reinterpret_cast<::std::byte const*>(code_end);
 

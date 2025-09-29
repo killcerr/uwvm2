@@ -54,8 +54,7 @@ int main()
         ::fast_io::u32obuf_file u32f{u8"error_code_test_u32c.log"};
         ::uwvm2::parser::wasm::base::error_output_t errout;
 
-        for(::std::uint_least32_t i{};
-            i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_custom_section_order) + 1u;
+        for(::std::uint_least32_t i{}; i != static_cast<::std::uint_least32_t>(::uwvm2::parser::wasm::base::wasm_parse_error_code::missing_code_body_end) + 1u;
             ++i)
         {
             // Specialization of the addressing section
@@ -131,9 +130,9 @@ int main()
             {
                 ::uwvm2::parser::wasm::base::error_output_t obuf_u8err_errout{errout};
                 obuf_u8err_errout.flag.enable_ansi = static_cast<::std::uint_least8_t>(::uwvm2::uwvm::utils::ansies::put_color);
-#  if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
+#if defined(_WIN32) && (_WIN32_WINNT < 0x0A00 || defined(_WIN32_WINDOWS))
                 obuf_u8err_errout.flag.win32_use_text_attr = static_cast<::std::uint_least8_t>(!::uwvm2::uwvm::utils::ansies::log_win32_use_ansi_b);
-#  endif
+#endif
                 ::fast_io::io::perrln(obuf_u8err, obuf_u8err_errout);
             }
 

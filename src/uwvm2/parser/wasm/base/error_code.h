@@ -164,7 +164,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::base
         init_const_expr_illegal_data,
         init_const_expr_ref_illegal_imported_global,
         init_const_expr_ref_mutable_imported_global,
-        illegal_custom_section_order
+        illegal_custom_section_order,
+        missing_code_body_end
     };
 
     /// @brief used for duplicate_imports_of_the_same_import_type
