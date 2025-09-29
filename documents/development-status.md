@@ -26,13 +26,13 @@ The following components are planned for implementation in the upcoming developm
 
 - **WebAssembly Module Initialization and Validation**: Developing mechanisms for module initialization and validation to ensure compliance with the WebAssembly specification and security requirements.
 
-- **Non-Interpreter Virtual Machine Concepts**: Exploring advanced virtual machine concepts such as virtual threads and tiered compilation algorithms to enhance performance and scalability.
+- **Non-Image Compiler Concepts**: Exploring advanced virtual machine concepts such as virtual threads and tiered compilation algorithms to enhance performance and scalability.
 
 - **High-Performance Interpreter (INT)**: Designing and implementing an efficient interpreter to execute WebAssembly code with optimized performance, serving as the baseline execution engine.
 
 - **Just-In-Time (JIT) Compilation with LLVM**: Integrating LLVM-based JIT compilation to dynamically translate WebAssembly code into native machine code at runtime, improving execution speed.
 
-- **INT Optable JIT Code Caching**: Developing a caching mechanism for JIT-compiled code to reduce compilation overhead and enhance runtime efficiency.
+- **INT Optable and JIT Code Caching**: Developing a caching mechanism for JIT-compiled code to reduce compilation overhead and enhance runtime efficiency.
 
 ## Release Preparation Cycle
 
@@ -76,5 +76,5 @@ The development process emphasizes:
 
 ---
 
-*Last Updated: January 2025*
+*Last Updated: September 2025*
 *Status: Developer Stable*
