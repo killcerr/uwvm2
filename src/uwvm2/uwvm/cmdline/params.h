@@ -62,6 +62,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
             // wasi
             ::std::addressof(::uwvm2::uwvm::cmdline::params::wasip1_set_fd_limit),
+            ::std::addressof(::uwvm2::uwvm::cmdline::params::wasi_mount_root),
 
             // log
             ::std::addressof(::uwvm2::uwvm::cmdline::params::log_output),

@@ -1,4 +1,4 @@
-﻿ /*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -22,13 +22,13 @@
 module;
 
 // std
-# include <cstddef>
-# include <cstdint>
-# include <stdfloat>
-# include <limits>
-# include <type_traits>
+#include <cstddef>
+#include <cstdint>
+#include <stdfloat>
+#include <limits>
+#include <type_traits>
 // macro
-# include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.imported.wasi.wasip1.abi:wasm64;
 

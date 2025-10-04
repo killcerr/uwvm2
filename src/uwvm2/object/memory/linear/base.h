@@ -59,10 +59,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         // Provide mobile semantic convenience functions for return
         inline constexpr dummy_memory_operation_guard_t(dummy_memory_operation_guard_t&& other) noexcept = default;
         inline constexpr dummy_memory_operation_guard_t& operator= (dummy_memory_operation_guard_t&& other) noexcept = default;
-        
+
         inline constexpr ~dummy_memory_operation_guard_t() noexcept = default;
 
         inline constexpr void enter_operation() noexcept {}
+
         inline constexpr void exit_operation() noexcept {}
     };
 }  // namespace uwvm2::object::memory::linear

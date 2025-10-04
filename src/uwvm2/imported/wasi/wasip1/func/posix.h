@@ -92,7 +92,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             __asm__("_fcntl")
 # endif
                 ;
-                
+
         extern int ftruncate(int fd, ::off_t size) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("ftruncate")

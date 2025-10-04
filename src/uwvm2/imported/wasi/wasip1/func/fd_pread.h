@@ -83,7 +83,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         ::uwvm2::imported::wasi::wasip1::abi::filesize_t offset,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_t nread) noexcept
     {
-        auto& memory{env.wasip1_memory};
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(env.wasip1_memory == nullptr) [[unlikely]]
+        {
+            // Security issues inherent to virtual machines
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
+#endif
+        auto& memory{*env.wasip1_memory};
+
         auto const trace_wasip1_call{env.trace_wasip1_call};
 
         if(trace_wasip1_call) [[unlikely]]
@@ -217,9 +225,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Therefore, a unified check is implemented.
         if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_t::ebadf; }
 
-        // Rights check: pread uses read permission
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) [[unlikely]]
+        // Rights check: pread uses read permission and seek permission
+        if(((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) !=
+            ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_read) ||
+           ((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_seek) !=
+            ::uwvm2::imported::wasi::wasip1::abi::rights_t::right_fd_seek)) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotcapable;
         }

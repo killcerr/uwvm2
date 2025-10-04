@@ -44,7 +44,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline bool wasm_depend_recursion_limit_is_exist{};
+        inline bool wasm_depend_recursion_limit_is_exist{};  // [global]
         inline constexpr ::uwvm2::utils::container::u8string_view wasm_depend_recursion_limit_alias{u8"-Wdeplim"};
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type
             wasm_depend_recursion_limit_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,

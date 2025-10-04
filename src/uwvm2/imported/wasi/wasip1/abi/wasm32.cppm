@@ -22,13 +22,13 @@
 module;
 
 // std
-# include <cstddef>
-# include <cstdint>
-# include <stdfloat>
-# include <limits>
-# include <type_traits>
+#include <cstddef>
+#include <cstdint>
+#include <stdfloat>
+#include <limits>
+#include <type_traits>
 // macro
-# include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.imported.wasi.wasip1.abi:wasm32;
 

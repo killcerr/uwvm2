@@ -40,6 +40,7 @@ export import :wasm_depend_recursion_limit;
 
 // wasi
 export import :wasip1_set_fd_limit;
+export import :wasi_mount_root;
 
 // log
 export import :log_output;

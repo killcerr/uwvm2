@@ -64,4 +64,3 @@ import :posix;
 
 #include "fd_filestat_set_size_wasm64.h"
 
-

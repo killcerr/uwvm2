@@ -41,7 +41,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline bool version_is_exist{};
+        inline bool version_is_exist{};  // [global]
         inline constexpr ::uwvm2::utils::container::array<::uwvm2::utils::container::u8string_view, 2uz> version_alias{u8"-v", u8"-ver"};
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type version_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                      ::uwvm2::utils::cmdline::parameter_parsing_results*,

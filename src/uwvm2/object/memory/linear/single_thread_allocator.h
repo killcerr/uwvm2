@@ -182,10 +182,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             this->memory_length = new_memory_length;
         }
 
-        inline constexpr ::std::size_t get_page_size() const noexcept
-        {
-            return this->memory_length >> this->custom_page_size_log2;
-        }
+        inline constexpr ::std::size_t get_page_size() const noexcept { return this->memory_length >> this->custom_page_size_log2; }
 
         inline constexpr basic_single_thread_allocator_memory_t(basic_single_thread_allocator_memory_t const& other) noexcept = delete;
 

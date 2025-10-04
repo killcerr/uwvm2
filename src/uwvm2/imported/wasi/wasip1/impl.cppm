@@ -24,6 +24,8 @@ module;
 export module uwvm2.imported.wasi.wasip1;
 export import uwvm2.imported.wasi.wasip1.abi;
 export import uwvm2.imported.wasi.wasip1.fd_manager;
+export import uwvm2.imported.wasi.wasip1.memory;
+export import uwvm2.imported.wasi.wasip1.mount_root;
 export import uwvm2.imported.wasi.wasip1.environment;
 export import uwvm2.imported.wasi.wasip1.platform;
 

@@ -180,6 +180,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
             ///             and all constructs implicitly reference this table 0. This restriction may be lifted in future versions.
             /// @see        WebAssembly Release 1.0 (2019-07-20) § 2.5.4
 
+            // Since it has already been checked and an exception thrown in the import_section, it can never be greater than 1.
             UWVM_ASSERT(imported_table_size <= 1u);
             [[assume(imported_table_size <= 1u)]];
 

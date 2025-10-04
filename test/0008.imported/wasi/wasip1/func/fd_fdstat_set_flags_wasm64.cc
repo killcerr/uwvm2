@@ -44,7 +44,7 @@ int main()
     native_memory_t memory{};
     memory.init_by_page_count(1uz);
 
-    wasip1_environment<native_memory_t> env{.wasip1_memory = memory, .argv = {}, .envs = {}, .fd_storage = {}, .trace_wasip1_call = false};
+    wasip1_environment<native_memory_t> env{.wasip1_memory = ::std::addressof(memory), .argv = {}, .envs = {}, .fd_storage = {}, .mount_root={}, .trace_wasip1_call = false};
 
     // Prepare fd table
     env.fd_storage.opens.resize(6uz);
@@ -706,6 +706,117 @@ int main()
             }
         }
     }
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+    {
+        using ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t;
+        using ::uwvm2::imported::wasi::wasip1::abi::fdflags_wasm64_t;
+        using ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t;
+        using ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t;
+        using ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment;
+        using ::uwvm2::object::memory::linear::native_memory_t;
+    
+        native_memory_t memory{};
+        memory.init_by_page_count(1uz);
+    
+        wasip1_environment<native_memory_t> env{.wasip1_memory = ::std::addressof(memory), .argv = {}, .envs = {}, .fd_storage = {}, .mount_root={}, .trace_wasip1_call = false};
+    
+        // Prepare fd table
+        env.fd_storage.opens.resize(6uz);
+    
+        // Setup fd=4 as a Win32 socket with all rights
+        {
+            auto& fd4 = *env.fd_storage.opens.index_unchecked(4uz).fd_p;
+            fd4.socket_fd = ::fast_io::win32_socket_file{::fast_io::socket_family::ipv4, ::fast_io::socket_type::stream, ::fast_io::socket_protocol::tcp};
+            fd4.file_type = ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket;
+            fd4.rights_base = static_cast<rights_wasm64_t>(-1);
+            fd4.rights_inherit = static_cast<rights_wasm64_t>(-1);
+    
+            // nonblock should be supported on sockets
+            {
+                auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                   static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                                   fdflags_wasm64_t::fdflag_nonblock);
+                if(ret != errno_wasm64_t::esuccess)
+                {
+                    ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64(win32-socket): set nonblock expected esuccess");
+                    ::fast_io::fast_terminate();
+                }
+    
+                auto const clr = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                    static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                                    static_cast<fdflags_wasm64_t>(0));
+                if(clr != errno_wasm64_t::esuccess)
+                {
+                    ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64(win32-socket): clear nonblock expected esuccess");
+                    ::fast_io::fast_terminate();
+                }
+            }
+    
+            // Other flags should be ENOTSUP for sockets on Win32
+            {
+                auto const r1 = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                  static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                                  fdflags_wasm64_t::fdflag_append);
+                auto const r2 = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                  static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                                  fdflags_wasm64_t::fdflag_dsync);
+                auto const r3 = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                  static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                                  fdflags_wasm64_t::fdflag_rsync);
+                auto const r4 = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                  static_cast<wasi_posix_fd_wasm64_t>(4),
+                                                                                                  fdflags_wasm64_t::fdflag_sync);
+                if(!(r1 == errno_wasm64_t::enotsup && r2 == errno_wasm64_t::enotsup && r3 == errno_wasm64_t::enotsup && r4 == errno_wasm64_t::enotsup))
+                {
+                    ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64(win32-socket): unsupported flags should return enotsup");
+                    ::fast_io::fast_terminate();
+                }
+            }
+        }
+    
+        // Rights missing => enotcapable
+        {
+            auto& fde = *env.fd_storage.opens.index_unchecked(3uz).fd_p;
+            fde.socket_fd = ::fast_io::win32_socket_file{::fast_io::socket_family::ipv4, ::fast_io::socket_type::stream, ::fast_io::socket_protocol::tcp};
+            fde.file_type = ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket;
+            fde.rights_base = static_cast<rights_wasm64_t>(0);
+    
+            auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                 static_cast<wasi_posix_fd_wasm64_t>(3),
+                                                                                                 fdflags_wasm64_t::fdflag_nonblock);
+            if(ret != errno_wasm64_t::enotcapable)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64(win32-socket): expected enotcapable when rights missing");
+                ::fast_io::fast_terminate();
+            }
+        }
+    
+        // After close => ebadf
+        {
+            auto& fde = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
+            fde.socket_fd = ::fast_io::win32_socket_file{::fast_io::socket_family::ipv4, ::fast_io::socket_type::stream, ::fast_io::socket_protocol::tcp};
+            fde.file_type = ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket;
+            fde.rights_base = static_cast<rights_wasm64_t>(-1);
+    
+            auto const closed = ::uwvm2::imported::wasi::wasip1::func::fd_close_wasm64(env, static_cast<wasi_posix_fd_wasm64_t>(2));
+            if(closed != errno_wasm64_t::esuccess)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64(win32-socket): close expected esuccess");
+                ::fast_io::fast_terminate();
+            }
+    
+            auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_set_flags_wasm64(env,
+                                                                                                 static_cast<wasi_posix_fd_wasm64_t>(2),
+                                                                                                 fdflags_wasm64_t::fdflag_nonblock);
+            if(ret != errno_wasm64_t::ebadf)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_fdstat_set_flags_wasm64(win32-socket): expected ebadf after fd_close");
+                ::fast_io::fast_terminate();
+            }
+        }    
+    }
+#endif
 }
 
 #else

@@ -258,6 +258,101 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
                   typename Alloc = ::uwvm2::utils::container::fast_io_thread_local_std_allocator<::std::pair<Key const, Val>>>
         using unordered_node_map = ::uwvm2::utils::container::unordered_node_map<Key, Val, Hash, Pred, Alloc>;
     }  // namespace tlc
+
+    /// @brief predicates
+    /// Perform transparent comparisons using std::basic_string_view, supporting heterogeneous lookups while avoiding allocations.
+    namespace pred
+    {
+        template <::std::integral chartype>
+        struct basic_string_view_hash
+        {
+            using is_transparent = void;  // enable heterogeneous lookup
+
+            inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string_view<chartype> sv) const noexcept
+            {
+                return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(sv);
+            }
+
+            inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_cstring_view<chartype> sv) const noexcept
+            {
+                return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(
+                    ::uwvm2::utils::container::basic_string_view<chartype>{sv.data(), sv.size()});
+            }
+
+            inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string<chartype> const& s) const noexcept
+            {
+                return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(
+                    ::uwvm2::utils::container::basic_string_view<chartype>{s.data(), s.size()});
+            }
+
+            inline constexpr ::std::size_t operator() (chartype const* s) const noexcept
+            {
+                return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(
+                    ::uwvm2::utils::container::basic_string_view<chartype>{::fast_io::mnp::os_c_str(s)});
+            }
+        };
+
+        template <::std::integral chartype>
+        struct basic_string_view_equal
+        {
+            using is_transparent = void;  // enable heterogeneous lookup
+
+            template <typename L, typename R>
+                requires requires(L const& lhs, R const& rhs) {
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { lhs.data(), lhs.size() }
+                    };
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { rhs.data(), rhs.size() }
+                    };
+                }
+            inline constexpr bool operator() (L const& lhs, R const& rhs) const noexcept
+            {
+                using strvw = ::uwvm2::utils::container::basic_string_view<chartype>;
+                return strvw{lhs.data(), lhs.size()} == strvw{rhs.data(), rhs.size()};
+            }
+        };
+
+        template <::std::integral chartype>
+        struct basic_string_view_less
+        {
+            using is_transparent = void;  // enable heterogeneous lookup
+
+            template <typename L, typename R>
+                requires requires(L const& lhs, R const& rhs) {
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { lhs.data(), lhs.size() }
+                    };
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { rhs.data(), rhs.size() }
+                    };
+                }
+            inline constexpr bool operator() (L const& lhs, R const& rhs) const noexcept
+            {
+                using strvw = ::uwvm2::utils::container::basic_string_view<chartype>;
+                return strvw{lhs.data(), lhs.size()} < strvw{rhs.data(), rhs.size()};
+            }
+        };
+
+        using string_view_equal = basic_string_view_equal<char>;
+        using wstring_view_equal = basic_string_view_equal<wchar_t>;
+        using u8string_view_equal = basic_string_view_equal<char8_t>;
+        using u16string_view_equal = basic_string_view_equal<char16_t>;
+        using u32string_view_equal = basic_string_view_equal<char32_t>;
+
+        using string_view_less = basic_string_view_less<char>;
+        using wstring_view_less = basic_string_view_less<wchar_t>;
+        using u8string_view_less = basic_string_view_less<char8_t>;
+        using u16string_view_less = basic_string_view_less<char16_t>;
+        using u32string_view_less = basic_string_view_less<char32_t>;
+
+        using string_view_hash = basic_string_view_hash<char>;
+        using wstring_view_hash = basic_string_view_hash<wchar_t>;
+        using u8string_view_hash = basic_string_view_hash<char8_t>;
+        using u16string_view_hash = basic_string_view_hash<char16_t>;
+        using u32string_view_hash = basic_string_view_hash<char32_t>;
+
+    }  // namespace pred
 }
 
 UWVM_MODULE_EXPORT namespace std

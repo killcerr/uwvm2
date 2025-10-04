@@ -29,6 +29,7 @@ export import :preloaded_wasm;
 export import :local_preload;
 export import :preloaded_dl;
 export import :all_module;
+export import :wasi;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

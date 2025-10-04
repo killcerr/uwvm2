@@ -22,15 +22,15 @@
 module;
 
 // std
-# include <cstddef>
-# include <cstdint>
-# include <stdfloat>
-# include <limits>
-# include <type_traits>
-# include <memory>
-# include <new>
+#include <cstddef>
+#include <cstdint>
+#include <stdfloat>
+#include <limits>
+#include <type_traits>
+#include <memory>
+#include <new>
 // macro
-# include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.imported.wasi.wasip1.fd_manager:fd;
 

@@ -109,18 +109,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
 
         // preprocessing
         auto const argv_end{argv + argc};
-        for(++curr_argv; curr_argv != argv_end; ++curr_argv)
+        for(++curr_argv; curr_argv != argv_end;)
         {
             if(*curr_argv == nullptr) [[unlikely]]
             {
                 // This doesn't happen, but just in case
-                continue;
-            }
 
-            if(::uwvm2::utils::container::u8cstring_view const argv_str{::fast_io::mnp::os_c_str(*curr_argv)}; argv_str.empty()) [[unlikely]]
+                // Next parameter
+                ++curr_argv;
+            }
+            else if(::uwvm2::utils::container::u8cstring_view const argv_str{::fast_io::mnp::os_c_str(*curr_argv)}; argv_str.empty()) [[unlikely]]
             {
                 // No characters, may appear on windows, the first value of this parameter is u8'\0'
-                continue;
+
+                // Next parameter
+                ++curr_argv;
             }
             else if(argv_str.front_unchecked() == u8'-')
             {
@@ -135,6 +138,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                 {
                     // invalid parameter
                     pr.emplace_back_unchecked(argv_str, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::invalid_parameter);
+
+                    // Next parameter
+                    ++curr_argv;
                 }
                 else if(para == run_para)
                 {
@@ -198,12 +204,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
                     // If a signed integer is required for a subsequent argument,
                     // marking one bit back as occupied_arg prevents the negative sign from being misidentified as an argument prefix.
 
-                    if(para->pretreatment) { para->pretreatment(curr_argv, argv_end, pr); }
+                    if(para->pretreatment)
+                    {
+                        para->pretreatment(curr_argv, argv_end, pr);
+                        // For pretreat, the result of pretreat is the next parameter.
+                    }
+                    else
+                    {
+                        // Next parameter
+                        ++curr_argv;
+                    }
                 }
             }
             else
             {
                 pr.emplace_back_unchecked(argv_str, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg);
+
+                // Next parameter
+                ++curr_argv;
             }
         }
 
