@@ -113,212 +113,256 @@ namespace uwvm2::uwvm::cmdline::params::details
     };
 
     /// @brief Create a new NFA state and return its index.
-    inline ::std::size_t nfa_new_state(::uwvm2::utils::container::vector<nfa_state>& nfa) noexcept
+    inline constexpr ::std::size_t nfa_new_state(::uwvm2::utils::container::vector<nfa_state>& nfa) noexcept
     {
         auto const idx{nfa.size()};
         nfa.emplace_back(nfa_state{});
         return idx;
     }
 
+    inline constexpr ::std::size_t nfa_new_state_unchecked(::uwvm2::utils::container::vector<nfa_state>& nfa) noexcept
+    {
+        auto const idx{nfa.size()};
+        nfa.emplace_back_unchecked(nfa_state{});
+        return idx;
+    }
+
     /// @brief Add an epsilon transition in the NFA from -> to.
-    inline void nfa_add_eps(::uwvm2::utils::container::vector<nfa_state>& nfa, ::std::size_t from, ::std::size_t to) noexcept
+    /// @param nfa The NFA to add the epsilon transition to.
+    /// @param from The source state. (unchecked)
+    /// @param to The target state.
+    inline constexpr void nfa_add_eps(::uwvm2::utils::container::vector<nfa_state>& nfa, ::std::size_t from, ::std::size_t to) noexcept
     {
         nfa.index_unchecked(from).eps.emplace_back(to);
     }
 
-    /// @brief Add a consuming transition with given edge type and optional character.
-    inline void
-        nfa_add_edge(::uwvm2::utils::container::vector<nfa_state>& nfa, ::std::size_t from, ::std::size_t to, nfa_edge_type type, char8_t ch = u8'\0') noexcept
+    inline constexpr void nfa_add_eps_unchecked(::uwvm2::utils::container::vector<nfa_state>& nfa, ::std::size_t from, ::std::size_t to) noexcept
     {
-        nfa.index_unchecked(from).edges.emplace_back(nfa_edge{.type = type, .ch = ch, .to = to});
+        nfa.index_unchecked(from).eps.emplace_back_unchecked(to);
+    }
+
+    /// @brief Add a consuming transition with given edge type and optional character.
+    /// @param nfa The NFA to add the edge to.
+    /// @param from The source state. (unchecked)
+    /// @param to The target state.
+    /// @param type The type of edge to add.
+    /// @param ch The character to add (optional).
+    inline constexpr void nfa_add_edge(::uwvm2::utils::container::vector<nfa_state>& nfa,
+                                       ::std::size_t from,
+                                       ::std::size_t to,
+                                       nfa_edge_type type,
+                                       char8_t match_char = u8'\0') noexcept
+    {
+        nfa.index_unchecked(from).edges.emplace_back(type, match_char, to);
     }
 
     // Build an NFA from parsed pattern tokens
     /// @brief Compile a parsed token sequence into an NFA implementing glob semantics.
-    inline compiled_pattern_automaton build_nfa_from_tokens(::uwvm2::utils::container::vector<pattern_token> const& tokens) noexcept
+    inline constexpr compiled_pattern_automaton build_nfa_from_tokens(::uwvm2::utils::container::vector<pattern_token> const& tokens) noexcept
     {
-        compiled_pattern_automaton a{};
-        a.nfa.reserve(1uz + tokens.size() * 4uz);
-        a.start = nfa_new_state(a.nfa);
+        compiled_pattern_automaton automaton{};
+
+        auto const token_count{tokens.size()};
+        if(token_count > ::std::numeric_limits<::std::size_t>::max() / 4uz - 1uz) [[unlikely]] { ::fast_io::fast_terminate(); }
+        automaton.nfa.reserve(1uz + token_count * 4uz);
+        automaton.start = nfa_new_state_unchecked(automaton.nfa);
 
         // current endpoints to connect via epsilon
         ::uwvm2::utils::container::vector<::std::size_t> endpoints{};
-        endpoints.reserve(tokens.size() + 1uz);
-        endpoints.emplace_back(a.start);
+        endpoints.reserve(token_count + 1uz);
+        endpoints.emplace_back_unchecked(automaton.start);  // No check is needed here since it is always greater than 1.
 
-        for(auto const& tok: tokens)
+        for(auto const& token: tokens)
         {
-            switch(tok.type)
+            switch(token.type)
             {
                 case pattern_token_type::literal:
                 {
-                    if(tok.data.empty()) { break; }
+                    if(token.data.empty()) { break; }
 
                     // create a chain for literal
-                    ::std::size_t entry{nfa_new_state(a.nfa)};
-                    for(auto const ep: endpoints) { nfa_add_eps(a.nfa, ep, entry); }
+                    ::std::size_t const literal_entry_state{nfa_new_state(automaton.nfa)};
+                    for(auto const endpoint_state: endpoints) { nfa_add_eps(automaton.nfa, endpoint_state, literal_entry_state); }
 
-                    ::std::size_t last{entry};
-                    for(::std::size_t i{}; i < tok.data.size(); ++i)
+                    ::std::size_t last_state{literal_entry_state};
+                    for(auto const literal_char: token.data)
                     {
-                        auto const ch{tok.data.index_unchecked(i)};  // index_unchecked is safe: i < tok.data.size()
-                        auto const next{nfa_new_state(a.nfa)};
-                        nfa_add_edge(a.nfa, last, next, nfa_edge_type::char_eq, ch);
-                        last = next;
+                        auto const next_state{nfa_new_state(automaton.nfa)};
+                        nfa_add_edge(automaton.nfa, last_state, next_state, nfa_edge_type::char_eq, literal_char);
+                        last_state = next_state;
                     }
 
                     endpoints.clear();
-                    endpoints.emplace_back(last);
+                    endpoints.emplace_back_unchecked(last_state);
+
                     break;
                 }
                 case pattern_token_type::question:
                 {
-                    ::std::size_t next{nfa_new_state(a.nfa)};
-                    for(auto const ep: endpoints) { nfa_add_edge(a.nfa, ep, next, nfa_edge_type::any_not_slash); }
+                    ::std::size_t next_state{nfa_new_state(automaton.nfa)};
+                    for(auto const endpoint_state: endpoints) { nfa_add_edge(automaton.nfa, endpoint_state, next_state, nfa_edge_type::any_not_slash); }
+
                     endpoints.clear();
-                    endpoints.emplace_back(next);
+                    endpoints.emplace_back_unchecked(next_state);
+
                     break;
                 }
                 case pattern_token_type::star:
                 {
                     // zero or more of non-slash
-                    ::std::size_t s{nfa_new_state(a.nfa)};
-                    for(auto const ep: endpoints) { nfa_add_eps(a.nfa, ep, s); }
-                    nfa_add_edge(a.nfa, s, s, nfa_edge_type::any_not_slash);
+                    ::std::size_t repeat_non_slash_state{nfa_new_state(automaton.nfa)};
+                    for(auto const endpoint_state: endpoints) { nfa_add_eps(automaton.nfa, endpoint_state, repeat_non_slash_state); }
+                    nfa_add_edge(automaton.nfa, repeat_non_slash_state, repeat_non_slash_state, nfa_edge_type::any_not_slash);
+
                     endpoints.clear();
-                    endpoints.emplace_back(s);
+                    endpoints.emplace_back_unchecked(repeat_non_slash_state);
+
                     break;
                 }
                 case pattern_token_type::double_star:
                 {
                     // zero or more of any char
-                    ::std::size_t s{nfa_new_state(a.nfa)};
-                    for(auto const ep: endpoints) { nfa_add_eps(a.nfa, ep, s); }
-                    nfa_add_edge(a.nfa, s, s, nfa_edge_type::any_char);
+                    ::std::size_t repeat_any_char_state{nfa_new_state(automaton.nfa)};
+                    for(auto const endpoint_state: endpoints) { nfa_add_eps(automaton.nfa, endpoint_state, repeat_any_char_state); }
+                    nfa_add_edge(automaton.nfa, repeat_any_char_state, repeat_any_char_state, nfa_edge_type::any_char);
+
                     endpoints.clear();
-                    endpoints.emplace_back(s);
+                    endpoints.emplace_back_unchecked(repeat_any_char_state);
+
                     break;
                 }
                 case pattern_token_type::alternatives:
                 {
-                    ::std::size_t join{nfa_new_state(a.nfa)};
-                    for(auto const& alt: tok.alternatives)
+                    ::std::size_t alternatives_join_state{nfa_new_state(automaton.nfa)};
+                    for(auto const& alternative: token.alternatives)
                     {
-                        ::std::size_t entry{nfa_new_state(a.nfa)};
-                        for(auto const ep: endpoints) { nfa_add_eps(a.nfa, ep, entry); }
-                        ::std::size_t last{entry};
-                        for(::std::size_t i{}; i < alt.size(); ++i)
+                        ::std::size_t alt_entry_state{nfa_new_state(automaton.nfa)};
+                        for(auto const endpoint_state: endpoints) { nfa_add_eps(automaton.nfa, endpoint_state, alt_entry_state); }
+                        ::std::size_t last_state{alt_entry_state};
+                        for(auto const alt_char: alternative)
                         {
-                            auto const ch{alt.index_unchecked(i)};  // safe: i < alt.size()
-                            auto const next{nfa_new_state(a.nfa)};
-                            nfa_add_edge(a.nfa, last, next, nfa_edge_type::char_eq, ch);
-                            last = next;
+                            auto const next_state{nfa_new_state(automaton.nfa)};
+                            nfa_add_edge(automaton.nfa, last_state, next_state, nfa_edge_type::char_eq, alt_char);
+                            last_state = next_state;
                         }
-                        nfa_add_eps(a.nfa, last, join);
+                        nfa_add_eps(automaton.nfa, last_state, alternatives_join_state);
                     }
+
                     endpoints.clear();
-                    endpoints.emplace_back(join);
+                    endpoints.emplace_back_unchecked(alternatives_join_state);
+
                     break;
                 }
-                default: break;
+                [[unlikely]] default:
+                {
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    break;
+                }
             }
         }
 
         // accepting tail
-        ::std::size_t accept{nfa_new_state(a.nfa)};
-        a.nfa.index_unchecked(accept).accepting = true;
-        for(auto const ep: endpoints) { nfa_add_eps(a.nfa, ep, accept); }
+        ::std::size_t const accept_state{nfa_new_state(automaton.nfa)};
+        automaton.nfa.index_unchecked(accept_state).accepting = true;
+        for(auto const endpoint_state: endpoints) { nfa_add_eps(automaton.nfa, endpoint_state, accept_state); }
 
-        return a;
+        return automaton;
     }
 
     /// @brief Expand a set of NFA states by following epsilon transitions (in-place closure).
-    inline void nfa_epsilon_closure(::uwvm2::utils::container::vector<nfa_state> const& nfa, ::uwvm2::utils::container::vector<::std::size_t>& set) noexcept
+    inline constexpr void nfa_epsilon_closure(::uwvm2::utils::container::vector<nfa_state> const& nfa,
+                                              ::uwvm2::utils::container::vector<::std::size_t>& state_set) noexcept
     {
-        ::uwvm2::utils::container::vector<::std::size_t> stack{};
-        stack.reserve(set.size());
-        for(auto const s: set) { stack.emplace_back(s); }
+        ::uwvm2::utils::container::vector<::std::size_t> dfs_stack{};
+        dfs_stack.reserve(state_set.size());
+        for(auto const state_index: state_set) { dfs_stack.emplace_back_unchecked(state_index); }
 
-        ::uwvm2::utils::container::vector<unsigned char> vis{};
-        vis.resize(nfa.size());
-        for(auto const s: set) { vis.index_unchecked(s) = static_cast<unsigned char>(1); }
+        ::uwvm2::utils::container::vector<bool> visited{};
+        visited.resize(nfa.size());
+        for(auto const state_index: state_set) { visited.index_unchecked(state_index) = true; }
 
-        while(!stack.empty())
+        while(!dfs_stack.empty())
         {
-            auto const s{stack.back()};
-            stack.pop_back();
-            auto const& st{nfa.index_unchecked(s)};
-            for(auto const to: st.eps)
+            auto const state_index{dfs_stack.back_unchecked()};
+            dfs_stack.pop_back_unchecked();
+            auto const& state{nfa.index_unchecked(state_index)};
+            for(auto const to: state.eps)
             {
-                if(!vis.index_unchecked(to))
+                if(!visited.index_unchecked(to))
                 {
-                    vis.index_unchecked(to) = static_cast<unsigned char>(1);
-                    set.emplace_back(to);
-                    stack.emplace_back(to);
+                    visited.index_unchecked(to) = true;
+                    state_set.emplace_back(to);
+                    dfs_stack.emplace_back(to);
                 }
             }
         }
     }
 
     /// @brief Check if a consuming edge can match a given character.
-    inline bool nfa_edge_match(nfa_edge const& e, char8_t ch) noexcept
+    inline constexpr bool nfa_edge_match(nfa_edge const& edge, char8_t input_char) noexcept
     {
-        switch(e.type)
+        switch(edge.type)
         {
-            case nfa_edge_type::char_eq: return e.ch == ch;
-            case nfa_edge_type::any_not_slash: return ch != u8'/';
-            case nfa_edge_type::any_char: return true;
-            default: return false;
+            case nfa_edge_type::char_eq: return edge.ch == input_char;
+            case nfa_edge_type::any_not_slash: return input_char != u8'/';
+            case nfa_edge_type::any_char:
+                return true;
+            [[unlikely]] default:
+                return false;
         }
     }
 
     /// @brief Match a full path string against a compiled NFA.
-    inline bool match_nfa(compiled_pattern_automaton const& a, ::uwvm2::utils::container::u8string_view path) noexcept
+    inline constexpr bool match_nfa(compiled_pattern_automaton const& automaton, ::uwvm2::utils::container::u8string_view path) noexcept
     {
-        ::uwvm2::utils::container::vector<::std::size_t> curr{};
-        curr.emplace_back(a.start);
-        nfa_epsilon_closure(a.nfa, curr);
+        ::uwvm2::utils::container::vector<::std::size_t> current_state_set{};
+        current_state_set.reserve(1uz);
+        current_state_set.emplace_back_unchecked(automaton.start);  // No check is needed here since it is always greater than 1.
 
-        for(::std::size_t i{}; i < path.size(); ++i)
+        nfa_epsilon_closure(automaton.nfa, current_state_set);
+
+        for(auto const input_char: path)
         {
-            auto const ch{path.index_unchecked(i)};
-            ::uwvm2::utils::container::vector<::std::size_t> next{};
-            next.reserve(curr.size() + 4uz);
+            ::uwvm2::utils::container::vector<::std::size_t> next_state_set{};
+            next_state_set.reserve(current_state_set.size() + 4uz);
 
-            ::uwvm2::utils::container::vector<unsigned char> vis{};
-            vis.resize(a.nfa.size());
+            ::uwvm2::utils::container::vector<bool> visited{};
+            visited.resize(automaton.nfa.size());
 
-            for(auto const s: curr)
+            for(auto const state_index: current_state_set)
             {
-                auto const& st{a.nfa.index_unchecked(s)};
-                for(auto const& e: st.edges)
+                auto const& state{automaton.nfa.index_unchecked(state_index)};
+                for(auto const& edge: state.edges)
                 {
-                    if(nfa_edge_match(e, ch))
+                    if(nfa_edge_match(edge, input_char))
                     {
-                        if(!vis.index_unchecked(e.to))
+                        if(!visited.index_unchecked(edge.to))
                         {
-                            vis.index_unchecked(e.to) = static_cast<unsigned char>(1);
-                            next.emplace_back(e.to);
+                            visited.index_unchecked(edge.to) = true;
+                            next_state_set.emplace_back(edge.to);
                         }
                     }
                 }
             }
 
-            if(next.empty()) { return false; }
-            nfa_epsilon_closure(a.nfa, next);
-            curr.swap(next);
+            if(next_state_set.empty()) { return false; }
+            nfa_epsilon_closure(automaton.nfa, next_state_set);
+            current_state_set.swap(next_state_set);
         }
 
-        for(auto const s: curr)
+        for(auto const state_index: current_state_set)
         {
-            if(a.nfa.index_unchecked(s).accepting) { return true; }
+            if(automaton.nfa.index_unchecked(state_index).accepting) { return true; }
         }
+
         return false;
     }
 
     // Parse pattern into tokens
     /// @brief Tokenize a glob pattern; validates syntax and produces a token sequence.
-    inline pattern_token_error_and_vector_pattern_tokens parse_pattern(::uwvm2::utils::container::u8string_view pattern) noexcept
+    inline constexpr pattern_token_error_and_vector_pattern_tokens parse_pattern(::uwvm2::utils::container::u8string_view pattern) noexcept
     {
         ::uwvm2::utils::container::vector<pattern_token> tokens{};
 
@@ -326,7 +370,7 @@ namespace uwvm2::uwvm::cmdline::params::details
         // Upper bound: token count cannot exceed pattern length
         tokens.reserve(pattern_size);
 
-        ::std::size_t i{};
+        ::std::size_t pattern_index{};
         ::uwvm2::utils::container::u8string current_literal{};
         // Upper bound: a literal cannot exceed pattern length
         current_literal.reserve(pattern_size);
@@ -341,105 +385,107 @@ namespace uwvm2::uwvm::cmdline::params::details
                                }
                            }};
 
-        while(i < pattern.size())
+        while(pattern_index < pattern.size())
         {
-            char8_t const ch{pattern.index_unchecked(i)};  // safe: i < pattern.size()
+            char8_t const current_char{pattern.index_unchecked(pattern_index)};  // safe: pattern_index < pattern.size()
 
             // Handle escape sequences
-            if(ch == u8'\\' && i + 1uz < pattern.size())
+            if(current_char == u8'\\' && pattern_index + 1uz < pattern.size())
             {
-                char8_t const next{pattern.index_unchecked(i + 1uz)};  // safe: i+1 < pattern.size()
-                current_literal.push_back(next);
-                i += 2uz;
+                char8_t const escaped_char{pattern.index_unchecked(pattern_index + 1uz)};  // safe: pattern_index+1 < pattern.size()
+                current_literal.push_back(escaped_char);
+                pattern_index += 2uz;
                 continue;
             }
 
             // Handle **
-            if(ch == u8'*' && i + 1uz < pattern.size() && pattern.index_unchecked(i + 1uz) == u8'*')
+            if(current_char == u8'*' && pattern_index + 1uz < pattern.size() && pattern.index_unchecked(pattern_index + 1uz) == u8'*')
             {
                 // Check if ** is properly surrounded by / or at boundaries
                 bool valid_double_star{};
-                if(i == 0uz || pattern.index_unchecked(i - 1uz) == u8'/')
+                if(pattern_index == 0uz || pattern.index_unchecked(pattern_index - 1uz) == u8'/')
                 {
-                    if(i + 2uz >= pattern.size() || pattern.index_unchecked(i + 2uz) == u8'/') { valid_double_star = true; }
+                    if(pattern_index + 2uz >= pattern.size() || pattern.index_unchecked(pattern_index + 2uz) == u8'/') { valid_double_star = true; }
                 }
 
                 if(valid_double_star)
                 {
                     flush_literal();
                     tokens.emplace_back(pattern_token{.type = pattern_token_type::double_star});
-                    i += 2uz;
+                    pattern_index += 2uz;
                     continue;
                 }
                 else [[unlikely]]
                 {
                     return {
-                        pattern_match_error{.has_error = true, .error_pos = i, .error_message = u8"** must be surrounded by / or at path boundaries"},
+                        pattern_match_error{.has_error = true,
+                                            .error_pos = pattern_index,
+                                            .error_message = u8"** must be surrounded by / or at path boundaries"},
                         ::std::move(tokens)
                     };
                 }
             }
 
             // Handle *
-            if(ch == u8'*')
+            if(current_char == u8'*')
             {
                 flush_literal();
                 tokens.emplace_back(pattern_token{.type = pattern_token_type::star});
-                ++i;
+                ++pattern_index;
                 continue;
             }
 
             // Handle ?
-            if(ch == u8'?')
+            if(current_char == u8'?')
             {
                 flush_literal();
                 tokens.emplace_back(pattern_token{.type = pattern_token_type::question});
-                ++i;
+                ++pattern_index;
                 continue;
             }
 
             // Handle {alternatives}
-            if(ch == u8'{')
+            if(current_char == u8'{')
             {
                 flush_literal();
 
-                ::std::size_t const brace_start{i};
+                ::std::size_t const brace_start{pattern_index};
                 ::std::size_t brace_depth{1uz};
-                ::std::size_t j{i + 1uz};
+                ::std::size_t cursor{pattern_index + 1uz};
 
                 // First pass: find matching '}', count top-level commas
                 ::std::size_t top_level_commas{};
-                while(j < pattern.size() && brace_depth != 0uz)
+                while(cursor < pattern.size() && brace_depth != 0uz)
                 {
-                    char8_t const ch2{pattern.index_unchecked(j)};  // safe: j < pattern.size()
+                    char8_t const next_char{pattern.index_unchecked(cursor)};  // safe: cursor < pattern.size()
 
-                    if(ch2 == u8'\\' && j + 1uz < pattern.size())
+                    if(next_char == u8'\\' && cursor + 1uz < pattern.size())
                     {
-                        j += 2uz;
+                        cursor += 2uz;
                         continue;
                     }
 
-                    if(ch2 == u8'{')
+                    if(next_char == u8'{')
                     {
                         ++brace_depth;
-                        ++j;
+                        ++cursor;
                         continue;
                     }
-                    else if(ch2 == u8'}')
+                    else if(next_char == u8'}')
                     {
                         --brace_depth;
                         if(brace_depth == 0uz) { break; }
-                        ++j;
+                        ++cursor;
                         continue;
                     }
-                    else if(ch2 == u8',' && brace_depth == 1uz)
+                    else if(next_char == u8',' && brace_depth == 1uz)
                     {
                         ++top_level_commas;
-                        ++j;
+                        ++cursor;
                         continue;
                     }
 
-                    ++j;
+                    ++cursor;
                 }
 
                 if(brace_depth != 0uz) [[unlikely]]
@@ -450,8 +496,8 @@ namespace uwvm2::uwvm::cmdline::params::details
                     };
                 }
 
-                ::std::size_t const content_begin{i + 1uz};
-                ::std::size_t const content_end{j};  // index of '}'
+                ::std::size_t const content_begin{pattern_index + 1uz};
+                ::std::size_t const content_end{cursor};  // index of '}'
                 ::std::size_t const alt_count{top_level_commas + 1uz};
 
                 if(content_end == content_begin) [[unlikely]]
@@ -465,62 +511,62 @@ namespace uwvm2::uwvm::cmdline::params::details
                 ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string> alternatives{};
                 alternatives.reserve(alt_count);
 
-                ::uwvm2::utils::container::u8string current_alt{};
+                ::uwvm2::utils::container::u8string current_alternative{};
                 // Upper bound for a single alternative length: content span length
-                current_alt.reserve(content_end - content_begin);
+                current_alternative.reserve(content_end - content_begin);
 
                 // Second pass: build alternatives with capacity guarantees
-                ::std::size_t k{content_begin};
+                ::std::size_t content_cursor{content_begin};
                 ::std::size_t inner_depth{1uz};
-                while(k < content_end)
+                while(content_cursor < content_end)
                 {
-                    char8_t const ch2{pattern.index_unchecked(k)};  // safe: k < content_end <= pattern.size()
+                    char8_t const inner_char{pattern.index_unchecked(content_cursor)};  // safe: content_cursor < content_end <= pattern.size()
 
-                    if(ch2 == u8'\\' && k + 1uz < content_end)
+                    if(inner_char == u8'\\' && content_cursor + 1uz < content_end)
                     {
-                        current_alt.push_back(pattern.index_unchecked(k + 1uz));
-                        k += 2uz;
+                        current_alternative.push_back(pattern.index_unchecked(content_cursor + 1uz));
+                        content_cursor += 2uz;
                         continue;
                     }
 
-                    if(ch2 == u8'{')
+                    if(inner_char == u8'{')
                     {
                         ++inner_depth;
-                        current_alt.push_back(ch2);
-                        ++k;
+                        current_alternative.push_back(inner_char);
+                        ++content_cursor;
                         continue;
                     }
-                    else if(ch2 == u8'}')
+                    else if(inner_char == u8'}')
                     {
                         --inner_depth;
-                        if(inner_depth >= 1uz) { current_alt.push_back(ch2); }
-                        ++k;
+                        if(inner_depth >= 1uz) { current_alternative.push_back(inner_char); }
+                        ++content_cursor;
                         continue;
                     }
-                    else if(ch2 == u8',' && inner_depth == 1uz)
+                    else if(inner_char == u8',' && inner_depth == 1uz)
                     {
-                        alternatives.emplace_back(::std::move(current_alt));
-                        current_alt = {};
-                        current_alt.reserve(content_end - content_begin);
-                        ++k;
+                        alternatives.emplace_back(::std::move(current_alternative));
+                        current_alternative = {};
+                        current_alternative.reserve(content_end - content_begin);
+                        ++content_cursor;
                         continue;
                     }
 
-                    current_alt.push_back(ch2);
-                    ++k;
+                    current_alternative.push_back(inner_char);
+                    ++content_cursor;
                 }
 
-                alternatives.emplace_back(::std::move(current_alt));
+                alternatives.emplace_back(::std::move(current_alternative));
 
-                pattern_token tok{.type = pattern_token_type::alternatives, .alternatives = ::std::move(alternatives)};
-                tokens.emplace_back(::std::move(tok));
-                i = content_end + 1uz;
+                pattern_token alternatives_token{.type = pattern_token_type::alternatives, .alternatives = ::std::move(alternatives)};
+                tokens.emplace_back(::std::move(alternatives_token));
+                pattern_index = content_end + 1uz;
                 continue;
             }
 
             // Regular character
-            current_literal.push_back(ch);
-            ++i;
+            current_literal.push_back(current_char);
+            ++pattern_index;
         }
 
         flush_literal();
@@ -546,17 +592,18 @@ namespace uwvm2::uwvm::cmdline::params::details
     };
 
     /// @brief Convenience wrapper to match a path over a compiled pattern automaton.
-    inline bool match_compiled_pattern(::uwvm2::utils::container::u8string_view path, compiled_pattern_automaton const& a) noexcept
+    inline constexpr bool match_compiled_pattern(::uwvm2::utils::container::u8string_view path, compiled_pattern_automaton const& automaton) noexcept
     {
-        return match_nfa(a, path);
+        return match_nfa(automaton, path);
     }
 
     /// @brief Match a path against any of the compiled automata in the list.
-    inline bool match_any(::uwvm2::utils::container::u8string_view path, ::uwvm2::utils::container::vector<compiled_pattern_automaton> const& automata) noexcept
+    inline constexpr bool match_any(::uwvm2::utils::container::u8string_view path,
+                                    ::uwvm2::utils::container::vector<compiled_pattern_automaton> const& automata) noexcept
     {
-        for(auto const& a: automata)
+        for(auto const& automaton: automata)
         {
-            if(match_compiled_pattern(path, a)) { return true; }
+            if(match_compiled_pattern(path, automaton)) { return true; }
         }
         return false;
     }
@@ -570,11 +617,11 @@ namespace uwvm2::uwvm::cmdline::params::details
     };
 
     /// @brief Evaluate access policy for a relative path under a mount root, applying precedence rules.
-    inline access_policy evaluate_path_access(mount_root_entry const& entry,
-                                              ::uwvm2::utils::container::u8string_view relative_path,
-                                              bool is_symlink,
-                                              bool is_wasi_created,
-                                              bool is_symlink_creation) noexcept
+    inline constexpr access_policy evaluate_path_access(mount_root_entry const& entry,
+                                                        ::uwvm2::utils::container::u8string_view relative_path,
+                                                        bool is_symlink,
+                                                        bool is_wasi_created,
+                                                        bool is_symlink_creation) noexcept
     {
         // A) symlink-escape-nonwasi: highest priority
         if(is_symlink)
@@ -600,12 +647,12 @@ namespace uwvm2::uwvm::cmdline::params::details
     }
 
     /// @brief Check whether a path-open request is allowed under mount rules.
-    inline bool wasi_rule_allow_open(mount_root_entry const& entry,
-                                     ::uwvm2::utils::container::u8string_view relative_path,
-                                     bool is_symlink,
-                                     bool is_wasi_created,
-                                     bool is_symlink_creation,
-                                     access_policy* out_policy = nullptr) noexcept
+    inline constexpr bool wasi_rule_allow_open(mount_root_entry const& entry,
+                                               ::uwvm2::utils::container::u8string_view relative_path,
+                                               bool is_symlink,
+                                               bool is_wasi_created,
+                                               bool is_symlink_creation,
+                                               access_policy* out_policy = nullptr) noexcept
     {
         auto const pol{evaluate_path_access(entry, relative_path, is_symlink, is_wasi_created, is_symlink_creation)};
         if(out_policy) { *out_policy = pol; }
@@ -613,33 +660,33 @@ namespace uwvm2::uwvm::cmdline::params::details
     }
 
     /// @brief Filter a single directory layer's child entries according to mount rules.
-    inline void wasi_filter_directory_entries(mount_root_entry const& entry,
-                                              ::uwvm2::utils::container::u8string_view relative_dir,
-                                              ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> const& child_names,
-                                              ::uwvm2::utils::container::vector<unsigned char> const& child_is_symlink,
-                                              ::uwvm2::utils::container::vector<unsigned char>& out_allowed) noexcept
+    inline constexpr void wasi_filter_directory_entries(mount_root_entry const& entry,
+                                                        ::uwvm2::utils::container::u8string_view relative_dir,
+                                                        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> const& child_names,
+                                                        ::uwvm2::utils::container::vector<unsigned char> const& child_is_symlink,
+                                                        ::uwvm2::utils::container::vector<unsigned char>& out_allowed) noexcept
     {
         out_allowed.clear();
         out_allowed.reserve(child_names.size());
 
         bool const dir_has_trailing_slash{!relative_dir.empty() && relative_dir.back_unchecked() == u8'/'};  // back_unchecked safe: checked empty
-        for(::std::size_t i{}; i < child_names.size(); ++i)
+        for(::std::size_t child_index{}; child_index < child_names.size(); ++child_index)
         {
-            auto const name{child_names.index_unchecked(i)};  // index_unchecked safe: i < child_names.size()
+            auto const child_name{child_names.index_unchecked(child_index)};  // index_unchecked safe: child_index < child_names.size()
 
             // Build relative path: relative_dir + ['/' if needed] + name
-            ::uwvm2::utils::container::u8string rel_path{};
-            rel_path.reserve(relative_dir.size() + (dir_has_trailing_slash ? 0uz : 1uz) + name.size());
+            ::uwvm2::utils::container::u8string relative_path{};
+            relative_path.reserve(relative_dir.size() + (dir_has_trailing_slash ? 0uz : 1uz) + child_name.size());
             if(!relative_dir.empty())
             {
-                rel_path.append(relative_dir);
-                if(!dir_has_trailing_slash) { rel_path.push_back(u8'/'); }
+                relative_path.append(relative_dir);
+                if(!dir_has_trailing_slash) { relative_path.push_back(u8'/'); }
             }
-            rel_path.append(name);
+            relative_path.append(child_name);
 
             auto const allow{wasi_rule_allow_open(entry,
-                                                  ::uwvm2::utils::container::u8string_view{rel_path.data(), rel_path.size()},
-                                                  (i < child_is_symlink.size() && child_is_symlink.index_unchecked(i)) ? true : false,
+                                                  ::uwvm2::utils::container::u8string_view{relative_path.data(), relative_path.size()},
+                                                  (child_index < child_is_symlink.size() && child_is_symlink.index_unchecked(child_index)) ? true : false,
                                                   false,
                                                   false)};
             out_allowed.emplace_back(static_cast<unsigned char>(allow ? 1 : 0));
@@ -647,7 +694,7 @@ namespace uwvm2::uwvm::cmdline::params::details
     }
 
     // Global storage for mount roots (temporary, should be integrated with WASI implementation)
-    inline ::uwvm2::utils::container::vector<mount_root_entry> mount_roots{};
+    inline ::uwvm2::utils::container::vector<mount_root_entry> mount_roots{};  // [global]
 
     UWVM_GNU_COLD extern void wasi_mount_root_pretreatment(char8_t const* const*& argv_curr,
                                                            char8_t const* const* argv_end,
@@ -659,44 +706,44 @@ namespace uwvm2::uwvm::cmdline::params::details
         // Pre-scan to reserve exact additional capacity for pr before using *_unchecked
         {
             ::std::size_t entries_to_add{};  // not include parameter itself
-            auto scanp{argv_curr + 1u};
-            if(scanp != argv_end)
+            auto scan_ptr{argv_curr + 1u};
+            if(scan_ptr != argv_end)
             {
-                ::uwvm2::utils::container::u8cstring_view v{::fast_io::mnp::os_c_str(*scanp)};
-                if(!v.empty() && v.front_unchecked() != u8'-')
+                ::uwvm2::utils::container::u8cstring_view first_arg_view{::fast_io::mnp::os_c_str(*scan_ptr)};
+                if(!first_arg_view.empty() && first_arg_view.front_unchecked() != u8'-')
                 {
                     ++entries_to_add;  // root dir
-                    ++scanp;
+                    ++scan_ptr;
 
                     bool stop_scanning{};
-                    while(scanp != argv_end && !stop_scanning)
+                    while(scan_ptr != argv_end && !stop_scanning)
                     {
-                        ::uwvm2::utils::container::u8cstring_view v2{::fast_io::mnp::os_c_str(*scanp)};
+                        ::uwvm2::utils::container::u8cstring_view token_view{::fast_io::mnp::os_c_str(*scan_ptr)};
 
-                        if(v2.empty()) [[unlikely]]
+                        if(token_view.empty()) [[unlikely]]
                         {
-                            ++scanp;
+                            ++scan_ptr;
                             continue;
                         }
 
-                        if(v2 == u8"-add" || v2 == u8"-rm" || v2 == u8"--symlink-escape-nonwasi")
+                        if(token_view == u8"-add" || token_view == u8"-rm" || token_view == u8"--symlink-escape-nonwasi")
                         {
                             ++entries_to_add;  // the option itself
-                            ++scanp;
+                            ++scan_ptr;
 
-                            while(scanp != argv_end)
+                            while(scan_ptr != argv_end)
                             {
-                                ::uwvm2::utils::container::u8cstring_view v3{::fast_io::mnp::os_c_str(*scanp)};
+                                ::uwvm2::utils::container::u8cstring_view pattern_view{::fast_io::mnp::os_c_str(*scan_ptr)};
 
-                                if(v3.empty()) [[unlikely]]
+                                if(pattern_view.empty()) [[unlikely]]
                                 {
-                                    ++scanp;
+                                    ++scan_ptr;
                                     continue;
                                 }
 
-                                if(v3.front_unchecked() == u8'-')
+                                if(pattern_view.front_unchecked() == u8'-')
                                 {
-                                    if(v3 == u8"-add" || v3 == u8"-rm" || v3 == u8"--symlink-escape-nonwasi") { break; }
+                                    if(pattern_view == u8"-add" || pattern_view == u8"-rm" || pattern_view == u8"--symlink-escape-nonwasi") { break; }
                                     else
                                     {
                                         stop_scanning = true;
@@ -705,19 +752,19 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 }
 
                                 ++entries_to_add;  // a pattern
-                                ++scanp;
+                                ++scan_ptr;
                             }
 
                             continue;
                         }
-                        else if(v2.front_unchecked() == u8'-')
+                        else if(token_view.front_unchecked() == u8'-')
                         {
                             break;  // another parameter reached
                         }
                         else
                         {
                             ++entries_to_add;  // unexpected non-option argument after patterns
-                            ++scanp;
+                            ++scan_ptr;
                         }
                     }
                 }
@@ -808,10 +855,10 @@ namespace uwvm2::uwvm::cmdline::params::details
                                  ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
                                  ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
-        auto currp1{para_curr + 1};
+        auto param_cursor{para_curr + 1};
 
         // Check for root directory argument
-        if(currp1 == para_end || currp1->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
+        if(param_cursor == para_end || param_cursor->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
@@ -827,9 +874,9 @@ namespace uwvm2::uwvm::cmdline::params::details
         }
 
         mount_root_entry entry{};
-        entry.root_dir = ::fast_io::u8string_view{currp1->str};
-        currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
-        ++currp1;
+        entry.root_dir = ::fast_io::u8string_view{param_cursor->str};
+        param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
+        ++param_cursor;
 
         // Process -add, -rm and --symlink-escape-nonwasi options
         enum class mode_type : unsigned
@@ -848,14 +895,14 @@ namespace uwvm2::uwvm::cmdline::params::details
         ::std::size_t symlink_escape_count{};
 
         {
-            auto scanp{currp1};
+            auto scan_ptr{param_cursor};
             mode_type scan_mode{mode_type::none};
             bool expecting_pattern{false};
 
-            while(scanp != para_end && scanp->type == ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg)
+            while(scan_ptr != para_end && scan_ptr->type == ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg)
             {
-                auto const s{scanp->str};
-                if(s == u8"-add")
+                auto const token_str{scan_ptr->str};
+                if(token_str == u8"-add")
                 {
                     if(expecting_pattern) [[unlikely]]
                     {
@@ -882,10 +929,10 @@ namespace uwvm2::uwvm::cmdline::params::details
 
                     scan_mode = mode_type::add_mode;
                     expecting_pattern = true;
-                    ++scanp;
+                    ++scan_ptr;
                     continue;
                 }
-                if(s == u8"-rm")
+                if(token_str == u8"-rm")
                 {
                     if(expecting_pattern) [[unlikely]]
                     {
@@ -912,10 +959,10 @@ namespace uwvm2::uwvm::cmdline::params::details
 
                     scan_mode = mode_type::rm_mode;
                     expecting_pattern = true;
-                    ++scanp;
+                    ++scan_ptr;
                     continue;
                 }
-                if(s == u8"--symlink-escape-nonwasi")
+                if(token_str == u8"--symlink-escape-nonwasi")
                 {
                     if(expecting_pattern) [[unlikely]]
                     {
@@ -942,7 +989,7 @@ namespace uwvm2::uwvm::cmdline::params::details
 
                     scan_mode = mode_type::symlink_escape_mode;
                     expecting_pattern = true;
-                    ++scanp;
+                    ++scan_ptr;
                     continue;
                 }
 
@@ -971,14 +1018,14 @@ namespace uwvm2::uwvm::cmdline::params::details
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"Pattern \"",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                        s,
+                                        token_str,
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"\" must follow -add or -rm or --symlink-escape-nonwasi\n\n",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                     return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
                 }
 
-                ++scanp;
+                ++scan_ptr;
             }
 
             // Check if we ended with expecting_pattern (empty list)
@@ -1013,36 +1060,36 @@ namespace uwvm2::uwvm::cmdline::params::details
         if(rm_count) { entry.rm_automata.reserve(rm_count); }
         if(symlink_escape_count) { entry.symlink_escape_automata.reserve(symlink_escape_count); }
 
-        while(currp1 != para_end && currp1->type == ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg)
+        while(param_cursor != para_end && param_cursor->type == ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg)
         {
-            auto const arg_str{currp1->str};
+            auto const arg_str{param_cursor->str};
 
             if(arg_str == u8"-add")
             {
                 current_mode = mode_type::add_mode;
-                currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
-                ++currp1;
+                param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
+                ++param_cursor;
                 continue;
             }
             else if(arg_str == u8"-rm")
             {
                 current_mode = mode_type::rm_mode;
-                currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
-                ++currp1;
+                param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
+                ++param_cursor;
                 continue;
             }
             else if(arg_str == u8"--symlink-escape-nonwasi")
             {
                 current_mode = mode_type::symlink_escape_mode;
-                currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
-                ++currp1;
+                param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
+                ++param_cursor;
                 continue;
             }
 
             // Compile pattern tokens and build NFA (validate at the same time)
-            auto const pr{parse_pattern(arg_str)};
-            auto const& err{pr.error};
-            auto const& tokens{pr.tokens};
+            auto const parse_result{parse_pattern(arg_str)};
+            auto const& err{parse_result.error};
+            auto const& tokens{parse_result.tokens};
 
             if(err.has_error) [[unlikely]]
             {
@@ -1129,8 +1176,8 @@ namespace uwvm2::uwvm::cmdline::params::details
             }
             // Note: Pattern validation already done in pre-scan, so this should not happen
 
-            currp1->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
-            ++currp1;
+            param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
+            ++param_cursor;
         }
 
         mount_roots.emplace_back(::std::move(entry));
