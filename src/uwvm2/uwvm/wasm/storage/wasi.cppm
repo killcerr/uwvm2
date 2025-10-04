@@ -24,7 +24,7 @@
 
 module;
 
-export module uwvm2.uwvm.wasm.storage:preloaded_wasm;
+export module uwvm2.uwvm.wasm.storage:wasi;
 
 import fast_io;
 import uwvm2.utils.container;
