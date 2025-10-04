@@ -114,9 +114,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
     {
         ::uwvm2::utils::container::vector<nfa_state> nfa{};
         ::std::size_t start{};
-        ::uwvm2::utils::container::vector<::std::size_t> start_states{};  // epsilon-closure(start)
-        ::uwvm2::utils::container::u8string start_literal_prefix{};        // maximal deterministic literal prefix
-        ::uwvm2::utils::container::vector<::std::size_t> prefix_state_set_after{}; // state set after consuming the prefix
+        ::uwvm2::utils::container::vector<::std::size_t> start_states{};            // epsilon-closure(start)
+        ::uwvm2::utils::container::u8string start_literal_prefix{};                 // maximal deterministic literal prefix
+        ::uwvm2::utils::container::vector<::std::size_t> prefix_state_set_after{};  // state set after consuming the prefix
     };
 
     /// @brief Create a new NFA state and return its index.
@@ -412,8 +412,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         {
             ::uwvm2::utils::container::vector<::std::size_t> curr_set{automaton.start_states};
             ::uwvm2::utils::container::vector<::std::size_t> next_set{};
-            ::uwvm2::utils::container::vector<::std::uint32_t> visit{};
-            ::std::uint32_t gen{};
+            ::uwvm2::utils::container::vector<::std::size_t> visit{};
+            ::std::size_t gen{};
 
             automaton.start_literal_prefix.clear();
             bool can_extend{true};
@@ -424,22 +424,44 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 char8_t common_ch{};
                 for(auto const sidx: curr_set)
                 {
-                    auto const & st{automaton.nfa.index_unchecked(sidx)};
-                    if(st.edges.empty()) { can_extend = false; break; }
+                    auto const& st{automaton.nfa.index_unchecked(sidx)};
+                    if(st.edges.empty())
+                    {
+                        can_extend = false;
+                        break;
+                    }
                     // check all edges char_eq and if they share one same ch
-                    char8_t local_ch{}; bool local_set{false};
-                    for(auto const & e: st.edges)
+                    char8_t local_ch{};
+                    bool local_set{false};
+                    for(auto const& e: st.edges)
                     {
                         if(e.type != nfa_edge_type::char_eq)
                         {
-                            can_extend = false; break;
+                            can_extend = false;
+                            break;
                         }
-                        if(!local_set) { local_ch = e.ch; local_set = true; }
-                        else if(e.ch != local_ch) { can_extend = false; break; }
+                        if(!local_set)
+                        {
+                            local_ch = e.ch;
+                            local_set = true;
+                        }
+                        else if(e.ch != local_ch)
+                        {
+                            can_extend = false;
+                            break;
+                        }
                     }
                     if(!can_extend) { break; }
-                    if(first_state) { common_ch = local_ch; first_state = false; }
-                    else if(local_ch != common_ch) { can_extend = false; break; }
+                    if(first_state)
+                    {
+                        common_ch = local_ch;
+                        first_state = false;
+                    }
+                    else if(local_ch != common_ch)
+                    {
+                        can_extend = false;
+                        break;
+                    }
                 }
 
                 if(!can_extend) { break; }
@@ -450,8 +472,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 ++gen;
                 for(auto const sidx: curr_set)
                 {
-                    auto const & st{automaton.nfa.index_unchecked(sidx)};
-                    for(auto const & e: st.edges)
+                    auto const& st{automaton.nfa.index_unchecked(sidx)};
+                    for(auto const& e: st.edges)
                     {
                         if(e.ch == common_ch)
                         {
@@ -500,12 +522,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         ::std::size_t pos{};
         if(!automaton.start_literal_prefix.empty())
         {
-            auto const & pref{automaton.start_literal_prefix};
+            auto const& pref{automaton.start_literal_prefix};
             if(path.size() < pref.size()) { return false; }
             bool ok{true};
             for(::std::size_t i{}; i < pref.size(); ++i)
             {
-                if(path.index_unchecked(i) != pref.index_unchecked(i)) { ok = false; break; }
+                if(path.index_unchecked(i) != pref.index_unchecked(i))
+                {
+                    ok = false;
+                    break;
+                }
             }
             if(!ok) { return false; }
             current_state_set = automaton.prefix_state_set_after;
@@ -794,15 +820,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         ::uwvm2::utils::container::u8string_view root_dir{};  // Only existence of the root directory is validated
 
         // Raw patterns
+        // The purpose of using `string_view` here is because all data is provided via the command line and persists throughout the program's execution.
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> add_patterns{};             // whitelist
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> rm_patterns{};              // blacklist
         ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> symlink_escape_patterns{};  // parameter patterns
+
+        // wasi create lifecycle whitelist (owns keys, queryable by u8string_view)
+        ::uwvm2::utils::container::unordered_flat_set<::uwvm2::utils::container::u8string,
+                                                      ::uwvm2::utils::container::pred::u8string_view_hash,
+                                                      ::uwvm2::utils::container::pred::u8string_view_equal>
+            created_by_wasi_set{};
 
         // Compiled automata for fast matching at runtime (readdir/path access)
         ::uwvm2::utils::container::vector<compiled_pattern_automaton> add_automata{};
         ::uwvm2::utils::container::vector<compiled_pattern_automaton> rm_automata{};
         ::uwvm2::utils::container::vector<compiled_pattern_automaton> symlink_escape_automata{};
     };
+
+    /// @brief Record a path created by WASI into lifecycle whitelist set.
+    inline constexpr void wasi_mark_created(mount_root_entry & entry, ::uwvm2::utils::container::u8string_view canonical_relative_path) noexcept
+    {
+        entry.created_by_wasi_set.emplace(canonical_relative_path.cbegin(), canonical_relative_path.cend());
+    }
 
     /// @brief Convenience wrapper to match a path over a compiled pattern automaton.
     inline constexpr bool match_compiled_pattern(::uwvm2::utils::container::u8string_view path, compiled_pattern_automaton const& automaton) noexcept
@@ -835,20 +874,34 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                                                         ::uwvm2::utils::container::u8string_view relative_path,
                                                         bool is_symlink,
                                                         bool is_wasi_created,
-                                                        bool is_symlink_creation) noexcept
+                                                        bool is_symlink_creation,
+                                                        ::uwvm2::utils::container::u8string_view symlink_target_canonical_rel = {}) noexcept
     {
         // A) symlink-escape-nonwasi: highest priority
         if(is_symlink)
         {
             if(match_any(relative_path, entry.symlink_escape_automata)) { return access_policy::allow_bypass_root; }
         }
+
         if(is_symlink_creation) [[unlikely]]
         {
             if(match_any(relative_path, entry.symlink_escape_automata)) { return access_policy::deny; }
         }
 
+        // A.1) lifecycle whitelist: if the resolved symlink target (or the path itself when non-symlink) was created by WASI, allow
+        if(!symlink_target_canonical_rel.empty())
+        {
+            // Query lifecycle whitelist via transparent lookup (u8string_view, zero allocation)
+            if(entry.created_by_wasi_set.contains(symlink_target_canonical_rel)) { return access_policy::allow; }
+        }
+        else if(is_wasi_created)
+        {
+            // direct object marked as WASI-created
+            return access_policy::allow;
+        }
+
         // B) WASI whitelist: handled by WASI, but when informed, it should override blacklist
-        if(is_wasi_created) [[unlikely]] { return access_policy::allow; }
+        // (already handled above)
 
         // C) whitelist: if present and matched, allow (non-restrictive otherwise)
         if(!entry.add_automata.empty() && match_any(relative_path, entry.add_automata)) { return access_policy::allow; }
@@ -866,9 +919,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                                                bool is_symlink,
                                                bool is_wasi_created,
                                                bool is_symlink_creation,
-                                               access_policy* out_policy = nullptr) noexcept
+                                               access_policy* out_policy = nullptr,
+                                               ::uwvm2::utils::container::u8string_view symlink_target_canonical_rel = {}) noexcept
     {
-        auto const pol{evaluate_path_access(entry, relative_path, is_symlink, is_wasi_created, is_symlink_creation)};
+        auto const pol{evaluate_path_access(entry, relative_path, is_symlink, is_wasi_created, is_symlink_creation, symlink_target_canonical_rel)};
         if(out_policy) { *out_policy = pol; }
         return pol != access_policy::deny;
     }
@@ -884,7 +938,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         out_allowed.reserve(child_names.size());
 
         bool const dir_has_trailing_slash{!relative_dir.empty() && relative_dir.back_unchecked() == u8'/'};  // back_unchecked safe: checked empty
-        for(::std::size_t child_index{}; child_index < child_names.size(); ++child_index)
+        for(::std::size_t child_index{}; child_index != child_names.size(); ++child_index)
         {
             auto const child_name{child_names.index_unchecked(child_index)};  // index_unchecked safe: child_index < child_names.size()
 
