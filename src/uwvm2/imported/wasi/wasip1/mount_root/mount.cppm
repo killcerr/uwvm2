@@ -33,7 +33,7 @@ module;
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.imported.wasi.wasip1.platform:get_process_env;
+export module uwvm2.imported.wasi.wasip1.mount_root:mount;
 
 import fast_io;
 import uwvm2.uwvm_predefine.io;
@@ -48,5 +48,5 @@ import uwvm2.utils.debug;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "get_process_env.h"
+#include "mount.h"
 
