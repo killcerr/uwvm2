@@ -119,6 +119,42 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         ::uwvm2::utils::container::vector<::std::size_t> prefix_state_set_after{};  // state set after consuming the prefix
     };
 
+    // Integer overflow-safe helpers (terminate on overflow to avoid UB)
+    inline constexpr ::std::size_t checked_add_size(::std::size_t a, ::std::size_t b) noexcept
+    {
+        if(a > ::std::numeric_limits<::std::size_t>::max() - b) [[unlikely]] { ::fast_io::fast_terminate(); }
+
+        return static_cast<::std::size_t>(a + b);
+    }
+
+    inline constexpr ::std::size_t checked_mul_size(::std::size_t a, ::std::size_t b) noexcept
+    {
+        if(a != 0uz && b != 0uz)
+        {
+            if(a > ::std::numeric_limits<::std::size_t>::max() / b) [[unlikely]] { ::fast_io::fast_terminate(); }
+        }
+
+        return static_cast<::std::size_t>(a * b);
+    }
+
+    inline constexpr ::std::size_t checked_add3_size(::std::size_t a, ::std::size_t b, ::std::size_t c) noexcept
+    {
+        return checked_add_size(checked_add_size(a, b), c);
+    }
+
+    // Generation counter bump with wrap protection for mark vectors
+    inline constexpr void bump_generation(::std::size_t& gen, ::uwvm2::utils::container::vector<::std::size_t>& marks) noexcept
+    {
+        ++gen;
+        if(gen == 0uz) [[unlikely]]
+        {
+            // Rare wrap-around: reset all marks to zero and restart at 1
+            for(auto& m: marks) { m = 0uz; }
+
+            gen = 1uz;
+        }
+    }
+
     /// @brief Create a new NFA state and return its index.
     inline constexpr ::std::size_t nfa_new_state(::uwvm2::utils::container::vector<nfa_state> & nfa) noexcept
     {
@@ -170,13 +206,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         compiled_pattern_automaton automaton{};
 
         auto const token_count{tokens.size()};
-        if(token_count > ::std::numeric_limits<::std::size_t>::max() / 4uz - 1uz) [[unlikely]] { ::fast_io::fast_terminate(); }
-        automaton.nfa.reserve(1uz + token_count * 4uz);
+        automaton.nfa.reserve(checked_add_size(1uz, checked_mul_size(token_count, 4uz)));
         automaton.start = nfa_new_state_unchecked(automaton.nfa);
 
         // current endpoints to connect via epsilon
         ::uwvm2::utils::container::vector<::std::size_t> endpoints{};
-        endpoints.reserve(token_count + 1uz);
+        endpoints.reserve(checked_add_size(token_count, 1uz));
         endpoints.emplace_back_unchecked(automaton.start);  // No check is needed here since it is always greater than 1.
 
         bool previous_was_double_star{};
@@ -336,7 +371,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                              {
                                  auto& out{closures.index_unchecked(sidx)};
                                  if(!out.empty()) { return; }
-                                 ++seen_cur;
+                                 bump_generation(seen_cur, seen_gen);
                                  stack.clear();
                                  stack.emplace_back(sidx);
                                  seen_gen.index_unchecked(sidx) = seen_cur;
@@ -388,7 +423,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         {
             ::uwvm2::utils::container::vector<nfa_edge> new_edges{};
             // estimate size
-            new_edges.reserve(st.edges.size() + 4uz);
+            new_edges.reserve(checked_add_size(st.edges.size(), 4uz));
             for(auto const src_in_closure: *closures_curr)
             {
                 auto const& src{automaton.nfa.index_unchecked(src_in_closure)};
@@ -469,7 +504,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 // build next_set (union of destinations for common_ch)
                 next_set.clear();
                 if(visit.size() < automaton.nfa.size()) { visit.resize(automaton.nfa.size()); }
-                ++gen;
+                bump_generation(gen, visit);
                 for(auto const sidx: curr_set)
                 {
                     auto const& st{automaton.nfa.index_unchecked(sidx)};
@@ -550,10 +585,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         for(; pos < path.size(); ++pos)
         {
             next_state_set.clear();
-            next_state_set.reserve(current_state_set.size() + 4uz);
+            next_state_set.reserve(checked_add_size(current_state_set.size(), 4uz));
 
             if(visit_gen.size() < automaton.nfa.size()) { visit_gen.resize(automaton.nfa.size()); }
-            ++gen;
+            bump_generation(gen, visit_gen);
 
             for(auto const state_index: current_state_set)
             {
@@ -737,7 +772,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
 
                 ::std::size_t const content_begin{pattern_index + 1uz};
                 ::std::size_t const content_end{cursor};  // index of '}'
-                ::std::size_t const alt_count{top_level_commas + 1uz};
+                ::std::size_t const alt_count{checked_add_size(top_level_commas, 1uz)};
 
                 if(content_end == content_begin) [[unlikely]]
                 {
@@ -938,18 +973,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         out_allowed.reserve(child_names.size());
 
         bool const dir_has_trailing_slash{!relative_dir.empty() && relative_dir.back_unchecked() == u8'/'};  // back_unchecked safe: checked empty
+        ::uwvm2::utils::container::u8string base_prefix{};
+        if(!relative_dir.empty())
+        {
+            base_prefix.reserve(checked_add_size(relative_dir.size(), static_cast<::std::size_t>(!dir_has_trailing_slash)));
+            base_prefix.append(relative_dir);
+            if(!dir_has_trailing_slash) { base_prefix.push_back_unchecked(u8'/'); }
+        }
+        ::uwvm2::utils::container::u8string relative_path{base_prefix};
+        ::std::size_t const prefix_len{relative_path.size()};
         for(::std::size_t child_index{}; child_index != child_names.size(); ++child_index)
         {
             auto const child_name{child_names.index_unchecked(child_index)};  // index_unchecked safe: child_index < child_names.size()
 
             // Build relative path: relative_dir + ['/' if needed] + name
-            ::uwvm2::utils::container::u8string relative_path{};
-            relative_path.reserve(relative_dir.size() + (dir_has_trailing_slash ? 0uz : 1uz) + child_name.size());
-            if(!relative_dir.empty())
-            {
-                relative_path.append(relative_dir);
-                if(!dir_has_trailing_slash) { relative_path.push_back(u8'/'); }
-            }
+            relative_path.resize(prefix_len);
+            relative_path.reserve(checked_add_size(prefix_len, child_name.size()));
             relative_path.append(child_name);
 
             auto const rel_view{
