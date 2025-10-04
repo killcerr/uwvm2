@@ -114,6 +114,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
     {
         ::uwvm2::utils::container::vector<nfa_state> nfa{};
         ::std::size_t start{};
+        ::uwvm2::utils::container::vector<::std::size_t> start_states{};  // epsilon-closure(start)
     };
 
     /// @brief Create a new NFA state and return its index.
@@ -319,37 +320,97 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         automaton.nfa.index_unchecked(accept_state).accepting = true;
         for(auto const endpoint_state: endpoints) { nfa_add_eps(automaton.nfa, endpoint_state, accept_state); }
 
+        // finalize: precompute epsilon-closures and build epsilon-free transitions
+        // 1) compute closure for each state
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::vector<::std::size_t>> closures{};
+        closures.resize(automaton.nfa.size());
+
+        ::uwvm2::utils::container::vector<::std::size_t> stack{};
+        ::uwvm2::utils::container::vector<::std::size_t> seen_gen{};
+        ::std::size_t seen_cur{};
+        seen_gen.resize(automaton.nfa.size());
+
+        auto compute_closure{[&](::std::size_t sidx) constexpr noexcept
+                             {
+                                 auto& out{closures.index_unchecked(sidx)};
+                                 if(!out.empty()) { return; }
+                                 ++seen_cur;
+                                 stack.clear();
+                                 stack.emplace_back(sidx);
+                                 seen_gen.index_unchecked(sidx) = seen_cur;
+                                 out.clear();
+                                 out.reserve(8uz);
+                                 out.emplace_back(sidx);
+                                 while(!stack.empty())
+                                 {
+                                     auto curr{stack.back_unchecked()};
+                                     stack.pop_back_unchecked();
+                                     auto const& st{automaton.nfa.index_unchecked(curr)};
+                                     for(auto const to: st.eps)
+                                     {
+                                         if(seen_gen.index_unchecked(to) != seen_cur)
+                                         {
+                                             seen_gen.index_unchecked(to) = seen_cur;
+                                             stack.emplace_back(to);
+                                             out.emplace_back(to);
+                                         }
+                                     }
+                                 }
+                             }};
+
+        for(::std::size_t i{}; i != automaton.nfa.size(); ++i) { compute_closure(i); }
+
+        // 2) propagate accepting via closure
+        auto closures_curr{closures.begin()};
+        for(auto& st: automaton.nfa)
+        {
+            if(st.accepting) { continue; }
+            bool acc{};
+
+            for(auto const cst: *closures_curr)
+            {
+                if(automaton.nfa.index_unchecked(cst).accepting)
+                {
+                    acc = true;
+                    break;
+                }
+            }
+            ++closures_curr;
+
+            if(acc) { st.accepting = true; }
+        }
+
+        // 3) build epsilon-free edges: for each state, gather edges of all states in its closure, and push edges to closure(dest)
+        closures_curr = closures.begin();
+        for(auto& st: automaton.nfa)
+        {
+            ::uwvm2::utils::container::vector<nfa_edge> new_edges{};
+            // estimate size
+            new_edges.reserve(st.edges.size() + 4uz);
+            for(auto const src_in_closure: *closures_curr)
+            {
+                auto const& src{automaton.nfa.index_unchecked(src_in_closure)};
+                for(auto const& e: src.edges)
+                {
+                    // expand to closure of e.to
+                    for(auto const to_state: closures.index_unchecked(e.to)) { new_edges.emplace_back(nfa_edge{.type = e.type, .ch = e.ch, .to = to_state}); }
+                }
+            }
+            ++closures_curr;
+
+            st.edges.swap(new_edges);
+            // strip eps to reduce footprint (not used at runtime anymore)
+            st.eps.clear();
+        }
+
+        // 4) compute start_states as closure(start)
+        automaton.start_states = closures.index_unchecked(automaton.start);
+
         return automaton;
     }
 
     /// @brief Expand a set of NFA states by following epsilon transitions (in-place closure).
-    inline constexpr void nfa_epsilon_closure(::uwvm2::utils::container::vector<nfa_state> const& nfa,
-                                              ::uwvm2::utils::container::vector<::std::size_t>& state_set) noexcept
-    {
-        ::uwvm2::utils::container::vector<::std::size_t> dfs_stack{};
-        dfs_stack.reserve(state_set.size());
-        for(auto const state_index: state_set) { dfs_stack.emplace_back_unchecked(state_index); }
-
-        ::uwvm2::utils::container::vector<bool> visited{};
-        visited.resize(nfa.size());
-        for(auto const state_index: state_set) { visited.index_unchecked(state_index) = true; }
-
-        while(!dfs_stack.empty())
-        {
-            auto const state_index{dfs_stack.back_unchecked()};
-            dfs_stack.pop_back_unchecked();
-            auto const& state{nfa.index_unchecked(state_index)};
-            for(auto const to: state.eps)
-            {
-                if(!visited.index_unchecked(to))
-                {
-                    visited.index_unchecked(to) = true;
-                    state_set.emplace_back(to);
-                    dfs_stack.emplace_back(to);
-                }
-            }
-        }
-    }
+    // nfa_epsilon_closure no longer used at runtime after finalize
 
     /// @brief Check if a consuming edge can match a given character.
     inline constexpr bool nfa_edge_match(nfa_edge const& edge, char8_t input_char) noexcept
@@ -369,18 +430,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
     inline constexpr bool match_nfa(compiled_pattern_automaton const& automaton, ::uwvm2::utils::container::u8string_view path) noexcept
     {
         ::uwvm2::utils::container::vector<::std::size_t> current_state_set{};
-        current_state_set.reserve(1uz);
-        current_state_set.emplace_back_unchecked(automaton.start);  // No check is needed here since it is always greater than 1.
+        current_state_set = automaton.start_states;  // already epsilon-closed
 
-        nfa_epsilon_closure(automaton.nfa, current_state_set);
+        ::uwvm2::utils::container::vector<::std::size_t> next_state_set{};
+        ::uwvm2::utils::container::vector<::std::size_t> visit_gen{};
+        ::std::size_t gen{};
 
         for(auto const input_char: path)
         {
-            ::uwvm2::utils::container::vector<::std::size_t> next_state_set{};
+            next_state_set.clear();
             next_state_set.reserve(current_state_set.size() + 4uz);
 
-            ::uwvm2::utils::container::vector<bool> visited{};
-            visited.resize(automaton.nfa.size());
+            if(visit_gen.size() < automaton.nfa.size()) { visit_gen.resize(automaton.nfa.size()); }
+            ++gen;
 
             for(auto const state_index: current_state_set)
             {
@@ -389,9 +451,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 {
                     if(nfa_edge_match(edge, input_char))
                     {
-                        if(!visited.index_unchecked(edge.to))
+                        if(visit_gen.index_unchecked(edge.to) != gen)
                         {
-                            visited.index_unchecked(edge.to) = true;
+                            visit_gen.index_unchecked(edge.to) = gen;
                             next_state_set.emplace_back(edge.to);
                         }
                     }
@@ -399,7 +461,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
             }
 
             if(next_state_set.empty()) { return false; }
-            nfa_epsilon_closure(automaton.nfa, next_state_set);
             current_state_set.swap(next_state_set);
         }
 
@@ -696,13 +757,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         {
             if(match_any(relative_path, entry.symlink_escape_automata)) { return access_policy::allow_bypass_root; }
         }
-        if(is_symlink_creation)
+        if(is_symlink_creation) [[unlikely]]
         {
             if(match_any(relative_path, entry.symlink_escape_automata)) { return access_policy::deny; }
         }
 
         // B) WASI whitelist: handled by WASI, but when informed, it should override blacklist
-        if(is_wasi_created) { return access_policy::allow; }
+        if(is_wasi_created) [[unlikely]] { return access_policy::allow; }
 
         // C) whitelist: if present and matched, allow (non-restrictive otherwise)
         if(!entry.add_automata.empty() && match_any(relative_path, entry.add_automata)) { return access_policy::allow; }
