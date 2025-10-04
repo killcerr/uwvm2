@@ -58,8 +58,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 #endif
     inline constexpr ::uwvm2::utils::cmdline::parameter wasi_mount_root{
         .name{u8"--wasi-mount-root"},
-        .describe{u8"Mount a host directory to WASI filesystem with whitelist/blacklist patterns."},
-        .usage{u8"<dir:str> (-add <pattern>...) (-rm <pattern>...)"},
+        .describe{
+            u8"Mount a host directory to the WASI sandbox. Only the root directory existence is validated at parse time. At runtime, wildcard automata determine access with precedence: symlink-escape-nonwasi (symlink-only, highest), WASI whitelist (runtime-managed, not handled here), whitelist (-add), blacklist (-rm), then normal files. Patterns support *, ?, ** and {a,b}. WASI cannot create symlinks under symlink-escape-nonwasi matched paths but may create regular files there."},
+        .usage{u8"<dir:str> (-add <pattern>...) (-rm <pattern>...) (--symlink-escape-nonwasi <pattern>...)"},
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasi_mount_root_alias), 1uz}},
         .handle{::std::addressof(details::wasi_mount_root_callback)},
         .pretreatment{::std::addressof(details::wasi_mount_root_pretreatment)},
