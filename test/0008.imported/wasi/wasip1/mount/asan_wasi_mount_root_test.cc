@@ -19,6 +19,8 @@
 
 // Bring container aliases (u8string, u8string_view, vector, ...)
 #include <uwvm2/utils/container/impl.h>
+// System-entropy RNG (fast_io white_hole)
+#include <fast_io_hosted/white_hole/white_hole.h>
 
 // Include the implementation under test to access internal helpers
 #include <uwvm2/imported/wasi/wasip1/mount_root/mount.h>
@@ -172,12 +174,17 @@ static void test_dir_filter()
 
 static void fuzz_parse_and_match(std::size_t iterations)
 {
-	std::mt19937_64 rng{123456789ULL};
+	fast_io::basic_white_hole_engine<fast_io::u8native_white_hole> entropy_rng{};
 	auto rand_char = [&]() -> char8_t
 	{
 		static constexpr char8_t pool[] = u8"abcdefghijklmnopqrstuvwxyz/.*?{}\\,";
-		std::uniform_int_distribution<std::size_t> d(0, sizeof(pool) / sizeof(pool[0]) - 2);
-		return pool[d(rng)];
+		std::size_t const idx = static_cast<std::size_t>(entropy_rng()) % (sizeof(pool) / sizeof(pool[0]) - 1);
+		return pool[idx];
+	};
+	auto randint = [&](int lo, int hi) -> int
+	{
+		std::size_t const span = static_cast<std::size_t>(hi - lo + 1);
+		return lo + static_cast<int>(static_cast<std::size_t>(entropy_rng()) % span);
 	};
 
 	for(std::size_t it{}; it < iterations; ++it)
@@ -185,8 +192,7 @@ static void fuzz_parse_and_match(std::size_t iterations)
 		// build a random small pattern and path
 		::uwvm2::utils::container::u8string pat{};
 		::uwvm2::utils::container::u8string pth{};
-		std::uniform_int_distribution<int> lp(1, 12);
-		int n1 = lp(rng), n2 = lp(rng);
+		int n1 = randint(1, 12), n2 = randint(1, 12);
 		for(int i = 0; i < n1; ++i) { pat.push_back(rand_char()); }
 		for(int i = 0; i < n2; ++i) { pth.push_back(rand_char()); }
 
@@ -199,6 +205,166 @@ static void fuzz_parse_and_match(std::size_t iterations)
 	}
 }
 
+// Parse fuzz: random patterns, always attempt build; optionally skip match; focus on crash-only
+static void fuzz_parse_only(std::size_t iterations)
+{
+	fast_io::basic_white_hole_engine<fast_io::u8native_white_hole> entropy_rng{};
+	auto rand_char = [&]() -> char8_t
+	{
+		static constexpr char8_t pool[] = u8"abcdefghijklmnopqrstuvwxyz/.*?{}\\,";
+		std::size_t const idx = static_cast<std::size_t>(entropy_rng()) % (sizeof(pool) / sizeof(pool[0]) - 1);
+		return pool[idx];
+	};
+	auto randsz = [&](std::size_t lo, std::size_t hi) -> std::size_t
+	{
+		std::size_t const span = (hi - lo + 1);
+		return lo + (static_cast<std::size_t>(entropy_rng()) % span);
+	};
+
+	for(std::size_t it{}; it < iterations; ++it)
+	{
+		// Random pattern length [0, 256]
+		C::u8string pat{};
+		pat.reserve(256);
+		std::size_t const n = randsz(0, 256);
+		for(std::size_t i{}; i < n; ++i) { pat.push_back(rand_char()); }
+
+		auto res = parse_pattern(C::u8string_view{pat.data(), pat.size()});
+		// Always attempt to build NFA from returned tokens, regardless of error
+		(void)build_nfa_from_tokens(res.tokens);
+	}
+}
+
+// Access policy fuzz: random entry config and random requests; crash-only
+static void fuzz_access_policy_random(std::size_t iterations)
+{
+	fast_io::basic_white_hole_engine<fast_io::u8native_white_hole> entropy_rng{};
+	auto rand_char = [&]() -> char8_t
+	{
+		static constexpr char8_t pool[] = u8"abcdefghijklmnopqrstuvwxyz/.*?{}\\,";
+		std::size_t const idx = static_cast<std::size_t>(entropy_rng()) % (sizeof(pool) / sizeof(pool[0]) - 1);
+		return pool[idx];
+	};
+	auto randsz = [&](std::size_t lo, std::size_t hi) -> std::size_t
+	{
+		std::size_t const span = (hi - lo + 1);
+		return lo + (static_cast<std::size_t>(entropy_rng()) % span);
+	};
+	auto randbool = [&]() -> bool { return (entropy_rng() & 1u) != 0u; };
+
+	for(std::size_t it{}; it < iterations; ++it)
+	{
+		mount_root_entry entry{};
+
+		// Random lists sizes [0, 6]
+		std::size_t const addn = randsz(0, 6);
+		std::size_t const rmn = randsz(0, 6);
+		std::size_t const escn = randsz(0, 6);
+
+		C::vector<C::u8string> backing{}; // keep storage alive for views
+		backing.reserve(addn + rmn + escn + 8);
+
+		auto gen_pat = [&]() -> C::u8string_view
+		{
+			std::size_t const n = randsz(0, 128);
+			C::u8string s{}; s.reserve(n);
+			for(std::size_t i{}; i < n; ++i) { s.push_back(rand_char()); }
+			backing.emplace_back(::std::move(s));
+			return C::u8string_view{backing.back().data(), backing.back().size()};
+		};
+
+		for(std::size_t i{}; i < addn; ++i)
+		{
+			auto v = gen_pat(); auto res = parse_pattern(v);
+			entry.add_patterns.emplace_back(v);
+			entry.add_automata.emplace_back(build_nfa_from_tokens(res.tokens));
+		}
+		for(std::size_t i{}; i < rmn; ++i)
+		{
+			auto v = gen_pat(); auto res = parse_pattern(v);
+			entry.rm_patterns.emplace_back(v);
+			entry.rm_automata.emplace_back(build_nfa_from_tokens(res.tokens));
+		}
+		for(std::size_t i{}; i < escn; ++i)
+		{
+			auto v = gen_pat(); auto res = parse_pattern(v);
+			entry.symlink_escape_patterns.emplace_back(v);
+			entry.symlink_escape_automata.emplace_back(build_nfa_from_tokens(res.tokens));
+		}
+
+		// Random relative path
+		C::u8string rel{}; std::size_t const rn = randsz(0, 128);
+		rel.reserve(rn);
+		for(std::size_t i{}; i < rn; ++i) { rel.push_back(rand_char()); }
+
+		( void )evaluate_path_access(entry, C::u8string_view{rel.data(), rel.size()}, randbool(), randbool(), randbool());
+		access_policy pol{}; (void)wasi_rule_allow_open(entry, C::u8string_view{rel.data(), rel.size()}, randbool(), randbool(), randbool(), &pol);
+	}
+}
+
+// Directory filter fuzz: random names and symlink flags; assert only sizes; crash-only semantics
+static void fuzz_dir_filter_random(std::size_t iterations)
+{
+	fast_io::basic_white_hole_engine<fast_io::u8native_white_hole> entropy_rng{};
+	auto rand_char = [&]() -> char8_t
+	{
+		static constexpr char8_t pool[] = u8"abcdefghijklmnopqrstuvwxyz/.*?{}\\,";
+		std::size_t const idx = static_cast<std::size_t>(entropy_rng()) % (sizeof(pool) / sizeof(pool[0]) - 1);
+		return pool[idx];
+	};
+	auto randsz = [&](std::size_t lo, std::size_t hi) -> std::size_t
+	{
+		std::size_t const span = (hi - lo + 1);
+		return lo + (static_cast<std::size_t>(entropy_rng()) % span);
+	};
+	auto randbool = [&]() -> bool { return (entropy_rng() & 1u) != 0u; };
+
+	for(std::size_t it{}; it < iterations; ++it)
+	{
+		mount_root_entry entry{};
+		// With some chance add a whitelist so filter does strict include
+		if(randbool())
+		{
+			C::u8string w{}; std::size_t wn = randsz(0, 16); w.reserve(wn);
+			for(std::size_t i{}; i < wn; ++i) { w.push_back(rand_char()); }
+			auto res = parse_pattern(C::u8string_view{w.data(), w.size()});
+			entry.add_patterns.emplace_back(C::u8string_view{w.data(), w.size()});
+			entry.add_automata.emplace_back(build_nfa_from_tokens(res.tokens));
+		}
+
+		// relative_dir
+		C::u8string rel_dir{}; std::size_t const rdn = randsz(0, 32);
+		rel_dir.reserve(rdn);
+		for(std::size_t i{}; i < rdn; ++i) { rel_dir.push_back(rand_char()); }
+
+		// children
+		std::size_t const namesz = randsz(0, 32);
+		C::vector<C::u8string> names_backing{};
+		names_backing.reserve(namesz);
+		C::vector<C::u8string_view> names{};
+		names.reserve(namesz);
+		for(std::size_t i{}; i < namesz; ++i)
+		{
+			std::size_t ln = randsz(0, 32);
+			C::u8string s{}; s.reserve(ln);
+			for(std::size_t j{}; j < ln; ++j) { s.push_back(rand_char()); }
+			names_backing.emplace_back(::std::move(s));
+			names.emplace_back(C::u8string_view{names_backing.back().data(), names_backing.back().size()});
+		}
+
+		C::vector<bool> is_symlink{}; is_symlink.resize(namesz);
+		for(std::size_t i{}; i < namesz; ++i) { is_symlink[i] = randbool(); }
+
+		C::vector<bool> out_allowed{};
+		wasi_filter_directory_entries(entry,
+			C::u8string_view{rel_dir.data(), rel_dir.size()},
+			names,
+			is_symlink,
+			out_allowed);
+		require(out_allowed.size() == names.size(), "out_allowed size mismatch in fuzz_dir_filter_random");
+	}
+}
+
 int main()
 {
 	std::puts("[RUN] wasi_mount_root.default: basic tests");
@@ -207,7 +373,11 @@ int main()
 	test_nfa_match_basic();
 	test_access_policy();
 	test_dir_filter();
-	fuzz_parse_and_match(2000);
+	fuzz_parse_and_match(10000);
+	// memory-safety only fuzzers
+	fuzz_parse_only(20000);
+	fuzz_access_policy_random(10000);
+	fuzz_dir_filter_random(10000);
 
 	std::puts("[OK] all tests passed");
 	return 0;

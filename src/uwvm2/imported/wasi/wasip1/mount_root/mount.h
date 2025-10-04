@@ -176,7 +176,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         endpoints.reserve(token_count + 1uz);
         endpoints.emplace_back_unchecked(automaton.start);  // No check is needed here since it is always greater than 1.
 
-        bool previous_was_double_star{false};
+        bool previous_was_double_star{};
         for(auto const& token: tokens)
         {
             switch(token.type)
