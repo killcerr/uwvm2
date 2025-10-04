@@ -42,7 +42,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
-        inline bool wasi_mount_root_is_exist{}; // [global]
+        inline bool wasi_mount_root_is_exist{};  // [global]
         inline constexpr ::uwvm2::utils::container::u8string_view wasi_mount_root_alias{u8"-Iroot"};
         extern "C++" void wasi_mount_root_pretreatment(char8_t const* const*& argv_curr,
                                                        char8_t const* const* argv_end,

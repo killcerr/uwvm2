@@ -65,7 +65,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
     /// @note      This function only writes sizes; callers must provide valid memory offsets.
     /// @note      On Darwin platforms, `fd_advise` is non-atomic due to platform limitations. In extreme cases, it may only reserve space in the operating
     ///            system without modifying file attributes, rendering the operation invisible. Within the scope of WASM, however, it is atomic.
-    
+
     ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_advise_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,

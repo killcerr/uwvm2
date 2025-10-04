@@ -63,15 +63,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
         constexpr auto wasi_size_t_max{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_t>::max()};
 
-        #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
-            if(env.wasip1_memory == nullptr) [[unlikely]]
-            {
-                // Security issues inherent to virtual machines
-                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
-            }
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+        if(env.wasip1_memory == nullptr) [[unlikely]]
+        {
+            // Security issues inherent to virtual machines
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+        }
 #endif
         auto& memory{*env.wasip1_memory};
-        
+
         auto const trace_wasip1_call{env.trace_wasip1_call};
 
         if(trace_wasip1_call) [[unlikely]]

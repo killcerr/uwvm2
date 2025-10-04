@@ -121,7 +121,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline
             else if(::uwvm2::utils::container::u8cstring_view const argv_str{::fast_io::mnp::os_c_str(*curr_argv)}; argv_str.empty()) [[unlikely]]
             {
                 // No characters, may appear on windows, the first value of this parameter is u8'\0'
-                
+
                 // Next parameter
                 ++curr_argv;
             }

@@ -110,17 +110,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
     struct wasip1_environment
     {
         // wasip1 only support only one memory (memory[0])
-        memory_type* wasip1_memory;
+        memory_type* wasip1_memory{};
         // allow user custom argv, generate argv from system api is not supported
-        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> argv;
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> argv{};
         // allow user custom envs, use current vm envs by default
-        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> envs;
+        ::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> envs{};
 
-        ::uwvm2::imported::wasi::wasip1::fd_manager::wasm_fd_storage_t fd_storage; // [singleton]
+        ::uwvm2::imported::wasi::wasip1::fd_manager::wasm_fd_storage_t fd_storage{};  // [singleton]
 
-        ::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry mount_root;
+        ::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry mount_root{};
 
-        bool trace_wasip1_call;
+        bool trace_wasip1_call{};
     };
 
 }  // namespace uwvm2::imported::wasi::wasip1::environment

@@ -183,7 +183,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
             {
                 case pattern_token_type::literal:
                 {
-                    if(token.data.empty()) { previous_was_double_star = false; break; }
+                    if(token.data.empty())
+                    {
+                        previous_was_double_star = false;
+                        break;
+                    }
 
                     // create a chain for literal
                     ::std::size_t const literal_entry_state{nfa_new_state(automaton.nfa)};
@@ -234,10 +238,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
 
                     endpoints.clear();
                     endpoints.emplace_back_unchecked(last_state);
-                    if(has_optional_pre_trailing_slash)
-                    {
-                        endpoints.emplace_back_unchecked(optional_pre_trailing_slash_state);
-                    }
+                    if(has_optional_pre_trailing_slash) { endpoints.emplace_back_unchecked(optional_pre_trailing_slash_state); }
 
                     previous_was_double_star = false;
                     break;
@@ -751,7 +752,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
             }
             relative_path.append(child_name);
 
-            auto const rel_view{::uwvm2::utils::container::u8string_view{relative_path.data(), relative_path.size()}};
+            auto const rel_view{
+                ::uwvm2::utils::container::u8string_view{relative_path.data(), relative_path.size()}
+            };
 
             bool allowed{};
             if(!entry.add_automata.empty())
@@ -761,19 +764,19 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 if(allowed)
                 {
                     allowed = wasi_rule_allow_open(entry,
-                                                  rel_view,
-                                                  (child_index < child_is_symlink.size() && child_is_symlink.index_unchecked(child_index)),
-                                                  false,
-                                                  false);
+                                                   rel_view,
+                                                   (child_index < child_is_symlink.size() && child_is_symlink.index_unchecked(child_index)),
+                                                   false,
+                                                   false);
                 }
             }
             else
             {
                 allowed = wasi_rule_allow_open(entry,
-                                              rel_view,
-                                              (child_index < child_is_symlink.size() && child_is_symlink.index_unchecked(child_index)),
-                                              false,
-                                              false);
+                                               rel_view,
+                                               (child_index < child_is_symlink.size() && child_is_symlink.index_unchecked(child_index)),
+                                               false,
+                                               false);
             }
 
             out_allowed.emplace_back_unchecked(allowed);

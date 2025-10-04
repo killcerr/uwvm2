@@ -54,4 +54,3 @@ import uwvm2.imported.wasi.wasip1.environment;
 
 #include "environ_sizes_get_wasm64.h"
 
-

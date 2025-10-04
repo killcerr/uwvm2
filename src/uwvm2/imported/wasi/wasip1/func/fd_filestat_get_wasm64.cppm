@@ -18,7 +18,7 @@
  *  \___/    \_/\_/      \_/   |_|  |_| *
  *                                      *
  ****************************************/
- 
+
 module;
 
 // std
@@ -68,5 +68,4 @@ import :posix;
 #endif
 
 #include "fd_filestat_get_wasm64.h"
-
 
