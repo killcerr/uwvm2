@@ -214,7 +214,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         // - ?, *, **: +1
         // - {alts}: 1 (join) + alts_count + sum(len(alt))
         ::std::size_t upper_states{2uz};
-        for(auto const& t : tokens)
+        for(auto const& t: tokens)
         {
             switch(t.type)
             {
@@ -232,12 +232,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 }
                 case pattern_token_type::alternatives:
                 {
-                    ::std::size_t contrib{1uz}; // join node
+                    ::std::size_t contrib{1uz};  // join node
                     contrib = checked_add_size(contrib, t.alternatives.size());
-                    for(auto const& alt : t.alternatives)
-                    {
-                        contrib = checked_add_size(contrib, alt.size());
-                    }
+                    for(auto const& alt: t.alternatives) { contrib = checked_add_size(contrib, alt.size()); }
                     upper_states = checked_add_size(upper_states, contrib);
                     break;
                 }

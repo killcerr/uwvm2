@@ -266,7 +266,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         template <::std::integral chartype>
         struct basic_string_view_hash
         {
-            using is_transparent = void; // enable heterogeneous lookup
+            using is_transparent = void;  // enable heterogeneous lookup
 
             inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string_view<chartype> sv) const noexcept
             {
@@ -276,34 +276,36 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
             inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_cstring_view<chartype> sv) const noexcept
             {
                 return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(
-                    ::uwvm2::utils::container::basic_string_view<chartype>{sv.data(), sv.size()}
-                );
+                    ::uwvm2::utils::container::basic_string_view<chartype>{sv.data(), sv.size()});
             }
 
             inline constexpr ::std::size_t operator() (::uwvm2::utils::container::basic_string<chartype> const& s) const noexcept
             {
                 return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(
-                    ::uwvm2::utils::container::basic_string_view<chartype>{s.data(), s.size()}
-                );
+                    ::uwvm2::utils::container::basic_string_view<chartype>{s.data(), s.size()});
             }
 
             inline constexpr ::std::size_t operator() (chartype const* s) const noexcept
             {
-                return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(::uwvm2::utils::container::basic_string_view<chartype>{::fast_io::mnp::os_c_str(s)});
+                return ::std::hash<::uwvm2::utils::container::basic_string_view<chartype>>{}(
+                    ::uwvm2::utils::container::basic_string_view<chartype>{::fast_io::mnp::os_c_str(s)});
             }
         };
 
         template <::std::integral chartype>
         struct basic_string_view_equal
         {
-            using is_transparent = void; // enable heterogeneous lookup
+            using is_transparent = void;  // enable heterogeneous lookup
 
             template <typename L, typename R>
-            requires requires (L const& lhs, R const& rhs)
-            {
-                { ::uwvm2::utils::container::basic_string_view<chartype>{lhs.data(), lhs.size()} };
-                { ::uwvm2::utils::container::basic_string_view<chartype>{rhs.data(), rhs.size()} };
-            }
+                requires requires(L const& lhs, R const& rhs) {
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { lhs.data(), lhs.size() }
+                    };
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { rhs.data(), rhs.size() }
+                    };
+                }
             inline constexpr bool operator() (L const& lhs, R const& rhs) const noexcept
             {
                 using strvw = ::uwvm2::utils::container::basic_string_view<chartype>;
@@ -314,14 +316,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::container
         template <::std::integral chartype>
         struct basic_string_view_less
         {
-            using is_transparent = void; // enable heterogeneous lookup
+            using is_transparent = void;  // enable heterogeneous lookup
 
             template <typename L, typename R>
-            requires requires (L const& lhs, R const& rhs)
-            {
-                { ::uwvm2::utils::container::basic_string_view<chartype>{lhs.data(), lhs.size()} };
-                { ::uwvm2::utils::container::basic_string_view<chartype>{rhs.data(), rhs.size()} };
-            }
+                requires requires(L const& lhs, R const& rhs) {
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { lhs.data(), lhs.size() }
+                    };
+                    {
+                        ::uwvm2::utils::container::basic_string_view<chartype> { rhs.data(), rhs.size() }
+                    };
+                }
             inline constexpr bool operator() (L const& lhs, R const& rhs) const noexcept
             {
                 using strvw = ::uwvm2::utils::container::basic_string_view<chartype>;
