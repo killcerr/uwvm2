@@ -23,5 +23,4 @@
 
 #ifndef UWVM_MODULE
 # include "mount.h"
-# include "storage.h"
 #endif

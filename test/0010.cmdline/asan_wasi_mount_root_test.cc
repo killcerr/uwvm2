@@ -35,7 +35,7 @@ static void test_parse_valid_invalid()
 	}
 
 	// Invalid patterns should report error
-	for(auto const pat: {u8"a**b", u8"{", u8"}", u8"{}"})
+	for(auto const pat: {u8"a**b", u8"{", u8"}", u8"{}", u8"\\"})
 	{
 		auto res = ::uwvm2::imported::wasi::wasip1::mount_root::parse_pattern(uwvm2::utils::container::u8string_view{::fast_io::mnp::os_c_str(pat)});
 		require(res.error.has_error, "parse_pattern invalid case did not error");
@@ -68,6 +68,9 @@ static void test_nfa_match_basic()
 	// ** (can cross slash)
 	require(matches(uwvm2::utils::container::u8string_view{u8"**/foo"}, uwvm2::utils::container::u8string_view{u8"a/b/foo"}), "** cross failed");
 	require(matches(uwvm2::utils::container::u8string_view{u8"**/foo"}, uwvm2::utils::container::u8string_view{u8"foo"}), "** zero failed");
+	// optional trailing slash behavior
+	require(matches(uwvm2::utils::container::u8string_view{u8"dir/"}, uwvm2::utils::container::u8string_view{u8"dir"}), "dir/ should match dir");
+	require(!matches(uwvm2::utils::container::u8string_view{u8"dir/"}, uwvm2::utils::container::u8string_view{u8"dirx"}), "dir/ should not match dirx");
 
 	// alternatives
 	require(matches(uwvm2::utils::container::u8string_view{u8"{a,b}/x"}, uwvm2::utils::container::u8string_view{u8"a/x"}), "alt a failed");
@@ -124,6 +127,11 @@ static void test_access_policy()
 		auto pol = evaluate_path_access(entry, uwvm2::utils::container::u8string_view{u8"link/abc"}, true, false, false);
 		require(pol == access_policy::allow_bypass_root, "symlink escape allow_bypass_root failed");
 	}
+	// symlink creation hits symlink-escape → deny
+	{
+		auto pol = evaluate_path_access(entry, uwvm2::utils::container::u8string_view{u8"link/abc"}, false, false, true);
+		require(pol == access_policy::deny, "symlink creation should be denied when matching escape");
+	}
 }
 
 static void test_dir_filter()
@@ -147,6 +155,7 @@ static void test_dir_filter()
 	require(out_allowed.size() == 2, "out_allowed size mismatch");
 	require(out_allowed[0] == true, "visible should be allowed");
 	require(out_allowed[1] == false, "hidden should be denied by default (no match) if blacklist later present");
+
 }
 
 static void fuzz_parse_and_match(std::size_t iterations)

@@ -5,8 +5,11 @@
  *************************************************************/
 
 /**
+ * @brief       Imported wasm modules
+ * @details     "--wasm-load-wasm" or "-Wlw"
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-03-28
  * @copyright   APL-2.0 License
  */
 
@@ -19,20 +22,23 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+export module uwvm2.uwvm.wasm.storage:preloaded_wasm;
+
+import fast_io;
+import uwvm2.utils.container;
+import uwvm2.object.memory.linear;
+import uwvm2.imported.wasi;
+import uwvm2.uwvm.wasm.base;
+import uwvm2.uwvm.wasm.feature;
+import uwvm2.uwvm.wasm.type;
 
 #ifndef UWVM_MODULE
-// import
-# include "mount.h"
+# define UWVM_MODULE
 #endif
-
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
-{
-    // Global storage for mount roots (temporary, should be integrated with WASI implementation)
-    inline ::uwvm2::utils::container::vector<::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry> mount_roots{};  // [global]
-}  // namespace uwvm2::imported::wasi::wasip1::mount_root
-
+#include "wasi.h"

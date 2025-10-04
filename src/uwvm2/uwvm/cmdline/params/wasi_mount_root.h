@@ -42,6 +42,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
     namespace details
     {
+        inline bool wasi_mount_root_is_exist{}; // [global]
         inline constexpr ::uwvm2::utils::container::u8string_view wasi_mount_root_alias{u8"-Iroot"};
         extern "C++" void wasi_mount_root_pretreatment(char8_t const* const*& argv_curr,
                                                        char8_t const* const* argv_end,
@@ -49,7 +50,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type wasi_mount_root_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                              ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                              ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
-
     }  // namespace details
 
 #if defined(__clang__)
@@ -64,6 +64,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasi_mount_root_alias), 1uz}},
         .handle{::std::addressof(details::wasi_mount_root_callback)},
         .pretreatment{::std::addressof(details::wasi_mount_root_pretreatment)},
+        .is_exist{::std::addressof(details::wasi_mount_root_is_exist)},
         .cate{::uwvm2::utils::cmdline::categorization::wasi}};
 #if defined(__clang__)
 # pragma clang diagnostic pop

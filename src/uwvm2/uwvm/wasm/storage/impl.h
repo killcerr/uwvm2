@@ -29,4 +29,5 @@
 # include "local_preload.h"
 # include "preloaded_dl.h"
 # include "all_module.h"
+# include "wasi.h"
 #endif

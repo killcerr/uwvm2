@@ -23,7 +23,6 @@ module;
 
 export module uwvm2.imported.wasi.wasip1.mount_root;
 export import :mount;
-export import :storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

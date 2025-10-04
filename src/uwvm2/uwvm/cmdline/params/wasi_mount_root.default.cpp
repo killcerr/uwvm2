@@ -41,6 +41,7 @@
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/cmdline/params/impl.h>
+# include <uwvm2/uwvm/wasm/storage/impl.h>
 #endif
 
 namespace uwvm2::uwvm::cmdline::params::details
@@ -529,7 +530,7 @@ namespace uwvm2::uwvm::cmdline::params::details
             ++param_cursor;
         }
 
-        ::uwvm2::imported::wasi::wasip1::mount_root::mount_roots.emplace_back(::std::move(entry));
+        ::uwvm2::uwvm::wasm::storage::wasip1_env.mount_root = ::std::move(entry);
 
         return ::uwvm2::utils::cmdline::parameter_return_type::def;
     }

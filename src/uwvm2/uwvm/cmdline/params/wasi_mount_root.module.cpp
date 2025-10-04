@@ -30,6 +30,7 @@ import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.cmdline.params;
+import uwvm2.uwvm.wasm.storage;
 
 #include "wasi_mount_root.default.cpp"
 

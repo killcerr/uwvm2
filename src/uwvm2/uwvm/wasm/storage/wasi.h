@@ -5,8 +5,11 @@
  *************************************************************/
 
 /**
+ * @brief       Imported wasm modules
+ * @details     "--wasm-load-wasm" or "-Wlw"
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-03-28
  * @copyright   APL-2.0 License
  */
 
@@ -19,30 +22,25 @@
  *                                      *
  ****************************************/
 
-module;
-// std
-#include <cstddef>
-#include <cstdint>
-#include <limits>
-#include <memory>
-#include <new>
-#include <atomic>
-#include <bit>
-#include <utility>
-// macro
-#include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
-#include <uwvm2/utils/macro/push_macros.h>
-
-export module uwvm2.imported.wasi.wasip1.platform:storage;
-
-import :mount;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+// import
+# include <fast_io.h>
+# include <uwvm2/utils/container/impl.h>
+# include <uwvm2/object/memory/linear/impl.h>
+# include <uwvm2/imported/wasi/impl.h>
+# include <uwvm2/uwvm/wasm/base/impl.h>
+# include <uwvm2/uwvm/wasm/feature/impl.h>
+# include <uwvm2/uwvm/wasm/type/impl.h>
 #endif
+
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
+# define UWVM_MODULE_EXPORT
 #endif
 
-#include "storage.h"
-
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
+{
+    /// @brief     WasiPreview1 environment
+    inline ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> wasip1_env{};  // [global]
+}  // namespace uwvm2::uwvm::wasm::storage

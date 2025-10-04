@@ -39,6 +39,7 @@
 # include <uwvm2/uwvm_predefine/io/impl.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
 # include <uwvm2/utils/container/impl.h>
+# include <uwvm2/utils/debug/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -175,29 +176,70 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         endpoints.reserve(token_count + 1uz);
         endpoints.emplace_back_unchecked(automaton.start);  // No check is needed here since it is always greater than 1.
 
+        bool previous_was_double_star{false};
         for(auto const& token: tokens)
         {
             switch(token.type)
             {
                 case pattern_token_type::literal:
                 {
-                    if(token.data.empty()) { break; }
+                    if(token.data.empty()) { previous_was_double_star = false; break; }
 
                     // create a chain for literal
                     ::std::size_t const literal_entry_state{nfa_new_state(automaton.nfa)};
                     for(auto const endpoint_state: endpoints) { nfa_add_eps(automaton.nfa, endpoint_state, literal_entry_state); }
 
                     ::std::size_t last_state{literal_entry_state};
-                    for(auto const literal_char: token.data)
+                    ::std::size_t optional_pre_trailing_slash_state{};
+                    bool has_optional_pre_trailing_slash{};
+                    if(previous_was_double_star && !token.data.empty() && token.data.front_unchecked() == u8'/')
                     {
-                        auto const next_state{nfa_new_state(automaton.nfa)};
-                        nfa_add_edge(automaton.nfa, last_state, next_state, nfa_edge_type::char_eq, literal_char);
-                        last_state = next_state;
+                        auto const after_slash_state{nfa_new_state(automaton.nfa)};
+                        // consume '/'
+                        nfa_add_edge(automaton.nfa, last_state, after_slash_state, nfa_edge_type::char_eq, u8'/');
+                        // or skip it
+                        nfa_add_eps(automaton.nfa, last_state, after_slash_state);
+                        last_state = after_slash_state;
+
+                        for(::std::size_t idx{1uz}; idx < token.data.size(); ++idx)
+                        {
+                            auto const next_state{nfa_new_state(automaton.nfa)};
+                            nfa_add_edge(automaton.nfa, last_state, next_state, nfa_edge_type::char_eq, token.data.index_unchecked(idx));
+                            last_state = next_state;
+                        }
+                    }
+                    else
+                    {
+                        ::std::size_t pre_trailing_slash_state{};
+                        bool has_trailing_slash{};
+                        for(::std::size_t idx{}; idx < token.data.size(); ++idx)
+                        {
+                            auto const literal_char{token.data.index_unchecked(idx)};
+                            if(idx + 1uz == token.data.size() && literal_char == u8'/')
+                            {
+                                pre_trailing_slash_state = last_state;
+                                has_trailing_slash = true;
+                            }
+                            auto const next_state{nfa_new_state(automaton.nfa)};
+                            nfa_add_edge(automaton.nfa, last_state, next_state, nfa_edge_type::char_eq, literal_char);
+                            last_state = next_state;
+                        }
+                        if(has_trailing_slash)
+                        {
+                            // allow skipping the trailing '/'
+                            optional_pre_trailing_slash_state = pre_trailing_slash_state;
+                            has_optional_pre_trailing_slash = true;
+                        }
                     }
 
                     endpoints.clear();
                     endpoints.emplace_back_unchecked(last_state);
+                    if(has_optional_pre_trailing_slash)
+                    {
+                        endpoints.emplace_back_unchecked(optional_pre_trailing_slash_state);
+                    }
 
+                    previous_was_double_star = false;
                     break;
                 }
                 case pattern_token_type::question:
@@ -208,6 +250,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                     endpoints.clear();
                     endpoints.emplace_back_unchecked(next_state);
 
+                    previous_was_double_star = false;
                     break;
                 }
                 case pattern_token_type::star:
@@ -220,6 +263,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                     endpoints.clear();
                     endpoints.emplace_back_unchecked(repeat_non_slash_state);
 
+                    previous_was_double_star = false;
                     break;
                 }
                 case pattern_token_type::double_star:
@@ -232,6 +276,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                     endpoints.clear();
                     endpoints.emplace_back_unchecked(repeat_any_char_state);
 
+                    previous_was_double_star = true;
                     break;
                 }
                 case pattern_token_type::alternatives:
@@ -254,6 +299,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                     endpoints.clear();
                     endpoints.emplace_back_unchecked(alternatives_join_state);
 
+                    previous_was_double_star = false;
                     break;
                 }
                 [[unlikely]] default:
@@ -261,6 +307,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                     ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
+                    previous_was_double_star = false;
                     break;
                 }
             }
@@ -392,6 +439,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         {
             char8_t const current_char{pattern.index_unchecked(pattern_index)};  // safe: pattern_index < pattern.size()
 
+            // Unmatched '}' at top-level is invalid
+            if(current_char == u8'}')
+            {
+                return {
+                    pattern_match_error{.has_error = true, .error_pos = pattern_index, .error_message = u8"Unmatched '}', missing opening '{'"},
+                    ::std::move(tokens)
+                };
+            }
+
             // Handle escape sequences
             if(current_char == u8'\\' && pattern_index + 1uz < pattern.size())
             {
@@ -399,6 +455,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 current_literal.push_back(escaped_char);
                 pattern_index += 2uz;
                 continue;
+            }
+            if(current_char == u8'\\' && pattern_index + 1uz >= pattern.size())
+            {
+                return {
+                    pattern_match_error{.has_error = true, .error_pos = pattern_index, .error_message = u8"Trailing escape character '\\'"},
+                    ::std::move(tokens)
+                };
             }
 
             // Handle **
@@ -640,7 +703,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         // B) WASI whitelist: handled by WASI, but when informed, it should override blacklist
         if(is_wasi_created) { return access_policy::allow; }
 
-        // C) whitelist
+        // C) whitelist: if present and matched, allow (non-restrictive otherwise)
         if(!entry.add_automata.empty() && match_any(relative_path, entry.add_automata)) { return access_policy::allow; }
 
         // D) blacklist
@@ -688,12 +751,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
             }
             relative_path.append(child_name);
 
-            auto const allow{wasi_rule_allow_open(entry,
-                                                  ::uwvm2::utils::container::u8string_view{relative_path.data(), relative_path.size()},
+            auto const rel_view{::uwvm2::utils::container::u8string_view{relative_path.data(), relative_path.size()}};
+
+            bool allowed{};
+            if(!entry.add_automata.empty())
+            {
+                // Strict whitelist for directory listing: must match add_automata
+                allowed = match_any(rel_view, entry.add_automata);
+                if(allowed)
+                {
+                    allowed = wasi_rule_allow_open(entry,
+                                                  rel_view,
                                                   (child_index < child_is_symlink.size() && child_is_symlink.index_unchecked(child_index)),
                                                   false,
-                                                  false)};
-            out_allowed.emplace_back_unchecked(allow);
+                                                  false);
+                }
+            }
+            else
+            {
+                allowed = wasi_rule_allow_open(entry,
+                                              rel_view,
+                                              (child_index < child_is_symlink.size() && child_is_symlink.index_unchecked(child_index)),
+                                              false,
+                                              false);
+            }
+
+            out_allowed.emplace_back_unchecked(allowed);
         }
     }
 
