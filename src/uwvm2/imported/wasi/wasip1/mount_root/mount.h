@@ -288,21 +288,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                         nfa_add_eps(automaton.nfa, last_state, after_slash_state);
                         last_state = after_slash_state;
 
-                        for(::std::size_t idx{1uz}; idx < token.data.size(); ++idx)
+                        if(token.data.size() > 1uz)
                         {
-                            auto const next_state{nfa_new_state(automaton.nfa)};
-                            nfa_add_edge(automaton.nfa, last_state, next_state, nfa_edge_type::char_eq, token.data.index_unchecked(idx));
-                            last_state = next_state;
+                            auto const* begin_ptr{token.data.cbegin() + 1u};
+                            auto const* end_ptr{token.data.cend()};
+                            for(auto const* curr_ptr{begin_ptr}; curr_ptr != end_ptr; ++curr_ptr)
+                            {
+                                auto const next_state{nfa_new_state(automaton.nfa)};
+                                nfa_add_edge(automaton.nfa, last_state, next_state, nfa_edge_type::char_eq, *curr_ptr);
+                                last_state = next_state;
+                            }
                         }
                     }
                     else
                     {
                         ::std::size_t pre_trailing_slash_state{};
                         bool has_trailing_slash{};
-                        for(::std::size_t idx{}; idx < token.data.size(); ++idx)
+                        auto const* begin_ptr{token.data.cbegin()};
+                        auto const* end_ptr{token.data.cend()};
+                        for(auto const* curr_ptr{begin_ptr}; curr_ptr != end_ptr; ++curr_ptr)
                         {
-                            auto const literal_char{token.data.index_unchecked(idx)};
-                            if(idx + 1uz == token.data.size() && literal_char == u8'/')
+                            auto const literal_char{*curr_ptr};
+                            if(curr_ptr + 1u == end_ptr && literal_char == u8'/')
                             {
                                 pre_trailing_slash_state = last_state;
                                 has_trailing_slash = true;
