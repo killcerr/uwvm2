@@ -206,7 +206,52 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         compiled_pattern_automaton automaton{};
 
         auto const token_count{tokens.size()};
-        automaton.nfa.reserve(checked_add_size(1uz, checked_mul_size(token_count, 4uz)));
+        // Compute a safe upper bound on total NFA states to avoid unchecked push overflow.
+        // Components:
+        // - 1 start state
+        // - 1 accept state
+        // - literal: size + 1
+        // - ?, *, **: +1
+        // - {alts}: 1 (join) + alts_count + sum(len(alt))
+        ::std::size_t upper_states{2uz};
+        for(auto const& t : tokens)
+        {
+            switch(t.type)
+            {
+                case pattern_token_type::literal:
+                {
+                    upper_states = checked_add_size(upper_states, checked_add_size(t.data.size(), 1uz));
+                    break;
+                }
+                case pattern_token_type::question: [[fallthrough]];
+                case pattern_token_type::star: [[fallthrough]];
+                case pattern_token_type::double_star:
+                {
+                    upper_states = checked_add_size(upper_states, 1uz);
+                    break;
+                }
+                case pattern_token_type::alternatives:
+                {
+                    ::std::size_t contrib{1uz}; // join node
+                    contrib = checked_add_size(contrib, t.alternatives.size());
+                    for(auto const& alt : t.alternatives)
+                    {
+                        contrib = checked_add_size(contrib, alt.size());
+                    }
+                    upper_states = checked_add_size(upper_states, contrib);
+                    break;
+                }
+                [[unlikely]] default:
+                {
+                    // no-op
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                    ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+#endif
+                    break;
+                }
+            }
+        }
+        automaton.nfa.reserve(upper_states);
         automaton.start = nfa_new_state_unchecked(automaton.nfa);
 
         // current endpoints to connect via epsilon
