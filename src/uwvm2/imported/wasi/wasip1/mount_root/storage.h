@@ -22,10 +22,17 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "abi/impl.h"
-# include "fd_manager/impl.h"
-# include "memory/impl.h"
-# include "environment/impl.h"
-# include "platform/impl.h"
-# include "mount_root/impl.h"
+// import
+# include "mount.h"
 #endif
+
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
+{
+    // Global storage for mount roots (temporary, should be integrated with WASI implementation)
+    inline ::uwvm2::utils::container::vector<::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry> mount_roots{};  // [global]
+}  // namespace uwvm2::imported::wasi::wasip1::mount_root
+

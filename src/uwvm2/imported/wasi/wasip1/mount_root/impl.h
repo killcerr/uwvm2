@@ -22,10 +22,6 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-# include "abi/impl.h"
-# include "fd_manager/impl.h"
-# include "memory/impl.h"
-# include "environment/impl.h"
-# include "platform/impl.h"
-# include "mount_root/impl.h"
+# include "mount.h"
+# include "storage.h"
 #endif

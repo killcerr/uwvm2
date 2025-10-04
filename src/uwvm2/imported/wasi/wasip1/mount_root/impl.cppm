@@ -19,13 +19,17 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+
+export module uwvm2.imported.wasi.wasip1.mount_root;
+export import :mount;
+export import :storage;
 
 #ifndef UWVM_MODULE
-# include "abi/impl.h"
-# include "fd_manager/impl.h"
-# include "memory/impl.h"
-# include "environment/impl.h"
-# include "platform/impl.h"
-# include "mount_root/impl.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "impl.h"

@@ -19,13 +19,30 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
+// std
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <new>
+#include <atomic>
+#include <bit>
+#include <utility>
+// macro
+#include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
+#include <uwvm2/utils/macro/push_macros.h>
+
+export module uwvm2.imported.wasi.wasip1.platform:storage;
+
+import :mount;
 
 #ifndef UWVM_MODULE
-# include "abi/impl.h"
-# include "fd_manager/impl.h"
-# include "memory/impl.h"
-# include "environment/impl.h"
-# include "platform/impl.h"
-# include "mount_root/impl.h"
+# define UWVM_MODULE
 #endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "storage.h"
+
