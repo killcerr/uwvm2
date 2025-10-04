@@ -115,6 +115,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         ::uwvm2::utils::container::vector<nfa_state> nfa{};
         ::std::size_t start{};
         ::uwvm2::utils::container::vector<::std::size_t> start_states{};  // epsilon-closure(start)
+        ::uwvm2::utils::container::u8string start_literal_prefix{};        // maximal deterministic literal prefix
+        ::uwvm2::utils::container::vector<::std::size_t> prefix_state_set_after{}; // state set after consuming the prefix
     };
 
     /// @brief Create a new NFA state and return its index.
@@ -406,6 +408,70 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         // 4) compute start_states as closure(start)
         automaton.start_states = closures.index_unchecked(automaton.start);
 
+        // 5) compute maximal deterministic literal prefix from start_states
+        {
+            ::uwvm2::utils::container::vector<::std::size_t> curr_set{automaton.start_states};
+            ::uwvm2::utils::container::vector<::std::size_t> next_set{};
+            ::uwvm2::utils::container::vector<::std::uint32_t> visit{};
+            ::std::uint32_t gen{};
+
+            automaton.start_literal_prefix.clear();
+            bool can_extend{true};
+            while(can_extend && !curr_set.empty())
+            {
+                // Find common literal char across all states; allow multiple edges per state if all char_eq and same ch
+                bool first_state{true};
+                char8_t common_ch{};
+                for(auto const sidx: curr_set)
+                {
+                    auto const & st{automaton.nfa.index_unchecked(sidx)};
+                    if(st.edges.empty()) { can_extend = false; break; }
+                    // check all edges char_eq and if they share one same ch
+                    char8_t local_ch{}; bool local_set{false};
+                    for(auto const & e: st.edges)
+                    {
+                        if(e.type != nfa_edge_type::char_eq)
+                        {
+                            can_extend = false; break;
+                        }
+                        if(!local_set) { local_ch = e.ch; local_set = true; }
+                        else if(e.ch != local_ch) { can_extend = false; break; }
+                    }
+                    if(!can_extend) { break; }
+                    if(first_state) { common_ch = local_ch; first_state = false; }
+                    else if(local_ch != common_ch) { can_extend = false; break; }
+                }
+
+                if(!can_extend) { break; }
+
+                // build next_set (union of destinations for common_ch)
+                next_set.clear();
+                if(visit.size() < automaton.nfa.size()) { visit.resize(automaton.nfa.size()); }
+                ++gen;
+                for(auto const sidx: curr_set)
+                {
+                    auto const & st{automaton.nfa.index_unchecked(sidx)};
+                    for(auto const & e: st.edges)
+                    {
+                        if(e.ch == common_ch)
+                        {
+                            if(visit.index_unchecked(e.to) != gen)
+                            {
+                                visit.index_unchecked(e.to) = gen;
+                                next_set.emplace_back(e.to);
+                            }
+                        }
+                    }
+                }
+
+                if(next_set.empty()) { break; }
+                automaton.start_literal_prefix.push_back(common_ch);
+                curr_set.swap(next_set);
+            }
+
+            automaton.prefix_state_set_after = ::std::move(curr_set);
+        }
+
         return automaton;
     }
 
@@ -430,13 +496,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
     inline constexpr bool match_nfa(compiled_pattern_automaton const& automaton, ::uwvm2::utils::container::u8string_view path) noexcept
     {
         ::uwvm2::utils::container::vector<::std::size_t> current_state_set{};
-        current_state_set = automaton.start_states;  // already epsilon-closed
+        // Fast literal prefix check
+        ::std::size_t pos{};
+        if(!automaton.start_literal_prefix.empty())
+        {
+            auto const & pref{automaton.start_literal_prefix};
+            if(path.size() < pref.size()) { return false; }
+            bool ok{true};
+            for(::std::size_t i{}; i < pref.size(); ++i)
+            {
+                if(path.index_unchecked(i) != pref.index_unchecked(i)) { ok = false; break; }
+            }
+            if(!ok) { return false; }
+            current_state_set = automaton.prefix_state_set_after;
+            pos = pref.size();
+        }
+        else
+        {
+            current_state_set = automaton.start_states;  // already epsilon-closed
+            pos = 0uz;
+        }
 
         ::uwvm2::utils::container::vector<::std::size_t> next_state_set{};
         ::uwvm2::utils::container::vector<::std::size_t> visit_gen{};
         ::std::size_t gen{};
 
-        for(auto const input_char: path)
+        for(; pos < path.size(); ++pos)
         {
             next_state_set.clear();
             next_state_set.reserve(current_state_set.size() + 4uz);
@@ -449,7 +534,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                 auto const& state{automaton.nfa.index_unchecked(state_index)};
                 for(auto const& edge: state.edges)
                 {
-                    if(nfa_edge_match(edge, input_char))
+                    if(nfa_edge_match(edge, path.index_unchecked(pos)))
                     {
                         if(visit_gen.index_unchecked(edge.to) != gen)
                         {
