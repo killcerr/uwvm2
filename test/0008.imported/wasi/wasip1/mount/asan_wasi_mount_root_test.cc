@@ -367,7 +367,7 @@ static void fuzz_dir_filter_random(std::size_t iterations)
 
 int main()
 {
-	std::puts("[RUN] wasi_mount_root.default: basic tests");
+	std::puts("[RUN] wasi_mount_dir.default: basic tests");
 
 	test_parse_valid_invalid();
 	test_nfa_match_basic();

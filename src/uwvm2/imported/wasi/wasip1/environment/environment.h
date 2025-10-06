@@ -105,6 +105,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
     static_assert(wasip1_memory<::uwvm2::object::memory::linear::mmap_memory_t>);
 #endif
 
+    struct mount_dir_root_t
+    {
+        ::uwvm2::utils::container::u8string_view preload_dir{};
+        ::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry entry{};
+    };
+
     /// @brief [singleton]
     template <wasip1_memory memory_type>
     struct wasip1_environment
@@ -118,7 +124,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 
         ::uwvm2::imported::wasi::wasip1::fd_manager::wasm_fd_storage_t fd_storage{};  // [singleton]
 
-        ::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry mount_root{};
+        ::uwvm2::utils::container::vector<mount_dir_root_t> mount_dir_roots{};
 
         bool trace_wasip1_call{};
     };

@@ -41,6 +41,13 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-    /// @brief     WasiPreview1 environment
-    inline ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> wasip1_env{};  // [global]
+    using wasi_env_type = ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t>;
+
+    /// @brief     Default WasiPreview1 environment
+    inline wasi_env_type default_wasi_env{};  // [global]
+
+    /// @brief     Specialized WASM module WasiPreview1 environment
+    /// @note      After processing all WASIs, perform specialization to ensure the WASIs' vectors no longer resize. You may first cache the parameters.
+    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::uwvm::wasm::type::all_module_t*, wasi_env_type>
+        specialized_wasm_module_wasi_env{};  // [global]
 }  // namespace uwvm2::uwvm::wasm::storage

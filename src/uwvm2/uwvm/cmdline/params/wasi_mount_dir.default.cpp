@@ -36,6 +36,7 @@
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
+# include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/imported/wasi/wasip1/mount_root/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
@@ -46,12 +47,12 @@
 
 namespace uwvm2::uwvm::cmdline::params::details
 {
-    UWVM_GNU_COLD extern void wasi_mount_root_pretreatment(char8_t const* const*& argv_curr,
-                                                           char8_t const* const* argv_end,
-                                                           ::uwvm2::utils::container::vector<::uwvm2::utils::cmdline::parameter_parsing_results>& pr) noexcept
+    UWVM_GNU_COLD extern void wasi_mount_dir_pretreatment(char8_t const* const*& argv_curr,
+                                                          char8_t const* const* argv_end,
+                                                          ::uwvm2::utils::container::vector<::uwvm2::utils::cmdline::parameter_parsing_results>& pr) noexcept
     {
-        // argv_curr points to --wasi-mount-root or -Iroot
-        // We need to process: dir -add ... -rm ... until we hit another parameter
+        // argv_curr points to --wasi-mount-dir or -Idir
+        // New syntax: <wasidir> <system_dir> [-add ...] [-rm ...] [--symlink-escape-nonwasi ...]
 
         // Pre-scan to reserve exact additional capacity for pr before using *_unchecked
         {
@@ -59,62 +60,73 @@ namespace uwvm2::uwvm::cmdline::params::details
             auto scan_ptr{argv_curr + 1u};
             if(scan_ptr != argv_end)
             {
-                ::uwvm2::utils::container::u8cstring_view first_arg_view{::fast_io::mnp::os_c_str(*scan_ptr)};
-                if(!first_arg_view.empty() && first_arg_view.front_unchecked() != u8'-')
+                ::uwvm2::utils::container::u8cstring_view wasidir_view{::fast_io::mnp::os_c_str(*scan_ptr)};
+                if(!wasidir_view.empty() && wasidir_view.front_unchecked() != u8'-')
                 {
-                    ++entries_to_add;  // root dir
+                    ++entries_to_add;  // wasidir
                     ++scan_ptr;
 
-                    bool stop_scanning{};
-                    while(scan_ptr != argv_end && !stop_scanning)
+                    if(scan_ptr != argv_end)
                     {
-                        ::uwvm2::utils::container::u8cstring_view token_view{::fast_io::mnp::os_c_str(*scan_ptr)};
-
-                        if(token_view.empty()) [[unlikely]]
+                        ::uwvm2::utils::container::u8cstring_view sysdir_view{::fast_io::mnp::os_c_str(*scan_ptr)};
+                        if(!sysdir_view.empty() && sysdir_view.front_unchecked() != u8'-')
                         {
-                            ++scan_ptr;
-                            continue;
-                        }
-
-                        if(token_view == u8"-add" || token_view == u8"-rm" || token_view == u8"--symlink-escape-nonwasi")
-                        {
-                            ++entries_to_add;  // the option itself
+                            ++entries_to_add;  // system_dir
                             ++scan_ptr;
 
-                            while(scan_ptr != argv_end)
+                            bool stop_scanning{};
+                            while(scan_ptr != argv_end && !stop_scanning)
                             {
-                                ::uwvm2::utils::container::u8cstring_view pattern_view{::fast_io::mnp::os_c_str(*scan_ptr)};
+                                ::uwvm2::utils::container::u8cstring_view token_view{::fast_io::mnp::os_c_str(*scan_ptr)};
 
-                                if(pattern_view.empty()) [[unlikely]]
+                                if(token_view.empty()) [[unlikely]]
                                 {
                                     ++scan_ptr;
                                     continue;
                                 }
 
-                                if(pattern_view.front_unchecked() == u8'-')
+                                if(token_view == u8"-add" || token_view == u8"-rm" || token_view == u8"--symlink-escape-nonwasi")
                                 {
-                                    if(pattern_view == u8"-add" || pattern_view == u8"-rm" || pattern_view == u8"--symlink-escape-nonwasi") { break; }
-                                    else
+                                    ++entries_to_add;  // the option itself
+                                    ++scan_ptr;
+
+                                    while(scan_ptr != argv_end)
                                     {
-                                        stop_scanning = true;
-                                        break;
+                                        ::uwvm2::utils::container::u8cstring_view pattern_view{::fast_io::mnp::os_c_str(*scan_ptr)};
+
+                                        if(pattern_view.empty()) [[unlikely]]
+                                        {
+                                            ++scan_ptr;
+                                            continue;
+                                        }
+
+                                        if(pattern_view.front_unchecked() == u8'-')
+                                        {
+                                            if(pattern_view == u8"-add" || pattern_view == u8"-rm" || pattern_view == u8"--symlink-escape-nonwasi") { break; }
+                                            else
+                                            {
+                                                stop_scanning = true;
+                                                break;
+                                            }
+                                        }
+
+                                        ++entries_to_add;  // a pattern
+                                        ++scan_ptr;
                                     }
+
+                                    continue;
                                 }
-
-                                ++entries_to_add;  // a pattern
-                                ++scan_ptr;
+                                else if(token_view.front_unchecked() == u8'-')
+                                {
+                                    break;  // another parameter reached
+                                }
+                                else
+                                {
+                                    // Unexpected non-option argument after patterns: stop scanning further for this parameter
+                                    stop_scanning = true;
+                                    break;
+                                }
                             }
-
-                            continue;
-                        }
-                        else if(token_view.front_unchecked() == u8'-')
-                        {
-                            break;  // another parameter reached
-                        }
-                        else
-                        {
-                            ++entries_to_add;  // unexpected non-option argument after patterns
-                            ++scan_ptr;
                         }
                     }
                 }
@@ -128,16 +140,16 @@ namespace uwvm2::uwvm::cmdline::params::details
         ++argv_curr;
         if(argv_curr == argv_end) { return; }
 
-        // First argument must be the root directory (not starting with -)
+        // First argument must be the WASI dir (not starting with -)
         ::uwvm2::utils::container::u8cstring_view curr_view{::fast_io::mnp::os_c_str(*argv_curr)};
+        if(curr_view.empty() || curr_view.front_unchecked() == u8'-') [[unlikely]] { return; }
+        pr.emplace_back_unchecked(curr_view, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg);
+        ++argv_curr;
 
-        if(curr_view.empty() || curr_view.front_unchecked() == u8'-') [[unlikely]]
-        {
-            // No directory specified or starts with -, let callback handle the error
-            return;
-        }
-
-        // Add the root directory as an argument
+        // Second argument must be the system dir (not starting with -)
+        if(argv_curr == argv_end) { return; }
+        curr_view = ::uwvm2::utils::container::u8cstring_view{::fast_io::mnp::os_c_str(*argv_curr)};
+        if(curr_view.empty() || curr_view.front_unchecked() == u8'-') [[unlikely]] { return; }
         pr.emplace_back_unchecked(curr_view, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg);
         ++argv_curr;
 
@@ -193,21 +205,20 @@ namespace uwvm2::uwvm::cmdline::params::details
             }
             else
             {
-                // Unexpected non-option argument after patterns
-                pr.emplace_back_unchecked(curr_view, nullptr, ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg);
-                ++argv_curr;
+                // Unexpected non-option argument after patterns: stop processing this parameter here
+                return;
             }
         }
     }
 
     UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type
-        wasi_mount_root_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_begin,
-                                 ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
-                                 ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
+        wasi_mount_dir_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results* para_begin,
+                                ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
+                                ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
         auto param_cursor{para_curr + 1};
 
-        // Check for root directory argument
+        // Check for wasi mount dir
         if(param_cursor == para_end || param_cursor->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
         {
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
@@ -217,9 +228,37 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 u8"[error] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Usage: ",
-                                ::uwvm2::utils::cmdline::print_usage(::uwvm2::uwvm::cmdline::params::wasi_mount_root),
+                                ::uwvm2::utils::cmdline::print_usage(::uwvm2::uwvm::cmdline::params::wasi_mount_dir),
                                 u8"\n\n");
 
+            return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+        }
+
+        // Parse wasidir
+        ::uwvm2::utils::container::u8string_view wasidir{param_cursor->str};
+        param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
+        ++param_cursor;
+
+        // Check system dir argument
+        if(param_cursor == para_end || param_cursor->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
+        {
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Missing ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                u8"<system dir>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8" after ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                u8"<wasi dir>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8" for ",
+                                ::uwvm2::utils::cmdline::print_usage(::uwvm2::uwvm::cmdline::params::wasi_mount_dir),
+                                u8"\n\n");
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
@@ -227,6 +266,91 @@ namespace uwvm2::uwvm::cmdline::params::details
         entry.root_dir = ::fast_io::u8string_view{param_cursor->str};
         param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
         ++param_cursor;
+
+        // Validate wasidir: absolute POSIX-like, forbid illegal chars (\\, *, ?, ", <, >, |, :),
+        // forbid '//' and any path segment equal to '.' or '..' (but allow '.' as the whole path),
+        // allow other dots like '...'/'.config'. Additionally, require valid UTF-8 and forbid NUL inside view.
+        constexpr auto validate_wasidir{[](::uwvm2::utils::container::u8string_view p) constexpr noexcept -> bool
+                                        {
+                                            if(p.empty()) [[unlikely]] { return false; }
+
+                                            // UTF-8 validation with zero-illegal (no NUL allowed inside view)
+                                            auto const u8res{
+                                                ::uwvm2::utils::utf::check_legal_utf8<
+                                                    ::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(p.data(), p.data() + p.size())};
+                                            if(u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]] { return false; }
+
+                                            if(p == u8".") { return true; }
+                                            if(p.front_unchecked() != u8'/') [[unlikely]] { return false; }
+
+                                            bool prev_slash{};
+                                            ::std::size_t seg_len{};         // current segment length
+                                            bool seg_only_dots{true};        // whether current segment consists only of '.'
+
+                                            for(auto const ch: p)
+                                            {
+                                                if(ch == u8'/')
+                                                {
+                                                    if(prev_slash) [[unlikely]] { return false; }  // forbid '//'
+                                                    // end of previous segment: reject '.' or '..'
+                                                    if(seg_len != 0uz)
+                                                    {
+                                                        if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]] { return false; }
+                                                    }
+                                                    // reset for next segment
+                                                    seg_len = 0uz;
+                                                    seg_only_dots = true;
+                                                    prev_slash = true;
+                                                }
+                                                else
+                                                {
+                                                    // reject DOS-invalid characters; '.' allowed by default and dot-segments handled separately
+                                                    if(::fast_io::char_category::is_dos_path_invalid_character(ch)) [[unlikely]]
+                                                    {
+                                                        return false;
+                                                    }
+                                                    prev_slash = false;
+                                                    ++seg_len;
+                                                    if(seg_only_dots && ch != u8'.') { seg_only_dots = false; }
+                                                }
+                                            }
+
+                                            // tail segment check (when not ending with '/')
+                                            if(seg_len != 0uz)
+                                            {
+                                                if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]] { return false; }
+                                            }
+
+                                            return true;
+                                        }};
+
+        if(!validate_wasidir(wasidir)) [[unlikely]]
+        {
+            ::fast_io::io::perr(
+                ::uwvm2::uwvm::io::u8log_output,
+                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                u8"uwvm: ",
+                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                u8"[error] ",
+                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                u8"Invalid ",
+                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                u8"<wasi dir>",
+                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                u8": must be absolute like /a/x, must not contain '//' and must not contain path segments equal to '.' or '..'. Other dots such as '...'/'.config' are allowed. No illegal chars (ASCII less than 0x20, \\, *, ?, \" , <, >, |, :). UTF-8 string is required.\n\n",
+                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+            return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+        }
+
+        // Canonicalize wasidir: remove trailing '/' (except root "/") for stable comparisons
+        constexpr auto canonicalize_wasidir{[](::uwvm2::utils::container::u8string_view p) constexpr noexcept -> ::uwvm2::utils::container::u8string_view
+                                            {
+                                                if(p == u8".") { return p; }
+                                                auto n{p.size()};
+                                                while(n > 1uz && p.index_unchecked(n - 1uz) == u8'/') { --n; }
+                                                return ::uwvm2::utils::container::u8string_view{p.data(), n};
+                                            }};
+        auto const wasidir_norm{canonicalize_wasidir(wasidir)};
 
         // Process -add, -rm and --symlink-escape-nonwasi options
         enum class mode_type : unsigned
@@ -655,11 +779,12 @@ namespace uwvm2::uwvm::cmdline::params::details
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                     u8"[error] ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                    u8"--wasi-mount-root ",
+                                    u8"--wasi-mount-dir ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN));
 
                 if(current_mode == mode_type::add_mode) { ::fast_io::io::perr(u8log_output_ul, u8"-add "); }
                 else if(current_mode == mode_type::rm_mode) { ::fast_io::io::perr(u8log_output_ul, u8"-rm "); }
+                else if(current_mode == mode_type::symlink_escape_mode) { ::fast_io::io::perr(u8log_output_ul, u8"--symlink-escape-nonwasi "); }
 
                 // Print pattern with error position highlighted (render as text instead of numeric code points)
                 {
@@ -726,7 +851,62 @@ namespace uwvm2::uwvm::cmdline::params::details
             ++param_cursor;
         }
 
-        ::uwvm2::uwvm::wasm::storage::wasip1_env.mount_root = ::std::move(entry);
+        // Conflict check with existing mounts: disallow prefix conflicts both directions
+        auto& env{::uwvm2::uwvm::wasm::storage::default_wasi_env};
+        for(auto const& mr: env.mount_dir_roots)
+        {
+            auto const existing{mr.preload_dir};
+            auto const existing_norm{canonicalize_wasidir(existing)};
+            // normalize: we assume stored wasidir was validated and absolute
+            constexpr auto starts_with{[](::uwvm2::utils::container::u8string_view a, ::uwvm2::utils::container::u8string_view b) constexpr noexcept -> bool
+                                       {
+                                           if(a.size() < b.size()) { return false; }
+                                           if(a.size() == b.size()) { return a == b; }
+                                           return (::uwvm2::utils::container::u8string_view{a.data(), b.size()} == b) && (a.index_unchecked(b.size()) == u8'/');
+                                       }};
+
+            if(wasidir_norm == existing_norm) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Duplicate mount ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                    u8"<wasi dir>",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8": ",
+                                    wasidir_norm,
+                                    u8" already mounted.\n\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+            }
+
+            if(starts_with(wasidir_norm, existing_norm) || starts_with(existing_norm, wasidir_norm)) [[unlikely]]
+            {
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                    u8"[error] ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Mount conflict: disallow overlapping prefixes between ",
+                                    wasidir_norm,
+                                    u8" and ",
+                                    existing_norm,
+                                    u8"\n\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+            }
+        }
+
+        // Record into default_wasi_env
+        ::uwvm2::imported::wasi::wasip1::environment::mount_dir_root_t mdr{};
+        mdr.preload_dir = wasidir_norm;
+        mdr.entry = ::std::move(entry);
+        env.mount_dir_roots.emplace_back(::std::move(mdr));
 
         return ::uwvm2::utils::cmdline::parameter_return_type::def;
     }
@@ -736,4 +916,5 @@ namespace uwvm2::uwvm::cmdline::params::details
 // macro
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 #include <uwvm2/utils/macro/pop_macros.h>
+
 
