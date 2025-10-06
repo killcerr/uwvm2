@@ -43,7 +43,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     namespace details
     {
         inline bool wasi_mount_root_is_exist{};  // [global]
-        inline constexpr ::uwvm2::utils::container::u8string_view wasi_mount_root_alias{u8"-Iroot"};
+        inline constexpr ::uwvm2::utils::container::array<::uwvm2::utils::container::u8string_view, 2uz> wasi_mount_root_alias{u8"-Iroot", u8"-Idir"};
         extern "C++" void wasi_mount_root_pretreatment(char8_t const* const*& argv_curr,
                                                        char8_t const* const* argv_end,
                                                        ::uwvm2::utils::container::vector<::uwvm2::utils::cmdline::parameter_parsing_results>& pr) noexcept;
@@ -59,9 +59,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     inline constexpr ::uwvm2::utils::cmdline::parameter wasi_mount_root{
         .name{u8"--wasi-mount-root"},
         .describe{
-            u8"Mount a host directory to the WASI sandbox. Only the root directory existence is validated at parse time. At runtime, wildcard automata determine access with precedence: symlink-escape-nonwasi (symlink-only, highest), WASI whitelist (runtime-managed, not handled here), whitelist (-add), blacklist (-rm), then normal files. Patterns support *, ?, ** and {a,b}. WASI cannot create symlinks under symlink-escape-nonwasi matched paths but may create regular files there."},
+            u8"Mount a host directory to the WASI sandbox. Only the root directory existence is validated at parse time. At runtime, wildcard automata determine access with precedence: symlink-escape-nonwasi (symlink-only, highest), WASI whitelist (runtime-managed, not handled here), blacklist (-rm), whitelist (-add), then normal files. Patterns support *, ?, ** and {a,b}. WASI cannot create symlinks under symlink-escape-nonwasi matched paths but may create regular files there."},
         .usage{u8"<dir:str> (-add <pattern>...) (-rm <pattern>...) (--symlink-escape-nonwasi <pattern>...)"},
-        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasi_mount_root_alias), 1uz}},
+        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{details::wasi_mount_root_alias.data(), details::wasi_mount_root_alias.size()}},
         .handle{::std::addressof(details::wasi_mount_root_callback)},
         .pretreatment{::std::addressof(details::wasi_mount_root_pretreatment)},
         .is_exist{::std::addressof(details::wasi_mount_root_is_exist)},
