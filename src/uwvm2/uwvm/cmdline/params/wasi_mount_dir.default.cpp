@@ -267,78 +267,246 @@ namespace uwvm2::uwvm::cmdline::params::details
         param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
         ++param_cursor;
 
-        // Validate wasidir: absolute POSIX-like, forbid illegal chars (\\, *, ?, ", <, >, |, :),
-        // forbid '//' and any path segment equal to '.' or '..' (but allow '.' as the whole path),
-        // allow other dots like '...'/'.config'. Additionally, require valid UTF-8 and forbid NUL inside view.
-        constexpr auto validate_wasidir{[](::uwvm2::utils::container::u8string_view p) constexpr noexcept -> bool
-                                        {
-                                            if(p.empty()) [[unlikely]] { return false; }
+        // Validate wasidir (absolute and relative modes):
+        // Absolute mode: POSIX-like absolute path, forbid illegal chars (\\, *, ?, ", <, >, |, :),
+        //                forbid '//' and any path segment equal to '.' or '..' (but allow '.' as the whole path),
+        //                allow other dots like '...'/'.config'. Additionally, require valid UTF-8 and forbid NUL inside view.
+        // Relative mode: allow '.' or './name/...'; after the leading '.', segments cannot be '.' or '..'.
 
-                                            // UTF-8 validation with zero-illegal (no NUL allowed inside view)
-                                            auto const u8res{
-                                                ::uwvm2::utils::utf::check_legal_utf8<
-                                                    ::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(p.data(), p.data() + p.size())};
-                                            if(u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]] { return false; }
-
-                                            if(p == u8".") { return true; }
-                                            if(p.front_unchecked() != u8'/') [[unlikely]] { return false; }
-
-                                            bool prev_slash{};
-                                            ::std::size_t seg_len{};         // current segment length
-                                            bool seg_only_dots{true};        // whether current segment consists only of '.'
-
-                                            for(auto const ch: p)
-                                            {
-                                                if(ch == u8'/')
-                                                {
-                                                    if(prev_slash) [[unlikely]] { return false; }  // forbid '//'
-                                                    // end of previous segment: reject '.' or '..'
-                                                    if(seg_len != 0uz)
-                                                    {
-                                                        if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]] { return false; }
-                                                    }
-                                                    // reset for next segment
-                                                    seg_len = 0uz;
-                                                    seg_only_dots = true;
-                                                    prev_slash = true;
-                                                }
-                                                else
-                                                {
-                                                    // reject DOS-invalid characters; '.' allowed by default and dot-segments handled separately
-                                                    if(::fast_io::char_category::is_dos_path_invalid_character(ch)) [[unlikely]]
-                                                    {
-                                                        return false;
-                                                    }
-                                                    prev_slash = false;
-                                                    ++seg_len;
-                                                    if(seg_only_dots && ch != u8'.') { seg_only_dots = false; }
-                                                }
-                                            }
-
-                                            // tail segment check (when not ending with '/')
-                                            if(seg_len != 0uz)
-                                            {
-                                                if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]] { return false; }
-                                            }
-
-                                            return true;
-                                        }};
-
-        if(!validate_wasidir(wasidir)) [[unlikely]]
+        if(wasidir.empty()) [[unlikely]]
         {
-            ::fast_io::io::perr(
-                ::uwvm2::uwvm::io::u8log_output,
-                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
-                u8"uwvm: ",
-                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
-                u8"[error] ",
-                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                u8"Invalid ",
-                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                u8"<wasi dir>",
-                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                u8": must be absolute like /a/x, must not contain '//' and must not contain path segments equal to '.' or '..'. Other dots such as '...'/'.config' are allowed. No illegal chars (ASCII less than 0x20, \\, *, ?, \" , <, >, |, :). UTF-8 string is required.\n\n",
-                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Invalid ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                u8"<wasi dir>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8": cannot be empty\n\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+            return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+        }
+
+        // Detect relative mode: any path not starting with '/' is treated as relative (including '.')
+        bool const wasidir_is_relative{wasidir.front_unchecked() != u8'/'};
+
+        if(wasidir_is_relative)
+        {
+            // check not "."
+            if(wasidir != u8".")
+            {
+                bool prev_slash{};  // we don't start with '/'
+                ::std::size_t seg_len{};
+                bool seg_only_dots{true};
+
+                for(::std::size_t i{}; i != wasidir.size(); ++i)
+                {
+                    auto const ch{wasidir.index_unchecked(i)};
+                    if(ch == u8'/')
+                    {
+                        if(prev_slash) [[unlikely]]
+                        {
+                            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                u8"[error] ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Invalid ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                                u8"<wasi dir>",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8": must not contain '//', in ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                wasidir,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8" at offset ",
+                                                i,
+                                                u8"\n\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                            return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;  // forbid '//'
+                        }
+
+                        if(seg_len != 0uz)
+                        {
+                            // forbid '.' or '..' segment
+                            if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]]
+                            {
+                                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                    u8"uwvm: ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                    u8"[error] ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8"Invalid ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                                    u8"<wasi dir>",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                    u8": path segments './', '/.' or '..' are not allowed, in ",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                    wasidir,
+                                                    u8"\n\n",
+                                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+                            }
+                        }
+
+                        seg_len = 0uz;
+                        seg_only_dots = true;
+                        prev_slash = true;
+                    }
+                    else
+                    {
+                        // POSIX/WASI: do not restrict characters beyond '/' and dot-segment rules
+
+                        prev_slash = false;
+                        ++seg_len;
+                        if(seg_only_dots && ch != u8'.') { seg_only_dots = false; }
+                    }
+                }
+
+                if(seg_len != 0uz)
+                {
+                    if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]]
+                    {
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Invalid ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                            u8"<wasi dir>",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8": path segments './', '/.' or '..' are not allowed, in ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            wasidir,
+                                            u8"\n\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+                    }
+                }
+            }
+        }
+        else
+        {
+            bool prev_slash{};
+            ::std::size_t seg_len{};
+            bool seg_only_dots{true};
+
+            for(auto const ch: wasidir)
+            {
+                if(ch == u8'/')
+                {
+                    if(prev_slash) [[unlikely]]
+                    {
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                            u8"[error] ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Invalid ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                            u8"<wasi dir>",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8": must not contain '//', in ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            wasidir,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\n\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+                    }
+
+                    if(seg_len != 0uz)
+                    {
+                        if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]]
+                        {
+                            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                                u8"[error] ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Invalid ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                                u8"<wasi dir>",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8": path segments '.' or '..' are not allowed in absolute paths, in ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                wasidir,
+                                                u8"\n\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                            return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+                        }
+                    }
+                    
+                    seg_len = 0uz;
+                    seg_only_dots = true;
+                    prev_slash = true;
+                }
+                else
+                {
+                    // POSIX/WASI: do not restrict characters beyond '/' and dot-segment rules
+
+                    prev_slash = false;
+                    ++seg_len;
+                    if(seg_only_dots && ch != u8'.') { seg_only_dots = false; }
+                }
+            }
+
+            if(seg_len != 0uz)
+            {
+                if(seg_only_dots && (seg_len == 1uz || seg_len == 2uz)) [[unlikely]]
+                {
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                        u8"[error] ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"Invalid ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                        u8"<wasi dir>",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8": path segments '.' or '..' are not allowed in absolute paths, in ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                        wasidir,
+                                        u8"\n\n",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                    return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+                }
+            }
+        }
+
+        // check utf8
+        auto const u8res{
+            ::uwvm2::utils::utf::check_legal_utf8<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(wasidir.cbegin(), wasidir.cend())};
+        if(u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+        {
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Invalid ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                u8"<wasi dir>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8": invalid UTF-8 (",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                ::uwvm2::utils::utf::get_utf_error_description<char8_t>(u8res.err),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8")\n\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
@@ -350,7 +518,19 @@ namespace uwvm2::uwvm::cmdline::params::details
                                                 while(n > 1uz && p.index_unchecked(n - 1uz) == u8'/') { --n; }
                                                 return ::uwvm2::utils::container::u8string_view{p.data(), n};
                                             }};
-        auto const wasidir_norm{canonicalize_wasidir(wasidir)};
+
+        // Canonicalize relative wasidir: forbid './' prefix; keep '.' as is; trim trailing '/'.
+        constexpr auto canonicalize_wasidir_rel{[](::uwvm2::utils::container::u8string_view p) constexpr noexcept -> ::uwvm2::utils::container::u8string_view
+                                                {
+                                                    if(p == u8".") { return p; }
+                                                    // p is a pure relative path like 'b/xxx'; remove trailing '/'
+                                                    auto n{p.size()};
+                                                    while(n != 0uz && p.index_unchecked(n - 1uz) == u8'/') { --n; }
+                                                    if(n == 0uz) { return ::uwvm2::utils::container::u8string_view{u8".", 1uz}; }
+                                                    return ::uwvm2::utils::container::u8string_view{p.data(), n};
+                                                }};
+
+        auto const wasidir_norm{wasidir_is_relative ? canonicalize_wasidir_rel(wasidir) : canonicalize_wasidir(wasidir)};
 
         // Process -add, -rm and --symlink-escape-nonwasi options
         enum class mode_type : unsigned
@@ -371,7 +551,7 @@ namespace uwvm2::uwvm::cmdline::params::details
         {
             auto scan_ptr{param_cursor};
             mode_type scan_mode{mode_type::none};
-            bool expecting_pattern{false};
+            bool expecting_pattern{};
 
             while(scan_ptr != para_end && scan_ptr->type == ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg)
             {
@@ -856,12 +1036,25 @@ namespace uwvm2::uwvm::cmdline::params::details
         for(auto const& mr: env.mount_dir_roots)
         {
             auto const existing{mr.preload_dir};
-            auto const existing_norm{canonicalize_wasidir(existing)};
+            // Supports normalization of both absolute paths and relative paths (including “.”).
+            auto const existing_norm{(!existing.empty() && existing.front_unchecked() == u8'/') ? canonicalize_wasidir(existing)
+                                                                                                : canonicalize_wasidir_rel(existing)};
             // normalize: we assume stored wasidir was validated and absolute
             constexpr auto starts_with{[](::uwvm2::utils::container::u8string_view a, ::uwvm2::utils::container::u8string_view b) constexpr noexcept -> bool
                                        {
+                                           // Special case: '/' is the prefix of any absolute path
+                                           if(b == u8"/") { return (!a.empty() && a.front_unchecked() == u8'/'); }
+
+                                           // Special case: for relative paths, '.' is the prefix of any relative path
+                                           if(!a.empty() && a.front_unchecked() != u8'/' && b == u8".") { return true; }
+
                                            if(a.size() < b.size()) { return false; }
                                            if(a.size() == b.size()) { return a == b; }
+
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+                                           if(a.size() <= b.size()) [[unlikely]] { ::uwvm2::utils::debug::trap_and_inform_bug_pos(); }
+#endif
+
                                            return (::uwvm2::utils::container::u8string_view{a.data(), b.size()} == b) && (a.index_unchecked(b.size()) == u8'/');
                                        }};
 
@@ -878,7 +1071,9 @@ namespace uwvm2::uwvm::cmdline::params::details
                                     u8"<wasi dir>",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8": ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     wasidir_norm,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8" already mounted.\n\n",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                 return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
@@ -893,8 +1088,11 @@ namespace uwvm2::uwvm::cmdline::params::details
                                     u8"[error] ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Mount conflict: disallow overlapping prefixes between ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     wasidir_norm,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8" and ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
                                     existing_norm,
                                     u8"\n\n",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
@@ -916,5 +1114,4 @@ namespace uwvm2::uwvm::cmdline::params::details
 // macro
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 #include <uwvm2/utils/macro/pop_macros.h>
-
 
