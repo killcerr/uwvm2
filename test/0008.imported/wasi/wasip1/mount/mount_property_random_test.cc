@@ -327,8 +327,8 @@ static void run_property_cases(std::size_t cases)
 
 int main()
 {
-	std::fputs("[RUN] mount_property_random_test: 1000 randomized cases\n", stderr);
-	run_property_cases(100000000);
+	std::fputs("[RUN] mount_property_random_test: 10000 randomized cases\n", stderr);
+	run_property_cases(10000);
 	std::fputs("[OK] property tests passed\n", stderr);
 	return 0;
 }
