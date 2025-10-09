@@ -43,6 +43,11 @@
 # define UWVM_MODULE_EXPORT
 #endif
 
+/*NONEXPORT*/ namespace uwvm2::imported::wasi::wasip1::environment
+{
+    struct mount_dir_root_t;
+}
+
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 {
 #if defined(_WIN32)
@@ -92,6 +97,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::fd_manager
 
         // The "close pos" is only valid for those in the "close" list and invalid for those in the "renumber map".
         ::std::size_t close_pos{SIZE_MAX};
+
+        // No memory management required. If provided, path_open adds rule checks.
+        ::uwvm2::imported::wasi::wasip1::environment::mount_dir_root_t* preload_dir_root{};
 
         inline constexpr wasi_fd_t() noexcept = default;
 

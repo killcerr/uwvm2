@@ -42,7 +42,7 @@
 
 // wasi
 # include "wasip1_set_fd_limit.h"
-# include "wasi_mount_root.h"
+# include "wasi_mount_dir.h"
 
 // log
 # include "log_output.h"

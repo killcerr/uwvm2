@@ -40,16 +40,16 @@ static void require(bool cond, char const* msg)
 
 static void test_parse_valid_invalid()
 {
-	// Valid patterns should have no error
-	for(auto const pat: {u8"*", u8"**", u8"?", u8"abc",
-	                    u8"data/{a,b}/**/*.wasm", u8"a\\*b", u8"{x,y,z}", u8"**/foo"})
+    // Valid patterns should have no error (patterns must start with '/')
+    for(auto const pat: {u8"/*", u8"/**", u8"/?", u8"/abc",
+                        u8"/data/{a,b}/**/*.wasm", u8"/a\\*b", u8"/{x,y,z}", u8"/**/foo"})
 	{
 		auto res = ::uwvm2::imported::wasi::wasip1::mount_root::parse_pattern(uwvm2::utils::container::u8string_view{::fast_io::mnp::os_c_str(pat)});
 		require(!res.error.has_error, "parse_pattern valid case unexpectedly errored");
 	}
 
-	// Invalid patterns should report error
-	for(auto const pat: {u8"a**b", u8"{", u8"}", u8"{}", u8"\\"})
+    // Invalid patterns should report error
+	for(auto const pat: {u8"/a**b", u8"/{", u8"/}", u8"/{}", u8"/\\", u8"//abc", u8"/a//b", u8"/ss.//"})
 	{
 		auto res = ::uwvm2::imported::wasi::wasip1::mount_root::parse_pattern(uwvm2::utils::container::u8string_view{::fast_io::mnp::os_c_str(pat)});
 		require(res.error.has_error, "parse_pattern invalid case did not error");
@@ -66,58 +66,58 @@ static bool matches(uwvm2::utils::container::u8string_view pat, uwvm2::utils::co
 
 static void test_nfa_match_basic()
 {
-	// literal
-	require(matches(uwvm2::utils::container::u8string_view{u8"abc"}, uwvm2::utils::container::u8string_view{u8"abc"}), "literal match failed");
-	require(!matches(uwvm2::utils::container::u8string_view{u8"abc"}, uwvm2::utils::container::u8string_view{u8"ab"}), "literal negative failed");
+    // literal
+    require(matches(uwvm2::utils::container::u8string_view{u8"/abc"}, uwvm2::utils::container::u8string_view{u8"abc"}), "literal match failed");
+    require(!matches(uwvm2::utils::container::u8string_view{u8"/abc"}, uwvm2::utils::container::u8string_view{u8"ab"}), "literal negative failed");
 
-	// ? (non-slash)
-	require(matches(uwvm2::utils::container::u8string_view{u8"a?c"}, uwvm2::utils::container::u8string_view{u8"abc"}), "? basic failed");
-	require(!matches(uwvm2::utils::container::u8string_view{u8"a?c"}, uwvm2::utils::container::u8string_view{u8"a/c"}), "? slash should not match");
+    // ? (non-slash)
+    require(matches(uwvm2::utils::container::u8string_view{u8"/a?c"}, uwvm2::utils::container::u8string_view{u8"abc"}), "? basic failed");
+    require(!matches(uwvm2::utils::container::u8string_view{u8"/a?c"}, uwvm2::utils::container::u8string_view{u8"a/c"}), "? slash should not match");
 
-	// * (zero or more non-slash)
-	require(matches(uwvm2::utils::container::u8string_view{u8"a*c"}, uwvm2::utils::container::u8string_view{u8"ac"}), "* zero failed");
-	require(matches(uwvm2::utils::container::u8string_view{u8"a*c"}, uwvm2::utils::container::u8string_view{u8"abbbc"}), "* multi failed");
-	require(!matches(uwvm2::utils::container::u8string_view{u8"a*c"}, uwvm2::utils::container::u8string_view{u8"a/bc"}), "* should not cross slash");
+    // * (zero or more non-slash)
+    require(matches(uwvm2::utils::container::u8string_view{u8"/a*c"}, uwvm2::utils::container::u8string_view{u8"ac"}), "* zero failed");
+    require(matches(uwvm2::utils::container::u8string_view{u8"/a*c"}, uwvm2::utils::container::u8string_view{u8"abbbc"}), "* multi failed");
+    require(!matches(uwvm2::utils::container::u8string_view{u8"/a*c"}, uwvm2::utils::container::u8string_view{u8"a/bc"}), "* should not cross slash");
 
-	// ** (can cross slash)
-	require(matches(uwvm2::utils::container::u8string_view{u8"**/foo"}, uwvm2::utils::container::u8string_view{u8"a/b/foo"}), "** cross failed");
-	require(matches(uwvm2::utils::container::u8string_view{u8"**/foo"}, uwvm2::utils::container::u8string_view{u8"foo"}), "** zero failed");
-	// optional trailing slash behavior
-	require(matches(uwvm2::utils::container::u8string_view{u8"dir/"}, uwvm2::utils::container::u8string_view{u8"dir"}), "dir/ should match dir");
-	require(!matches(uwvm2::utils::container::u8string_view{u8"dir/"}, uwvm2::utils::container::u8string_view{u8"dirx"}), "dir/ should not match dirx");
+    // ** (can cross slash)
+    require(matches(uwvm2::utils::container::u8string_view{u8"/**/foo"}, uwvm2::utils::container::u8string_view{u8"a/b/foo"}), "** cross failed");
+    require(matches(uwvm2::utils::container::u8string_view{u8"/**/foo"}, uwvm2::utils::container::u8string_view{u8"foo"}), "** zero failed");
+    // optional trailing slash behavior
+    require(matches(uwvm2::utils::container::u8string_view{u8"/dir/"}, uwvm2::utils::container::u8string_view{u8"dir"}), "dir/ should match dir");
+    require(!matches(uwvm2::utils::container::u8string_view{u8"/dir/"}, uwvm2::utils::container::u8string_view{u8"dirx"}), "dir/ should not match dirx");
 
-	// alternatives
-	require(matches(uwvm2::utils::container::u8string_view{u8"{a,b}/x"}, uwvm2::utils::container::u8string_view{u8"a/x"}), "alt a failed");
-	require(matches(uwvm2::utils::container::u8string_view{u8"{a,b}/x"}, uwvm2::utils::container::u8string_view{u8"b/x"}), "alt b failed");
-	require(!matches(uwvm2::utils::container::u8string_view{u8"{a,b}/x"}, uwvm2::utils::container::u8string_view{u8"c/x"}), "alt negative failed");
+    // alternatives
+    require(matches(uwvm2::utils::container::u8string_view{u8"/{a,b}/x"}, uwvm2::utils::container::u8string_view{u8"a/x"}), "alt a failed");
+    require(matches(uwvm2::utils::container::u8string_view{u8"/{a,b}/x"}, uwvm2::utils::container::u8string_view{u8"b/x"}), "alt b failed");
+    require(!matches(uwvm2::utils::container::u8string_view{u8"/{a,b}/x"}, uwvm2::utils::container::u8string_view{u8"c/x"}), "alt negative failed");
 
-	// escape
-	require(matches(uwvm2::utils::container::u8string_view{u8"a\\*b"}, uwvm2::utils::container::u8string_view{u8"a*b"}), "escape * failed");
+    // escape
+    require(matches(uwvm2::utils::container::u8string_view{u8"/a\\*b"}, uwvm2::utils::container::u8string_view{u8"a*b"}), "escape * failed");
 }
 
 static void test_access_policy()
 {
 	mount_root_entry entry{};
 	// Prepare whitelist and blacklist
-	{
-		// add: allow/**
-		auto add_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"allow/**"});
+    {
+        // add: /allow/**
+        auto add_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"/allow/**"});
 		require(!add_res.error.has_error, "parse allow/** failed");
-		entry.add_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"allow/**"});
+        entry.add_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"/allow/**"});
 		entry.add_automata.emplace_back(build_nfa_from_tokens(add_res.tokens));
 	}
 	{
-		// rm: deny/**
-		auto rm_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"deny/**"});
+        // rm: /deny/**
+        auto rm_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"/deny/**"});
 		require(!rm_res.error.has_error, "parse deny/** failed");
-		entry.rm_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"deny/**"});
+        entry.rm_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"/deny/**"});
 		entry.rm_automata.emplace_back(build_nfa_from_tokens(rm_res.tokens));
 	}
 	{
-		// symlink-escape: link/**
-		auto se_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"link/**"});
+        // symlink-escape: /link/**
+        auto se_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"/link/**"});
 		require(!se_res.error.has_error, "parse link/** failed");
-		entry.symlink_escape_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"link/**"});
+        entry.symlink_escape_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"/link/**"});
 		entry.symlink_escape_automata.emplace_back(build_nfa_from_tokens(se_res.tokens));
 	}
 
@@ -151,10 +151,10 @@ static void test_access_policy()
 static void test_dir_filter()
 {
 	mount_root_entry entry{};
-	// whitelist: visible/**
-	auto add_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"visible/**"});
+    // whitelist: /visible/**
+    auto add_res = parse_pattern(uwvm2::utils::container::u8string_view{u8"/visible/**"});
 	require(!add_res.error.has_error, "parse visible/** failed");
-	entry.add_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"visible/**"});
+    entry.add_patterns.emplace_back(uwvm2::utils::container::u8string_view{u8"/visible/**"});
 	entry.add_automata.emplace_back(build_nfa_from_tokens(add_res.tokens));
 
 	::uwvm2::utils::container::vector<::uwvm2::utils::container::u8string_view> names{};
@@ -367,7 +367,7 @@ static void fuzz_dir_filter_random(std::size_t iterations)
 
 int main()
 {
-	std::puts("[RUN] wasi_mount_root.default: basic tests");
+	std::puts("[RUN] wasi_mount_dir.default: basic tests");
 
 	test_parse_valid_invalid();
 	test_nfa_match_basic();

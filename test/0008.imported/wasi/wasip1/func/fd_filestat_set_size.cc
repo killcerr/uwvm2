@@ -39,7 +39,7 @@ int main()
     native_memory_t memory{};
     memory.init_by_page_count(1uz);
 
-    wasip1_environment<native_memory_t> env{.wasip1_memory = ::std::addressof(memory), .argv = {}, .envs = {}, .fd_storage = {}, .mount_root={}, .trace_wasip1_call = false};
+    wasip1_environment<native_memory_t> env{.wasip1_memory = ::std::addressof(memory), .argv = {}, .envs = {}, .fd_storage = {}, .mount_dir_roots={}, .trace_wasip1_call = false};
 
     // Prepare fd table
     env.fd_storage.opens.resize(6uz);

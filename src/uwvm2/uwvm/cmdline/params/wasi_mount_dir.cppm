@@ -28,7 +28,7 @@ module;
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
-export module uwvm2.uwvm.cmdline.params.wasi_mount_root;
+export module uwvm2.uwvm.cmdline.params.wasi_mount_dir;
 
 import fast_io;
 import uwvm2.utils.container;
@@ -41,5 +41,5 @@ import uwvm2.utils.cmdline;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "wasi_mount_root.h"
+#include "wasi_mount_dir.h"
 
