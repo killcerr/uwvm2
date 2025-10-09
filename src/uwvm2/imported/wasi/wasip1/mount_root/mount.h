@@ -40,6 +40,7 @@
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/debug/impl.h>
+# include <uwvm2/utils/utf/utf8.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -699,7 +700,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         // Upper bound: token count cannot exceed pattern length
         tokens.reserve(pattern_size);
 
-        // Enforce: pattern must start with '/'. Allow multiple leading '/'; they will be ignored for matching.
+        // Enforce: pattern must start with '/'.
         if(pattern.empty() || pattern.index_unchecked(0uz) != u8'/')
         {
             return {
@@ -708,9 +709,37 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
             };
         }
 
+        // Reject any consecutive '/' anywhere in the pattern (including leading "//").
+        for(::std::size_t i{}; i + 1uz < pattern.size(); ++i)
+        {
+            if(pattern.index_unchecked(i) == u8'/' && pattern.index_unchecked(i + 1uz) == u8'/')
+            {
+                return {
+                    pattern_match_error{.has_error = true, .error_pos = i, .error_message = u8"Consecutive '//' are not allowed in pattern"},
+                    ::std::move(tokens)
+                };
+            }
+        }
+
         // Compute number of leading '/'
         ::std::size_t leading_slashes{};
         while(leading_slashes < pattern.size() && pattern.index_unchecked(leading_slashes) == u8'/') { ++leading_slashes; }
+
+        // UTF-8 validation for the entire pattern (RFC3629, NUL illegal)
+        {
+            auto const [u8pos,
+                        u8err]{::uwvm2::utils::utf::check_legal_utf8<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(pattern.cbegin(),
+                                                                                                                                             pattern.cend())};
+            if(u8err != ::uwvm2::utils::utf::utf_error_code::success)
+            {
+                return {
+                    pattern_match_error{.has_error = true,
+                                        .error_pos = static_cast<::std::size_t>(u8pos - pattern.cbegin()),
+                                        .error_message = u8"Pattern is not valid UTF-8"},
+                    ::std::move(tokens)
+                };
+            }
+        }
 
         // Reject any '.' or '..' segments inside the pattern (after leading '/')
         if(contains_forbidden_dot_segments(pattern, leading_slashes))

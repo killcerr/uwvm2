@@ -49,7 +49,7 @@ static void test_parse_valid_invalid()
 	}
 
     // Invalid patterns should report error
-    for(auto const pat: {u8"/a**b", u8"/{", u8"/}", u8"/{}", u8"/\\"})
+	for(auto const pat: {u8"/a**b", u8"/{", u8"/}", u8"/{}", u8"/\\", u8"//abc", u8"/a//b", u8"/ss.//"})
 	{
 		auto res = ::uwvm2::imported::wasi::wasip1::mount_root::parse_pattern(uwvm2::utils::container::u8string_view{::fast_io::mnp::os_c_str(pat)});
 		require(res.error.has_error, "parse_pattern invalid case did not error");
