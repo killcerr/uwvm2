@@ -23,11 +23,101 @@
 using namespace uwvm2::imported::wasi::wasip1::mount_root;
 namespace C = ::uwvm2::utils::container;
 
+// Pretty printer helpers for debugging output
+static char const* access_policy_cstr(access_policy p)
+{
+	switch(p)
+	{
+		case access_policy::deny: return "deny";
+		case access_policy::allow: return "allow";
+		case access_policy::allow_bypass_root: return "allow_bypass_root";
+		default: return "<unknown>";
+	}
+}
+
+static void print_u8_quoted(FILE* fp, C::u8string_view s)
+{
+	std::fprintf(fp, "\"");
+	// Safe: generated strings are small; cast to int for printf width
+	std::fprintf(fp, "%.*s", static_cast<int>(s.size()), reinterpret_cast<char const*>(s.data()));
+	std::fprintf(fp, "\"");
+}
+
+static void dump_patterns(FILE* fp, char const* label, C::vector<C::u8string_view> const& pats)
+{
+	std::fprintf(fp, "%s (%zu):\n", label, static_cast<std::size_t>(pats.size()));
+	for(auto const& v: pats)
+	{
+		std::fprintf(fp, "  - ");
+		print_u8_quoted(fp, v);
+		std::fprintf(fp, "\n");
+	}
+}
+
+// Debug context for a single property test iteration
+struct debug_case_ctx
+{
+	std::size_t case_index{};
+	mount_root_entry const* entry{};
+	C::u8string_view rel_view{};
+	bool is_symlink{};
+	bool is_symlink_creation{};
+	bool is_wasi_created{};
+	C::u8string_view symlink_target_view{};
+	access_policy pol{};
+	access_policy expected{};
+	bool allow_bool{};
+};
+
+static thread_local debug_case_ctx const* g_debug_ctx{};
+
+struct scoped_debug_ctx
+{
+	debug_case_ctx const* prev{};
+	explicit scoped_debug_ctx(debug_case_ctx const* cur) : prev(g_debug_ctx) { g_debug_ctx = cur; }
+	~scoped_debug_ctx() { g_debug_ctx = prev; }
+};
+
 static void require(bool cond, char const* msg)
 {
 	if(!cond)
 	{
 		std::fprintf(stderr, "[FAIL] %s\n", msg);
+		if(g_debug_ctx)
+		{
+			auto const& ctx = *g_debug_ctx;
+			std::fprintf(stderr, "[CASE] index=%zu\n", static_cast<std::size_t>(ctx.case_index));
+			std::fprintf(stderr, "[INPUT] rel_path=");
+			print_u8_quoted(stderr, ctx.rel_view);
+			std::fprintf(stderr, "  is_symlink=%s  is_symlink_creation=%s  is_wasi_created=%s\n",
+						 ctx.is_symlink ? "true" : "false",
+						 ctx.is_symlink_creation ? "true" : "false",
+						 ctx.is_wasi_created ? "true" : "false");
+			std::fprintf(stderr, "[INPUT] symlink_target=");
+			print_u8_quoted(stderr, ctx.symlink_target_view);
+			std::fprintf(stderr, "\n");
+			std::fprintf(stderr, "[RESULT] policy=%s  expected=%s  allow_open=%s\n",
+					 access_policy_cstr(ctx.pol),
+					 access_policy_cstr(ctx.expected),
+					 ctx.allow_bool ? "true" : "false");
+			if(ctx.entry)
+			{
+				// Dump patterns
+				dump_patterns(stderr, "[CONFIG] add_patterns", ctx.entry->add_patterns);
+				dump_patterns(stderr, "[CONFIG] rm_patterns", ctx.entry->rm_patterns);
+				dump_patterns(stderr, "[CONFIG] symlink_escape_patterns", ctx.entry->symlink_escape_patterns);
+				// Dump created_by_wasi_set
+				std::fprintf(stderr, "[CONFIG] created_by_wasi_set (%zu):\n",
+							 static_cast<std::size_t>(ctx.entry->created_by_wasi_set.size()));
+				for(auto const& s : ctx.entry->created_by_wasi_set)
+				{
+					std::fprintf(stderr, "  - ");
+					C::u8string_view v{ s.data(), s.size() };
+					print_u8_quoted(stderr, v);
+					std::fprintf(stderr, "\n");
+				}
+			}
+		}
 		std::fflush(stderr);
 		::fast_io::fast_terminate();
 	}
@@ -212,8 +302,25 @@ static void run_property_cases(std::size_t cases)
 			expected = access_policy::allow;
 		}
 
-		require(pol == expected, "evaluate_path_access precedence mismatch");
+		// Evaluate allow_open result ahead of assertions to be available for debug dump
 		bool allow_bool = wasi_rule_allow_open(entry, rel_view, is_symlink, is_wasi_created, is_symlink_creation, nullptr, symlink_target_view);
+
+		// Install debug context for richer failure output
+		debug_case_ctx dbg{
+			.case_index = it,
+			.entry = &entry,
+			.rel_view = rel_view,
+			.is_symlink = is_symlink,
+			.is_symlink_creation = is_symlink_creation,
+			.is_wasi_created = is_wasi_created,
+			.symlink_target_view = symlink_target_view,
+			.pol = pol,
+			.expected = expected,
+			.allow_bool = allow_bool
+		};
+		scoped_debug_ctx guard{&dbg};
+
+		require(pol == expected, "evaluate_path_access precedence mismatch");
 		require(allow_bool == (pol != access_policy::deny), "wasi_rule_allow_open result inconsistent with policy");
 	}
 }
@@ -221,7 +328,7 @@ static void run_property_cases(std::size_t cases)
 int main()
 {
 	std::fputs("[RUN] mount_property_random_test: 1000 randomized cases\n", stderr);
-	run_property_cases(1000);
+	run_property_cases(100000000);
 	std::fputs("[OK] property tests passed\n", stderr);
 	return 0;
 }
