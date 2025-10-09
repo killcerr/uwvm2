@@ -668,6 +668,28 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
     }
 
     // Parse pattern into tokens
+    /// @brief Check whether a path/pattern contains any '.' or '..' segments.
+    inline constexpr bool contains_forbidden_dot_segments(::uwvm2::utils::container::u8string_view s, ::std::size_t begin_index = 0uz) noexcept
+    {
+        // Reject single '.' or double '..' segments anywhere in the string.
+        ::std::size_t i{begin_index};
+        while(i < s.size())
+        {
+            ::std::size_t const seg_start{i};
+            while(i < s.size() && s.index_unchecked(i) != u8'/') { ++i; }
+            ::std::size_t const seg_len{i - seg_start};
+            if(seg_len == 1uz)
+            {
+                if(s.index_unchecked(seg_start) == u8'.') { return true; }
+            }
+            else if(seg_len == 2uz)
+            {
+                if(s.index_unchecked(seg_start) == u8'.' && s.index_unchecked(seg_start + 1uz) == u8'.') { return true; }
+            }
+            if(i < s.size() && s.index_unchecked(i) == u8'/') { ++i; }
+        }
+        return false;
+    }
     /// @brief Tokenize a glob pattern; validates syntax and produces a token sequence.
     inline constexpr pattern_token_error_and_vector_pattern_tokens parse_pattern(::uwvm2::utils::container::u8string_view pattern) noexcept
     {
@@ -677,7 +699,29 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
         // Upper bound: token count cannot exceed pattern length
         tokens.reserve(pattern_size);
 
-        ::std::size_t pattern_index{};
+        // Enforce: pattern must start with '/'. Allow multiple leading '/'; they will be ignored for matching.
+        if(pattern.empty() || pattern.index_unchecked(0uz) != u8'/')
+        {
+            return {
+                pattern_match_error{.has_error = true, .error_pos = 0uz, .error_message = u8"Pattern must start with '/'"},
+                ::std::move(tokens)
+            };
+        }
+
+        // Compute number of leading '/'
+        ::std::size_t leading_slashes{};
+        while(leading_slashes < pattern.size() && pattern.index_unchecked(leading_slashes) == u8'/') { ++leading_slashes; }
+
+        // Reject any '.' or '..' segments inside the pattern (after leading '/')
+        if(contains_forbidden_dot_segments(pattern, leading_slashes))
+        {
+            return {
+                pattern_match_error{.has_error = true, .error_pos = leading_slashes, .error_message = u8"'.' or '..' segments are not allowed in pattern"},
+                ::std::move(tokens)
+            };
+        }
+
+        ::std::size_t pattern_index{leading_slashes};
         ::uwvm2::utils::container::u8string current_literal{};
         // Upper bound: a literal cannot exceed pattern length
         current_literal.reserve(pattern_size);
@@ -1006,6 +1050,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
                                                access_policy* out_policy = nullptr,
                                                ::uwvm2::utils::container::u8string_view symlink_target_canonical_rel = {}) noexcept
     {
+        // Reject any path containing '.' or '..' segments
+        if(contains_forbidden_dot_segments(relative_path))
+        {
+            if(out_policy) { *out_policy = access_policy::deny; }
+            return false;
+        }
+
         auto const pol{evaluate_path_access(entry, relative_path, is_symlink, is_wasi_created, is_symlink_creation, symlink_target_canonical_rel)};
         if(out_policy) { *out_policy = pol; }
         return pol != access_policy::deny;
@@ -1043,6 +1094,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::mount_root
             auto const rel_view{
                 ::uwvm2::utils::container::u8string_view{relative_path.data(), relative_path.size()}
             };
+
+            // Short-circuit: never expose '.' or '..' entries in directory listings
+            if(child_name == u8"." || child_name == u8"..")
+            {
+                out_allowed.emplace_back_unchecked(false);
+                continue;
+            }
 
             bool allowed{};
             if(!entry.add_automata.empty())

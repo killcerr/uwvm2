@@ -85,16 +85,17 @@ static C::u8string gen_safe_pattern(fast_io::basic_white_hole_engine<fast_io::u8
 			parts.emplace_back(C::u8string{u8"**"});
 		}
 	}
-	// Join with '/'
-	C::u8string pat{};
-	std::size_t total{};
-	for(auto const &p: parts) { total += p.size(); }
-	pat.reserve(total + (segs ? segs - 1 : 0));
-	for(std::size_t i{}; i < parts.size(); ++i)
-	{
-		if(i) pat.push_back(u8'/');
-		pat.append(parts[i]);
-	}
+    // Join with '/' and ensure leading '/'
+    C::u8string pat{};
+    std::size_t total{};
+    for(auto const &p: parts) { total += p.size(); }
+    pat.reserve(1 + total + (segs ? segs - 1 : 0));
+    pat.push_back(u8'/');
+    for(std::size_t i{}; i < parts.size(); ++i)
+    {
+        if(i) pat.push_back(u8'/');
+        pat.append(parts[i]);
+    }
 	// maybe trailing slash
 	if((rng() & 7u) == 0u) { pat.push_back(u8'/'); }
 	return pat;

@@ -446,7 +446,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
                         }
                     }
-                    
+
                     seg_len = 0uz;
                     seg_only_dots = true;
                     prev_slash = true;
@@ -1010,19 +1010,27 @@ namespace uwvm2::uwvm::cmdline::params::details
             }
 
             // Add pattern to appropriate list and compiled automata
+            // Normalize trailing slashes for storage (keep "/" as-is; otherwise strip all trailing '/').
+            constexpr auto normalize_trailing_slashes_view{[](::uwvm2::utils::container::u8string_view v) constexpr noexcept
+                                                           {
+                                                               if(v.size() <= 1uz) { return v; }
+                                                               ::std::size_t end{v.size()};
+                                                               while(end > 1uz && v.index_unchecked(end - 1uz) == u8'/') { --end; }
+                                                               return v.subview(0uz, end);
+                                                           }};
             if(current_mode == mode_type::add_mode)
             {
-                entry.add_patterns.emplace_back(arg_str);
+                entry.add_patterns.emplace_back(normalize_trailing_slashes_view(arg_str));
                 entry.add_automata.emplace_back(::uwvm2::imported::wasi::wasip1::mount_root::build_nfa_from_tokens(tokens));
             }
             else if(current_mode == mode_type::rm_mode)
             {
-                entry.rm_patterns.emplace_back(arg_str);
+                entry.rm_patterns.emplace_back(normalize_trailing_slashes_view(arg_str));
                 entry.rm_automata.emplace_back(::uwvm2::imported::wasi::wasip1::mount_root::build_nfa_from_tokens(tokens));
             }
             else if(current_mode == mode_type::symlink_escape_mode)
             {
-                entry.symlink_escape_patterns.emplace_back(arg_str);
+                entry.symlink_escape_patterns.emplace_back(normalize_trailing_slashes_view(arg_str));
                 entry.symlink_escape_automata.emplace_back(::uwvm2::imported::wasi::wasip1::mount_root::build_nfa_from_tokens(tokens));
             }
             // Note: Pattern validation already done in pre-scan, so this should not happen
