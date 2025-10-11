@@ -240,7 +240,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #endif
 
         // reset is_preloaded_dir
-        curr_fd.is_preloaded_dir = false;
+        curr_fd.preloaded_dir.clear();
 
         // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
 
