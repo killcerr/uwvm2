@@ -239,6 +239,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         curr_fd.file_type = ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t{};
 #endif
 
+        // reset is_preloaded_dir
+        curr_fd.is_preloaded_dir = false;
+
         // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
 
         return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;

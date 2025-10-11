@@ -43,9 +43,6 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     namespace details
     {
         inline constexpr ::uwvm2::utils::container::u8string_view wasi_mount_dir_alias{u8"-Idir"};
-        extern "C++" void wasi_mount_dir_pretreatment(char8_t const* const*& argv_curr,
-                                                      char8_t const* const* argv_end,
-                                                      ::uwvm2::utils::container::vector<::uwvm2::utils::cmdline::parameter_parsing_results>& pr) noexcept;
         extern "C++" ::uwvm2::utils::cmdline::parameter_return_type wasi_mount_dir_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                             ::uwvm2::utils::cmdline::parameter_parsing_results*,
                                                                                             ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
@@ -58,11 +55,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
     inline constexpr ::uwvm2::utils::cmdline::parameter wasi_mount_dir{
         .name{u8"--wasi-mount-dir"},
         .describe{
-            u8"Mount a host directory to the WASI sandbox at a fixed WASI mount point. Usage now requires two leading arguments: <wasidir> <system_dir>. The <wasidir> must be a POSIX-style absolute path (e.g. /a/x/d), must not contain '..', and '.' is only allowed when it is the whole mount point. After these, options remain the same. At runtime, wildcard automata determine access with precedence: symlink-escape-nonwasi (symlink-only, highest), WASI whitelist (runtime-managed, not handled here), blacklist (-rm), whitelist (-add), then normal files. Patterns support *, ?, ** and {a,b}. WASI cannot create symlinks under symlink-escape-nonwasi matched paths but may create regular files there."},
-        .usage{u8"<wasi dir:str> <system dir:str> (-add <pattern>...) (-rm <pattern>...) (--symlink-escape-nonwasi <pattern>...)"},
+            u8"Mount a host directory to the WASI sandbox at a fixed WASI mount point. Usage requires two arguments: <wasi dir> <system dir>. The <wasi dir> must be a POSIX-style absolute path (e.g. /a/x/d), must not contain '..', and '.' is only allowed when it is the whole mount point. Extra options like -add/-rm/--symlink-escape-nonwasi are removed for security."},
+        .usage{u8"<wasi dir:str> <system dir:str>"},
         .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasi_mount_dir_alias), 1uz}},
         .handle{::std::addressof(details::wasi_mount_dir_callback)},
-        .pretreatment{::std::addressof(details::wasi_mount_dir_pretreatment)},
+        .pretreatment{nullptr},
         .cate{::uwvm2::utils::cmdline::categorization::wasi}};
 #if defined(__clang__)
 # pragma clang diagnostic pop
