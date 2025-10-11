@@ -55,5 +55,7 @@
 # include "fd_filestat_set_size.h"
 # include "fd_filestat_set_times_wasm64.h"
 # include "fd_filestat_set_times.h"
+# include "fd_prestat_dir_name_wasm64.h"
+# include "fd_prestat_dir_name.h"
 
 #endif

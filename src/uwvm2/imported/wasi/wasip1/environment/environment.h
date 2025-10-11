@@ -36,6 +36,7 @@
 # include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
+# include <fast_io_device.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
@@ -43,7 +44,6 @@
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
 # include <uwvm2/imported/wasi/wasip1/memory/impl.h>
-# include <uwvm2/imported/wasi/wasip1/mount_root/impl.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -108,7 +108,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
     struct mount_dir_root_t
     {
         ::uwvm2::utils::container::u8string_view preload_dir{};
-        ::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry entry{};
+        ::fast_io::dir_file entry{};
     };
 
     /// @brief [singleton]
@@ -124,6 +124,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
 
         ::uwvm2::imported::wasi::wasip1::fd_manager::wasm_fd_storage_t fd_storage{};  // [singleton]
 
+        /// @note  After preloading, the directory in `mount_dir_root_t` becomes invalid. Because its contents were moved to the file manager.
         ::uwvm2::utils::container::vector<mount_dir_root_t> mount_dir_roots{};
 
         bool trace_wasip1_call{};

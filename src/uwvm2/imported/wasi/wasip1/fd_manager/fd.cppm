@@ -24,7 +24,7 @@ module;
 // std
 #include <cstddef>
 #include <cstdint>
-#include <stdfloat>
+#include <climits>
 #include <limits>
 #include <type_traits>
 #include <memory>

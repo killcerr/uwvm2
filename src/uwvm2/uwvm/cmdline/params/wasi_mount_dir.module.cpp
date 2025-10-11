@@ -26,7 +26,6 @@ import uwvm2.utils.container;
 import uwvm2.utils.ansies;
 import uwvm2.utils.cmdline;
 import uwvm2.utils.utf;
-import uwvm2.imported.wasi.wasip1.mount_root;
 import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
