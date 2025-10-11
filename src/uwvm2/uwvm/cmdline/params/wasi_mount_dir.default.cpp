@@ -37,7 +37,6 @@
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
 # include <uwvm2/utils/utf/impl.h>
-# include <uwvm2/imported/wasi/wasip1/mount_root/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
@@ -52,7 +51,7 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::uwvm2::utils::cmdline::parameter_parsing_results* para_curr,
                                 ::uwvm2::utils::cmdline::parameter_parsing_results* para_end) noexcept
     {
-        auto param_cursor{para_curr + 1};
+        auto param_cursor{para_curr + 1u};
 
         // Check for wasi mount dir
         if(param_cursor == para_end || param_cursor->type != ::uwvm2::utils::cmdline::parameter_parsing_results_type::arg) [[unlikely]]
@@ -72,6 +71,25 @@ namespace uwvm2::uwvm::cmdline::params::details
 
         // Parse wasidir
         ::uwvm2::utils::container::u8string_view wasidir{param_cursor->str};
+
+        if(wasidir.empty()) [[unlikely]]
+        {
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Invalid ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                u8"<wasi dir>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8": cannot be empty\n\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+            return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+        }
+
         param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
         ++param_cursor;
 
@@ -98,18 +116,16 @@ namespace uwvm2::uwvm::cmdline::params::details
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
-        ::uwvm2::imported::wasi::wasip1::mount_root::mount_root_entry entry{};
-        entry.root_dir = ::fast_io::u8string_view{param_cursor->str};
-        param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
-        ++param_cursor;
-
-        // Validate wasidir (absolute and relative modes):
-        // Absolute mode: POSIX-like absolute path, forbid illegal chars (\\, *, ?, ", <, >, |, :),
-        //                forbid '//' and any path segment equal to '.' or '..' (but allow '.' as the whole path),
-        //                allow other dots like '...'/'.config'. Additionally, require valid UTF-8 and forbid NUL inside view.
-        // Relative mode: allow '.' or './name/...'; after the leading '.', segments cannot be '.' or '..'.
-
-        if(wasidir.empty()) [[unlikely]]
+        // get system dir
+        ::fast_io::dir_file entry;  // no initialize
+#ifdef UWVM_CPP_EXCEPTIONS
+        try
+#endif
+        {
+            entry = ::fast_io::dir_file{param_cursor->str};
+        }
+#ifdef UWVM_CPP_EXCEPTIONS
+        catch(::fast_io::error e)
         {
             ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
@@ -117,15 +133,31 @@ namespace uwvm2::uwvm::cmdline::params::details
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
                                 u8"[error] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8"Invalid ",
+                                u8"Unable to open system dir \"",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
-                                u8"<wasi dir>",
+                                param_cursor->str,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
-                                u8": cannot be empty\n\n",
-                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
-
+                                u8"\": ",
+                                e,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL),
+                                u8"\n"
+# ifndef _WIN32
+                                u8"\n"
+# endif
+            );
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
         }
+#endif
+
+        param_cursor->type = ::uwvm2::utils::cmdline::parameter_parsing_results_type::occupied_arg;
+        ++param_cursor;
+
+        // Validate wasidir (absolute and relative modes):
+        // Absolute: POSIX-like absolute path; forbid '//' and any path segment equal to '.' or '..'.
+        //           '.' is allowed only when used alone as the entire path. Characters other than '/' are not restricted.
+        //           Additionally, require valid UTF-8 and forbid embedded NUL.
+        // Relative: allow '.' alone, or pure relative paths without any '.' or '..' segments (e.g. "b/xxx").
+        //           './name' is NOT allowed; '//' is forbidden.
 
         // Detect relative mode: any path not starting with '/' is treated as relative (including '.')
         bool const wasidir_is_relative{wasidir.front_unchecked() != u8'/'};
@@ -378,7 +410,7 @@ namespace uwvm2::uwvm::cmdline::params::details
             // Supports normalization of both absolute paths and relative paths (including “.”).
             auto const existing_norm{(!existing.empty() && existing.front_unchecked() == u8'/') ? canonicalize_wasidir(existing)
                                                                                                 : canonicalize_wasidir_rel(existing)};
-            // normalize: we assume stored wasidir was validated and absolute
+            // Note: stored mount points are validated; they may be absolute or relative.
             constexpr auto starts_with{[](::uwvm2::utils::container::u8string_view a, ::uwvm2::utils::container::u8string_view b) constexpr noexcept -> bool
                                        {
                                            // Special case: '/' is the prefix of any absolute path
@@ -440,10 +472,7 @@ namespace uwvm2::uwvm::cmdline::params::details
         }
 
         // Record into default_wasi_env
-        ::uwvm2::imported::wasi::wasip1::environment::mount_dir_root_t mdr{};
-        mdr.preload_dir = wasidir_norm;
-        mdr.entry = ::std::move(entry);
-        env.mount_dir_roots.emplace_back(::std::move(mdr));
+        env.mount_dir_roots.emplace_back(wasidir_norm, ::std::move(entry));
 
         return ::uwvm2::utils::cmdline::parameter_return_type::def;
     }
