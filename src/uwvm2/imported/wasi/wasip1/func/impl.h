@@ -59,5 +59,7 @@
 # include "fd_prestat_dir_name.h"
 # include "fd_prestat_get_wasm64.h"
 # include "fd_prestat_get.h"
+# include "fd_pwrite_wasm64.h"
+# include "fd_pwrite.h"
 
 #endif

@@ -46,6 +46,7 @@
 # if !defined(_WIN32)
 #  include <errno.h>
 #  include <unistd.h>
+#  include <sys/stat.h>
 # endif
 // import
 # include <fast_io.h>
@@ -602,6 +603,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 #else
             // posix
+
+            // Reading or writing a directory file is undefined behavior on POSIX systems. Here, it uniformly returns `isdir`.
+            struct ::stat stbuf;  // no initialize
+            if(::uwvm2::imported::wasi::wasip1::func::posix::fstat(curr_fd.file_fd.native_handle(), ::std::addressof(stbuf)) == 0 && S_ISDIR(stbuf.st_mode))
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eisdir;
+            }
+
             ::fast_io::io_scatter_status_t scatter_status;  // no initialize
 
 # ifdef UWVM_CPP_EXCEPTIONS
@@ -652,6 +661,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #  endif
 #  if defined(ECONNRESET)
                     case ECONNRESET: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::econnreset;
+#  endif
+#  if defined(EPIPE)
+                    case EPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::epipe;
 #  endif
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
                 }
