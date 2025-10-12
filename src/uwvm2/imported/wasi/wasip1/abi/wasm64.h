@@ -142,6 +142,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::abi
                sizeof(wasi_iovec_wasm64_t) == size_of_wasi_iovec_wasm64_t && alignof(wasi_iovec_wasm64_t) == 8uz &&
                ::std::endian::native == ::std::endian::little;
     }
+
+    using wasi_ciovec_wasm64_t = wasi_iovec_wasm64_t;
+
+    inline constexpr ::std::size_t size_of_wasi_ciovec_wasm64_t{size_of_wasi_iovec_wasm64_t};
+
+    inline consteval bool is_default_wasi_ciovec_wasm64_data_layout() noexcept { return is_default_wasi_iovec_wasm64_data_layout(); }
 }
 
 #ifndef UWVM_MODULE
