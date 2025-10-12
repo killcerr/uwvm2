@@ -57,6 +57,8 @@ export import :fd_filestat_set_times_wasm64;
 export import :fd_filestat_set_times;
 export import :fd_prestat_dir_name_wasm64;
 export import :fd_prestat_dir_name;
+export import :fd_prestat_get_wasm64;
+export import :fd_prestat_get;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
