@@ -667,7 +667,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     case ECONNRESET: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::econnreset;
 #  endif
 #  if defined(EPIPE)
-                    case EPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::epipe;
+                    case EPIPE: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::epipe;
 #  endif
                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                 }
