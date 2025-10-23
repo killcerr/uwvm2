@@ -20,13 +20,13 @@
  ****************************************/
 
 #include <cstddef>
-#include <cstdint>
 
 #include <fast_io.h>
 
 #include <uwvm2/imported/wasi/wasip1/func/fd_fdstat_get.h>
 #include <uwvm2/imported/wasi/wasip1/func/fd_close.h>
 #include <uwvm2/imported/wasi/wasip1/func/posix.h>
+#include <uwvm2/imported/wasi/wasip1/fd_manager/fd.h>
 #if defined(_WIN32) && !defined(__CYGWIN__)
 
 int main()
@@ -58,10 +58,19 @@ int main()
     }
 
     // Case 1: success for regular file; check filetype only (Windows does not use fcntl flags here)
-    env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_base = static_cast<rights_t>(-1);
-    env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_inherit = static_cast<rights_t>(-1);
-    env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd =
-        ::fast_io::native_file{u8"test_fd_fdstat_get_win32_regular.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+    {
+        auto& fde4 = *env.fd_storage.opens.index_unchecked(4uz).fd_p;
+        fde4.rights_base = static_cast<rights_t>(-1);
+        fde4.rights_inherit = static_cast<rights_t>(-1);
+        fde4.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
+        fde4.wasi_fd.ptr->wasi_fd_storage.storage.file_fd
+#if defined(_WIN32) && !defined(__CYGWIN__)
+            .file
+#endif
+            = ::fast_io::native_file{
+            u8"test_fd_fdstat_get_win32_regular.tmp",
+            ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+    }
     {
         constexpr wasi_void_ptr_t stat_ptr{2048u};
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_fdstat_get(env, static_cast<wasi_posix_fd_t>(4), stat_ptr);
@@ -84,8 +93,14 @@ int main()
         auto& fde = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
         fde.rights_base = static_cast<rights_t>(-1);
         fde.rights_inherit = static_cast<rights_t>(-1);
-        fde.file_fd = ::fast_io::native_file{u8"test_fd_fdstat_get_win32_close.tmp",
-                                             ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+        fde.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
+        fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd
+#if defined(_WIN32) && !defined(__CYGWIN__)
+            .file
+#endif
+            = ::fast_io::native_file{
+            u8"test_fd_fdstat_get_win32_close.tmp",
+            ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
 
         auto const closed = ::uwvm2::imported::wasi::wasip1::func::fd_close(env, static_cast<wasi_posix_fd_t>(2));
         if(closed != errno_t::esuccess)
@@ -138,10 +153,16 @@ int main()
     // Prepare a regular file at fd=4 with O_APPEND to test flags and type
     env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_base = static_cast<rights_t>(-1);
     env.fd_storage.opens.index_unchecked(4uz).fd_p->rights_inherit = static_cast<rights_t>(-1);
-    env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd =
-        ::fast_io::native_file{u8"test_fd_fdstat_get_regular.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
     {
-        int const fd_native = env.fd_storage.opens.index_unchecked(4uz).fd_p->file_fd.native_handle();
+        auto& fde4 = *env.fd_storage.opens.index_unchecked(4uz).fd_p;
+        fde4.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
+        fde4.wasi_fd.ptr->wasi_fd_storage.storage.file_fd =
+            ::fast_io::native_file{u8"test_fd_fdstat_get_regular.tmp",
+                                   ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+    }
+    {
+        int const fd_native =
+            env.fd_storage.opens.index_unchecked(4uz).fd_p->wasi_fd.ptr->wasi_fd_storage.storage.file_fd.native_handle();
         int const curr = ::uwvm2::imported::wasi::wasip1::func::posix::fcntl(fd_native, F_GETFL);
         if(curr == -1)
         {
@@ -191,8 +212,10 @@ int main()
         auto& fde = *env.fd_storage.opens.index_unchecked(2uz).fd_p;
         fde.rights_base = static_cast<rights_t>(-1);
         fde.rights_inherit = static_cast<rights_t>(-1);
-        fde.file_fd =
-            ::fast_io::native_file{u8"test_fd_fdstat_get_close.tmp", ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+        fde.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
+        fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd =
+            ::fast_io::native_file{u8"test_fd_fdstat_get_close.tmp",
+                                   ::fast_io::open_mode::out | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
 
         auto const closed = ::uwvm2::imported::wasi::wasip1::func::fd_close(env, static_cast<wasi_posix_fd_t>(2));
         if(closed != errno_t::esuccess)

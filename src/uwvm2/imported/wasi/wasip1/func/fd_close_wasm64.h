@@ -183,6 +183,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 auto const new_close_pos{::std::addressof(wasm_fd_storage.closes.emplace_back(fd_opens_pos))};
 
                 // Add the position where it closes itself to facilitate subsequent renumbering.
+                // Since it is a vector, its internal iterators are contiguous, allowing direct access to adjacent elements.
                 curr_fd_p->close_pos = static_cast<::std::size_t>(new_close_pos - wasm_fd_storage.closes.cbegin());
             }
 
@@ -205,42 +206,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // The "close" operation always succeeds. Even if an exception is thrown, it will be reset to the initial value.
 
-#ifdef UWVM_CPP_EXCEPTIONS
-        try
-#endif
+        // If ptr is null, it indicates an attempt to open a closed file. However, the preceding check for close pos already prevents such closed files from
+        // being processed, making this a virtual machine implementation error.
+        if(curr_fd.wasi_fd.ptr == nullptr) [[unlikely]]
         {
-#if defined(_WIN32) && !defined(__CYGWIN__)
-            if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::socket) { curr_fd.socket_fd.close(); }
-# if defined(_WIN32_WINDOWS)
-            else if(curr_fd.file_type == ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t::dir) { curr_fd.dir_fd.close(); }
-# endif
-            else
-            {
-                curr_fd.file_fd.close();
-            }
-#else
-            curr_fd.file_fd.close();
+// This will be checked at runtime.
+#if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
+            ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
+            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
         }
-#ifdef UWVM_CPP_EXCEPTIONS
-        catch(::fast_io::error)
-        {
-            // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws an
-            // exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly likely
-            // already unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is thrown here and
-            // `eio` is returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights, the VM will
-            // mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe
-            // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
-        }
-#endif
 
-        // For Win32, restore the file_type to its original state.
-#if defined(_WIN32) && !defined(__CYGWIN__)
-        curr_fd.file_type = ::uwvm2::imported::wasi::wasip1::fd_manager::win32_wasi_fd_typesize_t{};
-#endif
+        // In `sys_close_throw_error`, `fast_io` first sets the file descriptor to -1 regardless of whether `close` succeeds or fails, then throws an
+        // exception based on the return value. This means that once `curr_fd.close()` throws an exception, the underlying handle is highly likely
+        // already unusable (especially on Linux, where `EINTR` and many error scenarios have effectively closed it). If an exception is thrown here and
+        // `eio` is returned directly without marking the fd in `wasm_fd_storage.closes`, updating `close_pos`, or resetting rights, the VM will
+        // mistakenly believe the fd remains usable despite its actual unavailability. This creates a state inconsistency. It is neither exception-safe
+        // (no fallback possible) nor prevents subsequent operations on the fd from failing. Therefore, no action is taken here.
 
-        // reset is_preloaded_dir
-        curr_fd.preloaded_dir.clear();
+        // The `reset_type` function does not throw exceptions, and the destructor of `fast_io` also does not throw exceptions. It will not close due to a
+        // failed close operation. Use `reset` directly. When creating from the vector of closed positions later, use `create_new`.
+        curr_fd.wasi_fd.reset();
 
         // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
 
