@@ -35,12 +35,14 @@ module;
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
 // platform
-#if !defined(_WIN32)
-# include <errno.h>
+#if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 # include <unistd.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <sys/stat.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:fd_seek;
+export module uwvm2.imported.wasi.wasip1.func:fd_sync_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -62,5 +64,6 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "fd_seek.h"
+#include "fd_sync_wasm64.h"
+
 
