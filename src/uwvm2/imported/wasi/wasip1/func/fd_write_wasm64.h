@@ -71,14 +71,14 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
-    /// @brief     WasiPreview1.fd_read (WASM64)
-    /// @details   __wasi_errno_t __wasi_fd_read(__wasi_fd_t fd, const __wasi_iovec_t *iovs, __wasi_size_t iovs_len, __wasi_size_t *nread);
-    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_read_wasm64(
+    /// @brief     WasiPreview1.fd_write (WASM64)
+    /// @details   __wasi_errno_t __wasi_fd_write(__wasi_fd_t fd, const __wasi_ciovec_t *iovs, __wasi_size_t iovs_len, __wasi_size_t *nwritten);
+    ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t fd_write_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t iovs,
         ::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t iovs_len,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t nread) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t nwritten) noexcept
     {
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
         if(env.wasip1_memory == nullptr) [[unlikely]]
@@ -102,7 +102,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"fd_read_wasm64",
+                                u8"fd_write_wasm64",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
@@ -118,7 +118,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8", ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
-                                ::fast_io::mnp::addrvw(nread),
+                                ::fast_io::mnp::addrvw(nwritten),
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8") ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
@@ -126,14 +126,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
             ::fast_io::io::perr(::fast_io::u8err(),
-                                u8"uwvm: [info]  wasip1: fd_read_wasm64(",
+                                u8"uwvm: [info]  wasip1: fd_write_wasm64(",
                                 fd,
                                 u8", ",
                                 ::fast_io::mnp::addrvw(iovs),
                                 u8", ",
                                 iovs_len,
                                 u8", ",
-                                ::fast_io::mnp::addrvw(nread),
+                                ::fast_io::mnp::addrvw(nwritten),
                                 u8") (wasi-trace)\n");
 #endif
         }
@@ -207,15 +207,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // If obtained from the renumber map, it will always be the correct value. If obtained from the open vec, it requires checking whether it is closed.
         if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
-        // Rights check: read uses read permission
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_read) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_read) [[unlikely]]
+        // Rights check: write uses write permission
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_write) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_fd_write) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
 
-        // check overflow (wasi_iovec_wasm64_t)
-        constexpr ::std::size_t max_iovs_len{::std::numeric_limits<::std::size_t>::max() / ::uwvm2::imported::wasi::wasip1::abi::size_of_wasi_iovec_wasm64_t};
+        // check overflow (wasi_ciovec_wasm64_t)
+        constexpr ::std::size_t max_iovs_len{::std::numeric_limits<::std::size_t>::max() / ::uwvm2::imported::wasi::wasip1::abi::size_of_wasi_ciovec_wasm64_t};
         if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max() > max_iovs_len)
         {
             if(iovs_len > max_iovs_len) [[unlikely]]
@@ -245,10 +245,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // After checking all items, determine whether the result equals zero.
         if(scatter_length == 0uz)
         {
-            // If the length of iovs is 0, the system call returns successfully with nread=0.
+            // If the length of iovs is 0, the system call returns successfully with nwritten=0.
             ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64(
                 memory,
-                nread,
+                nwritten,
                 static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(0uz));
 
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
@@ -257,7 +257,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // check memory bounds
         ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64(memory,
                                                                             iovs,
-                                                                            iovs_len * ::uwvm2::imported::wasi::wasip1::abi::size_of_wasi_iovec_wasm64_t);
+                                                                            iovs_len * ::uwvm2::imported::wasi::wasip1::abi::size_of_wasi_ciovec_wasm64_t);
 
         // If using reassignment
         ::uwvm2::imported::wasi::wasip1::func::fast_io_io_scatter_t_allocator_guard tmp_allocator_guard{};
@@ -297,11 +297,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             tmp_allocator_guard.ptr = scatter_base;
         }
 
-        // for nread
-        ::fast_io::intfpos_t total_bytes_read{};
+        // for nwritten
+        ::fast_io::intfpos_t total_bytes_write{};
 
         {
-            // Full locking is required during reading.
+            // Full locking is required during writing.
             [[maybe_unused]] auto const memory_locker_guard{::uwvm2::imported::wasi::wasip1::memory::lock_memory(memory)};
 
             // get scatter base
@@ -314,16 +314,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t wasm_base;  // no initialize
                 ::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t wasm_len;       // no initialize
 
-                if constexpr(::uwvm2::imported::wasi::wasip1::abi::is_default_wasi_iovec_wasm64_data_layout())
+                if constexpr(::uwvm2::imported::wasi::wasip1::abi::is_default_wasi_ciovec_wasm64_data_layout())
                 {
-                    ::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_wasm64_t tmp_iovec;  // no initialize
+                    ::uwvm2::imported::wasi::wasip1::abi::wasi_ciovec_wasm64_t tmp_iovec;  // no initialize
 
                     // iovs_len has been checked.
                     ::uwvm2::imported::wasi::wasip1::memory::read_all_from_memory_wasm64_unchecked_unlocked(
                         memory,
                         iovs_curr,
                         reinterpret_cast<::std::byte*>(::std::addressof(tmp_iovec)),
-                        reinterpret_cast<::std::byte*>(::std::addressof(tmp_iovec)) + sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_iovec_wasm64_t));
+                        reinterpret_cast<::std::byte*>(::std::addressof(tmp_iovec)) + sizeof(::uwvm2::imported::wasi::wasip1::abi::wasi_ciovec_wasm64_t));
                     iovs_curr += 16uz;
 
                     wasm_base = tmp_iovec.buf;
@@ -367,8 +367,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 }
 
                 // Conversion requires verification.
-                if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max() >
-                             ::std::numeric_limits<::std::size_t>::max())
+                if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max() > ::std::numeric_limits<::std::size_t>::max())
                 {
                     if(wasm_len > ::std::numeric_limits<::std::size_t>::max()) [[unlikely]]
                     {
@@ -415,7 +414,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     try
 # endif
                     {
-                        scatter_status = ::fast_io::operations::scatter_read_some_bytes(file_fd, scatter_base, scatter_length);
+                        scatter_status = ::fast_io::operations::scatter_write_some_bytes(file_fd, scatter_base, scatter_length);
                     }
 # ifdef UWVM_CPP_EXCEPTIONS
                     catch(::fast_io::error e)
@@ -453,19 +452,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 4uz /*ERROR_TOO_MANY_OPEN_FILES*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::emfile;
                                     case 24uz /*ERROR_BAD_LENGTH*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
                                     case 25uz /*ERROR_SEEK*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
-                                    case 21uz /*ERROR_NOT_READY*/:
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
-                                    [[likely]] case 38uz /*ERROR_HANDLE_EOF*/:
-                                    {
-                                        // Under POSIX semantics, EOF always returns correctly with nread set to 0.
-                                        // Since it is still within the locked memory section, the locked version cannot be used.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unlocked(
-                                            memory,
-                                            nread,
-                                            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(0uz));
-
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
-                                    }
+                                    case 21uz /*ERROR_NOT_READY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                                    case 38uz /*ERROR_HANDLE_EOF*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;  // write has no EOF concept
                                     case 112uz /*ERROR_DISK_FULL*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
                                     case 12uz /*ERROR_INVALID_ACCESS*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
                                     case 32uz /*ERROR_SHARING_VIOLATION*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebusy;
@@ -474,9 +462,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 232uz /*ERROR_NO_DATA*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::epipe;
                                     case 8uz /*ERROR_NOT_ENOUGH_MEMORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enomem;
                                     case 14uz /*ERROR_OUTOFMEMORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enomem;
-                                    case 267uz /*ERROR_DIRECTORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                                     case 995uz /*ERROR_OPERATION_ABORTED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ecanceled;
                                     case 997uz /*ERROR_IO_PENDING*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einprogress;
+                                    case 267uz /*ERROR_DIRECTORY*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                                 }
 
@@ -512,8 +500,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                         {
                                             [[likely]] case 0x00000000u:
                                                 break;
-                                            case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/:
-                                                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
+                                            case 0xC0000010u /*STATUS_INVALID_DEVICE_REQUEST*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::espipe;
                                             default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
                                         }
 
@@ -532,30 +519,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                     case 0xC0000043uz /* STATUS_SHARING_VIOLATION */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebusy;
                                     case 0xC0000054uz /* STATUS_FILE_LOCK_CONFLICT */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eagain;
                                     case 0xC000007Fuz /* STATUS_DISK_FULL */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enospc;
-                                    case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */:
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
-                                    [[likely]] case 0xC0000011uz /* STATUS_END_OF_FILE */:
-                                    {
-                                        // Under POSIX semantics, EOF always returns correctly with nread set to 0.
-                                        // It seems not to trigger in NT contexts, as it appears to reference POSIX design.
-                                        // Since it is still within the locked memory section, the locked version cannot be used.
-                                        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unlocked(
-                                            memory,
-                                            nread,
-                                            static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(0uz));
-
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::esuccess;
-                                    }
+                                    case 0xC0000010uz /* STATUS_INVALID_DEVICE_REQUEST */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enosys;
+                                    case 0xC0000011uz /* STATUS_END_OF_FILE */:
+                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;  // write has no EOF concept
                                     case 0xC0000013uz /* STATUS_NO_MEDIA_IN_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enoent;
                                     case 0xC000000Euz /* STATUS_NO_SUCH_DEVICE */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enoent;
                                     case 0xC0000101uz /* STATUS_DIRECTORY_NOT_EMPTY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotempty;
-                                    case 0xC0000281uz /* STATUS_DIRECTORY_IS_A_REPARSE_POINT */:
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
+                                    case 0xC0000281uz /* STATUS_DIRECTORY_IS_A_REPARSE_POINT */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                                     case 0xC00000BAuz /* STATUS_FILE_IS_A_DIRECTORY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                                     case 0xC000009Auz /* STATUS_INSUFFICIENT_RESOURCES */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enomem;
                                     case 0xC0000017uz /* STATUS_NO_MEMORY */: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enomem;
-                                    case 0xC0000120uz /*STATUS_CANCELLED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ecanceled;
-                                    case 0x00000103uz /*STATUS_PENDING*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einprogress;
+                                    case 0xC0000120uz /*STATUS CANCELLED*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ecanceled;
+                                    case 0x00000103uz /*STATUS PENDING*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einprogress;
                                     case 0xC000014Buz /*STATUS_PIPE_BROKEN*/: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::epipe;
                                     default: return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eio;
                                 }
@@ -575,7 +550,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     }
 # endif
 
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
+                    total_bytes_write = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
 
 #else
                     // posix
@@ -593,7 +568,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     try
 # endif
                     {
-                        scatter_status = ::fast_io::operations::scatter_read_some_bytes(file_fd, scatter_base, scatter_length);
+                        scatter_status = ::fast_io::operations::scatter_write_some_bytes(file_fd, scatter_base, scatter_length);
                     }
 # ifdef UWVM_CPP_EXCEPTIONS
                     catch(::fast_io::error e)
@@ -647,7 +622,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     }
 # endif
 
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
+                    total_bytes_write = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
 #endif
 
                     break;
@@ -667,7 +642,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     try
 # endif
                     {
-                        scatter_status = ::fast_io::operations::scatter_read_some_bytes(socket_fd, scatter_base, scatter_length);
+                        scatter_status = ::fast_io::operations::scatter_write_some_bytes(socket_fd, scatter_base, scatter_length);
                     }
 # ifdef UWVM_CPP_EXCEPTIONS
                     catch(::fast_io::error e)
@@ -742,7 +717,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                     }
 # endif
 
-                    total_bytes_read = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
+                    total_bytes_write = ::fast_io::fposoffadd_scatters(0, scatter_base, scatter_status);
 
                     break;
                 }
@@ -757,17 +732,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             }
 
             // Verified: fposoffadd_scatters cannot produce negative values; it undergoes saturation handling during overflow.
-            [[assume(total_bytes_read >= 0)]];
+            [[assume(total_bytes_write >= 0)]];
 
             // Since the total size was previously checked to be less than or equal to wasi_size_wasm64_t max, it must also be less than here.
             constexpr auto max_val{::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max()};
-            if constexpr(max_val < ::std::numeric_limits<::fast_io::intfpos_t>::max()) { [[assume(total_bytes_read <= max_val)]]; }
+            if constexpr(max_val < ::std::numeric_limits<::fast_io::intfpos_t>::max()) { [[assume(total_bytes_write <= max_val)]]; }
 
             // Requires locking and simultaneous checking
             ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm64_unlocked(
                 memory,
-                nread,
-                static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(total_bytes_read));
+                nwritten,
+                static_cast<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>(total_bytes_write));
 
             // memory_locker_guard deallocated here
         }
@@ -781,4 +756,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # include <uwvm2/utils/macro/pop_macros.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_pop_macro.h>
 #endif
+
+
+
 

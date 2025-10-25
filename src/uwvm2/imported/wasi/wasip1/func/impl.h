@@ -71,5 +71,9 @@
 # include "fd_seek.h"
 # include "fd_sync_wasm64.h"
 # include "fd_sync.h"
+# include "fd_tell_wasm64.h"
+# include "fd_tell.h"
+# include "fd_write_wasm64.h"
+# include "fd_write.h"
 
 #endif

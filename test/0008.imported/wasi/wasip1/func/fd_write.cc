@@ -25,12 +25,8 @@
 
 #include <fast_io.h>
 
-// keep tests minimal; avoid platform-specific headers
-
-// no third-party test headers
-
-#include <uwvm2/imported/wasi/wasip1/func/fd_read.h>
-#include <uwvm2/imported/wasi/wasip1/func/fd_pwrite.h>
+#include <uwvm2/imported/wasi/wasip1/func/fd_write.h>
+#include <uwvm2/imported/wasi/wasip1/func/fd_pread.h>
 
 int main()
 {
@@ -53,41 +49,40 @@ int main()
                                             .mount_dir_roots = {},
                                             .trace_wasip1_call = false};
 
-    // Prepare FD table
     env.fd_storage.opens.resize(8uz);
 
-    // Case 0: negative fd → ebadf (fast path, no memory access)
+    // Case 0: negative fd → ebadf
     {
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_read(env,
-                                                                        static_cast<wasi_posix_fd_t>(-1),
-                                                                        static_cast<wasi_void_ptr_t>(0u),
-                                                                        static_cast<wasi_size_t>(0u),
-                                                                        static_cast<wasi_void_ptr_t>(0u));
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::fd_write(env,
+                                                                         static_cast<wasi_posix_fd_t>(-1),
+                                                                         static_cast<wasi_void_ptr_t>(0u),
+                                                                         static_cast<wasi_size_t>(0u),
+                                                                         static_cast<wasi_void_ptr_t>(0u));
         if(ret != errno_t::ebadf)
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: expected ebadf for negative fd");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write: expected ebadf for negative fd");
             ::fast_io::fast_terminate();
         }
     }
 
-    // Case 1: regular file read two buffers from beginning; prepare content by pwrite
+    // Case 1: regular file write two buffers from current position; verify by pread
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(4uz).fd_p;
         fde.rights_base = static_cast<rights_t>(-1);
         fde.rights_inherit = static_cast<rights_t>(-1);
-        // initialize fd storage to file type and assign native_file
         fde.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
 #if defined(_WIN32) && !defined(__CYGWIN__)
         fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd.file =
-            ::fast_io::native_file{u8"test_fd_read_regular.tmp",
+            ::fast_io::native_file{u8"test_fd_write_regular.tmp",
                                    ::fast_io::open_mode::out | ::fast_io::open_mode::in | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+        [[maybe_unused]] auto& file_fd = fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd.file;
 #else
         fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd =
-            ::fast_io::native_file{u8"test_fd_read_regular.tmp",
+            ::fast_io::native_file{u8"test_fd_write_regular.tmp",
                                    ::fast_io::open_mode::out | ::fast_io::open_mode::in | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat};
+        [[maybe_unused]] auto& file_fd = fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd;
 #endif
 
-        // Write content using fd_pwrite at offset 0
         constexpr char const hello[] = "Hello";
         constexpr char const world[] = "World";
         constexpr wasi_void_ptr_t wbuf1{100u};
@@ -101,69 +96,72 @@ int main()
                                                                             reinterpret_cast<::std::byte const*>(world),
                                                                             reinterpret_cast<::std::byte const*>(world) + 5);
 
-        constexpr wasi_void_ptr_t wiovs_ptr{300u};
+        constexpr wasi_void_ptr_t iovs_ptr{300u};
         constexpr wasi_void_ptr_t nwritten_ptr{320u};
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, wiovs_ptr, wbuf1);
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
-                                                                                        static_cast<wasi_void_ptr_t>(wiovs_ptr + 4u),
-                                                                                        static_cast<wasi_size_t>(5u));
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, static_cast<wasi_void_ptr_t>(wiovs_ptr + 8u), wbuf2);
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
-                                                                                        static_cast<wasi_void_ptr_t>(wiovs_ptr + 12u),
-                                                                                        static_cast<wasi_size_t>(5u));
-
-        auto const wret = ::uwvm2::imported::wasi::wasip1::func::fd_pwrite(env,
-                                                                           static_cast<wasi_posix_fd_t>(4),
-                                                                           wiovs_ptr,
-                                                                           static_cast<wasi_size_t>(2u),
-                                                                           static_cast<filesize_t>(0u),
-                                                                           nwritten_ptr);
-        if(wret != errno_t::esuccess)
-        {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read test prepare: fd_pwrite failed");
-            ::fast_io::fast_terminate();
-        }
-
-        // Read back with fd_read
-        constexpr wasi_void_ptr_t rbuf1{512u};
-        constexpr wasi_void_ptr_t rbuf2{1024u};
-        constexpr wasi_void_ptr_t iovs_ptr{128u};
-        constexpr wasi_void_ptr_t nread_ptr{2000u};
-
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, iovs_ptr, static_cast<wasi_void_ptr_t>(rbuf1));
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, iovs_ptr, wbuf1);
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
                                                                                         static_cast<wasi_void_ptr_t>(iovs_ptr + 4u),
                                                                                         static_cast<wasi_size_t>(5u));
-        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
-                                                                                        static_cast<wasi_void_ptr_t>(iovs_ptr + 8u),
-                                                                                        static_cast<wasi_void_ptr_t>(rbuf2));
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, static_cast<wasi_void_ptr_t>(iovs_ptr + 8u), wbuf2);
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
                                                                                         static_cast<wasi_void_ptr_t>(iovs_ptr + 12u),
                                                                                         static_cast<wasi_size_t>(5u));
 
-        auto const ret =
-            ::uwvm2::imported::wasi::wasip1::func::fd_read(env, static_cast<wasi_posix_fd_t>(4), iovs_ptr, static_cast<wasi_size_t>(2u), nread_ptr);
-        if(ret != errno_t::esuccess)
+        auto const wret =
+            ::uwvm2::imported::wasi::wasip1::func::fd_write(env, static_cast<wasi_posix_fd_t>(4), iovs_ptr, static_cast<wasi_size_t>(2u), nwritten_ptr);
+        if(wret != errno_t::esuccess)
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: expected esuccess for regular file");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write: expected esuccess for regular file");
             ::fast_io::fast_terminate();
         }
 
+        auto const nwritten = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<wasi_size_t>(memory, nwritten_ptr);
+        if(nwritten != static_cast<wasi_size_t>(10u))
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write: nwritten should be 10");
+            ::fast_io::fast_terminate();
+        }
+
+        // Verify via pread at offset 0
+        constexpr wasi_void_ptr_t r_iovs_ptr{3000u};
+        constexpr wasi_void_ptr_t out1{3500u};
+        constexpr wasi_void_ptr_t out2{3600u};
+        constexpr wasi_void_ptr_t nread_ptr{3700u};
+
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, r_iovs_ptr, out1);
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
+                                                                                        static_cast<wasi_void_ptr_t>(r_iovs_ptr + 4u),
+                                                                                        static_cast<wasi_size_t>(5u));
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, static_cast<wasi_void_ptr_t>(r_iovs_ptr + 8u), out2);
+        ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
+                                                                                        static_cast<wasi_void_ptr_t>(r_iovs_ptr + 12u),
+                                                                                        static_cast<wasi_size_t>(5u));
+
+        auto const rret = ::uwvm2::imported::wasi::wasip1::func::fd_pread(env,
+                                                                          static_cast<wasi_posix_fd_t>(4),
+                                                                          r_iovs_ptr,
+                                                                          static_cast<wasi_size_t>(2u),
+                                                                          static_cast<filesize_t>(0u),
+                                                                          nread_ptr);
+        if(rret != errno_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write verify: fd_pread expected esuccess");
+            ::fast_io::fast_terminate();
+        }
         auto const nread = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<wasi_size_t>(memory, nread_ptr);
         if(nread != static_cast<wasi_size_t>(10u))
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: nread should be 10");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write verify: nread should be 10");
             ::fast_io::fast_terminate();
         }
-
-        if(std::memcmp(memory.memory_begin + rbuf1, "Hello", 5uz) != 0 || std::memcmp(memory.memory_begin + rbuf2, "World", 5uz) != 0)
+        if(std::memcmp(memory.memory_begin + out1, "Hello", 5uz) != 0 || std::memcmp(memory.memory_begin + out2, "World", 5uz) != 0)
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: buffers mismatch");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write verify: buffers mismatch");
             ::fast_io::fast_terminate();
         }
     }
 
-    // Case 2: zero iovecs → success, nread=0
+    // Case 2: zero iovecs → success, nwritten=0
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(5uz).fd_p;
         fde.rights_base = static_cast<rights_t>(-1);
@@ -171,62 +169,65 @@ int main()
         fde.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
 #if defined(_WIN32) && !defined(__CYGWIN__)
         fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd.file = ::fast_io::native_file{
-            u8"test_fd_read_zero.tmp",
+            u8"test_fd_write_zero.tmp",
             ::fast_io::open_mode::out | ::fast_io::open_mode::in | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat | ::fast_io::open_mode::no_block};
 #else
         fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd = ::fast_io::native_file{
-            u8"test_fd_read_zero.tmp",
+            u8"test_fd_write_zero.tmp",
             ::fast_io::open_mode::out | ::fast_io::open_mode::in | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat | ::fast_io::open_mode::no_block};
 #endif
 
         constexpr wasi_void_ptr_t iovs_ptr{128u};
-        constexpr wasi_void_ptr_t nread0_ptr{4100u};
+        constexpr wasi_void_ptr_t nwritten0_ptr{4100u};
         auto const ret =
-            ::uwvm2::imported::wasi::wasip1::func::fd_read(env, static_cast<wasi_posix_fd_t>(5), iovs_ptr, static_cast<wasi_size_t>(0u), nread0_ptr);
+            ::uwvm2::imported::wasi::wasip1::func::fd_write(env, static_cast<wasi_posix_fd_t>(5), iovs_ptr, static_cast<wasi_size_t>(0u), nwritten0_ptr);
         if(ret != errno_t::esuccess)
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: zero-iov should return esuccess");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write: zero-iov should return esuccess");
             ::fast_io::fast_terminate();
         }
-        auto const n0 = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<wasi_size_t>(memory, nread0_ptr);
-        if(n0 != static_cast<wasi_size_t>(0u))
+        auto const nw0 = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm32<wasi_size_t>(memory, nwritten0_ptr);
+        if(nw0 != static_cast<wasi_size_t>(0u))
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: zero-iov nread should be 0");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write: zero-iov nwritten should be 0");
             ::fast_io::fast_terminate();
         }
     }
 
-    // Case 3: enotcapable when no read rights
+    // Case 3: enotcapable when no write rights
     {
         auto& fde = *env.fd_storage.opens.index_unchecked(6uz).fd_p;
         // rights default 0
         fde.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
 #if defined(_WIN32) && !defined(__CYGWIN__)
         fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd.file = ::fast_io::native_file{
-            u8"test_fd_read_rights.tmp",
+            u8"test_fd_write_rights.tmp",
             ::fast_io::open_mode::out | ::fast_io::open_mode::in | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat | ::fast_io::open_mode::no_block};
-        auto& file_fd = fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd.file;
 #else
         fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd = ::fast_io::native_file{
-            u8"test_fd_read_rights.tmp",
+            u8"test_fd_write_rights.tmp",
             ::fast_io::open_mode::out | ::fast_io::open_mode::in | ::fast_io::open_mode::trunc | ::fast_io::open_mode::creat | ::fast_io::open_mode::no_block};
-        auto& file_fd = fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd;
 #endif
-        ::fast_io::io::print(file_fd, "data");
+
+        constexpr wasi_void_ptr_t buf{5000u};
+        constexpr char const data[] = "X";
+        ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm32(memory,
+                                                                            buf,
+                                                                            reinterpret_cast<::std::byte const*>(data),
+                                                                            reinterpret_cast<::std::byte const*>(data) + 1);
 
         constexpr wasi_void_ptr_t iovs_ptr{5200u};
-        constexpr wasi_void_ptr_t buf{5000u};
-        constexpr wasi_void_ptr_t nread_ptr{5300u};
+        constexpr wasi_void_ptr_t nwritten_ptr{5300u};
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, iovs_ptr, buf);
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
                                                                                         static_cast<wasi_void_ptr_t>(iovs_ptr + 4u),
-                                                                                        static_cast<wasi_size_t>(4u));
+                                                                                        static_cast<wasi_size_t>(1u));
 
         auto const ret =
-            ::uwvm2::imported::wasi::wasip1::func::fd_read(env, static_cast<wasi_posix_fd_t>(6), iovs_ptr, static_cast<wasi_size_t>(1u), nread_ptr);
+            ::uwvm2::imported::wasi::wasip1::func::fd_write(env, static_cast<wasi_posix_fd_t>(6), iovs_ptr, static_cast<wasi_size_t>(1u), nwritten_ptr);
         if(ret != errno_t::enotcapable)
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: expected enotcapable when rights missing");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write: expected enotcapable when rights missing");
             ::fast_io::fast_terminate();
         }
     }
@@ -238,25 +239,27 @@ int main()
         fde.rights_base = static_cast<rights_t>(-1);
         fde.rights_inherit = static_cast<rights_t>(-1);
         fde.wasi_fd.ptr->wasi_fd_storage.reset_type(::uwvm2::imported::wasi::wasip1::fd_manager::wasi_fd_type_e::file);
-# if defined(_WIN32) && !defined(__CYGWIN__)
-        fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd.file = ::fast_io::native_file{u8".", ::fast_io::open_mode::in | ::fast_io::open_mode::directory};
-# else
         fde.wasi_fd.ptr->wasi_fd_storage.storage.file_fd = ::fast_io::native_file{u8".", ::fast_io::open_mode::in | ::fast_io::open_mode::directory};
-# endif
+
+        constexpr wasi_void_ptr_t buf{6000u};
+        constexpr char const data[] = "Y";
+        ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm32(memory,
+                                                                            buf,
+                                                                            reinterpret_cast<::std::byte const*>(data),
+                                                                            reinterpret_cast<::std::byte const*>(data) + 1);
 
         constexpr wasi_void_ptr_t iovs_ptr{6200u};
-        constexpr wasi_void_ptr_t buf{6000u};
-        constexpr wasi_void_ptr_t nread_ptr{6300u};
+        constexpr wasi_void_ptr_t nwritten_ptr{6300u};
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory, iovs_ptr, buf);
         ::uwvm2::imported::wasi::wasip1::memory::store_basic_wasm_type_to_memory_wasm32(memory,
                                                                                         static_cast<wasi_void_ptr_t>(iovs_ptr + 4u),
                                                                                         static_cast<wasi_size_t>(1u));
 
         auto const ret =
-            ::uwvm2::imported::wasi::wasip1::func::fd_read(env, static_cast<wasi_posix_fd_t>(7), iovs_ptr, static_cast<wasi_size_t>(1u), nread_ptr);
+            ::uwvm2::imported::wasi::wasip1::func::fd_write(env, static_cast<wasi_posix_fd_t>(7), iovs_ptr, static_cast<wasi_size_t>(1u), nwritten_ptr);
         if(ret != errno_t::eisdir)
         {
-            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_read: expected eisdir for directory fd on POSIX");
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_write: expected eisdir for directory fd on POSIX");
             ::fast_io::fast_terminate();
         }
     }
