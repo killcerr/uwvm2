@@ -168,7 +168,8 @@ namespace uwvm2::uwvm::cmdline::params::details
             try
 # endif
             {
-                ::fast_io::native_file tmp{::fast_io::io_kernel, systemdir_nt_subview, ::fast_io::open_mode::directory};
+                // allow symlink
+                ::fast_io::native_file tmp{::fast_io::io_kernel, systemdir_nt_subview, ::fast_io::open_mode::directory | ::fast_io::open_mode::follow};
                 entry = ::fast_io::dir_file{tmp.release()};
             }
 # ifdef UWVM_CPP_EXCEPTIONS
@@ -200,7 +201,8 @@ namespace uwvm2::uwvm::cmdline::params::details
             try
 # endif
             {
-                entry = ::fast_io::dir_file{system_dir};
+                // allow symlink
+                entry = ::fast_io::dir_file{system_dir, ::fast_io::open_mode::follow};
             }
 # ifdef UWVM_CPP_EXCEPTIONS
             catch(::fast_io::error e)
@@ -232,7 +234,8 @@ namespace uwvm2::uwvm::cmdline::params::details
         try
 # endif
         {
-            entry = ::fast_io::dir_file{system_dir};
+            // allow symlink
+            entry = ::fast_io::dir_file{system_dir, ::fast_io::open_mode::follow};
         }
 # ifdef UWVM_CPP_EXCEPTIONS
         catch(::fast_io::error e)
@@ -610,7 +613,7 @@ namespace uwvm2::uwvm::cmdline::params::details
         // windows nt: safe (native handle)
         // windows 9x: unsafe (VxD does not provide directory handles, and multitasking exacerbates the TOCTOU problem.)
         // djgpp: safe (Due to single-task mode + full DJGPP control)
-        
+
 #if defined(_WIN32) && defined(_WIN32_WINDOWS)
         if(::uwvm2::uwvm::io::show_toctou_warning)
         {
@@ -650,6 +653,34 @@ namespace uwvm2::uwvm::cmdline::params::details
             }
         }
 #endif
+
+        if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+        {
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                u8"[info]  ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Mounted ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                u8"<wasi dir>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8" \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                wasidir_norm,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\" to ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                u8"<system dir>",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8" \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                system_dir,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\".\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+        }
 
         return ::uwvm2::utils::cmdline::parameter_return_type::def;
     }
