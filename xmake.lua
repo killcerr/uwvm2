@@ -14,7 +14,8 @@ set_allowedplats("windows", "mingw", "cygwin", "linux", "djgpp", "unix", "bsd", 
 includes("xmake/impl.lua")
 includes("xmake/platform/impl.lua")
 
-add_plugindirs("xmake/plugins")
+-- Currently, there are no plugins.
+-- add_plugindirs("xmake/plugins")
 
 set_defaultmode("releasedbg")
 set_allowedmodes(support_rules_table)
