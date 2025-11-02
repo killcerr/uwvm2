@@ -889,11 +889,11 @@ int main()
 #endif
 
 #if !(defined(_WIN32_WINDOWS) || (defined(_WIN32_WINNT) && _WIN32_WINNT <= 0x600) || defined(__MSDOS__) || defined(__DJGPP__))
-    // Case 20: symlink to ".." inside subdir -> esuccess (pcd64_escape_a/up/x -> x)
+    // Case 20: symlink to ".." inside subdir -> esuccess (pcd64_escape_a/pcd64_up/pcd64_x -> pcd64_x)
     {
         try
         {
-            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"x", ::fast_io::native_at_flags::removedir);
+            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd64_x", ::fast_io::native_at_flags::removedir);
         }
         catch(::fast_io::error)
         {
@@ -907,34 +907,35 @@ int main()
         }
         try
         {
-            ::fast_io::native_symlinkat(u8"..", ::fast_io::at_fdcwd(), u8"pcd64_escape_a/up");
+            ::fast_io::native_symlinkat(u8"..", ::fast_io::at_fdcwd(), u8"pcd64_escape_a/pcd64_up");
         }
         catch(::fast_io::error)
         {
         }
 
         constexpr wasi_void_ptr_wasm64_t p{49152u};
-        constexpr auto s = u8"pcd64_escape_a/up/x";
+        constexpr auto s = u8"pcd64_escape_a/pcd64_up/pcd64_x";
         ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm64(memory,
                                                                             p,
                                                                             reinterpret_cast<::std::byte const*>(s),
-                                                                            reinterpret_cast<::std::byte const*>(s) + sizeof(u8"pcd64_escape_a/up/x") - 1u);
+                                                                            reinterpret_cast<::std::byte const*>(s) +
+                                                                                sizeof(u8"pcd64_escape_a/pcd64_up/pcd64_x") - 1u);
 
-        auto const ret =
-            ::uwvm2::imported::wasi::wasip1::func::path_create_directory_wasm64(env,
-                                                                                static_cast<wasi_posix_fd_wasm64_t>(3),
-                                                                                p,
-                                                                                static_cast<wasi_size_wasm64_t>(sizeof(u8"pcd64_escape_a/up/x") - 1u));
+        auto const ret = ::uwvm2::imported::wasi::wasip1::func::path_create_directory_wasm64(
+            env,
+            static_cast<wasi_posix_fd_wasm64_t>(3),
+            p,
+            static_cast<wasi_size_wasm64_t>(sizeof(u8"pcd64_escape_a/pcd64_up/pcd64_x") - 1u));
         if(ret != errno_wasm64_t::esuccess)
         {
             ::fast_io::io::perrln("error: pcd64 Case 20 expected esuccess. ", static_cast<unsigned>(ret));
             ::fast_io::fast_terminate();
         }
 
-        // verify created at CWD: "x"
+        // verify created at CWD: "pcd64_x"
         try
         {
-            ::fast_io::dir_file df{u8"x"};
+            ::fast_io::dir_file df{u8"pcd64_x"};
         }
         catch(::fast_io::error)
         {
@@ -942,17 +943,17 @@ int main()
             ::fast_io::fast_terminate();
         }
 
-        // cleanup created "x"
+        // cleanup created "pcd64_x"
         try
         {
-            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"x", ::fast_io::native_at_flags::removedir);
+            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd64_x", ::fast_io::native_at_flags::removedir);
         }
         catch(::fast_io::error)
         {
         }
         try
         {
-            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd64_escape_a/up", {});
+            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd64_escape_a/pcd64_up", {});
         }
         catch(::fast_io::error)
         {
