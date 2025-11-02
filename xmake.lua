@@ -96,6 +96,8 @@ function def_build()
         bsd_target()
 	elseif is_plat("wasm-wasi", "wasm-wasip1", "wasm-wasip2", "wasm-wasi-threads", "wasm-wasip1-threads", "wasm-wasip2-threads") then 
 		wasm_wasi_target()
+	elseif is_plat("cygwin") then
+		cygwin_target()
 	elseif is_plat("none") then
 		none_target()
     end
