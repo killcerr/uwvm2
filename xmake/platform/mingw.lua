@@ -58,7 +58,7 @@ function mingw_target()
         -- Do not set --major-subsystem-version=10. During startup program exited with code 0xc000007b (invalid parameters).
         -- This option may be changed in a future update of the NT kernel major version.
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" then
             -- use all native instruction
@@ -79,7 +79,7 @@ function mingw_target()
         -- Do not set --major-subsystem-version=10. During startup program exited with code 0xc000007b (invalid parameters).
         -- This option may be changed in a future update of the NT kernel major version.
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
@@ -94,7 +94,7 @@ function mingw_target()
         add_defines("WINVER=0x0603")
         add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=3", {force = true})
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
@@ -109,7 +109,7 @@ function mingw_target()
         add_defines("WINVER=0x0602")
         add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=2", {force = true})
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
@@ -124,7 +124,7 @@ function mingw_target()
         add_defines("WINVER=0x0601")
         add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=1", {force = true})
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
@@ -139,7 +139,7 @@ function mingw_target()
         add_defines("WINVER=0x0600")
         add_ldflags("-Wl,--major-subsystem-version=6", "-Wl,--minor-subsystem-version=0", {force = true})
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
@@ -154,7 +154,7 @@ function mingw_target()
         add_defines("WINVER=0x0502")
         add_ldflags("-Wl,--major-subsystem-version=5", "-Wl,--minor-subsystem-version=2", {force = true})
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
@@ -168,7 +168,7 @@ function mingw_target()
         add_defines("WINVER=0x0501")
         add_ldflags("-Wl,--major-subsystem-version=5", "-Wl,--minor-subsystem-version=1", {force = true})
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
@@ -183,7 +183,7 @@ function mingw_target()
         add_defines("WINVER=0x0500")
         add_ldflags("-Wl,--major-subsystem-version=5", "-Wl,--minor-subsystem-version=0", {force = true})
         add_syslinks("ntdll")
-        add_syslinks("Shell32")
+        add_syslinks("shell32")
         local march = get_config("march")
         if march == "default" and is_arch("i686") then
             -- clang will automatically generate sse2 code on ix86 series, here use MinGW minimum support isa: i686
