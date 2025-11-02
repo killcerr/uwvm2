@@ -874,11 +874,11 @@ int main()
 #endif
 
 #if !(defined(_WIN32_WINDOWS) || (defined(_WIN32_WINNT) && _WIN32_WINNT <= 0x600) || defined(__MSDOS__) || defined(__DJGPP__))
-    // Case 20: symlink to ".." inside subdir -> esuccess (pcd32_escape_a/up/x -> x)
+    // Case 20: symlink to ".." inside subdir -> esuccess (pcd32_escape_a/pcd32_up/pcd32_x -> pcd32_x)
     {
         try
         {
-            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"x", ::fast_io::native_at_flags::removedir);
+            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd32_x", ::fast_io::native_at_flags::removedir);
         }
         catch(::fast_io::error)
         {
@@ -892,33 +892,35 @@ int main()
         }
         try
         {
-            ::fast_io::native_symlinkat(u8"..", ::fast_io::at_fdcwd(), u8"pcd32_escape_a/up");
+            ::fast_io::native_symlinkat(u8"..", ::fast_io::at_fdcwd(), u8"pcd32_escape_a/pcd32_up");
         }
         catch(::fast_io::error)
         {
         }
 
         constexpr wasi_void_ptr_t p{49152u};
-        constexpr auto s = u8"pcd32_escape_a/up/x";
+        constexpr auto s = u8"pcd32_escape_a/pcd32_up/pcd32_x";
         ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm32(memory,
                                                                             p,
                                                                             reinterpret_cast<::std::byte const*>(s),
-                                                                            reinterpret_cast<::std::byte const*>(s) + sizeof(u8"pcd32_escape_a/up/x") - 1u);
+                                                                            reinterpret_cast<::std::byte const*>(s) +
+                                                                                sizeof(u8"pcd32_escape_a/pcd32_up/pcd32_x") - 1u);
 
-        auto const ret = ::uwvm2::imported::wasi::wasip1::func::path_create_directory(env,
-                                                                                      static_cast<wasi_posix_fd_t>(3),
-                                                                                      p,
-                                                                                      static_cast<wasi_size_t>(sizeof(u8"pcd32_escape_a/up/x") - 1u));
+        auto const ret =
+            ::uwvm2::imported::wasi::wasip1::func::path_create_directory(env,
+                                                                         static_cast<wasi_posix_fd_t>(3),
+                                                                         p,
+                                                                         static_cast<wasi_size_t>(sizeof(u8"pcd32_escape_a/pcd32_up/pcd32_x") - 1u));
         if(ret != errno_t::esuccess)
         {
             ::fast_io::io::perrln("error: pcd32 Case 20 expected esuccess. ", static_cast<unsigned>(ret));
             ::fast_io::fast_terminate();
         }
 
-        // verify created at CWD: "x"
+        // verify created at CWD: "pcd32_x"
         try
         {
-            ::fast_io::dir_file df{u8"x"};
+            ::fast_io::dir_file df{u8"pcd32_x"};
         }
         catch(::fast_io::error)
         {
@@ -926,17 +928,17 @@ int main()
             ::fast_io::fast_terminate();
         }
 
-        // cleanup created "x"
+        // cleanup created "pcd32_x"
         try
         {
-            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"x", ::fast_io::native_at_flags::removedir);
+            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd32_x", ::fast_io::native_at_flags::removedir);
         }
         catch(::fast_io::error)
         {
         }
         try
         {
-            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd32_escape_a/up", {});
+            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"pcd32_escape_a/pcd32_up", {});
         }
         catch(::fast_io::error)
         {
@@ -1256,7 +1258,7 @@ int main()
     // Case 31: '\\'
     {
         constexpr wasi_void_ptr_t p{71680u};
-        constexpr auto s = u8"pcd64_inv_bs_a\\b";
+        constexpr auto s = u8"pcd32_inv_bs_a\\b";
         ::uwvm2::imported::wasi::wasip1::memory::write_all_to_memory_wasm32(memory,
                                                                             p,
                                                                             reinterpret_cast<::std::byte const*>(s),
@@ -1265,7 +1267,7 @@ int main()
         auto const ret = ::uwvm2::imported::wasi::wasip1::func::path_create_directory(env,
                                                                                       static_cast<wasi_posix_fd_t>(3),
                                                                                       p,
-                                                                                      static_cast<wasi_size_t>(sizeof(u8"C:pcd64_drive_rel") - 1u));
+                                                                                      static_cast<wasi_size_t>(sizeof(u8"pcd32_inv_bs_a\\b") - 1u));
         if(ret != errno_t::einval)
         {
             ::fast_io::io::perrln("error: pcd32 Case 31 expected einval. ", static_cast<unsigned>(ret));
