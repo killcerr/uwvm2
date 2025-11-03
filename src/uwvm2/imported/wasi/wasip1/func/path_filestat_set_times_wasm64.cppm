@@ -42,7 +42,7 @@ module;
 # include <sys/stat.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:path_filestat_set_times;
+export module uwvm2.imported.wasi.wasip1.func:path_filestat_set_times_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -65,5 +65,5 @@ import :fd_filestat_get;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "path_filestat_set_times.h"
+#include "path_filestat_set_times_wasm64.h"
 
