@@ -348,7 +348,29 @@ for _, file in ipairs(os.files("test/**.cc")) do
 
         add_files(file)
 
-        add_tests("default")
+		local is_libfuzzer = string.find(file, "test/0000.libfuzzer/", 1, true) ~= nil
+
+		if is_mode("debug") and get_config("use-llvm") and is_libfuzzer then
+			add_cxflags("-fsanitize=fuzzer", {force = true})
+			add_ldflags("-fsanitize=fuzzer", {force = true})
+		elseif is_mode("debug") and get_config("use-llvm") then
+			add_cxflags("-fsanitize=address,undefined", {force = true})
+			add_ldflags("-fsanitize=address,undefined", {force = true})
+		end
+
+		if is_libfuzzer then
+			if is_mode("debug") and get_config("use-llvm") then
+				-- change the env variables in ci to change the default values
+				local rss      = os.getenv("FUZZ_RSS") or "512"
+				local maxtime  = os.getenv("FUZZ_MAX_TIME") or "10"
+				local maxlen   = os.getenv("FUZZ_MAX_LEN") or "1024"
+				add_tests("fuzz", {group = "libfuzzer",runargs = { "-rss_limit_mb=" .. rss, "-max_total_time=" .. maxtime, "-max_len=" .. maxlen }}) -- xmake test -g libfuzzer
+			end
+		else
+			add_tests("unit", {group = "default"}) -- xmake test -g default
+		end
+
+		
 
 		set_warnings("all", "extra", "error")
 	target_end()
