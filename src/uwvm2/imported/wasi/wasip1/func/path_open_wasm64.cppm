@@ -42,7 +42,7 @@ module;
 # include <sys/stat.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:path_open;
+export module uwvm2.imported.wasi.wasip1.func:path_open_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -64,5 +64,5 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "path_open.h"
+#include "path_open_wasm64.h"
 
