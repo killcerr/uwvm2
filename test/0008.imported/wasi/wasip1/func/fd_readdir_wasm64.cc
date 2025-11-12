@@ -57,7 +57,11 @@ int main()
                                                                                   static_cast<wasi_size_wasm64_t>(0u),
                                                                                   static_cast<::uwvm2::imported::wasi::wasip1::abi::dircookie_wasm64_t>(0u),
                                                                                   static_cast<wasi_void_ptr_wasm64_t>(0u));
-        if(ret != errno_wasm64_t::ebadf) { ::fast_io::fast_terminate(); }
+        if(ret != errno_wasm64_t::ebadf)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: expected ebadf for negative fd: ", static_cast<unsigned>(ret));
+            ::fast_io::fast_terminate();
+        }
     }
 
     // Case 1: directory enumeration writes entries and reports buf_used
@@ -84,10 +88,18 @@ int main()
                                                                                   static_cast<wasi_size_wasm64_t>(2048u),
                                                                                   static_cast<::uwvm2::imported::wasi::wasip1::abi::dircookie_wasm64_t>(0u),
                                                                                   used_ptr);
-        if(ret != errno_wasm64_t::esuccess) { ::fast_io::fast_terminate(); }
+        if(ret != errno_wasm64_t::esuccess)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case1 expected esuccess: ", static_cast<unsigned>(ret));
+            ::fast_io::fast_terminate();
+        }
 
         auto const used = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<wasi_size_wasm64_t>(memory, used_ptr);
-        if(used > static_cast<wasi_size_wasm64_t>(2048u)) { ::fast_io::fast_terminate(); }
+        if(used > static_cast<wasi_size_wasm64_t>(2048u))
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case1 used exceeds buf limit: ", static_cast<unsigned>(used));
+            ::fast_io::fast_terminate();
+        }
     }
 
     // Case 2: rights check enotcapable
@@ -113,7 +125,11 @@ int main()
                                                                                   static_cast<wasi_size_wasm64_t>(1024u),
                                                                                   static_cast<::uwvm2::imported::wasi::wasip1::abi::dircookie_wasm64_t>(0u),
                                                                                   used_ptr);
-        if(ret != errno_wasm64_t::enotcapable) { ::fast_io::fast_terminate(); }
+        if(ret != errno_wasm64_t::enotcapable)
+        {
+            ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: rights check expected enotcapable: ", static_cast<unsigned>(ret));
+            ::fast_io::fast_terminate();
+        }
     }
 
     // Case 3: preload ".." inode must be 0; descend into 'a', then back to preload, '..' becomes 0 again
@@ -143,20 +159,34 @@ int main()
                                                                                       static_cast<wasi_size_wasm64_t>(512u),
                                                                                       static_cast<::uwvm2::imported::wasi::wasip1::abi::dircookie_wasm64_t>(0u),
                                                                                       used_ptr0);
-            if(ret != errno_wasm64_t::esuccess) { ::fast_io::fast_terminate(); }
+            if(ret != errno_wasm64_t::esuccess)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case3 preload read expected esuccess: ", static_cast<unsigned>(ret));
+                ::fast_io::fast_terminate();
+            }
             auto const used0 = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<wasi_size_wasm64_t>(memory, used_ptr0);
             // parse second entry ('..') d_ino
             auto const second_header_off = static_cast<::std::size_t>(::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t + 1u);
-            if(used0 < second_header_off + ::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t) { ::fast_io::fast_terminate(); }
+            if(used0 < second_header_off + ::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case3 preload used0 too small: ", static_cast<unsigned>(used0));
+                ::fast_io::fast_terminate();
+            }
             auto const dino =
                 ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<wasi_size_wasm64_t>(memory, buf_ptr0 + second_header_off + 8u);
-            if(dino != static_cast<wasi_size_wasm64_t>(0u)) { ::fast_io::fast_terminate(); }
+            if(dino != static_cast<wasi_size_wasm64_t>(0u))
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(),
+                                      u8"fd_readdir_wasm64: case3 '..' inode at preload must be 0, got ",
+                                      static_cast<unsigned long long>(dino));
+                ::fast_io::fast_terminate();
+            }
         }
 
-        // ensure a/ exists, then descend: stack = [root, a]
+        // ensure a_wasm64/ exists, then descend: stack = [root, a_wasm64]
         try
         {
-            ::fast_io::native_mkdirat(::fast_io::at_fdcwd(), u8"a");
+            ::fast_io::native_mkdirat(::fast_io::at_fdcwd(), u8"a_wasm64");
         }
         catch(...)
         {
@@ -165,7 +195,7 @@ int main()
 
         {
             ::uwvm2::imported::wasi::wasip1::fd_manager::dir_stack_entry_ref_t entry{};
-            entry.ptr->dir_stack.file = ::fast_io::dir_file{u8"a"};
+            entry.ptr->dir_stack.file = ::fast_io::dir_file{u8"a_wasm64"};
             dir_stack.dir_stack.push_back(::std::move(entry));
         }
 
@@ -179,20 +209,38 @@ int main()
                                                                                       static_cast<wasi_size_wasm64_t>(512u),
                                                                                       static_cast<::uwvm2::imported::wasi::wasip1::abi::dircookie_wasm64_t>(0u),
                                                                                       used_ptr1);
-            if(ret != errno_wasm64_t::esuccess) { ::fast_io::fast_terminate(); }
+            if(ret != errno_wasm64_t::esuccess)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case3 read at 'a_wasm64' expected esuccess: ", static_cast<unsigned>(ret));
+                ::fast_io::fast_terminate();
+            }
             auto const used1 = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<wasi_size_wasm64_t>(memory, used_ptr1);
             auto const second_header_off = static_cast<::std::size_t>(::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t + 1u);
-            if(used1 < second_header_off + ::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t) { ::fast_io::fast_terminate(); }
-            auto const dino_parent =
+            if(used1 < second_header_off + ::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case3 used1 too small: ", static_cast<unsigned>(used1));
+                ::fast_io::fast_terminate();
+            }
+            [[maybe_unused]] auto const dino_parent =
                 ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<wasi_size_wasm64_t>(memory, buf_ptr1 + second_header_off + 8u);
 
             // compute root ino
             ::fast_io::posix_file_status st_root{status(dir_stack.dir_stack.front_unchecked().ptr->dir_stack.file)};
-            auto const root_ino = static_cast<wasi_size_wasm64_t>(st_root.ino);
-            if(dino_parent == static_cast<wasi_size_wasm64_t>(0u) || dino_parent != root_ino) { ::fast_io::fast_terminate(); }
+            [[maybe_unused]] auto const root_ino = static_cast<wasi_size_wasm64_t>(st_root.ino);
+#if !(defined(_WIN32) && defined(_WIN32_WINDOWS))  // Win9x uses pathname emulation, so you can tell directly.
+            if(dino_parent == static_cast<wasi_size_wasm64_t>(0u) || dino_parent != root_ino)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(),
+                                      u8"fd_readdir_wasm64: case3 parent inode mismatch: dino_parent=",
+                                      static_cast<unsigned long long>(dino_parent),
+                                      u8", root_ino=",
+                                      static_cast<unsigned long long>(root_ino));
+                ::fast_io::fast_terminate();
+            }
+#endif
         }
 
-        // go back to preload (pop 'a'), '..' must be 0 again
+        // go back to preload (pop 'a_wasm64'), '..' must be 0 again
         dir_stack.dir_stack.resize(1uz);
         constexpr wasi_void_ptr_wasm64_t buf_ptr2{14080u};
         constexpr wasi_void_ptr_wasm64_t used_ptr2{14336u};
@@ -203,19 +251,33 @@ int main()
                                                                                       static_cast<wasi_size_wasm64_t>(512u),
                                                                                       static_cast<::uwvm2::imported::wasi::wasip1::abi::dircookie_wasm64_t>(0u),
                                                                                       used_ptr2);
-            if(ret != errno_wasm64_t::esuccess) { ::fast_io::fast_terminate(); }
+            if(ret != errno_wasm64_t::esuccess)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case3 return to preload expected esuccess: ", static_cast<unsigned>(ret));
+                ::fast_io::fast_terminate();
+            }
             auto const used2 = ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<wasi_size_wasm64_t>(memory, used_ptr2);
             auto const second_header_off = static_cast<::std::size_t>(::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t + 1u);
-            if(used2 < second_header_off + ::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t) { ::fast_io::fast_terminate(); }
+            if(used2 < second_header_off + ::uwvm2::imported::wasi::wasip1::func::size_of_wasi_dirent_wasm64_t)
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(), u8"fd_readdir_wasm64: case3 used2 too small: ", static_cast<unsigned>(used2));
+                ::fast_io::fast_terminate();
+            }
             auto const dino =
                 ::uwvm2::imported::wasi::wasip1::memory::get_basic_wasm_type_from_memory_wasm64<wasi_size_wasm64_t>(memory, buf_ptr2 + second_header_off + 8u);
-            if(dino != static_cast<wasi_size_wasm64_t>(0u)) { ::fast_io::fast_terminate(); }
+            if(dino != static_cast<wasi_size_wasm64_t>(0u))
+            {
+                ::fast_io::io::perrln(::fast_io::u8err(),
+                                      u8"fd_readdir_wasm64: case3 '..' inode after back to preload must be 0, got ",
+                                      static_cast<unsigned long long>(dino));
+                ::fast_io::fast_terminate();
+            }
         }
 
-        // cleanup a/
+        // cleanup a_wasm64/
         try
         {
-            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"a", ::fast_io::native_at_flags::removedir);
+            ::fast_io::native_unlinkat(::fast_io::at_fdcwd(), u8"a_wasm64", ::fast_io::native_at_flags::removedir);
         }
         catch(...)
         {
