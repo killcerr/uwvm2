@@ -14,7 +14,7 @@
 ## Windows NT (MSVC)
 * The windows-msvc toolchain defines its supported platforms and API levels through the Windows SDK. Currently, it only supports WINNT 10.0 (Windows 10, Windows Server 2016, Windows Server 2019, Windows Server 2022, Windows 11, Windows Server 2025).
 * (x86\_64, i686, aarch64, arm, arm64ec)-windows-msvc
-* Compilers (MSVC Target): LLVM Clang >= 21, ~~MSVC~~ (Not Support Yet)
+* Compilers (MSVC Target): LLVM Clang >= 21, ~~MSVC~~ (Not Supported Yet)
 
 ## Windows NT (MinGW)
 * Supported system versions: Windows NT 5.0 (Windows 2000, Windows Server 2000), Windows NT 5.1 (Windows XP), Windows NT 5.2 (Windows XP 64bit, Windows Server 2003), Windows NT 6.0 (Windows Vista, Windows Server 2008), Windows NT 6.1 (Windows 7, Windows Server 2008 R2), Windows NT 6.2 (Windows 8, Windows Server 2012), Windows NT 6.3 (Windows Blue, Windows Server 2012 R2), Windows NT 10.0 (Windows 10, Windows Server 2016, Windows Server 2019, Windows Server 2022, Windows 11, Windows Server 2025)
@@ -36,8 +36,12 @@
 * Compilers (MSDOS-DJGPP Target): GCC >= 16
 
 ## WASM-WASI
-* Self‑hosted WASI builds for `wasm32` and `wasm64` (WASI p1–p3). Threads/shared memory are not supported; browser runtimes require an adapter. Build guide: [wasm-wasi.md](documents/how-to-build/wasm-wasi.md)
+* Self‑hosted WASI builds for `wasm32` and `wasm64` (WASI p1–p3). Threads/shared memory are not supported; browser runtimes require an adapter. Build guide: [wasm-wasi.md](how-to-build/wasm-wasi.md)
 * Compilers (WASM-WASI Target): LLVM Clang >= 21
+
+## WASM-Emscripten
+* Self‑hosted Emscripten builds for `wasm32` and `wasm64`. Build guide: [wasm-emscripten.md](how-to-build/wasm-emscripten.md)
+* Compilers: Emscripten >= 2.0.18 with Emscripten LLVM Clang >= 21
 
 ## Host C Library Environment
 * This project's Newlib build does not provide executable binaries, offering only linkable object files and libraries for flexible integration within higher-level systems or plugin frameworks. It does not support wasi and only supports plugins using weak symbol extensions.
