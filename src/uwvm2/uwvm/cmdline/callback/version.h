@@ -7,7 +7,6 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-30
  * @copyright   APL-2.0 License
  */
 
@@ -20,25 +19,27 @@
  *                                      *
  ****************************************/
 
-// std
-#include <memory>
-#include <utility>
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-// platform
-#if defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
-# include <linux/version.h>
-#endif
-#if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
-# include <TargetConditionals.h>
-# include <Availability.h>
-#endif
-#if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH))
-# include <sgidefs.h>
-#endif
-// std
+#pragma once
+
 #ifndef UWVM_MODULE
+// std
+# include <memory>
+# include <utility>
+// macro
+# include <uwvm2/utils/macro/push_macros.h>
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+// platform
+# if defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
+#  include <linux/version.h>
+# endif
+# if defined(__APPLE__) || defined(__DARWIN_C_LEVEL)
+#  include <TargetConditionals.h>
+#  include <Availability.h>
+# endif
+# if (defined(__MIPS__) || defined(__mips__) || defined(_MIPS_ARCH))
+#  include <sgidefs.h>
+# endif
+// std
 # include <fast_io.h>
 # include <fast_io_crypto.h>
 # include <uwvm2/utils/container/impl.h>
@@ -53,10 +54,14 @@
 # include <uwvm2/uwvm/utils/install_path/impl.h>
 #endif
 
-namespace uwvm2::uwvm::cmdline::params::details
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT
+#endif
+
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
 {
     template <typename Stm>
-    inline constexpr void logo_u8print_not_rst_impl(Stm&& stm) noexcept
+    inline constexpr void logo_u8print_not_rst_impl(Stm && stm) noexcept
     {
         // Preventing the wasm32-wasi-uwvm stack from being too small and causing an overflow requires limiting the size of the contents of each print
         ::fast_io::io::perr(::std::forward<Stm>(stm),
@@ -132,21 +137,21 @@ namespace uwvm2::uwvm::cmdline::params::details
     }
 
     template <typename Stm, ::uwvm2::parser::wasm::concepts::has_feature_name F0, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
-    inline constexpr void version_u8print_wasm_feature_impl(Stm&& stm) noexcept
+    inline constexpr void version_u8print_wasm_feature_impl(Stm && stm) noexcept
     {
         ::fast_io::io::perrln(::std::forward<Stm>(stm), u8"        ", F0::feature_name);
         if constexpr(sizeof...(Fs) != 0) { version_u8print_wasm_feature_impl<Stm, Fs...>(::std::forward<Stm>(stm)); }
     }
 
     template <typename Stm, ::uwvm2::parser::wasm::concepts::has_feature_name... Fs>
-    inline constexpr void version_u8print_wasm_feature_from_tuple(Stm&& stm, ::uwvm2::utils::container::tuple<Fs...>) noexcept
+    inline constexpr void version_u8print_wasm_feature_from_tuple(Stm && stm, ::uwvm2::utils::container::tuple<Fs...>) noexcept
     {
         version_u8print_wasm_feature_impl<Stm, Fs...>(::std::forward<Stm>(stm));
     }
 
-    UWVM_GNU_COLD extern ::uwvm2::utils::cmdline::parameter_return_type version_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                         ::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                                                                         ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
+    UWVM_GNU_COLD inline constexpr ::uwvm2::utils::cmdline::parameter_return_type version_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                                   ::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                                   ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
     {
         // No copies will be made here.
         auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::io::u8log_output)};
@@ -952,7 +957,8 @@ namespace uwvm2::uwvm::cmdline::params::details
 
 }  // namespace uwvm2::uwvm::cmdline::params::details
 
-// This cpp may not be the end of the translation unit, it may be included in other cpp files. So it needs to be pop.
-// macro
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
-#include <uwvm2/utils/macro/pop_macros.h>
+#ifndef UWVM_MODULE
+# include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
+# include <uwvm2/utils/macro/pop_macros.h>
+#endif
+

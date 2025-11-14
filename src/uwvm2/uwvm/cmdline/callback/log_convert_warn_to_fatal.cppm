@@ -19,17 +19,32 @@
  *                                      *
  ****************************************/
 
+module;
+
+// std
+#include <cstddef>
+#include <memory>
+#include <utility>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
+#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+
+export module uwvm2.uwvm.cmdline.callback:log_convert_warn_to_fatal;
+
 import fast_io;
-import fast_io_crypto;
 import uwvm2.utils.container;
 import uwvm2.utils.ansies;
 import uwvm2.utils.cmdline;
-import uwvm2.parser.wasm.concepts;
 import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
-import uwvm2.uwvm.custom;
 import uwvm2.uwvm.cmdline;
-import uwvm2.uwvm.wasm.feature;
-import uwvm2.uwvm.utils.install_path;
+import uwvm2.uwvm.cmdline.params;
 
-#include "version.default.cpp"
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
+#ifndef UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
+#endif
+
+#include "log_convert_warn_to_fatal.h"

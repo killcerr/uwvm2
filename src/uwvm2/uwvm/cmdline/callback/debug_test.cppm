@@ -5,11 +5,8 @@
  *************************************************************/
 
 /**
- * @file        uwvm.cppm
- * @brief       uwvm cpp main function
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-20
  * @copyright   APL-2.0 License
  */
 
@@ -24,26 +21,23 @@
 
 module;
 
-#include <cstdint>
+// std
 #include <cstddef>
-#include <limits>
-#include <utility>
+#include <cstdint>
+#include <type_traits>
+#include <concepts>
+#include <memory>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 
-export module uwvm2.uwvm.crtmain:uwvm;
+export module uwvm2.uwvm.cmdline.callback:debug_test;
 
 import fast_io;
-import uwvm2.utils.ansies;
-import uwvm2.utils.debug;
+import uwvm2.utils.cmdline;
 import uwvm2.uwvm.io;
-import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
-import uwvm2.uwvm.run;
-import uwvm2.uwvm.crtmain.global;
-// callback
-import uwvm2.uwvm.cmdline.callback;
+import uwvm2.uwvm.cmdline.params;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -52,4 +46,4 @@ import uwvm2.uwvm.cmdline.callback;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "uwvm.h"
+#include "debug_test.h"
