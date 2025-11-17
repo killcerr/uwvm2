@@ -46,6 +46,7 @@
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/wasm/impl.h>
 # include "retval.h"
+# include "weak_symbol.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
@@ -176,6 +177,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         }
 
         return static_cast<int>(::uwvm2::uwvm::run::retval::ok);
+    }
+
+    inline int load_weak_symbol_modules() noexcept
+    {
+        return ::uwvm2::uwvm::run::load_weak_symbol_modules_details(::uwvm2::uwvm::wasm::storage::wasm_parameter);
     }
 
 }  // namespace uwvm2::uwvm::run

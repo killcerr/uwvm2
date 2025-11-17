@@ -44,6 +44,7 @@ import uwvm2.uwvm.wasm.feature;
 import :para;
 import :file;
 import :dl;
+import :weak_symbol;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

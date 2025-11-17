@@ -67,8 +67,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
         // load local modules
         if(auto const ret{::uwvm2::uwvm::run::load_local_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) [[unlikely]] { return ret; }
 
+        // load weak symbol modules
+        if(auto const ret{::uwvm2::uwvm::run::load_weak_symbol_modules()}; ret != static_cast<int>(::uwvm2::uwvm::run::retval::ok)) [[unlikely]] { return ret; }
+
         // check duplicate module and construct ::uwvm2::uwvm::wasm::storage::all_module
-        if(auto const ret{::uwvm2::uwvm::wasm::loader::contruct_all_module_and_check_duplicate_module()};
+        if(auto const ret{::uwvm2::uwvm::wasm::loader::construct_all_module_and_check_duplicate_module()};
            ret != ::uwvm2::uwvm::wasm::loader::load_and_check_modules_rtl::ok) [[unlikely]]
         {
             return static_cast<int>(::uwvm2::uwvm::run::retval::check_module_error);
@@ -127,7 +130,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             /// @todo
             [[unlikely]] default:
             {
-                /// @todo Maybe I forgot to realize it.
+                /// @warning Maybe I forgot to realize it.
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
                 ::uwvm2::utils::debug::trap_and_inform_bug_pos();
 #endif
