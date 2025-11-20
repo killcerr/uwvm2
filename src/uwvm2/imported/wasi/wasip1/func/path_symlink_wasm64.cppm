@@ -42,7 +42,7 @@ module;
 # include <sys/stat.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:path_symlink;
+export module uwvm2.imported.wasi.wasip1.func:path_symlink_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -64,5 +64,5 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "path_symlink.h"
+#include "path_symlink_wasm64.h"
 

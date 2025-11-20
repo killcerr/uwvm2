@@ -58,7 +58,6 @@
 # include <uwvm2/imported/wasi/wasip1/environment/impl.h>
 # include "base.h"
 # include "posix.h"
-# include "fd_filestat_get.h"
 #endif
 
 #ifndef UWVM_CPP_EXCEPTIONS
@@ -71,14 +70,16 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 {
-    /// @brief     WasiPreview1.path_remove_directory_wasm64
-    /// @details   __wasi_errno_wasm64_t path_remove_directory_wasm64(__wasi_fd_t fd, const char *path, size_t path_len);
+    /// @brief     WasiPreview1.path_symlink_wasm64
+    /// @details   __wasi_errno_t path_symlink_wasm64(const char *old_path, size_t old_path_len, __wasi_fd_t new_fd, const char *new_path, size_t new_path_len);
 
-    inline ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t path_remove_directory_wasm64(
+    inline ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t path_symlink_wasm64(
         ::uwvm2::imported::wasi::wasip1::environment::wasip1_environment<::uwvm2::object::memory::linear::native_memory_t> & env,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t fd,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t path_ptrsz,
-        ::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t path_len) noexcept
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t old_path_ptrsz,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t old_path_len,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t new_fd,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_void_ptr_wasm64_t new_path_ptrsz,
+        ::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t new_path_len) noexcept
     {
 #if (defined(_DEBUG) || defined(DEBUG)) && defined(UWVM_ENABLE_DETAILED_DEBUG_CHECK)
         if(env.wasip1_memory == nullptr) [[unlikely]]
@@ -102,19 +103,27 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"wasip1: ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
-                                u8"path_remove_directory_wasm64",
+                                u8"path_symlink_wasm64",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"(",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
-                                fd,
+                                ::fast_io::mnp::addrvw(old_path_ptrsz),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8", ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                old_path_len,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8",",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
-                                ::fast_io::mnp::addrvw(path_ptrsz),
+                                new_fd,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8",",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
-                                path_len,
+                                ::fast_io::mnp::addrvw(new_path_ptrsz),
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8", ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                new_path_len,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8") ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
@@ -122,18 +131,22 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
 #else
             ::fast_io::io::perr(::fast_io::u8err(),
-                                u8"uwvm: [info]  wasip1: path_remove_directory_wasm64(",
-                                fd,
+                                u8"uwvm: [info]  wasip1: path_symlink_wasm64(",
+                                ::fast_io::mnp::addrvw(old_path_ptrsz),
                                 u8", ",
-                                ::fast_io::mnp::addrvw(path_ptrsz),
+                                old_path_len,
                                 u8", ",
-                                path_len,
+                                new_fd,
+                                u8", ",
+                                ::fast_io::mnp::addrvw(new_path_ptrsz),
+                                u8", ",
+                                new_path_len,
                                 u8") (wasi-trace)\n");
 #endif
         }
 
         // The negative value fd is invalid, and this check prevents subsequent undefined behavior.
-        if(fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
+        if(new_fd < 0) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
         auto& wasm_fd_storage{env.fd_storage};
 
@@ -153,7 +166,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
             // Negative states have been excluded, so the conversion result will only be positive numbers.
             using unsigned_fd_t = ::std::make_unsigned_t<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_wasm64_t>;
-            auto const unsigned_fd{static_cast<unsigned_fd_t>(fd)};
+            auto const unsigned_fd{static_cast<unsigned_fd_t>(new_fd)};
 
             // On platforms where `size_t` is smaller than the `fd` type, this check must be added.
             constexpr auto size_t_max{::std::numeric_limits<::std::size_t>::max()};
@@ -168,7 +181,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
             if(wasm_fd_storage.opens.size() <= fd_opens_pos)
             {
                 // Possibly within the tree being renumbered
-                if(auto const renumber_map_iter{wasm_fd_storage.renumber_map.find(fd)}; renumber_map_iter != wasm_fd_storage.renumber_map.end())
+                if(auto const renumber_map_iter{wasm_fd_storage.renumber_map.find(new_fd)}; renumber_map_iter != wasm_fd_storage.renumber_map.end())
                 {
                     curr_wasi_fd_t_p = renumber_map_iter->second.fd_p;
                 }
@@ -210,8 +223,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         // Therefore, a unified check is implemented.
         if(curr_fd.close_pos != SIZE_MAX) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::ebadf; }
 
-        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_path_remove_directory) !=
-           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_path_remove_directory) [[unlikely]]
+        if((curr_fd.rights_base & ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_path_symlink) !=
+           ::uwvm2::imported::wasi::wasip1::abi::rights_wasm64_t::right_path_symlink) [[unlikely]]
         {
             return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotcapable;
         }
@@ -273,35 +286,62 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         auto const& curr_fd_native_file{curr_dir_stack_entry.ptr->dir_stack.file};
 
         // check path (Copy from WASM memory for use)
-        ::uwvm2::utils::container::u8string path{};
+        ::uwvm2::utils::container::u8string new_path{};
+
+        // symlink old path
+        ::uwvm2::utils::container::u8string old_path{};
 
         if constexpr(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_size_wasm64_t>::max() > ::std::numeric_limits<::std::size_t>::max())
         {
-            if(path_len > ::std::numeric_limits<::std::size_t>::max()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow; }
+            if(new_path_len > ::std::numeric_limits<::std::size_t>::max()) [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
+            }
+            if(old_path_len > ::std::numeric_limits<::std::size_t>::max()) [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eoverflow;
+            }
         }
 
         {
             // Full locking is required during reading.
             [[maybe_unused]] auto const memory_locker_guard{::uwvm2::imported::wasi::wasip1::memory::lock_memory(memory)};
 
-            ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64_unlocked(memory, path_ptrsz, path_len);
-
             using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
 
-            auto const path_begin{memory.memory_begin + path_ptrsz};
+            ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64_unlocked(memory, new_path_ptrsz, new_path_len);
+            auto const new_path_begin{memory.memory_begin + new_path_ptrsz};
+            new_path.assign(::uwvm2::utils::container::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(new_path_begin),
+                                                                     static_cast<::std::size_t>(new_path_len)});
 
-            path.assign(
-                ::uwvm2::utils::container::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(path_begin), static_cast<::std::size_t>(path_len)});
+            ::uwvm2::imported::wasi::wasip1::memory::check_memory_bounds_wasm64_unlocked(memory, old_path_ptrsz, old_path_len);
+            auto const old_path_begin{memory.memory_begin + old_path_ptrsz};
+            old_path.assign(::uwvm2::utils::container::u8string_view{reinterpret_cast<char8_t_const_may_alias_ptr>(old_path_begin),
+                                                                     static_cast<::std::size_t>(old_path_len)});
         }
 
-        if(path.empty()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval; }
+        // symlink allow empty old_path, no necessary to check
+        // The old path only requires UTF-8 checksum verification and internal null character checks, without any parsing, absolute path validation, or
+        // out-of-bounds checks. When opening symlinks, parsing is handled by the opening function.
+
+        if(new_path.empty()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval; }
 
         // WASI does not guarantee that strings are null-terminated, so you must check for zero characters in the middle and construct one yourself.
         if(!env.disable_utf8_check) [[likely]]
         {
-            auto const u8res{
-                ::uwvm2::utils::utf::check_legal_utf8<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(path.cbegin(), path.cend())};
-            if(u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+            auto const new_u8res{
+                ::uwvm2::utils::utf::check_legal_utf8<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(new_path.cbegin(),
+                                                                                                                              new_path.cend())};
+            if(new_u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+            {
+                // If the path string is not valid UTF-8, the function shall fail with ERRNO_ILSEQ.
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eilseq;
+            }
+
+            auto const old_u8res{
+                ::uwvm2::utils::utf::check_legal_utf8<::uwvm2::utils::utf::utf8_specification::utf8_rfc3629_and_zero_illegal>(old_path.cbegin(),
+                                                                                                                              old_path.cend())};
+            if(old_u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
             {
                 // If the path string is not valid UTF-8, the function shall fail with ERRNO_ILSEQ.
                 return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eilseq;
@@ -309,11 +349,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
         }
         else
         {
-            auto const u8res{::uwvm2::utils::utf::check_has_zero_illegal_unchecked(path.cbegin(), path.cend())};
-            if(u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eilseq; }
+            auto const new_u8res{::uwvm2::utils::utf::check_has_zero_illegal_unchecked(new_path.cbegin(), new_path.cend())};
+            if(new_u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eilseq;
+            }
+
+            auto const old_u8res{::uwvm2::utils::utf::check_has_zero_illegal_unchecked(old_path.cbegin(), old_path.cend())};
+            if(old_u8res.err != ::uwvm2::utils::utf::utf_error_code::success) [[unlikely]]
+            {
+                return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eilseq;
+            }
         }
 
-        auto const split_path_res{::uwvm2::imported::wasi::wasip1::func::split_posix_path(::uwvm2::utils::container::u8string_view{path.data(), path.size()})};
+        auto const split_path_res{
+            ::uwvm2::imported::wasi::wasip1::func::split_posix_path(::uwvm2::utils::container::u8string_view{new_path.data(), new_path.size()})};
 
         // The path series functions in wasip1 reject absolute paths.
         if(split_path_res.is_absolute) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm; }
@@ -355,181 +405,49 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 {
                     case ::uwvm2::imported::wasi::wasip1::func::dir_type_e::curr:
                     {
-                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                     }
                     case ::uwvm2::imported::wasi::wasip1::func::dir_type_e::prev:
                     {
                         if(path_stack.empty()) [[unlikely]] { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eperm; }
                         else
                         {
-                            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::einval;
+                            return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eisdir;
                         }
                     }
                     case ::uwvm2::imported::wasi::wasip1::func::dir_type_e::next:
                     {
                         auto const& next_name{split_curr->next_name};
 
-                        ::uwvm2::utils::container::u8string symlink_symbol{};
-
                         if(path_stack.empty())
                         {
-                            auto const& open_file_name{next_name};
-
-                            // path_stack is always empty
 #ifdef UWVM_CPP_EXCEPTIONS
                             try
 #endif
                             {
-#if defined(__MSDOS__) || defined(__DJGPP__)
-                                // djgpp's `unlink` function does not distinguish between directories and files; manual differentiation is
-                                // required.
-                                // The directory file defaults to nofollow, but DOS doesn't support symlinks.
-                                {
-                                    // dir_file default nofollow
-                                    ::fast_io::dir_file const new_dir_file{at(curr_fd_native_file), open_file_name};
-                                    ::fast_io::details::check_dos_fd_is_dir(new_dir_file.native_handle());
-                                }
-#endif
-
-                                // native_unlinkat is default nofollow
-                                ::fast_io::native_unlinkat(at(curr_fd_native_file), open_file_name, ::fast_io::native_at_flags::removedir);
+                                // symlinkat is symlink_nofollow
+                                ::fast_io::native_symlinkat(old_path, at(curr_fd_native_file), next_name);
                             }
 #ifdef UWVM_CPP_EXCEPTIONS
                             catch(::fast_io::error e)
                             {
-# if (defined(__MSDOS__) || defined(__DJGPP__)) || (defined(_WIN32) && defined(_WIN32_WINDOWS))
-                                // dos/win9x no enotempty, when notempty, it returns EACCES. You must open the directory yourself to determine the status.
-                                if(e.code ==
-#  if defined(__MSDOS__) || defined(__DJGPP__)
-                                   EACCES
-#  elif defined(_WIN32) && defined(_WIN32_WINDOWS)
-                                   5uz /*ERROR_ACCESS_DENIED*/
-#  endif
-                                )
-                                {
-#  ifdef UWVM_CPP_EXCEPTIONS
-                                    try
-#  endif
-                                    {
-                                        // dir_file default nofollow
-                                        ::fast_io::dir_file const new_dir_file{at(curr_fd_native_file), open_file_name};
-
-                                        unsigned counter{};
-                                        for([[maybe_unused]] auto const& curr_dir: current(at(new_dir_file)))
-                                        {
-                                            ++counter;
-                                            if(counter > 2u) { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotempty; }
-                                        }
-                                    }
-#  ifdef UWVM_CPP_EXCEPTIONS
-                                    catch(::fast_io::error e)
-                                    {
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
-                                    }
-#  endif
-                                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
-                                }
-                                else
-                                {
-                                    return ::uwvm2::imported::wasi::wasip1::func::path_errno_from_fast_io_error(e);
-                                }
-
-# elif !(defined(_WIN32) && !defined(__CYGWIN__)) && defined(EEXIST)
-                                // Note: Modern POSIX systems never return EEXIST for directory removal.
-                                // Historically, some early UNIX/Linux systems used EEXIST to indicate
-                                // "directory not empty", but this was replaced by ENOTEMPTY after POSIX
-                                // standardized the error code. Therefore, any EEXIST returned here should
-                                // be treated as legacy behavior equivalent to ENOTEMPTY.
-
-                                if(e.code == EEXIST) { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotempty; }
-                                else
-                                {
-                                    return ::uwvm2::imported::wasi::wasip1::func::path_errno_from_fast_io_error(e);
-                                }
-# else
                                 return ::uwvm2::imported::wasi::wasip1::func::path_errno_from_fast_io_error(e);
-# endif
                             }
 #endif
                         }
                         else
                         {
-                            auto const& open_file_name{next_name};
-
-                            // path_stack is not empty
 #ifdef UWVM_CPP_EXCEPTIONS
                             try
 #endif
                             {
-#if defined(__MSDOS__) || defined(__DJGPP__)
-                                // djgpp's `unlink` function does not distinguish between directories and files; manual differentiation is
-                                // required.
-                                // The directory file defaults to nofollow, but DOS doesn't support symlinks.
-                                {
-                                    // dir_file default nofollow
-                                    ::fast_io::dir_file const new_dir_file{at(path_stack.back_unchecked()), open_file_name};
-                                    ::fast_io::details::check_dos_fd_is_dir(new_dir_file.native_handle());
-                                }
-#endif
-
-                                // native_unlinkat is default nofollow
-                                ::fast_io::native_unlinkat(at(path_stack.back_unchecked()), open_file_name, ::fast_io::native_at_flags::removedir);
+                                // symlinkat is symlink_nofollow
+                                ::fast_io::native_symlinkat(old_path, at(path_stack.back_unchecked()), next_name);
                             }
 #ifdef UWVM_CPP_EXCEPTIONS
                             catch(::fast_io::error e)
                             {
-# if (defined(__MSDOS__) || defined(__DJGPP__)) || (defined(_WIN32) && defined(_WIN32_WINDOWS))
-                                // dos/win9x no enotempty, when notempty, it returns EACCES. You must open the directory yourself to determine the status.
-                                if(e.code ==
-#  if defined(__MSDOS__) || defined(__DJGPP__)
-                                   EACCES
-#  elif defined(_WIN32) && defined(_WIN32_WINDOWS)
-                                   5uz /*ERROR_ACCESS_DENIED*/
-#  endif
-                                )
-                                {
-#  ifdef UWVM_CPP_EXCEPTIONS
-                                    try
-#  endif
-                                    {
-                                        // dir_file default nofollow
-                                        ::fast_io::dir_file const new_dir_file{at(path_stack.back_unchecked()), open_file_name};
-
-                                        unsigned counter{};
-                                        for([[maybe_unused]] auto const& curr_dir: current(at(new_dir_file)))
-                                        {
-                                            ++counter;
-                                            if(counter > 2u) { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotempty; }
-                                        }
-                                    }
-#  ifdef UWVM_CPP_EXCEPTIONS
-                                    catch(::fast_io::error e)
-                                    {
-                                        return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
-                                    }
-#  endif
-                                    return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::eacces;
-                                }
-                                else
-                                {
-                                    return ::uwvm2::imported::wasi::wasip1::func::path_errno_from_fast_io_error(e);
-                                }
-
-# elif !(defined(_WIN32) && !defined(__CYGWIN__)) && defined(EEXIST)
-                                // Note: Modern POSIX systems never return EEXIST for directory removal.
-                                // Historically, some early UNIX/Linux systems used EEXIST to indicate
-                                // "directory not empty", but this was replaced by ENOTEMPTY after POSIX
-                                // standardized the error code. Therefore, any EEXIST returned here should
-                                // be treated as legacy behavior equivalent to ENOTEMPTY.
-
-                                if(e.code == EEXIST) { return ::uwvm2::imported::wasi::wasip1::abi::errno_wasm64_t::enotempty; }
-                                else
-                                {
-                                    return ::uwvm2::imported::wasi::wasip1::func::path_errno_from_fast_io_error(e);
-                                }
-# else
                                 return ::uwvm2::imported::wasi::wasip1::func::path_errno_from_fast_io_error(e);
-# endif
                             }
 #endif
                         }
