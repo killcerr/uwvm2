@@ -114,9 +114,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
                     // automatically close when erase
                     // There's no need to catch it, because the destructor doesn't throw an exception.
-                    wasm_fd_storage.renumber_map.erase(renumber_map_iter);
 
-                    return ::uwvm2::imported::wasi::wasip1::abi::errno_t::esuccess;
+                    // To prevent the system close operation from taking too much time, the close operation is performed outside the fdmanager lock here.
+                    auto& curr_fd{*renumber_map_iter->second.fd_p};
+                    old_wasi_fd.ptr = curr_fd.wasi_fd.ptr;
+                    curr_fd.wasi_fd.ptr = nullptr;
+
+                    wasm_fd_storage.renumber_map.erase(renumber_map_iter);
                 }
                 else [[unlikely]]
                 {
@@ -191,11 +195,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
                 // The `reset_type` function does not throw exceptions, and the destructor of `fast_io` also does not throw exceptions. It will not close due to
                 // a failed close operation. Use `reset` directly. When creating from the vector of closed positions later, use `create_new`.
+
+                // To prevent the system close operation from taking too much time, the close operation is performed outside the fdmanager lock here.
                 old_wasi_fd.ptr = curr_fd.wasi_fd.ptr;
                 curr_fd.wasi_fd.ptr = nullptr;
-
-                // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
             }
+
+            // After unlocking fds_lock, members within `wasm_fd_storage_t` can no longer be accessed or modified.
         }
 
         if(old_wasi_fd.ptr != nullptr) { old_wasi_fd.reset(); }
