@@ -34,14 +34,42 @@ module;
 // macro
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
+// platform
+#if !defined(_WIN32)
+# include <errno.h>
+# if __has_include(<poll.h>)
+#  include <poll.h>
+# endif
+# if defined(__linux__)
+#  if __has_include(<sys/epoll.h>)
+#   include <sys/epoll.h>
+#  endif
+#  if __has_include(<sys/timerfd.h>)
+#   include <sys/timerfd.h>
+#  endif
+#  if __has_include(<sys/ioctl.h>)
+#   include <sys/ioctl.h>
+#  endif
+# endif
+# if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(BSD) || defined(_SYSTYPE_BSD) ||          \
+     (defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+#  if __has_include(<sys/event.h>)
+#   include <sys/event.h>
+#  endif
+#  if __has_include(<sys/time.h>)
+#   include <sys/time.h>
+#  endif
+# endif
+#endif
 
-export module uwvm2.imported.wasi.wasip1.func:proc_exit;
+export module uwvm2.imported.wasi.wasip1.func:poll_oneoff_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
 import uwvm2.uwvm_predefine.io;
 import uwvm2.utils.mutex;
 import uwvm2.utils.debug;
+import uwvm2.utils.container;
 import uwvm2.object.memory.linear;
 import uwvm2.imported.wasi.wasip1.abi;
 import uwvm2.imported.wasi.wasip1.fd_manager;
@@ -57,5 +85,5 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "proc_exit.h"
+#include "poll_oneoff_wasm64.h"
 

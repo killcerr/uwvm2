@@ -427,6 +427,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 # if defined(ENOTEMPTY)
             case ENOTEMPTY: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::enotempty;
 # endif
+            // wasi no POLLERR
+# if defined(POLLNVAL) && (!defined(EPIPE) || (defined(EPIPE) && EPIPE != POLLNVAL))
+            case POLLNVAL: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::epipe;
+# endif
             default: return ::uwvm2::imported::wasi::wasip1::abi::errno_t::eio;
         }
 #endif

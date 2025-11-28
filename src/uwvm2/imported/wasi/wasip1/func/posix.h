@@ -41,10 +41,22 @@
 #  include <fcntl.h>
 #  include <sys/stat.h>
 #  include <sys/time.h>
+#  if __has_include(<poll.h>)
+#   include <poll.h>
+#  endif
+#  if __has_include(<sys/ioctl.h>)
+#   include <sys/ioctl.h>
+#  endif
+#  if __has_include(<sys/select.h>)
+#   include <sys/select.h>
+#  endif
 #  if !(defined(__MSDOS__) || defined(__DJGPP__))
 #   include <sys/socket.h>
 #  else
 #   include <utime.h>
+#  endif
+#  if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || (defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+#   include <sys/event.h>
 #  endif
 # endif
 
@@ -126,7 +138,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 ;
 
         // POSIX 2008
-        extern int futimens(int fd, const struct timespec times[2]) noexcept
+        extern int futimens(int fd, const struct ::timespec times[2]) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("futimens")
 # else
@@ -135,7 +147,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                 ;
 
         // POSIX 2001
-        extern int utimes(char const* path, const struct timeval times[2]) noexcept
+        extern int utimes(char const* path, const struct ::timeval times[2]) noexcept
 # if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("utimes")
 # else
@@ -145,7 +157,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 
         // POSIX 1988 (LEGACY), only support msdos-djgpp here
 # if defined(__MSDOS__) || defined(__DJGPP__)
-        extern int utime(char const* path, const struct utimbuf* time) noexcept
+        extern int utime(char const* path, const struct ::utimbuf* time) noexcept
 #  if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
             __asm__("utime")
 #  else
@@ -164,6 +176,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
 #  endif
                 ;
 # endif
+
+# if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || (defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+        extern int kqueue() noexcept
+#  if !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("kqueue")
+#  else
+            __asm__("_kqueue")
+#  endif
+                ;
+
+        extern int
+            kevent(int kq, const struct ::kevent* changelist, int nchanges, struct ::kevent* eventlist, int nevents, const struct ::timespec* timeout) noexcept
+#  if !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("kevent")
+#  else
+            __asm__("_kevent")
+#  endif
+                ;
+# endif
+
+        extern int poll(struct ::pollfd*, ::nfds_t, int) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("poll")
+# else
+            __asm__("_poll")
+# endif
+                ;
+
+        extern int select(int, ::fd_set*, ::fd_set*, ::fd_set*, struct ::timeval*) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("select")
+# else
+            __asm__("_select")
+# endif
+                ;
+
+        [[noreturn]] extern void exit(int) noexcept
+# if !(defined(__MSDOS__) || defined(__DJGPP__)) && !(defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+            __asm__("exit")
+# else
+            __asm__("_exit")
+# endif
+                ;
+
     }  // namespace posix
 #endif
 

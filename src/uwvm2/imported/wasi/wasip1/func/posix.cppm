@@ -40,10 +40,22 @@ module;
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <sys/time.h>
+# if __has_include(<poll.h>)
+#  include <poll.h>
+# endif
+# if __has_include(<sys/ioctl.h>)
+#  include <sys/ioctl.h>
+# endif
+# if __has_include(<sys/select.h>)
+#  include <sys/select.h>
+# endif
 # if !(defined(__MSDOS__) || defined(__DJGPP__))
 #  include <sys/socket.h>
 # else
 #  include <utime.h>
+# endif
+# if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || (defined(__APPLE__) || defined(__DARWIN_C_LEVEL))
+#  include <sys/event.h>
 # endif
 #endif
 
