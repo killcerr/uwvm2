@@ -72,8 +72,9 @@ struct ip_flags
 	bool v6shorten{true};
 	bool v6uppercase{};
 	bool v6bracket{true};
-	bool v6full{false};
+	bool v6full{};
 	bool showport{};
+	bool ipv4_mapped_ipv6{true};
 };
 
 inline constexpr ip_flags ip_default_flags{.showport = true};
@@ -104,9 +105,11 @@ struct ip_scan_flags
 	bool allowv6bracket{true};
 	bool requirev6full{false};
 	bool requireport{false};
+	bool ipv4_mapped_ipv6{true};
 };
 
 inline constexpr ip_scan_flags ip_scan_default_flags{.requireport = true};
+inline constexpr ip_scan_flags ip_scan_no_ipv4_mapped_ipv6{.requireport = true, .ipv4_mapped_ipv6 = false};
 inline constexpr ip_scan_flags ip_scan_default_inaddr_flags{};
 
 template <ip_scan_flags flags, typename T>

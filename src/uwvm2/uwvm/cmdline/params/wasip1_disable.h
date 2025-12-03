@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-10-01
  * @copyright   APL-2.0 License
  */
 
@@ -29,7 +29,7 @@
 # include <uwvm2/utils/macro/push_macros.h>
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
 # ifndef UWVM_DISABLE_LOCAL_IMPORTED_WASIP1
-#  include <uwvm2/imported/wasi/wasip1/feature/feature_push_macro.h>  // wasip1
+#  include <uwvm2/imported/wasi/wasip1/feature/feature_push_macro.h>
 # endif
 // import
 # include <fast_io.h>
@@ -40,6 +40,7 @@
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
+
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 {
 #ifndef UWVM_DISABLE_LOCAL_IMPORTED_WASIP1
@@ -47,26 +48,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 
     namespace details
     {
-        inline bool wasip1_set_fd_limit_is_exist{};  // [global]
-        inline constexpr ::uwvm2::utils::container::u8string_view wasip1_set_fd_limit_alias{u8"-I1fdlim"};
-        inline constexpr ::uwvm2::utils::cmdline::parameter_return_type
-            wasip1_set_fd_limit_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                         ::uwvm2::utils::cmdline::parameter_parsing_results*,
-                                         ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
-
+        inline constexpr ::uwvm2::utils::container::u8string_view wasip1_disable_alias{u8"-I1disable"};
+        inline constexpr ::uwvm2::utils::cmdline::parameter_return_type wasip1_disable_callback(::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                                ::uwvm2::utils::cmdline::parameter_parsing_results*,
+                                                                                                ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept;
     }  // namespace details
 
 #  if defined(__clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wbraced-scalar-init"
 #  endif
-    inline constexpr ::uwvm2::utils::cmdline::parameter wasip1_set_fd_limit{
-        .name{u8"--wasip1-set-fd-limit"},
-        .describe{u8"Set the WASI Preview 1 file descriptor limit."},
-        .usage{u8"<limit:size_t>"},
-        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasip1_set_fd_limit_alias), 1uz}},
-        .handle{::std::addressof(details::wasip1_set_fd_limit_callback)},
-        .is_exist{::std::addressof(details::wasip1_set_fd_limit_is_exist)},
+    inline constexpr ::uwvm2::utils::cmdline::parameter wasip1_disable{
+        .name{u8"--wasip1-disable"},
+        .describe{u8"Disable preloading of the local WASI Preview 1 module."},
+        .alias{::uwvm2::utils::cmdline::kns_u8_str_scatter_t{::std::addressof(details::wasip1_disable_alias), 1uz}},
+        .handle{::std::addressof(details::wasip1_disable_callback)},
         .cate{::uwvm2::utils::cmdline::categorization::wasi}};
 #  if defined(__clang__)
 #   pragma clang diagnostic pop
@@ -79,7 +75,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params
 #ifndef UWVM_MODULE
 // macro
 # ifndef UWVM_DISABLE_LOCAL_IMPORTED_WASIP1
-#  include <uwvm2/imported/wasi/wasip1/feature/feature_pop_macro.h>  // wasip1
+#  include <uwvm2/imported/wasi/wasip1/feature/feature_pop_macro.h>
 # endif
 # include <uwvm2/uwvm/utils/ansies/uwvm_color_pop_macro.h>
 # include <uwvm2/utils/macro/pop_macros.h>
