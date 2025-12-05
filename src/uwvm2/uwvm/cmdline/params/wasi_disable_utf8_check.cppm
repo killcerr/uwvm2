@@ -27,13 +27,14 @@ module;
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 #include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
+#include <uwvm2/imported/wasi/feature/feature_push_macro.h> // wasi
 
 export module uwvm2.uwvm.cmdline.params:wasi_disable_utf8_check;
 
 import fast_io;
 import uwvm2.utils.container;
 import uwvm2.utils.cmdline;
-import uwvm2.uwvm.wasm.storage;
+import uwvm2.uwvm.imported.wasi.storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

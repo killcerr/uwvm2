@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-03-27
+ * @date        2025-04-01
  * @copyright   APL-2.0 License
  */
 
@@ -20,16 +20,7 @@
  *                                      *
  ****************************************/
 
-module;
+// #pragma once
 
-export module uwvm2.uwvm.imported.wasi.wasip1.storage;
-export import :env;
-
-#ifndef UWVM_MODULE
-# define UWVM_MODULE
-#endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "impl.h"
+/// @todo add more features here
+#pragma pop_macro("UWVM_IMPORT_WASI")

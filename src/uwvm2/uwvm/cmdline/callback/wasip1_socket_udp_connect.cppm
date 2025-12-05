@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -48,6 +48,7 @@ import uwvm2.uwvm.io;
 import uwvm2.uwvm.utils.ansies;
 import uwvm2.uwvm.cmdline;
 import uwvm2.uwvm.cmdline.params;
+import uwvm2.uwvm.imported.wasi.wasip1.storage;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE

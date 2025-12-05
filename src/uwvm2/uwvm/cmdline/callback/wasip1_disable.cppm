@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -39,7 +39,7 @@ module;
 
 export module uwvm2.uwvm.cmdline.callback:wasip1_disable;
 
-import uwvm2.uwvm.cmdline;
+import uwvm2.utils.cmdline;
 import uwvm2.uwvm.wasm.storage;
 
 #ifndef UWVM_MODULE
