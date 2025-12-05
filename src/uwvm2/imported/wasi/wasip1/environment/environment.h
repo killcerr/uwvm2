@@ -123,6 +123,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
     };
 
     using sock_family_t = ::fast_io::sock_family;
+    using sock_protocol_t = ::fast_io::sock_protocol;
+    using sock_type_t = ::fast_io::sock_type;
     using ip_t = ::fast_io::ip;
 
     struct preopen_socket_t
@@ -130,6 +132,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
         // sock_family != local
         ip_t ip{};
         sock_family_t sock_family{};
+        sock_protocol_t sock_protocol{};
+        sock_type_t sock_type{};
+
         handle_type_e handle_type{};
 
         // sock_family == local
@@ -153,15 +158,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::environment
         ::uwvm2::imported::wasi::wasip1::fd_manager::wasm_fd_storage_t fd_storage{};  // [singleton]
 
         /// @brief Provide predefined wasi content, which is already opened during command-line processing (to prevent TOCTOU). Subsequent operations utilize
-        /// this content via dup.
+        ///        this content via dup.
+        /// @note  For platforms that support dup, use dup; for platforms that do not support dup, use observer.
         ::uwvm2::utils::container::vector<mount_dir_root_t> mount_dir_roots{};
 
         /// @brief Automatically binds during environment initialization
+        /// @note  Begin initializing the socket during environment initialization.
         ::uwvm2::utils::container::vector<preopen_socket_t> preopen_sockets{};
 
         /// @brief Custom process exit function pointer for WASI exit handling (No no-return operation is required, as plugin systems typically cannot operate
-        /// without returning.)
-        ///        If not set, the default exit behavior will be used. (exit(3))
+        ///        without returning.)
+        /// @note  If not set, the default exit behavior will be used. (exit(3))
         wasip1_proc_exit_ptr_t wasip1_proc_exit_func_ptr{};
         wasip1_proc_raise_ptr_t wasip1_proc_raise_func_ptr{};
         wasip1_sched_yield_ptr_t wasip1_sched_yield_func_ptr{};

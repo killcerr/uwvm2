@@ -135,6 +135,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
             return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
         }
 
+        if(fd > static_cast<fd_underlying_type>(::std::numeric_limits<::uwvm2::imported::wasi::wasip1::abi::wasi_posix_fd_t>::max())) [[unlikely]]
+        {
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                u8"[error] ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Invalid fd (fd_t): \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_CYAN),
+                                currp1_str,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\". Usage: ",
+                                ::uwvm2::utils::cmdline::print_usage(::uwvm2::uwvm::cmdline::params::wasip1_socket_tcp_connect),
+                                // print_usage comes with UWVM_COLOR_U8_RST_ALL
+                                u8"\n\n");
+
+            return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
+        }
+
         auto currp2{para_curr + 2u};
 
         // [... curr arg1] ...
@@ -202,6 +222,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
 
                 preopen_socket.fd = fd;
                 preopen_socket.sock_family = ::uwvm2::imported::wasi::wasip1::environment::sock_family_t::local;
+                preopen_socket.sock_protocol = ::uwvm2::imported::wasi::wasip1::environment::sock_protocol_t::ip;
+                preopen_socket.sock_type = ::uwvm2::imported::wasi::wasip1::environment::sock_type_t::stream;
                 preopen_socket.handle_type = ::uwvm2::imported::wasi::wasip1::environment::handle_type_e::connect;
                 preopen_socket.local_unix_path = ::uwvm2::utils::container::u8string{currp3_str};
 
@@ -373,7 +395,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
 
                     if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
                     {
-                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                        // No copies will be made here.
+                        auto u8log_output_osr{::fast_io::operations::output_stream_ref(::uwvm2::uwvm::io::u8log_output)};
+                        // Add raii locks while unlocking operations
+                        ::fast_io::operations::decay::stream_ref_decay_lock_guard u8log_output_lg{
+                            ::fast_io::operations::decay::output_stream_mutex_ref_decay(u8log_output_osr)};
+                        // No copies will be made here.
+                        auto u8log_output_ul{::fast_io::operations::decay::output_stream_unlocked_ref_decay(u8log_output_osr)};
+
+                        ::fast_io::io::perr(u8log_output_ul,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
                                             u8"uwvm: ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
@@ -390,14 +420,50 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
                                             u8"\". ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                             u8"(verbose)\n",
-                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                            u8"[info]  ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"All DNS query results: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(verbose)\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW));
+
+                        // print
+                        for(auto curr{dns_file_begin}; curr != dns_file_end; ++curr)
+                        {
+                            ::fast_io::io::perrln(u8log_output_ul, u8"              - ", to_ip_address(*curr));
+                        }
+
+                        // set to default
+                        ::fast_io::io::perr(u8log_output_ul, ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                     }
 
                     preopen_socket.sock_family = preopen_socket.ip.is_ipv4() ? ::uwvm2::imported::wasi::wasip1::environment::sock_family_t::inet
                                                                              : ::uwvm2::imported::wasi::wasip1::environment::sock_family_t::inet6;
+                    preopen_socket.sock_protocol = ::uwvm2::imported::wasi::wasip1::environment::sock_protocol_t::tcp;
+                    preopen_socket.sock_type = ::uwvm2::imported::wasi::wasip1::environment::sock_type_t::stream;
                     preopen_socket.handle_type = ::uwvm2::imported::wasi::wasip1::environment::handle_type_e::connect;
 
                     wasip1_env.preopen_sockets.emplace_back(::std::move(preopen_socket));
+                }
+                else
+                {
+                    ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                        u8"uwvm: ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RED),
+                                        u8"[error] ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8"DNS ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                        tmp_dnsfile_path,
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                        u8" lookup returned empty results.\n\n",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+
+                    return ::uwvm2::utils::cmdline::parameter_return_type::return_m1_imme;
                 }
             }
             else
@@ -430,6 +496,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
                 }
 
                 preopen_socket.sock_family = ::uwvm2::imported::wasi::wasip1::environment::sock_family_t::inet6;
+                preopen_socket.sock_protocol = ::uwvm2::imported::wasi::wasip1::environment::sock_protocol_t::tcp;
+                preopen_socket.sock_type = ::uwvm2::imported::wasi::wasip1::environment::sock_type_t::stream;
                 preopen_socket.handle_type = ::uwvm2::imported::wasi::wasip1::environment::handle_type_e::connect;
 
                 wasip1_env.preopen_sockets.emplace_back(::std::move(preopen_socket));
@@ -465,6 +533,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
             }
 
             preopen_socket.sock_family = ::uwvm2::imported::wasi::wasip1::environment::sock_family_t::inet;
+            preopen_socket.sock_protocol = ::uwvm2::imported::wasi::wasip1::environment::sock_protocol_t::tcp;
+            preopen_socket.sock_type = ::uwvm2::imported::wasi::wasip1::environment::sock_type_t::stream;
             preopen_socket.handle_type = ::uwvm2::imported::wasi::wasip1::environment::handle_type_e::connect;
 
             wasip1_env.preopen_sockets.emplace_back(::std::move(preopen_socket));
