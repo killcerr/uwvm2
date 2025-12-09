@@ -29,7 +29,7 @@ struct win32_socket_event_guard_t
 			return *this;
 		}
 
-		if(curr_handle) [[likely]]
+		if (curr_handle) [[likely]]
 		{
 			::fast_io::win32::WSACloseEvent(curr_handle);
 		}
