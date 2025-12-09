@@ -4392,7 +4392,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif UWVM_HAS_CPP_ATTRIBUTE(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                        \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) ||                                                                                    \
      (defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))) ||                  \
-     (defined(__wasm_simd128__) && (UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16) || UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16))))
+     (defined(__wasm_simd128__) && (UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16) || UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)))) &                     \
+        0
+
+        /// @deprecated After testing with aarch64 and SSE2, it was found that the SIMD implementation performs worse than the scalar implementation. Therefore,
+        /// it will not be enabled here.
+
         /// (Little Endian), [[gnu::vector_size]], no mask-u16, simd128
         ///  x86_64-sse2, aarch64-neon, wasm-simd128 (Since the wasm simd128 shuffle requirement is immediate, it cannot be used.)
         ///  Since the arm neon does not have a move mask, the shuffle algorithm cannot be used.
@@ -4629,66 +4634,202 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
         //                                                        ^^ section_curr
 
 #else
-        // default
-
-        while(section_curr != section_end) [[likely]]
+        /// SIMT little endian
+        if constexpr(::std::endian::native == ::std::endian::little && CHAR_BIT == 8)
         {
-            // Ensuring the existence of valid information
+            auto fast_decode_uleb128_u32{[&] UWVM_ALWAYS_INLINE(::std::byte const* p,
+                                                                ::std::byte const* end,
+                                                                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32& out_value,
+                                                                unsigned& out_len) constexpr UWVM_THROWS -> bool
+                                         {
+                                             using wasm_byte = ::uwvm2::parser::wasm::standard::wasm1::type::wasm_byte;
 
-            // [ ... typeidx1] ... typeidx2 ...
-            // [     safe    ] unsafe (could be the section_end)
-            //       ^^ section_curr
+                                             auto const remaining{static_cast<::std::size_t>(end - p)};
+                                             if(remaining == 0uz) [[unlikely]] { return false; }
 
-            // check function counter
-            // Ensure content is available before counting (section_curr != section_end)
-            if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
+                                             // This provides a maximum of 2 bytes for data storage. You can use `unsigned short`, but it will be type-promoted
+                                             // to `int` or `unsigned int` in expressions. To avoid type promotion, use `unsigned int` (i.e., `unsigned`)
+                                             // directly, which will not be promoted. According to the C standard, `short` is at least 16 bits, and `int` is at
+                                             // least as large as `short`. Therefore, the size of `unsigned int` is typically ≥ 2 bytes.
+                                             if(remaining < sizeof(unsigned)) [[unlikely]] { return false; }
+
+                                             // wasm_byte is uint_least8_t, so it is safe to reinterpret_cast
+                                             auto const* bytes{reinterpret_cast<wasm_byte const*>(p)};
+
+                                             unsigned word{};
+                                             ::std::memcpy(::std::addressof(word), bytes, sizeof(word));
+
+                                             // Bits 7, 15, 23, ... are zero for the terminating byte.
+                                             constexpr unsigned msb_mask{~0x7F7F7F7Fu};
+                                             unsigned const msbs{~word & msb_mask};
+
+                                             if(msbs == 0u) [[unlikely]]
+                                             {
+                                                 // No terminating byte in the first 8 bytes: extremely long or
+                                                 // malformed LEB128. Defer to the scalar implementation, which
+                                                 // will raise the appropriate parse error.
+                                                 return false;
+                                             }
+
+                                             unsigned const len_bits{static_cast<unsigned>(::std::countr_zero(msbs)) + 1u};
+                                             unsigned const len_bytes{len_bits / 8u};
+
+                                             // This can only hold up to 2 bytes.
+                                             if(len_bytes == 0u || len_bytes > 2u || static_cast<::std::size_t>(len_bytes) > remaining) [[unlikely]]
+                                             {
+                                                 return false;
+                                             }
+
+                                             // Scalar reconstruction from the packed bytes in 'word'.
+                                             unsigned value{word & 0x7Fu};
+                                             if(len_bytes == 2u) { value |= ((word >> 8u) & 0x7Fu) << 7u; }
+
+                                             out_value = static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32>(value);
+                                             out_len = len_bytes;
+                                             return true;
+                                         }};
+
+            while(section_curr != section_end) [[likely]]
             {
-                err.err_curr = section_curr;
-                err.err_selectable.u32 = func_count;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                // [ ... typeidx1] ... typeidx2 ...
+                // [     safe    ] unsafe (could be the section_end)
+                //       ^^ section_curr
+
+                // One function index per iteration.
+                if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u32 = func_count;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx{};
+                unsigned len_bytes{};
+
+                bool const ok_fast{fast_decode_uleb128_u32(section_curr, section_end, typeidx, len_bytes)};
+
+                if(!ok_fast) [[unlikely]]
+                {
+                    // Fallback: use the generic scalar decoder for tail / rare cases.
+                    using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                    auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                    reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                    ::fast_io::mnp::leb128_get(typeidx))};
+
+                    if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                    }
+
+                    // [ ... typeidx1 ...] typeidx2 ...
+                    // [      safe       ] unsafe (could be the section_end)
+                    //       ^^ section_curr
+
+                    if(typeidx >= type_section_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = typeidx;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
+                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+                    section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                    // [ ... typeidx1 ...] typeidx2 ...
+                    // [      safe       ] unsafe (could be the section_end)
+                    //                     ^^ section_curr
+                }
+                else
+                {
+                    if(typeidx >= type_section_count) [[unlikely]]
+                    {
+                        err.err_curr = section_curr;
+                        err.err_selectable.u32 = typeidx;
+                        err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                        ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                    }
+
+                    functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(
+                        static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+                    section_curr += len_bytes;
+
+                    // [ ... typeidx1 ...] typeidx2 ...
+                    // [      safe       ] unsafe (could be the section_end)
+                    //                     ^^ section_curr
+                }
             }
+        }
+        else
+        {
+            // Scalar
 
-            // [ ... typeidx1] ... typeidx2 ...
-            // [     safe    ] unsafe (could be the section_end)
-            //       ^^ section_curr
-
-            ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
-
-            using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
-
-            auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
-                                                                            reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
-                                                                            ::fast_io::mnp::leb128_get(typeidx))};
-
-            if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+            while(section_curr != section_end) [[likely]]
             {
-                err.err_curr = section_curr;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                // Ensuring the existence of valid information
+
+                // [ ... typeidx1] ... typeidx2 ...
+                // [     safe    ] unsafe (could be the section_end)
+                //       ^^ section_curr
+
+                // check function counter
+                // Ensure content is available before counting (section_curr != section_end)
+                if(::uwvm2::parser::wasm::utils::counter_selfinc_throw_when_overflow(func_counter, section_curr, err) > func_count) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u32 = func_count;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::func_section_resolved_exceeded_the_actual_number;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                // [ ... typeidx1] ... typeidx2 ...
+                // [     safe    ] unsafe (could be the section_end)
+                //       ^^ section_curr
+
+                ::uwvm2::parser::wasm::standard::wasm1::type::wasm_u32 typeidx;  // No initialization necessary
+
+                using char8_t_const_may_alias_ptr UWVM_GNU_MAY_ALIAS = char8_t const*;
+
+                auto const [typeidx_next, typeidx_err]{::fast_io::parse_by_scan(reinterpret_cast<char8_t_const_may_alias_ptr>(section_curr),
+                                                                                reinterpret_cast<char8_t_const_may_alias_ptr>(section_end),
+                                                                                ::fast_io::mnp::leb128_get(typeidx))};
+
+                if(typeidx_err != ::fast_io::parse_code::ok) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::invalid_type_index;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(typeidx_err);
+                }
+
+                // [ ... typeidx1 ...] typeidx2 ...
+                // [      safe       ] unsafe (could be the section_end)
+                //       ^^ section_curr
+
+                // check: type_index should less than type_section_count
+                if(typeidx >= type_section_count) [[unlikely]]
+                {
+                    err.err_curr = section_curr;
+                    err.err_selectable.u32 = typeidx;
+                    err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
+                    ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
+                }
+
+                // write data, func_counter has been checked and is ready to be written.
+                functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
+
+                section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
+
+                // [ ... typeidx1 ...] typeidx2 ...
+                // [      safe       ] unsafe (could be the section_end)
+                //                     ^^ section_curr
             }
-
-            // [ ... typeidx1 ...] typeidx2 ...
-            // [      safe       ] unsafe (could be the section_end)
-            //       ^^ section_curr
-
-            // check: type_index should less than type_section_count
-            if(typeidx >= type_section_count) [[unlikely]]
-            {
-                err.err_curr = section_curr;
-                err.err_selectable.u32 = typeidx;
-                err.err_code = ::uwvm2::parser::wasm::base::wasm_parse_error_code::illegal_type_index;
-                ::uwvm2::parser::wasm::base::throw_wasm_parse_code(::fast_io::parse_code::invalid);
-            }
-
-            // write data, func_counter has been checked and is ready to be written.
-            functionsec.funcs.storage.typeidx_u8_vector.emplace_back_unchecked(static_cast<::uwvm2::parser::wasm::standard::wasm1::type::wasm_u8>(typeidx));
-
-            section_curr = reinterpret_cast<::std::byte const*>(typeidx_next);
-
-            // [ ... typeidx1 ...] typeidx2 ...
-            // [      safe       ] unsafe (could be the section_end)
-            //                     ^^ section_curr
         }
 
         // [before_section ... | func_count ... typeidx1 ... ...] (end)
@@ -7604,7 +7745,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
 #elif UWVM_HAS_CPP_ATTRIBUTE(__gnu__::__vector_size__) && defined(__LITTLE_ENDIAN__) &&                                                                        \
     ((defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)) ||                                                                                    \
      (defined(__ARM_NEON) && (UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32) || UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu))) ||                  \
-     (defined(__wasm_simd128__) && (UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16) || UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16))))
+     (defined(__wasm_simd128__) && (UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16) || UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)))) &                     \
+        0
+
+        /// @deprecated After testing with aarch64 and SSE2, it was found that the SIMD implementation performs worse than the scalar implementation. Therefore,
+        /// it will not be enabled here.
+
         /// (Little Endian), [[gnu::vector_size]], no mask-u16, simd128
         ///  x86_64-sse2, aarch64-neon, wasm-simd128 (Since the wasm simd128 shuffle requirement is immediate, it cannot be used.)
         ///  Since the arm neon does not have a move mask, the shuffle algorithm cannot be used.
@@ -8459,9 +8605,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::parser::wasm::standard::wasm1::features
     inline constexpr function_section_storage_section_details_wrapper_t<Fs...> section_details(
         function_section_storage_t const& function_section_storage,
         ::uwvm2::parser::wasm::binfmt::ver1::splice_section_storage_structure_t<Fs...> const& all_sections) noexcept
-    {
-        return {::std::addressof(function_section_storage), ::std::addressof(all_sections)};
-    }
+    { return {::std::addressof(function_section_storage), ::std::addressof(all_sections)}; }
 
     /// @brief Print the function section details
     /// @throws maybe throw fast_io::error, see the implementation of the stream
