@@ -32,10 +32,13 @@ module;
 #include <utility>
 #include <type_traits>
 #include <atomic>
+// macro
+#include <uwvm2/utils/macro/push_macros.h>
 
 export module uwvm2.utils.mutex:rw_spin_lock;
 
 import fast_io;
+import uwvm2.utils.debug;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
