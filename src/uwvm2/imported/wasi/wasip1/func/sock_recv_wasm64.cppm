@@ -46,7 +46,7 @@ module;
 # include <netinet/in.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:sock_recv;
+export module uwvm2.imported.wasi.wasip1.func:sock_recv_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -68,5 +68,5 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "sock_recv.h"
+#include "sock_recv_wasm64.h"
 
