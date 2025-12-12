@@ -248,6 +248,31 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             }
         }
 
+        inline constexpr void xxh_writeLE64(::std::byte* ptr, ::std::uint_least64_t value) noexcept
+        {
+            if UWVM_IF_CONSTEVAL
+            {
+                for(unsigned i{}; i != 8u; ++i)
+                {
+                    ptr[i] = static_cast<::std::byte>(static_cast<::std::uint_least8_t>(value & 0xFFu));
+                    value >>= 8u;
+                }
+            }
+            else
+            {
+#if CHAR_BIT > 8
+                for(unsigned i{}; i != 8u; ++i)
+                {
+                    ptr[i] = static_cast<::std::byte>(static_cast<::std::uint_least8_t>(value & 0xFFu));
+                    value >>= 8u;
+                }
+#else
+                ::std::uint64_t const le{::fast_io::little_endian(static_cast<::std::uint64_t>(value))};
+                ::std::memcpy(ptr, ::std::addressof(le), sizeof(le));
+#endif
+            }
+        }
+
         alignas(xxh3_max_align_len) inline constexpr ::std::byte xxh3_kSecret[192u]{
             static_cast<::std::byte>(0xb8), static_cast<::std::byte>(0xfe), static_cast<::std::byte>(0x6c), static_cast<::std::byte>(0x39),
             static_cast<::std::byte>(0x23), static_cast<::std::byte>(0xa4), static_cast<::std::byte>(0x4b), static_cast<::std::byte>(0xbe),
@@ -297,6 +322,32 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             static_cast<::std::byte>(0x95), static_cast<::std::byte>(0x16), static_cast<::std::byte>(0x04), static_cast<::std::byte>(0x28),
             static_cast<::std::byte>(0xaf), static_cast<::std::byte>(0xd7), static_cast<::std::byte>(0xfb), static_cast<::std::byte>(0xca),
             static_cast<::std::byte>(0xbb), static_cast<::std::byte>(0x4b), static_cast<::std::byte>(0x40), static_cast<::std::byte>(0x7e)};
+
+        inline constexpr void xxh3_init_custom_secret(::std::byte* __restrict customSecret, ::std::uint_least64_t seed64) noexcept
+        {
+            [[assume(customSecret != nullptr)]];
+
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
+            if constexpr(dig64 != 64) { seed64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
+            constexpr ::std::size_t secretSize{sizeof(xxh3_kSecret)};
+            static_assert((secretSize & 15uz) == 0uz);
+
+            for(::std::size_t i{}; i != secretSize; i += 16uz)
+            {
+                auto lo{xxh_readLE64(xxh3_kSecret + i) + seed64};
+                auto hi{xxh_readLE64(xxh3_kSecret + i + 8uz) - seed64};
+
+                if constexpr(dig64 != 64)
+                {
+                    lo &= 0xFFFF'FFFF'FFFF'FFFFu;
+                    hi &= 0xFFFF'FFFF'FFFF'FFFFu;
+                }
+
+                xxh_writeLE64(customSecret + i, lo);
+                xxh_writeLE64(customSecret + i + 8uz, hi);
+            }
+        }
 
         inline constexpr ::std::uint_least32_t xxh_prime32_1{0x9E3779B1U}; /*!< 0b10011110001101110111100110110001 */
         inline constexpr ::std::uint_least32_t xxh_prime32_2{0x85EBCA77U}; /*!< 0b10000101111010111100101001110111 */
@@ -480,9 +531,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
         }
 
         inline constexpr ::std::uint_least64_t xxh3_mix2_accs(::std::uint_least64_t const* __restrict acc, ::std::byte const* __restrict secret) noexcept
-        {
-            return xxh3_mul128_fold64(acc[0u] ^ xxh_readLE64(secret), acc[1u] ^ xxh_readLE64(secret + 8u));
-        }
+        { return xxh3_mul128_fold64(acc[0u] ^ xxh_readLE64(secret), acc[1u] ^ xxh_readLE64(secret + 8u)); }
 
         inline constexpr ::std::uint_least64_t
             xxh3_merge_accs(::std::uint_least64_t const* __restrict acc, ::std::byte const* __restrict secret, ::std::uint_least64_t start) noexcept
@@ -1170,6 +1219,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 #  error "missing instruction"
 # endif
 
+# if defined(__clang__)
+                // Clang guard: prevent slower reordering of NEON ops.
+                __asm__("" : "+w"(sum_1));
+                __asm__("" : "+w"(sum_2));
+# endif
+
                 xacc[i] = xacc[i] + sum_1;
                 xacc[i + 1] = xacc[i + 1] + sum_2;
             }
@@ -1218,6 +1273,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
                 sum = __builtin_aarch64_umlalv2si_uuuu(data_swap, data_key_lo, data_key_hi);
 # else
 #  error "missing instruction"
+# endif
+
+# if defined(__clang__)
+                // Clang guard: prevent slower reordering of NEON ops.
+                __asm__("" : "+w"(sum));
 # endif
 
                 xacc[i] = xacc[i] + sum;
@@ -1820,7 +1880,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # endif
         };
 
-        *xacc =
+        auto tmp_xacc{
 # if UWVM_HAS_BUILTIN(__builtin_neon_vmull_v)              // Clang
             ::std::bit_cast<uint64x2_t>(prod_hi) +
             ::std::bit_cast<uint64x2_t>(__builtin_neon_vmull_v(::std::bit_cast<int8x8_t>(data_key_lo), ::std::bit_cast<int8x8_t>(kPrimeLo), 51))
@@ -1835,7 +1895,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
 # else
 #  error "missing instructions"
 # endif
-            ;
+        };
+
+# if defined(__clang__)
+        // Clang guard: prevent slower reordering of NEON ops.
+        __asm__("" : "+w"(tmp_xacc));
+# endif
+
+        *xacc = tmp_xacc;
 
         ++xacc;
     }
@@ -2149,6 +2216,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             constexpr ::std::size_t xxh3_secret_size_min{136uz};
             [[assume(secretLen >= xxh3_secret_size_min)]];
 
+            constexpr auto dig64{::std::numeric_limits<::std::uint_least64_t>::digits};
+            if constexpr(dig64 != 64) { seed64 &= 0xFFFF'FFFF'FFFF'FFFFu; }
+
             /*
              * If an action is to be taken if `secretLen` condition is not respected,
              * it should be done here.
@@ -2161,15 +2231,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::hash
             else if(len <= 240uz) { return xxh3_len_129to240_64b(input, len, secret, secretLen, seed64); }
             else
             {
-                return xxh3_hash_long_64bits_internal(input, len, secret, secretLen);
+                if(seed64 == 0u) { return xxh3_hash_long_64bits_internal(input, len, secret, secretLen); }
+                alignas(xxh3_max_align_len) ::std::byte custom_secret[sizeof(xxh3_kSecret)];
+                xxh3_init_custom_secret(custom_secret, seed64);
+                return xxh3_hash_long_64bits_internal(input, len, custom_secret, sizeof(custom_secret));
             }
         }
     }  // namespace details
 
-    inline constexpr ::std::uint_least64_t xxh3_64bits(::std::byte const* __restrict input, ::std::size_t len, ::std::uint_least64_t seed64 = 0u) noexcept
-    {
-        return details::xxh3_64bits_internal(input, len, seed64, details::xxh3_kSecret, sizeof(details::xxh3_kSecret));
-    }
+    UWVM_GNU_PURE inline constexpr ::std::uint_least64_t xxh3_64bits(::std::byte const* __restrict input,
+                                                                     ::std::size_t len,
+                                                                     ::std::uint_least64_t seed64 = 0u) noexcept
+    { return details::xxh3_64bits_internal(input, len, seed64, details::xxh3_kSecret, sizeof(details::xxh3_kSecret)); }
 
     /// @brief xxh3 context class for incremental hashing
     struct xxh3_64bits_context

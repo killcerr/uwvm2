@@ -962,6 +962,23 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             u8x64simd prev_input_block{};
             u8x64simd prev_incomplete{};
 
+            // Rewind so that scalar validation starts at (or before) the previous
+            // leading byte, matching simdutf's error pinpointing strategy.
+            auto const rewind_for_scalar{[&] UWVM_ALWAYS_INLINE() constexpr noexcept
+                                         {
+                                             if(str_curr == str_begin) { return; }
+
+                                             auto rewind_ptr{str_curr - 1uz};
+                                             for(unsigned i{}; i != 4u && rewind_ptr != str_begin; ++i)
+                                             {
+                                                 auto const byte{static_cast<::std::uint8_t>(*rewind_ptr)};
+                                                 if((byte & static_cast<::std::uint8_t>(0b1100'0000u)) != static_cast<::std::uint8_t>(0b1000'0000u)) { break; }
+                                                 --rewind_ptr;
+                                             }
+
+                                             str_curr = rewind_ptr;
+                                         }};
+
             while(static_cast<::std::size_t>(str_end - str_curr) >= sizeof(u8x64simd))
             {
                 u8x64simd curr0;
@@ -985,20 +1002,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 }
 
                 // check ascii
-
-                constexpr u8x64simd u8x64simd_0x7F{0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu};
-
-                if(
-# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)
-                    __builtin_ia32_ucmpb512_mask(curr0, u8x64simd_0x7F, 0x06, UINT64_MAX)
+                bool const check_has_non_ascii{static_cast<bool>(
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_movepi8_mask)
+                    __builtin_ia32_movepi8_mask(::std::bit_cast<i8x64simd>(curr0))
+# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)
+                    __builtin_ia32_ucmpb512_mask(curr0 & static_cast<::std::uint8_t>(0x80u), u8x64simd{}, 0x04, UINT64_MAX)
 # else
 #  error "missing instruction"
 # endif
-                )
+                        )};
+
+                if(check_has_non_ascii)
                 {
                     // utf-8
 
@@ -1023,6 +1037,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                         ) [[unlikely]]
                 {
                     // Jump out to scalar processing
+                    rewind_for_scalar();
                     return general_algorithm();
                 }
 
@@ -1079,20 +1094,17 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                 }
 
                 // check ascii
-
-                constexpr u8x64simd u8x64simd_0x7F{0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu,
-                                                   0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu, 0x7Fu};
-
-                if(
-# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)
-                    __builtin_ia32_ucmpb512_mask(curr0, u8x64simd_0x7F, 0x06, load_mask)  // Ensure that only part of the loaded or calculated
+                bool const check_has_non_ascii{static_cast<bool>(
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_movepi8_mask)
+                    __builtin_ia32_movepi8_mask(::std::bit_cast<i8x64simd>(curr0)) & load_mask
+# elif defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)
+                    __builtin_ia32_ucmpb512_mask(curr0 & static_cast<::std::uint8_t>(0x80u), u8x64simd{}, 0x04, load_mask)
 # else
 #  error "missing instruction"
 # endif
-                )
+                    )};
+
+                if(check_has_non_ascii)
                 {
                     // utf-8
 
@@ -1117,10 +1129,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
                     ) [[unlikely]]
                 {
                     // Jump out to scalar processing
+                    rewind_for_scalar();
                     return general_algorithm();
                 }
 
                 str_curr += last_load_predicate_size;
+            }
+
+            // simdutf-style EOF check: if the last processed block ended with an
+            // incomplete multibyte sequence, it is an error at the end of input.
+            error |= prev_incomplete;
+            if(
+# if defined(__AVX512BW__) && UWVM_HAS_BUILTIN(__builtin_ia32_ucmpb512_mask)
+                __builtin_ia32_ucmpb512_mask(error, u8x64simd{}, 0x04, UINT64_MAX)
+# else
+#  error "missing instruction"
+# endif
+                    ) [[unlikely]]
+            {
+                rewind_for_scalar();
+                return general_algorithm();
             }
 
             return {str_curr, ::uwvm2::utils::utf::utf_error_code::success};
@@ -1328,7 +1356,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 #  error "missing instructions"
 # endif
 
-                    const auto prev1_andF{prev1 & static_cast<::std::uint8_t>(0x0Fu)};
+                    auto const prev1_andF{prev1 & static_cast<::std::uint8_t>(0x0Fu)};
 
                     u8x32simd b1l;
 
@@ -1470,7 +1498,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 # if UWVM_HAS_BUILTIN(__builtin_elementwise_sub_sat)  // Clang
                     prev2 = __builtin_elementwise_sub_sat(prev2, prev2_needsubs_simd);
 # elif defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_psubusb256)
-                    prev2 = __builtin_ia32_psubusb128(prev2, prev2_needsubs_simd);
+                    prev2 = __builtin_ia32_psubusb256(prev2, prev2_needsubs_simd);
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvssub_bu)
                     prev2 = __builtin_lasx_xvssub_bu(prev2, prev2_needsubs_simd);  /// @todo need test
 # else
@@ -1516,7 +1544,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 # if UWVM_HAS_BUILTIN(__builtin_elementwise_sub_sat)  // Clang
                     prev3 = __builtin_elementwise_sub_sat(prev3, prev3_needsubs_simd);
 # elif defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_psubusb256)
-                    prev3 = __builtin_ia32_psubusb128(prev3, prev3_needsubs_simd);
+                    prev3 = __builtin_ia32_psubusb256(prev3, prev3_needsubs_simd);
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvssub_bu)
                     prev3 = __builtin_lasx_xvssub_bu(prev3, prev3_needsubs_simd);  /// @todo need test
 # else
@@ -1610,7 +1638,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 # if UWVM_HAS_BUILTIN(__builtin_elementwise_sub_sat)  // Clang
                                              input = __builtin_elementwise_sub_sat(input, max_value);
 # elif defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_psubusb256)
-                                             input = __builtin_ia32_psubusb128(input, max_value);
+                                             input = __builtin_ia32_psubusb256(input, max_value);
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xvssub_bu)
                                              input = __builtin_lasx_xvssub_bu(input, max_value);  /// @todo need test
 # else
@@ -1669,17 +1697,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                 // check ascii
 
-                auto const check_upper{(curr0 | curr1) > static_cast<::std::uint8_t>(0x7Fu)};
-
-                if(
-# if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
-                    !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(check_upper), ::std::bit_cast<i64x4simd>(check_upper))
+                auto const check_or{curr0 | curr1};
+                bool const check_has_non_ascii{static_cast<bool>(
+# if defined(__AVX2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb256)
+                    __builtin_ia32_pmovmskb256(::std::bit_cast<c8x32simd>(check_or))
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
-                    __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_upper))  /// @todo need check
+                    __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(check_or & static_cast<::std::uint8_t>(0x80u)))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
-                )
+                        )};
+
+                if(check_has_non_ascii)
                 {
                     // utf-8
 
@@ -1695,14 +1724,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                     error |= prev_incomplete;
                 }
-
-                auto const error_need_check{error != static_cast<::std::uint8_t>(0u)};
-
                 if(
 # if defined(__AVX__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz256)
-                    !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(error_need_check), ::std::bit_cast<i64x4simd>(error_need_check))
+                    !__builtin_ia32_ptestz256(::std::bit_cast<i64x4simd>(error), ::std::bit_cast<i64x4simd>(error))
 # elif defined(__loongarch_asx) && UWVM_HAS_BUILTIN(__builtin_lasx_xbnz_v)
-                    __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(error_need_check))  /// @todo need check
+                    __builtin_lasx_xbnz_v(::std::bit_cast<u8x32simd>(error))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
@@ -1722,6 +1748,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
 
             // tail handling
+            // If the previous SIMD block ended with an incomplete UTF-8 sequence,
+            // rewind so that the scalar loop validates it together with the
+            // remainder (simdutf-style).
+            if(str_curr != str_begin)
+            {
+                auto const processed{static_cast<::std::size_t>(str_curr - str_begin)};
+                unsigned rewind{};  // 0..3
+
+                if(processed >= 3uz && static_cast<::std::uint8_t>(*(str_curr - 3u)) >= static_cast<::std::uint8_t>(0b1111'0000u)) { rewind = 3u; }
+                else if(processed >= 2uz && static_cast<::std::uint8_t>(*(str_curr - 2u)) >= static_cast<::std::uint8_t>(0b1110'0000u)) { rewind = 2u; }
+                else if(processed >= 1uz && static_cast<::std::uint8_t>(*(str_curr - 1u)) >= static_cast<::std::uint8_t>(0b1100'0000u)) { rewind = 1u; }
+
+                str_curr -= rewind;
+            }
 
             while(str_curr != str_end)
             {
@@ -2045,7 +2085,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 #  error "missing instructions"
 # endif
 
-                    const auto prev1_andF{prev1 & static_cast<::std::uint8_t>(0x0Fu)};
+                    auto const prev1_andF{prev1 & static_cast<::std::uint8_t>(0x0Fu)};
 
                     u8x16simd b1l;
 
@@ -2391,27 +2431,26 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                 // check ascii
 
-                auto const check_upper{(curr0 | curr1 | curr2 | curr3) > static_cast<::std::uint8_t>(0x7Fu)};
-
-                if(
-# if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                    !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(check_upper), ::std::bit_cast<i64x2simd>(check_upper))
-# elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                    __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_upper))
-# elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
-                    !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~check_upper))
+                auto const check_or{curr0 | curr1 | curr2 | curr3};
+                bool const check_has_non_ascii{static_cast<bool>(
+# if defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
+                    __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(check_or))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
-                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_upper))
+                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(check_or))
+# elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u8)                   // Only supported by clang
+                    __builtin_neon_vmaxvq_u8(check_or) & static_cast<::std::uint8_t>(0x80u)
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                  // Only supported by clang
-                    __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_upper))
+                    __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(check_or) & static_cast<::std::uint32_t>(0x80808080u))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
-                    __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_upper))
+                    __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(check_or) & static_cast<::std::uint32_t>(0x80808080u))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                    __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_upper))  /// @todo need check
+                    __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(check_or & static_cast<::std::uint8_t>(0x80u)))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
-                )
+                        )};
+
+                if(check_has_non_ascii)
                 {
                     // utf-8
 
@@ -2429,24 +2468,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
 
                     error |= prev_incomplete;
                 }
-
-                auto const error_need_check{error != static_cast<::std::uint8_t>(0u)};
-
                 if(
 # if defined(__SSE4_1__) && UWVM_HAS_BUILTIN(__builtin_ia32_ptestz128)
-                    !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(error_need_check), ::std::bit_cast<i64x2simd>(error_need_check))
+                    !__builtin_ia32_ptestz128(::std::bit_cast<i64x2simd>(error), ::std::bit_cast<i64x2simd>(error))
 # elif defined(__SSE2__) && UWVM_HAS_BUILTIN(__builtin_ia32_pmovmskb128)
-                    __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(error_need_check))
+                    __builtin_ia32_pmovmskb128(::std::bit_cast<c8x16simd>(error != static_cast<::std::uint8_t>(0u)))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_all_true_i8x16)
-                    !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~error_need_check))
+                    !__builtin_wasm_all_true_i8x16(::std::bit_cast<i8x16simd>(~(error != static_cast<::std::uint8_t>(0u))))
 # elif defined(__wasm_simd128__) && UWVM_HAS_BUILTIN(__builtin_wasm_bitmask_i8x16)
-                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(error_need_check))
+                    __builtin_wasm_bitmask_i8x16(::std::bit_cast<i8x16simd>(error != static_cast<::std::uint8_t>(0u)))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_neon_vmaxvq_u32)                  // Only supported by clang
-                    __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(error_need_check))
+                    __builtin_neon_vmaxvq_u32(::std::bit_cast<u32x4simd>(error))
 # elif defined(__ARM_NEON) && UWVM_HAS_BUILTIN(__builtin_aarch64_reduc_umax_scal_v4si_uu)  // Only supported by GCC
-                    __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(error_need_check))
+                    __builtin_aarch64_reduc_umax_scal_v4si_uu(::std::bit_cast<u32x4simd>(error))
 # elif defined(__loongarch_sx) && UWVM_HAS_BUILTIN(__builtin_lsx_bnz_v)
-                    __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(error_need_check))  /// @todo need check
+                    __builtin_lsx_bnz_v(::std::bit_cast<u8x16simd>(error))  /// @todo need check
 # else
 #  error "missing instructions"
 # endif
@@ -2466,6 +2502,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::utils::utf
             }
 
             // tail handling
+            // If the previous SIMD block ended with an incomplete UTF-8 sequence,
+            // rewind so that the scalar loop validates it together with the
+            // remainder (simdutf-style).
+            if(str_curr != str_begin)
+            {
+                auto const processed{static_cast<::std::size_t>(str_curr - str_begin)};
+                unsigned rewind{};  // 0..3
+
+                if(processed >= 3uz && static_cast<::std::uint8_t>(*(str_curr - 3u)) >= static_cast<::std::uint8_t>(0b1111'0000u)) { rewind = 3u; }
+                else if(processed >= 2uz && static_cast<::std::uint8_t>(*(str_curr - 2u)) >= static_cast<::std::uint8_t>(0b1110'0000u)) { rewind = 2u; }
+                else if(processed >= 1uz && static_cast<::std::uint8_t>(*(str_curr - 1u)) >= static_cast<::std::uint8_t>(0b1100'0000u)) { rewind = 1u; }
+
+                str_curr -= rewind;
+            }
 
             while(str_curr != str_end)
             {
