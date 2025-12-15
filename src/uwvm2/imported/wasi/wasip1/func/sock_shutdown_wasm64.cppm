@@ -46,7 +46,7 @@ module;
 # include <netinet/in.h>
 #endif
 
-export module uwvm2.imported.wasi.wasip1.func:sock_shutdown;
+export module uwvm2.imported.wasi.wasip1.func:sock_shutdown_wasm64;
 
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
@@ -60,6 +60,7 @@ import uwvm2.imported.wasi.wasip1.memory;
 import uwvm2.imported.wasi.wasip1.environment;
 import :base;
 import :posix;
+import :sock_shutdown;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -68,4 +69,4 @@ import :posix;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "sock_shutdown.h"
+#include "sock_shutdown_wasm64.h"
