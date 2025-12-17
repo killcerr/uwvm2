@@ -39,6 +39,7 @@
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/debug/impl.h>
 # include <uwvm2/utils/mutex/impl.h>
+# include <uwvm2/utils/allocator/fast_io_strict/impl.h>
 # include <uwvm2/object/memory/wasm_page/impl.h>
 #endif
 
@@ -176,7 +177,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
         /// @brief      Enter the memory operation safely.
         /// @details    Implements the enter protocol to prevent race conditions:
         ///             1. Wait for grow operation to complete (acquire semantics)
-        ///             2. Increment active operations counter (acq_rel semantics)
+        ///             2. Increment active operations counter (acquire semantics)
         ///             3. Double-check that grow hasn't started (acquire semantics)
         ///             4. If grow started, undo increment and retry
         inline constexpr void enter_operation() noexcept
@@ -202,8 +203,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                     }
                 }
 
-                // 2) Declare entry into active region; relaxed is sufficient for pure reference counting
-                this->active_ops_p->fetch_add(1uz, ::std::memory_order_relaxed);
+                // 2) Declare entry into active region.
+                // Use acquire to prevent subsequent memory accesses from being reordered before the increment,
+                // otherwise grow() could observe active_ops==0 and start relocating while this operation is already in-flight.
+                this->active_ops_p->fetch_add(1uz, ::std::memory_order_acquire);
 
                 // 3) Double-check that grow hasn't started after we "entered"
                 if(!this->growing_flag_p->test(::std::memory_order_acquire))
@@ -285,6 +288,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
         // The default allocator is unaligned.
         using allocator_t = Alloc;
+        using strict_allocator_unadapted_t = ::uwvm2::utils::allocator::fast_io_strict::fast_io_allocator_to_strict<typename Alloc::allocator_type>;
+        using strict_allocator_t = ::uwvm2::utils::allocator::fast_io_strict::fast_io_strict_generic_allocator_adapter<strict_allocator_unadapted_t>;
+
         // A type allocator must be an aligned allocator.
         using atomic_flag_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_flag>;
         using atomic_size_allcator_t = ::fast_io::typed_generic_allocator_adapter<allocator_t, ::std::atomic_size_t>;
@@ -341,7 +347,11 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             // The same method as set_custom_page_size, but without adding a lock.
 
             // Check if it is a power of 2
-            if(!::std::has_single_bit(custom_page_size)) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(!::std::has_single_bit(custom_page_size)) [[unlikely]]
+            {
+                // paltform bug, not uwvm2 bug
+                ::fast_io::fast_terminate();
+            }
 
             // Since there is only one pop, directly counting the number of zeros suffices to calculate log2
             this->custom_page_size_log2 = ::std::countr_zero(custom_page_size);
@@ -371,16 +381,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
 
         /// @brief      Grow the memory.
         /// @param      max_limit_memory_length     This maximum value is derived from the maximum memory limit.
-        inline constexpr void grow(::std::size_t page_grow_size, ::std::size_t max_limit_memory_length = ::std::numeric_limits<::std::size_t>::max()) noexcept
+        inline constexpr void grow_silently(::std::size_t page_grow_size,
+                                            ::std::size_t max_limit_memory_length = ::std::numeric_limits<::std::size_t>::max()) noexcept
         {
             if(page_grow_size == 0uz) [[unlikely]] { return; }
+
+            if(this->growing_flag_p == nullptr || this->active_ops_p == nullptr) [[unlikely]]
+            {
+                // this is a bug
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             // Prevent new memory operation instructions from being read for speculation
             growing_flag_guard_t growing_flag_guard{this->growing_flag_p};
 
             // Stop-the-world: wait for all in-flight operations to finish
-
-            if(this->active_ops_p == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
 
             // Wait for all existing memory read instructions to complete.
             // acquire: observe decrements published with release; ensures quiescence is visible
@@ -400,13 +415,18 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 }
             }
 
-            if(this->memory_begin == nullptr) [[unlikely]] { ::fast_io::fast_terminate(); }
+            if(this->memory_begin == nullptr) [[unlikely]]
+            {
+                // this is a bug
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
 
             auto const this_custom_page_size_log2{this->custom_page_size_log2};
 
             if(page_grow_size > ::std::numeric_limits<::std::size_t>::max() >> this_custom_page_size_log2) [[unlikely]]
             {
                 // This situation cannot occur; it is due to user input error.
+                // slient
                 ::fast_io::fast_terminate();
             }
 
@@ -416,6 +436,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             if(max_limit_memory_length < curr_memory_length) [[unlikely]]
             {
                 // This situation cannot occur; it is due to user input error.
+                // slient
                 ::fast_io::fast_terminate();
             }
 
@@ -424,6 +445,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             if(memory_grow_size > left_memory_size) [[unlikely]]
             {
                 // Exceeded the maximum allowed value, error reported.
+                // slient
                 ::fast_io::fast_terminate();
             }
 
@@ -440,12 +462,16 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 // Very few platforms directly support
 
                 temp_memory_begin = reinterpret_cast<::std::byte*>(allocator_t::reallocate_aligned_zero(this->memory_begin, alignment, new_memory_length));
+
+                // fast_io::allocator is slient, nonecessary check
             }
             else if constexpr(allocator_t::has_reallocate_aligned)
             {
                 // Very few platforms directly support
 
                 temp_memory_begin = reinterpret_cast<::std::byte*>(allocator_t::reallocate_aligned(this->memory_begin, alignment, new_memory_length));
+
+                // fast_io::allocator is slient, nonecessary check
 
                 // Manually clear the contents from the old boundary to the new boundary.
                 ::fast_io::freestanding::bytes_clear_n(temp_memory_begin + curr_memory_length, memory_grow_size);
@@ -458,6 +484,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
                 // initialization mechanism, which sets all pages to zero.
                 temp_memory_begin = reinterpret_cast<::std::byte*>(allocator_t::allocate_aligned_zero(alignment, new_memory_length));
 
+                // fast_io::allocator is slient, nonecessary check
+
                 // Copy all old content to the new memory.
                 ::fast_io::freestanding::my_memcpy(temp_memory_begin, this->memory_begin, curr_memory_length);
 
@@ -469,6 +497,126 @@ UWVM_MODULE_EXPORT namespace uwvm2::object::memory::linear
             this->memory_length = new_memory_length;
 
             // growing_flag_guard destruct here
+        }
+
+        /// @brief      Grow the memory.
+        /// @param      max_limit_memory_length     This maximum value is derived from the maximum memory limit.
+        /// @note       Strictly use a non-silent allocator (which may return nullptr), then indicates allocation success via the return value.
+        inline constexpr bool grow_strictly(::std::size_t page_grow_size,
+                                            ::std::size_t max_limit_memory_length = ::std::numeric_limits<::std::size_t>::max()) noexcept
+        {
+            if(page_grow_size == 0uz) [[unlikely]] { return true; }
+
+            if(this->growing_flag_p == nullptr || this->active_ops_p == nullptr) [[unlikely]]
+            {
+                // this is a bug
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
+
+            // Prevent new memory operation instructions from being read for speculation
+            growing_flag_guard_t growing_flag_guard{this->growing_flag_p};
+
+            // Stop-the-world: wait for all in-flight operations to finish
+
+            // Wait for all existing memory read instructions to complete.
+            // acquire: observe decrements published with release; ensures quiescence is visible
+            unsigned spin_count{};
+
+            for(auto v{this->active_ops_p->load(::std::memory_order_acquire)}; v != 0uz; v = this->active_ops_p->load(::std::memory_order_acquire))
+            {
+                if(++spin_count > 1000u)
+                {
+                    // acquire: pair with operation's release decrement before proceeding after wake
+                    this->active_ops_p->wait(v, ::std::memory_order_acquire);
+                    spin_count = 0u;
+                }
+                else
+                {
+                    ::uwvm2::utils::mutex::rwlock_pause();
+                }
+            }
+
+            if(this->memory_begin == nullptr) [[unlikely]]
+            {
+                // this is a bug
+                ::uwvm2::utils::debug::trap_and_inform_bug_pos();
+            }
+
+            auto const this_custom_page_size_log2{this->custom_page_size_log2};
+
+            if(page_grow_size > ::std::numeric_limits<::std::size_t>::max() >> this_custom_page_size_log2) [[unlikely]]
+            {
+                // This situation cannot occur; it is due to user input error.
+                return false;
+            }
+
+            auto const memory_grow_size{page_grow_size << this_custom_page_size_log2};
+            auto const curr_memory_length{this->memory_length};
+
+            if(max_limit_memory_length < curr_memory_length) [[unlikely]]
+            {
+                // This situation cannot occur; it is due to user input error.
+                return false;
+            }
+
+            auto const left_memory_size{max_limit_memory_length - curr_memory_length};
+
+            if(memory_grow_size > left_memory_size) [[unlikely]]
+            {
+                // Exceeded the maximum allowed value, error reported.
+                return false;
+            }
+
+            // After realloc, write new_memory_length
+            auto const new_memory_length{curr_memory_length + memory_grow_size};
+
+            // In this model, regardless of whether `memory_begin` changes, no thread safety issues will arise.
+            // Therefore, realloc_zero is used by default here.
+            ::std::byte* temp_memory_begin;  // no init required
+
+            // All WASM memory must be aligned when allocated and released.
+            if constexpr(strict_allocator_t::has_reallocate_aligned_zero)
+            {
+                // Very few platforms directly support
+
+                temp_memory_begin =
+                    reinterpret_cast<::std::byte*>(strict_allocator_t::reallocate_aligned_zero(this->memory_begin, alignment, new_memory_length));
+
+                if(temp_memory_begin == nullptr) [[unlikely]] { return false; }
+            }
+            else if constexpr(strict_allocator_t::has_reallocate_aligned)
+            {
+                // Very few platforms directly support
+
+                temp_memory_begin = reinterpret_cast<::std::byte*>(strict_allocator_t::reallocate_aligned(this->memory_begin, alignment, new_memory_length));
+
+                if(temp_memory_begin == nullptr) [[unlikely]] { return false; }
+
+                // Manually clear the contents from the old boundary to the new boundary.
+                ::fast_io::freestanding::bytes_clear_n(temp_memory_begin + curr_memory_length, memory_grow_size);
+            }
+            else
+            {
+                // General Implementation
+
+                // Using `aligned zero` directly instead of `aligned` allocation followed by memory clearing leverages the platform's default page
+                // initialization mechanism, which sets all pages to zero.
+                temp_memory_begin = reinterpret_cast<::std::byte*>(strict_allocator_t::allocate_aligned_zero(alignment, new_memory_length));
+
+                if(temp_memory_begin == nullptr) [[unlikely]] { return false; }
+
+                // Copy all old content to the new memory.
+                ::fast_io::freestanding::my_memcpy(temp_memory_begin, this->memory_begin, curr_memory_length);
+
+                // Deallocate the old memory.
+                strict_allocator_t::deallocate_aligned_n(this->memory_begin, alignment, curr_memory_length);
+            }
+
+            this->memory_begin = ::std::assume_aligned<alignment>(temp_memory_begin);
+            this->memory_length = new_memory_length;
+
+            // growing_flag_guard destruct here
+            return true;
         }
 
         inline constexpr ::std::size_t get_page_size() const noexcept

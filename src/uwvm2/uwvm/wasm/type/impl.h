@@ -26,6 +26,7 @@
 # include "cwrapper.h"
 # include "para.h"
 # include "file.h"
+# include "local_imported.h"
 # include "dl.h"
 # include "weak_symbol.h"
 # include "all_module.h"
