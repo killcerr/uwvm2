@@ -42,6 +42,7 @@
 # include <uwvm2/uwvm/wasm/feature/impl.h>
 # include "para.h"
 # include "file.h"
+# include "local_imported.h"
 # include "dl.h"
 # include "weak_symbol.h"
 #endif
@@ -61,14 +62,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         preloaded_wasm,  // wasm_file
 
 #if defined(UWVM_SUPPORT_PRELOAD_DL)
-        // Dynamically loaded WASM binary import API, suitable for use as a plugin system, only supports platforms capable of dynamically loading DLLs.
-        // Currently, only the module import function is available.
+                         // Dynamically loaded WASM binary import API, suitable for use as a plugin system, only supports platforms capable of dynamically
+                         // loading DLLs. Currently, only the module import function is available.
         preloaded_dl,  // wasm_dl
 #endif
 
 #if defined(UWVM_SUPPORT_WEAK_SYMBOL)
-        // Static WASM modules implemented with weak symbols, available across all platforms, specified during linking, primarily for embedded environments.
-        // Currently, only the module import function is available.
+                       // Static WASM modules implemented with weak symbols, available across all platforms, specified during linking, primarily for embedded
+                       // environments. Currently, only the module import function is available.
         weak_symbol,  // wasm_weak_symbol
 #endif
 
@@ -77,8 +78,13 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         local_import  // wasip1, wasip2, ...
     };
 
-    // all module
+    // binfmt version 1
+    using binfmt_ver1_feature_list_t =
+        decltype(::uwvm2::uwvm::wasm::type::get_feature_list_from_tuple_impl(::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features));
+    using local_imported_t =
+        decltype(::uwvm2::uwvm::wasm::type::get_local_imported_module_from_feature_list(::uwvm2::uwvm::wasm::feature::wasm_binfmt1_features));
 
+    // all module
     union module_storage_ptr_u
     {
         // exec_wasm
@@ -95,7 +101,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         ::uwvm2::uwvm::wasm::type::wasm_weak_symbol_t const* wws;
 #endif
 
-        /// @todo local_import
+        // local_import
+        // note: This does not use a const pointer because partial member function calls can be made directly from it.
+        local_imported_t* li;
     };
 
     struct all_module_t
@@ -108,9 +116,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 
     template <::uwvm2::parser::wasm::concepts::wasm_feature... Fs>
     inline consteval auto get_binfmt_ver1_final_export_type_from_tuple(::uwvm2::utils::container::tuple<Fs...>) noexcept
-    {
-        return ::uwvm2::parser::wasm::standard::wasm1::features::final_export_type_t<Fs...>{};
-    }
+    { return ::uwvm2::parser::wasm::standard::wasm1::features::final_export_type_t<Fs...>{}; }
 
     // exec_wasm
     // preloaded_wasm
@@ -148,7 +154,20 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
     };
 #endif
 
-    /// @todo local_import
+    enum class local_imported_export_type_t : unsigned
+    {
+        func,
+        global,
+        memory
+    };
+
+    struct local_imported_export_t
+    {
+        // note: This does not use a const pointer because partial member function calls can be made directly from it.
+        local_imported_t* storage{};
+        ::std::size_t index{};
+        local_imported_export_type_t type{};
+    };
 
     struct all_module_export_t
     {
@@ -166,7 +185,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         using wasm_weak_symbol_export_storage_t = wasm_weak_symbol_export_t;
 #endif
 
-        /// @todo local_import
+        // local_import
+        using local_imported_export_storage_t = local_imported_export_t;
 
         union all_module_export_storage_u
         {
@@ -184,10 +204,14 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
 #if defined(UWVM_SUPPORT_WEAK_SYMBOL)
             // weak_symbol
             wasm_weak_symbol_export_storage_t wasm_weak_symbol_export_storage_ptr;
-            static_assert(::std::is_trivially_copyable_v<wasm_weak_symbol_export_storage_t> && ::std::is_trivially_destructible_v<wasm_weak_symbol_export_storage_t>);
+            static_assert(::std::is_trivially_copyable_v<wasm_weak_symbol_export_storage_t> &&
+                          ::std::is_trivially_destructible_v<wasm_weak_symbol_export_storage_t>);
 #endif
 
-            /// @todo local_import
+            // local_import
+            local_imported_export_storage_t local_imported_export_storage_ptr;
+            static_assert(::std::is_trivially_copyable_v<local_imported_export_storage_t> &&
+                          ::std::is_trivially_destructible_v<local_imported_export_storage_t>);
         };
 
         all_module_export_storage_u storage{};

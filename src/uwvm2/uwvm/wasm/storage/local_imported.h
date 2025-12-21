@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -43,11 +43,9 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::storage
 {
-#if defined(UWVM_SUPPORT_WEAK_SYMBOL)
-    /// @note  Must remain unchanged before initialization (to prevent iterator invalidation).
-    inline ::uwvm2::utils::container::vector<::uwvm2::uwvm::wasm::type::wasm_weak_symbol_t>
-        weak_symbol{};  // [global] No global variable dependencies from other translation units
-#endif
+    /// @note  Once any element address/reference/iterator is taken, this vector must not grow (no reallocation),
+    ///        otherwise previously stored pointers/references/iterators become dangling.
+    inline ::uwvm2::utils::container::vector<::uwvm2::uwvm::wasm::type::local_imported_t> preload_local_imported{};  //[global]
 }  // namespace uwvm2::uwvm::wasm::storage
 
 #ifndef UWVM_MODULE

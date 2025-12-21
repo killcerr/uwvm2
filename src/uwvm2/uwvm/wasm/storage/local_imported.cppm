@@ -1,12 +1,15 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
+ * @brief       Imported local dynamic libraries
+ * @details     "--wasm-load-dl" or "-Wld"
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-03-28
  * @copyright   APL-2.0 License
  */
 
@@ -21,31 +24,18 @@
 
 module;
 
-// std
-#include <cstdint>
-#include <cstddef>
-#include <cstring>
-#include <new>
-#include <memory>
-#include <type_traits>
 // macro
 #include <uwvm2/utils/macro/push_macros.h>
 
-export module uwvm2.uwvm.wasm.type:all_module;
+export module uwvm2.uwvm.wasm.storage:local_imported;
 
 import fast_io;
 import uwvm2.utils.container;
 import uwvm2.parser.wasm.concepts;
 import uwvm2.parser.wasm.standard.wasm1.type;
-import uwvm2.parser.wasm.standard.wasm1.features;
-import uwvm2.parser.wasm_custom.customs;
 import uwvm2.uwvm.wasm.base;
 import uwvm2.uwvm.wasm.feature;
-import :para;
-import :file;
-import :local_imported;
-import :dl;
-import :weak_symbol;
+import uwvm2.uwvm.wasm.type;
 
 #ifndef UWVM_MODULE
 # define UWVM_MODULE
@@ -54,4 +44,4 @@ import :weak_symbol;
 # define UWVM_MODULE_EXPORT export
 #endif
 
-#include "all_module.h"
+#include "local_imported.h"
