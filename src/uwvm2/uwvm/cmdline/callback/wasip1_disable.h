@@ -57,6 +57,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
         ::uwvm2::utils::cmdline::parameter_parsing_results*) noexcept
     {
         ::uwvm2::uwvm::wasm::storage::local_preload_wasip1 = false;
+
         return ::uwvm2::utils::cmdline::parameter_return_type::def;
     }
 
