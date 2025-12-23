@@ -3146,7 +3146,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
      (defined(BSD) || defined(_SYSTYPE_BSD) || defined(__BSD_VISIBLE)) || (defined(__MSDOS__) || defined(__DJGPP__))
             // POSIX or POSIX-like
 
-#  if !defined(_POSIX_C_SOURCE) || (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L)
+#  if (!defined(_POSIX_C_SOURCE) || (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L)) && !(defined(__MSDOS__) || defined(__DJGPP__))
             // POSIX.1-2001
             // libc: poll()
 
@@ -3760,7 +3760,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::imported::wasi::wasip1::func
                             auto& curr_file_ref{curr_fd.wasi_fd.ptr->wasi_fd_storage.storage.file_fd};
                             curr_io_observer = curr_file_ref;
                         }
-                        auto const& curr_fd_native_file{curr_io_observer};
+
+                        [[maybe_unused]] auto const& curr_fd_native_file{curr_io_observer};
 
                         int const native_fd{curr_fd_native_file.native_handle()};
 

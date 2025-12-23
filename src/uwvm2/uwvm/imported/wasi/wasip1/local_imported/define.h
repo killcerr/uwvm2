@@ -105,7 +105,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
         {
             using ret_type = Ret;
             using env_type = Env;
-            using arg_tuple = ::std::tuple<Args...>;
+            using arg_tuple = ::uwvm2::utils::container::tuple<Args...>;
+        };
+
+        template <typename Ret, typename Env, typename... Args>
+        struct wasip1_fn_traits<Ret (*)(Env&, Args...) noexcept>
+        {
+            using ret_type = Ret;
+            using env_type = Env;
+            using arg_tuple = ::uwvm2::utils::container::tuple<Args...>;
         };
 
         template <typename T, typename U>
@@ -123,11 +131,49 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
             }
         }
 
+        template <typename Sig, Sig Fn>
+        struct wasip1_local_imported_function_base_impl;
+
         template <auto Fn>
-        struct wasip1_local_imported_function_base;
+        struct wasip1_local_imported_function_base : wasip1_local_imported_function_base_impl<decltype(Fn), Fn>
+        {
+        };
 
         template <typename Ret, typename Env, typename... Args, Ret (*Fn)(Env&, Args...)>
-        struct wasip1_local_imported_function_base<Fn>
+        struct wasip1_local_imported_function_base_impl<Ret (*)(Env&, Args...), Fn>
+        {
+            static_assert(::std::is_same_v<Env, ::uwvm2::uwvm::imported::wasi::wasip1::storage::wasip1_env_type>,
+                          "WASI local_imported wrapper expects uwvm wasip1 env type");
+
+            using value_type = wasm_value_type;
+            using res_tuple = wasip1_result_tuple_t<Ret>;
+            using para_tuple = ::uwvm2::uwvm::wasm::type::import_function_parameter_tuple_t<feature_list, map_to_wasm_value_type<Args>()...>;
+            using local_imported_function_type = ::uwvm2::uwvm::wasm::type::local_imported_function_type_t<res_tuple, para_tuple>;
+
+            inline static constexpr void call(local_imported_function_type& func_type) noexcept
+            {
+                auto& env{::uwvm2::uwvm::imported::wasi::wasip1::storage::default_wasip1_env};
+
+                if constexpr(::std::is_void_v<Ret>)
+                {
+                    [&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+                    { Fn(env, cast_wasm_scalar<Args>(::uwvm2::utils::container::get<I>(func_type.params))...); }(::std::make_index_sequence<sizeof...(Args)>{});
+                }
+                else
+                {
+                    auto const retv{[&]<::std::size_t... I>(::std::index_sequence<I...>) constexpr noexcept
+                                    {
+                                        return Fn(env, cast_wasm_scalar<Args>(::uwvm2::utils::container::get<I>(func_type.params))...);
+                                    }(::std::make_index_sequence<sizeof...(Args)>{})};
+
+                    using res0_type = ::std::remove_cvref_t<decltype(::uwvm2::utils::container::get<0>(func_type.res))>;
+                    ::uwvm2::utils::container::get<0>(func_type.res) = static_cast<res0_type>(retv);
+                }
+            }
+        };
+
+        template <typename Ret, typename Env, typename... Args, Ret (*Fn)(Env&, Args...) noexcept>
+        struct wasip1_local_imported_function_base_impl<Ret (*)(Env&, Args...) noexcept, Fn>
         {
             static_assert(::std::is_same_v<Env, ::uwvm2::uwvm::imported::wasi::wasip1::storage::wasip1_env_type>,
                           "WASI local_imported wrapper expects uwvm wasip1 env type");
@@ -304,6 +350,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
         inline constexpr char8_t name_sched_yield[] = u8"sched_yield";
         using sched_yield = wasip1_local_imported_function<::std::addressof(::uwvm2::imported::wasi::wasip1::func::sched_yield), name_sched_yield>;
 
+#  if defined(UWVM_IMPORT_WASI_WASIP1_SUPPORT_SOCKET)
         inline constexpr char8_t name_sock_accept[] = u8"sock_accept";
         using sock_accept = wasip1_local_imported_function<::std::addressof(::uwvm2::imported::wasi::wasip1::func::sock_accept), name_sock_accept>;
 
@@ -315,7 +362,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
 
         inline constexpr char8_t name_sock_shutdown[] = u8"sock_shutdown";
         using sock_shutdown = wasip1_local_imported_function<::std::addressof(::uwvm2::imported::wasi::wasip1::func::sock_shutdown), name_sock_shutdown>;
-
+#  endif
         // wasi uextension: memory64. Non-standard extension, but imported by default for security reasons.
 
         inline constexpr char8_t name_args_get_wasm64[] = u8"args_get_wasm64";
@@ -482,6 +529,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
         using sched_yield_wasm64 =
             wasip1_local_imported_function<::std::addressof(::uwvm2::imported::wasi::wasip1::func::sched_yield_wasm64), name_sched_yield_wasm64>;
 
+#  if defined(UWVM_IMPORT_WASI_WASIP1_SUPPORT_SOCKET)
         inline constexpr char8_t name_sock_accept_wasm64[] = u8"sock_accept_wasm64";
         using sock_accept_wasm64 =
             wasip1_local_imported_function<::std::addressof(::uwvm2::imported::wasi::wasip1::func::sock_accept_wasm64), name_sock_accept_wasm64>;
@@ -497,6 +545,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
         inline constexpr char8_t name_sock_shutdown_wasm64[] = u8"sock_shutdown_wasm64";
         using sock_shutdown_wasm64 =
             wasip1_local_imported_function<::std::addressof(::uwvm2::imported::wasi::wasip1::func::sock_shutdown_wasm64), name_sock_shutdown_wasm64>;
+#  endif
     }  // namespace details
 
     struct wasip1_local_imported_module_t
@@ -544,11 +593,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
                                                                       details::proc_exit,
                                                                       details::proc_raise,
                                                                       details::random_get,
-                                                                      details::sched_yield,
+                                                                      details::sched_yield
+#  if defined(UWVM_IMPORT_WASI_WASIP1_SUPPORT_SOCKET)
+                                                                      ,
                                                                       details::sock_accept,
                                                                       details::sock_recv,
                                                                       details::sock_send,
-                                                                      details::sock_shutdown>;
+                                                                      details::sock_shutdown
+#  endif
+                                                                      >;
     };
 
     static_assert(::uwvm2::uwvm::wasm::type::is_local_imported_module<wasip1_local_imported_module_t>);
@@ -606,11 +659,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::imported::wasi::wasip1::local_imported
                                                                       details::proc_exit_wasm64,
                                                                       details::proc_raise_wasm64,
                                                                       details::random_get_wasm64,
-                                                                      details::sched_yield_wasm64,
+                                                                      details::sched_yield_wasm64
+#  if defined(UWVM_IMPORT_WASI_WASIP1_SUPPORT_SOCKET)
+                                                                      ,
                                                                       details::sock_accept_wasm64,
                                                                       details::sock_recv_wasm64,
                                                                       details::sock_send_wasm64,
-                                                                      details::sock_shutdown_wasm64>;
+                                                                      details::sock_shutdown_wasm64
+#  endif
+                                                                      >;
     };
 
     static_assert(::uwvm2::uwvm::wasm::type::is_local_imported_module<wasip1_wasm64_local_imported_module_t>);

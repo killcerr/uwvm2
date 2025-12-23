@@ -671,6 +671,7 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         using rcvmod_type = ::std::remove_cvref_t<LocalImport>;
         using name_type = ::uwvm2::utils::container::u8string_view;
 
+        // use std vector for consteval environment
         ::std::vector<name_type> names{};
         ::std::size_t total_count{};
 
@@ -695,18 +696,21 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         if constexpr(has_local_function_tuple<rcvmod_type>)
         {
             using func_tuple_type = typename rcvmod_type::local_function_tuple;
+            // use std vector for consteval environment
             []<typename... Ts>(::std::vector<name_type>& v, ::std::type_identity<::uwvm2::utils::container::tuple<Ts...>>) constexpr noexcept
             { (v.push_back(Ts::function_name), ...); }(names, ::std::type_identity<func_tuple_type>{});
         }
         if constexpr(has_local_global_tuple<rcvmod_type>)
         {
             using global_tuple_type = typename rcvmod_type::local_global_tuple;
+            // use std vector for consteval environment
             []<typename... Ts>(::std::vector<name_type>& v, ::std::type_identity<::uwvm2::utils::container::tuple<Ts...>>) constexpr noexcept
             { (v.push_back(Ts::global_name), ...); }(names, ::std::type_identity<global_tuple_type>{});
         }
         if constexpr(has_local_memory_tuple<rcvmod_type>)
         {
             using memory_tuple_type = typename rcvmod_type::local_memory_tuple;
+            // use std vector for consteval environment
             []<typename... Ts>(::std::vector<name_type>& v, ::std::type_identity<::uwvm2::utils::container::tuple<Ts...>>) constexpr noexcept
             { (v.push_back(Ts::memory_name), ...); }(names, ::std::type_identity<memory_tuple_type>{});
         }
@@ -1054,9 +1058,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         }
 
         template <typename Tuple, ::std::size_t... I>
-        inline constexpr void unpack_packed_to_tuple_impl(Tuple& dst, ::std::byte const* src, ::std::index_sequence<I...>) noexcept
+        inline constexpr void unpack_packed_to_tuple_impl(Tuple& dst, [[maybe_unused]] ::std::byte const* src, ::std::index_sequence<I...>) noexcept
         {
-            ::std::size_t offset{};
+            [[maybe_unused]] ::std::size_t offset{};
             ((
                  [&] constexpr noexcept
                  {
@@ -1077,9 +1081,9 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::type
         }
 
         template <typename Tuple, ::std::size_t... I>
-        inline constexpr void pack_tuple_to_packed_impl(::std::byte* dst, Tuple const& src, ::std::index_sequence<I...>) noexcept
+        inline constexpr void pack_tuple_to_packed_impl([[maybe_unused]] ::std::byte* dst, Tuple const& src, ::std::index_sequence<I...>) noexcept
         {
-            ::std::size_t offset{};
+            [[maybe_unused]] ::std::size_t offset{};
             ((
                  [&] constexpr noexcept
                  {
