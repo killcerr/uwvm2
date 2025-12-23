@@ -36,12 +36,16 @@
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1/features/impl.h>
+# include <uwvm2/parser/wasm/concepts/impl.h>
+# include <uwvm2/parser/wasm_custom/customs/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/utils/depend/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/cmdline/params/impl.h>
 # include <uwvm2/uwvm/wasm/storage/impl.h>
+# include <uwvm2/uwvm/wasm/feature/impl.h>
 # include <uwvm2/uwvm/wasm/custom/customs/impl.h>
 #endif
 
@@ -51,10 +55,15 @@
 
 UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
 {
-    UWVM_GNU_COLD inline constexpr ::uwvm2::utils::cmdline::parameter_return_type wasm_set_parser_limit_callback(
-        [[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results * para_begin,
-        ::uwvm2::utils::cmdline::parameter_parsing_results * para_curr,
-        ::uwvm2::utils::cmdline::parameter_parsing_results * para_end) noexcept
+#if defined(UWVM_MODULE)
+    extern "C++" UWVM_GNU_COLD
+#else
+    UWVM_GNU_COLD inline constexpr
+#endif
+        ::uwvm2::utils::cmdline::parameter_return_type wasm_set_parser_limit_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results *
+                                                                                          para_begin,
+                                                                                      ::uwvm2::utils::cmdline::parameter_parsing_results * para_curr,
+                                                                                      ::uwvm2::utils::cmdline::parameter_parsing_results * para_end) noexcept
     {
         // [... curr] ...
         // [  safe  ] unsafe (could be the module_end)

@@ -30,6 +30,7 @@ module;
 #include <concepts>
 #include <bit>
 #include <memory>
+#include <utility>
 // macro
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
@@ -44,6 +45,8 @@ export module uwvm2.imported.wasi.wasip1.func:base;
 import fast_io;
 import uwvm2.uwvm_predefine.utils.ansies;
 import uwvm2.uwvm_predefine.io;
+import uwvm2.utils.container;
+import uwvm2.utils.utf;
 import uwvm2.object.memory.linear;
 import uwvm2.imported.wasi.wasip1.abi;
 import uwvm2.imported.wasi.wasip1.fd_manager;

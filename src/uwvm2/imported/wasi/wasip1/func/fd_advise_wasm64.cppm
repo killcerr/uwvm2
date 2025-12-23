@@ -31,6 +31,7 @@ module;
 #include <bit>
 #include <memory>
 #include <type_traits>
+#include <utility>
 // macro
 #include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 #include <uwvm2/utils/macro/push_macros.h>
@@ -39,6 +40,7 @@ module;
 #if (!defined(__NEWLIB__) || defined(__CYGWIN__)) && !defined(_WIN32) && __has_include(<dirent.h>) && !defined(_PICOLIBC__)
 # include <unistd.h>
 # include <fcntl.h>
+# include <errno.h>
 #endif
 
 export module uwvm2.imported.wasi.wasip1.func:fd_advise_wasm64;

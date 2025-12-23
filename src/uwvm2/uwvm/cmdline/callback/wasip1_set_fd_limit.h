@@ -39,6 +39,7 @@
 # include <uwvm2/utils/container/impl.h>
 # include <uwvm2/utils/ansies/impl.h>
 # include <uwvm2/utils/cmdline/impl.h>
+# include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/uwvm/io/impl.h>
 # include <uwvm2/uwvm/utils/ansies/impl.h>
 # include <uwvm2/uwvm/utils/depend/impl.h>
@@ -56,10 +57,15 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::cmdline::params::details
 #ifndef UWVM_DISABLE_LOCAL_IMPORTED_WASIP1
 # if defined(UWVM_IMPORT_WASI_WASIP1)
 
-    UWVM_GNU_COLD inline constexpr ::uwvm2::utils::cmdline::parameter_return_type wasip1_set_fd_limit_callback(
-        [[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results * para_begin,
-        ::uwvm2::utils::cmdline::parameter_parsing_results * para_curr,
-        ::uwvm2::utils::cmdline::parameter_parsing_results * para_end) noexcept
+#  if defined(UWVM_MODULE)
+    extern "C++" UWVM_GNU_COLD
+#  else
+    UWVM_GNU_COLD inline constexpr
+#  endif
+        ::uwvm2::utils::cmdline::parameter_return_type wasip1_set_fd_limit_callback([[maybe_unused]] ::uwvm2::utils::cmdline::parameter_parsing_results *
+                                                                                        para_begin,
+                                                                                    ::uwvm2::utils::cmdline::parameter_parsing_results * para_curr,
+                                                                                    ::uwvm2::utils::cmdline::parameter_parsing_results * para_end) noexcept
     {
         // [... curr] ...
         // [  safe  ] unsafe (could be the module_end)

@@ -31,6 +31,7 @@
 # include <concepts>
 # include <bit>
 # include <memory>
+# include <utility>
 // macro
 # include <uwvm2/uwvm_predefine/utils/ansies/uwvm_color_push_macro.h>
 # include <uwvm2/utils/macro/push_macros.h>
@@ -44,6 +45,8 @@
 # include <fast_io_device.h>
 # include <uwvm2/uwvm_predefine/utils/ansies/impl.h>
 # include <uwvm2/uwvm_predefine/io/impl.h>
+# include <uwvm2/utils/container/impl.h>
+# include <uwvm2/utils/utf/impl.h>
 # include <uwvm2/object/memory/linear/impl.h>
 # include <uwvm2/imported/wasi/wasip1/abi/impl.h>
 # include <uwvm2/imported/wasi/wasip1/fd_manager/impl.h>
