@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,7 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
- * @date        2025-10-01
+ * @date        2025-04-05
  * @copyright   APL-2.0 License
  */
 
@@ -20,28 +20,9 @@
  *                                      *
  ****************************************/
 
-module;
-
-// std
-#include <memory>
-// macro
-#include <uwvm2/utils/macro/push_macros.h>
-#include <uwvm2/uwvm/utils/ansies/uwvm_color_push_macro.h>
-#ifndef UWVM_DISABLE_LOCAL_IMPORTED_WASIP1
-# include <uwvm2/imported/wasi/wasip1/feature/feature_push_macro.h>
-#endif
-
-export module uwvm2.uwvm.cmdline.params:wasiu_wasip1_wasm64_disable;
-
-import fast_io;
-import uwvm2.utils.container;
-import uwvm2.utils.cmdline;
+#pragma once
 
 #ifndef UWVM_MODULE
-# define UWVM_MODULE
+# include <uwvm2/uwvm/runtime/storage/impl.h>
+# include <uwvm2/uwvm/runtime/initializer/impl.h>
 #endif
-#ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT export
-#endif
-
-#include "wasiu_wasip1_wasm64_disable.h"

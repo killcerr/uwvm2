@@ -89,9 +89,30 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 load_file_name,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\". ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                u8"[",
+                                ::uwvm2::uwvm::io::get_local_realtime(),
+                                u8"] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(verbose)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+        }
+
+        ::fast_io::unix_timestamp start_time{};
+        if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+        {
+#ifdef UWVM_CPP_EXCEPTIONS
+            try
+#endif
+            {
+                start_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+            }
+#ifdef UWVM_CPP_EXCEPTIONS
+            catch(::fast_io::error)
+            {
+                // do nothing
+            }
+#endif
         }
 
 #if defined(_WIN32) && !defined(_WIN32_WINDOWS)
@@ -272,6 +293,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 wf.binfmt_ver,
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"\" Detected. ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                u8"[",
+                                ::uwvm2::uwvm::io::get_local_realtime(),
+                                u8"] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(verbose)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
@@ -343,6 +368,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                             load_file_name,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"\". ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            u8"[",
+                                            ::uwvm2::uwvm::io::get_local_realtime(),
+                                            u8"] ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                             u8"(verbose)\n",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
@@ -357,11 +386,65 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                         ::uwvm2::utils::debug::timer parsing_timer{u8"parse binfmt ver1"};
 #endif
 
+                        ::fast_io::unix_timestamp parser_start_time{};
+                        if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+                        {
+#ifdef UWVM_CPP_EXCEPTIONS
+                            try
+#endif
+                            {
+                                parser_start_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                            }
+#ifdef UWVM_CPP_EXCEPTIONS
+                            catch(::fast_io::error)
+                            {
+                                // do nothing
+                            }
+#endif
+                        }
+
                         wf.wasm_module_storage.wasm_binfmt_ver1_storage =
                             ::uwvm2::uwvm::wasm::feature::binfmt_ver1_handler(reinterpret_cast<::std::byte const*>(wf.wasm_file.cbegin()),
                                                                               reinterpret_cast<::std::byte const*>(wf.wasm_file.cend()),
                                                                               execute_wasm_binfmt_ver1_storage_wasm_err,
                                                                               wf.wasm_parameter.binfmt1_para);
+
+                        ::fast_io::unix_timestamp parser_end_time{};
+                        if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+                        {
+#ifdef UWVM_CPP_EXCEPTIONS
+                            try
+#endif
+                            {
+                                parser_end_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                            }
+#ifdef UWVM_CPP_EXCEPTIONS
+                            catch(::fast_io::error)
+                            {
+                                // do nothing
+                            }
+#endif
+
+                            // verbose
+                            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                                u8"uwvm: ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                                u8"[info]  ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"Parse wasm file \"",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                                load_file_name,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"\" done. (time=",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                                parser_end_time - parser_start_time,
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                                u8"s). ",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                                u8"(verbose)\n",
+                                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                        }
                     }
 #if defined(UWVM_CPP_EXCEPTIONS) && !defined(UWVM_TERMINATE_IMME_WHEN_PARSE)
                     catch(::fast_io::error)
@@ -437,13 +520,72 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                             load_file_name,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"\". ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            u8"[",
+                                            ::uwvm2::uwvm::io::get_local_realtime(),
+                                            u8"] ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                             u8"(verbose)\n",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
                     }
 
+                    // handle custom section timer
+                    ::fast_io::unix_timestamp custom_section_start_time{};
+                    if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+                    {
+#ifdef UWVM_CPP_EXCEPTIONS
+                        try
+#endif
+                        {
+                            custom_section_start_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                        }
+#ifdef UWVM_CPP_EXCEPTIONS
+                        catch(::fast_io::error)
+                        {
+                            // do nothing
+                        }
+#endif
+                    }
+
                     // handle custom section
                     ::uwvm2::uwvm::wasm::custom::handle_binfmtver1_custom_section(wf, ::uwvm2::uwvm::wasm::custom::custom_handle_funcs);
+
+                    ::fast_io::unix_timestamp custom_section_end_time{};
+                    if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+                    {
+#ifdef UWVM_CPP_EXCEPTIONS
+                        try
+#endif
+                        {
+                            custom_section_end_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                        }
+#ifdef UWVM_CPP_EXCEPTIONS
+                        catch(::fast_io::error)
+                        {
+                            // do nothing
+                        }
+#endif
+
+                        // verbose
+                        ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                            u8"uwvm: ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                            u8"[info]  ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"Parse custom section of wasm file \"",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                            load_file_name,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"\" done. (time=",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            custom_section_end_time - custom_section_start_time,
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                            u8"s). ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                            u8"(verbose)\n",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+                    }
 
                     // handle overall module name
 
@@ -679,6 +821,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                             wf.module_name,
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                             u8"\". ",
+                                            ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                            u8"[",
+                                            ::uwvm2::uwvm::io::get_local_realtime(),
+                                            u8"] ",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                             u8"(verbose)\n",
                                             ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
@@ -740,14 +886,108 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                     u8"[info]  ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Check some things that are allowed but not recommended in the WebAssembly specification. ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    u8"[",
+                                    ::uwvm2::uwvm::io::get_local_realtime(),
+                                    u8"] ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                     u8"(verbose)\n",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
             }
 
+            // timer
+            ::fast_io::unix_timestamp start_time{};
+            if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+            {
+# ifdef UWVM_CPP_EXCEPTIONS
+                try
+# endif
+                {
+                    start_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                }
+# ifdef UWVM_CPP_EXCEPTIONS
+                catch(::fast_io::error)
+                {
+                    // do nothing
+                }
+# endif
+            }
+
+            // warning
             ::uwvm2::uwvm::wasm::warning::show_wasm_binfmt_ver1_warning(wf);
+
+            // finished
+            ::fast_io::unix_timestamp end_time{};
+            if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+            {
+# ifdef UWVM_CPP_EXCEPTIONS
+                try
+# endif
+                {
+                    end_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                }
+# ifdef UWVM_CPP_EXCEPTIONS
+                catch(::fast_io::error)
+                {
+                    // do nothing
+                }
+# endif
+
+                // verbose
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                    u8"[info]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"The review of items permitted has been completed. (time=",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    end_time - start_time,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"s). ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8"(verbose)\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+            }
         }
 #endif
+
+        ::fast_io::unix_timestamp end_time{};
+        if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+        {
+#ifdef UWVM_CPP_EXCEPTIONS
+            try
+#endif
+            {
+                end_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+            }
+#ifdef UWVM_CPP_EXCEPTIONS
+            catch(::fast_io::error)
+            {
+                // do nothing
+            }
+#endif
+
+            // verbose
+            ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                u8"uwvm: ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                u8"[info]  ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"Load wasm file \"",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_YELLOW),
+                                load_file_name,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"\" done. (time=",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                end_time - start_time,
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                u8"s). ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                u8"(verbose)\n",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+        }
 
         return load_wasm_file_rtl::ok;
     }

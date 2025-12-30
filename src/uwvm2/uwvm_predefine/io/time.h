@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -7,6 +7,7 @@
 /**
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-04-16
  * @copyright   APL-2.0 License
  */
 
@@ -22,27 +23,38 @@
 #pragma once
 
 #ifndef UWVM_MODULE
-// std
-# include <cstddef>
-# include <cstdint>
-# include <limits>
-# include <memory>
-// macro
-# include <uwvm2/utils/macro/push_macros.h>
 // import
 # include <fast_io.h>
-# include <uwvm2/utils/container/impl.h>
-# include "table.h"
+# include <fast_io_device.h>
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::object::table
-{ using multi_table_vec_t = ::uwvm2::utils::container::vector<::uwvm2::object::table::wasm_table_vec_t>; }  // namespace uwvm2::object::table
+#ifdef UWVM
 
-#ifndef UWVM_MODULE
-// macro
-# include <uwvm2/utils/macro/pop_macros.h>
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::io
+{
+    // For verbose logging while preventing exceptions from being thrown.
+    inline constexpr ::fast_io::iso8601_timestamp get_local_realtime() noexcept
+    {
+        ::fast_io::iso8601_timestamp local_realtime{};
+# ifdef UWVM_CPP_EXCEPTIONS
+        try
+# endif
+        {
+            local_realtime = ::fast_io::local(::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::realtime));
+        }
+# ifdef UWVM_CPP_EXCEPTIONS
+        catch(::fast_io::error)
+        {
+            // keep default timestamp
+        }
+# endif
+
+        return local_realtime;
+    }
+}  // uwvm2::uwvm::io
+
 #endif

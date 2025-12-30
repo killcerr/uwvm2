@@ -45,6 +45,7 @@
 # include <uwvm2/uwvm/utils/memory/impl.h>
 # include <uwvm2/uwvm/cmdline/impl.h>
 # include <uwvm2/uwvm/wasm/impl.h>
+# include <uwvm2/uwvm/runtime/impl.h>
 # include "retval.h"
 # include "loader.h"
 #endif
@@ -92,6 +93,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
                                         u8"[info]  ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                         u8"Start printing section details. ",
+                                        ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                        u8"[",
+                                        ::uwvm2::uwvm::io::get_local_realtime(),
+                                        u8"] ",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                         u8"(verbose)\n",
                                         ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
@@ -117,7 +122,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             return static_cast<int>(::uwvm2::uwvm::run::retval::check_module_error);
         }
 
-        /// @todo initialization
+        // initialize runtime
+        ::uwvm2::uwvm::runtime::initializer::initialize_runtime();
 
         // run vm
         switch(::uwvm2::uwvm::wasm::storage::execute_wasm_mode)
@@ -125,6 +131,12 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::run
             case ::uwvm2::uwvm::wasm::base::mode::section_details:
             {
                 // section details Occurs before dependency checks
+                break;
+            }
+            case ::uwvm2::uwvm::wasm::base::mode::run:
+            {
+                // non-img mode
+                /// @todo run interpreter
                 break;
             }
             /// @todo add more modes here

@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
@@ -32,15 +32,25 @@
 // import
 # include <fast_io.h>
 # include <uwvm2/utils/container/impl.h>
-# include "table.h"
+# include <uwvm2/parser/wasm/standard/wasm1/type/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm1p1/type/impl.h>
+# include <uwvm2/parser/wasm/standard/wasm3/type/impl.h>
+# include <uwvm2/object/impl.h>
+# include <uwvm2/uwvm/wasm/impl.h>
+# include "wasm_module.h"
 #endif
 
 #ifndef UWVM_MODULE_EXPORT
 # define UWVM_MODULE_EXPORT
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::object::table
-{ using multi_table_vec_t = ::uwvm2::utils::container::vector<::uwvm2::object::table::wasm_table_vec_t>; }  // namespace uwvm2::object::table
+UWVM_MODULE_EXPORT namespace uwvm2::uwvm::runtime::storage
+{
+    /// @brief  wasm module -> runtime storage
+    /// @note   This must be used after the initialization of all_module to ensure that strvw is available.
+    inline ::uwvm2::utils::container::unordered_flat_map<::uwvm2::utils::container::u8string_view, ::uwvm2::uwvm::runtime::storage::wasm_module_storage_t>
+        wasm_module_runtime_storage{};  // [global]
+}
 
 #ifndef UWVM_MODULE
 // macro

@@ -242,6 +242,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 u8"[info]  ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"All modules have been loaded. ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                u8"[",
+                                ::uwvm2::uwvm::io::get_local_realtime(),
+                                u8"] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(verbose)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
@@ -261,9 +265,24 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
         adjacency_list_t adj;
     };
 
-    /// @brief      Build module dependency graph
-    /// @details    In the WASM standard, importing module A name B type C and importing module A name B type D simultaneously satisfies syntactic validity
-    ///             (binary format validity) but fails validation.
+    /// @brief      Build a *module-level* dependency graph from import declarations
+    /// @details    This graph models *declared module dependencies* only (edges are derived from `import.module_name`).
+    ///             It is used for early diagnostics such as:
+    ///             - missing imported modules,
+    ///             - duplicate/invalid export records for linking,
+    ///             - module-level dependency cycle discovery (warning-level).
+    ///
+    ///             Important: this is NOT an instantiation/initialization dependency analysis.
+    ///             A cycle in the module dependency graph does not necessarily imply an instantiation-time deadlock,
+    ///             because instantiation constraints depend on runtime semantics (import resolution, const-expr evaluation,
+    ///             start function execution, etc.).
+    ///
+    ///             Definitive instantiation-cycle detection and errors must therefore be handled by the initializer
+    ///             (instantiation stage), where the runtime can track `instantiating`/`instantiated` states and report
+    ///             semantic cycles precisely.
+    ///
+    ///             In the WASM standard, importing module A name B type C and importing module A name B type D simultaneously
+    ///             satisfies syntactic validity (binary format validity) but fails validation.
     /// @return     Adjacency list representation of the dependency graph
     inline constexpr build_dependency_graph_and_check_import_exist_ret_t
         build_dependency_graph_and_check_import_exist_and_construct_all_module_export() noexcept
@@ -673,6 +692,10 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                 u8"[info]  ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                 u8"Start checking whether the import exists. ",
+                                ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                u8"[",
+                                ::uwvm2::uwvm::io::get_local_realtime(),
+                                u8"] ",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                 u8"(verbose)\n",
                                 ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
@@ -682,7 +705,8 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
 
         if(ok != load_and_check_modules_rtl::ok) [[unlikely]] { return ok; }
 
-        // Detecting Cycle
+        // Detecting *module dependency* cycles (warning-level).
+        // Note: instantiation-cycle errors are handled in the instantiation/initializer stage.
         if(::uwvm2::uwvm::io::show_depend_warning)
         {
             // verbose
@@ -695,12 +719,69 @@ UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::loader
                                     u8"[info]  ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
                                     u8"Start Detecting Cycles. ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    u8"[",
+                                    ::uwvm2::uwvm::io::get_local_realtime(),
+                                    u8"] ",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
                                     u8"(verbose)\n",
                                     ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
             }
 
+            // timer
+            ::fast_io::unix_timestamp start_time{};
+            if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+            {
+#ifdef UWVM_CPP_EXCEPTIONS
+                try
+#endif
+                {
+                    start_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                }
+#ifdef UWVM_CPP_EXCEPTIONS
+                catch(::fast_io::error)
+                {
+                    // do nothing
+                }
+#endif
+            }
+
+            // detect
             auto const cycles{::uwvm2::uwvm::wasm::loader::detect_cycles(dependency_graph)};
+
+            // finished
+            ::fast_io::unix_timestamp end_time{};
+            if(::uwvm2::uwvm::io::show_verbose) [[unlikely]]
+            {
+#ifdef UWVM_CPP_EXCEPTIONS
+                try
+#endif
+                {
+                    end_time = ::fast_io::posix_clock_gettime(::fast_io::posix_clock_id::monotonic_raw);
+                }
+#ifdef UWVM_CPP_EXCEPTIONS
+                catch(::fast_io::error)
+                {
+                    // do nothing
+                }
+#endif
+
+                // verbose
+                ::fast_io::io::perr(::uwvm2::uwvm::io::u8log_output,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL_AND_SET_WHITE),
+                                    u8"uwvm: ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_LT_GREEN),
+                                    u8"[info]  ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"Detecting Cycles done. (time=",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_GREEN),
+                                    end_time - start_time,
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_WHITE),
+                                    u8"s). ",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_ORANGE),
+                                    u8"(verbose)\n",
+                                    ::fast_io::mnp::cond(::uwvm2::uwvm::utils::ansies::put_color, UWVM_COLOR_U8_RST_ALL));
+            }
 
             // Output cyclic dependency warnings
             if(!cycles.empty()) [[unlikely]]

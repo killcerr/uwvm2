@@ -1,12 +1,14 @@
-﻿/*************************************************************
+/*************************************************************
  * Ultimate WebAssembly Virtual Machine (Version 2)          *
  * Copyright (c) 2025-present UlteSoft. All rights reserved. *
  * Licensed under the APL-2.0 License (see LICENSE file).    *
  *************************************************************/
 
 /**
+ * @brief       WebAssembly Proposal
  * @author      MacroModel
  * @version     2.0.0
+ * @date        2025-04-03
  * @copyright   APL-2.0 License
  */
 
@@ -19,19 +21,18 @@
  *                                      *
  ****************************************/
 
-#pragma once
+module;
 
+export module uwvm2.object;
+export import uwvm2.object.table;
+export import uwvm2.object.memory;
+export import uwvm2.object.global;
+
+#ifndef UWVM_MODULE
+# define UWVM_MODULE
+#endif
 #ifndef UWVM_MODULE_EXPORT
-# define UWVM_MODULE_EXPORT
+# define UWVM_MODULE_EXPORT export
 #endif
 
-UWVM_MODULE_EXPORT namespace uwvm2::uwvm::wasm::base
-{
-    /// @brief wasm running mode
-    enum class mode : unsigned
-    {
-        section_details,
-        run // non-img
-    };
-
-}  // namespace uwvm2::parser::wasm::base
+#include "impl.h"
